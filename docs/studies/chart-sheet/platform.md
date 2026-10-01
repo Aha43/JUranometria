@@ -31,3 +31,6 @@ the sheet's own answer and the same everywhere.
 | `sheet-a4.pdf` | 516013 |
 | `sheet-a4-modules.pdf` | 421221 |
 | `sheet-a4-300dpi.png` | 428567 |
+| `sheet-a4-solar-system.svg` | 397144 |
+| `sheet-a4-solar-system.pdf` | 423402 |
+| `sheet-a4-solar-system.png` | 377346 |

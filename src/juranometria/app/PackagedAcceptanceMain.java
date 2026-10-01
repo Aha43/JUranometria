@@ -444,6 +444,7 @@ public final class PackagedAcceptanceMain {
         moonTableJourney();
         sunOnTheChartJourney();
         moonOnTheChartJourney();
+        solarSystemSheetJourney();
 
         System.out.println("PACKAGED ACCEPTANCE OK");
     }
@@ -570,6 +571,261 @@ public final class PackagedAcceptanceMain {
                 + " crescent with its lit side, a four-row range with its"
                 + " appended end, and the Norwegian surface, all inside the"
                 + " image)");
+    }
+
+    /**
+     * The gallery's moment (#418), restated from
+     * {@code juranometria.tool.GalleryPageMain#WHEN} because the
+     * packaged journeys do not reach into the study tools;
+     * {@code PackagedMoonInstantTest} holds the two equal.
+     */
+    static final java.time.Instant GALLERY_MOMENT =
+            java.time.Instant.parse("2026-03-20T21:33:00Z");
+
+    /**
+     * The two-body sheet inside the packaged image (#418, which also
+     * corrected #415's export: the application's sheet carried no
+     * Solar System body). The production component at the sheet's own
+     * chart size, the ecliptic and both bodies on at the gallery's
+     * moment, exported to a 300 dpi PNG through the application's own
+     * export path; the file's pixels are then held to an inspected
+     * recording of the same layers, and that recording to the screen:
+     * exact positions, true diameters, opaque discs, and both names
+     * placed clear of every reference word, of each other and of every
+     * disc. Whether the 4.3 % crescent's direction is visible is not
+     * asked here: at 42° it is narrower than the printable outline, and
+     * the close gallery page carries that proof.
+     */
+    private static void solarSystemSheetJourney() throws Exception {
+        juranometria.solar.SolarSystemService solar =
+                juranometria.solar.SolarSystemService.load();
+        juranometria.sky.Observer oslo = new juranometria.sky.Observer(
+                59.913, 10.752, GALLERY_MOMENT);
+        juranometria.chart.SkyPosition sun =
+                ((juranometria.solar.SolarSystemService.SunObservation)
+                        solar.observe(juranometria.solar.SolarSystemService.Body.SUN,
+                                oslo)).astrometricJ2000();
+        juranometria.solar.SolarSystemService.MoonObservation moonSeen =
+                (juranometria.solar.SolarSystemService.MoonObservation)
+                        solar.observe(juranometria.solar.SolarSystemService.Body.MOON,
+                                oslo);
+        juranometria.chart.SkyPosition moon = moonSeen.astrometricJ2000();
+        juranometria.sheet.PaperSize paper = juranometria.sheet.PaperSize.A4;
+        ChartViewController navigation = new ChartViewController();
+        navigation.recenter(halfway(sun, moon), 42.0);
+        juranometria.ui.ChartComponent[] chart = new juranometria.ui.ChartComponent[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            chart[0] = new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
+            chart[0].setSize(paper.chartWideUnits(), paper.chartHighUnits());
+            chart[0].setViewState(navigation.state());
+            juranometria.ecliptic.EclipticModule ecliptic =
+                    new juranometria.ecliptic.EclipticModule();
+            ecliptic.showing(true);
+            chart[0].overlays().offer(juranometria.ecliptic.EclipticModule.ID,
+                    ecliptic::contributedGeometry);
+            juranometria.solarchart.SolarSystemModule bodies =
+                    new juranometria.solarchart.SolarSystemModule(() -> oslo,
+                            () -> solar, () -> false);
+            bodies.sunShowing(true);
+            bodies.moonShowing(true);
+            chart[0].overlays().offer(juranometria.solarchart.SolarSystemModule.ID,
+                    bodies::contributedGeometry);
+        });
+        javax.swing.SwingUtilities.invokeAndWait(() -> { });
+        javax.swing.SwingUtilities.invokeAndWait(() -> { });
+        java.awt.image.BufferedImage screen = new java.awt.image.BufferedImage(
+                paper.chartWideUnits(), paper.chartHighUnits(),
+                java.awt.image.BufferedImage.TYPE_INT_RGB);
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            java.awt.Graphics2D g = screen.createGraphics();
+            try {
+                chart[0].paint(g);
+            } finally {
+                g.dispose();
+            }
+        });
+        java.util.List<juranometria.ui.ReferenceInk.BodyPlacement> onScreen =
+                chart[0].renderedBodies();
+
+        // The application's own export, to a PNG on a scratch folder.
+        java.nio.file.Path folder = java.nio.file.Files.createTempDirectory(
+                "juranometria-solar-sheet");
+        Preferences scratch = Preferences.userRoot()
+                .node("juranometria-packaged-sheet-" + System.nanoTime());
+        java.awt.image.BufferedImage exported;
+        try {
+            ExportSheet.Outcome outcome = ExportSheetSession.exportTo(
+                    folder.resolve("solar-system").toFile(),
+                    new ExportSheet.Request(juranometria.sheet.SheetFormat.PNG,
+                            paper, 300, false),
+                    navigation, chart[0],
+                    new ChartOptionsController(ChartOptionsStore.forNode(scratch)),
+                    new juranometria.chart.WorkingSelection(), file -> true,
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+            require(outcome instanceof ExportSheet.Outcome.Written,
+                    "the two-body sheet is written: " + outcome);
+            exported = javax.imageio.ImageIO.read(
+                    folder.resolve("solar-system.png").toFile());
+        } finally {
+            scratch.removeNode();
+            try (var files = java.nio.file.Files.list(folder)) {
+                for (java.nio.file.Path file : files.toList()) {
+                    java.nio.file.Files.delete(file);
+                }
+            }
+            java.nio.file.Files.delete(folder);
+        }
+
+        // The same layers, inspected: what the bodies layer placed, and
+        // the reference words it was placed against.
+        java.util.List<juranometria.ui.ReferenceInk.BodyPlacement> onPaper =
+                new java.util.ArrayList<>();
+        java.util.List<java.awt.geom.Rectangle2D> words = new java.util.ArrayList<>();
+        juranometria.sheet.SheetRecording inspected = juranometria.sheet.ChartSheet.record(
+                chart[0].assembler()::assemble, navigation.state(),
+                chart[0].chartOptions(),
+                juranometria.ui.SheetInk.reference(chart[0], java.util.Set.of()),
+                (g, scene, reserved) -> {
+                    juranometria.project.DrawnPage page =
+                            juranometria.project.DrawnPage.of(scene);
+                    var offered = chart[0].overlays().collect();
+                    words.addAll(juranometria.ui.ReferenceInk.referenceBoxes(page,
+                            offered, ENGLISH_PAGE, reserved, structure -> false));
+                    onPaper.addAll(juranometria.ui.ReferenceInk.paintBodies(g, page,
+                            offered, juranometria.render.ChartPalette.WHITE_PAPER,
+                            ENGLISH_PAGE, reserved, java.util.List.copyOf(words)));
+                },
+                juranometria.render.ChartRenderer.ReferenceLayer.NONE, paper,
+                ENGLISH_PAGE, java.util.Set.of());
+        java.awt.image.BufferedImage expected = javax.imageio.ImageIO.read(
+                new java.io.ByteArrayInputStream(
+                        juranometria.sheet.PngSheetWriter.write(inspected, 300)));
+        require(exported.getWidth() == expected.getWidth()
+                        && exported.getHeight() == expected.getHeight(),
+                "the exported sheet is the inspected sheet's size");
+        long differing = 0;
+        for (int y = 0; y < expected.getHeight(); y++) {
+            for (int x = 0; x < expected.getWidth(); x++) {
+                if (exported.getRGB(x, y) != expected.getRGB(x, y)) {
+                    differing++;
+                }
+            }
+        }
+        require(differing == 0, "the exported sheet is pixel for pixel the"
+                + " inspected one: " + differing + " pixels differ");
+
+        // Positions and true diameters, on paper and on screen.
+        require(onPaper.size() == 2 && onScreen.size() == 2,
+                "both bodies on the sheet and on the screen: " + onPaper + " / " + onScreen);
+        juranometria.project.DrawnPage page =
+                juranometria.project.DrawnPage.of(chart[0].currentScene());
+        juranometria.project.ViewportMapping mapping =
+                new juranometria.project.ViewportMapping(page);
+        for (int i = 0; i < 2; i++) {
+            juranometria.ui.ReferenceInk.BodyPlacement drawn = onPaper.get(i);
+            juranometria.ui.ReferenceInk.BodyPlacement shown = onScreen.get(i);
+            require(drawn.identity().equals(shown.identity())
+                            && Math.abs(drawn.centre().x() - shown.centre().x()) < 1e-9
+                            && Math.abs(drawn.centre().y() - shown.centre().y()) < 1e-9
+                            && Math.abs(drawn.disc().getBounds2D().getWidth()
+                                    - shown.disc().getBounds2D().getWidth()) < 1e-9,
+                    "the sheet draws " + drawn.identity() + " where and as large as"
+                            + " the screen does");
+            juranometria.chart.SkyPosition at = "sun".equals(drawn.identity()) ? sun : moon;
+            juranometria.project.PixelPoint projected = mapping.toPixel(
+                    page.projection().project(at).orElseThrow());
+            double diameter = "sun".equals(drawn.identity())
+                    ? ((juranometria.solar.SolarSystemService.SunObservation) solar.observe(
+                            juranometria.solar.SolarSystemService.Body.SUN, oslo))
+                            .angularDiameterArcseconds()
+                    : moonSeen.angularDiameterArcseconds();
+            juranometria.project.PixelPoint limb = mapping.toPixel(page.projection()
+                    .project(new juranometria.chart.SkyPosition(at.raDegrees(),
+                            at.decDegrees() + diameter / 3600.0 / 2.0)).orElseThrow());
+            double radius = Math.hypot(limb.x() - projected.x(), limb.y() - projected.y());
+            require(Math.hypot(drawn.centre().x() - projected.x(),
+                            drawn.centre().y() - projected.y()) < 1e-9
+                            && Math.abs(drawn.disc().getBounds2D().getWidth() - 2.0 * radius)
+                                    < 1e-9,
+                    drawn.identity() + " at its projected position and true size");
+        }
+
+        // Opaque: each disc's interior is its own ink in the exported file.
+        double toPixels = 300.0 / 72.0;
+        for (juranometria.ui.ReferenceInk.BodyPlacement drawn : onPaper) {
+            double r = drawn.disc().getBounds2D().getWidth() / 2.0;
+            int cx = (int) Math.floor((paper.marginPoints() + drawn.centre().x()) * toPixels);
+            int cy = (int) Math.floor((paper.marginPoints() + drawn.centre().y()) * toPixels);
+            int inside = (int) Math.round(0.6 * r * toPixels);
+            if ("moon".equals(drawn.identity())) {
+                // An almost-new Moon: its centre is the inked dark side.
+                int red = new java.awt.Color(exported.getRGB(cx, cy)).getRed();
+                require(Math.abs(red - (int) Math.round(255
+                                * juranometria.ui.ReferenceInk.darkSide())) <= 2,
+                        "the Moon's disc is opaque dark side: " + red);
+            } else {
+                require(new java.awt.Color(exported.getRGB(cx, cy)).getRed() < 60,
+                        "the Sun's centre dot");
+                for (int[] at : new int[][] {{cx - inside, cy}, {cx + inside, cy},
+                        {cx, cy - inside}, {cx, cy + inside}}) {
+                    require(exported.getRGB(at[0], at[1]) == java.awt.Color.WHITE.getRGB(),
+                            "inside the Sun's ring the paper is the disc's own"
+                                    + " ground, nothing showing through");
+                }
+            }
+        }
+
+        // Both names placed, clear of every reference word, of each other
+        // and of every disc; the March equinox word kept and clear too.
+        java.util.List<java.awt.geom.Ellipse2D> inks = new java.util.ArrayList<>();
+        for (juranometria.ui.ReferenceInk.BodyPlacement drawn : onPaper) {
+            java.awt.geom.Rectangle2D d = drawn.disc().getBounds2D();
+            double grow = Math.max(1.0, d.getWidth() / 2.0 / 12.0) / 2.0 + 1.0;
+            inks.add(new java.awt.geom.Ellipse2D.Double(d.getX() - grow, d.getY() - grow,
+                    d.getWidth() + 2 * grow, d.getHeight() + 2 * grow));
+        }
+        require(!words.isEmpty(), "the ecliptic's words are on the sheet");
+        for (java.awt.geom.Rectangle2D word : words) {
+            for (java.awt.geom.Ellipse2D ink : inks) {
+                require(!ink.intersects(word), "no reference word under a disc: " + word);
+            }
+        }
+        for (juranometria.ui.ReferenceInk.BodyPlacement drawn : onPaper) {
+            require(drawn.box() != null, drawn.identity() + " is named on the sheet");
+            for (java.awt.geom.Rectangle2D word : words) {
+                require(!drawn.box().intersects(word),
+                        drawn.identity() + "'s name is not on a reference word");
+            }
+            for (java.awt.geom.Ellipse2D ink : inks) {
+                require(!ink.intersects(drawn.box()),
+                        drawn.identity() + "'s name is clear of every disc");
+            }
+        }
+        require(!onPaper.get(0).box().intersects(onPaper.get(1).box()),
+                "the two names are two labels");
+        System.out.println("solar system sheet OK (the application's export of the"
+                + " two-body sheet at the gallery's moment is pixel for pixel the"
+                + " inspected recording; the Sun and the Moon at their projected"
+                + " positions and true sizes, as on screen, opaque, and named"
+                + " clear of the ecliptic's words, of each other and of both discs)");
+    }
+
+    /** Halfway along the great circle between two positions. */
+    private static juranometria.chart.SkyPosition halfway(
+            juranometria.chart.SkyPosition a, juranometria.chart.SkyPosition b) {
+        double x = 0.0;
+        double y = 0.0;
+        double z = 0.0;
+        for (juranometria.chart.SkyPosition p : java.util.List.of(a, b)) {
+            double ra = Math.toRadians(p.raDegrees());
+            double dec = Math.toRadians(p.decDegrees());
+            x += Math.cos(dec) * Math.cos(ra);
+            y += Math.cos(dec) * Math.sin(ra);
+            z += Math.sin(dec);
+        }
+        double ra = Math.toDegrees(Math.atan2(y, x));
+        return new juranometria.chart.SkyPosition(ra < 0.0 ? ra + 360.0 : ra,
+                Math.toDegrees(Math.atan2(z, Math.hypot(x, y))));
     }
 
     /**

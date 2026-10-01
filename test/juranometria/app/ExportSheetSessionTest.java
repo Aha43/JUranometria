@@ -118,6 +118,85 @@ class ExportSheetSessionTest {
                 "the chart the reader was looking at");
     }
 
+    /**
+     * The export carries the Solar System bodies the screen shows
+     * (#418, correcting #415: the session passed only the reference
+     * layer, so a reader who switched the Sun and the Moon on got a
+     * sheet without them).
+     */
+    @Test
+    void theSheetCarriesTheSunAndTheMoonTheScreenShows(@TempDir Path folder)
+            throws Exception {
+        SwingSession.scratchPreferences("export-bodies", node ->
+                sheetCarriesTheBodies(folder, node));
+    }
+
+    private void sheetCarriesTheBodies(Path folder, java.util.prefs.Preferences node)
+            throws Exception {
+        juranometria.sky.Observer oslo = new juranometria.sky.Observer(59.913, 10.752,
+                juranometria.tool.GalleryPageMain.WHEN);
+        juranometria.solar.SolarSystemService service =
+                juranometria.solar.SolarSystemService.load();
+        SkyPosition sun = ((juranometria.solar.SolarSystemService.SunObservation)
+                service.observe(juranometria.solar.SolarSystemService.Body.SUN, oslo))
+                .astrometricJ2000();
+        SkyPosition moon = ((juranometria.solar.SolarSystemService.MoonObservation)
+                service.observe(juranometria.solar.SolarSystemService.Body.MOON, oslo))
+                .astrometricJ2000();
+        ChartViewController navigation = new ChartViewController();
+        // Halfway along the great circle between them: the Sun stands at
+        // 23h 59m and the Moon at 1h 22m, so an average of right
+        // ascensions would land on the far side of the sky.
+        navigation.recenter(halfway(sun, moon), 42.0);
+        ChartComponent chart = chart(navigation);
+        juranometria.solarchart.SolarSystemModule module =
+                new juranometria.solarchart.SolarSystemModule(() -> oslo,
+                        () -> service, () -> false);
+        SwingUtilities.invokeAndWait(() -> chart.overlays().offer(
+                juranometria.solarchart.SolarSystemModule.ID,
+                module::contributedGeometry));
+        ChartOptionsController options = new ChartOptionsController(
+                ChartOptionsStore.forNode(node));
+        ExportSheet.Request request = new ExportSheet.Request(SheetFormat.SVG,
+                PaperSize.A4, 300, false);
+        juranometria.ui.language.InterfaceText english =
+                juranometria.ui.language.InterfaceText.forLanguage("en");
+
+        ExportSheetSession.exportTo(folder.resolve("without").toFile(), request,
+                navigation, chart, options, new WorkingSelection(), file -> true,
+                english);
+        String without = Files.readString(folder.resolve("without.svg"));
+        assertTrue(!without.contains(">Sun<") && !without.contains(">Moon<"),
+                "switched off, the sheet carries no body");
+
+        SwingUtilities.invokeAndWait(() -> {
+            module.sunShowing(true);
+            module.moonShowing(true);
+        });
+        ExportSheetSession.exportTo(folder.resolve("with").toFile(), request,
+                navigation, chart, options, new WorkingSelection(), file -> true,
+                english);
+        String with = Files.readString(folder.resolve("with.svg"));
+        assertTrue(with.contains(">Sun<"), "the sheet names the Sun the screen shows");
+        assertTrue(with.contains(">Moon<"), "and the Moon");
+    }
+
+    private static SkyPosition halfway(SkyPosition a, SkyPosition b) {
+        double x = 0.0;
+        double y = 0.0;
+        double z = 0.0;
+        for (SkyPosition p : List.of(a, b)) {
+            double ra = Math.toRadians(p.raDegrees());
+            double dec = Math.toRadians(p.decDegrees());
+            x += Math.cos(dec) * Math.cos(ra);
+            y += Math.cos(dec) * Math.sin(ra);
+            z += Math.sin(dec);
+        }
+        double ra = Math.toDegrees(Math.atan2(y, x));
+        return new SkyPosition(ra < 0.0 ? ra + 360.0 : ra,
+                Math.toDegrees(Math.atan2(z, Math.hypot(x, y))));
+    }
+
     @Test
     void theDecisionTheApplicationUsesAsksAndObeysTheAnswer() {
         // The bypass this closes is a quiet one: replacing the

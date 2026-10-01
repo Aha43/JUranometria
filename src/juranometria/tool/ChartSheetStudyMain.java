@@ -107,6 +107,7 @@ public final class ChartSheetStudyMain {
         pdf(report, "sheet-a4-modules.pdf", EQUINOX, PaperSize.A4, true);
         png(report, "sheet-a4-300dpi.png", ORION, PaperSize.A4,
                 PngSheetWriter.DEFAULT_RESOLUTION);
+        solarSystem(report);
 
         report.append("\n`sheet-a4-outlines.svg` is the same chart with"
                 + " every label converted to\nits outline, for a"
@@ -117,6 +118,14 @@ public final class ChartSheetStudyMain {
                 + " meridian, the horizon, the zenith and"
                 + "\nthe ecliptic - the March equinox page, where the"
                 + " ecliptic's landmarks are.\n\n");
+        report.append("`sheet-a4-solar-system` (SVG, PDF and a"
+                + " 300 dpi PNG) carries the Sun and the Moon"
+                + "\nat the gallery's moment - Oslo, 2026-03-20 21:33"
+                + " UTC - with the ecliptic, on a\n42° page centred"
+                + " halfway between them; the horizon is not drawn,"
+                + " so it is\nthe celestial chart, and both bodies"
+                + " are drawn as they are, not dimmed (#418).\n\n");
+        report.append(crescentAtThisScale());
         report.append("The PDF draws its labels as outlines, because the"
                 + " base-14 fonts every\nreader has cannot spell the"
                 + " chart's own notation; the PNG is the whole"
@@ -283,6 +292,147 @@ public final class ChartSheetStudyMain {
                 text == SvgSheetWriter.Text.OUTLINES ? 0
                         : sheet.textCount()));
         sized(name, file.length());
+    }
+
+    /**
+     * The sheet carrying both Solar System bodies (#418): the gallery's
+     * observer and instant ({@link GalleryPageMain#WHEN}), the ecliptic
+     * as the reference layer and the Sun and the Moon as the bodies
+     * layer, exactly as an export from the screen carries them.
+     */
+    private static void solarSystem(StringBuilder report) throws Exception {
+        SheetRecording sheet = solarSystemSheet();
+        String svg = SvgSheetWriter.write(sheet, SvgSheetWriter.Text.EDITABLE);
+        File svgFile = new File(DIR, "sheet-a4-solar-system.svg");
+        Files.writeString(svgFile.toPath(), svg, StandardCharsets.UTF_8);
+        report.append(String.format(Locale.ROOT, "| `%s` | %s | %d | %d |%n",
+                svgFile.getName(), PaperSize.A4.identity(), sheet.shapeCount(),
+                sheet.textCount()));
+        sized(svgFile.getName(), svgFile.length());
+        byte[] pdf = PdfSheetWriter.write(sheet);
+        Files.write(new File(DIR, "sheet-a4-solar-system.pdf").toPath(), pdf);
+        report.append(String.format(Locale.ROOT,
+                "| `%s` | %s | %d | %d as outlines |%n",
+                "sheet-a4-solar-system.pdf", PaperSize.A4.identity(),
+                sheet.shapeCount(), sheet.textCount()));
+        sized("sheet-a4-solar-system.pdf", pdf.length);
+        int dpi = PngSheetWriter.DEFAULT_RESOLUTION;
+        byte[] png = PngSheetWriter.write(sheet, dpi);
+        Files.write(new File(DIR, "sheet-a4-solar-system.png").toPath(), png);
+        report.append(String.format(Locale.ROOT,
+                "| `%s` | %s at %d dpi, %d x %d px | %d | %d |%n",
+                "sheet-a4-solar-system.png", PaperSize.A4.identity(), dpi,
+                PngSheetWriter.widePixels(PaperSize.A4, dpi),
+                PngSheetWriter.highPixels(PaperSize.A4, dpi),
+                sheet.shapeCount(), sheet.textCount()));
+        sized("sheet-a4-solar-system.png", png.length);
+    }
+
+    /** The two-body sheet's recording, for the study and for tests. */
+    public static SheetRecording solarSystemSheet() {
+        Observer oslo = new Observer(59.913, 10.752, GalleryPageMain.WHEN);
+        juranometria.solar.SolarSystemService service =
+                juranometria.solar.SolarSystemService.load();
+        SkyPosition sun = ((juranometria.solar.SolarSystemService.SunObservation)
+                service.observe(juranometria.solar.SolarSystemService.Body.SUN, oslo))
+                .astrometricJ2000();
+        SkyPosition moon = ((juranometria.solar.SolarSystemService.MoonObservation)
+                service.observe(juranometria.solar.SolarSystemService.Body.MOON, oslo))
+                .astrometricJ2000();
+        OverlayRegistry registry = new OverlayRegistry();
+        EclipticModule ecliptic = new EclipticModule();
+        ecliptic.showing(true);
+        registry.offer(EclipticModule.ID, ecliptic::contributedGeometry);
+        juranometria.solarchart.SolarSystemModule bodies =
+                new juranometria.solarchart.SolarSystemModule(() -> oslo,
+                        () -> service, () -> false);
+        bodies.sunShowing(true);
+        bodies.moonShowing(true);
+        registry.offer(juranometria.solarchart.SolarSystemModule.ID,
+                bodies::contributedGeometry);
+        return ChartSheet.record(Atlas.assembler()::assemble,
+                new ChartViewState(halfway(sun, moon), 42.0, 6.0),
+                ChartOptions.DEFAULTS,
+                (g, painted, reserved) -> ReferenceInk.paint(g, painted,
+                        registry.collect(), ChartPalette.WHITE_PAPER, ENGLISH,
+                        reserved),
+                (g, painted, reserved) -> {
+                    juranometria.project.DrawnPage page =
+                            juranometria.project.DrawnPage.of(painted);
+                    ReferenceInk.paintBodies(g, page, registry.collect(),
+                            ChartPalette.WHITE_PAPER, ENGLISH, reserved,
+                            ReferenceInk.referenceBoxes(page, registry.collect(),
+                                    ENGLISH, reserved, structure -> false));
+                },
+                ChartRenderer.ReferenceLayer.NONE, PaperSize.A4, ENGLISH,
+                java.util.Set.of());
+    }
+
+    /**
+     * What the sheet's scale can say about the Moon's phase (#418,
+     * owner ruling): the disc, its lit crescent's widest point (2r·k)
+     * and the outline's stroke, from the sheet's own geometry. An
+     * almost-new Moon at 42° reads as an almost-dark disc because the
+     * crescent is narrower than the printable outline - the scale's
+     * honest limit, not a defect; the gallery's 3° page shows it.
+     */
+    private static String crescentAtThisScale() {
+        Observer oslo = new Observer(59.913, 10.752, GalleryPageMain.WHEN);
+        juranometria.solar.SolarSystemService service =
+                juranometria.solar.SolarSystemService.load();
+        SkyPosition sun = ((juranometria.solar.SolarSystemService.SunObservation)
+                service.observe(juranometria.solar.SolarSystemService.Body.SUN, oslo))
+                .astrometricJ2000();
+        juranometria.solar.SolarSystemService.MoonObservation moon =
+                (juranometria.solar.SolarSystemService.MoonObservation)
+                        service.observe(juranometria.solar.SolarSystemService.Body.MOON,
+                                oslo);
+        // The sheet's own page, and the Moon's disc through it.
+        juranometria.project.DrawnPage page = juranometria.project.DrawnPage.of(
+                Atlas.assembler().assemble(new ChartViewState(
+                                halfway(sun, moon.astrometricJ2000()), 42.0, 6.0),
+                        PaperSize.A4.chartWideUnits(), PaperSize.A4.chartHighUnits()));
+        juranometria.project.ViewportMapping mapping =
+                new juranometria.project.ViewportMapping(page);
+        juranometria.project.PixelPoint centre = mapping.toPixel(
+                page.projection().project(moon.astrometricJ2000()).orElseThrow());
+        juranometria.project.PixelPoint limb = mapping.toPixel(page.projection()
+                .project(new SkyPosition(moon.astrometricJ2000().raDegrees(),
+                        moon.astrometricJ2000().decDegrees()
+                                + moon.angularDiameterArcseconds() / 7200.0))
+                .orElseThrow());
+        double mmPerUnit = PaperSize.A4.chartWideMm() / PaperSize.A4.chartWideUnits();
+        double r = Math.hypot(limb.x() - centre.x(), limb.y() - centre.y());
+        double crescent = 2.0 * r * moon.illuminatedFraction();
+        double outline = Math.max(1.0, r / 40.0);
+        return String.format(Locale.ROOT, "On that sheet the Moon is %.1f %%"
+                + " lit and %.1f mm across. Its crescent is\nat most %.2f mm"
+                + " wide (2r·k), and the inner half of the disc's outline is"
+                + "\n%.2f mm: at this scale the crescent is narrower than the"
+                + " printable outline\nand is not resolved, so an almost-new"
+                + " Moon reads as an almost-dark disc.\nThat is the scale's"
+                + " honest limit, not a defect; nothing is enlarged. The\n"
+                + "gallery's 3° page shows the same crescent and the side it"
+                + " faces.%n%n", 100.0 * moon.illuminatedFraction(),
+                2.0 * r * mmPerUnit, crescent * mmPerUnit,
+                outline / 2.0 * mmPerUnit);
+    }
+
+    /** Halfway along the great circle between two positions. */
+    private static SkyPosition halfway(SkyPosition a, SkyPosition b) {
+        double x = 0.0;
+        double y = 0.0;
+        double z = 0.0;
+        for (SkyPosition p : java.util.List.of(a, b)) {
+            double ra = Math.toRadians(p.raDegrees());
+            double dec = Math.toRadians(p.decDegrees());
+            x += Math.cos(dec) * Math.cos(ra);
+            y += Math.cos(dec) * Math.sin(ra);
+            z += Math.sin(dec);
+        }
+        double ra = Math.toDegrees(Math.atan2(y, x));
+        return new SkyPosition(ra < 0.0 ? ra + 360.0 : ra,
+                Math.toDegrees(Math.atan2(z, Math.hypot(x, y))));
     }
 
     /** One file's encoded size, for the record beside the report. */

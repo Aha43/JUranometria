@@ -190,6 +190,52 @@ candidates over production pages; the owner inspected them.
 - **Not done, by ruling.** No libration, no surface, no earthshine,
   no eclipse, no selection, no emphasis, no edge hints, no tracks.
 
+## The shared evidence integration (#418)
+
+- **A correction to #415: exported sheets carried no body.** #415
+  wrote `SheetInk.bodies` and said a sheet carries the Sun the screen
+  showed, but the application's export (`ExportSheetSession`) passed
+  only the reference layer, and `ChartSheet` had no bodies layer at
+  all - so from #415 until #418 every sheet a reader exported left out
+  the Sun and the Moon they had switched on. Found while building this
+  issue's sheet, not by any check: the #415 owner review accepted
+  "exported-sheet agreement" against a sheet that could not show it.
+  `ChartSheet.record` and `ExportSheet.write` now take the bodies layer
+  (every earlier overload keeps its arity and passes `NONE`, so every
+  released sheet is byte-identical), and the export passes the
+  screen's. `ExportSheetSessionTest` exports through the session's own
+  path and fails without the wiring.
+- **The gallery: one moment.** A room of its own, "The Sun and the
+  Moon", at the gallery's instant (Oslo, 2026-03-20 21:33 UTC): the
+  young Moon, 4.3 % lit, on a 3° page with no horizon, showing its
+  crescent and the side it faces; and a 36° page centred on the Sun,
+  the Moon and the horizon point nearest the Moon, with Oslo's
+  mathematical horizon drawn and both bodies below it, dimmed and
+  saying so. Both drawn by the production component
+  (`GalleryPageMain`), which refuses to write a slide missing the
+  bodies it is about.
+- **The sheet: both bodies at true scale.** `sheet-a4-solar-system`
+  (SVG, PDF and a 300 dpi PNG) at the same moment, 42° - the smallest
+  field holding both - centred halfway between them, the ecliptic on
+  and the horizon off. The released sheets are unchanged. At this
+  scale the Moon is about 3.4 mm across and its 4.3 % crescent at most
+  0.15 mm wide, narrower than the inner half of the outline (0.18 mm),
+  so an almost-new Moon reads as an almost-dark disc: the scale's
+  honest limit, ruled not a defect, with nothing enlarged and no
+  paper-only limb rule; the gallery's 3° page carries the crescent.
+  The sheet report states it from the sheet's own geometry.
+- **Packaged acceptance.** `solarSystemSheetJourney` exports that
+  sheet as a PNG through the application's own export path and holds
+  the file pixel for pixel to an inspected recording of the same
+  layers, and that recording to the screen: both bodies at their
+  projected positions and true diameters, opaque, and named clear of
+  the ecliptic's words, of each other and of both discs. It does not
+  claim the crescent's direction is resolved on the sheet. The
+  gallery's moment is restated in the image and held to
+  `GalleryPageMain.WHEN` by `PackagedMoonInstantTest`.
+- **Not changed, by ruling.** The wide-field outline-ring observation
+  recorded on #418 stays a non-blocking note for dogfooding.
+
 ## Evidence
 
 `docs/studies/moon-on-the-chart/` - the Moon's production pages (the
