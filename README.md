@@ -23,6 +23,8 @@ zoom-where-you-point. The 1.0 promise is recorded in
 - [Technical architecture](docs/architecture.md)
 - [How JUranometria works](docs/how/README.md) — explanatory tours of the
   architecture through working features
+- [Articles](docs/articles/README.md) — astronomy and cartography through the
+  atlas
 - [Catalogue strategy](docs/catalogues.md)
 - [Development workflow](docs/development.md)
 - [First sprint](docs/sprint-01.md) — Sprint 1's product document;
