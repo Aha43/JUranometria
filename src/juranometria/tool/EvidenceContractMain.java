@@ -714,7 +714,25 @@ public final class EvidenceContractMain {
      * the committed one and say the study has fallen behind, because
      * there the comparison means what it says.
      */
-    public enum Mode { PORTABLE, CANONICAL }
+    public enum Mode {
+        PORTABLE, CANONICAL,
+        /**
+         * The interaction route (#428): the portable run over the
+         * generators that own no chart picture only. Every chart
+         * producer is skipped and its committed pictures are held as
+         * committed - byte for byte, with their provenance accounts -
+         * so the run proves no chart picture moved without drawing
+         * any.
+         */
+        INTERACTION
+    }
+
+    /**
+     * Which generators this run invokes: all of them, except on the
+     * interaction route, where only those {@link EvidenceGenerators}
+     * finds reproducible (#428).
+     */
+    private static java.util.function.Predicate<String> runs = main -> true;
 
     /**
      * A breach, on its way out through the restoration (#323).
@@ -730,12 +748,29 @@ public final class EvidenceContractMain {
     }
 
     public static void main(String[] args) throws Exception {
-        Mode mode = args.length > 0 && "ci".equals(args[0])
-                ? Mode.PORTABLE : Mode.CANONICAL;
+        Mode mode = args.length == 0 ? Mode.CANONICAL
+                : switch (args[0]) {
+                    case "ci" -> Mode.PORTABLE;
+                    case "interaction" -> Mode.INTERACTION;
+                    default -> Mode.CANONICAL;
+                };
+        if (mode == Mode.INTERACTION) {
+            java.util.Set<String> reproduced = new java.util.TreeSet<>();
+            for (String type : EvidenceGenerators.of(
+                    RenderingClosure.of(Path.of("build/classes")),
+                    Path.of("docs/studies"))
+                    .of(EvidenceGenerators.Kind.REPRODUCED)) {
+                reproduced.add(type.replace('/', '.'));
+            }
+            runs = reproduced::contains;
+            System.out.println("interaction contract: the " + reproduced.size()
+                    + " generators that own no chart picture are reproduced;"
+                    + " every chart picture is held as committed");
+        }
         Map<String, Snapshot> committed = snapshot();
         List<String> failures = new ArrayList<>();
         Map<String, Integer> verdicts = new TreeMap<>();
-        System.out.println(mode == Mode.PORTABLE
+        System.out.println(mode != Mode.CANONICAL
                 ? "portable contract: renderings are held to"
                         + " reproducing here, never to another"
                         + " machine's pixels"
@@ -1448,11 +1483,22 @@ public final class EvidenceContractMain {
         // nondeterministic report image would have passed while the
         // run claimed every rendering reproduced (review, #322).
         DrawnTwice twice = null;
-        if (mode == Mode.PORTABLE) {
-            twice = drawTwice(renderingGenerators(),
-                    rendererDrawn(committed),
-                    new ArrayList<>(BUILD_WRITERS.values()),
-                    new ArrayList<>(PLATFORM_REPORTS.values()));
+        if (mode != Mode.CANONICAL) {
+            List<String> writerDirs = new ArrayList<>();
+            for (Map.Entry<String, String> writer : BUILD_WRITERS.entrySet()) {
+                if (runs.test(writer.getKey())) {
+                    writerDirs.add(writer.getValue());
+                }
+            }
+            List<String> records = new ArrayList<>();
+            for (Map.Entry<String, String> record : PLATFORM_REPORTS.entrySet()) {
+                if (runs.test(record.getKey())) {
+                    records.add(record.getValue());
+                }
+            }
+            twice = drawTwice(renderingGenerators().stream()
+                            .filter(runs).toList(),
+                    rendererDrawn(committed), writerDirs, records);
             for (String path : twice.differing()) {
                 failures.add(path + ": renderer-drawn image did not"
                         + " reproduce byte-for-byte between two"
@@ -1508,6 +1554,11 @@ public final class EvidenceContractMain {
         // ---- deterministic reports, from stdout: no churn --------
         PrintStream realOut = System.out;
         for (Map.Entry<String, String> report : REPORT_MAINS.entrySet()) {
+            if (!runs.test(report.getKey())) {
+                tally(verdicts, "held as committed (a chart producer; the"
+                        + " interaction route does not run it)");
+                continue;
+            }
             // Portable runs have already run this generator twice and
             // kept both of the things it said, so judging it here
             // costs nothing (#323). Canonical runs it once, here,
@@ -1577,6 +1628,11 @@ public final class EvidenceContractMain {
         // taken out of the report beside it (#315).
         for (Map.Entry<String, String> record
                 : PLATFORM_REPORTS.entrySet()) {
+            if (!runs.test(record.getKey())) {
+                tally(verdicts, "held as committed (a chart producer; the"
+                        + " interaction route does not run it)");
+                continue;
+            }
             Path file = Path.of(record.getValue());
             if (!Files.exists(file)) {
                 failures.add(record.getValue() + ": the platform"
@@ -1680,6 +1736,12 @@ public final class EvidenceContractMain {
         java.util.Set<String> judgedViaBuild = new java.util.TreeSet<>();
         java.util.Set<String> skippedBuildDirs = new java.util.TreeSet<>();
         for (Map.Entry<String, String> writer : BUILD_WRITERS.entrySet()) {
+            if (!runs.test(writer.getKey())) {
+                skippedBuildDirs.add(writer.getValue());
+                tally(verdicts, "held as committed (a chart producer; the"
+                        + " interaction route does not run it)");
+                continue;
+            }
             Gate gate = GATED_GENERATORS.get(writer.getKey());
             String incomplete = gate == null ? null
                     : incompleteBreach(writer.getValue(), gate,
@@ -1691,7 +1753,7 @@ public final class EvidenceContractMain {
                 // as a breach because that machine is the one that
                 // promotes these families; a portable run reports it
                 // as what it is (#315).
-                if (mode == Mode.PORTABLE) {
+                if (mode != Mode.CANONICAL) {
                     tally(verdicts, "unavailable here (raw sources are"
                             + " gitignored downloads)");
                 } else {
@@ -1728,7 +1790,7 @@ public final class EvidenceContractMain {
                     continue;
                 }
                 judgedViaBuild.add(path);
-                if (mode == Mode.PORTABLE) {
+                if (mode != Mode.CANONICAL) {
                     // Whether the study has fallen behind the atlas
                     // is a question about cartography, and a machine
                     // whose fonts are not the fonts the page was
@@ -1775,7 +1837,7 @@ public final class EvidenceContractMain {
             // rendering with the one it drew a moment ago on this
             // machine; only the canonical run compares it with the
             // pixels somebody agreed to elsewhere.
-            byte[] reference = mode == Mode.PORTABLE
+            byte[] reference = mode != Mode.CANONICAL
                     && twice != null && twice.first().containsKey(path)
                     ? twice.first().get(path) : entry.getValue().bytes();
             boolean same = java.util.Arrays.equals(reference, now);
@@ -1805,7 +1867,7 @@ public final class EvidenceContractMain {
                     } else {
                         failures.add(path + ": renderer-drawn image"
                                 + " did not reproduce byte-for-byte"
-                                + (mode == Mode.PORTABLE
+                                + (mode != Mode.CANONICAL
                                         ? " between two renderings on"
                                                 + " this machine - the"
                                                 + " generator is not"

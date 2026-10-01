@@ -68,14 +68,19 @@ hold the measured design gates.
    technically blocks the merge, not just culturally.
 9. Know which route the change takes before pushing: `make classify`
    (against `origin/main`, or `BASE=<ref>`) prints, path by path,
-   whether the change can reach a renderer, a chart contribution, an
-   evidence generator, a committed image or a provenance row. If none
-   can, CI takes the **narrow** route and skips the evidence contract,
-   the native images and the portable archive, saying so in the
-   `classify` job's summary; anything else is **wide** and runs them
-   all. The unit and display suites run either way. The rule, its
-   roots and what it cannot decide are in
-   `docs/decisions/rendering-neutral-gate.md` (issue #398).
+   which of three routes it takes and why, and CI's `classify` job
+   says the same in its summary:
+
+   | route | when | CI runs |
+   |---|---|---|
+   | **narrow** | prose, tests, and code nothing ships or generates reaches | `test`, `display` |
+   | **interaction** | interface work no chart producer reaches: Swing chrome, menus, dialogs, input handling, interface words and photographs, packaged journeys | `test`, `display`, `interaction-evidence` (the interface and report evidence reproduced, every chart picture held as committed, the tree unchanged), `app-image` with packaged acceptance, `dist` |
+   | **wide** | anything that can reach chart ink or its evidence, `JUranometriaMain`, the build and the guard - and every push to `main`, tag and release | everything, `evidence` included |
+
+   A path in both closures, an unknown owner, a key or file nothing
+   names, a removed source: all wide. The rules are in
+   `docs/decisions/rendering-neutral-gate.md` (issue #398) and
+   `docs/decisions/interaction-ci.md` (issues #427, #428).
 
 Prefer a small number of meaningful commits over preserving every experiment.
 Commit messages state the result and may include `Closes #NN` when the commit

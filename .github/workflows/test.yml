@@ -155,10 +155,39 @@ jobs:
             build/interface-gate-evidence
           if-no-files-found: ignore
 
-  # Which route this change takes (issue #398). Everything above
-  # runs whatever the answer; only the evidence job below reads it.
+  # Which route this change takes (issue #398, extended by #428).
+  # Everything above runs whatever the answer; only the evidence jobs
+  # below read it.
   classify:
     uses: ./.github/workflows/classify.yml
+
+  # The interaction route's evidence (#427/#428). Interface work that
+  # no chart producer reaches: every generator that owns no chart
+  # picture - the reports, platform records and inspection imagery -
+  # is reproduced as the portable contract reproduces it, and every
+  # chart picture is held as committed with its provenance account.
+  # No chart producer runs, so nothing chart is regenerated; and the
+  # tree must come out of the run exactly as it went in, which is the
+  # proof that no chart picture or provenance row moved.
+  interaction-evidence:
+    needs: classify
+    if: needs.classify.outputs.route == 'interaction'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/cache@v6
+        with:
+          path: lib
+          key: libs-${{ hashFiles('scripts/lib-versions.env') }}
+      - run: scripts/download-libs.sh
+      - name: Reproduce the interface and report evidence; hold every chart picture
+        run: xvfb-run -a make evidence-contracts-interaction
+      - name: Nothing moved
+        run: git diff --exit-code --stat
 
   # Generated evidence, checked against its own generators (issue
   # #315). `make test` never runs this, and at the end of #314 the

@@ -577,7 +577,7 @@ black-sky-study: classes
 		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BlackSkyStudyMain \
 		> docs/studies/black-sky/measurements.md
 
-.PHONY: evidence-contracts test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study sun-on-the-chart-study moon-on-the-chart-study printable-chart-study
+.PHONY: evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study sun-on-the-chart-study moon-on-the-chart-study printable-chart-study
 # The heap is stated rather than inherited from whatever a machine's
 # ergonomics chose for it: the CI runner's default quarter-of-RAM is
 # not the same number as a developer's.
@@ -604,6 +604,12 @@ evidence-contracts: classes
 # docs/decisions/test-evidence.md.
 evidence-contracts-ci: classes
 	$(JAVA) -Xmx1g -cp "$(CLASSES_DIR):$(LIB_DIR)/*" -Djava.awt.headless=true juranometria.tool.EvidenceContractMain ci
+
+# The interaction route (#428): the portable contract over the
+# generators that own no chart picture; every chart picture is held as
+# committed, with its provenance account, and none is drawn.
+evidence-contracts-interaction: classes
+	$(JAVA) -Xmx1g -cp "$(CLASSES_DIR):$(LIB_DIR)/*" -Djava.awt.headless=true juranometria.tool.EvidenceContractMain interaction
 
 # Run on the machine that promotes reference images, after a reviewed
 # regeneration: records when, on what, and from which generator each
@@ -755,10 +761,17 @@ BASE ?= origin/main
 classify: classes
 	@base=$$(git merge-base $(BASE) HEAD); \
 	{ git diff --name-only "$$base"; git ls-files --others --exclude-standard; } \
-		| sort -u > $(BUILD_DIR)/changed-paths.txt
+		| sort -u > $(BUILD_DIR)/changed-paths.txt; \
+	rm -rf $(BUILD_DIR)/base; mkdir -p $(BUILD_DIR)/base; \
+	while IFS= read -r path; do \
+		if git cat-file -e "$$base:$$path" 2>/dev/null; then \
+			mkdir -p "$(BUILD_DIR)/base/$$(dirname "$$path")"; \
+			git show "$$base:$$path" > "$(BUILD_DIR)/base/$$path"; \
+		fi; \
+	done < $(BUILD_DIR)/changed-paths.txt
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" \
 		juranometria.tool.ChangeClassifierMain \
-		--changed $(BUILD_DIR)/changed-paths.txt
+		--changed $(BUILD_DIR)/changed-paths.txt --base $(BUILD_DIR)/base
 
 test: check-libs classes
 	rm -rf $(TEST_CLASSES)
