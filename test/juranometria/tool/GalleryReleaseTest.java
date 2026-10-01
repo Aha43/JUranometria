@@ -9,6 +9,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -47,7 +48,7 @@ class GalleryReleaseTest {
      * name. Each release adds the one it replaces.
      */
     private static final List<String> EARLIER =
-            List.of("1.11.0", "1.12.0", "2.0.0", "2.1.0");
+            List.of("1.11.0", "1.12.0", "2.0.0", "2.1.0", "3.0.0");
 
     /** The chart-sheet study: SVG metadata, PDF producer, PNG text. */
     private static final Path SHEETS =
@@ -189,10 +190,18 @@ class GalleryReleaseTest {
             throws Exception {
         String version = Files.readString(Path.of("VERSION"),
                 StandardCharsets.UTF_8).strip();
-        List<String> sheets = List.of("sheet-a4.svg",
-                "sheet-a4-modules.svg", "sheet-a4-outlines.svg",
-                "sheet-letter.svg", "sheet-a4.pdf",
-                "sheet-a4-modules.pdf", "sheet-a4-300dpi.png");
+        // Every sheet the study writes, not a remembered list: the
+        // three solar-system files (#418) carried the version for a
+        // sprint before a release noticed the list did not name them.
+        List<String> sheets;
+        try (var files = Files.list(SHEETS)) {
+            sheets = files.map(f -> f.getFileName().toString())
+                    .filter(name -> name.startsWith("sheet-")
+                            && (name.endsWith(".svg") || name.endsWith(".pdf")
+                                    || name.endsWith(".png")))
+                    .sorted().toList();
+        }
+        assertTrue(sheets.size() >= 10, "the study's sheets are all found: " + sheets);
 
         List<String> current = new ArrayList<>();
         List<String> stale = new ArrayList<>();
@@ -218,6 +227,24 @@ class GalleryReleaseTest {
                         + " VERSION");
         assertEquals(List.of(), stale,
                 "and none names an earlier one");
+    }
+
+    /**
+     * The published articles' footer names the release (#419, 4.0.0):
+     * their build reads it from VERSION rather than carrying a number,
+     * so a release cannot leave them advertising the one before it.
+     */
+    @Test
+    void theArticlesFooterReadsTheVersionRatherThanHoldingOne()
+            throws Exception {
+        String script = Files.readString(Path.of("scripts/build-articles.py"),
+                StandardCharsets.UTF_8);
+        assertTrue(script.contains("(ROOT / \"VERSION\")"),
+                "the article build reads VERSION");
+        assertFalse(java.util.regex.Pattern.compile(
+                        "releases/tag/v[0-9]|JUranometria [0-9]")
+                        .matcher(script).find(),
+                "and names no release of its own");
     }
 
     /**

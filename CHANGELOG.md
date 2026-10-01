@@ -7,24 +7,112 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [4.0.0] - 2026-10-01
+
+**The Sun and the Moon.** Sprints 35–37 — the Sun computed and
+tabulated (#398–#400), the Moon computed and tabulated (#406–#408,
+#410), and both drawn on the chart, on paper and in the gallery
+(#414–#416, #418), with two reader articles (#419).
+
+Until 4.0 the atlas drew a fixed sky: stars, deep-sky objects and the
+lines that frame them, for any place and instant but with nothing in
+it that moved against the stars. This release adds the two bodies that
+do, and does it in the order a chart can trust - first as numbers held
+to an independent authority, then as tables a reader can check, and
+only then drawn, at the size they really are.
+
+**Where the Sun and the Moon are, offline.** The atlas carries a small,
+digest-verified excerpt of JPL's DE440 ephemeris for 1900–2100 - the
+Sun, the Earth–Moon barycentre, the Earth and the Moon, as a
+JUranometria-modified SPICE kernel under NAIF's rules - and the IERS
+leap-second record. From them it computes each body's position in the
+chart's own frame, its altitude and azimuth for Place and Time's
+observer, its distance and apparent diameter, and for the Moon its
+illuminated fraction, phase, elongation and the direction of its lit
+side. Nothing is fetched. Every quantity was compared row by row with
+JPL Horizons - 12 670 rows for the Sun and 52 870 for the Moon, for
+five observers from the Arctic to the Chatham Islands - and the
+measured limits are stated with their causes rather than rounded away.
+
+**View → Sun… and View → Moon….** Two tables beside Place and Time:
+one instant or a range with a step, in English and Norwegian, every
+column named, a below-horizon altitude saying so, and a range that
+cannot be answered refused with its reason. The Moon's table adds how
+much is lit, the phase in words, how far it stands from the Sun and on
+which side, and which way its lit side faces.
+
+**The Sun and the Moon on the chart.** View → Sun on the chart and View
+→ Moon on the chart, each off until chosen and remembered. Both are
+drawn at their true angular size on every page and never enlarged: the
+Sun as a ring with its centre dot, the Moon as a disc lit on the side
+the table states, its lit area the table's fraction, its dark side
+inked. The phase is turned into the page's own north and east at the
+Moon, so it faces the right way anywhere on a page. A disc covers what
+lies under it, and a click on it never selects a star it hides; the
+nearer Moon draws over the Sun. Below a drawn horizon a body is dimmed
+and says so. Names sit beside the discs or are left off, and a disc
+is never allowed to cover another label - the equinox's, a line's or a
+direction letter. An exported sheet carries the bodies the screen
+shows.
+
+**The gallery and the articles.** The public gallery gains a room, *The
+Sun and the Moon*, at its one moment over Oslo. Two articles explain
+the work: *Where the Sun is* and *Which way the light falls*, which
+tells what the Moon's phase is, which way it faces on a chart and in
+your sky, and what a chart drawn at true scale can and cannot show.
+
+**What it does not do.** No libration, surface or earthshine; no
+eclipses drawn as such or the Earth's shadow
+([#417](https://github.com/Aha43/JUranometria/issues/417) is an
+optional experiment); no rise, set or twilight; no tracks; the bodies
+are not selectable in the inspector; no planets. On a wide page a
+thin crescent can be narrower than the line that draws the disc's
+edge, and is then not resolved - true scale, not an error.
+
+**macOS downloads remain unsigned and not notarised.** A browser
+download is quarantined, and macOS may refuse it as "damaged" — the
+archive is not corrupt, and `SHA256SUMS.txt` answers that. Ordinary
+Finder installation is **not supported** for this release either;
+[#282](https://github.com/Aha43/JUranometria/issues/282) stays open, and
+the documented quarantine-removal step is a workaround rather than the
+accepted route. Nothing in this release changes how it is installed.
+
+**Still not printed.** No page has been read on paper, and no globe at
+arm's length.
+[#293](https://github.com/Aha43/JUranometria/issues/293) is open for
+anyone who prints one.
+
 ### Added
 
 - **The Sun, computed.** A bundled, digest-verified excerpt of JPL's
-  DE440 ephemeris (Sun, Earth–Moon barycentre and Earth, 1900–2100, as
-  a JUranometria-modified SPICE kernel under NAIF's rules) and the IERS
-  leap-second file, with a removable service that computes the Sun's
-  chart position, altitude and azimuth, distance and apparent diameter
-  for Place and Time's observer and instant - offline, held row by row
-  to JPL Horizons. Nothing is drawn yet; Help → About lists the new
-  notice (#398, #399).
-- **View → Sun…**, the first Solar System surface: a table of where the
-  Sun is for the observing place and instant set in Place and Time -
-  right ascension and declination (J2000), ecliptic longitude, altitude
-  and azimuth without refraction, distance and apparent diameter - at
-  that instant or over a range of instants with a chosen step, in
-  English and Norwegian, with every control named for a screen reader
-  and reachable by keyboard. Nothing is drawn on the chart, and nothing
-  is remembered between sessions (#400).
+  DE440 ephemeris and the IERS leap-second file, with a removable
+  service that computes the Sun's chart position, altitude and azimuth,
+  distance and apparent diameter for Place and Time's observer and
+  instant - offline, held row by row to JPL Horizons. Help → About lists
+  the new notice (#398, #399).
+- **View → Sun…**, a table of where the Sun is for the place and instant
+  set in Place and Time, at that instant or over a range, in English and
+  Norwegian (#400).
+- **The Moon, computed**, from the same excerpt regenerated once to carry
+  it (14 910 464 bytes): position, altitude and azimuth, distance and
+  diameter, phase angle, illuminated fraction, elongation and side, the
+  waxing or waning trend, the phase in words and the bright limb's
+  direction, held to JPL Horizons, Meeus and named lunar events (#406,
+  #407).
+- **View → Moon…**, the Moon's table, beside the Sun's (#408).
+- **View → Sun on the chart** and **View → Moon on the chart**: both
+  bodies drawn at true scale, the Moon phased and oriented, on screen
+  and on exported sheets (#414, #415, #416, #418).
+- The gallery room *The Sun and the Moon*, a printable two-body sample
+  sheet, and the articles *Where the Sun is* and *Which way the light
+  falls* (#418, #419).
+
+### Changed
+
+- How many labels a chart sheet places is recorded per machine rather
+  than in the portable evidence report, because it depends on the
+  fonts. This is developer-facing and changes nothing a reader sees
+  (#418).
 
 ## [3.0.0] - 2026-09-28
 

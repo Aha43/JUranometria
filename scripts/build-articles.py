@@ -6,6 +6,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 REPO = "https://github.com/Aha43/JUranometria/blob/main/"
+# The release the footer names, read from VERSION when the site is built,
+# so a release cannot leave the articles advertising the one before it.
+VERSION = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
+RELEASE_NAME = ".".join(VERSION.split(".")[:2])
 
 PAGES = [
     (ROOT / "docs/articles/README.md", "index.html", "JUranometria articles"),
@@ -131,7 +135,7 @@ def page(title: str, series: str, body: str, filename: str) -> str:
 <title>{html.escape(title)} — JUranometria</title><link rel="stylesheet" href="articles.css"></head>
 <body><nav><a href="../index.html">Gallery</a><a href="index.html">Articles</a><a href="https://github.com/Aha43/JUranometria">Repository</a></nav>
 <main><p class="series">{html.escape(series)}</p>{body}</main>
-<footer><p>JUranometria 3.0 · <a href="https://github.com/Aha43/JUranometria/releases/tag/v3.0.0">Download the atlas</a></p></footer></body></html>\n'''
+<footer><p>JUranometria {RELEASE_NAME} · <a href="https://github.com/Aha43/JUranometria/releases/tag/v{VERSION}">Download the atlas</a></p></footer></body></html>\n'''
 
 def validate_site(out: Path, articles: Path) -> None:
     from html.parser import HTMLParser
