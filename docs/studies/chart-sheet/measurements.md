@@ -17,18 +17,18 @@ Regenerate with `make chart-sheet-study`.
 
 ## The sheets
 
-| file | paper | shapes | labels |
-|---|---|---:|---:|
-| `sheet-a4.svg` | A4 | 2267 | 26 |
-| `sheet-letter.svg` | US Letter | 2472 | 26 |
-| `sheet-a4-outlines.svg` | A4 | 2267 | 0 |
-| `sheet-a4-modules.svg` | A4 | 1966 | 16 |
-| `sheet-a4.pdf` | A4 | 2267 | 26 as outlines |
-| `sheet-a4-modules.pdf` | A4 | 1966 | 16 as outlines |
-| `sheet-a4-300dpi.png` | A4 at 300 dpi, 3508 x 2480 px | 2267 | 26 |
-| `sheet-a4-solar-system.svg` | A4 | 2001 | 15 |
-| `sheet-a4-solar-system.pdf` | A4 | 2001 | 15 as outlines |
-| `sheet-a4-solar-system.png` | A4 at 300 dpi, 3508 x 2480 px | 2001 | 15 |
+| file | paper | shapes |
+|---|---|---:|
+| `sheet-a4.svg` | A4 | 2267 |
+| `sheet-letter.svg` | US Letter | 2472 |
+| `sheet-a4-outlines.svg` | A4 | 2267 |
+| `sheet-a4-modules.svg` | A4 | 1966 |
+| `sheet-a4.pdf` | A4 | 2267 |
+| `sheet-a4-modules.pdf` | A4 | 1966 |
+| `sheet-a4-300dpi.png` | A4 at 300 dpi, 3508 x 2480 px | 2267 |
+| `sheet-a4-solar-system.svg` | A4 | 2001 |
+| `sheet-a4-solar-system.pdf` | A4 | 2001 |
+| `sheet-a4-solar-system.png` | A4 at 300 dpi, 3508 x 2480 px | 2001 |
 
 `sheet-a4-outlines.svg` is the same chart with every label converted to
 its outline, for a machine whose fonts are unknown. It is larger and it
@@ -89,6 +89,8 @@ revise these numbers.
 
 **Label positions are this machine's.** The renderer places a label with
 font metrics, so another machine's sans-serif moves it slightly and may
-fit one where this one did not. The sheets reproduce byte for byte on a
-given machine, which is the same classification the renderer studies carry.
+fit one where this one did not - which is why how many labels each sheet
+placed is recorded with the machine, in the platform record, and not here
+(#418). The sheets reproduce byte for byte on a given machine, which is the
+same classification the renderer studies carry.
 

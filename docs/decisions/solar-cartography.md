@@ -233,6 +233,16 @@ candidates over production pages; the owner inspected them.
   claim the crescent's direction is resolved on the sheet. The
   gallery's moment is restated in the image and held to
   `GalleryPageMain.WHEN` by `PackagedMoonInstantTest`.
+- **Placed labels are a platform fact (owner ruling).** The first CI
+  run of this issue (`ccf2bcd`, run 36823686715, job `evidence`) found
+  the chart-sheet report not reproducing on Linux: the solar-system
+  sheet placed 15 labels on macOS and 14 there, with every shape the
+  same. Which labels fit is the fonts' answer, true of every sheet even
+  where two platforms happen to agree, so placed-label counts left the
+  deterministic chart-sheet report for every sheet and joined each
+  file's bytes in its per-machine platform record; the report keeps
+  file, paper and shapes. The sheet was not adjusted to make the
+  platforms agree.
 - **Not changed, by ruling.** The wide-field outline-ring observation
   recorded on #418 stays a non-blocking note for dogfooding.
 
