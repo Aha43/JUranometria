@@ -1,0 +1,35 @@
+# Named lunar events of 2026, as published (issue #406 ruling M8; issue #407)
+#
+# Source: Fred Espenak, AstroPixels - "Phases of the Moon: 2001 to 2100"
+# and "Moon at Perigee and Apogee: 2001 to 2100", computed by the
+# author from Jean Meeus's Astronomical Algorithms (Willmann-Bell,
+# 1998/1999) and published to the minute. The phase table states its
+# times in Universal Time; the perigee/apogee table states Greenwich
+# Mean Time, read here as UT, and its distances are centre to centre.
+# Both pages were retrieved on 2026-09-29 (15:27 UTC); the digests are
+# of the HTML files as retrieved that day.
+#
+#   Phases:          https://astropixels.com/ephemeris/phasescat/phases2001.html
+#     126303 bytes, sha256 1632f276badc8cfe2aaf9c4cb590712202ba92f6d8a1f4fb39919c9644a853b4
+#   Perigee/apogee:  https://astropixels.com/ephemeris/moon/moonperap2001.html
+#     154263 bytes, sha256 b11c9c87081d418171a9708bd56d65d91ac0805bb64c7be3f85306da49001d3a
+#
+# Scope, as ruled: these rows NAME useful instants at their stated
+# minute precision - one lunation around midsummer, the checkpoint's
+# late-January perigee and apogee, and the year's nearest perigee and
+# farthest apogee (the table marks each with "M"). They are not the
+# numerical authority: positions, distances and phases are held to
+# DE440 and JPL Horizons; at these instants the atlas's own answer is
+# checked to be what the name says, within what a minute of motion
+# and the tables' own rounding allow. The tables' apparent diameters
+# follow the author's own radius convention and are not compared.
+#
+# columns: event <tab> instant (UTC, ISO 8601) <tab> distance km or "-" <tab> the row as published
+new-moon-june	2026-06-15T02:54:00Z	-	Jun 15  02:54 (New Moon, 2026)
+first-quarter-june	2026-06-21T21:55:00Z	-	Jun 21  21:55 (First Quarter, 2026)
+full-moon-june	2026-06-29T23:57:00Z	-	Jun 29  23:57 (Full Moon, 2026)
+last-quarter-july	2026-07-07T19:29:00Z	-	Jul  7  19:29 (Last Quarter, 2026)
+perigee-january	2026-01-29T21:53:00Z	365878	Jan 29  21:53     365878     32.66 (Perigee, 2026)
+apogee-february	2026-02-10T16:52:00Z	404577	Feb 10  16:52     404577     29.54 (Apogee, 2026)
+perigee-nearest	2026-06-14T23:18:00Z	357196	Jun 14  23:18     357196     33.46 (Perigee, 2026; the year's nearest)
+apogee-farthest	2026-12-11T06:46:00Z	406421	Dec 11  06:46     406421 M   29.40 (Apogee, 2026; the year's farthest)

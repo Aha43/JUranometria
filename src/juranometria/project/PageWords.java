@@ -172,4 +172,13 @@ public interface PageWords {
      * @throws IllegalStateException if the token has no reader phrase
      */
     String ground(String paletteToken);
+
+    /**
+     * A Solar System body's name on the page (Sprint 37, issue #415),
+     * by its identity: {@code sun}, {@code moon}.
+     */
+    String bodyName(String bodyIdentity);
+
+    /** The status appended to a body's name when it stands below the drawn horizon. */
+    String bodyBelowHorizon();
 }

@@ -64,6 +64,25 @@ public final class SheetInk {
      * @param members the working selection, in membership order
      * @param leadIdentity the member that leads, or null
      */
+    /**
+     * The Solar System bodies the chart carries, for paper (#415): the
+     * same layer the screen paints, on white paper's ground.
+     */
+    public static ChartRenderer.ReferenceLayer bodies(ChartComponent chart) {
+        if (chart == null) {
+            throw new IllegalArgumentException("a chart is required");
+        }
+        return (g, scene, reserved) -> {
+            juranometria.project.DrawnPage page =
+                    juranometria.project.DrawnPage.of(scene);
+            java.util.List<juranometria.module.OverlayRegistry.Owned> offered =
+                    chart.overlays().collect();
+            ReferenceInk.paintBodies(g, page, offered, ChartPalette.WHITE_PAPER,
+                    chart.words(), reserved, ReferenceInk.referenceBoxes(page,
+                            offered, chart.words(), reserved, structure -> false));
+        };
+    }
+
     public static ChartRenderer.ReferenceLayer working(
             ChartComponent chart, java.util.List<String> members,
             String leadIdentity, ChartOptions options) {

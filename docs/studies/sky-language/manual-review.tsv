@@ -146,3 +146,20 @@ d6ec4403b577d737	sheet/PngSheetWriter.java	Title	collection/alias flow not trace
 715ef47ebffe1748	sheet/PngSheetWriter.java	Description	collection/alias flow not traced	identifier	a stable key, path or stored value; no language changes it
 36aa094f9216be00	sheet/PngSheetWriter.java	Software	collection/alias flow not traced	identifier	a stable key, path or stored value; no language changes it
 3a05bc44cc171e52	sheet/PngSheetWriter.java	Emphasis	collection/alias flow not traced	identifier	a stable key, path or stored value; no language changes it
+284e3f8afa4891b6	solar/time/LeapSeconds.java	^\\s*(\\d+(?:\\.\\d+)?)\\s+(\\d{1,2})\\s+(\\d{1,2})\\s+(\\d{4})\\s+(\\d+)\\s*$	unresolved: no route found, needs manual inspection	notation	a regular expression: the shape of one row of the IERS leap-second file, a formal pattern the parser matches and no reader sees
+32edc1b91faa4ba0	solar/SolarSystemPack.java	checksum.	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+34aa079df0bd5fb6	solar/SolarSystemPack.java	solar-system	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+c271dd35f2eefea8	solar/SolarSystemPack.java	/resources/solar-system/	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+d673091a8a11b2bb	solar/spk/SpkExcerpt.java	DAF/SPK 	unresolved: no route found, needs manual inspection	notation	the SPK file format's own magic word, written into a kernel's file record; never shown
+8a90e69519156f3d	app/AppMenuBar.java	sunTableItem	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+1458bbb76eb4d309	app/AppMenuBar.java	moonTableItem	declared name used, but never at a known sink	identifier	the Moon table item's component name, which tests find it by; no language changes it
+72296b89cd993f9e	ui/solar/SolarTableModel.java	column.	declared name used, but never at a known sink	identifier	a language-key prefix assembled with a column's suffix; the key, not a word
+66de225c0d51797a	ui/solar/SolarTableModel.java	.explain	declared name used, but never at a known sink	identifier	a language-key suffix assembled onto a column's key; the key, not a word
+9298072bfdac6e2d	ui/solar/SolarTableWords.java	solartable	declared name used, but never at a known sink	identifier	the shared key family's stem, under which the table's words are looked up; no language changes it
+7633c774e50262e6	app/AppMenuBar.java	sunOnChartItem	declared name used, but never at a known sink	identifier	the Sun-on-the-chart item's component name, which tests find it by; no language changes it
+278d7b4778128b64	solarchart/SolarSystemModule.java	solar-system	declared name used, but never at a known sink	identifier	the module's registry id, under which its geometry is offered; no language changes it
+e5c2b8b6872573f7	solarchart/SolarSystemModule.java	sun	declared name used, but never at a known sink	identifier	the body's identity, which the page's language names; the key, not a word
+ab19dedf996fa2ad	ui/solar/SunChartStore.java	sunOnChartShown	declared name used, but never at a known sink	identifier	a stable preference key; no language changes it
+daf7e6d12102006e	app/AppMenuBar.java	moonOnChartItem	declared name used, but never at a known sink	identifier	the Moon-on-the-chart item's component name, which tests find it by; no language changes it
+1f27c4b123d1bc34	solarchart/SolarSystemModule.java	moon	declared name used, but never at a known sink	identifier	the body's identity, which the page's language names; the key, not a word
+83a967abf1390b96	ui/solar/MoonChartStore.java	moonOnChartShown	declared name used, but never at a known sink	identifier	a stable preference key; no language changes it

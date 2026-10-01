@@ -188,6 +188,10 @@ public final class ExportSheetSession {
                 chart.assembler()::assemble,
                 navigation.state(), options.options(),
                 SheetInk.reference(chart, emphasized),
+                // The Sun and the Moon the screen carries (#418,
+                // correcting #415, which drew them on the screen and
+                // left them off the paper).
+                SheetInk.bodies(chart),
                 request.workingSelection()
                         ? SheetInk.working(chart, working.members(),
                                 working.lead(), options.options())

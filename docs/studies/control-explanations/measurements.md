@@ -29,8 +29,12 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Menu bar | JMenu | View | &mdash; | What the chart draws, where you are looking from, and how far out | self-explanatory |
 | Menu bar | JMenuItem | Chart Options... | &mdash; | Opens the window that chooses what the chart draws and labels. Chart shortcuts begin wi... | self-explanatory |
 | Menu bar | JMenuItem | Place and Time... | &mdash; | Opens the window that sets your location and the instant used to draw the meridian, hor... | self-explanatory |
+| Menu bar | JMenuItem | Sun... | Where the Sun is, for the place and instant set in Place and Time | Opens a table of the Sun's computed position, height above the horizon, distance and ap... | hovered |
+| Menu bar | JMenuItem | Moon... | Where the Moon is, for the place and instant set in Place and Time | Opens a table of the Moon's computed position, height above the horizon, distance, appa... | hovered |
 | Menu bar | JCheckBoxMenuItem | Inspector | &mdash; | Shows or hides the panel that describes the selected mark and what is on this page | self-explanatory |
 | Menu bar | JCheckBoxMenuItem | Ecliptic | &mdash; | Shows or hides the ecliptic and its equinox and solstice marks. The chart shortcut is <... | self-explanatory |
+| Menu bar | JCheckBoxMenuItem | Sun on the chart | &mdash; | Shows or hides the Sun on the chart, drawn at its true size where it stands for the pla... | self-explanatory |
+| Menu bar | JCheckBoxMenuItem | Moon on the chart | &mdash; | Shows or hides the Moon on the chart, drawn at its true size where it stands for the pl... | self-explanatory |
 | Menu bar | JMenuItem | Zoom In | &mdash; | Shows a narrower field, with fainter stars on it | self-explanatory |
 | Menu bar | JMenuItem | Zoom Out | &mdash; | Shows a wider field, with fewer stars on it | self-explanatory |
 | Menu bar | JMenu | Help | &mdash; | Information about this application and what it is built on | self-explanatory |
@@ -68,6 +72,24 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Place and Time | JCheckBox | Zenith | Mark the point overhead | Marks the point directly above you. It is drawn with the observer's lines and has no sh... | hovered |
 | Place and Time | JButton | Now | Reads the clock once and freezes the chart at that instant | Freezes the reference lines at the present moment. The clock is read once; nothing move... | hovered |
 | Place and Time | JButton | Centre on zenith | Move the chart to the point overhead | Moves the page to the point directly above you. This is the only control in this window... | hovered |
+| Sun table | JRadioButton | This instant | One row, at the instant set in Place and Time | Shows a single row: the Sun at the observing instant set in Place and Time. | hovered |
+| Sun table | JRadioButton | Over a range | A row for every step from a start to an end | Shows a row for every step from the start to the end, both included; an end that is not... | hovered |
+| Sun table | JTextField | (a field) | yyyy-mm-dd hh:mm or hh:mm:ss, in UTC | The first instant of the range, in UTC. Starts at the instant set in Place and Time. | hovered |
+| Sun table | JTextField | (a field) | yyyy-mm-dd hh:mm or hh:mm:ss, in UTC | The last instant of the range, in UTC, included; if it is not on the grid it is added a... | hovered |
+| Sun table | JComboBox | (Step between rows) | The elapsed time between rows | The elapsed time between rows, on the UTC timeline, so a daily range does not drift acr... | hovered |
+| Sun table | JButton | Compute | Fill the table for the range above | Computes a row for every step of the range above. | hovered |
+| Sun table | JTable | (The Sun's computed quantities) | &mdash; | Each row is one instant. The columns are the instant in UTC; right ascension and declin... | self-explanatory |
+| Sun table | JButton | Update from Place and Time | Read the place and instant from Place and Time again | Reads the observing place and instant from Place and Time again and recomputes. The tab... | hovered |
+| Sun table | JButton | Close | &mdash; | Closes the table. Nothing is changed or remembered; Place and Time keeps the place and ... | self-explanatory |
+| Moon table | JRadioButton | This instant | One row, at the instant set in Place and Time | Shows a single row: the Moon at the observing instant set in Place and Time. | hovered |
+| Moon table | JRadioButton | Over a range | A row for every step from a start to an end | Shows a row for every step from the start to the end, both included; an end that is not... | hovered |
+| Moon table | JTextField | (a field) | yyyy-mm-dd hh:mm or hh:mm:ss, in UTC | The first instant of the range, in UTC. Starts at the instant set in Place and Time. | hovered |
+| Moon table | JTextField | (a field) | yyyy-mm-dd hh:mm or hh:mm:ss, in UTC | The last instant of the range, in UTC, included; if it is not on the grid it is added a... | hovered |
+| Moon table | JComboBox | (Step between rows) | The elapsed time between rows | The elapsed time between rows, on the UTC timeline, so a daily range does not drift acr... | hovered |
+| Moon table | JButton | Compute | Fill the table for the range above | Computes a row for every step of the range above. | hovered |
+| Moon table | JTable | (The Moon's computed quantities) | &mdash; | Each row is one instant. The columns are the instant in UTC; right ascension and declin... | self-explanatory |
+| Moon table | JButton | Update from Place and Time | Read the place and instant from Place and Time again | Reads the observing place and instant from Place and Time again and recomputes. The tab... | hovered |
+| Moon table | JButton | Close | &mdash; | Closes the table. Nothing is changed or remembered; Place and Time keeps the place and ... | self-explanatory |
 | Export Chart Sheet | JComboBox | (Format) | Choose SVG or PDF for a line drawing, or PNG for a picture | Chooses the file the sheet is written as. SVG and PDF keep the drawing as lines; PNG is... | hovered |
 | Export Chart Sheet | JComboBox | (Paper) | The size of the page the chart is laid out on | Chooses the paper the sheet is laid out for. The chart is fitted to it; the page you ar... | hovered |
 | Export Chart Sheet | JComboBox | (Resolution) | How finely a PNG is drawn; ignored by SVG and PDF | Chooses how many dots per inch a PNG is drawn at. SVG and PDF keep the drawing as lines... | hovered |
@@ -99,7 +121,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 
 ## The audit
 
-**82 operable controls** across 11 surfaces: **49** hovered, **7** dynamic, **26** left to their own visible words, **0 undecided**.
+**104 operable controls** across 13 surfaces: **65** hovered, **7** dynamic, **32** left to their own visible words, **0 undecided**.
 
 **0** say the same words twice - a tooltip read back as a description. The seam refuses it, so this is zero or a finding.
 

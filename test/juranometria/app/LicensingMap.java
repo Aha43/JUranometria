@@ -52,11 +52,12 @@ public final class LicensingMap {
             "openngc", "CC BY-SA 4.0",
             "constellations", "BSD-3-Clause",
             "starnames", "BSD-3-Clause",
+            "solar", "NAIF",
             "icons", "MIT");
 
     /** The order they are checked in, so a failure reads predictably. */
     public static final List<String> FAMILIES = List.of("code", "tycho",
-            "openngc", "constellations", "starnames", "icons");
+            "openngc", "constellations", "starnames", "solar", "icons");
 
     /**
      * How each language names a family, as {@code |}-separated words.
@@ -81,6 +82,7 @@ public final class LicensingMap {
                             "openngc", "openngc",
                             "constellations", "constellation",
                             "starnames", "star names|star-identity",
+                            "solar", "solar system|ephemeris|de440",
                             "icons", "tabler|icons"),
                     "nb-NO", Map.of(
                             "code", "kode",
@@ -88,6 +90,7 @@ public final class LicensingMap {
                             "openngc", "openngc",
                             "constellations", "stjernebilde",
                             "starnames", "stjernenavn",
+                            "solar", "solsystem|efemeride|de440",
                             "icons", "tabler|ikon"));
 
     /**

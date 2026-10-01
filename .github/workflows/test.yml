@@ -155,6 +155,11 @@ jobs:
             build/interface-gate-evidence
           if-no-files-found: ignore
 
+  # Which route this change takes (issue #398). Everything above
+  # runs whatever the answer; only the evidence job below reads it.
+  classify:
+    uses: ./.github/workflows/classify.yml
+
   # Generated evidence, checked against its own generators (issue
   # #315). `make test` never runs this, and at the end of #314 the
   # contract had 107 breaches nobody had seen: moving where labels
@@ -167,7 +172,16 @@ jobs:
   # portable contract, which never compares a rendering made here with
   # pixels recorded on somebody else's machine. See
   # docs/decisions/test-evidence.md, "Three kinds of evidence".
+  #
+  # Only on the wide route (issue #398). A change the classifier
+  # proved cannot reach a renderer, a chart contribution, an evidence
+  # generator, a committed image or a provenance row has nothing for
+  # this job to regenerate, and the classifier's summary says so by
+  # name for every path. Anything else, and every push to main, runs
+  # it. A classifier that failed skips this job and fails the run.
   evidence:
+    needs: classify
+    if: needs.classify.outputs.route == 'wide'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7

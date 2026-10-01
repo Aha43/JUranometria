@@ -48,7 +48,7 @@ JAR   := $(JDK_BIN)jar
 REQUIRED_LIBS := 	$(LIB_DIR)/flatlaf-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/flatlaf-extras-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/jsvg-$(JSVG_VERSION).jar
 JUNIT_JAR := $(TEST_LIB_DIR)/junit-platform-console-standalone-$(JUNIT_VERSION).jar
 
-.PHONY: all help clean classes jar app run run-log test globe-study globe-frame-study globe-density-study globe-furniture-study globe-grid-study globe-grid-fade-study globe-limb-study globe-family-study globe-name-study globe-pointing-study globe-module-study globe-export-study globe-drag-study chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study on-this-page-study wider-field-study chart-sheet-study overview-study overview-ink-study figure-anchor-study label-study released-text toggle-shortcut-study control-explanation-study sky-language-study evidence-contracts-ci evidence-provenance icons check-libs check-jdk dist app-image
+.PHONY: all help clean classes jar app run run-log test classify globe-study globe-frame-study globe-density-study globe-furniture-study globe-grid-study globe-grid-fade-study globe-limb-study globe-family-study globe-name-study globe-pointing-study globe-module-study globe-export-study globe-drag-study chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study on-this-page-study wider-field-study chart-sheet-study overview-study overview-ink-study figure-anchor-study label-study released-text toggle-shortcut-study control-explanation-study sky-language-study evidence-contracts-ci evidence-provenance icons check-libs check-jdk dist app-image
 
 all: app
 
@@ -59,12 +59,19 @@ help:
 	@echo "  run    Build and launch the app (also logs to build/run.log)"
 	@echo "  run-log  What the last run said, and whether it threw"
 	@echo "  test         Compile and run unit tests"
+	@echo "  classify     Which CI route the change since BASE (origin/main) takes: narrow or wide (#398)"
 	@echo "  chart-image  Write the deterministic reference chart image"
 	@echo "  import-allsky     Regenerate the bright-sky all-sky pack from pinned inputs"
 	@echo "  regional-study    Render the Sprint 6 regional-zoom candidate charts"
 	@echo "  constellation-study  Render the Sprint 7 constellation-geography study"
 	@echo "  import-constellations  Regenerate the bundled constellation-geography pack"
 	@echo "  import-star-identities  Regenerate the bundled star-identity pack"
+	@echo "  import-solar-system  Regenerate the bundled Solar System ephemeris pack from pinned inputs"
+	@echo "  sun-study    Write the first Sun table from the bundled pack (issue #399)"
+	@echo "  moon-study   Write the first Moon table from the bundled pack (issue #407)"
+	@echo "  solar-cartography-study  Measure the Sun and Moon on the atlas's pages, with mockups (issue #414)"
+	@echo "  sun-on-the-chart-study  The Sun on production pages through the module (issue #415)"
+	@echo "  moon-on-the-chart-study The Moon on production pages, and the lunation as a row of phases (issue #416)"
 	@echo "  pan-study         Measure the Sprint 8 grab-to-pan geometry and costs"
 	@echo "  chart-options-study  Render the Sprint 12 chart-options candidates"
 	@echo "  star-identity-study  Measure and render the Sprint 13 star-identity candidates"
@@ -256,6 +263,9 @@ import-allsky: classes
 
 import-constellations: classes
 	$(JAVA) -cp "$(CLASSES_DIR)" juranometria.tool.ConstellationPackMain
+
+import-solar-system: classes
+	$(JAVA) -cp "$(CLASSES_DIR)" juranometria.tool.SolarSystemPackMain
 
 import-star-identities: classes
 	$(JAVA) -cp "$(CLASSES_DIR)" juranometria.tool.StarIdentityPackMain
@@ -567,7 +577,7 @@ black-sky-study: classes
 		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BlackSkyStudyMain \
 		> docs/studies/black-sky/measurements.md
 
-.PHONY: evidence-contracts test-evidence-study place-and-time-study black-sky-study ecliptic-study printable-chart-study
+.PHONY: evidence-contracts test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study sun-on-the-chart-study moon-on-the-chart-study printable-chart-study
 # The heap is stated rather than inherited from whatever a machine's
 # ergonomics chose for it: the CI runner's default quarter-of-RAM is
 # not the same number as a developer's.
@@ -644,6 +654,48 @@ printable-chart-study: classes
 		> docs/studies/printable-chart/measurements.md
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.WiderFieldPageMain
 
+# The first Sun table (issue #399): numbers from the bundled pack,
+# in the columns and rounding the contract froze, for the owner to
+# read before any application surface exists.
+sun-study: classes
+	mkdir -p docs/studies/solar-system
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.SunTableStudyMain \
+		> docs/studies/solar-system/measurements.md
+	@echo "written to docs/studies/solar-system/measurements.md"
+
+# The first Moon table (issue #407): the same, for the Moon, in the
+# columns and rounding the #406 ruling froze.
+moon-study: classes
+	mkdir -p docs/studies/solar-system
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.MoonTableStudyMain \
+		> docs/studies/solar-system/moon-measurements.md
+	@echo "written to docs/studies/solar-system/moon-measurements.md"
+
+# The Sun-Moon cartography contract, measured (issue #414): true-scale
+# discs on every page, how north turns, and candidate marks drawn over
+# production pages as mockups. Needs a display, like the gallery.
+solar-cartography-study: classes
+	mkdir -p docs/studies/solar-cartography
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.SolarCartographyStudyMain \
+		> docs/studies/solar-cartography/measurements.md
+	@echo "written to docs/studies/solar-cartography/measurements.md"
+
+# The Sun on the chart (issue #415): the production composition's own
+# pages with the module attached - production ink, no study overlay.
+sun-on-the-chart-study: classes
+	mkdir -p docs/studies/sun-on-the-chart
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.SunOnTheChartStudyMain \
+		> docs/studies/sun-on-the-chart/measurements.md
+	@echo "written to docs/studies/sun-on-the-chart/measurements.md"
+
+# The Moon on the chart (issue #416): production pages with the module
+# attached, and the June 2026 lunation measured from its own pixels.
+moon-on-the-chart-study: classes
+	mkdir -p docs/studies/moon-on-the-chart
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.MoonOnTheChartStudyMain \
+		> docs/studies/moon-on-the-chart/measurements.md
+	@echo "written to docs/studies/moon-on-the-chart/measurements.md"
+
 ecliptic-study: classes
 	mkdir -p docs/studies/ecliptic
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.EclipticStudyMain \
@@ -682,6 +734,7 @@ dist: app
 	   $(CLASSES_DIR)/resources/geo/constellations/NOTICE-constellations.md \
 	   $(CLASSES_DIR)/resources/catalog/star-identities/NOTICE-star-identities.md \
 	   $(CLASSES_DIR)/resources/catalog/star-identities/LICENSE-BSD-3-Clause.txt \
+	   $(CLASSES_DIR)/resources/solar-system/NOTICE-solar-system.md \
 	   $(DIST_STAGE)/licenses/
 	cp $(CLASSES_DIR)/resources/icons/LICENSE \
 	   $(DIST_STAGE)/licenses/LICENSE-Tabler-MIT.txt
@@ -691,6 +744,21 @@ dist: app
 	cd $(DIST_DIR) && find $(DIST_NAME) | LC_ALL=C sort 		| zip -X -q $(DIST_NAME).zip -@
 	@echo "dist: $(DIST_ZIP)"
 	scripts/verify-dist.sh $(DIST_ZIP)
+
+# The rendering-neutral gate (issue #398), answered before a push:
+# every path changed since the merge base with BASE, judged against
+# the rendering closure of the compiled head. The same program CI
+# runs, so the answer here is the answer there.
+# Listing the change is git's job and stays out of the shipped
+# classes (OfflinePromiseTest lets no shipped class start a process).
+BASE ?= origin/main
+classify: classes
+	@base=$$(git merge-base $(BASE) HEAD); \
+	{ git diff --name-only "$$base"; git ls-files --others --exclude-standard; } \
+		| sort -u > $(BUILD_DIR)/changed-paths.txt
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" \
+		juranometria.tool.ChangeClassifierMain \
+		--changed $(BUILD_DIR)/changed-paths.txt
 
 test: check-libs classes
 	rm -rf $(TEST_CLASSES)

@@ -104,6 +104,50 @@ public final class SkyFrame {
     }
 
     /**
+     * The exact reverse of {@link #toJ2000}: a J2000 position to the
+     * true equator and equinox of date, by the same IAU 1976
+     * precession and IAU 1980 nutation, applied forward (Sprint 35,
+     * issue #399).
+     *
+     * <p>The chart still learns nothing of dates: this exists for the
+     * Solar System service, which computes a body's apparent place of
+     * date from its J2000 direction and the atlas's own precession and
+     * nutation rather than a second model. It is the transpose of the
+     * rotations above, in the reverse order, and a round trip through
+     * both is the identity to floating-point rounding.
+     */
+    public static SkyPosition toOfDate(SkyPosition j2000, double julianDate) {
+        double t = centuries(julianDate);
+        return toPosition(applyNutation(applyPrecession(toVector(j2000), t), t));
+    }
+
+    /** Precession, IAU 1976 (Lieske), forward: J2000 to mean of date. */
+    private static double[] applyPrecession(double[] j2000, double centuries) {
+        double zeta = arcseconds(2306.2181 * centuries
+                + 0.30188 * centuries * centuries
+                + 0.017998 * centuries * centuries * centuries);
+        double z = arcseconds(2306.2181 * centuries
+                + 1.09468 * centuries * centuries
+                + 0.018203 * centuries * centuries * centuries);
+        double theta = arcseconds(2004.3109 * centuries
+                - 0.42665 * centuries * centuries
+                - 0.041833 * centuries * centuries * centuries);
+        // Rz(-z) Ry(theta) Rz(-zeta), applied right to left.
+        return rotateZ(rotateY(rotateZ(j2000, -zeta), theta), -z);
+    }
+
+    /** Nutation, IAU 1980 truncated, forward: mean of date to true. */
+    private static double[] applyNutation(double[] meanOfDate, double centuries) {
+        double[] nutation = nutationDegrees(centuries);
+        double epsilon0 = Math.toRadians(meanObliquityDegrees(centuries));
+        double deltaPsi = Math.toRadians(nutation[0]);
+        double deltaEpsilon = Math.toRadians(nutation[1]);
+        // Rx(-(eps0+deps)) Rz(-dpsi) Rx(eps0), applied right to left.
+        return rotateX(rotateZ(rotateX(meanOfDate, epsilon0), -deltaPsi),
+                -(epsilon0 + deltaEpsilon));
+    }
+
+    /**
      * Precession, IAU 1976 (Lieske), inverted: mean equinox of date
      * back to J2000.
      */

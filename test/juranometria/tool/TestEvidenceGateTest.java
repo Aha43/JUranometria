@@ -308,18 +308,23 @@ class TestEvidenceGateTest {
                         "src/juranometria/tool/ExportSheetDialogSheetMain.java",
                         "src/juranometria/tool/InspectorSheetMain.java",
                         "src/juranometria/tool/MenuSheetMain.java",
+                        "src/juranometria/tool/MoonTableSheetMain.java",
                         "src/juranometria/tool/OnThisPageMockupMain.java",
                         "src/juranometria/tool/OnThisPageSheetMain.java",
                         "src/juranometria/tool/PlaceAndTimeControlsMockupMain.java",
                         "src/juranometria/tool/PlaceAndTimeDialogStudyMain.java",
                         "src/juranometria/tool/PlaceAndTimeSheetMain.java",
                         "src/juranometria/tool/SettingsSheetMain.java",
+                        "src/juranometria/tool/SunTableSheetMain.java",
                         "src/juranometria/tool/SwingChromeSheetMain.java",
                         "src/juranometria/tool/ToggleShortcutStudyMain.java",
                         "src/juranometria/tool/ToolbarSheetMain.java",
                         "src/juranometria/tool/WorkingSelectionMockupMain.java"),
                 unpaired,
-                "the twenty widget photographers, whose font and theme"
+                "the twenty-two widget photographers - the twenty-first"
+                        + " is #400's Sun table sheet and the twenty-second"
+                        + " #408's Moon table sheet, arriving by this"
+                        + " decision - whose font and theme"
                         + " setting dies with the JVM - benign by"
                         + " construction, and pinned so the next one"
                         + " arrives by decision; the fifth arrived by"
@@ -473,15 +478,20 @@ class TestEvidenceGateTest {
                         "AppearanceStore.us" + "er(",
                         "ChartOptionsStore.us" + "er(",
                         "EclipticStore.us" + "er(",
+                        "MoonChartStore.us" + "er(",
                         "PackagedAcceptanceMain.ma" + "in(",
                         "PlaceStore.us" + "er(",
-                        "SkyLanguageStore.us" + "er("),
+                        "SkyLanguageStore.us" + "er(",
+                        "SunChartStore.us" + "er("),
                 TestEvidenceScan.realPreferenceDoors(),
-                "the seven production entry points to the reader's"
+                "the nine production entry points to the reader's"
                         + " store - the sixth is #274's, which keeps"
                         + " one key for whether the ecliptic is shown,"
-                        + " and the seventh is #348's, which keeps the"
-                        + " two language keys. Each arrived by this"
+                        + " the seventh is #348's, which keeps the"
+                        + " two language keys, the eighth is #415's,"
+                        + " which keeps one key for whether the Sun is"
+                        + " on the chart, and the ninth is #416's, the"
+                        + " same for the Moon. Each arrived by this"
                         + " pin changing rather than by a silent gap"
                         + " in a remembered list, which is the whole"
                         + " reason the set is derived");

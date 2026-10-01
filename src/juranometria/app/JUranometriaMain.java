@@ -293,6 +293,34 @@ public final class JUranometriaMain {
         // is the truth it reads, and nothing about it is persisted.
         toolbar.attachEmphasis(chart);
 
+        // The Solar System service reads an 8.9 MB pack; once, and
+        // only when a reader first opens the Sun table (#400).
+        java.util.function.Supplier<juranometria.solar.SolarSystemService>
+                solarSystem = new java.util.function.Supplier<>() {
+                    private juranometria.solar.SolarSystemService loaded;
+
+                    @Override
+                    public synchronized juranometria.solar.SolarSystemService get() {
+                        if (loaded == null) {
+                            loaded = juranometria.solar.SolarSystemService.load();
+                        }
+                        return loaded;
+                    }
+                };
+        // The Sun on the chart (Sprint 37, issue #415): one Solar
+        // System module over Place and Time's observer, read through
+        // the meridian module when the page paints and never copied;
+        // the pack through the same lazy supplier the tables use;
+        // dimmed below the horizon only while the meridian module
+        // draws it. Hidden until the reader switches it on, and the
+        // choice is remembered like the ecliptic's.
+        juranometria.ui.solar.SunChartStore sunChartStore = stores.sunChart();
+        // The Moon (#416) on the same module, with a switch of its own.
+        juranometria.ui.solar.MoonChartStore moonChartStore = stores.moonChart();
+        juranometria.solarchart.SolarSystemModule sunOnChart =
+                juranometria.ui.solar.SunChartSession.begin(modules,
+                        () -> meridian.attached() ? meridian.observer() : null,
+                        solarSystem, meridian::horizonShowing);
         // Built after the controls seam, because the menu
         // says its words in the same language the seam
         // derived from the session (#350).
@@ -356,7 +384,32 @@ public final class JUranometriaMain {
                                             reason),
                                     said.say("viewReport.refused.title"),
                                     javax.swing.JOptionPane.WARNING_MESSAGE);
-                        })));
+                        }),
+                // View, Sun (#400): where the Sun is for the place and
+                // instant the meridian module owns, as a table. The
+                // observer is read from the module when the table asks,
+                // never copied; the pack is read on first opening.
+                () -> juranometria.ui.solar.SolarTableDialog.open(frame,
+                        () -> meridian.attached() ? meridian.observer() : null,
+                        solarSystem.get(),
+                        juranometria.ui.language.InterfaceText.forLanguage(
+                                language.interfaceLanguage()),
+                        juranometria.ui.solar.SolarTable.sun()),
+                // View, Moon (#408): the same table shell over the same
+                // observer and pack, for the Moon's own columns.
+                () -> juranometria.ui.solar.SolarTableDialog.open(frame,
+                        () -> meridian.attached() ? meridian.observer() : null,
+                        solarSystem.get(),
+                        juranometria.ui.language.InterfaceText.forLanguage(
+                                language.interfaceLanguage()),
+                        juranometria.ui.solar.SolarTable.moon()),
+                // View, Sun on the chart (#415): the switch, remembered.
+                juranometria.ui.solar.SunChartSession.toggle(sunOnChart,
+                        sunChartStore),
+                // View, Moon on the chart (#416): its own switch on the
+                // same module, remembered the same way.
+                juranometria.ui.solar.MoonChartSession.toggle(sunOnChart,
+                        moonChartStore)));
         // Both of these read the bar, so both come AFTER it is set.
         // They sat above the menu until the bar moved down to be
         // built in the session's language (#350), and reading a bar
@@ -369,6 +422,10 @@ public final class JUranometriaMain {
         juranometria.ui.ecliptic.EclipticSession.restore(ecliptic,
                 eclipticStore,
                 AppMenuBar.eclipticItem(frame.getJMenuBar()));
+        juranometria.ui.solar.SunChartSession.restore(sunOnChart,
+                sunChartStore, AppMenuBar.sunChartItem(frame.getJMenuBar()));
+        juranometria.ui.solar.MoonChartSession.restore(sunOnChart,
+                moonChartStore, AppMenuBar.moonChartItem(frame.getJMenuBar()));
         javax.swing.JCheckBoxMenuItem inspectorItem =
                 AppMenuBar.inspectorItem(frame.getJMenuBar());
         if (inspectorItem != null) {

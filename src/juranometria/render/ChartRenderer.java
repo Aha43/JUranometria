@@ -536,8 +536,8 @@ public final class ChartRenderer {
     public void render(Graphics2D g, ChartScene scene, ChartOptions options,
                        ReferenceLayer reference,
                        java.util.List<LabelPlacement.Placement> given) {
-        renderRaising(g, scene, options, reference, given,
-                structure -> false);
+        renderRaising(g, scene, options, reference, ReferenceLayer.NONE,
+                given, structure -> false);
     }
 
     /**
@@ -554,7 +554,23 @@ public final class ChartRenderer {
                        ReferenceLayer reference,
                        java.util.List<LabelPlacement.Placement> given,
                        java.util.Set<ChartStructure> emphasized) {
-        renderRaising(g, scene, options, reference, given,
+        renderRaising(g, scene, options, reference, ReferenceLayer.NONE,
+                given, ChartStructure.membersOf(emphasized));
+    }
+
+    /**
+     * The same, with a layer of Solar System bodies (Sprint 37, issue
+     * #415, under the #414 ruling): painted after every catalogue
+     * mark and label and before the page's furniture, so an opaque
+     * disc hides what it covers and nothing but the title block, the
+     * key and the frame is drawn over it. {@code NONE} draws the
+     * released page.
+     */
+    public void render(Graphics2D g, ChartScene scene, ChartOptions options,
+                       ReferenceLayer reference, ReferenceLayer bodies,
+                       java.util.List<LabelPlacement.Placement> given,
+                       java.util.Set<ChartStructure> emphasized) {
+        renderRaising(g, scene, options, reference, bodies, given,
                 ChartStructure.membersOf(emphasized));
     }
 
@@ -569,17 +585,31 @@ public final class ChartRenderer {
                        ReferenceLayer reference,
                        java.util.List<LabelPlacement.Placement> given,
                        ChartStructure emphasized) {
-        renderRaising(g, scene, options, reference, given,
+        renderRaising(g, scene, options, reference, ReferenceLayer.NONE,
+                given, structure -> structure == emphasized);
+    }
+
+    /** The same, with a layer of Solar System bodies (#415). */
+    public void render(Graphics2D g, ChartScene scene, ChartOptions options,
+                       ReferenceLayer reference, ReferenceLayer bodies,
+                       java.util.List<LabelPlacement.Placement> given,
+                       ChartStructure emphasized) {
+        renderRaising(g, scene, options, reference, bodies, given,
                 structure -> structure == emphasized);
     }
 
     private void renderRaising(Graphics2D g, ChartScene scene,
                                ChartOptions options,
                                ReferenceLayer reference,
+                               ReferenceLayer bodies,
                                java.util.List<LabelPlacement.Placement>
                                        given,
                                java.util.function.Predicate<ChartStructure>
                                        emphasized) {
+        if (bodies == null) {
+            throw new IllegalArgumentException("the bodies layer is NONE"
+                    + " for a page carrying no Solar System body, never null");
+        }
         int width = scene.viewport().widthPx();
         int height = scene.viewport().heightPx();
         ChartPalette palette = options.palette();
@@ -716,6 +746,12 @@ public final class ChartRenderer {
                 placement -> !isDeepSkyText(placement.request(), scene));
         drawText(g, LABEL_FONT, palette.textInk(), placedText,
                 placement -> isDeepSkyText(placement.request(), scene));
+        // The Solar System bodies (#415): above every mark and label
+        // the catalogue drew, below the furniture. Within the sky, so
+        // a disc at a bounded page's limb is cut where the sky is.
+        g.setClip(sky);
+        bodies.paint(g, scene, java.util.List.copyOf(reserved));
+        g.setClip(paper);
         // Furniture last and opaque, in the decided order (Sprint 20,
         // docs/decisions/chart-furniture.md): neither block is ever
         // half-covered by chart ink, and each is the reader's to
@@ -782,8 +818,9 @@ public final class ChartRenderer {
     private static final double LIMB_STRENGTH = 0.25;
 
     /** An ink let down towards the ground, for furniture that must not shout. */
-    private static java.awt.Color quiet(java.awt.Color ink,
-                                        java.awt.Color ground) {
+    /** An ink moved most of the way towards the ground: the limb's, a dimmed body's. */
+    public static java.awt.Color quiet(java.awt.Color ink,
+                                       java.awt.Color ground) {
         return new java.awt.Color(
                 towards(ground.getRed(), ink.getRed()),
                 towards(ground.getGreen(), ink.getGreen()),

@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="600" viewBox="0 0 1000 600" font-family="Helvetica, Arial, sans-serif" font-size="15">
+  <rect width="1000" height="600" fill="white"/>
+  <title>Phase angle and elongation: the Sun, the Moon and the observer</title>
+  <!-- Sun -->
+  <circle cx="110" cy="130" r="36" fill="#f5d76e" stroke="#b58a00" stroke-width="2"/>
+  <text x="110" y="190" text-anchor="middle" font-weight="bold">Sun</text>
+  <!-- Moon: lit half faces the Sun (to the left) -->
+  <defs>
+    <clipPath id="moonClip"><circle cx="600" cy="130" r="34"/></clipPath>
+  </defs>
+  <circle cx="600" cy="130" r="34" fill="#3a3a3a" stroke="#1a1a1a" stroke-width="2"/>
+  <g clip-path="url(#moonClip)">
+    <rect x="566" y="96" width="34" height="68" fill="#e8e8e8"/>
+  </g>
+  <text x="600" y="190" text-anchor="middle" font-weight="bold">Moon</text>
+  <!-- Observer on the Earth's surface -->
+  <circle cx="870" cy="300" r="28" fill="#9dc3e6" stroke="#2f5d8a" stroke-width="2"/>
+  <circle cx="852" cy="279" r="3.5" fill="#1a1a1a"/>
+  <text x="870" y="350" text-anchor="middle" font-weight="bold">observer</text>
+  <text x="870" y="370" text-anchor="middle" font-size="12" fill="#444">on the Earth's surface (topocentric)</text>
+  <!-- Moon -> Sun, Moon -> observer, observer -> Sun -->
+  <line x1="146" y1="130" x2="566" y2="130" stroke="#b58a00" stroke-width="2" stroke-dasharray="6 5"/>
+  <line x1="624" y1="154" x2="852" y2="279" stroke="#1a1a1a" stroke-width="2"/>
+  <line x1="140" y1="150" x2="852" y2="279" stroke="#2f5d8a" stroke-width="2" stroke-dasharray="6 5"/>
+  <!-- phase angle i at the Moon -->
+  <path d="M 560 130 A 40 40 0 0 0 632 152" fill="none" stroke="#c0392b" stroke-width="2.5"/>
+  <text x="548" y="176" fill="#c0392b" font-weight="bold" font-size="20">i</text>
+  <!-- elongation psi at the observer -->
+  <path d="M 808 271 A 45 45 0 0 1 813 258" fill="none" stroke="#1f7a4d" stroke-width="2.5"/>
+  <text x="782" y="262" fill="#1f7a4d" font-weight="bold" font-size="20">ψ</text>
+  <!-- definitions -->
+  <g font-size="15">
+    <text x="40" y="420" font-weight="bold">Definitions the contract freezes</text>
+    <text x="40" y="448"><tspan fill="#c0392b" font-weight="bold">i</tspan>, phase angle: at the Moon, between the direction to the Sun and the direction to the observer.</text>
+    <text x="40" y="470">0° at full Moon, 90° at the quarters, 180° at new Moon. Illuminated fraction k = (1 + cos i) / 2.</text>
+    <text x="40" y="498"><tspan fill="#1f7a4d" font-weight="bold">ψ</tspan>, elongation: at the observer, between the direction to the Sun and the direction to the Moon.</text>
+    <text x="40" y="520">0° near new Moon, 180° near full; the side is stated - the Moon east of the Sun (evening) or west of it (morning).</text>
+    <text x="40" y="548">Both from topocentric, light-time-corrected positions. Waxing: elongation east of the Sun and growing; waning: west of it.</text>
+  </g>
+  <text x="40" y="585" font-size="12" fill="#666">JUranometria, issue #406 - figure 1 of 2. Not to scale.</text>
+</svg>

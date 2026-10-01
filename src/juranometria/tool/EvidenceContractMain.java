@@ -91,6 +91,22 @@ public final class EvidenceContractMain {
                 "docs/studies/working-selection/measurements.md");
         REPORT_MAINS.put("juranometria.tool.EclipticStudyMain",
                 "docs/studies/ecliptic/measurements.md");
+        REPORT_MAINS.put("juranometria.tool.SunTableStudyMain",
+                "docs/studies/solar-system/measurements.md");
+        REPORT_MAINS.put("juranometria.tool.MoonTableStudyMain",
+                "docs/studies/solar-system/moon-measurements.md");
+        // The Sun-Moon cartography contract's measurements (#414):
+        // the report is deterministic; its mockup pages are held
+        // beside it through IMAGE_MAINS.
+        REPORT_MAINS.put("juranometria.tool.SolarCartographyStudyMain",
+                "docs/studies/solar-cartography/measurements.md");
+        // The Sun on production pages (#415): the report is
+        // deterministic; its pages are held through IMAGE_MAINS.
+        REPORT_MAINS.put("juranometria.tool.SunOnTheChartStudyMain",
+                "docs/studies/sun-on-the-chart/measurements.md");
+        // The Moon on production pages (#416), the same way.
+        REPORT_MAINS.put("juranometria.tool.MoonOnTheChartStudyMain",
+                "docs/studies/moon-on-the-chart/measurements.md");
         REPORT_MAINS.put("juranometria.tool.PrintableChartStudyMain",
                 "docs/studies/printable-chart/measurements.md");
         // Not prose but an oracle: the released pages' own pixels
@@ -350,6 +366,16 @@ public final class EvidenceContractMain {
             // The gallery's module slides (issue #252): composed by
             // the production component, renderer-drawn contract.
             "juranometria.tool.GalleryPageMain",
+            // The Sun-Moon cartography mockups (issue #414): production
+            // pages composed by the component, with the study's own
+            // candidate marks drawn over them; renderer-drawn contract.
+            "juranometria.tool.SolarCartographyStudyMain",
+            // The Sun on the chart (issue #415): production pages
+            // composed by the component with the module attached.
+            "juranometria.tool.SunOnTheChartStudyMain",
+            // The Moon on the chart (issue #416): the same, and the
+            // lunation strip cut from production pages.
+            "juranometria.tool.MoonOnTheChartStudyMain",
             // The working-selection surface mock-ups (issue #258):
             // widget-rendered inspection, the selection- prefix.
             "juranometria.tool.WorkingSelectionMockupMain",

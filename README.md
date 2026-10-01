@@ -145,6 +145,16 @@ make import-constellations
 make import-star-identities
 ```
 
+The Solar System ephemeris pack under `src/resources/solar-system/` - a
+JUranometria-modified excerpt of JPL DE440 and the IERS leap-second
+file - is generated from its own pinned inputs, and rebuilding it
+writes the same bytes:
+
+```sh
+scripts/download-solar-system-sources.sh   # ~32 MB de440s.bsp and Leap_Second.dat
+make import-solar-system                   # verifies the pins, proves the excerpt, writes the pack
+```
+
 ## Using the atlas
 
 `make run` opens the M31 region chart. The toolbar above the page:
@@ -260,6 +270,17 @@ make import-star-identities
   and the switches deliberately are not, so every session begins
   with the ordinary chart and no stale saved clock can masquerade
   as now.
+- **Ask where the Sun is.** **View → Sun…** shows, for the place and
+  instant set in Place and Time, the Sun's right ascension and
+  declination in the chart's own J2000 frame, its ecliptic longitude,
+  its altitude and azimuth above the mathematical horizon (without
+  refraction; a negative altitude keeps its number and says it is
+  below the horizon), its distance, and how large it looks - at that
+  instant, or a row for every step of a range you choose. The numbers
+  come from a bundled excerpt of JPL's DE440 ephemeris and the IERS
+  leap-second record, held to JPL Horizons, and work offline; the
+  table says when its clock correction is estimated. Nothing is drawn
+  on the chart yet.
 - **Reset view** returns to the default M31 centre, 8° field, and
   stars to V 8.0, clearing the search.
 - The readout on the right and the chart's title block always state the

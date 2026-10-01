@@ -1,0 +1,78 @@
+# The rendering-neutral gate (issue #398): which route a change takes.
+#
+# Calculation and table work - the Sun, the Moon, later the planets -
+# should not pay for the hour-long rendering regime when nothing in
+# the change can reach a renderer. But "cannot reach" is not something
+# a pull request may assert about itself. This workflow computes it:
+# juranometria.tool.ChangeClassifierMain follows every reference from
+# the programs whose output CI compares (the evidence contract and its
+# generators, the provenance recorder, the smoke render, every
+# interface photographer) and judges each changed path against that
+# closure and against the inputs the regime consumes without
+# compiling - committed evidence, resources, packaging, the build,
+# the workflows, the application's entry points, and the guard itself.
+#
+# The answer is `route`: `narrow` when no path can alter rendering or
+# the evidence of it, `wide` otherwise. The callers gate their
+# expensive jobs on it. The unit and display suites never consult it.
+#
+# Only a pull request can be narrow. A push to main, a tag and a
+# manual dispatch are wide by event, whatever they changed, so what
+# lands, what is released and what somebody asked for by hand always
+# gets the whole regime. And a classification that cannot be computed
+# fails this job, which skips every job that needs it and turns the
+# run red: silence is never read as narrow.
+#
+# Permanent, and body-agnostic. It is not a sprint's shortcut to be
+# reverted later; docs/decisions/rendering-neutral-gate.md records it.
+name: classify
+
+on:
+  workflow_call:
+    outputs:
+      route:
+        description: "narrow when nothing can reach rendering, else wide"
+        value: ${{ jobs.classify.outputs.route }}
+
+jobs:
+  classify:
+    runs-on: ubuntu-latest
+    outputs:
+      route: ${{ steps.route.outputs.route }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # The merge base with the target branch has to be reachable,
+          # or there is no change to classify.
+          fetch-depth: 0
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/cache@v6
+        with:
+          path: lib
+          key: libs-${{ hashFiles('scripts/lib-versions.env') }}
+      - run: scripts/download-libs.sh
+      - name: Compile the head, so the closure is of what will run
+        run: make classes
+      - name: List every path changed since the merge base with the target
+        # Only a pull request has a base to diff against; every other
+        # event is wide before a path is read. Listing the change is
+        # git's job here, not the classifier's: no shipped class may
+        # start a process (OfflinePromiseTest), and none needs to.
+        if: github.event_name == 'pull_request'
+        run: |
+          base=$(git merge-base "${{ github.event.pull_request.base.sha }}" HEAD)
+          { git diff --name-only "$base"; git ls-files --others --exclude-standard; } \
+            | sort -u > build/changed-paths.txt
+          echo "merge base $base; $(wc -l < build/changed-paths.txt) changed path(s)"
+      - name: Classify every changed path against the rendering closure
+        id: route
+        run: |
+          java -cp "build/classes:lib/*" \
+            juranometria.tool.ChangeClassifierMain \
+            --event "${{ github.event_name }}" \
+            --changed build/changed-paths.txt \
+            --github-output "$GITHUB_OUTPUT" \
+            --summary "$GITHUB_STEP_SUMMARY"

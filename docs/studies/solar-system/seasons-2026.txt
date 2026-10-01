@@ -1,0 +1,35 @@
+# The seasonal events of 2026, as published (issue #399, owner checkpoint)
+#
+# Source: P. Rocher, Institut de mécanique céleste et de calcul des
+# éphémérides (IMCCE), Observatoire de Paris - the tables of the dates
+# of the equinoxes and solstices from 1583 to 2999, published at
+# imcce.fr. Times are stated in the tables as UT (temps universel),
+# to the second. Read on 2026-09-29 from the documents' own text
+# streams; the digests are of the PDFs as retrieved that day.
+#
+#   Équinoxe de printemps: https://www.imcce.fr/newsletter/docs/Equinoxe_printemps_1583_2999.pdf
+#     837562 bytes, sha256 666129d0bff8cac854a3e2ca8db47473dc1cd41b18e9d8b487575ca94a269df4
+#   Solstice d'été:        https://www.imcce.fr/newsletter/docs/Solstice_ete_1583_2999.pdf
+#     777265 bytes, sha256 c96d9d39d4f6ac3899718f8f4f2be6587c494529437ae683eaccabf16f9aa733
+#   Équinoxe d'automne:    https://www.imcce.fr/newsletter/docs/Equinoxe_automne_1583_2999.pdf
+#     792744 bytes, sha256 c2d3c5fc7c5eb466d753b693f89078b802397b432b43fb3ef4a9f65880f4e784
+#   Solstice d'hiver:      https://www.imcce.fr/newsletter/docs/Solstice_hiver_1583_2999.pdf
+#     778632 bytes, sha256 4ea7cd51348eeb8be4036d02ae8c9444d7a2350000cff8b65b32fc6a87ed7973
+#
+# Why this file exists: the first Sun table named the June solstice and
+# the September equinox at instants supplied from memory, hours wrong.
+# Every place that names a seasonal event - the study, the Horizons
+# request script, the contract test - now reads these rows and never
+# types an instant of its own.
+#
+# One known spread inside the IMCCE's own publications: a 2026
+# newsletter document gives the June solstice as 08h 24m 31,64s UTC,
+# 5.6 s later than the table quoted here. This file pins the tables,
+# one source for all four events; the difference is below the second
+# of motion that matters to any column the atlas shows.
+#
+# columns: event <tab> instant (UTC, ISO 8601) <tab> the row as published
+march-equinox	2026-03-20T14:45:53Z	le 20/03/2026 à 14h 45m 53s UT
+june-solstice	2026-06-21T08:24:26Z	le 21/06/2026 à 08h 24m 26s UT
+september-equinox	2026-09-23T00:05:08Z	le 23/09/2026 à 00h 05m 08s UT
+december-solstice	2026-12-21T20:50:09Z	le 21/12/2026 à 20h 50m 09s UT

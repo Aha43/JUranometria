@@ -24,6 +24,11 @@
       "id": "ecliptic",
       "name": "The Ecliptic",
       "lead": "A removable module that lays one permanent circle over the fixed chart: the plane the Earth's orbit defines, with the two equinoxes and two solstices marked where they sit in J2000. It has no date and no observer, and it draws no Sun."
+    },
+    {
+      "id": "sun-and-moon",
+      "name": "The Sun and the Moon",
+      "lead": "One removable module that draws the Sun and the Moon for Place and Time's single moment: each at its true angular size, never enlarged; the Sun a ring with its centre dot, the Moon a disc lit on the side the Moon table states; dimmed and saying so when below a drawn horizon."
     }
   ],
   "slides": [
@@ -169,6 +174,32 @@
       "source": "docs/studies/gallery/ecliptic-solstice.png",
       "produced": "Composed by the production chart component with the real ecliptic module and reference-ink painter (GalleryPageMain); regenerated and compared by make evidence-contracts. Sprint 28 tree (d9be561).",
       "alt": "A star chart on the Gemini and Taurus border with a dash-dot line labelled Ecliptic running horizontally through a small open diamond labelled June solstice, the cluster M 35 above it and Orion below."
+    },
+    {
+      "slug": "sun-and-moon-crescent",
+      "room": "sun-and-moon",
+      "kind": "chart",
+      "title": "A young Moon at true size",
+      "caption": "The gallery's moment — Oslo, 2026-03-20 21:33 UTC — on a 3° page: the Moon 4.3 % lit, a thin crescent on the side towards the Sun, 23.8° away to the west. The disc is drawn at its true angular size; its unlit part is inked, so nothing behind it shows through.",
+      "region": "Pisces",
+      "field": "3°",
+      "ink": "The phased disc and its name are Sun and Moon module ink; everything else is the core chart.",
+      "source": "docs/studies/gallery/sun-and-moon-crescent.png",
+      "produced": "Composed by the production chart component with the real Solar System module and body painter (GalleryPageMain); regenerated and compared by make evidence-contracts. Sprint 37 tree.",
+      "alt": "A star chart in Pisces at a 3 degree field, centred on a large grey disc labelled Moon with a thin white crescent along its right-hand edge, a few stars and small galaxy outlines around it."
+    },
+    {
+      "slug": "sun-and-moon-horizon",
+      "room": "sun-and-moon",
+      "kind": "chart",
+      "title": "Both below the horizon",
+      "caption": "The same moment on a 36° page with Oslo's mathematical horizon drawn: the Moon has set, 8.2° below it, and the Sun is 26.2° below. Both are drawn where they are, dimmed towards the paper, each saying it is below the horizon.",
+      "region": "Pisces",
+      "field": "36°",
+      "ink": "The dashed horizon is Place and Time module ink; the two dimmed bodies and their names are Sun and Moon module ink; everything else is the core chart.",
+      "source": "docs/studies/gallery/sun-and-moon-horizon.png",
+      "produced": "Composed by the production chart component with the real meridian and Solar System modules and reference-ink and body painters (GalleryPageMain); regenerated and compared by make evidence-contracts. Sprint 37 tree.",
+      "alt": "A star chart of Pisces with Aries, Andromeda and Pegasus at the edges, a dashed line labelled Mathematical horizon crossing the upper left, a small pale disc labelled Moon (below the horizon) left of centre, and a small pale ring labelled Sun (below the horizon) near the lower right corner."
     }
   ]
 }

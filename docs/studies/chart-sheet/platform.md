@@ -18,16 +18,22 @@ Recorded on: `Mac OS X 27.0/aarch64/Homebrew 21.0.12.1`
 
 What a sheet weighs is what its fonts encode to: an SVG with its text as
 outlines carries the glyph paths of whatever font drew it, and a PNG carries
-whatever those glyphs rasterised to. The report beside this one carries the
-file's structure - how many shapes, how many labels, which paper - which is
-the sheet's own answer and the same everywhere.
+whatever those glyphs rasterised to. How many labels the page placed is
+the fonts' answer as well: the renderer fits a label by its font's metrics, so
+another machine may fit one more or one fewer on the same sheet - the
+solar-system sheet placed 15 on macOS and 14 on Linux (#418). The report
+beside this one carries the file's structure - its shapes and its paper -
+which is the sheet's own answer and the same everywhere.
 
-| file | bytes |
-|---|---:|
-| `sheet-a4.svg` | 461379 |
-| `sheet-letter.svg` | 504392 |
-| `sheet-a4-outlines.svg` | 536890 |
-| `sheet-a4-modules.svg` | 392296 |
-| `sheet-a4.pdf` | 516013 |
-| `sheet-a4-modules.pdf` | 421221 |
-| `sheet-a4-300dpi.png` | 428567 |
+| file | bytes | labels placed |
+|---|---:|---:|
+| `sheet-a4.svg` | 461379 | 26 |
+| `sheet-letter.svg` | 504392 | 26 |
+| `sheet-a4-outlines.svg` | 536890 | 0 (as outlines) |
+| `sheet-a4-modules.svg` | 392296 | 16 |
+| `sheet-a4.pdf` | 516013 | 26 as outlines |
+| `sheet-a4-modules.pdf` | 421221 | 16 as outlines |
+| `sheet-a4-300dpi.png` | 428567 | 26 |
+| `sheet-a4-solar-system.svg` | 397144 | 15 |
+| `sheet-a4-solar-system.pdf` | 423402 | 15 as outlines |
+| `sheet-a4-solar-system.png` | 377346 | 15 |

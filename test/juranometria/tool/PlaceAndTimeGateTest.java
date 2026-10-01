@@ -109,27 +109,90 @@ class PlaceAndTimeGateTest {
         }
     }
 
+    /**
+     * The Solar System's own home, and the only one (issue #398, R1).
+     *
+     * <p>Until #398 this test forbade any bundled resource whose name
+     * said leap, ut1, ephemeris, iers or horizon, anywhere under
+     * {@code src/resources}: Place and Time was to bring no data,
+     * because data brings a provenance and a licence with it. That
+     * rule still holds for Place and Time. What changed is that the
+     * Sun and Moon need exactly such data, and the owner ruled that a
+     * <em>separately owned</em> Solar System pack and service may
+     * carry it - so the test now proves ownership rather than banning
+     * astronomy-shaped filenames across the whole application.
+     */
+    private static final Path SOLAR_SYSTEM_PACK =
+            Path.of("src/resources/solar-system");
+
+    private static final List<String> TIME_AND_EPHEMERIS_NAMES =
+            List.of("leap", "ut1", "ephemeris", "iers", "horizon",
+                    "de440", "delta-t", "deltat", ".bsp", ".tls");
+
     @Test
-    void theGateBringsNoNewBundledResource() throws IOException {
+    void timeScaleAndEphemerisDataLiveOnlyInTheSolarSystemPack()
+            throws IOException {
         // The licensing position is one of the few things the atlas
         // cannot renegotiate quietly: the bundled pack is CC BY-NC
         // 3.0 IGO and the application is non-commercial because of
-        // it. A gate that added a resource would be adding a
-        // provenance question with it.
+        // it. A resource with a provenance of its own belongs where
+        // its provenance is kept - the Solar System pack carries its
+        // source, digests, coverage and terms beside its data - and
+        // nowhere else.
+        List<String> strays = new ArrayList<>();
         try (Stream<Path> tree = Files.walk(Path.of("src/resources"))) {
-            long added = tree.filter(Files::isRegularFile)
-                    .filter(path -> {
-                        String name = path.getFileName().toString()
-                                .toLowerCase(java.util.Locale.ROOT);
-                        return name.contains("leap") || name.contains("ut1")
-                                || name.contains("ephemeris")
-                                || name.contains("iers")
-                                || name.contains("horizon");
-                    }).count();
-            assertEquals(0, added,
-                    "no time-scale table, no ephemeris, nothing with a"
-                            + " provenance of its own");
+            for (Path path : (Iterable<Path>) tree
+                    .filter(Files::isRegularFile)::iterator) {
+                String name = path.getFileName().toString()
+                        .toLowerCase(java.util.Locale.ROOT);
+                boolean astronomical = TIME_AND_EPHEMERIS_NAMES.stream()
+                        .anyMatch(name::contains);
+                if (astronomical && !path.startsWith(SOLAR_SYSTEM_PACK)) {
+                    strays.add(path.toString());
+                }
+            }
         }
+        assertEquals(List.of(), strays,
+                "no time-scale table, no ephemeris, nothing with a"
+                        + " provenance of its own outside "
+                        + SOLAR_SYSTEM_PACK);
+    }
+
+    /**
+     * Place and Time owns the observer and the civil instant, and
+     * learns nothing of how an ephemeris works (issue #398, R1).
+     *
+     * <p>Read from compiled classes, as {@code RemovableModelBoundaryTest}
+     * reads them: every {@code juranometria} type a class refers to is
+     * in its constant pool, and a reference to the Solar System
+     * service from the sky model, the meridian module or the Place
+     * and Time dialog is the dependency the ruling forbids. The other
+     * direction - the service consuming Place and Time's observer -
+     * is the design.
+     */
+    @Test
+    void placeAndTimeDoesNotLearnHowAnEphemerisWorks() throws IOException {
+        List<String> leaks = new ArrayList<>();
+        for (String pkg : List.of("juranometria/sky", "juranometria/meridian",
+                "juranometria/ui/placeandtime")) {
+            Path dir = Path.of("build/classes").resolve(pkg);
+            try (Stream<Path> tree = Files.walk(dir)) {
+                for (Path file : (Iterable<Path>) tree
+                        .filter(p -> p.toString().endsWith(".class"))::iterator) {
+                    RenderingClosure.ClassFile parsed =
+                            RenderingClosure.ClassFile.read(file);
+                    for (String referred : parsed.referenced) {
+                        if (referred.startsWith("juranometria/solar")) {
+                            leaks.add(parsed.name + " refers to " + referred);
+                        }
+                    }
+                }
+            }
+        }
+        assertEquals(List.of(), leaks,
+                "the sky model, the meridian module and the Place and"
+                        + " Time dialog refer to nothing under"
+                        + " juranometria.solar");
     }
 
     @Test

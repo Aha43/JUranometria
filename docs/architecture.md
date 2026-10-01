@@ -214,13 +214,20 @@ dialog knows nothing of the sky.
 
 **The Solar System road.** The ecliptic is the frame the Solar System is
 described in, so this module is the frame arriving without any of the
-bodies. A future module drawing the Sun, the Moon or a planet can express
-its positions in ecliptic coordinates through `juranometria.sky.Ecliptic`
-and contribute them as ordinary points and paths, while the chart stays
-fixed to J2000 and learns no ephemeris. The transformation is already
-here, held to an authority; what such a module would add is its own
-ephemeris data and its own lifecycle, both removable, and the chart would
-not need to change to accept them.
+bodies. Sprint 35 brought the first body as numbers: `juranometria.solar`
+is a removable service that consumes Place and Time's observer and civil
+instant and answers where the Sun is - chart position in J2000, apparent
+place of date, altitude and azimuth, distance, apparent diameter - from
+a bundled, digest-verified excerpt of JPL DE440 and the IERS leap-second
+file, offline, under the contract in
+[`decisions/sun-computation.md`](decisions/sun-computation.md), and
+`juranometria.ui.solar` is the reader's table over it - View → Sun… -
+which reads the observer from the meridian module on demand and keeps
+no state of its own. It draws nothing yet. A later module drawing the Sun, the Moon or a planet will
+express its positions through `juranometria.sky.Ecliptic` and contribute
+them as ordinary points and paths, while the chart stays fixed to J2000
+and learns no ephemeris: the service is held to refer to no renderer,
+and the chart core, the sky model and Place and Time to nothing under it.
 
 ## Decisions deliberately deferred
 

@@ -37,14 +37,15 @@ class InterfaceLanguageStatusTest {
     private static final Path COMPANIONS =
             Path.of("docs/studies/interface-language");
 
-    /** The twelve companions that describe the Norwegian interface. */
+    /** The fourteen companions that describe the Norwegian interface. */
     private static final List<String> EVERY_COMPANION = List.of(
             "about-strings.md", "chartkeyboard-strings.md",
             "chartoptions-strings.md", "export-strings.md",
-            "inspector-strings.md", "menu-strings.md",
+            "inspector-strings.md", "menu-strings.md", "moontable-strings.md",
             "onthispage-strings.md", "page-language-strings.md",
             "placeandtime-strings.md", "settings-strings.md",
-            "swing-chrome-strings.md", "toolbar-strings.md");
+            "suntable-strings.md", "swing-chrome-strings.md",
+            "toolbar-strings.md");
 
     @Test
     void theManifestIsWhereTheStatusLives() {

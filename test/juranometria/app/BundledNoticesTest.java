@@ -90,6 +90,39 @@ class BundledNoticesTest {
     }
 
     @Test
+    void theSolarSystemPackShipsWithItsNoticeAndProvenance() {
+        String notice = resourceText(
+                "/resources/solar-system/NOTICE-solar-system.md");
+        assertTrue(notice.contains("modified kernel"),
+                "the excerpt is called what NAIF's rules call it");
+        assertTrue(notice.contains("not an original JPL file"),
+                "and never presented as JPL's own");
+        assertTrue(notice.contains("NAIF") && notice.contains("DE440"));
+        assertTrue(notice.contains("doi:10.3847/1538-3881/abd414"),
+                "the ephemeris authors are acknowledged");
+        assertTrue(notice.contains("IERS") && notice.contains("unmodified"),
+                "the leap-second file is the IERS's, unchanged");
+        String provenance = resourceText("/resources/solar-system/PROVENANCE.md");
+        for (String required : new String[] {"naif.jpl.nasa.gov", "hpiers.obspm.fr",
+                "SHA-256", "SpkExcerpt", "Validation", "identical to the source"}) {
+            assertTrue(provenance.contains(required),
+                    "the provenance records " + required);
+        }
+    }
+
+    @Test
+    void everySolarSystemResourceShipsOnTheClasspath() {
+        for (String resource : new String[] {
+                "manifest.properties",
+                "juranometria-de440-sun-emb-earth-moon-1900-2100.bsp",
+                "Leap_Second.dat", "NOTICE-solar-system.md", "PROVENANCE.md"}) {
+            assertNotNull(BundledNoticesTest.class.getResource(
+                            "/resources/solar-system/" + resource),
+                    resource + " must ship as a resource");
+        }
+    }
+
+    @Test
     void everyConstellationGeographyResourceShipsOnTheClasspath() {
         for (String resource : new String[] {
                 "manifest.properties", "constellations.csv", "figures.csv",

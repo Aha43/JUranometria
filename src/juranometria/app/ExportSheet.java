@@ -164,6 +164,26 @@ public final class ExportSheet {
                 destination, replace, SINK, said, emphasized);
     }
 
+    /**
+     * The same, carrying the Solar System bodies the screen shows
+     * (#418, correcting #415: the application's export passed only the
+     * reference layer, so a sheet lost the Sun and the Moon the reader
+     * had switched on).
+     */
+    public static Outcome write(ChartSheet.Pages pages,
+                                ChartViewState state, ChartOptions options,
+                                ChartRenderer.ReferenceLayer ink,
+                                ChartRenderer.ReferenceLayer bodies,
+                                ChartRenderer.ReferenceLayer overChart,
+                                Request request, File destination,
+                                ReplaceDecision replace,
+                                juranometria.ui.language.InterfaceText said,
+                                java.util.Set<juranometria.render.ChartStructure>
+                                        emphasized) {
+        return write(pages, state, options, ink, bodies, overChart, request,
+                destination, replace, SINK, said, emphasized);
+    }
+
     /** The same, writing however it is told to - a seam for tests. */
     static Outcome write(ChartSheet.Pages pages,
                          ChartViewState state, ChartOptions options,
@@ -180,6 +200,21 @@ public final class ExportSheet {
     static Outcome write(ChartSheet.Pages pages,
                          ChartViewState state, ChartOptions options,
                          ChartRenderer.ReferenceLayer ink,
+                         ChartRenderer.ReferenceLayer overChart,
+                         Request request, File destination,
+                         ReplaceDecision replace, ByteSink sink,
+                         juranometria.ui.language.InterfaceText said,
+                         java.util.Set<juranometria.render.ChartStructure> emphasized) {
+        return write(pages, state, options, ink,
+                ChartRenderer.ReferenceLayer.NONE, overChart, request,
+                destination, replace, sink, said, emphasized);
+    }
+
+    /** The deepest seam, with the bodies layer and the emphasized structure stated. */
+    static Outcome write(ChartSheet.Pages pages,
+                         ChartViewState state, ChartOptions options,
+                         ChartRenderer.ReferenceLayer ink,
+                         ChartRenderer.ReferenceLayer bodies,
                          ChartRenderer.ReferenceLayer overChart,
                          Request request, File destination,
                          ReplaceDecision replace, ByteSink sink,
@@ -240,7 +275,7 @@ public final class ExportSheet {
             // exports what they are looking at gets a file that says
             // what the screen said (#349, #350).
             SheetRecording sheet = ChartSheet.record(pages, state, options,
-                    ink, overChart, request.paper(),
+                    ink, bodies, overChart, request.paper(),
                     juranometria.ui.language.PageText.in(said),
                     emphasized);
             bytes = SheetWriters.write(sheet, request.format(),

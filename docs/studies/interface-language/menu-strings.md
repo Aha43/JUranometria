@@ -40,7 +40,7 @@ open menu would cover the thing it explains.
 
 ![](menu-en-1-menus.png)
 
-Bar packed 572 × 195 px; widest popup 211 px.
+Bar packed 575 × 287 px; widest popup 211 px.
 
 | channel | words |
 |---|---|
@@ -66,6 +66,16 @@ Bar packed 572 × 195 px; widest popup 211 px.
 | item spoken name \| Place and Time |
 | item spoken description \| Opens the window that sets your location and the instant used to draw the meridian, horizon and zenith |
 | item access letter (language) \| P |
+| item label \| Sun... |
+| item hover \| Where the Sun is, for the place and instant set in Place and Time |
+| item spoken name \| Sun table |
+| item spoken description \| Opens a table of the Sun's computed position, height above the horizon, distance and apparent size for the observing place and instant set in Place and Time, at that instant or over a range of instants. Nothing is drawn on the chart. |
+| item access letter (language) \| S |
+| item label \| Moon... |
+| item hover \| Where the Moon is, for the place and instant set in Place and Time |
+| item spoken name \| Moon table |
+| item spoken description \| Opens a table of the Moon's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the observing place and instant set in Place and Time, at that instant or over a range of instants. |
+| item access letter (language) \| M |
 | item label \| Inspector |
 | item spoken name \| Inspector |
 | item spoken description \| Shows or hides the panel that describes the selected mark and what is on this page |
@@ -74,6 +84,14 @@ Bar packed 572 × 195 px; widest popup 211 px.
 | item label \| Ecliptic |
 | item spoken name \| Ecliptic |
 | item spoken description \| Shows or hides the ecliptic and its equinox and solstice marks. The chart shortcut is ⌘K then I. |
+| item label \| Sun on the chart |
+| item spoken name \| Sun on the chart |
+| item spoken description \| Shows or hides the Sun on the chart, drawn at its true size where it stands for the place and instant set in Place and Time; below a drawn horizon it is dimmed and says so. |
+| item access letter (language) \| U |
+| item label \| Moon on the chart |
+| item spoken name \| Moon on the chart |
+| item spoken description \| Shows or hides the Moon on the chart, drawn at its true size where it stands for the place and instant set in Place and Time, lit on the side the Moon table states; below a drawn horizon it is dimmed and says so. |
+| item access letter (language) \| O |
 | item label \| Zoom In |
 | item spoken name \| Zoom In |
 | item spoken description \| Shows a narrower field, with fainter stars on it |
@@ -97,7 +115,7 @@ Bar packed 572 × 195 px; widest popup 211 px.
 
 ![](menu-en-2-checked.png)
 
-Bar packed 572 × 195 px; widest popup 211 px.
+Bar packed 575 × 287 px; widest popup 211 px.
 
 | channel | words |
 |---|---|
@@ -123,6 +141,16 @@ Bar packed 572 × 195 px; widest popup 211 px.
 | item spoken name \| Place and Time |
 | item spoken description \| Opens the window that sets your location and the instant used to draw the meridian, horizon and zenith |
 | item access letter (language) \| P |
+| item label \| Sun... |
+| item hover \| Where the Sun is, for the place and instant set in Place and Time |
+| item spoken name \| Sun table |
+| item spoken description \| Opens a table of the Sun's computed position, height above the horizon, distance and apparent size for the observing place and instant set in Place and Time, at that instant or over a range of instants. Nothing is drawn on the chart. |
+| item access letter (language) \| S |
+| item label \| Moon... |
+| item hover \| Where the Moon is, for the place and instant set in Place and Time |
+| item spoken name \| Moon table |
+| item spoken description \| Opens a table of the Moon's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the observing place and instant set in Place and Time, at that instant or over a range of instants. |
+| item access letter (language) \| M |
 | item label [checked] \| Inspector |
 | item spoken name \| Inspector |
 | item spoken description \| Shows or hides the panel that describes the selected mark and what is on this page |
@@ -131,6 +159,14 @@ Bar packed 572 × 195 px; widest popup 211 px.
 | item label [checked] \| Ecliptic |
 | item spoken name \| Ecliptic |
 | item spoken description \| Shows or hides the ecliptic and its equinox and solstice marks. The chart shortcut is ⌘K then I. |
+| item label \| Sun on the chart |
+| item spoken name \| Sun on the chart |
+| item spoken description \| Shows or hides the Sun on the chart, drawn at its true size where it stands for the place and instant set in Place and Time; below a drawn horizon it is dimmed and says so. |
+| item access letter (language) \| U |
+| item label \| Moon on the chart |
+| item spoken name \| Moon on the chart |
+| item spoken description \| Shows or hides the Moon on the chart, drawn at its true size where it stands for the place and instant set in Place and Time, lit on the side the Moon table states; below a drawn horizon it is dimmed and says so. |
+| item access letter (language) \| O |
 | item label \| Zoom In |
 | item spoken name \| Zoom In |
 | item spoken description \| Shows a narrower field, with fainter stars on it |
@@ -154,7 +190,7 @@ Bar packed 572 × 195 px; widest popup 211 px.
 
 ![](menu-en-3-widest.png)
 
-Bar packed 572 × 195 px; widest popup 211 px.
+Bar packed 575 × 287 px; widest popup 211 px.
 
 | channel | words |
 |---|---|
@@ -180,6 +216,16 @@ Bar packed 572 × 195 px; widest popup 211 px.
 | item spoken name \| Place and Time |
 | item spoken description \| Opens the window that sets your location and the instant used to draw the meridian, horizon and zenith |
 | item access letter (language) \| P |
+| item label \| Sun... |
+| item hover \| Where the Sun is, for the place and instant set in Place and Time |
+| item spoken name \| Sun table |
+| item spoken description \| Opens a table of the Sun's computed position, height above the horizon, distance and apparent size for the observing place and instant set in Place and Time, at that instant or over a range of instants. Nothing is drawn on the chart. |
+| item access letter (language) \| S |
+| item label \| Moon... |
+| item hover \| Where the Moon is, for the place and instant set in Place and Time |
+| item spoken name \| Moon table |
+| item spoken description \| Opens a table of the Moon's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the observing place and instant set in Place and Time, at that instant or over a range of instants. |
+| item access letter (language) \| M |
 | item label \| Inspector |
 | item spoken name \| Inspector |
 | item spoken description \| Shows or hides the panel that describes the selected mark and what is on this page |
@@ -188,6 +234,14 @@ Bar packed 572 × 195 px; widest popup 211 px.
 | item label \| Ecliptic |
 | item spoken name \| Ecliptic |
 | item spoken description \| Shows or hides the ecliptic and its equinox and solstice marks. The chart shortcut is ⌘K then I. |
+| item label \| Sun on the chart |
+| item spoken name \| Sun on the chart |
+| item spoken description \| Shows or hides the Sun on the chart, drawn at its true size where it stands for the place and instant set in Place and Time; below a drawn horizon it is dimmed and says so. |
+| item access letter (language) \| U |
+| item label \| Moon on the chart |
+| item spoken name \| Moon on the chart |
+| item spoken description \| Shows or hides the Moon on the chart, drawn at its true size where it stands for the place and instant set in Place and Time, lit on the side the Moon table states; below a drawn horizon it is dimmed and says so. |
+| item access letter (language) \| O |
 | item label \| Zoom In |
 | item spoken name \| Zoom In |
 | item spoken description \| Shows a narrower field, with fainter stars on it |
@@ -211,7 +265,7 @@ Bar packed 572 × 195 px; widest popup 211 px.
 
 ![](menu-en-4-narrowest.png)
 
-Bar packed 572 × 195 px; widest popup 211 px.
+Bar packed 575 × 287 px; widest popup 211 px.
 
 | channel | words |
 |---|---|
@@ -237,6 +291,16 @@ Bar packed 572 × 195 px; widest popup 211 px.
 | item spoken name \| Place and Time |
 | item spoken description \| Opens the window that sets your location and the instant used to draw the meridian, horizon and zenith |
 | item access letter (language) \| P |
+| item label \| Sun... |
+| item hover \| Where the Sun is, for the place and instant set in Place and Time |
+| item spoken name \| Sun table |
+| item spoken description \| Opens a table of the Sun's computed position, height above the horizon, distance and apparent size for the observing place and instant set in Place and Time, at that instant or over a range of instants. Nothing is drawn on the chart. |
+| item access letter (language) \| S |
+| item label \| Moon... |
+| item hover \| Where the Moon is, for the place and instant set in Place and Time |
+| item spoken name \| Moon table |
+| item spoken description \| Opens a table of the Moon's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the observing place and instant set in Place and Time, at that instant or over a range of instants. |
+| item access letter (language) \| M |
 | item label \| Inspector |
 | item spoken name \| Inspector |
 | item spoken description \| Shows or hides the panel that describes the selected mark and what is on this page |
@@ -245,6 +309,14 @@ Bar packed 572 × 195 px; widest popup 211 px.
 | item label \| Ecliptic |
 | item spoken name \| Ecliptic |
 | item spoken description \| Shows or hides the ecliptic and its equinox and solstice marks. The chart shortcut is ⌘K then I. |
+| item label \| Sun on the chart |
+| item spoken name \| Sun on the chart |
+| item spoken description \| Shows or hides the Sun on the chart, drawn at its true size where it stands for the place and instant set in Place and Time; below a drawn horizon it is dimmed and says so. |
+| item access letter (language) \| U |
+| item label \| Moon on the chart |
+| item spoken name \| Moon on the chart |
+| item spoken description \| Shows or hides the Moon on the chart, drawn at its true size where it stands for the place and instant set in Place and Time, lit on the side the Moon table states; below a drawn horizon it is dimmed and says so. |
+| item access letter (language) \| O |
 | item label [unavailable] \| Zoom In |
 | item spoken name [unavailable] \| Zoom In |
 | item spoken description [unavailable] \| Unavailable: this is the narrowest field the atlas draws |
@@ -270,7 +342,7 @@ Bar packed 572 × 195 px; widest popup 211 px.
 
 ![](menu-nb-NO-5-menus.png)
 
-Bar packed 578 × 195 px; widest popup 201 px.
+Bar packed 578 × 287 px; widest popup 201 px.
 
 | channel | words |
 |---|---|
@@ -296,6 +368,16 @@ Bar packed 578 × 195 px; widest popup 201 px.
 | item spoken name \| Sted og tid |
 | item spoken description \| Åpner vinduet der du velger stedet og tidspunktet som brukes når meridianen, horisonten og senit tegnes |
 | item access letter (language) \| S |
+| item label \| Solen... |
+| item hover \| Hvor Solen er, for stedet og tidspunktet satt i Sted og tid |
+| item spoken name \| Soltabell |
+| item spoken description \| Åpner en tabell over Solens beregnede posisjon, høyde over horisonten, avstand og tilsynelatende størrelse for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. Ingenting tegnes på kartet. |
+| item access letter (language) \| O |
+| item label \| Månen... |
+| item hover \| Hvor Månen er, for stedet og tidspunktet satt i Sted og tid |
+| item spoken name \| Månetabell |
+| item spoken description \| Åpner en tabell over Månens beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. |
+| item access letter (language) \| M |
 | item label \| Utforskeren |
 | item spoken name \| Utforskeren |
 | item spoken description \| Viser eller skjuler panelet som beskriver det valgte merket og hva som finnes på denne siden |
@@ -304,6 +386,14 @@ Bar packed 578 × 195 px; widest popup 201 px.
 | item label \| Ekliptikken |
 | item spoken name \| Ekliptikken |
 | item spoken description \| Viser eller skjuler ekliptikken og merkene for jevndøgn og solverv. Hurtigtasten for kartet er ⌘K deretter I. |
+| item label \| Solen på kartet |
+| item spoken name \| Solen på kartet |
+| item spoken description \| Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid; under en tegnet horisont dempes den og sier fra. |
+| item access letter (language) \| T |
+| item label \| Månen på kartet |
+| item spoken name \| Månen på kartet |
+| item spoken description \| Viser eller skjuler Månen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid, opplyst på den siden Månetabellen oppgir; under en tegnet horisont dempes den og sier fra. |
+| item access letter (language) \| N |
 | item label \| Zoom inn |
 | item spoken name \| Zoom inn |
 | item spoken description \| Viser et smalere synsfelt med svakere stjerner |
@@ -327,7 +417,7 @@ Bar packed 578 × 195 px; widest popup 201 px.
 
 ![](menu-nb-NO-6-checked.png)
 
-Bar packed 578 × 195 px; widest popup 201 px.
+Bar packed 578 × 287 px; widest popup 201 px.
 
 | channel | words |
 |---|---|
@@ -353,6 +443,16 @@ Bar packed 578 × 195 px; widest popup 201 px.
 | item spoken name \| Sted og tid |
 | item spoken description \| Åpner vinduet der du velger stedet og tidspunktet som brukes når meridianen, horisonten og senit tegnes |
 | item access letter (language) \| S |
+| item label \| Solen... |
+| item hover \| Hvor Solen er, for stedet og tidspunktet satt i Sted og tid |
+| item spoken name \| Soltabell |
+| item spoken description \| Åpner en tabell over Solens beregnede posisjon, høyde over horisonten, avstand og tilsynelatende størrelse for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. Ingenting tegnes på kartet. |
+| item access letter (language) \| O |
+| item label \| Månen... |
+| item hover \| Hvor Månen er, for stedet og tidspunktet satt i Sted og tid |
+| item spoken name \| Månetabell |
+| item spoken description \| Åpner en tabell over Månens beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. |
+| item access letter (language) \| M |
 | item label [checked] \| Utforskeren |
 | item spoken name \| Utforskeren |
 | item spoken description \| Viser eller skjuler panelet som beskriver det valgte merket og hva som finnes på denne siden |
@@ -361,6 +461,14 @@ Bar packed 578 × 195 px; widest popup 201 px.
 | item label [checked] \| Ekliptikken |
 | item spoken name \| Ekliptikken |
 | item spoken description \| Viser eller skjuler ekliptikken og merkene for jevndøgn og solverv. Hurtigtasten for kartet er ⌘K deretter I. |
+| item label \| Solen på kartet |
+| item spoken name \| Solen på kartet |
+| item spoken description \| Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid; under en tegnet horisont dempes den og sier fra. |
+| item access letter (language) \| T |
+| item label \| Månen på kartet |
+| item spoken name \| Månen på kartet |
+| item spoken description \| Viser eller skjuler Månen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid, opplyst på den siden Månetabellen oppgir; under en tegnet horisont dempes den og sier fra. |
+| item access letter (language) \| N |
 | item label \| Zoom inn |
 | item spoken name \| Zoom inn |
 | item spoken description \| Viser et smalere synsfelt med svakere stjerner |
@@ -384,7 +492,7 @@ Bar packed 578 × 195 px; widest popup 201 px.
 
 ![](menu-nb-NO-7-widest.png)
 
-Bar packed 578 × 195 px; widest popup 201 px.
+Bar packed 578 × 287 px; widest popup 201 px.
 
 | channel | words |
 |---|---|
@@ -410,6 +518,16 @@ Bar packed 578 × 195 px; widest popup 201 px.
 | item spoken name \| Sted og tid |
 | item spoken description \| Åpner vinduet der du velger stedet og tidspunktet som brukes når meridianen, horisonten og senit tegnes |
 | item access letter (language) \| S |
+| item label \| Solen... |
+| item hover \| Hvor Solen er, for stedet og tidspunktet satt i Sted og tid |
+| item spoken name \| Soltabell |
+| item spoken description \| Åpner en tabell over Solens beregnede posisjon, høyde over horisonten, avstand og tilsynelatende størrelse for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. Ingenting tegnes på kartet. |
+| item access letter (language) \| O |
+| item label \| Månen... |
+| item hover \| Hvor Månen er, for stedet og tidspunktet satt i Sted og tid |
+| item spoken name \| Månetabell |
+| item spoken description \| Åpner en tabell over Månens beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. |
+| item access letter (language) \| M |
 | item label \| Utforskeren |
 | item spoken name \| Utforskeren |
 | item spoken description \| Viser eller skjuler panelet som beskriver det valgte merket og hva som finnes på denne siden |
@@ -418,6 +536,14 @@ Bar packed 578 × 195 px; widest popup 201 px.
 | item label \| Ekliptikken |
 | item spoken name \| Ekliptikken |
 | item spoken description \| Viser eller skjuler ekliptikken og merkene for jevndøgn og solverv. Hurtigtasten for kartet er ⌘K deretter I. |
+| item label \| Solen på kartet |
+| item spoken name \| Solen på kartet |
+| item spoken description \| Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid; under en tegnet horisont dempes den og sier fra. |
+| item access letter (language) \| T |
+| item label \| Månen på kartet |
+| item spoken name \| Månen på kartet |
+| item spoken description \| Viser eller skjuler Månen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid, opplyst på den siden Månetabellen oppgir; under en tegnet horisont dempes den og sier fra. |
+| item access letter (language) \| N |
 | item label \| Zoom inn |
 | item spoken name \| Zoom inn |
 | item spoken description \| Viser et smalere synsfelt med svakere stjerner |
@@ -441,7 +567,7 @@ Bar packed 578 × 195 px; widest popup 201 px.
 
 ![](menu-nb-NO-8-narrowest.png)
 
-Bar packed 578 × 195 px; widest popup 201 px.
+Bar packed 578 × 287 px; widest popup 201 px.
 
 | channel | words |
 |---|---|
@@ -467,6 +593,16 @@ Bar packed 578 × 195 px; widest popup 201 px.
 | item spoken name \| Sted og tid |
 | item spoken description \| Åpner vinduet der du velger stedet og tidspunktet som brukes når meridianen, horisonten og senit tegnes |
 | item access letter (language) \| S |
+| item label \| Solen... |
+| item hover \| Hvor Solen er, for stedet og tidspunktet satt i Sted og tid |
+| item spoken name \| Soltabell |
+| item spoken description \| Åpner en tabell over Solens beregnede posisjon, høyde over horisonten, avstand og tilsynelatende størrelse for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. Ingenting tegnes på kartet. |
+| item access letter (language) \| O |
+| item label \| Månen... |
+| item hover \| Hvor Månen er, for stedet og tidspunktet satt i Sted og tid |
+| item spoken name \| Månetabell |
+| item spoken description \| Åpner en tabell over Månens beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. |
+| item access letter (language) \| M |
 | item label \| Utforskeren |
 | item spoken name \| Utforskeren |
 | item spoken description \| Viser eller skjuler panelet som beskriver det valgte merket og hva som finnes på denne siden |
@@ -475,6 +611,14 @@ Bar packed 578 × 195 px; widest popup 201 px.
 | item label \| Ekliptikken |
 | item spoken name \| Ekliptikken |
 | item spoken description \| Viser eller skjuler ekliptikken og merkene for jevndøgn og solverv. Hurtigtasten for kartet er ⌘K deretter I. |
+| item label \| Solen på kartet |
+| item spoken name \| Solen på kartet |
+| item spoken description \| Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid; under en tegnet horisont dempes den og sier fra. |
+| item access letter (language) \| T |
+| item label \| Månen på kartet |
+| item spoken name \| Månen på kartet |
+| item spoken description \| Viser eller skjuler Månen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid, opplyst på den siden Månetabellen oppgir; under en tegnet horisont dempes den og sier fra. |
+| item access letter (language) \| N |
 | item label [unavailable] \| Zoom inn |
 | item spoken name [unavailable] \| Zoom inn |
 | item spoken description [unavailable] \| Utilgjengelig: dette er atlasets smaleste synsfelt |

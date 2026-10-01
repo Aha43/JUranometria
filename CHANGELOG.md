@@ -7,6 +7,25 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **The Sun, computed.** A bundled, digest-verified excerpt of JPL's
+  DE440 ephemeris (Sun, Earth–Moon barycentre and Earth, 1900–2100, as
+  a JUranometria-modified SPICE kernel under NAIF's rules) and the IERS
+  leap-second file, with a removable service that computes the Sun's
+  chart position, altitude and azimuth, distance and apparent diameter
+  for Place and Time's observer and instant - offline, held row by row
+  to JPL Horizons. Nothing is drawn yet; Help → About lists the new
+  notice (#398, #399).
+- **View → Sun…**, the first Solar System surface: a table of where the
+  Sun is for the observing place and instant set in Place and Time -
+  right ascension and declination (J2000), ecliptic longitude, altitude
+  and azimuth without refraction, distance and apparent diameter - at
+  that instant or over a range of instants with a chosen step, in
+  English and Norwegian, with every control named for a screen reader
+  and reachable by keyboard. Nothing is drawn on the chart, and nothing
+  is remembered between sessions (#400).
+
 ## [3.0.0] - 2026-09-28
 
 **The chart explains itself.** Sprint 34 — the observer's directions
