@@ -684,6 +684,13 @@ class InterfaceEvidenceGateTest {
                 }
                 String name = file.getFileName().toString()
                         .replace(".java", "");
+                // The registry names the directory it audits; it
+                // writes nothing there (#428 moved it into production
+                // so the classifier can read it).
+                if (name.equals(InterfacePhotographers.class
+                        .getSimpleName())) {
+                    continue;
+                }
                 if (!GENERATORS.containsKey(name)) {
                     undeclared.add(name);
                 }

@@ -81,7 +81,6 @@ class RenderingClosureTest {
                 "src/juranometria/app/JUranometriaMain.java",
                 "src/juranometria/app/ViewReport.java",
                 "src/juranometria/app/CopyViewReport.java",
-                "src/juranometria/tool/RenderingClosure.java",
                 "src/juranometria/tool/ChangeRoute.java",
                 "src/juranometria/tool/ChangeClassifierMain.java")) {
             if (closure.sources().contains(source)) {
@@ -93,6 +92,15 @@ class RenderingClosureTest {
                         + " the guard itself are outside the closure."
                         + " They are held by name where that matters,"
                         + " which is ChangeRoute's job, not this one's");
+        // Since #428 the evidence contract's interaction mode reads
+        // the closure to choose which generators it reproduces, so
+        // the closure itself is reached - through the contract and
+        // nothing else - and is held wide by name in ChangeRoute.
+        assertEquals(Optional.of(List.of(
+                        "juranometria/tool/EvidenceContractMain",
+                        "juranometria/tool/RenderingClosure")),
+                closure.chainTo("src/juranometria/tool/RenderingClosure.java"),
+                "the closure is reached only by the contract that uses it");
         assertTrue(closure.sources().size() < closure.classes().size(),
                 "and the closure is smaller than the tree: "
                         + closure.sources().size() + " sources of "
