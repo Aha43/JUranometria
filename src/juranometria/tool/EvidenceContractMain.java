@@ -6,6 +6,7 @@ import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -229,6 +230,16 @@ public final class EvidenceContractMain {
 
     static List<String> imageMains() {
         return IMAGE_MAINS;
+    }
+
+    /** The deterministic reports, by generator (#428). */
+    static Map<String, String> reportMains() {
+        return Collections.unmodifiableMap(REPORT_MAINS);
+    }
+
+    /** The platform records, by generator (#428). */
+    static Map<String, String> platformReports() {
+        return Collections.unmodifiableMap(PLATFORM_REPORTS);
     }
 
     /**

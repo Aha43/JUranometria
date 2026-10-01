@@ -171,9 +171,10 @@ class RenderingClosureTest {
 
     @Test
     void everyInterfacePhotographerIsARoot() throws IOException {
-        Set<String> photographers = named(
-                Path.of("test/juranometria/tool/InterfaceEvidenceGateTest.java"),
-                "GENERATORS\\.put\\(\"([A-Za-z0-9]+)\"");
+        // The production registry since #428, which the interface
+        // gate and the CI classifier both read.
+        Set<String> photographers = new TreeSet<>(
+                InterfacePhotographers.ALL.keySet());
         assertTrue(photographers.size() >= 12,
                 "the premise: the interface gate registers a dozen ("
                         + photographers.size() + " found)");

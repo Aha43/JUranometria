@@ -115,6 +115,7 @@ public final class RenderingClosure {
     public static RenderingClosure of(Path classes) throws IOException {
         Map<String, String> sourceOf = new TreeMap<>();
         Map<String, Set<String>> refers = new TreeMap<>();
+        Map<String, Set<String>> strings = new TreeMap<>();
         try (Stream<Path> tree = Files.walk(classes)) {
             for (Path file : (Iterable<Path>) tree
                     .filter(p -> p.toString().endsWith(".class"))
@@ -125,6 +126,7 @@ public final class RenderingClosure {
                 }
                 sourceOf.put(parsed.name, parsed.sourcePath());
                 refers.put(parsed.name, parsed.referenced);
+                strings.put(parsed.name, parsed.strings);
             }
         }
         Set<String> roots = new TreeSet<>();
@@ -158,7 +160,52 @@ public final class RenderingClosure {
                 }
             }
         }
-        return new RenderingClosure(sourceOf, refers, roots, reachedFrom);
+        RenderingClosure closure =
+                new RenderingClosure(sourceOf, refers, roots, reachedFrom);
+        closure.strings = strings;
+        return closure;
+    }
+
+    /** Every class's string constants, by class name (#428). */
+    private Map<String, Set<String>> strings = Map.of();
+
+    /** The string constants a compiled class holds (#428). */
+    public Set<String> stringsOf(String type) {
+        return Collections.unmodifiableSet(
+                strings.getOrDefault(type, Set.of()));
+    }
+
+    /**
+     * The classes reached from these roots, roots included, by the
+     * same references the default closure follows (#428): the graph
+     * is one, and which programs it is read from is the question.
+     * A root that is not a compiled class is refused, because a
+     * boundary computed from a root that is not there proves nothing.
+     */
+    public Map<String, String> reach(java.util.Collection<String> from) {
+        Map<String, String> reached = new LinkedHashMap<>();
+        Deque<String> queue = new ArrayDeque<>();
+        for (String root : from) {
+            if (!sourceOf.containsKey(root)) {
+                throw new IllegalStateException("root " + root
+                        + " is not among the compiled classes; the"
+                        + " boundary cannot be computed from it");
+            }
+            if (reached.putIfAbsent(root, null) == null
+                    && !queue.contains(root)) {
+                queue.add(root);
+            }
+        }
+        while (!queue.isEmpty()) {
+            String type = queue.remove();
+            for (String next : refers.getOrDefault(type, Set.of())) {
+                if (sourceOf.containsKey(next) && !reached.containsKey(next)) {
+                    reached.put(next, type);
+                    queue.add(next);
+                }
+            }
+        }
+        return reached;
     }
 
     /** The roots found among the compiled classes. */
@@ -228,12 +275,20 @@ public final class RenderingClosure {
         final String name;
         final String sourceFile;
         final Set<String> referenced;
+        /**
+         * Every string constant the class holds - literals, and the
+         * recipes the compiler writes for a concatenation, with
+         * {@code \u0001} where each value is spliced in (issue #428:
+         * what language keys and output paths a class can name).
+         */
+        final Set<String> strings;
 
         private ClassFile(String name, String sourceFile,
-                          Set<String> referenced) {
+                          Set<String> referenced, Set<String> strings) {
             this.name = name;
             this.sourceFile = sourceFile;
             this.referenced = referenced;
+            this.strings = strings;
         }
 
         /**
@@ -259,6 +314,7 @@ public final class RenderingClosure {
                 int count = data.readUnsignedShort();
                 String[] utf8 = new String[count];
                 int[] classNameIndex = new int[count];
+                List<Integer> stringIndex = new ArrayList<>();
                 for (int i = 1; i < count; i++) {
                     int tag = data.readUnsignedByte();
                     switch (tag) {
@@ -269,7 +325,8 @@ public final class RenderingClosure {
                             i++; // takes two slots
                         }
                         case 7 -> classNameIndex[i] = data.readUnsignedShort();
-                        case 8, 16, 19, 20 -> data.readUnsignedShort();
+                        case 8 -> stringIndex.add(data.readUnsignedShort());
+                        case 16, 19, 20 -> data.readUnsignedShort();
                         case 9, 10, 11, 12, 17, 18 -> data.readInt();
                         case 15 -> {
                             data.readUnsignedByte();
@@ -326,7 +383,13 @@ public final class RenderingClosure {
                     }
                 }
                 referenced.remove(name);
-                return new ClassFile(name, sourceFile, referenced);
+                Set<String> strings = new LinkedHashSet<>();
+                for (int index : stringIndex) {
+                    if (utf8[index] != null) {
+                        strings.add(utf8[index]);
+                    }
+                }
+                return new ClassFile(name, sourceFile, referenced, strings);
             }
         }
 

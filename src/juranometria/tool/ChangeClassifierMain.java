@@ -16,7 +16,8 @@ import juranometria.tool.ChangeRoute.Route;
  *
  * <pre>
  *   java juranometria.tool.ChangeClassifierMain --changed FILE
- *       [--event pull_request] [--github-output FILE] [--summary FILE]
+ *       [--base DIR] [--event pull_request]
+ *       [--github-output FILE] [--summary FILE]
  * </pre>
  *
  * <p>{@code --changed} names a file with one changed path per line,
@@ -28,8 +29,15 @@ import juranometria.tool.ChangeRoute.Route;
  * a push - and this class starts no process, which is what
  * {@code OfflinePromiseTest} requires of every class that ships.
  *
- * <p>Every path gets a finding; the route of the whole change is wide
- * if any path is (issue #398). Only a pull request can be narrow. A
+ * <p>{@code --base} names a directory holding the merge base's copy of
+ * each changed file that existed there, at its own relative path -
+ * again git's job - so a language file can be judged key by key and
+ * the provenance record row by row (#428). Without it every key and
+ * row reads as new, which can only make a change wider.
+ *
+ * <p>Every path gets a finding; the route of the whole change is the
+ * widest any path takes - narrow, interaction or wide (issue #398,
+ * extended by #427/#428). Only a pull request can be less than wide. A
  * push to {@code main}, a tag and a manual dispatch are wide by
  * event: what lands on main, what is released and what somebody asked
  * for by hand all get the whole regime, whatever they changed.
@@ -48,12 +56,14 @@ public final class ChangeClassifierMain {
 
     public static void main(String[] args) throws Exception {
         Path changedList = null;
+        Path baseDir = null;
         String event = "pull_request";
         Path githubOutput = null;
         Path summary = null;
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
                 case "--changed" -> changedList = Path.of(args[++i]);
+                case "--base" -> baseDir = Path.of(args[++i]);
                 case "--event" -> event = args[++i];
                 case "--github-output" -> githubOutput = Path.of(args[++i]);
                 case "--summary" -> summary = Path.of(args[++i]);
@@ -75,7 +85,8 @@ public final class ChangeClassifierMain {
         if (!"pull_request".equals(event)) {
             route = Route.WIDE;
             report.append("route: wide - the event is `").append(event)
-                    .append("`, and only a pull request may be narrow\n");
+                    .append("`, and only a pull request may take a cheaper"
+                            + " route\n");
         } else {
             if (changedList == null || !Files.isRegularFile(changedList)) {
                 System.err.println("--changed FILE is required for a pull"
@@ -85,20 +96,24 @@ public final class ChangeClassifierMain {
             }
             List<String> changed = read(changedList);
             RenderingClosure closure = RenderingClosure.of(CLASSES);
-            findings = ChangeRoute.classify(changed, closure.sources(),
-                    closure::chainTo, ChangeRoute::existsInTree);
+            ChangeBoundary boundary = ChangeBoundary.of(closure, Path.of("."),
+                    baseDir);
+            findings = ChangeRoute.classify(changed, boundary,
+                    ChangeRoute::existsInTree);
             route = ChangeRoute.routeOf(findings);
             report.append("route: ").append(route.name().toLowerCase())
                     .append(" - ").append(changed.size())
                     .append(" changed path(s)\n");
-            report.append("rendering closure: ")
-                    .append(closure.reached().size())
-                    .append(" classes in ").append(closure.sources().size())
-                    .append(" source files, from ")
-                    .append(closure.roots().size()).append(" roots\n");
+            report.append("closures: ").append(boundary.sizes().get("chart"))
+                    .append(" classes the chart producers reach, ")
+                    .append(boundary.sizes().get("interaction"))
+                    .append(" the interface reaches\n");
             for (Finding finding : findings) {
-                report.append(finding.route() == Route.WIDE ? "  WIDE   "
-                        : "  narrow ").append(finding.path())
+                report.append(switch (finding.route()) {
+                    case WIDE -> "  WIDE        ";
+                    case INTERACTION -> "  interaction ";
+                    case NARROW -> "  narrow      ";
+                }).append(finding.path())
                         .append("  (").append(finding.reason()).append(")\n");
             }
             if (changed.isEmpty()) {
@@ -123,22 +138,30 @@ public final class ChangeClassifierMain {
     private static String markdown(Route route, CharSequence report,
                                    List<Finding> findings) {
         StringBuilder md = new StringBuilder();
-        md.append("## Rendering-neutral gate: ").append(
-                route == Route.WIDE ? "wide" : "narrow").append("\n\n");
-        md.append(route == Route.WIDE
-                ? "The whole rendering regime applies: evidence, native"
-                        + " images and the portable archive run.\n\n"
-                : "No path in this change can reach a renderer, a chart"
-                        + " contribution, an evidence generator, a committed"
-                        + " image or a provenance row, so the evidence,"
-                        + " native-image and portable-archive jobs are"
-                        + " skipped by this verdict. The unit and display"
-                        + " suites run regardless.\n\n");
-        long wide = findings.stream()
-                .filter(f -> f.route() == Route.WIDE).count();
+        md.append("## CI route: ").append(route.name().toLowerCase())
+                .append("\n\n");
+        md.append(switch (route) {
+            case WIDE -> "The whole regime applies: every chart generator"
+                    + " reproduced, the native images and the portable"
+                    + " archive.\n\n";
+            case INTERACTION -> "Interface work that cannot reach chart ink:"
+                    + " the interface and report evidence is reproduced,"
+                    + " the native images with packaged acceptance and the"
+                    + " portable archive run, and no chart producer runs -"
+                    + " the run proves no chart picture or provenance row"
+                    + " moved.\n\n";
+            case NARROW -> "Nothing in this change reaches the application or"
+                    + " its evidence: the unit and display suites run, and"
+                    + " the rest is skipped by this verdict.\n\n";
+        });
         if (!findings.isEmpty()) {
-            md.append(wide).append(" wide, ").append(findings.size() - wide)
-                    .append(" narrow.\n\n");
+            for (Route each : Route.values()) {
+                long count = findings.stream()
+                        .filter(f -> f.route() == each).count();
+                md.append(count).append(' ')
+                        .append(each.name().toLowerCase()).append(each
+                                == Route.WIDE ? ".\n\n" : ", ");
+            }
         }
         md.append("```\n").append(report).append("```\n");
         return md.toString();
