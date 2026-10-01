@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**458 promoted artifacts.**
+**463 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -125,6 +125,9 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/chart-sheet/sheet-a4-modules.pdf` | `38d513bee9f54bf7456680073797f398f69f6a3e9ae95cdaf71fce91b0ac654a` | 2026-09-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/chart-sheet/sheet-a4-modules.svg` | `116e031c63224ef9d3d8a8398556c2deb48c8176d360a47c5cbfa00f0cc1b2ca` | 2026-09-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/chart-sheet/sheet-a4-outlines.svg` | `cc2697b88cfd624de6ffbfaac55b07754d4637fb90f70e25f28d226d006faa37` | 2026-09-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/chart-sheet/sheet-a4-solar-system.pdf` | `1c386f9a10d7d0a8ba9fec925b066b5edcf88bf4d5f184fc882f70a48eccd6a2` | 2026-10-01 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/chart-sheet/sheet-a4-solar-system.png` | `ce3c663c2d0cb36eafcec2e15767a66b36bb9afd6ba7c52b11f265ced4950a41` | 2026-10-01 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/chart-sheet/sheet-a4-solar-system.svg` | `aa895cfaf9fe3871b31bc7d8c95ef22fc2c62fe1db5844db00897b52d7d24981` | 2026-10-01 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/chart-sheet/sheet-a4.pdf` | `134b3a3fb3cb5585e2db7a86a90f4fb87c8bf6d07bfb98165cd662cb7c943166` | 2026-09-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/chart-sheet/sheet-a4.svg` | `5bc3a6e3ce1778ed212cdce6b4cadcda032d5bc48b464b8232c6a95dc210797d` | 2026-09-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/chart-sheet/sheet-letter.svg` | `a9a73cbe0ca625b889b438dc24f60cff21e4edd8accf5136fbcb8ff1469fa3d0` | 2026-09-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
@@ -192,6 +195,8 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/gallery/on-this-page-marks.png` | `90eccb38c7ed2daa16192baa6a91ec064d74ddc98a99e6689242e6439b7e894c` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/gallery/place-and-time-horizon.png` | `84f8f0e7fbb83eadcc91de9a796bf0fae42eae25953fb9c21f944e3bb9d0cd35` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/gallery/place-and-time-zenith.png` | `4f50707e9f8e78cc429df7ba74e9e82b09134c5e76902bac317b69b4d7ebc249` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/gallery/sun-and-moon-crescent.png` | `b3b05987db7cda875a97581c8ea1af5cf00ab61183139ff812296c935dc571e4` | 2026-10-01 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/gallery/sun-and-moon-horizon.png` | `6072f6b9911cc308846c9d1e94ca2a2d343ce472716ea95677dd7bcb5bb3a6f5` | 2026-10-01 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/about-en-1-compact-light.png` | `1daded1007b65e2b32ffbf9ad50a02f8235489087da07bf8f4650b9416020b4e` | 2026-09-29 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/about-en-2-notices-light.png` | `4e77229c21ad64603fe5c22e3f4d70f9824ebbceeaa199465fe06411bf808914` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/about-en-3-compact-dark.png` | `a1cf1a4b8fe15fc9bd159a69f99fad932249abbf3a669bcc7d3ecc61de5c3877` | 2026-09-29 | Mac OS X aarch64, Java 21.0.12.1 | various |

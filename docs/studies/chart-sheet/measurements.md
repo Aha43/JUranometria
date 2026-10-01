@@ -17,15 +17,18 @@ Regenerate with `make chart-sheet-study`.
 
 ## The sheets
 
-| file | paper | shapes | labels |
-|---|---|---:|---:|
-| `sheet-a4.svg` | A4 | 2267 | 26 |
-| `sheet-letter.svg` | US Letter | 2472 | 26 |
-| `sheet-a4-outlines.svg` | A4 | 2267 | 0 |
-| `sheet-a4-modules.svg` | A4 | 1966 | 16 |
-| `sheet-a4.pdf` | A4 | 2267 | 26 as outlines |
-| `sheet-a4-modules.pdf` | A4 | 1966 | 16 as outlines |
-| `sheet-a4-300dpi.png` | A4 at 300 dpi, 3508 x 2480 px | 2267 | 26 |
+| file | paper | shapes |
+|---|---|---:|
+| `sheet-a4.svg` | A4 | 2267 |
+| `sheet-letter.svg` | US Letter | 2472 |
+| `sheet-a4-outlines.svg` | A4 | 2267 |
+| `sheet-a4-modules.svg` | A4 | 1966 |
+| `sheet-a4.pdf` | A4 | 2267 |
+| `sheet-a4-modules.pdf` | A4 | 1966 |
+| `sheet-a4-300dpi.png` | A4 at 300 dpi, 3508 x 2480 px | 2267 |
+| `sheet-a4-solar-system.svg` | A4 | 2001 |
+| `sheet-a4-solar-system.pdf` | A4 | 2001 |
+| `sheet-a4-solar-system.png` | A4 at 300 dpi, 3508 x 2480 px | 2001 |
 
 `sheet-a4-outlines.svg` is the same chart with every label converted to
 its outline, for a machine whose fonts are unknown. It is larger and it
@@ -34,6 +37,18 @@ master.
 
 `sheet-a4-modules.svg` and its PDF carry the meridian, the horizon, the zenith and
 the ecliptic - the March equinox page, where the ecliptic's landmarks are.
+
+`sheet-a4-solar-system` (SVG, PDF and a 300 dpi PNG) carries the Sun and the Moon
+at the gallery's moment - Oslo, 2026-03-20 21:33 UTC - with the ecliptic, on a
+42° page centred halfway between them; the horizon is not drawn, so it is
+the celestial chart, and both bodies are drawn as they are, not dimmed (#418).
+
+On that sheet the Moon is 4.3 % lit and 3.4 mm across. Its crescent is
+at most 0.15 mm wide (2r·k), and the inner half of the disc's outline is
+0.18 mm: at this scale the crescent is narrower than the printable outline
+and is not resolved, so an almost-new Moon reads as an almost-dark disc.
+That is the scale's honest limit, not a defect; nothing is enlarged. The
+gallery's 3° page shows the same crescent and the side it faces.
 
 The PDF draws its labels as outlines, because the base-14 fonts every
 reader has cannot spell the chart's own notation; the PNG is the whole sheet
@@ -74,6 +89,8 @@ revise these numbers.
 
 **Label positions are this machine's.** The renderer places a label with
 font metrics, so another machine's sans-serif moves it slightly and may
-fit one where this one did not. The sheets reproduce byte for byte on a
-given machine, which is the same classification the renderer studies carry.
+fit one where this one did not - which is why how many labels each sheet
+placed is recorded with the machine, in the platform record, and not here
+(#418). The sheets reproduce byte for byte on a given machine, which is the
+same classification the renderer studies carry.
 

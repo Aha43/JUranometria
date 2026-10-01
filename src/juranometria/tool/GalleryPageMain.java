@@ -56,7 +56,7 @@ public final class GalleryPageMain {
     private static final File DIR = new File("docs/studies/gallery");
 
     /** The dialog photograph's own place and instant, restated. */
-    private static final Instant WHEN = ZonedDateTime
+    public static final Instant WHEN = ZonedDateTime
             .of(2026, 3, 20, 21, 33, 0, 0, ZoneOffset.UTC).toInstant();
     private static final Observer OSLO =
             new Observer(59.913, 10.752, WHEN);
@@ -109,7 +109,86 @@ public final class GalleryPageMain {
                 juranometria.sky.Ecliptic.OBLIQUITY_DEGREES), 24.0, 8.0,
                 null, null), "ecliptic-solstice");
 
+        // --- The Sun and the Moon (#418): the same moment ---------
+        // At the gallery's instant the Moon is a young crescent low in
+        // the west and both bodies have set at Oslo. First the phase,
+        // close up, on the celestial chart with no horizon drawn; then
+        // one page wide enough for both bodies and the horizon above
+        // them, where the module dims each and says so.
+        juranometria.solar.SolarSystemService solar =
+                juranometria.solar.SolarSystemService.load();
+        SkyPosition moon = ((juranometria.solar.SolarSystemService.MoonObservation)
+                solar.observe(juranometria.solar.SolarSystemService.Body.MOON, OSLO))
+                .astrometricJ2000();
+        SkyPosition sun = ((juranometria.solar.SolarSystemService.SunObservation)
+                solar.observe(juranometria.solar.SolarSystemService.Body.SUN, OSLO))
+                .astrometricJ2000();
+        bodiesSlide(new ChartViewState(moon, 3.0, 8.0, null, null), false,
+                solar, "sun-and-moon-crescent", 1);
+        SkyPosition horizonAboveTheMoon = null;
+        for (SkyPosition on : sky.horizon().around(720)) {
+            if (horizonAboveTheMoon == null || on.separationDegrees(moon)
+                    < horizonAboveTheMoon.separationDegrees(moon)) {
+                horizonAboveTheMoon = on;
+            }
+        }
+        bodiesSlide(new ChartViewState(meanOf(sun, moon, horizonAboveTheMoon),
+                36.0, 8.0, null, null), true, solar, "sun-and-moon-horizon", 2);
+
         System.out.println("gallery slides written to " + DIR.getPath());
+    }
+
+    /**
+     * One Sun-and-Moon slide through the production composition: the
+     * Solar System module over the gallery's observer, both bodies
+     * switched on, and - when asked - the meridian module drawing the
+     * mathematical horizon alone, so the bodies below it are dimmed.
+     * Refuses to write a slide that does not draw the bodies it is
+     * about.
+     */
+    private static void bodiesSlide(ChartViewState state, boolean horizon,
+                                    juranometria.solar.SolarSystemService solar,
+                                    String name, int bodiesExpected)
+            throws Exception {
+        ChartComponent chart = component(state);
+        SwingUtilities.invokeAndWait(() -> {
+            MeridianModule meridian = new MeridianModule(OSLO);
+            meridian.showing(false, horizon, false);
+            if (horizon) {
+                chart.overlays().offer(MeridianModule.ID,
+                        meridian::contributedGeometry);
+            }
+            juranometria.solarchart.SolarSystemModule bodies =
+                    new juranometria.solarchart.SolarSystemModule(() -> OSLO,
+                            () -> solar, meridian::horizonShowing);
+            bodies.sunShowing(true);
+            bodies.moonShowing(true);
+            chart.overlays().offer(juranometria.solarchart.SolarSystemModule.ID,
+                    bodies::contributedGeometry);
+        });
+        write(chart, name);
+        if (chart.renderedBodies().size() != bodiesExpected) {
+            throw new IllegalStateException(name + " drew "
+                    + chart.renderedBodies() + ", not the " + bodiesExpected
+                    + " bodies it is about");
+        }
+    }
+
+    /** The centre of a few positions, on the sphere. */
+    private static SkyPosition meanOf(SkyPosition... positions) {
+        double x = 0.0;
+        double y = 0.0;
+        double z = 0.0;
+        for (SkyPosition p : positions) {
+            double ra = Math.toRadians(p.raDegrees());
+            double dec = Math.toRadians(p.decDegrees());
+            x += Math.cos(dec) * Math.cos(ra);
+            y += Math.cos(dec) * Math.sin(ra);
+            z += Math.sin(dec);
+        }
+        double ra = Math.toDegrees(Math.atan2(y, x));
+        return new SkyPosition(ra < 0.0 ? ra + 360.0 : ra,
+                Math.toDegrees(Math.atan2(z, Math.hypot(x, y))));
     }
 
     /** One ecliptic slide through the production composition. */

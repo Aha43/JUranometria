@@ -1436,6 +1436,11 @@ public final class ReferenceInk {
      */
     static final double DARK_SIDE = 0.3;
 
+    /** The Moon's dark-side share, for journeys outside this package. */
+    public static double darkSide() {
+        return DARK_SIDE;
+    }
+
     /**
      * The Moon: the whole disc in the dark side's ink, the lit region
      * in the page's lighter ink, and the limb in star ink.

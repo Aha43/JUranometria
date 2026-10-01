@@ -130,10 +130,44 @@ public final class ChartSheet {
                                         java.util.Set<juranometria.render
                                                 .ChartStructure>
                                                 emphasized) {
+        return record(pages, state, options, reference,
+                ChartRenderer.ReferenceLayer.NONE, overChart, paper, words,
+                emphasized);
+    }
+
+    /**
+     * The same, with the Solar System bodies the screen carries (#418,
+     * correcting #415): the renderer's bodies layer, painted after
+     * every catalogue mark and label and before the furniture, exactly
+     * where the screen paints it, so a sheet carries the Sun and the
+     * Moon the reader was shown. {@code NONE} is a sheet with no body.
+     */
+    public static SheetRecording record(Pages pages,
+                                        ChartViewState state,
+                                        ChartOptions options,
+                                        ChartRenderer.ReferenceLayer reference,
+                                        ChartRenderer.ReferenceLayer bodies,
+                                        ChartRenderer.ReferenceLayer overChart,
+                                        PaperSize paper,
+                                        juranometria.project.PageWords words,
+                                        java.util.Set<juranometria.render
+                                                .ChartStructure>
+                                                emphasized) {
+        requireBodies(bodies);
         return recorded(pages, state, options, reference, overChart, paper,
                 words, (renderer, g, scene, onPaper) -> renderer.render(
-                        g, scene, onPaper, reference, null, emphasized),
+                        g, scene, onPaper, reference, bodies, null, emphasized),
                 juranometria.render.ChartStructure.joinedTokens(emphasized));
+    }
+
+    private static void requireBodies(ChartRenderer.ReferenceLayer bodies) {
+        if (bodies == null) {
+            throw new IllegalArgumentException("the bodies layer is"
+                    + " ChartRenderer.ReferenceLayer.NONE for a sheet"
+                    + " carrying no Solar System body, never null: an"
+                    + " export that meant to carry the Sun and lost it"
+                    + " would otherwise look perfectly correct");
+        }
     }
 
     /**
@@ -152,9 +186,26 @@ public final class ChartSheet {
                                         juranometria.project.PageWords words,
                                         juranometria.render.ChartStructure
                                                 emphasized) {
+        return record(pages, state, options, reference,
+                ChartRenderer.ReferenceLayer.NONE, overChart, paper, words,
+                emphasized);
+    }
+
+    /** The one-target form with the screen's bodies (#418). */
+    public static SheetRecording record(Pages pages,
+                                        ChartViewState state,
+                                        ChartOptions options,
+                                        ChartRenderer.ReferenceLayer reference,
+                                        ChartRenderer.ReferenceLayer bodies,
+                                        ChartRenderer.ReferenceLayer overChart,
+                                        PaperSize paper,
+                                        juranometria.project.PageWords words,
+                                        juranometria.render.ChartStructure
+                                                emphasized) {
+        requireBodies(bodies);
         return recorded(pages, state, options, reference, overChart, paper,
                 words, (renderer, g, scene, onPaper) -> renderer.render(
-                        g, scene, onPaper, reference, null, emphasized),
+                        g, scene, onPaper, reference, bodies, null, emphasized),
                 java.util.Optional.ofNullable(emphasized)
                         .map(juranometria.render.ChartStructure::token));
     }

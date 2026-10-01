@@ -18,4 +18,10 @@ class PackagedMoonInstantTest {
         assertEquals(MoonEventsFixture.read().get("first-quarter-june").instant(),
                 PackagedAcceptanceMain.MOON_FIRST_QUARTER);
     }
+
+    @Test
+    void thePackagedGalleryMomentIsTheGallerysOwn() {
+        assertEquals(juranometria.tool.GalleryPageMain.WHEN,
+                PackagedAcceptanceMain.GALLERY_MOMENT);
+    }
 }
