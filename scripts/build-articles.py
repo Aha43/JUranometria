@@ -11,6 +11,10 @@ PAGES = [
     (ROOT / "docs/articles/README.md", "index.html", "JUranometria articles"),
     (ROOT / "docs/articles/from-celestial-sphere-to-page.md",
      "celestial-sphere-to-page.html", "Exploring the sky"),
+    (ROOT / "docs/articles/where-the-sun-is.md",
+     "where-the-sun-is.html", "Exploring the sky"),
+    (ROOT / "docs/articles/which-way-the-light-falls.md",
+     "which-way-the-light-falls.html", "Exploring the sky"),
     (ROOT / "docs/how/language.md", "language.html", "How JUranometria works"),
     (ROOT / "docs/how/projections.md", "projections.html", "How JUranometria works"),
 ]
@@ -18,6 +22,8 @@ PAGES = [
 SPECIAL_LINKS = {
     "from-celestial-sphere-to-page.md": "celestial-sphere-to-page.html",
     "../articles/from-celestial-sphere-to-page.md": "celestial-sphere-to-page.html",
+    "where-the-sun-is.md": "where-the-sun-is.html",
+    "which-way-the-light-falls.md": "which-way-the-light-falls.html",
     "../how/language.md": "language.html",
     "../how/projections.md": "projections.html",
     "language.md": "language.html",
