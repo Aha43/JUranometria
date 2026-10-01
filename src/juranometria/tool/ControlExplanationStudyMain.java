@@ -329,7 +329,8 @@ public final class ControlExplanationStudyMain {
         surfaces.put("Toolbar", new juranometria.ui.AtlasToolbar(
                 navigation, search,
                 new juranometria.ui.InspectorToggle(), "0.0.0",
-                () -> { }, new juranometria.chart.SelectionMode(), english));
+                () -> { }, new juranometria.chart.SelectionMode(),
+                new juranometria.ui.ZoomLock(), english));
         surfaces.put("Menu bar", AppMenuBar.create(navigation, () -> { },
                 () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
                 () -> { }, () -> { }, () -> { }, () -> { }, () -> { }, () -> { },

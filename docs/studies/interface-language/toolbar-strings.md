@@ -49,6 +49,9 @@ The shipped catalogue, nothing typed.
 | Zoom out (⌘-) |
 | Zoom out |
 | Shows a wider field, with fewer stars on it |
+| Lock zoom |
+| When on, the mouse wheel and the trackpad do not change the field. The zoom buttons and View's zoom items still do. |
+| Off, scrolling over the chart zooms in and out; on, it does nothing, so a careless wheel or trackpad cannot change the field. Zoom In, Zoom Out and their keys still change it, and the choice is remembered. |
 | Show fewer stars with a brighter magnitude limit |
 | Fewer stars |
 | Draws only the brighter stars, one step at a time |
@@ -89,6 +92,9 @@ The shipped catalogue. Every row is a catalogue identity pair and is not transla
 | Zoom out (⌘-) |
 | Zoom out |
 | Shows a wider field, with fewer stars on it |
+| Lock zoom |
+| When on, the mouse wheel and the trackpad do not change the field. The zoom buttons and View's zoom items still do. |
+| Off, scrolling over the chart zooms in and out; on, it does nothing, so a careless wheel or trackpad cannot change the field. Zoom In, Zoom Out and their keys still change it, and the choice is remembered. |
 | Show fewer stars with a brighter magnitude limit |
 | Fewer stars |
 | Draws only the brighter stars, one step at a time |
@@ -145,6 +151,9 @@ The shipped catalogue. The item is disabled because there really is nothing to c
 | Zoom out (⌘-) |
 | Zoom out |
 | Shows a wider field, with fewer stars on it |
+| Lock zoom |
+| When on, the mouse wheel and the trackpad do not change the field. The zoom buttons and View's zoom items still do. |
+| Off, scrolling over the chart zooms in and out; on, it does nothing, so a careless wheel or trackpad cannot change the field. Zoom In, Zoom Out and their keys still change it, and the choice is remembered. |
 | Show fewer stars with a brighter magnitude limit |
 | Fewer stars |
 | Draws only the brighter stars, one step at a time |
@@ -187,6 +196,9 @@ The shipped catalogue. The item is disabled because there really is nothing to c
 | Zoom out (⌘-) |
 | Zoom out |
 | Unavailable: this is the widest field the atlas draws |
+| Lock zoom |
+| When on, the mouse wheel and the trackpad do not change the field. The zoom buttons and View's zoom items still do. |
+| Off, scrolling over the chart zooms in and out; on, it does nothing, so a careless wheel or trackpad cannot change the field. Zoom In, Zoom Out and their keys still change it, and the choice is remembered. |
 | Unavailable: V 8.0 is the brightest magnitude limit |
 | Fewer stars |
 | Unavailable: V 8.0 is the brightest magnitude limit the atlas draws |
@@ -231,6 +243,9 @@ The shipped catalogue, nothing typed.
 | Zoom ut (⌘-) |
 | Zoom ut |
 | Viser et større synsfelt med færre stjerner |
+| Lås zoom |
+| Når denne er på, endrer ikke musehjulet og styreflaten synsfeltet. Zoomknappene og zoompunktene under Vis gjør det fortsatt. |
+| Når denne er av, zoomer du inn og ut ved å rulle over kartet; når den er på, skjer ingenting, så et uforsiktig musehjul eller en styreflate kan ikke endre synsfeltet. Zoom inn, Zoom ut og tastene deres endrer det fortsatt, og valget huskes. |
 | Vis færre stjerner med en lysere grensemagnitude |
 | Færre stjerner |
 | Tegner bare lysere stjerner, ett steg om gangen |
@@ -271,6 +286,9 @@ The shipped catalogue. Every row is a catalogue identity pair and is not transla
 | Zoom ut (⌘-) |
 | Zoom ut |
 | Viser et større synsfelt med færre stjerner |
+| Lås zoom |
+| Når denne er på, endrer ikke musehjulet og styreflaten synsfeltet. Zoomknappene og zoompunktene under Vis gjør det fortsatt. |
+| Når denne er av, zoomer du inn og ut ved å rulle over kartet; når den er på, skjer ingenting, så et uforsiktig musehjul eller en styreflate kan ikke endre synsfeltet. Zoom inn, Zoom ut og tastene deres endrer det fortsatt, og valget huskes. |
 | Vis færre stjerner med en lysere grensemagnitude |
 | Færre stjerner |
 | Tegner bare lysere stjerner, ett steg om gangen |
@@ -327,6 +345,9 @@ The shipped catalogue. The item is disabled because there really is nothing to c
 | Zoom ut (⌘-) |
 | Zoom ut |
 | Viser et større synsfelt med færre stjerner |
+| Lås zoom |
+| Når denne er på, endrer ikke musehjulet og styreflaten synsfeltet. Zoomknappene og zoompunktene under Vis gjør det fortsatt. |
+| Når denne er av, zoomer du inn og ut ved å rulle over kartet; når den er på, skjer ingenting, så et uforsiktig musehjul eller en styreflate kan ikke endre synsfeltet. Zoom inn, Zoom ut og tastene deres endrer det fortsatt, og valget huskes. |
 | Vis færre stjerner med en lysere grensemagnitude |
 | Færre stjerner |
 | Tegner bare lysere stjerner, ett steg om gangen |
@@ -369,6 +390,9 @@ The shipped catalogue. The item is disabled because there really is nothing to c
 | Zoom ut (⌘-) |
 | Zoom ut |
 | Utilgjengelig: dette er atlasets største synsfelt |
+| Lås zoom |
+| Når denne er på, endrer ikke musehjulet og styreflaten synsfeltet. Zoomknappene og zoompunktene under Vis gjør det fortsatt. |
+| Når denne er av, zoomer du inn og ut ved å rulle over kartet; når den er på, skjer ingenting, så et uforsiktig musehjul eller en styreflate kan ikke endre synsfeltet. Zoom inn, Zoom ut og tastene deres endrer det fortsatt, og valget huskes. |
 | Utilgjengelig: V 8.0 er den lyseste grensemagnituden |
 | Færre stjerner |
 | Utilgjengelig: V 8.0 er atlasets lyseste grensemagnitude |

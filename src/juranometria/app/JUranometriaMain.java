@@ -154,7 +154,15 @@ public final class JUranometriaMain {
         // options state that owns no navigation.
         TargetRetirement.connect(chartOptions, chart, controller);
         juranometria.ui.PanInteraction.install(chart, controller);
-        juranometria.ui.ZoomInteraction.install(chart, controller);
+        // The zoom lock (Sprint 38, issue #428): one state for the
+        // wheel, the toolbar's toggle and the remembered choice,
+        // restored before the reader can turn a wheel, and saved on
+        // every change; the clean shutdown flushes it with the rest.
+        juranometria.ui.ZoomLockStore zoomLockStore = stores.zoomLock();
+        juranometria.ui.ZoomLock zoomLock = new juranometria.ui.ZoomLock();
+        zoomLock.lock(zoomLockStore.lockedOrDefault());
+        zoomLock.onChange(zoomLockStore::save);
+        juranometria.ui.ZoomInteraction.install(chart, controller, zoomLock);
 
         // Point and identify (issue #170). The selection is shared
         // state; the chart produces it, the inspector consumes it,
@@ -256,7 +264,7 @@ public final class JUranometriaMain {
         AtlasChrome controls = AtlasChrome.of(language, controller,
                 Atlas.search(), assembler, inspectorToggle,
                 AppInfo.version(), shutdown::request,
-                modules.selectionMode());
+                modules.selectionMode(), zoomLock);
         juranometria.ui.SearchField searchField = controls.searchField();
         // Finding an object by name selects it, so a reader with no
         // pointer can reach the inspector at all - and it joins the

@@ -16,6 +16,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 |---|---|---|---|---|---|
 | Toolbar | JButton | (icon only) | Zoom in (<key:zoomIn>) | Shows a narrower field, with fainter stars on it | dynamic |
 | Toolbar | JButton | (icon only) | Zoom out (<key:zoomOut>) | Shows a wider field, with fewer stars on it | dynamic |
+| Toolbar | JToggleButton | Lock zoom | When on, the mouse wheel and the trackpad do not change the field. The zoom buttons and... | Off, scrolling over the chart zooms in and out; on, it does nothing, so a careless whee... | hovered |
 | Toolbar | JButton | (icon only) | Show fewer stars with a brighter magnitude limit | Draws only the brighter stars, one step at a time | dynamic |
 | Toolbar | JButton | (icon only) | Unavailable: V 8.0 is the faintest magnitude limit | Unavailable: V 8.0 is the faintest magnitude limit the atlas draws | dynamic |
 | Toolbar | JButton | (icon only) | Reset view: back to the atlas's first page | Returns the chart to where every reader begins, and clears the search; what the chart d... | hovered |
@@ -121,7 +122,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 
 ## The audit
 
-**104 operable controls** across 13 surfaces: **65** hovered, **7** dynamic, **32** left to their own visible words, **0 undecided**.
+**105 operable controls** across 13 surfaces: **66** hovered, **7** dynamic, **32** left to their own visible words, **0 undecided**.
 
 **0** say the same words twice - a tooltip read back as a description. The seam refuses it, so this is zero or a finding.
 

@@ -355,8 +355,8 @@ class InterfaceTextTest {
             }
         }
         assertEquals(java.util.List.of(
-                        "en:429 export.replace.question",
-                        "nb-NO:383 export.replace.question"),
+                        "en:433 export.replace.question",
+                        "nb-NO:387 export.replace.question"),
                 escaped,
                 "only the overwrite question uses an escape, in each"
                         + " language: " + escaped);

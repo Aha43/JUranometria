@@ -163,3 +163,5 @@ ab19dedf996fa2ad	ui/solar/SunChartStore.java	sunOnChartShown	declared name used,
 daf7e6d12102006e	app/AppMenuBar.java	moonOnChartItem	declared name used, but never at a known sink	identifier	the Moon-on-the-chart item's component name, which tests find it by; no language changes it
 1f27c4b123d1bc34	solarchart/SolarSystemModule.java	moon	declared name used, but never at a known sink	identifier	the body's identity, which the page's language names; the key, not a word
 83a967abf1390b96	ui/solar/MoonChartStore.java	moonOnChartShown	declared name used, but never at a known sink	identifier	a stable preference key; no language changes it
+96e86526f116c7d6	ui/AtlasToolbar.java	zoomLock	declared name used, but never at a known sink	identifier	the zoom-lock toggle's component name, which tests find it by; no language changes it
+43f2af373668c4ab	ui/ZoomLockStore.java	zoomLocked	declared name used, but never at a known sink	identifier	a stable preference key; no language changes it

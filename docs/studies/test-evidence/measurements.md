@@ -136,6 +136,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | juranometria/app/SprintTwentyNineJourneyTest.java | focus-owner, point-reachable, control-showing | back-door-click |
 | juranometria/app/StartupJourneyTest.java | point-reachable, control-showing | none |
 | juranometria/app/SwingSessionTest.java | none | none |
+| juranometria/app/ZoomLockRestartJourneyTest.java | none | none |
 | juranometria/tool/ExportCompanionTest.java | none | none |
 | juranometria/tool/InterfaceEvidenceGateTest.java | none | none |
 | juranometria/tool/SheetCaptureSizingTest.java | none | none |
@@ -169,11 +170,11 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | juranometria/ui/placeandtime/PlaceAndTimeDialogLifecycleTest.java | focus-owner | back-door-click |
 | juranometria/ui/placeandtime/PlaceAndTimeSizeDeclarationTest.java | none | none |
 
-**50 display-dependent files.** 19 state a focused-window or focus-owner premise, 28 state a reachability premise, and 21 use a back-door action (doClick or postActionEvent) somewhere - each either a menu convention or a debt the discipline issue #243 owns.
+**51 display-dependent files.** 19 state a focused-window or focus-owner premise, 28 state a reachability premise, and 21 use a back-door action (doClick or postActionEvent) somewhere - each either a menu convention or a debt the discipline issue #243 owns.
 
 ## Input routes across the whole suite
 
-- files dispatching real pointer events: 19
+- files dispatching real pointer events: 20
 - files dispatching real keyboard events: 2
 - files using doClick somewhere: 37
 - files using postActionEvent somewhere: 3
@@ -197,8 +198,8 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 
 Whether a particular read happens on the event thread is control flow, which text cannot decide; issue #220 proved the cost of guessing, three times. What can be counted is the traffic:
 
-- reads of live chart state (currentScene, pageOffsetY, navigation.state): **455** across the suite
-- explicit event-thread hand-offs (invokeAndWait): **842**
+- reads of live chart state (currentScene, pageOffsetY, navigation.state): **456** across the suite
+- explicit event-thread hand-offs (invokeAndWait): **867**
 
 ## Generated evidence, classified
 

@@ -21,23 +21,45 @@ import juranometria.project.PlanePoint;
  * chrome are left alone: an anchored gesture with no anchor refuses,
  * it does not guess. Every accepted step is the controller's atomic
  * pointer-zoom transition with its reviewed acceptance contract.
+ *
+ * <p>While the {@link ZoomLock} is locked (issue #428), a wheel or
+ * trackpad event over the paper is consumed and does nothing, and any
+ * banked remainder is dropped, so unlocking never releases a step the
+ * reader made while locked. This is the only continuous pointer route
+ * to the field: AWT delivers trackpad scrolling as wheel events, and
+ * the atlas listens to no gesture or magnification.
  */
 public final class ZoomInteraction implements MouseWheelListener {
 
     private final ChartComponent chart;
     private final ChartViewController controller;
+    private final ZoomLock lock;
     private double accumulated;
 
     private ZoomInteraction(ChartComponent chart,
-                            ChartViewController controller) {
+                            ChartViewController controller,
+                            ZoomLock lock) {
         this.chart = chart;
         this.controller = controller;
+        this.lock = lock;
     }
 
-    /** Installs wheel zoom on the chart; returns the interaction. */
+    /** Installs wheel zoom on the chart, never locked; returns it. */
     public static ZoomInteraction install(ChartComponent chart,
                                           ChartViewController controller) {
-        ZoomInteraction interaction = new ZoomInteraction(chart, controller);
+        return install(chart, controller, new ZoomLock());
+    }
+
+    /** Installs wheel zoom that the given lock can stop (#428). */
+    public static ZoomInteraction install(ChartComponent chart,
+                                          ChartViewController controller,
+                                          ZoomLock lock) {
+        if (lock == null) {
+            throw new IllegalArgumentException(
+                    "a zoom lock, unlocked or not, is required");
+        }
+        ZoomInteraction interaction =
+                new ZoomInteraction(chart, controller, lock);
         chart.addMouseWheelListener(interaction);
         return interaction;
     }
@@ -53,6 +75,12 @@ public final class ZoomInteraction implements MouseWheelListener {
             return;
         }
         event.consume();
+        if (lock.locked()) {
+            // Locked: the wheel visibly does nothing, and nothing is
+            // banked for later.
+            accumulated = 0.0;
+            return;
+        }
         double rotation = event.getPreciseWheelRotation();
         if (rotation == 0.0) {
             return;

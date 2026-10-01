@@ -80,6 +80,20 @@ public final class AtlasChrome {
                                    String versionText,
                                    Runnable requestExit,
                                    SelectionMode selectionMode) {
+        return of(language, controller, search, assembler, inspector,
+                versionText, requestExit, selectionMode, null);
+    }
+
+    /** The same, with the zoom lock on the bar (Sprint 38, issue #428). */
+    public static AtlasChrome of(SkyLanguageSession language,
+                                   ChartViewController controller,
+                                   LocalSearch search,
+                                   SceneAssembler assembler,
+                                   InspectorToggle inspector,
+                                   String versionText,
+                                   Runnable requestExit,
+                                   SelectionMode selectionMode,
+                                   juranometria.ui.ZoomLock zoomLock) {
         if (language == null) {
             throw new IllegalArgumentException(
                     "the controls speak the session's language");
@@ -89,7 +103,7 @@ public final class AtlasChrome {
         SearchField field = new SearchField(search, assembler, controller,
                 said);
         AtlasToolbar bar = new AtlasToolbar(controller, field, inspector,
-                versionText, requestExit, selectionMode, said);
+                versionText, requestExit, selectionMode, zoomLock, said);
         return new AtlasChrome(field, bar, said);
     }
 
