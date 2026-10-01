@@ -1,8 +1,8 @@
 # Where the Sun is
 
-*Draft for the JUranometria articles, Sprint 35. The atlas can now say
-where the Sun is; it does not yet draw it, and the Moon's numbers come
-before any drawing. This article is about the saying.*
+*Draft for the JUranometria articles, Sprint 35; figures added in
+Sprint 37, when the atlas began to draw the Sun. This article is about
+the saying: where the Sun is, in numbers held to an authority.*
 
 ## A question with four answers
 
@@ -108,14 +108,38 @@ the last row and marked. In Norwegian the words are Norwegian and the
 decimal is a comma; the digits, the frames and the units are the same,
 because they are notation, not language.
 
+![The Sun table at Oslo, 21 June 2026 10:00 UTC: right ascension 5h 58m
+40.8s, declination +23 degrees 26 minutes 2 seconds, ecliptic longitude
+89.70 degrees, altitude 51.01 degrees, azimuth 150.56 degrees.](images/sun-table-instant.png)
+
+*The June solstice morning at Oslo: the Sun near the top of the
+ecliptic, its longitude 89.70°, a little short of 90° because the
+equinox has moved since 2000.*
+
 ## What it does not do yet
 
-It does not draw the Sun. Where on a page a disc thirty-two arcminutes
-across belongs, how small it may honestly be drawn at a wide field,
-what it covers, whether it is labelled or selectable or exported - none
-of that is decided by numbers, and it will begin with pictures on real
-pages rather than prose, after the Moon has been given the same
-numerical treatment the Sun has here. It does not say which constellation
+It draws the Sun now, since Sprint 37 - and every decision about
+the drawing was made from pictures on real pages, not from the
+numbers: the disc at its true angular size and never enlarged, a ring
+with its centre dot, opaque over what it covers, named beside it or
+not at all, dimmed and saying so below a drawn horizon. The numbers
+above are what put it there.
+
+![A 24-degree chart of Pisces with the ecliptic crossing it; at right
+ascension 0h a small ring with a centre dot labelled Sun sits on the
+ecliptic beside a small diamond labelled March equinox.](images/sun-equinox-24.png)
+
+*The IMCCE's March equinox instant of 2026, 20 March 14:45:53 UTC: the
+Sun on the ecliptic at right ascension 0h, at its true size on a 24°
+page, beside the ecliptic's own equinox mark - each with its own word.*
+
+![A 36-degree chart with a dashed line labelled Mathematical horizon and,
+below it, a small pale ring labelled Sun (below the horizon).](images/sun-below-horizon-36.png)
+
+*Oslo on the evening of the same day, 18:30 UTC, with the horizon
+drawn: the Sun 8.1° below it, dimmed and saying so.*
+
+What the table still does not do: it does not say which constellation
 the Sun is in: two independent implementations disagreed on five of
 the 12 670 rows, every one at an instant when the Sun was crossing a
 boundary, and the atlas has no boundary lookup yet that would settle
