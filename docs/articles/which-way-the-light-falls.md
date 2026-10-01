@@ -1,9 +1,7 @@
 # Which way the light falls
 
-*Draft for the JUranometria articles, Sprint 37. The atlas has said how
-much of the Moon is lit since Sprint 36; now it draws it. This article
-is about the drawing - what a phase is, which way it faces, and what a
-chart can and cannot show of it.*
+*How JUranometria draws the Moon's phase - what a phase is, which way
+it faces, and what a chart can and cannot show of it*
 
 ## Two numbers and a direction
 
@@ -23,7 +21,7 @@ marked at the Moon between the directions to the Sun and to the observer,
 and the elongation psi marked at the observer between the directions to
 the Sun and to the Moon.](images/moon-phase-geometry.png)
 
-*The two angles the contract froze before anything was drawn. The phase
+*The two angles fixed before anything was drawn. The phase
 angle is the Moon's; the elongation - how far the Moon stands from the
 Sun in your sky - is yours.*
 
@@ -145,8 +143,9 @@ side on the chart's terms rather than as "left" or "right".
 
 ## What the sky shows and the chart does not
 
-When the owner first checked the drawn Moon against the real one, the atlas said 78.3 % lit and Stellarium 78 %; the drawing looked
-a little fuller than that. Measured from the screenshot, it was not:
+When the drawn Moon was first checked against the real one, the atlas
+said 78.3 % lit and Stellarium 78 %; the drawing looked a little fuller
+than that. Measured from a screenshot of the chart, it was not:
 the dark crescent was the width the fraction requires. The difference
 is in the Moon. Near the terminator the Sun is low in the lunar sky,
 the ground there is lit at a grazing angle, and it looks dim; the eye

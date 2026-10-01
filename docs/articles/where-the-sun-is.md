@@ -1,8 +1,7 @@
 # Where the Sun is
 
-*Draft for the JUranometria articles, Sprint 35; figures added in
-Sprint 37, when the atlas began to draw the Sun. This article is about
-the saying: where the Sun is, in numbers held to an authority.*
+*How JUranometria knows where the Sun is, and how it holds that answer
+to an authority*
 
 ## A question with four answers
 
@@ -10,7 +9,7 @@ Ask an atlas where the Sun is and you are asking four questions at
 once, and they have different answers.
 
 *Where is it among the stars?* A star chart is drawn in one fixed
-frame - the sky of the year 2000, ICRS - and every star on the page
+frame - the fixed ICRS/J2000 chart frame - and every star on the page
 sits where the catalogue put it. To put the Sun on that page, you need
 its direction in that same frame, from where you stand, at the moment
 you ask, with the light's own travel time taken into account.
@@ -20,10 +19,11 @@ drawn among the fixed stars without lying to them.
 *Where is it in my sky?* That is a different frame: your horizon,
 north, the point over your head. It depends on where you are on Earth
 and on how far the Earth has turned. Here the answer is the
-**apparent** direction - the astrometric one nudged by the aberration
-of light, which comes from the Earth's own motion - given as an
-altitude above the mathematical horizon and an azimuth from north
-through east. No refraction: the atlas says so on the heading, because
+**apparent** direction - the astrometric one carried into the Earth's
+orientation at that moment (its rotation, and the slow precession and
+nutation of its axis) and nudged by the aberration of light, which
+comes from the Earth's own motion - given as an altitude above the
+mathematical horizon and an azimuth from north through east. No refraction: the atlas says so on the heading, because
 your real horizon has air in it and the atlas does not pretend to know
 about the air.
 
@@ -35,18 +35,17 @@ July, because the Earth's orbit is not a circle.
 *When?* Every one of those answers moves. The Sun drifts a degree a day
 along the ecliptic and wheels fifteen degrees an hour across your sky.
 So the atlas answers for an instant, or for a range of instants with a
-step, and the range is the same idea whether the body is the Sun today
-or the Moon next sprint.
+step, and the range is the same idea for the Sun and for the Moon.
 
 ## Where the numbers come from
 
 Nothing is fetched. The atlas carries a small excerpt of JPL's
-planetary ephemeris **DE440** - the Sun, the Earth–Moon barycentre and
-the Earth, for the years 1900 to 2100 - as a SPICE kernel modified by
-JUranometria under NAIF's rules for such kernels, renamed and
-re-attributed, with every coefficient exactly as JPL published it. The
-excerpt was proved against the official kernel before it was written:
-129 555 positions and velocities, identical. Beside it travels the
+planetary ephemeris **DE440** - the Sun, the Earth–Moon barycentre,
+the Earth and the Moon, for the years 1900 to 2100 - as a SPICE kernel
+modified by JUranometria under NAIF's rules for such kernels, renamed
+and re-attributed, with every coefficient exactly as JPL published it.
+The excerpt was proved against the official kernel before it was
+written: 172 740 states, identical. Beside it travels the
 IERS leap-second record, unmodified, so the atlas knows exactly how
 civil time and the ephemeris's time differ - until the date the record
 itself says its knowledge ends.
@@ -116,22 +115,22 @@ because they are notation, not language.
 ecliptic, its longitude 89.70°, a little short of 90° because the
 equinox has moved since 2000.*
 
-## What it does not do yet
+## From the numbers to the chart
 
-It draws the Sun now, since Sprint 37 - and every decision about
-the drawing was made from pictures on real pages, not from the
-numbers: the disc at its true angular size and never enlarged, a ring
+The atlas draws the Sun - and every decision about the drawing was
+made from pictures on real pages, not from the numbers: the disc at its true angular size and never enlarged, a ring
 with its centre dot, opaque over what it covers, named beside it or
 not at all, dimmed and saying so below a drawn horizon. The numbers
 above are what put it there.
 
-![A 24-degree chart of Pisces with the ecliptic crossing it; at right
+![A 24-degree chart of Pisces with the ecliptic crossing it; near right
 ascension 0h a small ring with a centre dot labelled Sun sits on the
-ecliptic beside a small diamond labelled March equinox.](images/sun-equinox-24.png)
+ecliptic, just beside a small diamond labelled March equinox.](images/sun-equinox-24.png)
 
 *The IMCCE's March equinox instant of 2026, 20 March 14:45:53 UTC: the
-Sun on the ecliptic at right ascension 0h, at its true size on a 24°
-page, beside the ecliptic's own equinox mark - each with its own word.*
+Sun on the ecliptic near right ascension 0h, at its true size on a 24°
+page, near - not on - the fixed J2000 equinox mark, because the
+equinox of date has moved since 2000. Each has its own word.*
 
 ![A 36-degree chart with a dashed line labelled Mathematical horizon and,
 below it, a small pale ring labelled Sun (below the horizon).](images/sun-below-horizon-36.png)
