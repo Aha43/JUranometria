@@ -91,6 +91,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | src/juranometria/tool/AboutSheetMain.java | look-and-feel | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/ChartKeyboardSheetMain.java | look-and-feel, preferences | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/ChartOptionsSheetMain.java | look-and-feel, preferences | UNPROTECTED: look-and-feel |
+| src/juranometria/tool/CompanionWindowStudyMain.java | look-and-feel, default-font, preferences | protected-locally |
 | src/juranometria/tool/ControlExplanationStudyMain.java | look-and-feel | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/DeepSkyVocabularyMockupMain.java | look-and-feel, default-font, preferences | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/tool/EclipticCandidateStudyMain.java | default-font | UNPROTECTED: default-font |
@@ -112,7 +113,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | src/juranometria/tool/WorkingSelectionMockupMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/app/PackagedAcceptanceMain.java | look-and-feel, locale, preferences | protected-locally |
 
-**23 evidence executables** touch process-wide state; 22 carry an unpaired touch.
+**24 evidence executables** touch process-wide state; 22 carry an unpaired touch.
 
 ## Display-dependent tests, their premises and their routes
 
@@ -205,11 +206,11 @@ Whether a particular read happens on the event thread is control flow, which tex
 
 | class | the contract | files |
 |---|---|---|
-| deterministic-report | regenerates byte-for-byte on the same tree | 77 |
+| deterministic-report | regenerates byte-for-byte on the same tree | 79 |
 | byte-exact-fixture | committed data with provenance; never regenerated casually | 42 |
 | captured-evidence | an operating-system screenshot, digest-pinned; a re-capture is a provenance event | 13 |
 | renderer-drawn | byte-reproducible per machine; production ink, no widgets | 463 |
-| widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 39 |
+| widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 59 |
 | session-photograph | a packed window on a display; drifts between desktop sessions | 3 |
 
 The byte-exact fixtures:
@@ -272,6 +273,26 @@ The captured evidence (operating-system screenshots; provenance in the decision 
 - docs/studies/mac-identity/screenshot-switcher.png
 
 The widget-rendered artifacts (a new one arrives by a reviewed addition to the scanner's list, not a habit):
+- docs/studies/companion-window/controls-companion-en-collapsed-360.png
+- docs/studies/companion-window/controls-companion-en-dark-300.png
+- docs/studies/companion-window/controls-companion-en-dark-360.png
+- docs/studies/companion-window/controls-companion-en-dark-420.png
+- docs/studies/companion-window/controls-companion-en-light-300.png
+- docs/studies/companion-window/controls-companion-en-light-360.png
+- docs/studies/companion-window/controls-companion-en-light-420.png
+- docs/studies/companion-window/controls-companion-en-refused-360.png
+- docs/studies/companion-window/controls-companion-nb-NO-collapsed-360.png
+- docs/studies/companion-window/controls-companion-nb-NO-dark-300.png
+- docs/studies/companion-window/controls-companion-nb-NO-dark-360.png
+- docs/studies/companion-window/controls-companion-nb-NO-dark-420.png
+- docs/studies/companion-window/controls-companion-nb-NO-light-300.png
+- docs/studies/companion-window/controls-companion-nb-NO-light-360.png
+- docs/studies/companion-window/controls-companion-nb-NO-light-420.png
+- docs/studies/companion-window/controls-companion-nb-NO-refused-360.png
+- docs/studies/companion-window/controls-companion-placement-1280x800.png
+- docs/studies/companion-window/controls-companion-placement-1440x900.png
+- docs/studies/companion-window/controls-companion-placement-1920x1080.png
+- docs/studies/companion-window/controls-companion-placement-2560x1440.png
 - docs/studies/deep-sky-vocabulary/deep-sky-tab-dark.png
 - docs/studies/deep-sky-vocabulary/deep-sky-tab-focus-dark.png
 - docs/studies/deep-sky-vocabulary/deep-sky-tab-focus.png
