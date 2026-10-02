@@ -760,7 +760,7 @@ dist: app
 BASE ?= origin/main
 classify: classes
 	@base=$$(git merge-base $(BASE) HEAD); \
-	{ git diff --name-only "$$base"; git ls-files --others --exclude-standard; } \
+	{ git diff --name-only --no-renames "$$base"; git ls-files --others --exclude-standard; } \
 		| sort -u > $(BUILD_DIR)/changed-paths.txt; \
 	rm -rf $(BUILD_DIR)/base; mkdir -p $(BUILD_DIR)/base; \
 	while IFS= read -r path; do \

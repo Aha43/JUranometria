@@ -112,6 +112,11 @@ carriage return, a reorder with nothing else changed, or a missing
 base. The directory-reader rule stays as conservative as it was for
 every other committed input.
 
+**Moves.** The change is listed with `git diff --name-only
+--no-renames`, so a moved file is judged at both of its paths. Until
+#432, git's rename detection named only the new path, and the old one
+was never judged - a gap since #398's two-route gate.
+
 **Events.** Only a pull request can be less than wide. A push to
 `main`, a tag and a manual dispatch are wide by event.
 
