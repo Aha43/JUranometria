@@ -1,7 +1,9 @@
 # The companion window, around Place and Time
 
-Sprint 39, issue #433. **Proposed — awaiting the owner's ruling.** No
-production companion exists; this record is what #434 would build.
+Sprint 39, issue #433. **Ruled by the owner (2026-10-02)** — see
+[The ruling](#the-ruling) at the end, which governs where it differs
+from the proposal. No production companion exists; this record is
+what #434 builds.
 The study is `docs/studies/companion-window/`
 (`make companion-window-study`).
 
@@ -215,11 +217,52 @@ lands the authority change on its own, reviewable, and gives the
 interaction route an honest first run. Option 1 is one review and one
 wide run.
 
-## Questions for the owner
+## The ruling
 
-1. The three choices: A, A, A?
-2. The split: option 1 or option 2?
-3. The window's title: **Controls** / **Kontroller**, or another word?
-4. Reopen at startup if it was open when the application quit?
-5. The refusal line in the old dialog too (shared panel), or the
-   companion only?
+The owner's answers to the five questions put at the checkpoint:
+
+1. **Architecture: A, A, A.**
+   - Notifications belong in `MeridianModule`. It is the authority, so
+     every mutation notifies from there; a UI-side controller would
+     only conceal bypasses.
+   - One shared `PlaceAndTimePanel`, hosted by both the dialog and the
+     companion, with the same presentation and actions.
+   - One owned, modeless `JDialog`: a single instance, hidden on close
+     and never rebuilt. It stays above its chart owner, not above
+     unrelated applications.
+
+   The stale-checkbox defect is a real 4.0 defect. Fixing it through
+   the authoritative notification seam is part of the architecture,
+   not unrelated scope.
+2. **The three-PR split (option 2),** each merged and post-merge
+   checked before the next begins:
+   1. The module notification and the current dialog subscribing.
+      Wide.
+   2. The shared panel, the companion, its store, evidence and
+      journeys, without application wiring. Interaction.
+   3. View access, startup restoration and shutdown. Wide.
+
+   Code is not rearranged merely to preserve those classifications.
+   The owner's packaged checkpoint is on PR 3's candidate, before
+   PR 3 merges.
+3. **Title: Controls / Kontroller** for the first version. It is broad
+   enough for later panels and quiet beside the chart. The Norwegian
+   word may be reconsidered after using the packaged window.
+4. **Visibility is restored at startup.** If the companion was visible
+   at a clean quit it reopens; if it was hidden it stays hidden. In
+   addition:
+   - it is restored only after the chart window has valid screen
+     geometry;
+   - it is recovered onto an available display;
+   - it does not take the chart's intended initial keyboard focus;
+   - its visibility is remembered independently of the accepted
+     Place and Time state.
+5. **The refusal line appears in both presentations.** It belongs to
+   the shared panel, so the dialog and the companion explain the same
+   refused input. Silent put-back was poor behaviour, and explaining
+   only in the companion would make the two presentations
+   semantically different. This is an architecture-required
+   correction, allowed under the freeze.
+
+No other panel, menu redesign, version work or new functionality
+enters the sprint.
