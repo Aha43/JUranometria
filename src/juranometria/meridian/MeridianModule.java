@@ -34,6 +34,19 @@ import juranometria.sky.Observer;
  * - never a side effect of setting a latitude or a clock. A page
  * that moved while a reader was reading it could not be read.
  *
+ * <h2>Every change is announced, here</h2>
+ *
+ * <p>The module is the one authority for the place, the instant and
+ * the three lines, so it is the one place that says when they change
+ * (#433, ruled; #434). Every presentation that shows them - the Place
+ * and Time dialog today, the companion next - subscribes through
+ * {@link #onChange} and is told after every mutation, whoever made
+ * it. A presentation that only read the module when it was built went
+ * stale: with the dialog open, the chart keyboard turned the meridian
+ * on, the dialog's box still showed it off, and the next click in the
+ * dialog turned it back off. A notification raised by the authority
+ * cannot be bypassed by a writer that forgets to raise it.
+ *
  * <h2>Nothing ticks</h2>
  *
  * <p>The observer carries a frozen instant. There is no clock here,
@@ -49,6 +62,8 @@ public final class MeridianModule implements ChartModule {
     private boolean meridianShowing = true;
     private boolean horizonShowing = true;
     private boolean zenithShowing = true;
+
+    private final List<Runnable> listeners = new ArrayList<>();
 
     private ChartServices services;
     private Runnable withdraw;
@@ -117,6 +132,7 @@ public final class MeridianModule implements ChartModule {
         }
         this.observer = observer;
         redraw();
+        changed();
     }
 
     /** Which of the three a reader is being shown. */
@@ -125,6 +141,51 @@ public final class MeridianModule implements ChartModule {
         this.horizonShowing = horizon;
         this.zenithShowing = zenith;
         redraw();
+        changed();
+    }
+
+    /** A registration that ends when cancelled; cancelling twice is once. */
+    public interface Subscription {
+        void cancel();
+    }
+
+    /**
+     * Told after every change to the observer or the lines, by
+     * whichever presentation or key made it. The listener runs on the
+     * thread that made the change - the event thread, as for every
+     * Swing caller - and must not itself change the module.
+     */
+    public Subscription onChange(Runnable listener) {
+        if (listener == null) {
+            throw new IllegalArgumentException(
+                    "a subscription is somebody listening");
+        }
+        listeners.add(listener);
+        return new Subscription() {
+            private boolean live = true;
+
+            @Override
+            public void cancel() {
+                if (live) {
+                    live = false;
+                    listeners.remove(listener);
+                }
+            }
+        };
+    }
+
+    /**
+     * How many subscriptions are live - so that "reopening adds no
+     * listener" is a claim a test can make (#433, invariant 4).
+     */
+    public int subscribers() {
+        return listeners.size();
+    }
+
+    private void changed() {
+        for (Runnable listener : List.copyOf(listeners)) {
+            listener.run();
+        }
     }
 
     public boolean meridianShowing() {

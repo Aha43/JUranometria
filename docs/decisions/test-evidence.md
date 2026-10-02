@@ -378,7 +378,7 @@ Text cannot decide whether a read runs on the event thread — that
 is control flow, and #220 proved the cost of guessing, three times
 (the journey's mark derivation, its page offset, and finally its
 own premise capture). The measurements count the traffic: **456
-reads of live chart state** against **867 explicit hand-offs**
+reads of live chart state** against **871 explicit hand-offs**
 suite-wide (requoted for the #261 reader-surface tests, which read
 scenes and marks under the same one-hand-off discipline; for #275's
 closing journey, which reads the page's own objects and takes its
@@ -422,7 +422,10 @@ reads of a component no event thread is painting, counted with the
 rest; and for the #359 completion's cardinal landmark journeys,
 which read the page they painted - its scene and page offset - on
 the event thread, because a chart painted off it raced the toolkit
-and drew the opening page). The discipline
+and drew the opening page; and for #434's dialog lifecycle test, which
+opens Place and Time from the real menu three times and closes it by
+its close box, each step on the event thread, counting the module's
+subscriptions in between). The discipline
 that closed #220 — derive, read and act
 in **one** `invokeAndWait`, with the deterministic queued-change
 race tests holding it — is the named pattern; its mutations already

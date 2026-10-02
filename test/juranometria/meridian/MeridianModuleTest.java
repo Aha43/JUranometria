@@ -165,6 +165,47 @@ class MeridianModuleTest {
                         + " or time reassembles nothing");
     }
 
+    // ---- every change is announced (#434) ------------------------------
+
+    @Test
+    void everyChangeIsAnnouncedAndACancelledSubscriptionHearsNothing() {
+        MeridianModule module = attached(new TestChartServices());
+        int[] heard = new int[1];
+        MeridianModule.Subscription subscription =
+                module.onChange(() -> heard[0]++);
+        assertEquals(1, module.subscribers());
+
+        module.observer(OSLO.from(-33.87, 151.21));
+        module.observer(module.observer().at(WHEN.plusSeconds(7200)));
+        module.showing(true, false, true);
+        assertEquals(3, heard[0], "the place, the instant and the lines,"
+                + " each told once");
+        assertEquals(-33.87, module.observer().latitudeDegrees(),
+                "and told after the change, not before it");
+
+        subscription.cancel();
+        subscription.cancel();
+        assertEquals(0, module.subscribers(),
+                "cancelled, and cancelling twice is once");
+        module.showing(false, false, false);
+        assertEquals(3, heard[0], "a cancelled subscription hears nothing");
+        assertThrows(IllegalArgumentException.class,
+                () -> module.onChange(null));
+    }
+
+    @Test
+    void aListenerSeesTheValueTheChangeLeft() {
+        MeridianModule module = attached(new TestChartServices());
+        boolean[] seen = new boolean[3];
+        module.onChange(() -> {
+            seen[0] = module.meridianShowing();
+            seen[1] = module.horizonShowing();
+            seen[2] = module.zenithShowing();
+        });
+        module.showing(true, false, true);
+        assertTrue(seen[0] && !seen[1] && seen[2]);
+    }
+
     @Test
     void onlyAReaderAskingMovesTheChartAndThenOnlyAsARequest() {
         TestChartServices services = new TestChartServices();

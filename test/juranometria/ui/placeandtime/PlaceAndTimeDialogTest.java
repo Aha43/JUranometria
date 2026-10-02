@@ -110,6 +110,66 @@ class PlaceAndTimeDialogTest {
         field.postActionEvent();
     }
 
+    // ---- one state, whoever changes it (#434) -------------------------
+
+    /**
+     * The 4.0 defect #433 found: with the dialog open, the chart
+     * keyboard turned the meridian on; the dialog's box still showed
+     * it off; ticking Zenith then sent all three boxes and turned the
+     * meridian back off. The keyboard writes the module exactly as
+     * {@code ChartKeyboardSession} does - straight to the authority.
+     */
+    @Test
+    void aLineTheKeyboardTurnedOnSurvivesTheNextClickInTheDialog() {
+        Rig rig = new Rig(node);
+        rig.module.showing(false, false, false);
+        AbstractButton meridian = rig.button("showMeridian");
+        assertTrue(!meridian.isSelected(), "the box follows the module");
+
+        // The keyboard: Cmd/Ctrl-K then R.
+        rig.module.showing(true, rig.module.horizonShowing(),
+                rig.module.zenithShowing());
+        assertTrue(meridian.isSelected(),
+                "the open dialog shows what the keyboard did");
+
+        rig.button("showZenith").doClick();
+        assertTrue(rig.module.meridianShowing(),
+                "ticking Zenith keeps the meridian the keyboard turned on");
+        assertTrue(rig.module.zenithShowing());
+    }
+
+    @Test
+    void theFieldsFollowAChangeMadeElsewhereButNotOverTyping() {
+        Rig rig = new Rig(node);
+        rig.module.observer(rig.module.observer().from(-33.87, 151.21));
+        assertEquals("-33.87", rig.field("latitudeField").getText(),
+                "a place changed elsewhere is shown here");
+        assertEquals("151.21", rig.field("longitudeField").getText());
+
+        // The reader is typing a longitude, not yet committed, when the
+        // place changes elsewhere: the typing stays.
+        rig.field("longitudeField").setText("12.5");
+        rig.module.observer(rig.module.observer().from(59.913, 10.752));
+        assertEquals("59.913", rig.field("latitudeField").getText());
+        assertEquals("12.5", rig.field("longitudeField").getText(),
+                "the field holding an uncommitted edit keeps it");
+        rig.field("longitudeField").postActionEvent();
+        assertEquals(12.5, rig.module.observer().eastLongitudeDegrees(),
+                "and committing it applies it, as before");
+        assertEquals("12.5", rig.field("longitudeField").getText());
+    }
+
+    @Test
+    void theContentIsOneSubscriptionAndFollowingNeverWrites() {
+        Rig rig = new Rig(node);
+        assertEquals(1, rig.module.subscribers(),
+                "the content follows the module through one subscription");
+        int redraws = rig.services.redraws;
+        rig.module.showing(true, true, true);
+        assertEquals(redraws + 1, rig.services.redraws,
+                "following the change wrote nothing back to the module");
+    }
+
     // ---- the surface is the gate's ----------------------------------
 
     @Test
