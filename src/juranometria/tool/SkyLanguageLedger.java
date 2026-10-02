@@ -31,7 +31,7 @@ public final class SkyLanguageLedger {
 
     /** Where the reviewed dispositions live. */
     public static final Path RECORD =
-            Path.of("docs/studies/sky-language/manual-review.tsv");
+            Path.of("docs/studies/language-ledger/manual-review.tsv");
 
     /**
      * The dispositions a reviewer may give.

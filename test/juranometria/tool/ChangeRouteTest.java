@@ -230,12 +230,136 @@ class ChangeRouteTest {
                 "docs/studies/solar-system/moon-events-2026.txt").route(),
                 "a fixture a chart study reads");
         Stated tree = tree();
-        tree.fileReaders.put("docs/studies/sky-language/manual-review.tsv",
-                new Finding("docs/studies/sky-language/manual-review.tsv",
+        tree.fileReaders.put("docs/studies/sky-language/review-input.tsv",
+                new Finding("docs/studies/sky-language/review-input.tsv",
                         Route.INTERACTION, "a committed input only the suite holds"));
         assertEquals(Route.INTERACTION, one(tree,
-                "docs/studies/sky-language/manual-review.tsv").route(),
-                "a ledger only the suite reads, though it sits beside chart pictures");
+                "docs/studies/sky-language/review-input.tsv").route(),
+                "an input only the suite reads, though it sits beside chart pictures");
+    }
+
+    // ---- the language-review ledger, row by row (#432) -----------------
+
+    private static final String PREAMBLE = "# The manual ledger.\n#\n"
+            + "identity\tfile\tliteral\tscanner-reason\tdisposition\twhy\n";
+
+    private static String row(String identity, String file, String literal) {
+        return identity + "\t" + file + "\t" + literal
+                + "\tdeclared name used, but never at a known sink"
+                + "\tidentifier\ta stable key; no language changes it\n";
+    }
+
+    private static final String TOOLBAR =
+            row("1111111111111111", "ui/AtlasToolbar.java", "zoomIn");
+    private static final String PAGE =
+            row("2222222222222222", "render/ChartRenderer.java", "ICRS");
+
+    /** A ledger changed from {@code base} to {@code head}, judged. */
+    private static Finding ledger(Stated tree, String base, String head) {
+        if (base != null) {
+            tree.base.put(ChangeRoute.LEDGER, base);
+        }
+        if (head != null) {
+            tree.head.put(ChangeRoute.LEDGER, head);
+        }
+        return one(tree, ChangeRoute.LEDGER);
+    }
+
+    @Test
+    void aLedgerRowOnInterfaceLanguageIsInteractionAndOnChartLanguageWide() {
+        String base = PREAMBLE + TOOLBAR + PAGE;
+        assertEquals(Route.INTERACTION, ledger(tree(), base, base
+                + row("3333333333333333", "ui/AtlasToolbar.java", "zoomLock")).route(),
+                "toolbar or dialog wording: an added row on an interface source");
+        assertEquals(Route.INTERACTION, ledger(tree(), base,
+                PREAMBLE + TOOLBAR.replace("a stable key", "the button's name")
+                        + PAGE).route(),
+                "an edited row on an interface source");
+        assertEquals(Route.INTERACTION, ledger(tree(), base, PREAMBLE + PAGE).route(),
+                "a removed row on an interface source");
+        Finding page = ledger(tree(), base, PREAMBLE + TOOLBAR
+                + PAGE.replace("a stable key", "notation"));
+        assertEquals(Route.WIDE, page.route(), "chart or page wording");
+        assertTrue(page.reason().contains("chart or page language"), page.reason());
+    }
+
+    @Test
+    void aLedgerRowWhoseSourceIsSharedUnknownOrUnreachedIsWide() {
+        String base = PREAMBLE + TOOLBAR;
+        assertEquals(Route.WIDE, ledger(tree(), base, base
+                + row("4444444444444444", "ui/ChartComponent.java", "chart")).route(),
+                "a shared source: the chart reaches it too");
+        Finding unknown = ledger(tree(), base, base
+                + row("5555555555555555", "ui/RemovedPanel.java", "panel"));
+        assertEquals(Route.WIDE, unknown.route(), "an unknown or removed source");
+        assertTrue(unknown.reason().contains("does not exist"), unknown.reason());
+        Finding unreached = ledger(tree(), base, base
+                + row("6666666666666666", "tool/SomeStudyMain.java", "study"));
+        assertEquals(Route.WIDE, unreached.route(), "a source neither closure reaches");
+        assertTrue(unreached.reason().contains("unresolved"), unreached.reason());
+        assertEquals(Route.WIDE, ledger(tree(), PREAMBLE + TOOLBAR
+                        + row("4444444444444444", "ui/ChartComponent.java", "chart"),
+                PREAMBLE + TOOLBAR).route(),
+                "removing a row on a shared source is judged by that source too");
+    }
+
+    @Test
+    void aLedgerChangeMixingChartAndInterfaceRowsIsWide() {
+        String base = PREAMBLE + TOOLBAR + PAGE;
+        assertEquals(Route.WIDE, ledger(tree(), base, base
+                + row("3333333333333333", "ui/AtlasToolbar.java", "zoomLock")
+                + row("7777777777777777", "render/ChartRenderer.java", "J2000")).route());
+    }
+
+    @Test
+    void anythingButAWellFormedRowChangeInTheLedgerIsWide() {
+        String base = PREAMBLE + TOOLBAR;
+        Map<String, String> heads = new java.util.LinkedHashMap<>();
+        heads.put("a row with five columns", base
+                + "3333333333333333\tui/AtlasToolbar.java\tx\treason\tidentifier\n");
+        heads.put("a row whose identity is not one", base
+                + row("not-an-identity!", "ui/AtlasToolbar.java", "x"));
+        heads.put("a row whose source is not a source path", base
+                + row("3333333333333333", "../secrets/AtlasToolbar.java", "x"));
+        heads.put("a disposition that is not one of the six", base
+                + row("3333333333333333", "ui/AtlasToolbar.java", "x")
+                        .replace("\tidentifier\t", "\treviewed\t"));
+        heads.put("a duplicated identity", base + TOOLBAR);
+        heads.put("a comment among the rows", base + "# a note\n");
+        heads.put("a blank line among the rows", base + "\n"
+                + row("3333333333333333", "ui/AtlasToolbar.java", "x"));
+        heads.put("an edited preamble", base.replace("The manual ledger.",
+                "The manual ledger, revised."));
+        heads.put("an edited header", base.replace("\twhy\n", "\treason\n"));
+        heads.put("a missing header", "# The manual ledger.\n" + TOOLBAR);
+        heads.put("a carriage return", base.replace("\n", "\r\n"));
+        heads.put("the rows reordered and nothing else",
+                PREAMBLE + row("3333333333333333", "ui/AtlasToolbar.java", "x") + TOOLBAR);
+        List<String> notWide = new ArrayList<>();
+        for (Map.Entry<String, String> head : heads.entrySet()) {
+            String start = head.getKey().equals("the rows reordered and nothing else")
+                    ? PREAMBLE + TOOLBAR + row("3333333333333333", "ui/AtlasToolbar.java", "x")
+                    : base;
+            Finding f = ledger(tree(), start, head.getValue());
+            if (f.route() != Route.WIDE) {
+                notWide.add(head.getKey() + ": " + f.route() + " (" + f.reason() + ")");
+            }
+        }
+        assertEquals(List.of(), notWide, "every structural edit fails closed");
+    }
+
+    @Test
+    void aLedgerWithoutItsBaseOrWhoseReaderIsChartCodeIsWide() {
+        assertEquals(Route.WIDE, ledger(tree(), null, PREAMBLE + TOOLBAR).route(),
+                "without the base every line reads as new, the preamble too");
+        assertEquals(Route.WIDE, ledger(tree(), PREAMBLE + TOOLBAR, null).route(),
+                "the ledger removed");
+        Stated read = tree();
+        read.fileReaders.put(ChangeRoute.LEDGER, new Finding(ChangeRoute.LEDGER,
+                Route.WIDE, "a committed input chart code reads (SomeChartStudy)"));
+        assertEquals(Route.WIDE, ledger(read, PREAMBLE + TOOLBAR, PREAMBLE + TOOLBAR
+                + row("3333333333333333", "ui/AtlasToolbar.java", "x")).route(),
+                "chart code that reads the ledger makes every change to it wide");
     }
 
     @Test
@@ -356,6 +480,78 @@ class ChangeRouteTest {
         assertEquals(Route.INTERACTION, real.consumersOf("toolbar.zoomIn.tooltip").route());
         assertEquals(Route.WIDE, real.consumersOf("page.body.sun").route());
         assertEquals(Route.WIDE, real.consumersOf("nothing.names.this.key").route());
+    }
+
+    /**
+     * The exact change #430 made to the ledger - two appended rows, for
+     * the zoom lock's component name and preference key - is
+     * interaction against the real closures. Its base is rebuilt from
+     * the committed ledger without those two rows, which is byte for
+     * byte the ledger at {@code 99f6077}: the move to its own
+     * directory changed no byte, and #430 changed nothing else.
+     */
+    @Test
+    void onTheRealTreeTheZoomLockRowsAreInteractionAndPageRowsWide()
+            throws IOException {
+        RenderingClosure classes = RenderingClosure.of(Path.of("build/classes"));
+        ChangeBoundary real = ChangeBoundary.of(classes, Path.of("."), null);
+        String head = Files.readString(Path.of(ChangeRoute.LEDGER));
+        assertEquals(Path.of(ChangeRoute.LEDGER), SkyLanguageLedger.RECORD,
+                "the classifier judges the ledger the scanner is held to");
+        List<String> zoomLock = new ArrayList<>();
+        StringBuilder base = new StringBuilder();
+        for (String line : head.split("\n", -1)) {
+            if (line.startsWith("96e86526f116c7d6\tui/AtlasToolbar.java\tzoomLock\t")
+                    || line.startsWith("43f2af373668c4ab\tui/ZoomLockStore.java\tzoomLocked\t")) {
+                zoomLock.add(line);
+            } else {
+                base.append(line).append('\n');
+            }
+        }
+        assertEquals(2, zoomLock.size(), "both of #430's rows are committed");
+        String before = base.substring(0, base.length() - 1);
+
+        Finding found = ChangeRoute.classify(List.of(ChangeRoute.LEDGER),
+                comparing(real, before, head), ChangeRoute::existsInTree).get(0);
+        assertEquals(Route.INTERACTION, found.route(), found.reason());
+        assertTrue(found.reason().startsWith("2 ledger row(s)"), found.reason());
+
+        // A row on page wording - a sheet writer's - is wide.
+        String sheetRow = null;
+        for (String line : head.split("\n")) {
+            if (line.contains("\tsheet/PdfSheetWriter.java\t")) {
+                sheetRow = line;
+                break;
+            }
+        }
+        assertTrue(sheetRow != null, "the ledger holds a sheet writer's row");
+        String edited = head.replace(sheetRow, sheetRow + " (revised)");
+        Finding page = ChangeRoute.classify(List.of(ChangeRoute.LEDGER),
+                comparing(real, head, edited), ChangeRoute::existsInTree).get(0);
+        assertEquals(Route.WIDE, page.route(), page.reason());
+
+        // The ledger has a reader of its own now, and no chart producer
+        // names its directory; the directory rule is unchanged for its
+        // former neighbours.
+        assertEquals(Route.INTERACTION,
+                real.readersOfFile(ChangeRoute.LEDGER).orElseThrow().route());
+        assertEquals(Route.WIDE, real.readersOfFile(
+                "docs/studies/sky-language/iau-constellations.tsv").orElseThrow().route(),
+                "the IAU identities beside the chart's language study stay wide");
+    }
+
+    /** The real boundary, with a stated base and head for one file. */
+    private static ChangeRoute.Boundary comparing(ChangeBoundary real,
+                                                  String base, String head) {
+        return new ChangeRoute.Boundary() {
+            public Optional<String> chartChain(String s) { return real.chartChain(s); }
+            public Optional<String> interactionChain(String s) { return real.interactionChain(s); }
+            public Optional<Route> ownerOf(String p) { return real.ownerOf(p); }
+            public Finding consumersOf(String k) { return real.consumersOf(k); }
+            public Optional<Finding> readersOfFile(String p) { return real.readersOfFile(p); }
+            public Optional<String> base(String p) { return Optional.of(base); }
+            public Optional<String> head(String p) { return Optional.of(head); }
+        };
     }
 
     @Test
