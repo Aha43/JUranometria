@@ -5,7 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
@@ -13,6 +12,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
+
+import juranometria.tool.InterfacePhotographers.Photographer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -54,70 +55,12 @@ class InterfaceEvidenceGateTest {
             Path.of("docs/studies/interface-language");
 
     /**
-     * One photographer: what it writes, and what it holds still.
-     *
-     * <p>The kind is declared and never defaulted. Chart Options was
-     * photographed at its packed 394 px and Place and Time at 326 -
-     * both widths no reader meets - because the coordinator assumed
-     * every window was a packed one, and an undeclared default is
-     * how that assumption gets made again.
-     */
-    record Photographer(String companion,
-                        SheetCapture.Kind kind) {
-    }
-
-    /**
-     * Every generator that owns part of this directory.
-     *
-     * <p>One registry, in one place. The inventory checks below read
-     * this and the committed directory and require them to describe
-     * the same set - in both directions, because a generator nobody
-     * registered and an artifact nobody generates are the same
-     * defect seen from two ends.
+     * Every generator that owns part of this directory - the
+     * production registry, so the CI classifier reads the same list
+     * this gate holds to the committed directory (#428).
      */
     private static final Map<String, Photographer> GENERATORS =
-            new LinkedHashMap<>();
-
-    static {
-        // Dialogs that production only packs.
-        GENERATORS.put("AboutSheetMain",
-                new Photographer("about-strings.md", SheetCapture.Kind.PACKED));
-        GENERATORS.put("ExportSheetDialogSheetMain",
-                new Photographer("export-strings.md", SheetCapture.Kind.PACKED));
-        GENERATORS.put("SwingChromeSheetMain",
-                new Photographer("swing-chrome-strings.md",
-                        SheetCapture.Kind.PACKED));
-        GENERATORS.put("SunTableSheetMain",
-                new Photographer("suntable-strings.md", SheetCapture.Kind.PACKED));
-        GENERATORS.put("MoonTableSheetMain",
-                new Photographer("moontable-strings.md", SheetCapture.Kind.PACKED));
-        // Components inside a packed study frame.
-        GENERATORS.put("ChartKeyboardSheetMain",
-                new Photographer("chartkeyboard-strings.md",
-                        SheetCapture.Kind.PACKED));
-        GENERATORS.put("InspectorSheetMain",
-                new Photographer("inspector-strings.md", SheetCapture.Kind.PACKED));
-        GENERATORS.put("MenuSheetMain",
-                new Photographer("menu-strings.md", SheetCapture.Kind.PACKED));
-        GENERATORS.put("OnThisPageSheetMain",
-                new Photographer("onthispage-strings.md", SheetCapture.Kind.PACKED));
-        GENERATORS.put("ToolbarSheetMain",
-                new Photographer("toolbar-strings.md", SheetCapture.Kind.PACKED));
-        // Dialogs whose size the application states.
-        GENERATORS.put("ChartOptionsSheetMain",
-                new Photographer("chartoptions-strings.md",
-                        SheetCapture.Kind.APPLICATION_SIZED));
-        GENERATORS.put("PlaceAndTimeSheetMain",
-                new Photographer("placeandtime-strings.md",
-                        SheetCapture.Kind.APPLICATION_SIZED));
-        // No window to size.
-        GENERATORS.put("SettingsSheetMain",
-                new Photographer("settings-strings.md",
-                        SheetCapture.Kind.FIXED_CANVAS));
-        GENERATORS.put("PageLanguageSheetMain",
-                new Photographer("page-language-strings.md",
-                        SheetCapture.Kind.FIXED_CANVAS));
-    }
+            InterfacePhotographers.ALL;
 
     /** Every companion this registry owns. */
     private static List<String> companions() {
@@ -741,6 +684,13 @@ class InterfaceEvidenceGateTest {
                 }
                 String name = file.getFileName().toString()
                         .replace(".java", "");
+                // The registry names the directory it audits; it
+                // writes nothing there (#428 moved it into production
+                // so the classifier can read it).
+                if (name.equals(InterfacePhotographers.class
+                        .getSimpleName())) {
+                    continue;
+                }
                 if (!GENERATORS.containsKey(name)) {
                     undeclared.add(name);
                 }

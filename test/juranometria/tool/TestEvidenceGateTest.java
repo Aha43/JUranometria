@@ -482,16 +482,18 @@ class TestEvidenceGateTest {
                         "PackagedAcceptanceMain.ma" + "in(",
                         "PlaceStore.us" + "er(",
                         "SkyLanguageStore.us" + "er(",
-                        "SunChartStore.us" + "er("),
+                        "SunChartStore.us" + "er(",
+                        "ZoomLockStore.us" + "er("),
                 TestEvidenceScan.realPreferenceDoors(),
-                "the nine production entry points to the reader's"
+                "the ten production entry points to the reader's"
                         + " store - the sixth is #274's, which keeps"
                         + " one key for whether the ecliptic is shown,"
                         + " the seventh is #348's, which keeps the"
                         + " two language keys, the eighth is #415's,"
                         + " which keeps one key for whether the Sun is"
-                        + " on the chart, and the ninth is #416's, the"
-                        + " same for the Moon. Each arrived by this"
+                        + " on the chart, the ninth is #416's, the"
+                        + " same for the Moon, and the tenth is #428's,"
+                        + " whether zoom is locked. Each arrived by this"
                         + " pin changing rather than by a silent gap"
                         + " in a remembered list, which is the whole"
                         + " reason the set is derived");
@@ -540,7 +542,7 @@ class TestEvidenceGateTest {
                         || f.premises().contains("focus-owner")).count();
         long reachPremise = display.stream().filter(f ->
                 f.premises().contains("point-reachable")).count();
-        assertEquals(50, display.size(),
+        assertEquals(51, display.size(),
                 "the display corpus is the twenty the decision names"
                         + " plus the black-sky journey (#246), the"
                         + " #261 pair - the surfaces journey and the"
@@ -647,7 +649,13 @@ class TestEvidenceGateTest {
                         + " exists until the window has a native"
                         + " peer, and a declaration proved against a"
                         + " panel would be proved against a size no"
-                        + " window has");
+                        + " window has; and #428's zoom-lock restart,"
+                        + " which starts the real application twice on"
+                        + " one preference node - a restart is two"
+                        + " starts, and a start makes a window - and"
+                        + " hands its wheel events straight to the"
+                        + " chart, so it needs neither focus nor"
+                        + " reachability");
         assertTrue(focusPremise >= 14,
                 "focus premises spread under #243 and may not"
                         + " retreat: " + focusPremise + " of "

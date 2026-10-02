@@ -32,6 +32,7 @@ public final class AtlasToolbar extends JToolBar {
     private final JLabel readout = new JLabel();
     private javax.swing.JToggleButton inspectorButton;
     private javax.swing.JToggleButton accumulate;
+    private javax.swing.JToggleButton zoomLock;
     /**
      * The running version, as status text (issue #198). The toolbar
      * is handed the string rather than looking it up, so it holds no
@@ -152,6 +153,23 @@ public final class AtlasToolbar extends JToolBar {
                         Runnable requestExit,
                         juranometria.chart.SelectionMode selectionMode,
                         InterfaceText said) {
+        this(controller, searchField, inspector, versionText, requestExit,
+                selectionMode, null, said);
+    }
+
+    /**
+     * The bar with the zoom lock beside the zoom buttons (Sprint 38,
+     * issue #428). A null lock leaves the toggle out, which is every
+     * earlier caller's bar.
+     */
+    public AtlasToolbar(ChartViewController controller,
+                        SearchField searchField,
+                        InspectorToggle inspector,
+                        String versionText,
+                        Runnable requestExit,
+                        juranometria.chart.SelectionMode selectionMode,
+                        ZoomLock lock,
+                        InterfaceText said) {
         if (said == null) {
             throw new IllegalArgumentException(
                     "the bar has to say its words in some language");
@@ -192,6 +210,27 @@ public final class AtlasToolbar extends JToolBar {
 
         add(zoomIn);
         add(zoomOut);
+        if (lock != null) {
+            // Beside the controls it leaves working: a deliberate
+            // press of either still zooms while the wheel is locked.
+            // The toggle asks the shared lock and shows what it says,
+            // so the remembered choice and the bar cannot disagree.
+            zoomLock = new javax.swing.JToggleButton(
+                    said.say("toolbar.zoomLock.label"), lock.locked());
+            zoomLock.setName(ZOOM_LOCK);
+            zoomLock.setFocusable(true);
+            zoomLock.getAccessibleContext().setAccessibleName(
+                    said.say("toolbar.zoomLock.a11y"));
+            Explain.control(zoomLock,
+                    said.say("toolbar.zoomLock.hover"),
+                    said.say("toolbar.zoomLock.explain"));
+            zoomLock.addActionListener(event -> {
+                lock.lock(zoomLock.isSelected());
+                zoomLock.setSelected(lock.locked());
+            });
+            lock.onChange(zoomLock::setSelected);
+            add(zoomLock);
+        }
         addSeparator();
         add(fewerStars);
         add(moreStars);
@@ -393,6 +432,14 @@ public final class AtlasToolbar extends JToolBar {
     /** The way out, for tests that drive it as a reader would. */
     public JButton exitButton() {
         return exit;
+    }
+
+    /** The component name the zoom lock carries, for tests (#428). */
+    public static final String ZOOM_LOCK = "zoomLock";
+
+    /** The zoom lock, or null on a bar built without one (#428). */
+    public javax.swing.JToggleButton zoomLockButton() {
+        return zoomLock;
     }
 
     /** The Accumulate control, for tests that drive it as a reader would. */

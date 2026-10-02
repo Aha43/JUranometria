@@ -78,7 +78,7 @@ non-preference locals list is exactly `SwingSession.java`.
 The standing counts, quoted from the scanner so the gate can hold
 this document to them: **71 files** touch process-wide state —
 **35** use the shared guard, **35** restore locally,
-**0 flagged unprotected** — and **50 files** depend on a display,
+**0 flagged unprotected** — and **51 files** depend on a display,
 of which **19** state a focus premise and **28** a reachability
 premise through the shared route helper. (#246 added two
 guard-protected look-and-feel touchers — the black-sky renderer
@@ -377,8 +377,8 @@ aborts — a run count, not a claim of eliminated intermittence.
 Text cannot decide whether a read runs on the event thread — that
 is control flow, and #220 proved the cost of guessing, three times
 (the journey's mark derivation, its page offset, and finally its
-own premise capture). The measurements count the traffic: **455
-reads of live chart state** against **842 explicit hand-offs**
+own premise capture). The measurements count the traffic: **456
+reads of live chart state** against **867 explicit hand-offs**
 suite-wide (requoted for the #261 reader-surface tests, which read
 scenes and marks under the same one-hand-off discipline; for #275's
 closing journey, which reads the page's own objects and takes its

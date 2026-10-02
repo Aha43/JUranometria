@@ -15,10 +15,10 @@ import juranometria.ui.placeandtime.PlaceStore;
  * preferences, which the evidence gate forbids and which would be
  * wrong even if it did not.
  *
- * <p>So they are gathered and handed in - seven since the Sun and the
- * Moon joined the chart (#415, #416). {@link #user()} is the
- * one place that reaches for the reader's nodes, and {@code main} is
- * the one caller of it. A journey that wants to prove the shipping
+ * <p>So they are gathered and handed in - eight since the Sun and the
+ * Moon joined the chart (#415, #416) and zoom could be locked (#428).
+ * {@link #user()} is the one place that reaches for the reader's
+ * nodes, and {@code main} is the one caller of it. A journey that wants to prove the shipping
  * route supplies its own and gets the real
  * {@code JUranometriaMain.start} - the same lines, in the same order,
  * with the same wiring.
@@ -39,7 +39,8 @@ record StartupStores(AppearanceStore appearance,
                      PlaceStore place,
                      EclipticStore ecliptic,
                      juranometria.ui.solar.SunChartStore sunChart,
-                     juranometria.ui.solar.MoonChartStore moonChart) {
+                     juranometria.ui.solar.MoonChartStore moonChart,
+                     juranometria.ui.ZoomLockStore zoomLock) {
 
     StartupStores {
         require(appearance, "appearance");
@@ -49,6 +50,7 @@ record StartupStores(AppearanceStore appearance,
         require(ecliptic, "ecliptic");
         require(sunChart, "sun on the chart");
         require(moonChart, "moon on the chart");
+        require(zoomLock, "zoom lock");
     }
 
     /**
@@ -62,7 +64,8 @@ record StartupStores(AppearanceStore appearance,
                 ChartOptionsStore.user(), SkyLanguageStore.user(),
                 PlaceStore.user(), EclipticStore.user(),
                 juranometria.ui.solar.SunChartStore.user(),
-                juranometria.ui.solar.MoonChartStore.user());
+                juranometria.ui.solar.MoonChartStore.user(),
+                juranometria.ui.ZoomLockStore.user());
     }
 
     private static void require(Object store, String what) {

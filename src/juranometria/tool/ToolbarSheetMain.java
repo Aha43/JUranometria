@@ -213,9 +213,11 @@ public final class ToolbarSheetMain {
                 InspectorToggle toggle = new InspectorToggle();
                 toggle.bind(() -> { }, () -> true);
 
+                // The bar a reader gets, the zoom lock (#428) included.
                 controls[0] = AtlasChrome.of(session, controller,
                         Atlas.search(), assembler, toggle, "2.0.0",
-                        () -> { }, new SelectionMode());
+                        () -> { }, new SelectionMode(),
+                        new juranometria.ui.ZoomLock());
 
                 owner[0] = new JFrame("study");
                 SheetCapture.prepareShownWindow(owner[0]);

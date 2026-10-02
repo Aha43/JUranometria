@@ -12,9 +12,13 @@
 # compiling - committed evidence, resources, packaging, the build,
 # the workflows, the application's entry points, and the guard itself.
 #
-# The answer is `route`: `narrow` when no path can alter rendering or
-# the evidence of it, `wide` otherwise. The callers gate their
-# expensive jobs on it. The unit and display suites never consult it.
+# The answer is `route`: `narrow` when nothing reaches the
+# application or its evidence, `interaction` when the change is
+# interface work no chart producer reaches (#427/#428: the interface
+# and report evidence is reproduced, the native images and the
+# portable archive run, no chart picture is drawn and none may move),
+# `wide` otherwise. The callers gate their expensive jobs on it. The
+# unit and display suites never consult it.
 #
 # Only a pull request can be narrow. A push to main, a tag and a
 # manual dispatch are wide by event, whatever they changed, so what
@@ -61,12 +65,22 @@ jobs:
         # event is wide before a path is read. Listing the change is
         # git's job here, not the classifier's: no shipped class may
         # start a process (OfflinePromiseTest), and none needs to.
+        # The base's copy of each changed file goes beside it, so a
+        # language file is judged key by key and the provenance
+        # record row by row (#428).
         if: github.event_name == 'pull_request'
         run: |
           base=$(git merge-base "${{ github.event.pull_request.base.sha }}" HEAD)
           { git diff --name-only "$base"; git ls-files --others --exclude-standard; } \
             | sort -u > build/changed-paths.txt
           echo "merge base $base; $(wc -l < build/changed-paths.txt) changed path(s)"
+          mkdir -p build/base
+          while IFS= read -r path; do
+            if git cat-file -e "$base:$path" 2>/dev/null; then
+              mkdir -p "build/base/$(dirname "$path")"
+              git show "$base:$path" > "build/base/$path"
+            fi
+          done < build/changed-paths.txt
       - name: Classify every changed path against the rendering closure
         id: route
         run: |
@@ -74,5 +88,6 @@ jobs:
             juranometria.tool.ChangeClassifierMain \
             --event "${{ github.event_name }}" \
             --changed build/changed-paths.txt \
+            --base build/base \
             --github-output "$GITHUB_OUTPUT" \
             --summary "$GITHUB_STEP_SUMMARY"

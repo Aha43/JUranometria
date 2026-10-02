@@ -445,6 +445,7 @@ public final class PackagedAcceptanceMain {
         sunOnTheChartJourney();
         moonOnTheChartJourney();
         solarSystemSheetJourney();
+        zoomLockJourney();
 
         System.out.println("PACKAGED ACCEPTANCE OK");
     }
@@ -571,6 +572,83 @@ public final class PackagedAcceptanceMain {
                 + " crescent with its lit side, a four-row range with its"
                 + " appended end, and the Norwegian surface, all inside the"
                 + " image)");
+    }
+
+    /**
+     * The zoom lock inside the packaged image (Sprint 38, issue #428):
+     * the production chart with its wheel handler and the toolbar the
+     * application builds. Locked, a wheel notch and a trackpad's fine
+     * rotations leave the field and the centre where they are; the
+     * toolbar's Zoom In still zooms; unlocked, the wheel zooms again;
+     * and the choice round-trips through the bundled runtime's own
+     * preference backend on a scratch node.
+     */
+    private static void zoomLockJourney() throws Exception {
+        ChartViewController controller = new ChartViewController();
+        juranometria.ui.ZoomLock lock = new juranometria.ui.ZoomLock();
+        juranometria.ui.ChartComponent[] chart = new juranometria.ui.ChartComponent[1];
+        juranometria.ui.AtlasToolbar[] bar = new juranometria.ui.AtlasToolbar[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            chart[0] = new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
+            juranometria.ui.ZoomInteraction.install(chart[0], controller, lock);
+            controller.onChange(chart[0]::setViewState);
+            chart[0].setSize(900, 700);
+            juranometria.ui.language.InterfaceText said =
+                    juranometria.ui.language.InterfaceText.forLanguage("en");
+            bar[0] = new juranometria.ui.AtlasToolbar(controller,
+                    new juranometria.ui.SearchField(Atlas.search(), Atlas.assembler(),
+                            controller, said),
+                    null, null, null, null, lock, said);
+        });
+        javax.swing.SwingUtilities.invokeAndWait(() -> { });
+        javax.swing.JToggleButton toggle = bar[0].zoomLockButton();
+        require(toggle != null && !toggle.isSelected(),
+                "the packaged toolbar carries the zoom lock, unlocked");
+        javax.swing.SwingUtilities.invokeAndWait(toggle::doClick);
+        require(lock.locked(), "pressing it locks");
+        juranometria.chart.ChartViewState before = controller.state();
+        for (double rotation : new double[] {-1.0, 1.0, -0.4, -0.4, -0.4}) {
+            wheel(chart[0], rotation);
+        }
+        require(controller.state().equals(before),
+                "locked, the wheel and the trackpad leave the field and centre: "
+                        + controller.state());
+        javax.swing.SwingUtilities.invokeAndWait(() ->
+                ((javax.swing.JButton) bar[0].getComponent(0)).doClick());
+        require(controller.state().fieldWidthDegrees() < before.fieldWidthDegrees(),
+                "locked, the toolbar's Zoom In still zooms");
+        javax.swing.SwingUtilities.invokeAndWait(toggle::doClick);
+        double field = controller.state().fieldWidthDegrees();
+        wheel(chart[0], 1.0);
+        require(controller.state().fieldWidthDegrees() > field,
+                "unlocked, the wheel zooms again");
+        Preferences scratch = Preferences.userRoot()
+                .node("juranometria-packaged-zoomlock-" + System.nanoTime());
+        try {
+            juranometria.ui.ZoomLockStore store =
+                    juranometria.ui.ZoomLockStore.forNode(scratch);
+            require(!store.lockedOrDefault(), "a fresh profile is unlocked");
+            store.save(true);
+            scratch.flush();
+            require(juranometria.ui.ZoomLockStore.forNode(scratch).lockedOrDefault(),
+                    "a restart reads the lock back");
+        } finally {
+            scratch.removeNode();
+        }
+        System.out.println("zoom lock OK (locked, the wheel and trackpad leave the"
+                + " field and centre; the toolbar still zooms; unlocked, the wheel"
+                + " zooms; the choice round-trips through the runtime's preferences)");
+    }
+
+    private static void wheel(juranometria.ui.ChartComponent chart, double rotation)
+            throws Exception {
+        javax.swing.SwingUtilities.invokeAndWait(() -> chart.dispatchEvent(
+                new java.awt.event.MouseWheelEvent(chart,
+                        java.awt.event.MouseEvent.MOUSE_WHEEL,
+                        System.nanoTime() / 1_000_000, 0, 300, 200, 300, 200, 0, false,
+                        java.awt.event.MouseWheelEvent.WHEEL_UNIT_SCROLL, 1,
+                        (int) rotation, rotation)));
+        javax.swing.SwingUtilities.invokeAndWait(() -> { });
     }
 
     /**

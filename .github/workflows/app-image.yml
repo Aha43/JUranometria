@@ -54,7 +54,9 @@ jobs:
 
   image:
     needs: [jar, classify]
-    if: needs.classify.outputs.route == 'wide'
+    # The interaction route builds them too (#428): interface work is
+    # proved by packaged acceptance inside every native image.
+    if: needs.classify.outputs.route != 'narrow'
     strategy:
       fail-fast: false
       matrix:

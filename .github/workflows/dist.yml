@@ -27,7 +27,9 @@ jobs:
 
   build:
     needs: classify
-    if: needs.classify.outputs.route == 'wide'
+    # And on the interaction route: GUI work must still prove the
+    # portable archive and its resources complete (#427, I3).
+    if: needs.classify.outputs.route != 'narrow'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7

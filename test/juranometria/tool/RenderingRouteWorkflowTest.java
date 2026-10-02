@@ -39,6 +39,9 @@ class RenderingRouteWorkflowTest {
     private static final String GATE =
             "if: needs.classify.outputs.route == 'wide'";
 
+    private static final String NOT_NARROW =
+            "if: needs.classify.outputs.route != 'narrow'";
+
     @Test
     void theClassifierWorkflowRunsTheClassifierAgainstTheBase()
             throws IOException {
@@ -55,6 +58,8 @@ class RenderingRouteWorkflowTest {
                 "git ls-files --others --exclude-standard",
                 "--event \"${{ github.event_name }}\"",
                 "--changed build/changed-paths.txt",
+                "--base build/base",
+                "git show \"$base:$path\" > \"build/base/$path\"",
                 "--github-output \"$GITHUB_OUTPUT\"",
                 "--summary \"$GITHUB_STEP_SUMMARY\"")) {
             if (!classify.contains(required)) {
@@ -83,6 +88,22 @@ class RenderingRouteWorkflowTest {
     }
 
     @Test
+    void theInteractionEvidenceRunsOnlyOnTheInteractionRouteAndProvesNothingMoved()
+            throws IOException {
+        String job = job(read("test.yml"), "interaction-evidence");
+        assertTrue(job.contains("needs: classify"));
+        assertTrue(job.contains(
+                "if: needs.classify.outputs.route == 'interaction'"),
+                "only the interaction route runs it (#428)");
+        assertTrue(job.contains("make evidence-contracts-interaction"),
+                "the contract over the generators that own no chart picture");
+        assertTrue(job.contains("git diff --exit-code"),
+                "and the tree comes out as it went in");
+        assertFalse(job.contains("evidence-contracts-ci"),
+                "no chart producer runs on this route");
+    }
+
+    @Test
     void theRequiredSuitesNeverConsultTheRoute() throws IOException {
         String test = read("test.yml");
         for (String name : List.of("test", "display")) {
@@ -95,25 +116,26 @@ class RenderingRouteWorkflowTest {
     }
 
     @Test
-    void theNativeImagesAreBuiltOnlyOnTheWideRoute() throws IOException {
+    void theNativeImagesAreBuiltOnEveryRouteButNarrow() throws IOException {
         String images = read("app-image.yml");
         assertTrue(job(images, "classify").contains(CALL));
         String image = job(images, "image");
         assertTrue(image.contains("needs: [jar, classify]"),
                 "the image matrix needs the JAR and the classification");
-        assertTrue(image.contains(GATE), "and runs only when wide");
+        assertTrue(image.contains(NOT_NARROW),
+                "and runs on the interaction and wide routes (#428)");
         assertFalse(job(images, "jar").contains("needs:"),
                 "the JAR is cheap and always builds");
     }
 
     @Test
-    void theArchiveIsBuiltAndVerifiedOnlyOnTheWideRoute()
+    void theArchiveIsBuiltAndVerifiedOnEveryRouteButNarrow()
             throws IOException {
         String dist = read("dist.yml");
         assertTrue(job(dist, "classify").contains(CALL));
         String build = job(dist, "build");
         assertTrue(build.contains("needs: classify"));
-        assertTrue(build.contains(GATE));
+        assertTrue(build.contains(NOT_NARROW), "#427, I3: dist on interaction too");
         assertTrue(job(dist, "verify").contains("needs: build"),
                 "verify follows build, so it follows the route");
     }
@@ -134,7 +156,7 @@ class RenderingRouteWorkflowTest {
                 StandardCharsets.UTF_8);
         assertTrue(main.contains("if (!\"pull_request\".equals(event))")
                 && main.contains("route = Route.WIDE;"),
-                "only a pull request may be narrow; every other event"
+                "only a pull request may take a cheaper route; every other event"
                         + " is wide before any path is read");
     }
 
