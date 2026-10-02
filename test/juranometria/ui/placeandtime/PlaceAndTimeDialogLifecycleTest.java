@@ -256,6 +256,58 @@ class PlaceAndTimeDialogLifecycleTest {
                         + " it");
     }
 
+    /**
+     * Reopening adds no listener (#433, invariant 4): every dialog the
+     * menu opens follows the module through one subscription, and
+     * releases it when it closes, so the count returns to where it was.
+     */
+    @Test
+    void everyDialogFollowsTheModuleOnceAndLetsGoWhenItCloses()
+            throws Exception {
+        Assumptions.assumeFalse(GraphicsEnvironment.isHeadless(),
+                "a dialog is a window, and a window needs a display");
+        MeridianModule module = new MeridianModule(
+                new Observer(59.913, 10.752, WHEN));
+        module.attach(new TestChartServices());
+        PlaceStore store = PlaceStore.forNode(node);
+        SwingUtilities.invokeAndWait(() -> {
+            owner = new JFrame("subscriptions");
+            owner.setSize(600, 400);
+            owner.setJMenuBar(juranometria.app.AppMenuBar.create(null,
+                    () -> { }, () -> { }, () -> { }, null,
+                    () -> PlaceAndTimeDialog.open(owner, module, store,
+                            () -> WHEN, juranometria.ui.language.InterfaceText.forLanguage("en")), juranometria.ui.language.InterfaceText.forLanguage("en")));
+            owner.setVisible(true);
+        });
+        assertEquals(0, module.subscribers(), "nothing open, nothing following");
+
+        for (int round = 0; round < 3; round++) {
+            SwingUtilities.invokeAndWait(() -> menuItem(owner,
+                    "Place and Time...").doClick());
+            flush();
+            SwingUtilities.invokeAndWait(() -> menuItem(owner,
+                    "Place and Time...").doClick());
+            flush();
+            assertEquals(1, module.subscribers(), "round " + round
+                    + ": one dialog, chosen twice, follows once");
+            PlaceAndTimeDialog dialog = (PlaceAndTimeDialog)
+                    java.util.Arrays.stream(Window.getWindows())
+                            .filter(w -> w instanceof PlaceAndTimeDialog
+                                    && w.isDisplayable())
+                            .findFirst().orElseThrow();
+            // The close box: it needs no keyboard focus, so this runs on
+            // every desktop. Escape ends in the same dispose(), and the
+            // test above holds that route.
+            SwingUtilities.invokeAndWait(() -> dialog.dispatchEvent(
+                    new java.awt.event.WindowEvent(dialog,
+                            java.awt.event.WindowEvent.WINDOW_CLOSING)));
+            flush();
+            assertEquals(0, dialogsShowing());
+            assertEquals(0, module.subscribers(), "round " + round
+                    + ": closed, it follows nothing");
+        }
+    }
+
     /** The named item on the frame's real menu bar. */
     private static javax.swing.JMenuItem menuItem(JFrame frame,
                                                   String text) {

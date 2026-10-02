@@ -345,6 +345,35 @@ public final class PlaceAndTimeDialog extends JDialog {
             box.addActionListener(event -> showing.run());
             panel.add(box);
         }
+
+        // The content shows what the module holds, whoever changed it
+        // (#434): the chart keyboard toggles a line while this is
+        // open, and the box follows - so the next click here sends
+        // what the reader sees, not what was true when this was
+        // built. A field the reader is typing in keeps the typing;
+        // setSelected fires no action, so following never writes.
+        MeridianModule.Subscription following = module.onChange(() -> {
+            latitude.refresh();
+            longitude.refresh();
+            instant.refresh();
+            meridian.setSelected(module.meridianShowing());
+            horizon.setSelected(module.horizonShowing());
+            zenith.setSelected(module.zenithShowing());
+        });
+        // Released when the window holding it is disposed - the only
+        // way the dialog closes - so reopening adds no listener.
+        boolean[] shown = new boolean[1];
+        panel.addHierarchyListener(event -> {
+            if ((event.getChangeFlags()
+                    & java.awt.event.HierarchyEvent.DISPLAYABILITY_CHANGED) == 0) {
+                return;
+            }
+            if (panel.isDisplayable()) {
+                shown[0] = true;
+            } else if (shown[0]) {
+                following.cancel();
+            }
+        });
         panel.add(strut(12));
 
         // Committing a field applies it: the lines are redrawn and
@@ -415,10 +444,13 @@ public final class PlaceAndTimeDialog extends JDialog {
 
         private java.util.function.Predicate<String> apply;
         private Supplier<String> current;
+        /** What this field last showed of the module. */
+        private String shown;
 
         CommitField(String name, String text) {
             super(text, 12);
             setName(name);
+            shown = text;
         }
 
         void onCommit(java.util.function.Predicate<String> apply,
@@ -443,7 +475,23 @@ public final class PlaceAndTimeDialog extends JDialog {
             // was - the module never saw it - and a right one is
             // shown as it was understood.
             apply.test(getText().trim());
-            setText(current.get());
+            show(current.get());
+        }
+
+        /**
+         * Shows what the module holds now - unless the reader has typed
+         * something not yet committed, which stays until they commit it
+         * or it is refused.
+         */
+        void refresh() {
+            if (current != null && getText().equals(shown)) {
+                show(current.get());
+            }
+        }
+
+        private void show(String text) {
+            setText(text);
+            shown = text;
         }
     }
 
