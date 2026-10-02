@@ -80,6 +80,7 @@ gate reads).
 | `docs/studies/...`, a committed input (fixture, ledger) | by which closure's code names its path or its directory: chart → **wide**, interface only → **interaction**, only the suite → **interaction**; named by nothing → by owner |
 | `docs/studies/...`, generated evidence | by the owning generator: chart producer → **wide**, reproduced or photographer → **interaction**, none → **wide** |
 | `docs/studies/PROVENANCE.md` | row by row against the merge base: every changed row an interaction-owned artifact's → **interaction**, else **wide** |
+| `docs/studies/language-ledger/manual-review.tsv` | row by row against the merge base (#432, below) |
 | `src/resources/interface-language/*.properties` | key by key against the merge base (below) |
 
 **Keys.** A key is read by a closure when a string constant of one of
@@ -93,6 +94,28 @@ resolve is **wide**; one only the interface can resolve is
 **interaction**; one nothing names is **wide**. A key-only or
 comment-only edit is interaction; without the merge base, every key
 reads as new.
+
+**The language ledger (#432).** The review ledger sits in a directory
+of its own, so no study generator reads it merely by naming a folder
+it shares. Its readers are judged first: if chart code reads it, every
+change is **wide**. After that, each row that changed is judged by the
+source its `file` column names, both before and after the change:
+
+- **interaction** when only the interface reaches that source;
+- **wide** when a chart producer reaches it, including a source both
+  closures reach;
+- **wide** when the source is missing or neither closure reaches it.
+
+Anything that is not a well-formed row change is **wide**: a malformed
+line, a duplicated identity, an edit to the preamble or header, a
+carriage return, a reorder with nothing else changed, or a missing
+base. The directory-reader rule stays as conservative as it was for
+every other committed input.
+
+**Moves.** The change is listed with `git diff --name-only
+--no-renames`, so a moved file is judged at both of its paths. Until
+#432, git's rename detection named only the new path, and the old one
+was never judged - a gap since #398's two-route gate.
 
 **Events.** Only a pull request can be less than wide. A push to
 `main`, a tag and a manual dispatch are wide by event.
@@ -125,17 +148,23 @@ full contract on CI. Expected wall clock for the route: about
   the route's packaged acceptance is what proves it.
 - Interface photographs and UI reports were wide by sitting under
   `docs/studies/`; they are interaction now.
-- **A finding the route surfaced:** the language-review ledger,
-  `docs/studies/sky-language/manual-review.tsv`, lies in a directory
-  a chart producer (`SkyLanguagePairMain`) names, so a change that
-  adds a ledger row - which most new controls do - is wide. Nothing
-  proves that producer does not read the ledger, so the rule holds;
-  whether the ledger belongs elsewhere is the owner's question, not
-  the classifier's.
+- **A finding the route surfaced, settled by #432:** the
+  language-review ledger used to lie in
+  `docs/studies/sky-language/`, a directory the chart producer
+  `SkyLanguagePairMain` names. That producer names the folder only to
+  write its pair pages, but the constant pool cannot tell a write from
+  a read, so every new control's ledger rows were wide. #432 moved the
+  ledger to `docs/studies/language-ledger/` and judges it row by row.
+  The alternative was measured and declined: treating a class that
+  only writes into a folder as a non-reader is not provable from the
+  constant pool. It would also have dropped the IAU identity data
+  beside the language study, `iau-constellations.tsv`, which only a
+  test reads, from wide to interaction.
 
 ## Proof
 
 `ChangeRouteTest` (narrow, interaction, shared, unknown, language-key,
-provenance-row and entry-point cases against a stated boundary, and
-the real tree against the ruling's examples), `RenderingClosureTest`,
+provenance-row, ledger-row and entry-point cases against a stated
+boundary, and the real tree against the ruling's examples, including
+#430's two zoom-lock rows), `RenderingClosureTest`,
 `RenderingRouteWorkflowTest` (the three gates in the workflows).

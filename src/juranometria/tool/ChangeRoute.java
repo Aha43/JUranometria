@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -13,6 +14,7 @@ import java.util.Properties;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 /**
  * Which route a change takes through CI: narrow, interaction or wide
@@ -145,6 +147,27 @@ public final class ChangeRoute {
     /** The provenance record, judged row by row. */
     static final String PROVENANCE = "docs/studies/PROVENANCE.md";
 
+    /**
+     * The language-review ledger, judged row by row (#432). It lives
+     * in a directory of its own so that no study generator appears to
+     * read it merely by naming the folder it shares.
+     */
+    static final String LEDGER =
+            "docs/studies/language-ledger/manual-review.tsv";
+
+    /** The directory a ledger row's {@code file} column is relative to. */
+    private static final String LEDGER_SOURCES = "src/juranometria/";
+
+    /** The line that ends the ledger's preamble; only rows follow it. */
+    private static final String LEDGER_HEADER =
+            "identity\tfile\tliteral\tscanner-reason\tdisposition\twhy";
+
+    private static final Pattern LEDGER_IDENTITY =
+            Pattern.compile("[0-9a-f]{16}");
+
+    private static final Pattern LEDGER_SOURCE =
+            Pattern.compile("[A-Za-z0-9_]+(/[A-Za-z0-9_]+)*\\.java");
+
     private static final String LANGUAGES = "src/resources/interface-language/";
 
     private ChangeRoute() {
@@ -184,6 +207,9 @@ public final class ChangeRoute {
         }
         if (path.equals(PROVENANCE)) {
             return rows(path, tree);
+        }
+        if (path.equals(LEDGER)) {
+            return ledger(path, tree, present);
         }
         if (path.startsWith("docs/studies/")) {
             // A committed input is judged by who reads it, not by the
@@ -303,6 +329,150 @@ public final class ChangeRoute {
         }
         return new Finding(path, Route.INTERACTION, changed.size()
                 + " provenance row(s), every one for interface evidence");
+    }
+
+    /**
+     * The language-review ledger, row by row (#432): interaction only
+     * when every row that changed - added, removed or edited, before
+     * and after - names a source only the interface reaches. A row on
+     * chart or page language is wide; so is a row whose source is
+     * shared with the chart, missing or unreached, a malformed line,
+     * and any edit to the preamble or to the order of the rows. Before
+     * any row is read, the ledger's own readers are judged, so chart
+     * code that ever came to read the ledger makes every change wide.
+     */
+    private static Finding ledger(String path, Boundary tree,
+                                  Predicate<String> present) {
+        Optional<Finding> read = tree.readersOfFile(path);
+        if (read.isPresent() && read.get().route() == Route.WIDE) {
+            return new Finding(path, Route.WIDE, read.get().reason());
+        }
+        Optional<String> now = tree.head(path);
+        if (now.isEmpty()) {
+            return new Finding(path, Route.WIDE,
+                    "ledger removed: what its rows covered cannot be judged");
+        }
+        Ledger before = Ledger.of(tree.base(path).orElse(""));
+        Ledger after = Ledger.of(now.get());
+        if (after.malformed() != null) {
+            return new Finding(path, Route.WIDE,
+                    "malformed ledger line: " + after.malformed());
+        }
+        if (before.malformed() != null) {
+            return new Finding(path, Route.WIDE,
+                    "the base's ledger is malformed: unresolved");
+        }
+        if (!before.preamble().equals(after.preamble())) {
+            return new Finding(path, Route.WIDE, "an edit outside the"
+                    + " ledger's rows (its preamble or header)");
+        }
+        TreeSet<String> changed = new TreeSet<>();
+        for (String identity : before.rows().keySet()) {
+            if (!before.rows().get(identity).equals(
+                    after.rows().get(identity))) {
+                changed.add(identity);
+            }
+        }
+        for (String identity : after.rows().keySet()) {
+            if (!after.rows().get(identity).equals(
+                    before.rows().get(identity))) {
+                changed.add(identity);
+            }
+        }
+        if (changed.isEmpty()) {
+            return new Finding(path, Route.WIDE, "the ledger changed but"
+                    + " no row did (the rows' order): unresolved");
+        }
+        for (String identity : changed) {
+            for (Ledger rows : List.of(before, after)) {
+                String row = rows.rows().get(identity);
+                if (row == null) {
+                    continue;
+                }
+                Finding source = ledgerSource(row.split("\t", -1)[1],
+                        tree, present);
+                if (source.route() != Route.INTERACTION) {
+                    return new Finding(path, Route.WIDE, "ledger row "
+                            + identity + ": " + source.reason());
+                }
+            }
+        }
+        return new Finding(path, Route.INTERACTION, changed.size()
+                + " ledger row(s), every one on a source only the"
+                + " interface reaches");
+    }
+
+    /** Which closure a ledger row's source belongs to. */
+    private static Finding ledgerSource(String file, Boundary tree,
+                                        Predicate<String> present) {
+        String source = LEDGER_SOURCES + file;
+        if (!present.test(source)) {
+            return new Finding(source, Route.WIDE, source
+                    + " does not exist: an unknown or removed source");
+        }
+        Optional<String> chart = tree.chartChain(source);
+        if (chart.isPresent()) {
+            return new Finding(source, Route.WIDE,
+                    "chart or page language, reached by a chart producer: "
+                            + chart.get());
+        }
+        Optional<String> interaction = tree.interactionChain(source);
+        if (interaction.isPresent()) {
+            return new Finding(source, Route.INTERACTION,
+                    "interface language: " + interaction.get());
+        }
+        return new Finding(source, Route.WIDE,
+                source + " is reached by neither closure: unresolved");
+    }
+
+    /**
+     * The ledger split into its preamble - every line up to and
+     * including the header - and its rows by identity, in order. The
+     * first line that is not a well-formed row after the header, or a
+     * missing header, is kept as {@code malformed}.
+     */
+    record Ledger(List<String> preamble, Map<String, String> rows,
+                  String malformed) {
+
+        static Ledger of(String text) {
+            List<String> preamble = new ArrayList<>();
+            Map<String, String> rows = new LinkedHashMap<>();
+            if (text.isEmpty()) {
+                return new Ledger(preamble, rows, null);
+            }
+            if (text.indexOf('\r') >= 0) {
+                return new Ledger(preamble, rows, "a carriage return");
+            }
+            String[] lines = text.split("\n", -1);
+            int at = 0;
+            boolean header = false;
+            for (; at < lines.length && !header; at++) {
+                preamble.add(lines[at]);
+                header = lines[at].equals(LEDGER_HEADER);
+            }
+            if (!header) {
+                return new Ledger(preamble, rows, "no header line");
+            }
+            for (; at < lines.length; at++) {
+                String line = lines[at];
+                if (line.isEmpty() && at == lines.length - 1) {
+                    continue;
+                }
+                String[] columns = line.split("\t", -1);
+                boolean wellFormed = columns.length == 6
+                        && LEDGER_IDENTITY.matcher(columns[0]).matches()
+                        && LEDGER_SOURCE.matcher(columns[1]).matches()
+                        && SkyLanguageLedger.DISPOSITIONS.contains(columns[4])
+                        && !columns[5].isBlank()
+                        && !rows.containsKey(columns[0]);
+                if (!wellFormed) {
+                    return new Ledger(preamble, rows,
+                            "line " + (at + 1) + ": " + line);
+                }
+                rows.put(columns[0], line);
+            }
+            return new Ledger(preamble, rows, null);
+        }
     }
 
     static Map<String, String> properties(Optional<String> text) {

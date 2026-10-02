@@ -216,9 +216,9 @@ The byte-exact fixtures:
 - docs/studies/ecliptic/reference-vectors.txt
 - docs/studies/label-placement/census-before.tsv
 - docs/studies/label-placement/text-before.tsv
+- docs/studies/language-ledger/manual-review.tsv
 - docs/studies/place-and-time/reference-vectors.txt
 - docs/studies/sky-language/iau-constellations.tsv
-- docs/studies/sky-language/manual-review.tsv
 - docs/studies/solar-system/horizons-moon/NAMED-CASES.txt
 - docs/studies/solar-system/horizons-moon/dense-2026-oslo.txt
 - docs/studies/solar-system/horizons-moon/geocentric-meeus-47a-tt.txt

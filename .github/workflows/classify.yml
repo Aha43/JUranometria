@@ -67,11 +67,12 @@ jobs:
         # start a process (OfflinePromiseTest), and none needs to.
         # The base's copy of each changed file goes beside it, so a
         # language file is judged key by key and the provenance
-        # record row by row (#428).
+        # record row by row (#428). A move is listed as both of its
+        # paths (--no-renames), so the old one is judged too (#432).
         if: github.event_name == 'pull_request'
         run: |
           base=$(git merge-base "${{ github.event.pull_request.base.sha }}" HEAD)
-          { git diff --name-only "$base"; git ls-files --others --exclude-standard; } \
+          { git diff --name-only --no-renames "$base"; git ls-files --others --exclude-standard; } \
             | sort -u > build/changed-paths.txt
           echo "merge base $base; $(wc -l < build/changed-paths.txt) changed path(s)"
           mkdir -p build/base

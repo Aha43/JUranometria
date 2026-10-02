@@ -55,6 +55,10 @@ class RenderingRouteWorkflowTest {
                 "run: make classes",
                 "juranometria.tool.ChangeClassifierMain",
                 "git merge-base \"${{ github.event.pull_request.base.sha }}\" HEAD",
+                // A move is a deletion and an addition, both judged:
+                // with rename detection on, git names only the new
+                // path and the old one escapes the classifier (#432).
+                "git diff --name-only --no-renames \"$base\"",
                 "git ls-files --others --exclude-standard",
                 "--event \"${{ github.event_name }}\"",
                 "--changed build/changed-paths.txt",
@@ -73,6 +77,15 @@ class RenderingRouteWorkflowTest {
         assertFalse(classify.contains("pull_request:")
                 || classify.contains("push:"),
                 "it is called, never triggered on its own");
+    }
+
+    @Test
+    void theLocalClassifierListsAMoveAsBothOfItsPaths() throws IOException {
+        String make = Files.readString(Path.of("Makefile"));
+        assertTrue(make.contains("git diff --name-only --no-renames \"$$base\""),
+                "make classify judges what CI judges: a moved file's old"
+                        + " path as well as its new one");
+        assertFalse(make.contains("git diff --name-only \"$$base\""));
     }
 
     @Test
