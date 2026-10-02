@@ -446,6 +446,7 @@ public final class PackagedAcceptanceMain {
         moonOnTheChartJourney();
         solarSystemSheetJourney();
         zoomLockJourney();
+        companionJourney();
 
         System.out.println("PACKAGED ACCEPTANCE OK");
     }
@@ -572,6 +573,134 @@ public final class PackagedAcceptanceMain {
                 + " crescent with its lit side, a four-row range with its"
                 + " appended end, and the Norwegian surface, all inside the"
                 + " image)");
+    }
+
+    /**
+     * The companion's foundation inside the packaged image (#434, PR 2):
+     * the dialog's content and the companion's section are one class
+     * over one module, so a change made in either - or by the chart
+     * keyboard, which writes the module directly - is shown in both;
+     * an entry refused in either is refused in the same words and
+     * changes nothing; the companion's store round-trips through the
+     * bundled runtime's own preferences and holds only its own keys;
+     * and a remembered place on a display that has gone is not where
+     * it opens. Headless, as this acceptance runs: the window itself
+     * is held by the display suite and its photographer.
+     */
+    private static void companionJourney() throws Exception {
+        juranometria.meridian.MeridianModule module =
+                new juranometria.meridian.MeridianModule(
+                        new juranometria.sky.Observer(59.913, 10.752,
+                                java.time.Instant.parse("2026-03-20T21:33:00Z")));
+        module.showing(false, false, false);
+        Preferences scratch = Preferences.userRoot()
+                .node("juranometria-packaged-companion-" + System.nanoTime());
+        try {
+            juranometria.ui.placeandtime.PlaceStore place =
+                    juranometria.ui.placeandtime.PlaceStore.forNode(scratch);
+            juranometria.ui.language.InterfaceText said =
+                    juranometria.ui.language.InterfaceText.forLanguage("en");
+            javax.swing.JComponent[] hosts = new javax.swing.JComponent[2];
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                hosts[0] = juranometria.ui.placeandtime.PlaceAndTimeDialog
+                        .contentForStudy(module, place, said);
+                hosts[1] = new juranometria.ui.placeandtime.PlaceAndTimePanel(
+                        module, place, module.observer()::instant, said);
+            });
+            require(hosts[0].getClass() == hosts[1].getClass(),
+                    "the dialog and the companion hold one panel class");
+            require(module.subscribers() == 2, "each host follows once");
+            juranometria.ui.placeandtime.PlaceAndTimePanel dialog =
+                    (juranometria.ui.placeandtime.PlaceAndTimePanel) hosts[0];
+            juranometria.ui.placeandtime.PlaceAndTimePanel companion =
+                    (juranometria.ui.placeandtime.PlaceAndTimePanel) hosts[1];
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                javax.swing.JTextField latitude = (javax.swing.JTextField)
+                        namedIn(companion, "latitudeField");
+                latitude.setText("-33.87");
+                latitude.postActionEvent();
+                ((javax.swing.AbstractButton) namedIn(dialog, "showZenith"))
+                        .doClick();
+                module.showing(true, module.horizonShowing(),
+                        module.zenithShowing());
+            });
+            require("-33.87".equals(((javax.swing.JTextField) namedIn(dialog,
+                            "latitudeField")).getText()),
+                    "a place typed in the companion is shown in the dialog");
+            require(((javax.swing.AbstractButton) namedIn(companion,
+                            "showZenith")).isSelected(),
+                    "a line ticked in the dialog is ticked in the companion");
+            require(((javax.swing.AbstractButton) namedIn(dialog,
+                            "showMeridian")).isSelected()
+                            && ((javax.swing.AbstractButton) namedIn(companion,
+                                    "showMeridian")).isSelected()
+                            && module.zenithShowing(),
+                    "the chart keyboard's line is shown in both, and kept");
+            juranometria.sky.Observer before = module.observer();
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                for (juranometria.ui.placeandtime.PlaceAndTimePanel host
+                        : new juranometria.ui.placeandtime.PlaceAndTimePanel[] {
+                                dialog, companion}) {
+                    javax.swing.JTextField latitude = (javax.swing.JTextField)
+                            namedIn(host, "latitudeField");
+                    latitude.setText("91");
+                    latitude.postActionEvent();
+                }
+            });
+            require(!dialog.refusalText().isEmpty()
+                            && dialog.refusalText().equals(companion.refusalText()),
+                    "a refused entry is refused in the same words in both: "
+                            + dialog.refusalText());
+            require(module.observer().equals(before),
+                    "and reached nothing");
+
+            juranometria.ui.companion.CompanionStore store =
+                    juranometria.ui.companion.CompanionStore.forNode(scratch);
+            store.saveBounds(new java.awt.Rectangle(-40000, 40, 360, 330));
+            store.saveVisible(true);
+            store.saveCollapsed("placeandtime", true);
+            scratch.flush();
+            juranometria.ui.companion.CompanionStore again =
+                    juranometria.ui.companion.CompanionStore.forNode(scratch);
+            require(again.visible() && again.collapsed("placeandtime")
+                            && again.bounds().isPresent(),
+                    "the companion's own state round-trips");
+            java.awt.Rectangle placed = juranometria.ui.companion
+                    .CompanionPlacement.place(again.bounds(),
+                            java.util.List.of(new java.awt.Rectangle(0, 25, 1440, 875)),
+                            new java.awt.Rectangle(100, 60, 900, 760),
+                            new java.awt.Dimension(360, 330),
+                            new java.awt.Dimension(342, 120));
+            require(new java.awt.Rectangle(0, 25, 1440, 875).contains(placed),
+                    "a remembered place on a display that has gone is not"
+                            + " where it opens: " + placed);
+            for (String key : scratch.keys()) {
+                require(key.startsWith("companion.") || key.startsWith("place."),
+                        "only the companion's and the place's keys: " + key);
+            }
+        } finally {
+            scratch.removeNode();
+        }
+        System.out.println("companion OK (one panel in both hosts; a change in"
+                + " either, or by the keyboard, shown in both; a refusal in the"
+                + " same words, reaching nothing; its own state round-trips;"
+                + " a lost display recovered)");
+    }
+
+    private static java.awt.Component namedIn(java.awt.Component root,
+                                              String name) {
+        if (name.equals(root.getName())) {
+            return root;
+        }
+        if (root instanceof java.awt.Container container) {
+            for (java.awt.Component child : container.getComponents()) {
+                java.awt.Component found = namedIn(child, name);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
     }
 
     /**

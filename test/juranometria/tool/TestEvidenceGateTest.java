@@ -542,7 +542,7 @@ class TestEvidenceGateTest {
                         || f.premises().contains("focus-owner")).count();
         long reachPremise = display.stream().filter(f ->
                 f.premises().contains("point-reachable")).count();
-        assertEquals(51, display.size(),
+        assertEquals(52, display.size(),
                 "the display corpus is the twenty the decision names"
                         + " plus the black-sky journey (#246), the"
                         + " #261 pair - the surfaces journey and the"
@@ -655,7 +655,15 @@ class TestEvidenceGateTest {
                         + " starts, and a start makes a window - and"
                         + " hands its wheel events straight to the"
                         + " chart, so it needs neither focus nor"
-                        + " reachability");
+                        + " reachability; and #434's companion window,"
+                        + " an owned window whose whole contract is"
+                        + " what showing, hiding and disposing it do -"
+                        + " which subscriptions it holds, where it"
+                        + " opens, whether it is remembered open - and"
+                        + " none of that happens to a window that"
+                        + " never has a peer; its one press, a"
+                        + " section's heading, is a pointer click with"
+                        + " its reachability proven");
         assertTrue(focusPremise >= 14,
                 "focus premises spread under #243 and may not"
                         + " retreat: " + focusPremise + " of "
@@ -708,7 +716,7 @@ class TestEvidenceGateTest {
                 f.routes().contains("back-door-click")).count();
         long postAction = files.stream().filter(f ->
                 f.routes().contains("back-door-commit")).count();
-        assertTrue(doClick <= 37,
+        assertTrue(doClick <= 38,
                 "doClick files shrank under #243 to menu convention"
                         + " and mechanism tests, and may not grow"
                         + " beyond them - the black-sky journey"
@@ -756,11 +764,19 @@ class TestEvidenceGateTest {
                         + " where the tokens each selector stores are"
                         + " visible, while the public face journey"
                         + " presses the real OK and proves it arrives"
-                        + " there. A bound that bends when it is"
+                        + " there; and #434's PlaceAndTimePanelTest is"
+                        + " a headless content test of the dialog"
+                        + " content's own kind - one panel class in two"
+                        + " hosts, driven the way PlaceAndTimeDialogTest"
+                        + " drives the same controls, with no window to"
+                        + " press in, while the companion's window test"
+                        + " presses for real. A bound that bends when it is"
                         + " inconvenient is not a bound: " + doClick);
-        assertTrue(postAction <= 3,
+        assertTrue(postAction <= 4,
                 "postActionEvent survives only in the named mechanism"
-                        + " tests: " + postAction);
+                        + " tests - the dialog content's, and #434's"
+                        + " panel test, which commits a field in two"
+                        + " hosts the same way: " + postAction);
     }
 
     @Test
