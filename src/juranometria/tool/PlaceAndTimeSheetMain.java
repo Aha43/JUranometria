@@ -79,16 +79,16 @@ public final class PlaceAndTimeSheetMain {
             Path.of("docs/studies/interface-language");
 
     /** The frozen moment every sheet is taken at. */
-    private static final Instant WHEN =
+    static final Instant WHEN =
             Instant.parse("2026-03-20T21:33:00Z");
 
     /** One arrangement of the dialog, and why it is here. */
-    private record State(String name, String title, double latitude,
+    record State(String name, String title, double latitude,
                          double eastLongitude, boolean meridian,
                          boolean horizon, boolean zenith, String note) {
     }
 
-    private static final List<State> STATES = List.of(
+    static final List<State> STATES = List.of(
             new State("default", "Nothing remembered", 0.0, 0.0,
                     true, true, false,
                     "The released default: the equator at Greenwich."

@@ -101,6 +101,12 @@ public final class EvidenceContractMain {
         // beside it through IMAGE_MAINS.
         REPORT_MAINS.put("juranometria.tool.SolarCartographyStudyMain",
                 "docs/studies/solar-cartography/measurements.md");
+        // The companion-window study (issue #433): what the production
+        // Place and Time content is, in both languages, and where a
+        // companion goes on four screens. Its widths are one machine's
+        // answer, in the platform record registered below.
+        REPORT_MAINS.put("juranometria.tool.CompanionWindowStudyMain",
+                "docs/studies/companion-window/measurements.md");
         // The Sun on production pages (#415): the report is
         // deterministic; its pages are held through IMAGE_MAINS.
         REPORT_MAINS.put("juranometria.tool.SunOnTheChartStudyMain",
@@ -265,6 +271,8 @@ public final class EvidenceContractMain {
         // measurable - is held by its own tests.
         PLATFORM_REPORTS.put("juranometria.tool.SkyLanguageStudyMain",
                 "docs/studies/sky-language/placement.md");
+        PLATFORM_REPORTS.put("juranometria.tool.CompanionWindowStudyMain",
+                "docs/studies/companion-window/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.ToggleShortcutStudyMain",
                 "docs/studies/toggle-shortcuts/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.ControlExplanationStudyMain",
@@ -381,6 +389,10 @@ public final class EvidenceContractMain {
             // pages composed by the component, with the study's own
             // candidate marks drawn over them; renderer-drawn contract.
             "juranometria.tool.SolarCartographyStudyMain",
+            // The companion-window mock-ups (issue #433): the production
+            // Place and Time content in a study-only shell, painted off
+            // screen; widget-rendered inspection, the controls- prefix.
+            "juranometria.tool.CompanionWindowStudyMain",
             // The Sun on the chart (issue #415): production pages
             // composed by the component with the module attached.
             "juranometria.tool.SunOnTheChartStudyMain",
