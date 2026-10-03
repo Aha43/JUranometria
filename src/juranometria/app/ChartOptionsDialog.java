@@ -636,11 +636,24 @@ public final class ChartOptionsDialog extends JDialog {
     }
 
     /**
-     * The dialog's content in a stated interface language (#350).
+     * The dialog's content in a stated interface language, over a
+     * controller the caller states - for the companion study (#442),
+     * which draws it with a master switch off.
      *
      * <p>For the sheet a person reads when judging a translation. A
      * seam rather than public internals: a study needs the result,
      * not the parts.
+     */
+    public static JComponent contentForStudy(
+            ChartOptionsController controller, String interfaceLanguage) {
+        return content(controller, () -> { }, () -> { },
+                juranometria.ui.language.InterfaceText.forLanguage(
+                        interfaceLanguage));
+    }
+
+    /**
+     * The dialog's content in a stated interface language, over a
+     * scratch controller at the released defaults (#350).
      */
     public static JComponent contentForStudy(String interfaceLanguage) {
         java.util.prefs.Preferences node = java.util.prefs.Preferences

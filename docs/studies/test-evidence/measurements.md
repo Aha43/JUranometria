@@ -92,6 +92,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 |---|---|---|
 | src/juranometria/tool/AboutSheetMain.java | look-and-feel | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/ChartKeyboardSheetMain.java | look-and-feel, preferences | UNPROTECTED: look-and-feel |
+| src/juranometria/tool/ChartOptionsCompanionStudyMain.java | look-and-feel, default-font, preferences | protected-locally |
 | src/juranometria/tool/ChartOptionsSheetMain.java | look-and-feel, preferences | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/CompanionSheetMain.java | look-and-feel, default-font, preferences | protected-locally |
 | src/juranometria/tool/CompanionWindowStudyMain.java | look-and-feel, default-font, preferences | protected-locally |
@@ -116,7 +117,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | src/juranometria/tool/WorkingSelectionMockupMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/app/PackagedAcceptanceMain.java | look-and-feel, locale, preferences | protected-locally |
 
-**25 evidence executables** touch process-wide state; 22 carry an unpaired touch.
+**26 evidence executables** touch process-wide state; 22 carry an unpaired touch.
 
 ## Display-dependent tests, their premises and their routes
 
@@ -211,11 +212,11 @@ Whether a particular read happens on the event thread is control flow, which tex
 
 | class | the contract | files |
 |---|---|---|
-| deterministic-report | regenerates byte-for-byte on the same tree | 80 |
+| deterministic-report | regenerates byte-for-byte on the same tree | 82 |
 | byte-exact-fixture | committed data with provenance; never regenerated casually | 42 |
 | captured-evidence | an operating-system screenshot, digest-pinned; a re-capture is a provenance event | 13 |
 | renderer-drawn | byte-reproducible per machine; production ink, no widgets | 471 |
-| widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 59 |
+| widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 77 |
 | session-photograph | a packed window on a display; drifts between desktop sessions | 3 |
 
 The byte-exact fixtures:
@@ -278,6 +279,24 @@ The captured evidence (operating-system screenshots; provenance in the decision 
 - docs/studies/mac-identity/screenshot-switcher.png
 
 The widget-rendered artifacts (a new one arrives by a reviewed addition to the scanner's list, not a habit):
+- docs/studies/chart-options-companion/controls-co-companion-en-1-tabs.png
+- docs/studies/chart-options-companion/controls-co-companion-en-2-groups.png
+- docs/studies/chart-options-companion/controls-co-companion-en-3-groups-dark.png
+- docs/studies/chart-options-companion/controls-co-companion-en-4-one-open.png
+- docs/studies/chart-options-companion/controls-co-companion-en-5-both-short-screen.png
+- docs/studies/chart-options-companion/controls-co-companion-en-6-deep-sky-off.png
+- docs/studies/chart-options-companion/controls-co-companion-en-7-dialog-shared-immediate.png
+- docs/studies/chart-options-companion/controls-co-companion-en-8-dialog-transactional.png
+- docs/studies/chart-options-companion/controls-co-companion-en-9-companion-draft.png
+- docs/studies/chart-options-companion/controls-co-companion-nb-NO-1-tabs.png
+- docs/studies/chart-options-companion/controls-co-companion-nb-NO-2-groups.png
+- docs/studies/chart-options-companion/controls-co-companion-nb-NO-3-groups-dark.png
+- docs/studies/chart-options-companion/controls-co-companion-nb-NO-4-one-open.png
+- docs/studies/chart-options-companion/controls-co-companion-nb-NO-5-both-short-screen.png
+- docs/studies/chart-options-companion/controls-co-companion-nb-NO-6-deep-sky-off.png
+- docs/studies/chart-options-companion/controls-co-companion-nb-NO-7-dialog-shared-immediate.png
+- docs/studies/chart-options-companion/controls-co-companion-nb-NO-8-dialog-transactional.png
+- docs/studies/chart-options-companion/controls-co-companion-nb-NO-9-companion-draft.png
 - docs/studies/companion-window/controls-companion-en-collapsed-360.png
 - docs/studies/companion-window/controls-companion-en-dark-300.png
 - docs/studies/companion-window/controls-companion-en-dark-360.png

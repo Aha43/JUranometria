@@ -71,6 +71,7 @@ help:
 	@echo "  moon-study   Write the first Moon table from the bundled pack (issue #407)"
 	@echo "  solar-cartography-study  Measure the Sun and Moon on the atlas's pages, with mockups (issue #414)"
 	@echo "  companion-window-study  Measure Place and Time for a companion window, with mockups (issue #433)"
+	@echo "  chart-options-companion-study  Measure Chart Options for the companion, with mockups (issue #442)"
 	@echo "  sun-on-the-chart-study  The Sun on production pages through the module (issue #415)"
 	@echo "  moon-on-the-chart-study The Moon on production pages, and the lunation as a row of phases (issue #416)"
 	@echo "  pan-study         Measure the Sprint 8 grab-to-pan geometry and costs"
@@ -578,7 +579,7 @@ black-sky-study: classes
 		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BlackSkyStudyMain \
 		> docs/studies/black-sky/measurements.md
 
-.PHONY: evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study sun-on-the-chart-study moon-on-the-chart-study printable-chart-study
+.PHONY: evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study sun-on-the-chart-study moon-on-the-chart-study printable-chart-study
 # The heap is stated rather than inherited from whatever a machine's
 # ergonomics chose for it: the CI runner's default quarter-of-RAM is
 # not the same number as a developer's.
@@ -696,6 +697,16 @@ companion-window-study: classes
 		juranometria.tool.CompanionWindowStudyMain \
 		> docs/studies/companion-window/measurements.md
 	@echo "written to docs/studies/companion-window/measurements.md"
+
+# Chart Options in the companion (issue #442): the production controls
+# as tabs and as collapsible groups, the action rows each semantic would
+# need, and their heights on this machine. Off screen; no display needed.
+chart-options-companion-study: classes
+	mkdir -p docs/studies/chart-options-companion
+	$(JAVA) -Djava.awt.headless=true -cp "$(CLASSES_DIR):$(LIB_DIR)/*" \
+		juranometria.tool.ChartOptionsCompanionStudyMain \
+		> docs/studies/chart-options-companion/measurements.md
+	@echo "written to docs/studies/chart-options-companion/measurements.md"
 
 # The Sun on the chart (issue #415): the production composition's own
 # pages with the module attached - production ink, no study overlay.
