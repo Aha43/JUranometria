@@ -158,8 +158,43 @@ public interface ChartSwitches {
      * dropped, which is the sort of mistake that shows up as a layer
      * quietly switching itself off.
      */
-    private static ChartOptions withChart(ChartOptions from, String id,
-                                          boolean to) {
+    /**
+     * Whether a chart switch is on in a value - the read every
+     * presentation of the options shares (#443).
+     */
+    static boolean isOn(ChartOptions chart, String id) {
+        return switch (id) {
+            case ChartKeys.DEEP_SKY -> chart.deepSkyObjects();
+            case "chart.galaxies" -> chart.galaxies();
+            case "chart.openClusters" -> chart.openClusters();
+            case "chart.globularClusters" -> chart.globularClusters();
+            case "chart.nebulae" -> chart.nebulae();
+            case "chart.planetaryNebulae" -> chart.planetaryNebulae();
+            case "chart.deepSkyLabels" -> chart.deepSkyLabels();
+            case "chart.starNames" -> chart.starNames();
+            case "chart.bayerLetters" -> chart.bayerLetters();
+            case "chart.flamsteedNumbers" -> chart.flamsteedNumbers();
+            case ChartKeys.FIGURES -> chart.constellationFigures();
+            case "chart.constellationBoundaries" ->
+                    chart.constellationBoundaries();
+            case "chart.constellationNames" -> chart.constellationNames();
+            case "chart.equatorialGrid" -> chart.equatorialGrid();
+            case "chart.titleBlock" -> chart.titleBlock();
+            case "chart.magnitudeKey" -> chart.magnitudeKey();
+            case "chart.blackSky" -> chart.palette()
+                    == juranometria.render.ChartPalette.BLACK_SKY;
+            default -> throw new IllegalArgumentException(
+                    "no such chart switch: " + id);
+        };
+    }
+
+    /**
+     * A value with one chart switch set and every other field as it was -
+     * the write every presentation of the options shares (#443), so no
+     * box ever writes a whole value of its own.
+     */
+    static ChartOptions withChart(ChartOptions from, String id,
+                                  boolean to) {
         for (SymbolFamily family : SymbolFamily.values()) {
             if (id.equals(idOf(family))) {
                 return from.withFamily(family, to);

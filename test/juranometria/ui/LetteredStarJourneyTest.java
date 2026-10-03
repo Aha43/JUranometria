@@ -194,9 +194,13 @@ class LetteredStarJourneyTest {
             assertFalse(labels().contains("Merak β"),
                     "no pair survives with names hidden: " + labels());
 
-            ReaderInput.click(button(dialog.getContentPane(), "OK"));
+            // Shared immediate (#443): the box saved the choice at
+            // once; Close only closes.
+            ReaderInput.click(button(dialog.getContentPane(), "Close"));
             flush();
-            assertFalse(store.load().starNames(), "OK persisted the choice");
+            assertFalse(store.load().starNames(),
+                    "the box saved the choice, and Close took nothing"
+                            + " back");
             assertFalse(new ChartOptionsController(store).options()
                             .starNames(),
                     "a restart honours exactly what was confirmed");
@@ -278,9 +282,11 @@ class LetteredStarJourneyTest {
             flush();
             JDialog reopened = optionsDialog();
             ReaderInput.chooseTab(tabbedPane(reopened), "Stars");
-            ReaderInput.click(button(reopened.getContentPane(),
-                    "Restore Defaults"));
-            ReaderInput.click(button(reopened.getContentPane(), "OK"));
+            // Asked first and confirmed: saved at once (#443).
+            ReaderInput.clickThenAnswer(button(reopened.getContentPane(),
+                    "Restore Defaults"), "Restore Defaults",
+                    "Restore Defaults");
+            ReaderInput.click(button(reopened.getContentPane(), "Close"));
             flush();
             ReaderInput.click(button(frame[0].getContentPane(),
                     "Reset view"));

@@ -153,10 +153,11 @@ class ControlExplanationJourneyTest {
                                     + " description read back");
 
                     // And the one surface that deliberately says
-                    // nothing on hover: OK needs no tooltip, because
-                    // the word on it is the whole of it.
-                    JButton ok = onEdt(() -> button(dialog, "OK"));
-                    assertNotNull(ok, "the dialog has its OK");
+                    // nothing on hover: Close (OK until #443) needs
+                    // no tooltip, because the word on it is the whole
+                    // of it.
+                    JButton ok = onEdt(() -> button(dialog, "Close"));
+                    assertNotNull(ok, "the dialog has its Close");
                     assertNull(ReaderInput.hover(ok),
                             "a control whose own word is the whole"
                                     + " meaning shows no box over it");

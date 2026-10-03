@@ -78,9 +78,8 @@ because nobody looks at them.
 
 | shown | hovered | spoken as | read out |
 |---|---|---|---|
-| Restore Defaults | Preview the atlas defaults: every layer and deep-sky family in this window on, the title block on, the magnitude key off, and the chart on white paper. | Restore Defaults | Returns every choice in this window to the atlas defaults. Like every change here, this is a preview: OK keeps the choices; Cancel restores your previous choices. |
-| Cancel | — | Cancel | Puts the chart back the way it was and closes this window. |
-| OK | — | OK | Keeps what the chart is showing now, and remembers it for next time. |
+| Restore Defaults | Return to the atlas defaults: every layer and deep-sky family in this window on, the title block on, the magnitude key off, and the chart on white paper. You are asked first. | Restore Defaults | Returns every choice in this window to the atlas defaults, on the chart at once and remembered. Because nothing takes it back, you are asked first. |
+| Close | — | Close | Closes this window. Every change made here is already on the chart and remembered. |
 
 ## Norsk bokmål (`nb-NO`)
 
@@ -142,7 +141,6 @@ because nobody looks at them.
 
 | shown | hovered | spoken as | read out |
 |---|---|---|---|
-| Gjenopprett standardvalg | Forhåndsvis atlasets standardvalg: alle lag og dyphimmelfamilier i dette vinduet på, tittelfeltet på, magnitudeforklaringen av og kartet på hvitt papir. | Gjenopprett standardvalg | Setter alle valgene i vinduet til atlasets standardinnstillinger. Som andre endringer her er dette en forhåndsvisning: OK beholder valgene, mens Avbryt gjenoppretter de tidligere valgene. |
-| Avbryt | — | Avbryt | Setter kartet tilbake slik det var og lukker vinduet. |
-| OK | — | OK | Beholder det kartet viser nå, og husker det til neste gang. |
+| Gjenopprett standardvalg | Gå tilbake til atlasets standardvalg: alle lag og dyphimmelfamilier i dette vinduet på, tittelfeltet på, magnitudeforklaringen av og kartet på hvitt papir. Du blir spurt først. | Gjenopprett standardvalg | Setter alle valgene i vinduet tilbake til atlasets standardvalg, på kartet med en gang og husket. Fordi ingenting angrer det, blir du spurt først. |
+| Lukk | — | Lukk | Lukker vinduet. Alle endringer gjort her er allerede på kartet og husket. |
 

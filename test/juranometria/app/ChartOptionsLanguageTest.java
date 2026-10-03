@@ -166,7 +166,7 @@ class ChartOptionsLanguageTest {
                     ChartOptionsDialog.content(
                             new ChartOptionsController(
                                     ChartOptionsStore.forNode(node)),
-                            () -> { }, () -> { },
+                            () -> { }, () -> false,
                             InterfaceText.forLanguage(language)));
             SwingUtilities.invokeAndWait(() -> { });
             collect(content[0], said);

@@ -37,8 +37,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * controls: a reader upgrading from 1.1.0 opens the Inspector from
  * the new toolbar button, finds the menu agreeing with it, watches a
  * narrow window close the panel and a wide one bring it back, turns
- * the chart's furniture on and off in the real dialog, cancels once
- * and confirms once, restarts, restores defaults, and comes Home to
+ * the chart's furniture on and off in the real dialog, takes it back
+ * with the same boxes and chooses again (each click saved at once,
+ * #443), restarts, restores defaults, and comes Home to
  * the released page.
  *
  * <p>Every step drives a control rather than the callback beneath
@@ -204,24 +205,37 @@ class ChartFurnitureJourneyTest {
             assertEquals(selectedBeforeDialog, selection.selection(),
                     "nor disturbs the selection");
 
-            // 7. Cancel reverts; a confirmed choice persists.
-            ReaderInput.click(button(dialogPane, "Cancel"));
+            // 7. Shared immediate (#443): each click was saved at
+            // once, and nothing takes it back. The reader undoes both
+            // with the same two boxes - saved at once too - and Close
+            // only closes.
+            assertEquals("true", store.get("chart.magnitudeKey", null),
+                    "the key box saved its choice at once");
+            SwingUtilities.invokeAndWait(key::doClick);
+            SwingUtilities.invokeAndWait(title::doClick);
+            flush();
+            ReaderInput.click(button(dialogPane, "Close"));
             flush();
             assertFalse(options.options().magnitudeKey(),
-                    "Cancel took the preview away");
+                    "the second click took the key away");
             assertTrue(options.options().titleBlock(),
-                    "and restored the title block");
+                    "and brought the title block back");
+            assertFalse(ChartOptionsStore.forNode(store).load()
+                            .magnitudeKey(),
+                    "both undone choices were saved at once");
+            assertTrue(ChartOptionsStore.forNode(store).load()
+                            .titleBlock());
 
             openDialog();
             SwingUtilities.invokeAndWait(
                     furnitureBox("Stellar-magnitude key")::doClick);
             flush();
-            ReaderInput.click(button(dialogPane, "OK"));
+            ReaderInput.click(button(dialogPane, "Close"));
             flush();
             assertTrue(options.options().magnitudeKey(),
-                    "OK kept the reader's choice");
+                    "Close kept the reader's choice");
             assertEquals("true", store.get("chart.magnitudeKey", null),
-                    "and wrote it down");
+                    "which the box wrote down at once");
 
             // A restart: a fresh store over the same node.
             ChartOptions reloaded = ChartOptionsStore.forNode(store).load();
@@ -232,13 +246,19 @@ class ChartFurnitureJourneyTest {
 
             // 8. Restore Defaults, then Home.
             openDialog();
-            ReaderInput.click(button(dialogPane, "Restore Defaults"));
+            // Asked first and confirmed: saved at once (#443).
+            ReaderInput.clickThenAnswer(button(dialogPane,
+                    "Restore Defaults"), "Restore Defaults",
+                    "Restore Defaults");
             flush();
             assertTrue(options.options().titleBlock(),
                     "the released chart keeps its title block");
             assertFalse(options.options().magnitudeKey(),
                     "and has no key");
-            ReaderInput.click(button(dialogPane, "OK"));
+            assertEquals(ChartOptions.DEFAULTS,
+                    ChartOptionsStore.forNode(store).load(),
+                    "the confirmed defaults were saved at once");
+            ReaderInput.click(button(dialogPane, "Close"));
             flush();
             ReaderInput.click(button(window.getContentPane(),
                     "Reset view"));

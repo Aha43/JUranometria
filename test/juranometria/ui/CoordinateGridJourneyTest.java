@@ -38,8 +38,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * RA-wrap, Orion, the northern pole, and the southern sky; wheel and
  * keyboard zoom step the grid's intervals at the reviewed
  * thresholds in both directions; a real pan crosses 0h; the real
- * Chart Options dialog hides and shows the grid with live preview,
- * Cancel, and OK - repaint-only, the very same scene and navigation
+ * Chart Options dialog hides and shows the grid, each click saved at
+ * once (#443), and Close - repaint-only, the very same scene and navigation
  * - Home resets navigation without touching the confirmed choice, a
  * restart honours it, and Restore Defaults ends the journey on the
  * exact decided default. A missing grid pass, interval transition,
@@ -224,13 +224,22 @@ class CoordinateGridJourneyTest {
                     "the searched target rides through the toggle");
             assertFalse(gridInkPresent(), "the preview really hid the grid");
 
-            // Cancel restores the opening value...
-            ReaderInput.click(button(dialog.getContentPane(),
-                    "Cancel"));
+            // Shared immediate (#443): the toggle was saved at once,
+            // and nothing takes it back - the reader brings the grid
+            // back with the same box, saved at once too, and Close
+            // only closes.
+            assertFalse(store.load().equatorialGrid(),
+                    "the box saved the grid-off choice at once");
+            ReaderInput.click(box(dialog.getContentPane(),
+                    "Equatorial coordinate grid"));
+            ReaderInput.click(button(dialog.getContentPane(), "Close"));
             flush();
             assertTrue(options.options().equatorialGrid(),
-                    "Cancel restores the grid");
-            // ...then hide it again and confirm.
+                    "the second click brought the grid back");
+            assertTrue(store.load().equatorialGrid(),
+                    "and saved it at once");
+            assertTrue(gridInkPresent(), "the grid draws again");
+            // ...then hide it again and close.
             SwingUtilities.invokeAndWait(() ->
                     frame[0].getJMenuBar().getMenu(0).getItem(0).doClick());
             flush();
@@ -238,10 +247,11 @@ class CoordinateGridJourneyTest {
             ReaderInput.chooseTab(tabbedPane(second), "Chart");
             ReaderInput.click(box(second.getContentPane(),
                     "Equatorial coordinate grid"));
-            ReaderInput.click(button(second.getContentPane(), "OK"));
+            ReaderInput.click(button(second.getContentPane(), "Close"));
             flush();
             assertFalse(store.load().equatorialGrid(),
-                    "OK persisted the grid-off choice");
+                    "the box saved the grid-off choice at once, and"
+                            + " Close took nothing back");
 
             // Home resets navigation only; a restart honours the
             // confirmed choice.
@@ -261,9 +271,11 @@ class CoordinateGridJourneyTest {
             flush();
             JDialog third = optionsDialog();
             ReaderInput.chooseTab(tabbedPane(third), "Chart");
-            ReaderInput.click(button(third.getContentPane(),
-                    "Restore Defaults"));
-            ReaderInput.click(button(third.getContentPane(), "OK"));
+            // Asked first and confirmed: saved at once (#443).
+            ReaderInput.clickThenAnswer(button(third.getContentPane(),
+                    "Restore Defaults"), "Restore Defaults",
+                    "Restore Defaults");
+            ReaderInput.click(button(third.getContentPane(), "Close"));
             flush();
             assertEquals(ChartOptions.DEFAULTS, store.load());
             assertEquals(ChartViewState.DEFAULT, navigation.state());

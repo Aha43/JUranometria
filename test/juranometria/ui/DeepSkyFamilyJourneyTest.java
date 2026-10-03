@@ -401,13 +401,13 @@ class DeepSkyFamilyJourneyTest {
             }
             assertFalse(familyBox(SymbolFamily.NEBULAE).isSelected(),
                     "nebulae hidden, for what the search must do next");
-            closeDialogWithOk();
+            closeDialogWithClose();
 
             // 9. Search still finds what the chart is hiding.
             openDialog();
             assertFalse(familyBox(SymbolFamily.NEBULAE).isSelected(),
                     "nebulae are hidden as the reader left them");
-            closeDialogWithOk();
+            closeDialogWithClose();
             // NGC 6514 is the Trifid: a nebula, in the family the
             // reader has just switched off.
             searchFor("NGC 6514");
@@ -449,9 +449,9 @@ class DeepSkyFamilyJourneyTest {
             SwingUtilities.invokeAndWait(
                     familyBox(SymbolFamily.GALAXIES)::doClick);
             flush();
-            closeDialogWithOk();
+            closeDialogWithClose();
             assertEquals("false", store.get("chart.galaxies", null),
-                    "OK wrote the choice down");
+                    "the box saved the choice at once (#443)");
 
             // A restart, across the session boundary the claim is
             // about: a new controller over a new store instance for
@@ -501,13 +501,14 @@ class DeepSkyFamilyJourneyTest {
                     "and the journey never touched a preference"
                             + " outside the chart's own");
             openDialog();
-            ReaderInput.click(button(dialogPane, "Restore Defaults"));
+            ReaderInput.clickThenAnswer(button(dialogPane, "Restore Defaults"),
+                    "Restore Defaults", "Restore Defaults");
             flush();
             for (SymbolFamily family : SymbolFamily.values()) {
                 assertTrue(familyBox(family).isSelected(),
                         family + " is back with the released chart");
             }
-            closeDialogWithOk();
+            closeDialogWithClose();
             ReaderInput.click(button(window.getContentPane(),
                     "Reset view"));
             flush();
@@ -722,15 +723,15 @@ class DeepSkyFamilyJourneyTest {
     private void closeDialog() throws Exception {
         JDialog dialog = optionsDialog();
         if (dialog != null) {
-            ReaderInput.click(button(dialogPane, "Cancel"));
+            ReaderInput.click(button(dialogPane, "Close"));
             flush();
         }
     }
 
-    private void closeDialogWithOk() throws Exception {
+    private void closeDialogWithClose() throws Exception {
         JDialog dialog = optionsDialog();
         if (dialog != null) {
-            ReaderInput.click(button(dialogPane, "OK"));
+            ReaderInput.click(button(dialogPane, "Close"));
             flush();
         }
     }

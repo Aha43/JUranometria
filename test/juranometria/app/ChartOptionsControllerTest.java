@@ -27,8 +27,10 @@ class ChartOptionsControllerTest {
                     "the controller starts from the persisted options");
 
             List<ChartOptions> seen = new ArrayList<>();
-            controller.onChange(seen::add);
+            ChartOptionsController.Subscription following =
+                    controller.onChange(seen::add);
             assertEquals(1, seen.size(), "registration hands the current value");
+            assertEquals(1, controller.subscribers());
 
             // Live preview: one notification per real change, none for
             // a no-op.
@@ -42,27 +44,33 @@ class ChartOptionsControllerTest {
             assertEquals(snapshot, store.load(),
                     "previewing persists nothing");
 
-            // Restore Defaults is an ordinary previewed transition and
-            // includes the star-label option exactly.
+            // Restore Defaults is one accepted change (#443): the
+            // released chart, every identifier layer on, saved at once -
+            // there is no Cancel to take it back, so its presentations
+            // ask first.
             controller.restoreDefaults();
             assertEquals(ChartOptions.DEFAULTS, controller.options());
             assertTrue(controller.options().starNames()
                             && controller.options().bayerLetters()
                             && controller.options().flamsteedNumbers(),
                     "Restore Defaults turns every identifier layer on");
-            assertEquals(snapshot, store.load(),
-                    "Restore Defaults previews; it does not persist");
+            assertEquals(ChartOptions.DEFAULTS, store.load(),
+                    "Restore Defaults is saved at once");
+            assertEquals(3, seen.size());
 
-            // Cancel: back to the open-time snapshot, still unpersisted.
-            controller.revertTo(snapshot);
-            assertEquals(snapshot, controller.options());
+            // accept: the chart and the store together.
+            controller.accept(previewed);
+            assertEquals(previewed, store.load(),
+                    "accept saves exactly what it applied");
             assertEquals(4, seen.size());
 
-            // OK: the current previewed value persists.
-            controller.apply(previewed);
-            controller.confirm();
-            assertEquals(previewed, store.load(),
-                    "confirm persists exactly the previewed options");
+            // A subscription ends when cancelled, and twice is once.
+            following.cancel();
+            following.cancel();
+            assertEquals(0, controller.subscribers());
+            controller.accept(ChartOptions.DEFAULTS);
+            assertEquals(4, seen.size(), "a cancelled subscription hears nothing");
+            controller.accept(previewed);
             assertTrue(new ChartOptionsController(store).options()
                             .equals(previewed),
                     "a fresh session reads the confirmed options");
@@ -164,18 +172,6 @@ class ChartOptionsControllerTest {
             assertTrue(!controller.options().equatorialGrid(),
                     "a restart honours the persisted grid-off");
 
-            // Cancel: preview the grid on, then revert to the opening
-            // snapshot - the grid is off again, nothing persisted.
-            ChartOptions snapshot = controller.options();
-            controller.apply(ChartOptions.DEFAULTS);
-            assertTrue(controller.options().equatorialGrid(),
-                    "the preview turned the grid on");
-            controller.revertTo(snapshot);
-            assertTrue(!controller.options().equatorialGrid(),
-                    "Cancel restores the opening grid value");
-            assertTrue(!store.load().equatorialGrid(),
-                    "previewing persisted nothing");
-
             // Home resets navigation only: the real navigation
             // controller beside the real options controller.
             juranometria.ui.ChartViewController navigation =
@@ -188,11 +184,10 @@ class ChartOptionsControllerTest {
             assertTrue(!controller.options().equatorialGrid(),
                     "Home leaves the grid choice alone");
 
-            // Restore Defaults turns the grid on; OK persists it.
+            // Restore Defaults turns the grid on, and saves it.
             controller.restoreDefaults();
             assertTrue(controller.options().equatorialGrid(),
                     "Restore Defaults turns the grid back on");
-            controller.confirm();
             assertTrue(new ChartOptionsController(store).options()
                             .equatorialGrid(),
                     "the restored default survives a restart");

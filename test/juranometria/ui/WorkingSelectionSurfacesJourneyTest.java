@@ -516,7 +516,8 @@ class WorkingSelectionSurfacesJourneyTest {
                             + " takes the cross away - the observable"
                             + " ring, cross, ring transition");
 
-            // ---- The palette, kept for the restart: Black sky, OK.
+            // ---- The palette, kept for the restart: Black sky, saved
+            // at once by the box (#443), then Close.
             ReaderInput.chooseTab(tabsIn(dialog.getContentPane()),
                     "Chart");
             ReaderInput.click(box(dialog.getContentPane(), "Black sky"));
@@ -524,11 +525,12 @@ class WorkingSelectionSurfacesJourneyTest {
             assertEquals(held, working().members(),
                     "the ground changes and the set does not");
             assertEquals(m42, working().lead());
-            ReaderInput.click(button(dialog.getContentPane(), "OK"));
+            ReaderInput.click(button(dialog.getContentPane(), "Close"));
             flush();
             assertEquals(juranometria.render.ChartPalette.BLACK_SKY,
                     store.load().palette(),
-                    "OK persisted the reader's sky");
+                    "the box saved the reader's sky at once, and Close"
+                            + " took nothing back");
             assertEquals(held, working().members());
 
             // ---- The theme, both directions, through the real

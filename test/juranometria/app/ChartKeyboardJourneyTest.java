@@ -240,8 +240,9 @@ class ChartKeyboardJourneyTest {
                 assertTrue(dialog != null, "the reader's own dialog opens");
                 try {
                     javax.swing.JButton ok =
-                            onEdt(() -> button(dialog, "OK"));
-                    assertTrue(ok != null, "with its own OK to stand on");
+                            onEdt(() -> button(dialog, "Close"));
+                    assertTrue(ok != null,
+                            "with its own Close to stand on");
                     juranometria.ui.ReaderInput.shortcutOn(ok,
                             KeyEvent.VK_K, AppMenuBar.menuShortcutMask());
                     flush();
@@ -378,14 +379,17 @@ class ChartKeyboardJourneyTest {
     // ---- the two routes, each walked on its own --------------------
 
     /**
-     * The chart after a reader presses the real checkbox <em>and the
-     * dialog's own OK</em>.
+     * The chart after a reader presses the real checkbox, read back
+     * out of the store, <em>then closes with the dialog's own
+     * Close</em>.
      *
-     * <p>The OK is the point. A checkbox previews and OK commits, so
-     * stopping at the checkbox compares an uncommitted preview with
-     * the keyboard's committed action - two different things, and a
-     * broken OK route would pass (review, #312). What is returned is
-     * read back out of the store by somebody who did not write it.
+     * <p>Until #443 a checkbox previewed and OK committed, so the OK
+     * was the point (review, #312). Since #443 the box is the whole
+     * act: its press is saved at once, exactly like the keyboard's.
+     * So the store is read straight after the box - before Close, so
+     * a box that only previewed would fail - and Close must then take
+     * nothing back. What is returned is read back out of the store by
+     * somebody who did not write it.
      */
     private ChartOptions byTheDialog(String control) throws Exception {
         Session session = new Session();
@@ -412,11 +416,16 @@ class ChartKeyboardJourneyTest {
             ReaderInput.click(box, () -> new java.awt.Point(
                     box.getWidth() / 2, box.getHeight() / 2), 0);
             flush();
-            javax.swing.JButton ok = onEdt(() -> button(dialog, "OK"));
-            assertTrue(ok != null, "the dialog's own OK");
-            ReaderInput.click(ok);
+            ChartOptions saved = session.stored();
+            javax.swing.JButton close =
+                    onEdt(() -> button(dialog, "Close"));
+            assertTrue(close != null, "the dialog's own Close");
+            ReaderInput.click(close);
             flush();
-            return session.stored();
+            assertEquals(saved, session.stored(),
+                    "Close takes nothing back of what the box saved"
+                            + " (#443)");
+            return saved;
         } finally {
             session.close();
         }

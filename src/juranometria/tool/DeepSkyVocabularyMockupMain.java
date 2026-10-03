@@ -454,7 +454,7 @@ public final class DeepSkyVocabularyMockupMain {
                 usable.height - screen.top - screen.bottom);
         List<String> lost = new ArrayList<>();
         List<String> unreachable = new ArrayList<>();
-        for (String name : List.of("OK", "Cancel", "Restore Defaults")) {
+        for (String name : List.of("Close", "Restore Defaults")) {
             AbstractButton button = button(frame.getContentPane(), name);
             if (button == null || !button.isShowing()) {
                 lost.add(name);

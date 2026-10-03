@@ -241,39 +241,37 @@ class HiddenFamilyTargetJourneyTest {
                 "and hiding them again - shown to hidden, the real"
                         + " transition - retires it");
 
-        // 7. Cancel restores the options it was given and nothing
-        // else. Retiring a target is a navigation transition - the
-        // same one panning makes - and the options dialog owns no
-        // navigation, so it does not reach across to undo one. The
-        // reader is left where they are, with their families back,
-        // and the chart titled honestly; asking for M 33 again is a
-        // search, which is what asking for it always was.
+        // 7. Setting the family back restores the options and nothing
+        // else (#443: there is no Cancel any more; the reader ticks the
+        // box again). Retiring a target is a navigation transition -
+        // the same one panning makes - and an options change owns no
+        // navigation, so showing galaxies again does not reach across
+        // to undo one. The reader is left where they are, with their
+        // galaxies back, and the chart titled honestly; asking for M 33
+        // again is a search, which is what asking for it always was.
         apply(ChartOptions.DEFAULTS);
         searchFor("M33");
         assertEquals(M33, navigation.state().targetIdentity(), "premise");
-        ChartOptions atDialogOpen = options.options();
         apply(options.options().withFamily(SymbolFamily.GALAXIES, false));
         assertNull(navigation.state().targetIdentity(),
-                "the live preview retired it");
-        SwingUtilities.invokeAndWait(() -> options.revertTo(atDialogOpen));
+                "hiding galaxies retired it");
+        SwingUtilities.invokeAndWait(() -> options.accept(
+                options.options().withFamily(SymbolFamily.GALAXIES, true)));
         flush();
-        assertEquals(atDialogOpen, options.options(),
-                "Cancel restored exactly the options it was opened"
-                        + " with");
+        assertTrue(options.options().galaxies(), "galaxies are back");
         assertTrue(drawnIds().contains(M33),
                 "so M 33 is drawn again, an ordinary galaxy among"
                         + " galaxies");
         assertNull(navigation.state().targetIdentity(),
-                "and the target stays retired: Cancel undoes the"
-                        + " options it owns, not a navigation"
-                        + " transition it never made");
+                "and the target stays retired: an options change"
+                        + " undoes no navigation transition");
 
-        // OK persists what is on the page and touches nothing else.
+        // Saving touches nothing else.
         ChartViewState beforeConfirm = navigation.state();
         SwingUtilities.invokeAndWait(options::confirm);
         flush();
         assertEquals(beforeConfirm, navigation.state(),
-                "OK moves nothing and retires nothing");
+                "saving moves nothing and retires nothing");
 
         // 8. Home returns the reader to the released page.
         SwingUtilities.invokeAndWait(navigation::reset);

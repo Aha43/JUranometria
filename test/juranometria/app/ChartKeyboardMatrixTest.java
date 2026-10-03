@@ -63,10 +63,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * exactly the sort of mistake that hides in the sixteen switches
  * nobody wrote a case for (review, #312).
  *
- * <p>The GUI route presses <strong>OK</strong>. The dialog's checkbox
- * previews and its OK commits; comparing an uncommitted preview with
- * the keyboard's committed action compares two different things and
- * would pass with a broken OK.
+ * <p>Since #443 both routes save at once: the dialog's checkbox, like
+ * the keyboard's letter, is one accepted change, and the GUI route then
+ * presses <strong>Close</strong>, which takes nothing back. The
+ * comparison is between two saved values, read back from the store.
  */
 class ChartKeyboardMatrixTest {
 
@@ -297,13 +297,12 @@ class ChartKeyboardMatrixTest {
                         box.getWidth() / 2, box.getHeight() / 2), 0);
                 flush();
 
-                // And the gesture the dialog asks for. Without this
-                // the comparison is between an uncommitted preview
-                // and the keyboard's committed action, and a broken
-                // OK route passes (review, #312).
-                JButton ok = onEdt(() -> button(dialog, "OK"));
-                assertNotNull(ok, "the dialog's own OK");
-                ReaderInput.click(ok);
+                // And the reader closes the window. Since #443 the box
+                // saved itself, as a letter does, so the comparison below
+                // is between two saved values; Close takes nothing back.
+                JButton close = onEdt(() -> button(dialog, "Close"));
+                assertNotNull(close, "the dialog's own Close");
+                ReaderInput.click(close);
                 flush();
             } finally {
                 SwingUtilities.invokeAndWait(dialog::dispose);

@@ -38,12 +38,15 @@ import juranometria.ui.SymbolChip;
 /**
  * The Chart Options dialog (issue #105, retabbed in Sprint 21 for
  * issue #185): pure wiring onto the production
- * {@link ChartOptionsController}, exactly the interaction model of
- * docs/decisions/chart-options.md. Every change previews live on the
- * chart; OK confirms and persists; Cancel, the window close button,
- * and Escape revert to the options captured when the dialog opened
- * and persist nothing; Restore Defaults is an ordinary previewed
- * transition back to the released chart.
+ * {@link ChartOptionsController}. Since #443 the model is shared
+ * immediate (docs/decisions/chart-options-companion.md): every change
+ * is the chart at once and saved at once, as on the chart keyboard;
+ * Close, the window's close box and Escape close and take nothing
+ * back; Restore Defaults, asked first, is one accepted change. The
+ * dialog follows the controller, so a change made anywhere else is
+ * shown here while it is open. Before #443 it previewed, and its
+ * Cancel restored the value it had opened with over every change made
+ * since (reproduced on #442).
  *
  * <p><strong>Four tabs</strong>, by subject: Deep sky, Stars,
  * Constellations, Chart. Eleven checkboxes in one column was already
@@ -116,23 +119,15 @@ public final class ChartOptionsDialog extends JDialog {
                 said.say("chartoptions.title"));
         getAccessibleContext().setAccessibleDescription(
                 said.say("chartoptions.a11y"));
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        ChartOptions snapshot = controller.options();
-        Runnable cancel = () -> {
-            controller.revertTo(snapshot);
-            dispose();
-        };
-        setContentPane(content(controller, cancel, () -> {
-            controller.confirm();
-            dispose();
-        }, said));
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent event) {
-                cancel.run();
-            }
-        });
-        getRootPane().registerKeyboardAction(event -> cancel.run(),
+        // Shared immediate (ruled on #442): every change here is already
+        // the chart and already saved, so closing - Close, the close box
+        // or Escape - takes nothing back. The old Cancel restored the
+        // value the dialog opened with, over every change made since,
+        // the keyboard's included (reproduced on #442).
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setContentPane(content(controller, this::dispose,
+                () -> restoreConfirmed(this, said), said));
+        getRootPane().registerKeyboardAction(event -> dispose(),
                 javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
         sizeToScreen(this, ORDINARY_WIDTH);
@@ -166,29 +161,40 @@ public final class ChartOptionsDialog extends JDialog {
      */
     public static JComponent contentForStudy(
             ChartOptionsController controller) {
-        return content(controller, () -> { }, () -> { });
+        return content(controller, () -> { }, () -> false);
     }
 
     /**
      * The dialog content; headless-constructible for tests and for
-     * the study that reviews it. Controls reflect the controller's
-     * current options, every change previews live through
-     * {@code controller.apply}, and the dependency enablement follows
-     * the decided rules.
+     * the study that reviews it.
+     *
+     * <p>Shared immediate (ruled on #442, #443): every box writes the
+     * controller's <em>current</em> value with its own one field
+     * changed, and that is saved at once - the chart keyboard's
+     * gesture exactly. The content follows the controller through one
+     * subscription, so a change made anywhere else is shown here at
+     * once, ticks and enabled states both; it lets go when the window
+     * holding it is disposed.
+     *
+     * @param close           what Close does
+     * @param restoreConfirmed asked before Restore Defaults is applied;
+     *     nothing takes it back, so the reader confirms it first
      */
     static JComponent content(ChartOptionsController controller,
-                              Runnable cancel, Runnable confirm) {
+                              Runnable close,
+                              java.util.function.BooleanSupplier restoreConfirmed) {
         // No language stated, so English - explicitly, not by a
         // lookup that would make the dialog depend on when it was
         // built. The application states the reader's (#350).
-        return content(controller, cancel, confirm,
+        return content(controller, close, restoreConfirmed,
                 juranometria.ui.language.InterfaceText.forLanguage(
                         juranometria.ui.language.InterfaceText.ENGLISH));
     }
 
     /** The same, speaking a language the caller states. */
     static JComponent content(ChartOptionsController controller,
-                              Runnable cancel, Runnable confirm,
+                              Runnable close,
+                              java.util.function.BooleanSupplier restoreConfirmed,
                               juranometria.ui.language.InterfaceText said) {
         ChartOptions initial = controller.options();
 
@@ -268,42 +274,67 @@ public final class ChartOptionsDialog extends JDialog {
                 said.say("chartoptions.blackSky.explain"),
                 "chart.blackSky", said);
 
-        Runnable sync = () -> {
-            // The two decided dependencies, and the five families,
-            // which the master governs while they remember.
-            labels.setEnabled(dsos.isSelected());
-            names.setEnabled(figures.isSelected());
-            for (JCheckBox family : families) {
-                family.setEnabled(dsos.isSelected());
+        // Each box and the switch it is: its keyboard id, the one
+        // registry both routes read.
+        java.util.Map<JCheckBox, String> switches = new java.util.LinkedHashMap<>();
+        switches.put(dsos, ChartKeys.DEEP_SKY);
+        for (int i = 0; i < families.size(); i++) {
+            switches.put(families.get(i), familyKey(SymbolFamily.values()[i]));
+        }
+        switches.put(labels, "chart.deepSkyLabels");
+        switches.put(starNames, "chart.starNames");
+        switches.put(bayerLetters, "chart.bayerLetters");
+        switches.put(flamsteedNumbers, "chart.flamsteedNumbers");
+        switches.put(figures, ChartKeys.FIGURES);
+        switches.put(boundaries, "chart.constellationBoundaries");
+        switches.put(names, "chart.constellationNames");
+        switches.put(grid, "chart.equatorialGrid");
+        switches.put(titleBlock, "chart.titleBlock");
+        switches.put(magnitudeKey, "chart.magnitudeKey");
+        switches.put(blackSky, "chart.blackSky");
+        for (java.util.Map.Entry<JCheckBox, String> each : switches.entrySet()) {
+            JCheckBox box = each.getKey();
+            String id = each.getValue();
+            // One field, onto the controller's current value: never a
+            // whole value assembled from these boxes, which may have
+            // been built before a change made elsewhere.
+            box.addActionListener(event -> controller.accept(
+                    ChartSwitches.withChart(controller.options(), id,
+                            box.isSelected())));
+        }
+
+        JPanel panel = new JPanel(new BorderLayout());
+        // Following the controller: the ticks, and the two decided
+        // dependencies with the five families, which the master
+        // governs while they remember. setSelected fires no action,
+        // so following never writes.
+        ChartOptionsController.Subscription following =
+                controller.onChange(current -> {
+                    for (java.util.Map.Entry<JCheckBox, String> each
+                            : switches.entrySet()) {
+                        each.getKey().setSelected(ChartSwitches.isOn(current,
+                                each.getValue()));
+                    }
+                    labels.setEnabled(current.deepSkyObjects());
+                    names.setEnabled(current.constellationFigures());
+                    for (JCheckBox family : families) {
+                        family.setEnabled(current.deepSkyObjects());
+                    }
+                });
+        // Released when the window holding it is disposed, so reopening
+        // adds no listener.
+        boolean[] shown = new boolean[1];
+        panel.addHierarchyListener(event -> {
+            if ((event.getChangeFlags()
+                    & java.awt.event.HierarchyEvent.DISPLAYABILITY_CHANGED) == 0) {
+                return;
             }
-            ChartOptions next = new ChartOptions(dsos.isSelected(),
-                    labels.isSelected(), figures.isSelected(),
-                    boundaries.isSelected(), names.isSelected(),
-                    starNames.isSelected(), bayerLetters.isSelected(),
-                    flamsteedNumbers.isSelected(), grid.isSelected(),
-                    titleBlock.isSelected(), magnitudeKey.isSelected(),
-                    families.get(0).isSelected(),
-                    families.get(1).isSelected(),
-                    families.get(2).isSelected(),
-                    families.get(3).isSelected(),
-                    families.get(4).isSelected(),
-                    blackSky.isSelected() ? ChartPalette.BLACK_SKY
-                            : ChartPalette.WHITE_PAPER);
-            controller.apply(next);
-        };
-        labels.setEnabled(initial.deepSkyObjects());
-        names.setEnabled(initial.constellationFigures());
-        for (JCheckBox family : families) {
-            family.setEnabled(initial.deepSkyObjects());
-        }
-        List<JCheckBox> all = new ArrayList<>(List.of(dsos, labels, figures,
-                boundaries, names, starNames, bayerLetters,
-                flamsteedNumbers, grid, titleBlock, magnitudeKey,
-                blackSky));
-        all.addAll(families);
-        for (JCheckBox box : all) {
-            box.addActionListener(event -> sync.run());
-        }
+            if (panel.isDisplayable()) {
+                shown[0] = true;
+            } else if (shown[0]) {
+                following.cancel();
+            }
+        });
 
         JTabbedPane tabs = new JTabbedPane();
         // One row of tabs, always. The default wrapping layout moves
@@ -338,54 +369,26 @@ public final class ChartOptionsDialog extends JDialog {
         juranometria.ui.Explain.control(restore,
                 said.say("chartoptions.defaults.hover"),
                 said.say("chartoptions.defaults.explain"));
+        // Asked first, with Cancel the safe answer (ruled on #442):
+        // confirmed, it is one accepted change, saved, and every
+        // presentation shows it through its subscription.
         restore.addActionListener(event -> {
-            controller.restoreDefaults();
-            ChartOptions defaults = controller.options();
-            dsos.setSelected(defaults.deepSkyObjects());
-            labels.setSelected(defaults.deepSkyLabels());
-            figures.setSelected(defaults.constellationFigures());
-            boundaries.setSelected(defaults.constellationBoundaries());
-            titleBlock.setSelected(defaults.titleBlock());
-            magnitudeKey.setSelected(defaults.magnitudeKey());
-            names.setSelected(defaults.constellationNames());
-            starNames.setSelected(defaults.starNames());
-            bayerLetters.setSelected(defaults.bayerLetters());
-            flamsteedNumbers.setSelected(defaults.flamsteedNumbers());
-            grid.setSelected(defaults.equatorialGrid());
-            blackSky.setSelected(
-                    defaults.palette() == ChartPalette.BLACK_SKY);
-            for (int i = 0; i < families.size(); i++) {
-                families.get(i).setSelected(
-                        defaults.family(SymbolFamily.values()[i]));
-                families.get(i).setEnabled(true);
+            if (restoreConfirmed.getAsBoolean()) {
+                controller.restoreDefaults();
             }
-            labels.setEnabled(true);
-            names.setEnabled(true);
         });
-        JButton cancelButton = new JButton(said.say("chartoptions.cancel.label"));
-        cancelButton.getAccessibleContext().setAccessibleName(
-                said.say("chartoptions.cancel.a11y"));
-        juranometria.ui.Explain.selfExplanatory(cancelButton,
-                said.say("chartoptions.cancel.explain"));
-        cancelButton.addActionListener(event -> cancel.run());
-        JButton ok = new JButton(said.say("chartoptions.ok.label"));
-        ok.getAccessibleContext().setAccessibleName(
-                said.say("chartoptions.ok.a11y"));
-        juranometria.ui.Explain.selfExplanatory(ok,
-                said.say("chartoptions.ok.explain"));
-        ok.addActionListener(event -> confirm.run());
+        JButton closeButton = new JButton(said.say("chartoptions.close.label"));
+        closeButton.getAccessibleContext().setAccessibleName(
+                said.say("chartoptions.close.a11y"));
+        juranometria.ui.Explain.selfExplanatory(closeButton,
+                said.say("chartoptions.close.explain"));
+        closeButton.addActionListener(event -> close.run());
 
         JPanel buttons = new JPanel(new BorderLayout());
         buttons.setBorder(BorderFactory.createEmptyBorder(12, 0, 0, 0));
         buttons.add(restore, BorderLayout.WEST);
-        JPanel right = new JPanel();
-        right.setLayout(new BoxLayout(right, BoxLayout.X_AXIS));
-        right.add(cancelButton);
-        right.add(Box.createHorizontalStrut(8));
-        right.add(ok);
-        buttons.add(right, BorderLayout.EAST);
+        buttons.add(closeButton, BorderLayout.EAST);
 
-        JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(12, 14, 12, 14));
         panel.add(tabs, BorderLayout.CENTER);
         panel.add(buttons, BorderLayout.SOUTH);
@@ -646,7 +649,7 @@ public final class ChartOptionsDialog extends JDialog {
      */
     public static JComponent contentForStudy(
             ChartOptionsController controller, String interfaceLanguage) {
-        return content(controller, () -> { }, () -> { },
+        return content(controller, () -> { }, () -> false,
                 juranometria.ui.language.InterfaceText.forLanguage(
                         interfaceLanguage));
     }
@@ -661,7 +664,7 @@ public final class ChartOptionsDialog extends JDialog {
         try {
             return content(new ChartOptionsController(
                             ChartOptionsStore.forNode(node)),
-                    () -> { }, () -> { },
+                    () -> { }, () -> false,
                     juranometria.ui.language.InterfaceText.forLanguage(
                             interfaceLanguage));
         } finally {
@@ -751,6 +754,22 @@ public final class ChartOptionsDialog extends JDialog {
         public boolean getScrollableTracksViewportHeight() {
             return false;
         }
+    }
+
+    /**
+     * Asks before Restore Defaults (ruled on #442): the question names
+     * what happens, and the safe answer - Cancel - is the default.
+     */
+    static boolean restoreConfirmed(java.awt.Component over,
+                                    juranometria.ui.language.InterfaceText said) {
+        String yes = said.say("chartoptions.defaults.confirm.yes");
+        String no = said.say("chartoptions.defaults.confirm.no");
+        return javax.swing.JOptionPane.showOptionDialog(over,
+                said.say("chartoptions.defaults.confirm.message"),
+                said.say("chartoptions.defaults.confirm.title"),
+                javax.swing.JOptionPane.OK_CANCEL_OPTION,
+                javax.swing.JOptionPane.QUESTION_MESSAGE, null,
+                new Object[] {yes, no}, no) == 0;
     }
 
     // ---- sizing ----------------------------------------------------
@@ -860,7 +879,7 @@ public final class ChartOptionsDialog extends JDialog {
      * How tall this dialog may be on the screen it opens on.
      *
      * <p>Not a constant. A dialog capped at a number chosen on a tall
-     * display puts its own OK button under the taskbar of a short
+     * display puts its own buttons under the taskbar of a short
      * one, and a reader cannot resize what they cannot reach.
      */
     public static int ceilingForUsableHeight(int usableHeight) {
