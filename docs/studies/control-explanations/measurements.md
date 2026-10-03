@@ -30,6 +30,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Menu bar | JMenu | View | &mdash; | What the chart draws, where you are looking from, and how far out | self-explanatory |
 | Menu bar | JMenuItem | Chart Options... | &mdash; | Opens the window that chooses what the chart draws and labels. Chart shortcuts begin wi... | self-explanatory |
 | Menu bar | JMenuItem | Place and Time... | &mdash; | Opens the window that sets your location and the instant used to draw the meridian, hor... | self-explanatory |
+| Menu bar | JCheckBoxMenuItem | Controls | &mdash; | Shows or hides the Controls window, which keeps Place and Time beside the chart; it ope... | self-explanatory |
 | Menu bar | JMenuItem | Sun... | Where the Sun is, for the place and instant set in Place and Time | Opens a table of the Sun's computed position, height above the horizon, distance and ap... | hovered |
 | Menu bar | JMenuItem | Moon... | Where the Moon is, for the place and instant set in Place and Time | Opens a table of the Moon's computed position, height above the horizon, distance, appa... | hovered |
 | Menu bar | JCheckBoxMenuItem | Inspector | &mdash; | Shows or hides the panel that describes the selected mark and what is on this page | self-explanatory |
@@ -73,6 +74,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Place and Time | JCheckBox | Zenith | Mark the point overhead | Marks the point directly above you. It is drawn with the observer's lines and has no sh... | hovered |
 | Place and Time | JButton | Now | Reads the clock once and freezes the chart at that instant | Freezes the reference lines at the present moment. The clock is read once; nothing move... | hovered |
 | Place and Time | JButton | Centre on zenith | Move the chart to the point overhead | Moves the page to the point directly above you. This is the only control in this window... | hovered |
+| Controls | JToggleButton | ▾ Place and Time | Show or hide this section | A hidden section keeps everything it is set to; whether it is hidden is remembered. | hovered |
 | Sun table | JRadioButton | This instant | One row, at the instant set in Place and Time | Shows a single row: the Sun at the observing instant set in Place and Time. | hovered |
 | Sun table | JRadioButton | Over a range | A row for every step from a start to an end | Shows a row for every step from the start to the end, both included; an end that is not... | hovered |
 | Sun table | JTextField | (a field) | yyyy-mm-dd hh:mm or hh:mm:ss, in UTC | The first instant of the range, in UTC. Starts at the instant set in Place and Time. | hovered |
@@ -122,7 +124,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 
 ## The audit
 
-**105 operable controls** across 13 surfaces: **66** hovered, **7** dynamic, **32** left to their own visible words, **0 undecided**.
+**107 operable controls** across 14 surfaces: **67** hovered, **7** dynamic, **33** left to their own visible words, **0 undecided**.
 
 **0** say the same words twice - a tooltip read back as a description. The seam refuses it, so this is zero or a finding.
 

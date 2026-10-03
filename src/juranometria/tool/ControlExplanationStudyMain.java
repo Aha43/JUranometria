@@ -334,10 +334,17 @@ public final class ControlExplanationStudyMain {
         surfaces.put("Menu bar", AppMenuBar.create(navigation, () -> { },
                 () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
                 () -> { }, () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
-                english));
+                () -> { }, english));
         surfaces.put("Chart Options",
                 ChartOptionsDialog.contentForStudy(options()));
         surfaces.put("Place and Time", placeAndTime());
+        // The companion's own control (#434): a section's heading,
+        // which collapses it. What the section holds is Place and Time,
+        // audited above; the window is a display's, so the section is
+        // built for the study as the dialog's content is.
+        surfaces.put("Controls", juranometria.ui.companion.CompanionSection
+                .forStudy("placeandtime", english.say("placeandtime.title"),
+                        new javax.swing.JPanel(), english));
         // The Sun table (#400), over a stated observer: the audit is of
         // its controls, not its numbers.
         surfaces.put("Sun table", juranometria.ui.solar.SolarTableDialog.content(

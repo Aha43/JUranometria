@@ -34,6 +34,11 @@ public interface CompanionStore {
 
     void saveCollapsed(String section, boolean collapsed);
 
+    /** The reader's own store, beside the application's other preferences. */
+    static CompanionStore user() {
+        return forNode(Preferences.userRoot().node("juranometria"));
+    }
+
     static CompanionStore forNode(Preferences node) {
         return new CompanionStore() {
 

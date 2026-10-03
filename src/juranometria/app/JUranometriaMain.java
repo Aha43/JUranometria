@@ -281,6 +281,27 @@ public final class JUranometriaMain {
         // Detached newest first, which is what the detach step is
         // for.
         shutdown.onShutdown(modules::detachAll);
+
+        // The companion (Sprint 39, issue #434, ruled on #433):
+        // Controls kept beside the chart - one owned window, built
+        // once, holding the same Place and Time panel the dialog
+        // holds, over the same module and place store. Released on
+        // the shutdown path before the modules detach (newest first),
+        // so its panel lets go of the module it follows; disposing it
+        // does not forget that it was open.
+        juranometria.ui.companion.CompanionStore companionStore =
+                stores.companion();
+        juranometria.ui.language.InterfaceText companionWords =
+                juranometria.ui.language.InterfaceText.forLanguage(
+                        language.interfaceLanguage());
+        juranometria.ui.companion.CompanionWindow companion =
+                new juranometria.ui.companion.CompanionWindow(frame,
+                        companionWords, companionStore);
+        companion.addSection("placeandtime",
+                companionWords.say("placeandtime.title"),
+                new juranometria.ui.placeandtime.PlaceAndTimePanel(meridian,
+                        placeStore, java.time.Instant::now, companionWords));
+        shutdown.onShutdown(companion::dispose);
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
@@ -417,7 +438,16 @@ public final class JUranometriaMain {
                 // View, Moon on the chart (#416): its own switch on the
                 // same module, remembered the same way.
                 juranometria.ui.solar.MoonChartSession.toggle(sunOnChart,
-                        moonChartStore)));
+                        moonChartStore),
+                // View, Controls (#434): the companion, shown or hidden.
+                // Opened by the reader, it takes the keyboard.
+                () -> {
+                    if (companion.isVisible()) {
+                        companion.hideCompanion();
+                    } else {
+                        companion.showCompanion(true);
+                    }
+                }));
         // Both of these read the bar, so both come AFTER it is set.
         // They sat above the menu until the bar moved down to be
         // built in the session's language (#350), and reading a bar
@@ -434,6 +464,20 @@ public final class JUranometriaMain {
                 sunChartStore, AppMenuBar.sunChartItem(frame.getJMenuBar()));
         juranometria.ui.solar.MoonChartSession.restore(sunOnChart,
                 moonChartStore, AppMenuBar.moonChartItem(frame.getJMenuBar()));
+        // The tick follows the window, however it was closed.
+        javax.swing.JCheckBoxMenuItem companionItem =
+                AppMenuBar.companionItem(frame.getJMenuBar());
+        companion.addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentShown(java.awt.event.ComponentEvent event) {
+                companionItem.setSelected(true);
+            }
+
+            @Override
+            public void componentHidden(java.awt.event.ComponentEvent event) {
+                companionItem.setSelected(false);
+            }
+        });
         javax.swing.JCheckBoxMenuItem inspectorItem =
                 AppMenuBar.inspectorItem(frame.getJMenuBar());
         if (inspectorItem != null) {
@@ -454,6 +498,14 @@ public final class JUranometriaMain {
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+        // Open at the last clean quit, open again (ruled on #433) -
+        // after the chart window has its place on a screen, so the
+        // companion is placed against real geometry, and without
+        // taking the keyboard the chart window is meant to have.
+        if (companionStore.visible()) {
+            javax.swing.SwingUtilities.invokeLater(
+                    () -> companion.showCompanion(false));
+        }
         return frame;
     }
 }

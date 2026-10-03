@@ -256,6 +256,15 @@ public final class AppMenuBar {
         return checkBoxItem(bar, MOON_CHART_ITEM);
     }
 
+    /** The name View's Controls switch carries, for tests (#434). */
+    public static final String COMPANION_ITEM = "companionItem";
+
+    /** View's Controls switch, or null when the bar has none (#434). */
+    public static javax.swing.JCheckBoxMenuItem companionItem(
+            javax.swing.JMenuBar bar) {
+        return checkBoxItem(bar, COMPANION_ITEM);
+    }
+
     /** View's Sun-on-the-chart switch, or null when the bar has none. */
     public static javax.swing.JCheckBoxMenuItem sunChartItem(
             javax.swing.JMenuBar bar) {
@@ -382,6 +391,38 @@ public final class AppMenuBar {
                                   Runnable toggleSunOnChart,
                                   Runnable toggleMoonOnChart,
                                   juranometria.ui.language.InterfaceText said) {
+        return create(navigation, openSettings, openChartOptions, openAbout,
+                toggleInspector, openPlaceAndTime, toggleEcliptic,
+                exportSheet, copyViewReport, openSunTable, openMoonTable,
+                toggleSunOnChart, toggleMoonOnChart, null, said);
+    }
+
+    /**
+     * The menu bar with View's Controls switch (Sprint 39, issue #434,
+     * ruled on #433): the one access point the companion window has,
+     * a checkbox directly after Place and Time... - the section it
+     * holds - showing whether the window is open. The menu is
+     * otherwise unchanged, and Place and Time... still opens its
+     * dialog.
+     *
+     * @param toggleCompanion runs on View's Controls item (may be
+     *     null, omitting the item)
+     */
+    public static JMenuBar create(ChartViewController navigation,
+                                  Runnable openSettings,
+                                  Runnable openChartOptions,
+                                  Runnable openAbout,
+                                  Runnable toggleInspector,
+                                  Runnable openPlaceAndTime,
+                                  Runnable toggleEcliptic,
+                                  Runnable exportSheet,
+                                  Runnable copyViewReport,
+                                  Runnable openSunTable,
+                                  Runnable openMoonTable,
+                                  Runnable toggleSunOnChart,
+                                  Runnable toggleMoonOnChart,
+                                  Runnable toggleCompanion,
+                                  juranometria.ui.language.InterfaceText said) {
         if (said == null) {
             throw new IllegalArgumentException(
                     "the menu has to say its words in some language");
@@ -466,6 +507,24 @@ public final class AppMenuBar {
                 placeAndTime.addActionListener(event ->
                         openPlaceAndTime.run());
                 view.add(placeAndTime);
+            }
+            if (toggleCompanion != null) {
+                // The companion (#434): Controls beside the chart,
+                // after the one section it holds. A checkbox, because
+                // the window is open or it is not, and the tick says
+                // which - including when the window's own close box
+                // or Escape closed it.
+                javax.swing.JCheckBoxMenuItem companion =
+                        new javax.swing.JCheckBoxMenuItem(
+                                said.say("menu.companion.label"));
+                companion.setName(COMPANION_ITEM);
+                letters.apply(companion, "menu.companion.mnemonic");
+                companion.getAccessibleContext().setAccessibleName(
+                        said.say("menu.companion.a11y"));
+                juranometria.ui.Explain.selfExplanatory(companion,
+                        said.say("menu.companion.explain"));
+                companion.addActionListener(event -> toggleCompanion.run());
+                view.add(companion);
             }
             if (openSunTable != null) {
                 // The Sun table (#400): where the Sun is for the place

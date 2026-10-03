@@ -58,6 +58,18 @@ public final class CompanionSection extends JPanel {
         open(!collapsed);
     }
 
+    /**
+     * A section, open and remembering nothing, for the audit that reads
+     * what every control says (#311): the window that would hold it
+     * needs a display, and the audit does not have one.
+     */
+    public static CompanionSection forStudy(String id, String title,
+                                            JComponent content,
+                                            InterfaceText said) {
+        return new CompanionSection(id, title, content, said, false,
+                collapsed -> { });
+    }
+
     private void open(boolean open) {
         content.setVisible(open);
         heading.setText((open ? "▾ " : "▸ ") + title);

@@ -138,6 +138,13 @@ public final class CompanionWindow extends JDialog {
      */
     public void showCompanion(boolean takeFocus) {
         if (!placed) {
+            // The peer first: until the window has one its title bar
+            // reads as no inset at all, and a size worked out then is a
+            // title bar short - the bottom row of controls opened
+            // behind a scroll bar (#434, found by the startup journey
+            // pressing Now for real).
+            addNotify();
+            updateMinimum();
             setBounds(CompanionPlacement.place(store.bounds(), screens(),
                     getOwner().getBounds(), sizePolicySize(),
                     getMinimumSize()));
