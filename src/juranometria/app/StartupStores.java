@@ -15,8 +15,9 @@ import juranometria.ui.placeandtime.PlaceStore;
  * preferences, which the evidence gate forbids and which would be
  * wrong even if it did not.
  *
- * <p>So they are gathered and handed in - eight since the Sun and the
- * Moon joined the chart (#415, #416) and zoom could be locked (#428).
+ * <p>So they are gathered and handed in - nine since the Sun and the
+ * Moon joined the chart (#415, #416), zoom could be locked (#428) and
+ * the companion window remembered itself (#434).
  * {@link #user()} is the one place that reaches for the reader's
  * nodes, and {@code main} is the one caller of it. A journey that wants to prove the shipping
  * route supplies its own and gets the real
@@ -40,7 +41,8 @@ record StartupStores(AppearanceStore appearance,
                      EclipticStore ecliptic,
                      juranometria.ui.solar.SunChartStore sunChart,
                      juranometria.ui.solar.MoonChartStore moonChart,
-                     juranometria.ui.ZoomLockStore zoomLock) {
+                     juranometria.ui.ZoomLockStore zoomLock,
+                     juranometria.ui.companion.CompanionStore companion) {
 
     StartupStores {
         require(appearance, "appearance");
@@ -51,6 +53,7 @@ record StartupStores(AppearanceStore appearance,
         require(sunChart, "sun on the chart");
         require(moonChart, "moon on the chart");
         require(zoomLock, "zoom lock");
+        require(companion, "companion window");
     }
 
     /**
@@ -65,7 +68,8 @@ record StartupStores(AppearanceStore appearance,
                 PlaceStore.user(), EclipticStore.user(),
                 juranometria.ui.solar.SunChartStore.user(),
                 juranometria.ui.solar.MoonChartStore.user(),
-                juranometria.ui.ZoomLockStore.user());
+                juranometria.ui.ZoomLockStore.user(),
+                juranometria.ui.companion.CompanionStore.user());
     }
 
     private static void require(Object store, String what) {

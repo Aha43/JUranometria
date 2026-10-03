@@ -188,16 +188,20 @@ public final class MenuSheetMain {
                 // Every action the application hands the bar, Copy
                 // View Report (#372), the Sun and Moon tables (#400,
                 // #408) and the Sun and the Moon on the chart (#415,
-                // #416) included: the picture is of the menu a reader
-                // opens.
+                // #416) and the companion's Controls (#434) included:
+                // the picture is of the menu a reader opens.
                 bar[0] = chrome.menuBar(navigation, () -> { }, () -> { },
                         () -> { }, () -> { }, () -> { }, () -> { },
                         () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
-                        () -> { });
+                        () -> { }, () -> { });
 
                 JCheckBoxMenuItem inspector = AppMenuBar.inspectorItem(bar[0]);
                 if (inspector != null) {
                     inspector.setSelected(state.checked());
+                }
+                JCheckBoxMenuItem companion = AppMenuBar.companionItem(bar[0]);
+                if (companion != null) {
+                    companion.setSelected(state.checked());
                 }
                 JCheckBoxMenuItem ecliptic = AppMenuBar.eclipticItem(bar[0]);
                 if (ecliptic != null) {

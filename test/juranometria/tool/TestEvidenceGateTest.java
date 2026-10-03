@@ -477,6 +477,7 @@ class TestEvidenceGateTest {
         assertEquals(List.of("AppShutdown.re" + "al(",
                         "AppearanceStore.us" + "er(",
                         "ChartOptionsStore.us" + "er(",
+                        "CompanionStore.us" + "er(",
                         "EclipticStore.us" + "er(",
                         "MoonChartStore.us" + "er(",
                         "PackagedAcceptanceMain.ma" + "in(",
@@ -485,15 +486,17 @@ class TestEvidenceGateTest {
                         "SunChartStore.us" + "er(",
                         "ZoomLockStore.us" + "er("),
                 TestEvidenceScan.realPreferenceDoors(),
-                "the ten production entry points to the reader's"
+                "the eleven production entry points to the reader's"
                         + " store - the sixth is #274's, which keeps"
                         + " one key for whether the ecliptic is shown,"
                         + " the seventh is #348's, which keeps the"
                         + " two language keys, the eighth is #415's,"
                         + " which keeps one key for whether the Sun is"
                         + " on the chart, the ninth is #416's, the"
-                        + " same for the Moon, and the tenth is #428's,"
-                        + " whether zoom is locked. Each arrived by this"
+                        + " same for the Moon, the tenth is #428's,"
+                        + " whether zoom is locked, and the eleventh is"
+                        + " #434's, where the companion window was and"
+                        + " whether it was open. Each arrived by this"
                         + " pin changing rather than by a silent gap"
                         + " in a remembered list, which is the whole"
                         + " reason the set is derived");
@@ -542,7 +545,7 @@ class TestEvidenceGateTest {
                         || f.premises().contains("focus-owner")).count();
         long reachPremise = display.stream().filter(f ->
                 f.premises().contains("point-reachable")).count();
-        assertEquals(52, display.size(),
+        assertEquals(53, display.size(),
                 "the display corpus is the twenty the decision names"
                         + " plus the black-sky journey (#246), the"
                         + " #261 pair - the surfaces journey and the"
@@ -663,7 +666,14 @@ class TestEvidenceGateTest {
                         + " none of that happens to a window that"
                         + " never has a peer; its one press, a"
                         + " section's heading, is a pointer click with"
-                        + " its reachability proven");
+                        + " its reachability proven; and #434's companion"
+                        + " startup journey, which starts the real"
+                        + " application three times on one preference"
+                        + " node, because restoring the window at"
+                        + " startup is the claim, and presses the"
+                        + " companion's Now with its reachability"
+                        + " proven - the press that found it opening a"
+                        + " title bar short");
         assertTrue(focusPremise >= 14,
                 "focus premises spread under #243 and may not"
                         + " retreat: " + focusPremise + " of "
@@ -716,7 +726,7 @@ class TestEvidenceGateTest {
                 f.routes().contains("back-door-click")).count();
         long postAction = files.stream().filter(f ->
                 f.routes().contains("back-door-commit")).count();
-        assertTrue(doClick <= 38,
+        assertTrue(doClick <= 39,
                 "doClick files shrank under #243 to menu convention"
                         + " and mechanism tests, and may not grow"
                         + " beyond them - the black-sky journey"
@@ -770,7 +780,11 @@ class TestEvidenceGateTest {
                         + " hosts, driven the way PlaceAndTimeDialogTest"
                         + " drives the same controls, with no window to"
                         + " press in, while the companion's window test"
-                        + " presses for real. A bound that bends when it is"
+                        + " presses for real; and #434's companion startup"
+                        + " journey reaches View's Controls and Place and"
+                        + " Time items by the recorded menu-item"
+                        + " convention, and presses the companion's own"
+                        + " control for real. A bound that bends when it is"
                         + " inconvenient is not a bound: " + doClick);
         assertTrue(postAction <= 4,
                 "postActionEvent survives only in the named mechanism"

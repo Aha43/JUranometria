@@ -40,7 +40,7 @@ open menu would cover the thing it explains.
 
 ![](menu-en-1-menus.png)
 
-Bar packed 575 × 287 px; widest popup 211 px.
+Bar packed 575 × 310 px; widest popup 211 px.
 
 | channel | words |
 |---|---|
@@ -66,6 +66,10 @@ Bar packed 575 × 287 px; widest popup 211 px.
 | item spoken name \| Place and Time |
 | item spoken description \| Opens the window that sets your location and the instant used to draw the meridian, horizon and zenith |
 | item access letter (language) \| P |
+| item label \| Controls |
+| item spoken name \| Controls |
+| item spoken description \| Shows or hides the Controls window, which keeps Place and Time beside the chart; it opens again where you left it. |
+| item access letter (language) \| R |
 | item label \| Sun... |
 | item hover \| Where the Sun is, for the place and instant set in Place and Time |
 | item spoken name \| Sun table |
@@ -115,7 +119,7 @@ Bar packed 575 × 287 px; widest popup 211 px.
 
 ![](menu-en-2-checked.png)
 
-Bar packed 575 × 287 px; widest popup 211 px.
+Bar packed 575 × 310 px; widest popup 211 px.
 
 | channel | words |
 |---|---|
@@ -141,6 +145,10 @@ Bar packed 575 × 287 px; widest popup 211 px.
 | item spoken name \| Place and Time |
 | item spoken description \| Opens the window that sets your location and the instant used to draw the meridian, horizon and zenith |
 | item access letter (language) \| P |
+| item label [checked] \| Controls |
+| item spoken name \| Controls |
+| item spoken description \| Shows or hides the Controls window, which keeps Place and Time beside the chart; it opens again where you left it. |
+| item access letter (language) \| R |
 | item label \| Sun... |
 | item hover \| Where the Sun is, for the place and instant set in Place and Time |
 | item spoken name \| Sun table |
@@ -190,7 +198,7 @@ Bar packed 575 × 287 px; widest popup 211 px.
 
 ![](menu-en-3-widest.png)
 
-Bar packed 575 × 287 px; widest popup 211 px.
+Bar packed 575 × 310 px; widest popup 211 px.
 
 | channel | words |
 |---|---|
@@ -216,6 +224,10 @@ Bar packed 575 × 287 px; widest popup 211 px.
 | item spoken name \| Place and Time |
 | item spoken description \| Opens the window that sets your location and the instant used to draw the meridian, horizon and zenith |
 | item access letter (language) \| P |
+| item label \| Controls |
+| item spoken name \| Controls |
+| item spoken description \| Shows or hides the Controls window, which keeps Place and Time beside the chart; it opens again where you left it. |
+| item access letter (language) \| R |
 | item label \| Sun... |
 | item hover \| Where the Sun is, for the place and instant set in Place and Time |
 | item spoken name \| Sun table |
@@ -265,7 +277,7 @@ Bar packed 575 × 287 px; widest popup 211 px.
 
 ![](menu-en-4-narrowest.png)
 
-Bar packed 575 × 287 px; widest popup 211 px.
+Bar packed 575 × 310 px; widest popup 211 px.
 
 | channel | words |
 |---|---|
@@ -291,6 +303,10 @@ Bar packed 575 × 287 px; widest popup 211 px.
 | item spoken name \| Place and Time |
 | item spoken description \| Opens the window that sets your location and the instant used to draw the meridian, horizon and zenith |
 | item access letter (language) \| P |
+| item label \| Controls |
+| item spoken name \| Controls |
+| item spoken description \| Shows or hides the Controls window, which keeps Place and Time beside the chart; it opens again where you left it. |
+| item access letter (language) \| R |
 | item label \| Sun... |
 | item hover \| Where the Sun is, for the place and instant set in Place and Time |
 | item spoken name \| Sun table |
@@ -342,7 +358,7 @@ Bar packed 575 × 287 px; widest popup 211 px.
 
 ![](menu-nb-NO-5-menus.png)
 
-Bar packed 578 × 287 px; widest popup 201 px.
+Bar packed 578 × 310 px; widest popup 201 px.
 
 | channel | words |
 |---|---|
@@ -368,6 +384,10 @@ Bar packed 578 × 287 px; widest popup 201 px.
 | item spoken name \| Sted og tid |
 | item spoken description \| Åpner vinduet der du velger stedet og tidspunktet som brukes når meridianen, horisonten og senit tegnes |
 | item access letter (language) \| S |
+| item label \| Kontroller |
+| item spoken name \| Kontroller |
+| item spoken description \| Viser eller skjuler vinduet Kontroller, som har Sted og tid ved siden av kartet; det åpnes igjen der du forlot det. |
+| item access letter (language) \| R |
 | item label \| Solen... |
 | item hover \| Hvor Solen er, for stedet og tidspunktet satt i Sted og tid |
 | item spoken name \| Soltabell |
@@ -417,7 +437,7 @@ Bar packed 578 × 287 px; widest popup 201 px.
 
 ![](menu-nb-NO-6-checked.png)
 
-Bar packed 578 × 287 px; widest popup 201 px.
+Bar packed 578 × 310 px; widest popup 201 px.
 
 | channel | words |
 |---|---|
@@ -443,6 +463,10 @@ Bar packed 578 × 287 px; widest popup 201 px.
 | item spoken name \| Sted og tid |
 | item spoken description \| Åpner vinduet der du velger stedet og tidspunktet som brukes når meridianen, horisonten og senit tegnes |
 | item access letter (language) \| S |
+| item label [checked] \| Kontroller |
+| item spoken name \| Kontroller |
+| item spoken description \| Viser eller skjuler vinduet Kontroller, som har Sted og tid ved siden av kartet; det åpnes igjen der du forlot det. |
+| item access letter (language) \| R |
 | item label \| Solen... |
 | item hover \| Hvor Solen er, for stedet og tidspunktet satt i Sted og tid |
 | item spoken name \| Soltabell |
@@ -492,7 +516,7 @@ Bar packed 578 × 287 px; widest popup 201 px.
 
 ![](menu-nb-NO-7-widest.png)
 
-Bar packed 578 × 287 px; widest popup 201 px.
+Bar packed 578 × 310 px; widest popup 201 px.
 
 | channel | words |
 |---|---|
@@ -518,6 +542,10 @@ Bar packed 578 × 287 px; widest popup 201 px.
 | item spoken name \| Sted og tid |
 | item spoken description \| Åpner vinduet der du velger stedet og tidspunktet som brukes når meridianen, horisonten og senit tegnes |
 | item access letter (language) \| S |
+| item label \| Kontroller |
+| item spoken name \| Kontroller |
+| item spoken description \| Viser eller skjuler vinduet Kontroller, som har Sted og tid ved siden av kartet; det åpnes igjen der du forlot det. |
+| item access letter (language) \| R |
 | item label \| Solen... |
 | item hover \| Hvor Solen er, for stedet og tidspunktet satt i Sted og tid |
 | item spoken name \| Soltabell |
@@ -567,7 +595,7 @@ Bar packed 578 × 287 px; widest popup 201 px.
 
 ![](menu-nb-NO-8-narrowest.png)
 
-Bar packed 578 × 287 px; widest popup 201 px.
+Bar packed 578 × 310 px; widest popup 201 px.
 
 | channel | words |
 |---|---|
@@ -593,6 +621,10 @@ Bar packed 578 × 287 px; widest popup 201 px.
 | item spoken name \| Sted og tid |
 | item spoken description \| Åpner vinduet der du velger stedet og tidspunktet som brukes når meridianen, horisonten og senit tegnes |
 | item access letter (language) \| S |
+| item label \| Kontroller |
+| item spoken name \| Kontroller |
+| item spoken description \| Viser eller skjuler vinduet Kontroller, som har Sted og tid ved siden av kartet; det åpnes igjen der du forlot det. |
+| item access letter (language) \| R |
 | item label \| Solen... |
 | item hover \| Hvor Solen er, for stedet og tidspunktet satt i Sted og tid |
 | item spoken name \| Soltabell |
