@@ -245,6 +245,83 @@ class CompanionWindowTest {
                 "and asked for it when the reader opens it");
     }
 
+    /**
+     * Chart Options in the real window (#443): beside Place and Time, at
+     * the companion's own width, with Deep sky opened - nothing drawn
+     * narrower than it asks, every wrapped description given its whole
+     * height - and both sections' subscriptions released on disposal.
+     */
+    @Test
+    void chartOptionsInTheCompanionFitsAndLetsGo() throws Exception {
+        needsADisplay();
+        Rig rig = new Rig(node, "en");
+        juranometria.app.ChartOptionsController options =
+                new juranometria.app.ChartOptionsController(
+                        juranometria.app.ChartOptionsStore.forNode(node));
+        InterfaceText said = InterfaceText.forLanguage("en");
+        SwingUtilities.invokeAndWait(() -> rig.companion.addSection("chartoptions",
+                said.say("chartoptions.title"),
+                new juranometria.app.ChartOptionsControls(options, () -> false,
+                        said).inCompanion(CompanionStore.forNode(node), said)));
+        rig.show();
+        assertEquals(1, options.subscribers());
+        javax.swing.AbstractButton deepSky = (javax.swing.AbstractButton)
+                find(rig.companion.getContentPane(), "heading.chartoptions.deepsky");
+        juranometria.ui.ReaderInput.click(deepSky);
+        flush();
+        flush();
+        List<String> narrow = new java.util.ArrayList<>();
+        SwingUtilities.invokeAndWait(() -> collectNarrow(
+                rig.companion.getContentPane(), narrow));
+        assertEquals(List.of(), narrow, "at " + rig.companion.getWidth()
+                + " px nothing is drawn narrower or shorter than it asks");
+        SwingUtilities.invokeAndWait(rig.companion::dispose);
+        flush();
+        assertEquals(0, options.subscribers(), "disposed, Chart Options lets go");
+        assertEquals(0, rig.module.subscribers(), "and so does Place and Time");
+    }
+
+    private static java.awt.Component find(java.awt.Component root, String name) {
+        if (name.equals(root.getName())) {
+            return root;
+        }
+        if (root instanceof java.awt.Container container) {
+            for (java.awt.Component child : container.getComponents()) {
+                java.awt.Component found = find(child, name);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
+    }
+
+    private static void collectNarrow(java.awt.Component at, List<String> into) {
+        if (!at.isVisible()) {
+            return;
+        }
+        boolean wrapped = at instanceof javax.swing.JLabel label
+                && String.valueOf(label.getText()).startsWith("<html>");
+        if ((at instanceof javax.swing.AbstractButton
+                || at instanceof javax.swing.JTextField
+                || (at instanceof javax.swing.JLabel && !wrapped))
+                && at.isShowing()
+                && at.getWidth() < at.getPreferredSize().width) {
+            into.add(at.getClass().getSimpleName() + " " + at.getWidth() + "/"
+                    + at.getPreferredSize().width);
+        }
+        if (wrapped && at.isShowing()
+                && at.getHeight() < at.getPreferredSize().height) {
+            into.add("description " + at.getHeight() + "/"
+                    + at.getPreferredSize().height + " tall");
+        }
+        if (at instanceof java.awt.Container container) {
+            for (java.awt.Component child : container.getComponents()) {
+                collectNarrow(child, into);
+            }
+        }
+    }
+
     @Test
     void escapeHides() throws Exception {
         needsADisplay();

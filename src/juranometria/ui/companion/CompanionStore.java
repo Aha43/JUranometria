@@ -30,7 +30,17 @@ public interface CompanionStore {
     void saveVisible(boolean visible);
 
     /** Whether a section was collapsed; false when never chosen. */
-    boolean collapsed(String section);
+    default boolean collapsed(String section) {
+        return collapsed(section, false);
+    }
+
+    /**
+     * Whether a section was collapsed, or the host's own default when
+     * the reader never chose (#443: Deep sky's group is introduced
+     * collapsed). A presentation default - nothing to do with what the
+     * chart draws.
+     */
+    boolean collapsed(String section, boolean ifNeverChosen);
 
     void saveCollapsed(String section, boolean collapsed);
 
@@ -74,9 +84,15 @@ public interface CompanionStore {
             }
 
             @Override
-            public boolean collapsed(String section) {
-                return "true".equals(node.get(
-                        "companion.collapsed." + section, null));
+            public boolean collapsed(String section, boolean ifNeverChosen) {
+                String chosen = node.get("companion.collapsed." + section, null);
+                if ("true".equals(chosen)) {
+                    return true;
+                }
+                if ("false".equals(chosen)) {
+                    return false;
+                }
+                return ifNeverChosen;
             }
 
             @Override

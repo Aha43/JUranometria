@@ -244,6 +244,51 @@ public final class ChartOptionsControls {
         });
     }
 
+    /**
+     * These controls as the Controls companion holds them (#443, ruled
+     * on #442): the four subjects as groups that each remember their
+     * own collapse - Deep sky introduced collapsed, the rest open - and
+     * Restore Defaults below them. The groups' collapse is the
+     * companion's presentation, kept in its store; what the boxes show
+     * is the controller's. The descriptions are wrapped narrow before
+     * the companion knows its width, and re-wrapped to the room their
+     * columns get whenever it changes.
+     */
+    public JComponent inCompanion(juranometria.ui.companion.CompanionStore store,
+                                  juranometria.ui.language.InterfaceText said) {
+        javax.swing.JPanel held = new javax.swing.JPanel();
+        held.setLayout(new javax.swing.BoxLayout(held,
+                javax.swing.BoxLayout.Y_AXIS));
+        for (Subject subject : subjects) {
+            held.add(juranometria.ui.companion.CompanionSection.remembered(
+                    "chartoptions." + subject.id(), subject.title(),
+                    subject.column(), said, store,
+                    subject.id().equals("deepsky")));
+        }
+        javax.swing.JPanel actions = new javax.swing.JPanel(
+                new java.awt.BorderLayout());
+        actions.setBorder(javax.swing.BorderFactory.createEmptyBorder(
+                10, 14, 12, 14));
+        actions.add(restoreDefaults, java.awt.BorderLayout.WEST);
+        held.add(actions);
+        ChartOptionsDialog.wrapDescriptions(held, NARROW_WRAP);
+        held.addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent event) {
+                ChartOptionsDialog.rewrapToColumns(held);
+            }
+        });
+        releaseWith(held);
+        return held;
+    }
+
+    /**
+     * The width descriptions are first wrapped at in the companion, before
+     * it is laid out: narrow enough never to make the companion wider
+     * than its own default asks.
+     */
+    static final int NARROW_WRAP = 200;
+
     /** Releases the subscription now. */
     public void release() {
         following.cancel();

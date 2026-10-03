@@ -51,8 +51,13 @@ public final class CompanionWindow extends JDialog {
     /** The width it opens at when nothing is remembered. */
     public static final int DEFAULT_WIDTH = 360;
 
-    /** The tallest it opens at; taller content scrolls. */
-    static final int DEFAULT_MAX_HEIGHT = 640;
+    /**
+     * The tallest it opens at; taller content scrolls, and the screen it
+     * is placed on caps it. Raised for Chart Options (#443): both
+     * sections, Deep sky collapsed, measured 782 px, which is ruled to
+     * fit a 900-tall screen.
+     */
+    static final int DEFAULT_MAX_HEIGHT = 900;
 
     private final CompanionStore store;
     private final InterfaceText said;
