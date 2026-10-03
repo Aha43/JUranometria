@@ -202,10 +202,12 @@ class NamedStarJourneyTest {
                     "the guaranteed label is really on the page while"
                             + " ordinary star labels are off");
 
-            // OK persists the choice; a restarted session reads it.
-            ReaderInput.click(button(dialog.getContentPane(), "OK"));
+            // The box saved the choice at once (#443); Close only
+            // closes; a restarted session reads it.
+            ReaderInput.click(button(dialog.getContentPane(), "Close"));
             assertFalse(store.load().starNames(),
-                    "OK persisted the choice");
+                    "the box saved the choice, and Close took nothing"
+                            + " back");
             assertFalse(new ChartOptionsController(store).options()
                             .starNames(),
                     "a restart honours exactly what was confirmed");
@@ -229,16 +231,18 @@ class NamedStarJourneyTest {
             assertFalse(chart[0].scene().title().contains("Cru"),
                     "the panned chart titles by coordinates, honestly");
 
-            // Restore Defaults + OK through the dialog, then Home: the
+            // Restore Defaults (asked first, confirmed, saved at once
+            // - #443) + Close through the dialog, then Home: the
             // journey ends on the exact released default chart.
             SwingUtilities.invokeAndWait(() ->
                     frame[0].getJMenuBar().getMenu(0).getItem(0).doClick());
             flush();
             JDialog reopened = optionsDialog();
             ReaderInput.chooseTab(tabbedPane(reopened), "Stars");
-            ReaderInput.click(button(reopened.getContentPane(),
-                    "Restore Defaults"));
-            ReaderInput.click(button(reopened.getContentPane(), "OK"));
+            ReaderInput.clickThenAnswer(button(reopened.getContentPane(),
+                    "Restore Defaults"), "Restore Defaults",
+                    "Restore Defaults");
+            ReaderInput.click(button(reopened.getContentPane(), "Close"));
             ReaderInput.click(button(frame[0].getContentPane(),
                     "Reset view"));
             assertEquals(ChartOptions.DEFAULTS, store.load());

@@ -364,7 +364,8 @@ class SprintThirtyOneJourneyTest {
                     "and one more brings them back");
             assertFalse(namesDrawn(chart, options).isEmpty(),
                     "onto the page, where they were");
-            press(button(dialog, "OK"));
+            // Each press was saved at once (#443); Close only closes.
+            press(button(dialog, "Close"));
             flush();
 
             // ---- 4b. the chart's own keyboard, which this sprint
@@ -572,8 +573,11 @@ class SprintThirtyOneJourneyTest {
                     "and so does the ecliptic");
             choose(window[0], "Chart Options...");
             JDialog again = dialogTitled("Chart Options");
-            press(onEdt(() -> button(again, "Restore Defaults")));
-            press(onEdt(() -> button(again, "OK")));
+            // Asked first and confirmed: saved at once (#443).
+            ReaderInput.clickThenAnswer(
+                    onEdt(() -> button(again, "Restore Defaults")),
+                    "Restore Defaults", "Restore Defaults");
+            press(onEdt(() -> button(again, "Close")));
             flush();
             assertEquals(ChartOptions.DEFAULTS, onEdt(options::options),
                     "and the chart the reader started with is the chart"

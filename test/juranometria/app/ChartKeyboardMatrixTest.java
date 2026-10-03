@@ -63,10 +63,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * exactly the sort of mistake that hides in the sixteen switches
  * nobody wrote a case for (review, #312).
  *
- * <p>The GUI route presses <strong>OK</strong>. The dialog's checkbox
- * previews and its OK commits; comparing an uncommitted preview with
- * the keyboard's committed action compares two different things and
- * would pass with a broken OK.
+ * <p>Since #443 both routes save at once: the dialog's checkbox, like
+ * the keyboard's letter, is one accepted change, and the GUI route then
+ * presses <strong>Close</strong>, which takes nothing back. The
+ * comparison is between two saved values, read back from the store.
  */
 class ChartKeyboardMatrixTest {
 

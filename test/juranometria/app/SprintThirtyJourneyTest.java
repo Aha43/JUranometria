@@ -513,15 +513,16 @@ class SprintThirtyJourneyTest {
                     "which shows what the chart is doing now");
             ReaderInput.click(galaxies);
             assertEquals(wanted, onEdt(() -> options.options().galaxies()),
-                    "and pressing it previews on the chart at once");
-            // OK, which is what makes a preview a choice. Disposing
-            // the dialog instead leaves the reader's option in
-            // whatever state a preview happened to be in, and the
-            // journey would be asserting about a dialog it abandoned.
+                    "and pressing it changes the chart at once");
+            // Close, through the reader's own button. Since #443 the
+            // box's press was already the choice, saved at once;
+            // closing takes nothing back. Disposing the dialog instead
+            // would leave the journey asserting about a dialog it
+            // abandoned rather than one a reader closed.
             ReaderInput.click(onEdt(() -> mustFind(
-                    dialog.getContentPane(), "OK")));
+                    dialog.getContentPane(), "Close")));
             assertTrue(onEdt(() -> optionsDialog() == null),
-                    "and OK closes the dialog");
+                    "and Close closes the dialog");
             assertEquals(wanted, onEdt(() -> options.options().galaxies()),
                     "with the option kept");
 
@@ -850,7 +851,7 @@ class SprintThirtyJourneyTest {
             ReaderInput.click(onEdt(() -> checkBox(again.getContentPane(),
                     juranometria.ui.language.SymbolFamilyText.in(juranometria.ui.language.InterfaceText.forLanguage("en")).label(juranometria.render.SymbolFamily.GALAXIES))));
             ReaderInput.click(onEdt(() -> mustFind(
-                    again.getContentPane(), "OK")));
+                    again.getContentPane(), "Close")));
             assertEquals(before.galaxies(),
                     onEdt(() -> options.options().galaxies()),
                     "and the reader put their option back with the same"

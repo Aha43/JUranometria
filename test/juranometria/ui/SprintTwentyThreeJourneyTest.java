@@ -263,42 +263,57 @@ class SprintTwentyThreeJourneyTest {
                         + " reciting the facts of a mark nobody can"
                         + " see: " + inspector.lines());
 
-        // 8. Cancel, through the dialog's own button: it restores
-        // the options it was opened with, and does not reach across
-        // into navigation to undo a transition it never made.
-        ChartOptions atOpen = options.options();
-        clickDialogButton("Cancel");
+        // 8. Shared immediate (#443): nothing takes a change back,
+        // so the reader puts the two families back with their own
+        // boxes - each saved at once - and Close only closes. Putting
+        // them back does not reach across into navigation to undo a
+        // transition the options never made.
+        assertFalse(ChartOptionsStore.forNode(store).load().galaxies(),
+                "the premise: the hidden family was saved at once");
+        clickFamily(SymbolFamily.GALAXIES);
+        clickFamily(SymbolFamily.NEBULAE);
+        clickDialogButton("Close");
+        assertNull(optionsDialog(), "Close closed the dialog");
         assertTrue(drawnIds().contains(M33),
-                "Cancel put the families back: " + drawnIds());
+                "the reader's own clicks put the families back: "
+                        + drawnIds());
         assertNull(navigation.state().targetIdentity(),
                 "and left the target retired, as decided");
 
-        // Restore Defaults previews the released chart - and Cancel
-        // undoes even that, which is the reader's protection against
-        // a button that would otherwise discard the settings they
-        // arrived with.
+        // Restore Defaults is asked first, and declining it changes
+        // nothing - which is the reader's protection against a button
+        // that would otherwise discard the settings they arrived with
+        // (before #443, Cancel undoing a previewed restore was).
         ChartOptions theirs = options.options();
         assertFalse(theirs.flamsteedNumbers(),
                 "the premise: the reader's store differs from the"
                         + " released defaults");
         openOptionsDialog();
-        clickDialogButton("Restore Defaults");
-        assertEquals(ChartOptions.DEFAULTS, options.options(),
-                "Restore Defaults is the released chart");
-        assertNull(navigation.state().targetIdentity(),
-                "and does not resurrect a retired target");
-        clickDialogButton("Cancel");
+        javax.swing.JButton restore = find(dialogPane,
+                javax.swing.JButton.class, "Restore Defaults");
+        assertNotNull(restore, "Restore Defaults is a button in the"
+                + " dialog");
+        ReaderInput.clickThenAnswer(restore, "Restore Defaults",
+                "Cancel");
+        flush();
+        awaitSettled();
         assertEquals(theirs, options.options(),
-                "Cancel gave the reader their own chart back,"
-                        + " Restore Defaults included");
+                "declining the question kept the reader's own chart");
+        assertEquals(theirs, ChartOptionsStore.forNode(store).load(),
+                "and saved nothing over it");
+        assertNull(navigation.state().targetIdentity(),
+                "and did not resurrect a retired target");
 
-        // And OK persists a deliberate choice.
-        openOptionsDialog();
+        // And a deliberate choice is saved by its box at once; Close
+        // closes.
         clickFamily(SymbolFamily.GLOBULAR_CLUSTERS);
         assertFalse(options.options().globularClusters(),
                 "the premise: a deliberate change to keep");
-        clickDialogButton("OK");
-        assertNull(optionsDialog(), "OK closed the dialog");
+        assertFalse(ChartOptionsStore.forNode(store).load()
+                        .globularClusters(),
+                "the box saved it at once");
+        clickDialogButton("Close");
+        assertNull(optionsDialog(), "Close closed the dialog");
 
         // Home, from the toolbar control a reader presses.
         SwingUtilities.invokeAndWait(
@@ -345,7 +360,7 @@ class SprintTwentyThreeJourneyTest {
                             + " in which nothing has been searched"
                             + " for");
             assertFalse(restarted.options.options().globularClusters(),
-                    "it reads back what OK persisted");
+                    "it reads back what the box saved (#443)");
             assertFalse(restarted.options.options().flamsteedNumbers(),
                     "and still has the choice the reader arrived"
                             + " with, which nothing in this journey"

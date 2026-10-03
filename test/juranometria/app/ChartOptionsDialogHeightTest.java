@@ -113,7 +113,8 @@ class ChartOptionsDialogHeightTest {
      * Whether the dialog's action buttons are still where a reader
      * can use them: inside the window, inside the screen's usable
      * area, and reachable by Tab. A scroll bar answers a tab that is
-     * too tall; nothing answers an OK button under a taskbar.
+     * too tall; nothing answers a Close button under a taskbar.
+     * Since #443 the action buttons are Close and Restore Defaults.
      */
     private static String actionButtons(JFrame frame) {
         Rectangle usable = frame.getGraphicsConfiguration().getBounds();
@@ -125,7 +126,7 @@ class ChartOptionsDialogHeightTest {
         java.util.List<String> lost = new java.util.ArrayList<>();
         java.util.List<String> unreachable = new java.util.ArrayList<>();
         for (String name
-                : java.util.List.of("OK", "Cancel", "Restore Defaults")) {
+                : java.util.List.of("Close", "Restore Defaults")) {
             javax.swing.AbstractButton button =
                     button(frame.getContentPane(), name);
             if (button == null || !button.isShowing()) {
@@ -206,7 +207,7 @@ class ChartOptionsDialogHeightTest {
                                 + measured[0] + " px on a screen that"
                                 + " allows " + measured[1]);
                 assertEquals("on screen, tab-reachable", verdict[0],
-                        "OK, Cancel and Restore Defaults at " + textScale
+                        "Close and Restore Defaults at " + textScale
                                 + "x text");
 
                 // The tab strip is the other thing scrolling cannot

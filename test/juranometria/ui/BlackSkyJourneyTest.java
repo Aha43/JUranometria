@@ -23,6 +23,7 @@ import juranometria.render.ChartOptions;
 import juranometria.render.ChartPalette;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -32,9 +33,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * the production paths: the real View menu, the real Chart tab and
  * its Black sky control pressed as a reader presses them, the
  * production controller, persistence, and the real chart component's
- * own painted pixels. The switch is repaint-only, Cancel reverts,
- * OK persists across a restart, Restore Defaults returns to white
- * paper, and neither direction of the theme/chart boundary leaks:
+ * own painted pixels. The switch is repaint-only and saved at once
+ * (#443: there is no Cancel; the reader takes it back with the same
+ * box), it persists across a restart, Restore Defaults (asked first)
+ * returns to white paper, and neither direction of the theme/chart boundary leaks:
  * choosing a ground changes no chrome, and changing the theme
  * changes no ground. Requires a display; aborted by assumption on
  * headless runners, where the renderer, store and dialog layers are
@@ -118,22 +120,31 @@ class BlackSkyJourneyTest {
                     pageGround(chart[0]),
                     "the component's own pixels wear the black sky");
 
-            // Cancel is a real revert: white paper back, nothing
-            // persisted.
-            ReaderInput.click(button(dialog.getContentPane(), "Cancel"));
+            // Shared immediate (#443): the click is the chart and is
+            // saved at once - there is no preview left to cancel.
+            assertEquals(ChartPalette.BLACK_SKY, store.load().palette(),
+                    "the box saved the black sky at once");
+
+            // Taking it back is the reader's own gesture now: the same
+            // box again, which is white paper, saved at once. Close
+            // then closes and takes nothing back.
+            ReaderInput.click(box(dialog.getContentPane(), "Black sky"));
+            ReaderInput.click(button(dialog.getContentPane(), "Close"));
             flush();
+            assertFalse(dialog.isDisplayable(), "Close closed the dialog");
             assertEquals(ChartPalette.WHITE_PAPER,
                     options.options().palette(),
-                    "Cancel reverts the preview");
+                    "the second click took the black sky back");
             assertEquals(ChartPalette.WHITE_PAPER,
                     store.load().palette(),
-                    "and persisted nothing");
+                    "and saved white paper at once");
             assertEquals(ChartPalette.WHITE_PAPER.ground().getRGB(),
                     pageGround(chart[0]),
                     "the page is paper again");
 
-            // Choose it for real: reopen, choose, OK. A restarted
-            // session reads the black sky back.
+            // Choose it for real: reopen, choose, Close. The box saved
+            // it at once (#443); a restarted session reads the black
+            // sky back.
             SwingUtilities.invokeAndWait(() ->
                     frame[0].getJMenuBar().getMenu(0).getItem(0)
                             .doClick());
@@ -142,15 +153,17 @@ class BlackSkyJourneyTest {
             ReaderInput.chooseTab(tabsIn(again.getContentPane()),
                     "Chart");
             ReaderInput.click(box(again.getContentPane(), "Black sky"));
-            ReaderInput.click(button(again.getContentPane(), "OK"));
+            assertEquals(ChartPalette.BLACK_SKY, store.load().palette(),
+                    "the box saved the reader's sky at once");
+            ReaderInput.click(button(again.getContentPane(), "Close"));
             flush();
             assertEquals(ChartPalette.BLACK_SKY, store.load().palette(),
-                    "OK persisted the reader's sky");
+                    "and Close took nothing back");
             assertEquals(ChartPalette.BLACK_SKY,
                     new ChartOptionsController(store).options()
                             .palette(),
                     "a restarted session reads exactly what was"
-                            + " confirmed");
+                            + " chosen");
 
             // The other direction of the boundary: the application
             // theme, either way, never alters the chart choice or
@@ -188,9 +201,11 @@ class BlackSkyJourneyTest {
                             .doClick());
             flush();
             JDialog last = optionsDialog();
-            ReaderInput.click(button(last.getContentPane(),
-                    "Restore Defaults"));
-            ReaderInput.click(button(last.getContentPane(), "OK"));
+            // Asked first and confirmed: saved at once (#443).
+            ReaderInput.clickThenAnswer(button(last.getContentPane(),
+                    "Restore Defaults"), "Restore Defaults",
+                    "Restore Defaults");
+            ReaderInput.click(button(last.getContentPane(), "Close"));
             flush();
             assertEquals(ChartOptions.DEFAULTS, store.load(),
                     "Restore Defaults returns to the released chart,"
