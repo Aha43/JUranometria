@@ -501,7 +501,8 @@ class DeepSkyFamilyJourneyTest {
                     "and the journey never touched a preference"
                             + " outside the chart's own");
             openDialog();
-            ReaderInput.click(button(dialogPane, "Restore Defaults"));
+            ReaderInput.clickThenAnswer(button(dialogPane, "Restore Defaults"),
+                    "Restore Defaults", "Restore Defaults");
             flush();
             for (SymbolFamily family : SymbolFamily.values()) {
                 assertTrue(familyBox(family).isSelected(),
@@ -722,7 +723,7 @@ class DeepSkyFamilyJourneyTest {
     private void closeDialog() throws Exception {
         JDialog dialog = optionsDialog();
         if (dialog != null) {
-            ReaderInput.click(button(dialogPane, "Cancel"));
+            ReaderInput.click(button(dialogPane, "Close"));
             flush();
         }
     }
@@ -730,7 +731,7 @@ class DeepSkyFamilyJourneyTest {
     private void closeDialogWithOk() throws Exception {
         JDialog dialog = optionsDialog();
         if (dialog != null) {
-            ReaderInput.click(button(dialogPane, "OK"));
+            ReaderInput.click(button(dialogPane, "Close"));
             flush();
         }
     }

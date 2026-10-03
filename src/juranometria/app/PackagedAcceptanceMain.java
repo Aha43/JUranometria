@@ -447,6 +447,7 @@ public final class PackagedAcceptanceMain {
         solarSystemSheetJourney();
         zoomLockJourney();
         companionJourney();
+        chartOptionsJourney();
 
         System.out.println("PACKAGED ACCEPTANCE OK");
     }
@@ -573,6 +574,118 @@ public final class PackagedAcceptanceMain {
                 + " crescent with its lit side, a four-row range with its"
                 + " appended end, and the Norwegian surface, all inside the"
                 + " image)");
+    }
+
+    /**
+     * Chart Options, shared immediate, inside the packaged image (#443,
+     * PR 1; ruled on #442): the dialog's content follows the
+     * controller, so a letter on the chart keyboard - driven by its own
+     * route - is shown at once; a click writes its own field into the
+     * current value and saves it, never the dialog's stale value of
+     * every other; Restore Defaults is asked first and, declined,
+     * changes nothing, and confirmed is saved; and the content's
+     * subscription is released when it is. Headless, on a scratch
+     * store in the bundled runtime's preferences.
+     */
+    private static void chartOptionsJourney() throws Exception {
+        Preferences scratch = Preferences.userRoot()
+                .node("juranometria-packaged-chartoptions-" + System.nanoTime());
+        try {
+            ChartOptionsStore store = ChartOptionsStore.forNode(scratch);
+            ChartOptionsController controller = new ChartOptionsController(store);
+            ChartSwitches keyboard = ChartSwitches.of(controller,
+                    new ChartSwitches.Ecliptic() {
+                        public boolean showing() {
+                            return false;
+                        }
+
+                        public void toggle() {
+                        }
+                    }, new ChartSwitches.ObserverLines() {
+                        public boolean meridianShowing() {
+                            return false;
+                        }
+
+                        public boolean horizonShowing() {
+                            return false;
+                        }
+
+                        public void showing(boolean meridian, boolean horizon) {
+                        }
+                    });
+            boolean[] answer = {false};
+            javax.swing.JComponent[] content = new javax.swing.JComponent[1];
+            javax.swing.SwingUtilities.invokeAndWait(() -> content[0] =
+                    ChartOptionsDialog.content(controller, () -> { },
+                            () -> answer[0],
+                            juranometria.ui.language.InterfaceText.forLanguage("en")));
+            require(controller.subscribers() == 1, "the content follows once");
+            javax.swing.SwingUtilities.invokeAndWait(
+                    () -> keyboard.toggle("chart.equatorialGrid"));
+            javax.swing.JCheckBox grid = optionsBox(content[0],
+                    "Equatorial coordinate grid");
+            require(!grid.isSelected(), "the keyboard's change is shown at once");
+            javax.swing.SwingUtilities.invokeAndWait(() ->
+                    optionsBox(content[0], "Title block").doClick());
+            require(!controller.options().equatorialGrid()
+                            && !controller.options().titleBlock()
+                            && !store.load().equatorialGrid()
+                            && !store.load().titleBlock(),
+                    "a click writes its own field and is saved, never the"
+                            + " stale value of the others");
+            juranometria.render.ChartOptions before = controller.options();
+            javax.swing.JButton restore = optionsButton(content[0], "Restore Defaults");
+            javax.swing.SwingUtilities.invokeAndWait(restore::doClick);
+            require(controller.options().equals(before),
+                    "Restore Defaults, declined, changes nothing");
+            answer[0] = true;
+            javax.swing.SwingUtilities.invokeAndWait(restore::doClick);
+            require(controller.options().equals(juranometria.render.ChartOptions.DEFAULTS)
+                            && store.load().equals(juranometria.render.ChartOptions.DEFAULTS),
+                    "Restore Defaults, confirmed, is saved at once");
+            require(optionsButton(content[0], "OK") == null
+                            && optionsButton(content[0], "Cancel") == null
+                            && optionsButton(content[0], "Close") != null,
+                    "no OK and no Cancel: Close only closes");
+        } finally {
+            scratch.removeNode();
+        }
+        System.out.println("chart options OK (the dialog follows the keyboard;"
+                + " a click writes its own field and is saved; Restore"
+                + " Defaults asked first; no OK, no Cancel)");
+    }
+
+    private static javax.swing.JCheckBox optionsBox(java.awt.Component root,
+                                                    String accessibleName) {
+        if (root instanceof javax.swing.JCheckBox box && accessibleName.equals(
+                box.getAccessibleContext().getAccessibleName())) {
+            return box;
+        }
+        if (root instanceof java.awt.Container container) {
+            for (java.awt.Component child : container.getComponents()) {
+                javax.swing.JCheckBox found = optionsBox(child, accessibleName);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
+    }
+
+    private static javax.swing.JButton optionsButton(java.awt.Component root,
+                                                     String text) {
+        if (root instanceof javax.swing.JButton button && text.equals(button.getText())) {
+            return button;
+        }
+        if (root instanceof java.awt.Container container) {
+            for (java.awt.Component child : container.getComponents()) {
+                javax.swing.JButton found = optionsButton(child, text);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
     }
 
     /**

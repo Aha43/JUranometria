@@ -1,8 +1,9 @@
 # Chart Options in the Controls companion
 
-Sprint 40, issue #442. **Proposed — awaiting the owner's ruling.** No
-production Chart Options companion exists; this record is what #443
-would build. The study is `docs/studies/chart-options-companion/`
+Sprint 40, issue #442. **Ruled by the owner (2026-10-03)** — see
+[The ruling](#the-ruling) at the end, which governs where it differs
+from the proposal. #443 builds it in two pull requests; the first
+makes the existing dialog shared immediate. The study is `docs/studies/chart-options-companion/`
 (`make chart-options-companion-study`).
 
 > A persistent control panel tells the truth about the chart now. It must
@@ -248,13 +249,57 @@ proposed.
    and the evidence. The owner's packaged checkpoint is on this one,
    before it merges.
 
-## Questions for the owner
+## The ruling
 
-1. Semantics: **1, shared immediate**?
-2. Layout: **independently collapsible groups**, with the old dialog
-   keeping its tabs?
-3. Default: Chart Options expanded, with **Deep sky collapsed** and the
-   rest open?
-4. Restore Defaults: immediate as proposed, or immediate **after a
-   confirmation** ("Reset all chart choices?")?
-5. Split: **A** or **B**?
+1. **Shared immediate.**
+   - Every accepted change updates the chart and persists at once.
+   - The companion, the old dialog, the keyboard and the View switches
+     all show the same current value.
+   - Each control changes only its own field in the controller's
+     latest value.
+   - The old dialog loses OK and Cancel and gains **Close**; the close
+     box and Escape close without reverting anything.
+2. **Four independently collapsible subject groups** in the companion:
+   Deep sky, Stars, Constellations, Chart.
+   - Each group remembers its own collapse, and more than one may stay
+     open; it is not an accordion.
+   - The old dialog keeps its tabs. Both hosts share the controls and
+     the semantics, not the layout.
+3. **First appearance:**
+   - the outer Chart Options section is expanded;
+   - Deep sky is collapsed;
+   - Stars, Constellations and Chart are open.
+
+   After that, every collapse is remembered.
+4. **Restore Defaults is immediate after an explicit confirmation**:
+   "Restore every chart option to the atlas defaults?", with Cancel as
+   the safe default. Confirmed, it is one authoritative change, saved at
+   once, and both presentations update together.
+5. **Two pull requests, both wide:**
+   1. The controller's notification and the shared-immediate old
+      dialog. This independently removes the reproduced defects.
+   2. The companion section, grouping, evidence and journeys, stopping
+      at the packaged owner checkpoint before merge.
+
+   The real wide dependency is not rearranged to seek the interaction
+   route.
+
+## A conditional precedent for capture refusals
+
+Recorded by the owner on #442 (2026-10-03). It is not a blanket
+exemption for `SheetCaptureSizingTest`.
+
+A safe capture refusal in gate 1 may continue to gates 2–7, the push
+and CI without another ruling **only when all of these hold**:
+
+1. The full refusal trace and its retained evidence exist.
+2. The refusal is a known fail-closed geometry transition.
+3. No generated artifact disagrees with committed bytes.
+4. No unrelated test fails.
+5. The change cannot affect capture sizing, window lifecycle,
+   generator behaviour or the refused surface.
+6. The local record calls the test unexecuted, never passed.
+7. The first CI `display` run executes that exact test successfully,
+   with zero failures, aborts or skips.
+
+If any condition is unclear, stop for a ruling.

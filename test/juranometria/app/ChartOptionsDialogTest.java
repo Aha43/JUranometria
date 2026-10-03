@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ChartOptionsDialogTest {
 
     @Test
-    void checkboxesBindLivePreviewDependenciesAndTheProtocol() throws Exception {
+    void aBoxAppliesAndSavesAtOnceAndTheDependenciesHold() throws Exception {
         Preferences node = Preferences.userRoot()
                 .node("juranometria-test-" + System.nanoTime());
         try {
@@ -32,22 +32,27 @@ class ChartOptionsDialogTest {
             store.save(new ChartOptions(true, true, true, false, true));
             ChartOptionsController controller =
                     new ChartOptionsController(store);
-            int[] cancelled = new int[1];
-            int[] confirmed = new int[1];
+            int[] closed = new int[1];
+            int[] asked = new int[1];
+            boolean[] answer = {false};
             JComponent content = ChartOptionsDialog.content(controller,
-                    () -> cancelled[0]++, () -> confirmed[0]++);
+                    () -> closed[0]++, () -> {
+                        asked[0]++;
+                        return answer[0];
+                    });
 
             // Controls display the persisted/current value honestly.
             assertTrue(box(content, "Deep-sky objects").isSelected());
             assertFalse(box(content, "Constellation boundaries").isSelected());
             assertTrue(box(content, "Deep-sky labels").isEnabled());
 
-            // Every change previews live through the controller.
+            // Shared immediate (#443): a click is the chart at once and
+            // is saved at once, as a letter on the chart keyboard is.
             box(content, "Constellation boundaries").doClick();
             assertTrue(controller.options().constellationBoundaries(),
-                    "a click previews immediately");
-            assertEquals(false, store.load().constellationBoundaries(),
-                    "previewing persists nothing");
+                    "a click is the chart at once");
+            assertEquals(true, store.load().constellationBoundaries(),
+                    "and is saved at once");
 
             // Dependency enablement: symbols off disables labels, which
             // remembers its state.
@@ -88,10 +93,19 @@ class ChartOptionsDialogTest {
                     "and leaves the other identifier layers alone");
             assertTrue(controller.options().flamsteedNumbers());
 
-            // Restore Defaults previews the released chart and re-enables
-            // every dependent control.
+            // Restore Defaults asks first; declined, nothing changes.
+            ChartOptions before = controller.options();
+            AboutDialogTest.button(content, "Restore Defaults").doClick();
+            assertEquals(1, asked[0], "the reader is asked first");
+            assertEquals(before, controller.options(),
+                    "declined, nothing changes");
+            // Confirmed, it is the released chart, saved, and every
+            // dependent control is usable again.
+            answer[0] = true;
             AboutDialogTest.button(content, "Restore Defaults").doClick();
             assertEquals(ChartOptions.DEFAULTS, controller.options());
+            assertEquals(ChartOptions.DEFAULTS, store.load(),
+                    "confirmed, it is saved at once");
             assertTrue(box(content, "Constellation names").isEnabled());
             assertTrue(box(content, "Constellation boundaries").isSelected());
             for (String control : new String[] {"Star names",
@@ -103,18 +117,19 @@ class ChartOptionsDialogTest {
                             .isSelected(),
                     "Restore Defaults includes the grid option");
 
-            // OK and Cancel run exactly their wired protocol actions.
-            AboutDialogTest.button(content, "OK").doClick();
-            assertEquals(1, confirmed[0]);
-            AboutDialogTest.button(content, "Cancel").doClick();
-            assertEquals(1, cancelled[0]);
+            // Close closes; there is no OK and no Cancel to take
+            // anything back.
+            assertEquals(null, AboutDialogTest.button(content, "OK"));
+            assertEquals(null, AboutDialogTest.button(content, "Cancel"));
+            AboutDialogTest.button(content, "Close").doClick();
+            assertEquals(1, closed[0]);
         } finally {
             node.removeNode();
         }
     }
 
     @Test
-    void blackSkyPreviewsLiveDependsOnNothingAndRestoresToPaper()
+    void blackSkyAppliesAtOnceDependsOnNothingAndRestoresToPaper()
             throws Exception {
         // Sprint 26, issue #246: one persisted choice for the chart
         // ground on the Chart tab, previewing live like every other
@@ -128,7 +143,7 @@ class ChartOptionsDialogTest {
             ChartOptionsController controller =
                     new ChartOptionsController(store);
             JComponent content = ChartOptionsDialog.content(controller,
-                    () -> { }, () -> { });
+                    () -> { }, () -> true);
 
             assertFalse(box(content, "Black sky").isSelected(),
                     "the released chart is white paper");
@@ -139,10 +154,10 @@ class ChartOptionsDialogTest {
             box(content, "Black sky").doClick();
             assertEquals(juranometria.render.ChartPalette.BLACK_SKY,
                     controller.options().palette(),
-                    "the ground previews immediately");
-            assertEquals(juranometria.render.ChartPalette.WHITE_PAPER,
+                    "the ground changes immediately");
+            assertEquals(juranometria.render.ChartPalette.BLACK_SKY,
                     store.load().palette(),
-                    "previewing persists nothing");
+                    "and is saved at once");
             assertTrue(lookAndFeel
                             == javax.swing.UIManager.getLookAndFeel(),
                     "a chart-ground change never alters application"
@@ -161,7 +176,7 @@ class ChartOptionsDialogTest {
     }
 
     @Test
-    void theDialogIsSingleInstanceAndEscapeIsCancel() throws Exception {
+    void theDialogIsSingleInstanceAndClosingTakesNothingBack() throws Exception {
         Assumptions.assumeFalse(GraphicsEnvironment.isHeadless(),
                 "window behaviour needs a display; content is tested headless");
         Preferences node = Preferences.userRoot()
@@ -179,13 +194,13 @@ class ChartOptionsDialogTest {
             flush();
             assertEquals(1, openDialogCount(),
                     "opening twice never multiplies the dialog");
+            assertEquals(1, controller.subscribers(),
+                    "the open dialog follows the controller once");
 
-            // Preview a change, then Escape: the revert protocol runs.
+            // A change, then Escape: kept, saved, closed (#443).
             JDialog dialog = findDialog();
             SwingUtilities.invokeAndWait(() ->
                     box(dialog.getContentPane(), "Deep-sky objects").doClick());
-            assertFalse(controller.options().deepSkyObjects(),
-                    "premise: a live preview is active");
             SwingUtilities.invokeAndWait(() -> {
                 var action = dialog.getRootPane().getActionForKeyStroke(
                         javax.swing.KeyStroke.getKeyStroke(
@@ -194,67 +209,48 @@ class ChartOptionsDialogTest {
                         dialog.getRootPane(), 0, "escape"));
             });
             flush();
-            assertTrue(controller.options().deepSkyObjects(),
-                    "Escape reverts the preview to the open-time snapshot");
-            assertEquals(ChartOptions.DEFAULTS, store.load(),
-                    "Escape persists nothing");
             assertFalse(dialog.isDisplayable(), "Escape closes the dialog");
+            assertFalse(controller.options().deepSkyObjects(),
+                    "and takes nothing back");
+            assertFalse(store.load().deepSkyObjects(), "the change was saved");
+            assertEquals(0, controller.subscribers(),
+                    "closed, it follows nothing");
 
-            // The production OK wiring: preview a change, press the real
-            // OK button - the previewed value persists and the dialog
-            // closes (a swapped constructor callback would fail here).
-            SwingUtilities.invokeAndWait(() ->
-                    ChartOptionsDialog.open(frame[0], controller));
-            flush();
-            JDialog okDialog = findDialog();
-            SwingUtilities.invokeAndWait(() -> {
-                box(okDialog.getContentPane(), "Constellation boundaries")
-                        .doClick();
-                AboutDialogTest.button(okDialog.getContentPane(), "OK")
-                        .doClick();
-            });
-            flush();
-            assertFalse(okDialog.isDisplayable(), "OK closes the dialog");
-            assertFalse(store.load().constellationBoundaries(),
-                    "OK persists exactly the previewed options");
-            assertFalse(controller.options().constellationBoundaries());
-
-            // The production Cancel wiring: preview, press the real
-            // Cancel - reverted, nothing persisted, dialog closed.
-            SwingUtilities.invokeAndWait(() ->
-                    ChartOptionsDialog.open(frame[0], controller));
-            flush();
-            JDialog cancelDialog = findDialog();
-            SwingUtilities.invokeAndWait(() -> {
-                box(cancelDialog.getContentPane(), "Constellation figures")
-                        .doClick();
-                AboutDialogTest.button(cancelDialog.getContentPane(), "Cancel")
-                        .doClick();
-            });
-            flush();
-            assertFalse(cancelDialog.isDisplayable(), "Cancel closes");
-            assertTrue(controller.options().constellationFigures(),
-                    "Cancel reverts the preview");
-            assertFalse(store.load().constellationBoundaries(),
-                    "Cancel leaves the previously confirmed store alone");
-
-            // The production window-close wiring: same revert protocol.
+            // Close: the same.
             SwingUtilities.invokeAndWait(() ->
                     ChartOptionsDialog.open(frame[0], controller));
             flush();
             JDialog closeDialog = findDialog();
             SwingUtilities.invokeAndWait(() -> {
-                box(closeDialog.getContentPane(), "Deep-sky objects")
+                box(closeDialog.getContentPane(), "Constellation boundaries")
                         .doClick();
-                closeDialog.dispatchEvent(new java.awt.event.WindowEvent(
-                        closeDialog,
-                        java.awt.event.WindowEvent.WINDOW_CLOSING));
+                AboutDialogTest.button(closeDialog.getContentPane(), "Close")
+                        .doClick();
             });
             flush();
-            assertFalse(closeDialog.isDisplayable(),
+            assertFalse(closeDialog.isDisplayable(), "Close closes");
+            assertFalse(controller.options().constellationBoundaries());
+            assertFalse(store.load().constellationBoundaries());
+            assertEquals(0, controller.subscribers());
+
+            // The window's close box: the same.
+            SwingUtilities.invokeAndWait(() ->
+                    ChartOptionsDialog.open(frame[0], controller));
+            flush();
+            JDialog boxDialog = findDialog();
+            SwingUtilities.invokeAndWait(() -> {
+                box(boxDialog.getContentPane(), "Constellation figures")
+                        .doClick();
+                boxDialog.dispatchEvent(new java.awt.event.WindowEvent(
+                        boxDialog, java.awt.event.WindowEvent.WINDOW_CLOSING));
+            });
+            flush();
+            assertFalse(boxDialog.isDisplayable(),
                     "the window close button closes the dialog");
-            assertTrue(controller.options().deepSkyObjects(),
-                    "window close reverts the preview like Cancel");
+            assertFalse(controller.options().constellationFigures(),
+                    "and takes nothing back either");
+            assertFalse(store.load().constellationFigures());
+            assertEquals(0, controller.subscribers());
         } finally {
             SwingUtilities.invokeAndWait(() -> {
                 for (Window window : Window.getWindows()) {
@@ -324,7 +320,7 @@ class ChartOptionsDialogTest {
             ChartOptionsController controller = new ChartOptionsController(
                     ChartOptionsStore.forNode(node));
             JComponent content = ChartOptionsDialog.content(controller,
-                    () -> { }, () -> { });
+                    () -> { }, () -> false);
 
             java.util.Map<String, Character> inherited =
                     new java.util.LinkedHashMap<>();
@@ -377,7 +373,7 @@ class ChartOptionsDialogTest {
             ChartOptionsController controller = new ChartOptionsController(
                     ChartOptionsStore.forNode(node));
             JComponent content = ChartOptionsDialog.content(controller,
-                    () -> { }, () -> { });
+                    () -> { }, () -> false);
 
             assertEquals(box(content, "Constellation figures")
                             .getMnemonic(),
@@ -418,7 +414,7 @@ class ChartOptionsDialogTest {
             ChartOptionsController controller = new ChartOptionsController(
                     ChartOptionsStore.forNode(node));
             JComponent content = ChartOptionsDialog.content(controller,
-                    () -> { }, () -> { });
+                    () -> { }, () -> false);
 
             javax.swing.JTabbedPane tabs =
                     ChartOptionsDialog.tabsOf(content);
@@ -460,7 +456,7 @@ class ChartOptionsDialogTest {
     }
 
     @Test
-    void aFamilyPreviewsLiveAndTheMasterGovernsWithoutErasing()
+    void aFamilyAppliesAtOnceAndTheMasterGovernsWithoutErasing()
             throws Exception {
         Preferences node = Preferences.userRoot()
                 .node("juranometria-test-" + System.nanoTime());
@@ -468,11 +464,11 @@ class ChartOptionsDialogTest {
             ChartOptionsController controller = new ChartOptionsController(
                     ChartOptionsStore.forNode(node));
             JComponent content = ChartOptionsDialog.content(controller,
-                    () -> { }, () -> { });
+                    () -> { }, () -> false);
 
             box(content, "Nebulae").doClick();
             assertFalse(controller.options().nebulae(),
-                    "the family previews live on the chart");
+                    "the family changes on the chart at once");
             assertTrue(controller.options().galaxies(),
                     "and only that family");
 
@@ -507,7 +503,7 @@ class ChartOptionsDialogTest {
             ChartOptionsController controller = new ChartOptionsController(
                     ChartOptionsStore.forNode(node));
             JComponent content = ChartOptionsDialog.content(controller,
-                    () -> { }, () -> { });
+                    () -> { }, () -> true);
             box(content, "Galaxies").doClick();
             box(content, "Nebulae").doClick();
             box(content, "Deep-sky objects").doClick();
@@ -515,7 +511,7 @@ class ChartOptionsDialogTest {
             button(content, "Restore Defaults").doClick();
 
             assertEquals(ChartOptions.DEFAULTS, controller.options(),
-                    "Restore Defaults previews the released chart");
+                    "Restore Defaults, confirmed, is the released chart");
             for (juranometria.render.SymbolFamily family
                     : juranometria.render.SymbolFamily.values()) {
                 JCheckBox box = box(content, words().label(family));
@@ -523,45 +519,71 @@ class ChartOptionsDialogTest {
                 assertTrue(box.isEnabled(),
                         family + " is usable again");
             }
-            assertFalse(ChartOptionsStore.forNode(node).load()
-                            .equals(ChartOptions.DEFAULTS)
-                    && node.get("chart.galaxies", null) != null,
-                    "and nothing is persisted until OK");
+            assertEquals(ChartOptions.DEFAULTS,
+                    ChartOptionsStore.forNode(node).load(),
+                    "and is saved at once");
         } finally {
             node.removeNode();
         }
     }
 
+    /**
+     * The defects #442 reproduced, held closed (#443): with the dialog
+     * open, a letter on the chart keyboard turned the grid off; the
+     * dialog's box still showed it on, and the next click anywhere in
+     * the dialog wrote all seventeen of its boxes back, the grid's
+     * stale tick with them. The keyboard is driven by its own route,
+     * {@code ChartSwitches}, exactly as the application installs it.
+     */
     @Test
-    void cancelRevertsEveryFamilyToTheOpeningSnapshot() throws Exception {
+    void aChangeMadeElsewhereIsShownAndNoClickWritesItBack() throws Exception {
         Preferences node = Preferences.userRoot()
                 .node("juranometria-test-" + System.nanoTime());
         try {
             ChartOptionsStore store = ChartOptionsStore.forNode(node);
-            store.save(ChartOptions.DEFAULTS.withFamily(
-                    juranometria.render.SymbolFamily.OPEN_CLUSTERS, false));
             ChartOptionsController controller =
                     new ChartOptionsController(store);
-            ChartOptions opening = controller.options();
-            int[] cancelled = new int[1];
             JComponent content = ChartOptionsDialog.content(controller,
-                    () -> {
-                        controller.revertTo(opening);
-                        cancelled[0]++;
-                    }, () -> { });
+                    () -> { }, () -> false);
+            ChartSwitches keyboard = ChartSwitches.of(controller,
+                    new ChartSwitches.Ecliptic() {
+                        public boolean showing() {
+                            return false;
+                        }
 
-            box(content, "Galaxies").doClick();
-            box(content, "Planetary nebulae").doClick();
-            assertFalse(controller.options().galaxies());
+                        public void toggle() {
+                        }
+                    }, new ChartSwitches.ObserverLines() {
+                        public boolean meridianShowing() {
+                            return false;
+                        }
 
-            button(content, "Cancel").doClick();
+                        public boolean horizonShowing() {
+                            return false;
+                        }
 
-            assertEquals(1, cancelled[0]);
-            assertEquals(opening, controller.options(),
-                    "the whole opening snapshot comes back, families"
-                            + " included");
-            assertFalse(controller.options().openClusters(),
-                    "including the one that was already off");
+                        public void showing(boolean meridian, boolean horizon) {
+                        }
+                    });
+
+            keyboard.toggle("chart.equatorialGrid");
+            assertFalse(box(content, "Equatorial coordinate grid").isSelected(),
+                    "the open dialog shows what the keyboard did");
+
+            box(content, "Title block").doClick();
+            assertFalse(controller.options().equatorialGrid(),
+                    "a click writes its own field, not the dialog's stale"
+                            + " value of every other");
+            assertFalse(controller.options().titleBlock());
+            assertFalse(store.load().equatorialGrid(),
+                    "and the store agrees with the chart");
+
+            keyboard.toggle(ChartKeys.DEEP_SKY);
+            assertFalse(box(content, "Galaxies").isEnabled(),
+                    "a master the keyboard switched off disables its"
+                            + " children here too");
+            assertTrue(box(content, "Galaxies").isSelected(),
+                    "while their remembered choice stands");
         } finally {
             node.removeNode();
         }

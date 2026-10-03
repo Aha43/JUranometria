@@ -297,13 +297,12 @@ class ChartKeyboardMatrixTest {
                         box.getWidth() / 2, box.getHeight() / 2), 0);
                 flush();
 
-                // And the gesture the dialog asks for. Without this
-                // the comparison is between an uncommitted preview
-                // and the keyboard's committed action, and a broken
-                // OK route passes (review, #312).
-                JButton ok = onEdt(() -> button(dialog, "OK"));
-                assertNotNull(ok, "the dialog's own OK");
-                ReaderInput.click(ok);
+                // And the reader closes the window. Since #443 the box
+                // saved itself, as a letter does, so the comparison below
+                // is between two saved values; Close takes nothing back.
+                JButton close = onEdt(() -> button(dialog, "Close"));
+                assertNotNull(close, "the dialog's own Close");
+                ReaderInput.click(close);
                 flush();
             } finally {
                 SwingUtilities.invokeAndWait(dialog::dispose);

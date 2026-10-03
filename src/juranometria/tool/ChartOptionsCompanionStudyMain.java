@@ -56,8 +56,9 @@ import juranometria.ui.placeandtime.PlaceStore;
  * open, or one open at a time), both companion sections together on a
  * short screen, and the groups with a master switch off. The action
  * rows each semantic would need are drawn with the production words
- * where they exist (Restore Defaults, Cancel, OK) and study words where
- * they do not yet (Close, Apply, Revert); none of them is a decision.
+ * where they exist and study words where they do not (since #443 the
+ * dialog has Close, and Cancel and OK are study words for the footer it
+ * used to have).
  *
  * <p>Painted off screen, as the contract's headless process requires;
  * the implementation's photographs will be of real windows. Standard output is the portable report; how tall and
@@ -88,6 +89,8 @@ public final class ChartOptionsCompanionStudyMain {
         boolean en = language.equals("en");
         return switch (what) {
             case "close" -> en ? "Close" : "Lukk";
+            case "cancel" -> en ? "Cancel" : "Avbryt";
+            case "ok" -> "OK";
             case "apply" -> en ? "Apply" : "Bruk";
             case "revert" -> en ? "Revert" : "Tilbakestill";
             case "pending" -> en
@@ -561,7 +564,12 @@ public final class ChartOptionsCompanionStudyMain {
         write(sized(wrap(shared), 420, Integer.MAX_VALUE),
                 stem + "7-dialog-shared-immediate.png");
         names.add(stem + "7-dialog-shared-immediate.png");
+        // The transactional footer the dialog had until #443, drawn by
+        // the study since production no longer has it.
         JComponent transactional = dialogContent(node, said, false);
+        replaceButtons(transactional, actions(said,
+                List.of(said.say("chartoptions.defaults.label")),
+                List.of(study(language, "cancel"), study(language, "ok")), null));
         write(sized(wrap(transactional), 420, Integer.MAX_VALUE),
                 stem + "8-dialog-transactional.png");
         names.add(stem + "8-dialog-transactional.png");

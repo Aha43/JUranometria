@@ -135,14 +135,15 @@ class ChartOptionsJourneyTest {
             assertFalse(options.options().deepSkyObjects(),
                     "Home leaves the chosen options alone");
 
-            // Restore Defaults and confirm: the released chart returns
-            // and persists; then a restarted session reads it.
-            ReaderInput.click(button(dialog.getContentPane(),
-                    "Restore Defaults"));
-            ReaderInput.click(button(dialog.getContentPane(), "OK"));
+            // Restore Defaults, asked first and confirmed: the released
+            // chart returns and is saved at once (#443); Close closes;
+            // then a restarted session reads it.
+            ReaderInput.clickThenAnswer(button(dialog.getContentPane(),
+                    "Restore Defaults"), "Restore Defaults", "Restore Defaults");
+            ReaderInput.click(button(dialog.getContentPane(), "Close"));
             assertEquals(ChartOptions.DEFAULTS, options.options());
             assertEquals(ChartOptions.DEFAULTS, store.load(),
-                    "OK persisted the restored defaults");
+                    "the confirmed defaults were saved at once");
             assertEquals(ChartOptions.DEFAULTS,
                     new ChartOptionsController(store).options(),
                     "a restarted session reads exactly what was confirmed");

@@ -438,4 +438,67 @@ public final class ReaderInput {
         return accessible != null ? accessible
                 : control.getClass().getSimpleName();
     }
+
+    /**
+     * Clicks a control that answers with a modal question, and answers
+     * it the way a reader does: the click runs on its own thread, since
+     * the question holds the click until it is answered; the question's
+     * window is found by its title and the answer pressed in it with the
+     * same pointer premises as any other click (#443: Restore Defaults
+     * asks first).
+     */
+    public static void clickThenAnswer(JComponent control, String question,
+                                       String answer) throws Exception {
+        Exception[] failed = new Exception[1];
+        Thread asking = new Thread(() -> {
+            try {
+                click(control);
+            } catch (Exception e) {
+                failed[0] = e;
+            }
+        }, "reader-asks");
+        asking.start();
+        javax.swing.JButton pressed = null;
+        for (int attempt = 0; attempt < 250 && pressed == null; attempt++) {
+            javax.swing.JButton[] found = new javax.swing.JButton[1];
+            SwingUtilities.invokeAndWait(() -> {
+                for (java.awt.Window window : java.awt.Window.getWindows()) {
+                    if (window instanceof javax.swing.JDialog dialog
+                            && dialog.isShowing()
+                            && question.equals(dialog.getTitle())) {
+                        found[0] = buttonIn(dialog, answer);
+                    }
+                }
+            });
+            pressed = found[0];
+            if (pressed == null) {
+                Thread.sleep(20);
+            }
+        }
+        assertTrue(pressed != null, "the question \"" + question
+                + "\" was asked, with the answer \"" + answer + "\"");
+        click(pressed);
+        asking.join(5000);
+        assertTrue(!asking.isAlive(), "answering let the click finish");
+        if (failed[0] != null) {
+            throw failed[0];
+        }
+    }
+
+    private static javax.swing.JButton buttonIn(java.awt.Container from,
+                                                String text) {
+        for (java.awt.Component child : from.getComponents()) {
+            if (child instanceof javax.swing.JButton button
+                    && text.equals(button.getText())) {
+                return button;
+            }
+            if (child instanceof java.awt.Container inner) {
+                javax.swing.JButton found = buttonIn(inner, text);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
+    }
 }

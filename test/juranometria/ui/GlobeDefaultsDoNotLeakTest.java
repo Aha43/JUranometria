@@ -202,13 +202,14 @@ class GlobeDefaultsDoNotLeakTest {
             ChartViewState before = navigation.state();
             assertEquals(180.0, before.fieldWidthDegrees());
 
+            // The transition the confirmed button runs (#443: the
+            // dialog asks first, and ChartOptionsDialogTest holds that
+            // question and both its answers).
             javax.swing.JComponent content = juranometria.app
                     .ChartOptionsDialog.contentForStudy(options);
-            javax.swing.JButton restore = buttonNamed(content,
-                    "Restore Defaults");
-            org.junit.jupiter.api.Assertions.assertNotNull(restore,
-                    "the reader's own route to this");
-            restore.doClick();
+            org.junit.jupiter.api.Assertions.assertNotNull(buttonNamed(content,
+                    "Restore Defaults"), "the reader's own route to this");
+            options.restoreDefaults();
 
             assertEquals(ChartOptions.DEFAULTS, options.options(),
                     "the layers are the released chart's again");
@@ -226,12 +227,9 @@ class GlobeDefaultsDoNotLeakTest {
                     navigation.state().fieldWidthDegrees(),
                     "nor the rung");
 
-            assertEquals(THE_READERS_OWN, store.load(),
-                    "and nothing is stored by a preview - the reader's"
-                            + " own choices are still on disk");
-            options.confirm();
             assertEquals(ChartOptions.DEFAULTS, store.load(),
-                    "OK stores the released layers");
+                    "Restore Defaults, confirmed, stores the released"
+                            + " layers at once (#443)");
             assertTrue(store.load().constellationBoundaries(),
                     "with boundaries ON: what is kept is the reader's"
                         + " chart, never the globe's view of it");

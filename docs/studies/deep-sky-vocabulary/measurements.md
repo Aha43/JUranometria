@@ -206,7 +206,7 @@ Real Swing controls under the real application themes, shown in a real window - 
 | [deep-sky-tab-short-screen-large-text](deep-sky-tab-short-screen-large-text.png) | light | 420 px | 1.5x | 728 px | 420x668 px | 12 | 0 | 4 rows | on screen, tab-reachable | - |
 | [tab-stars](tab-stars.png) | light | 420 px | 1.0x | 900 px | 420x547 px | 3 | 0 | no | on screen, tab-reachable | - |
 | [tab-constellations](tab-constellations.png) | light | 420 px | 1.0x | 900 px | 420x547 px | 3 | 0 | no | on screen, tab-reachable | - |
-| [tab-chart](tab-chart.png) | light | 420 px | 1.0x | 900 px | 420x547 px | 3 | 0 | no | on screen, tab-reachable | - |
+| [tab-chart](tab-chart.png) | light | 420 px | 1.0x | 900 px | 420x547 px | 4 | 0 | no | on screen, tab-reachable | - |
 
 The longest explanation is **Nebulae**, at 172 characters, and it is in every mock-up above rather than in one of its own: the row that wraps worst is the row the narrow and the enlarged layouts have to survive.
 
@@ -245,11 +245,12 @@ Why each one exists:
 | Chart | Equatorial coordinate grid | `E` |
 | Chart | Title block | `T` |
 | Chart | Stellar-magnitude key | `K` |
+| Chart | Black sky | `B` |
 | (buttons) | Restore Defaults | `R` |
 
 **No two controls on one tab share a letter**, which is the collision that would matter: a mnemonic only reaches the tab in front.
 
-Shared across tabs, harmlessly: F: Flamsteed numbers and Constellation figures. This pair collided in the single panel of the 1.2.0 dialog, where both controls were visible at once and one of the two was unreachable by its own letter. Separating them onto different tabs is what makes each letter unambiguous.
+Shared across tabs, harmlessly: F: Flamsteed numbers and Constellation figures; B: Constellation boundaries and Black sky. This pair collided in the single panel of the 1.2.0 dialog, where both controls were visible at once and one of the two was unreachable by its own letter. Separating them onto different tabs is what makes each letter unambiguous.
 
 A mnemonic reaches only the controls on the tab in front, which is a property of tabs rather than of this design: pressing a family's letter while the Stars tab shows does nothing. Tabs are therefore reached the way tabs are reached - Control-Page Up and Control-Page Down, or the arrow keys once a tab has focus - and no meaning anywhere depends on the pointer.
 

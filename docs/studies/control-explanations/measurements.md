@@ -63,9 +63,8 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Chart Options | JCheckBox | Title block | The panel in the lower left stating the target, centre, frame, field width, limiting ma... | The panel in the lower left stating the target, centre, frame, field width, limiting ma... | hovered |
 | Chart Options | JCheckBox | Stellar-magnitude key | A key in the upper right showing the circle size the chart draws for three visual magni... | A key in the upper right showing the circle size the chart draws for three visual magni... | hovered |
 | Chart Options | JCheckBox | Black sky | White stars and restrained light ink on a black ground, instead of the white-paper char... | White stars and restrained light ink on a black ground, instead of the white-paper char... | hovered |
-| Chart Options | JButton | Restore Defaults | Preview the atlas defaults: every layer and deep-sky family in this window on, the titl... | Returns every choice in this window to the atlas defaults. Like every change here, this... | hovered |
-| Chart Options | JButton | Cancel | &mdash; | Puts the chart back the way it was and closes this window. | self-explanatory |
-| Chart Options | JButton | OK | &mdash; | Keeps what the chart is showing now, and remembers it for next time. | self-explanatory |
+| Chart Options | JButton | Restore Defaults | Return to the atlas defaults: every layer and deep-sky family in this window on, the ti... | Returns every choice in this window to the atlas defaults, on the chart at once and rem... | hovered |
+| Chart Options | JButton | Close | &mdash; | Closes this window. Every change made here is already on the chart and remembered. | self-explanatory |
 | Place and Time | CommitField | (a field) | Degrees north of the equator, e.g. 59.913; south is negative, -90 to 90 | Degrees north of the equator, negative south, -90 to 90 | hovered |
 | Place and Time | CommitField | (a field) | Degrees east of Greenwich, e.g. 10.752; west is negative | Degrees east of Greenwich; west is negative | hovered |
 | Place and Time | CommitField | (a field) | The moment the lines are drawn for, as 2026-03-20 21:33:00 | The instant used to draw the reference lines. Time does not advance until you change it. | hovered |
@@ -124,7 +123,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 
 ## The audit
 
-**107 operable controls** across 14 surfaces: **67** hovered, **7** dynamic, **33** left to their own visible words, **0 undecided**.
+**106 operable controls** across 14 surfaces: **67** hovered, **7** dynamic, **32** left to their own visible words, **0 undecided**.
 
 **0** say the same words twice - a tooltip read back as a description. The seam refuses it, so this is zero or a finding.
 

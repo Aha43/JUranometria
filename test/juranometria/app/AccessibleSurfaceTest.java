@@ -105,7 +105,7 @@ class AccessibleSurfaceTest {
                 JComponent content = ChartOptionsDialog.content(
                         new ChartOptionsController(
                                 ChartOptionsStore.forNode(node)),
-                        () -> { }, () -> { });
+                        () -> { }, () -> false);
                 content.setSize(240, 500);
                 content.doLayout();
                 content.validate();
@@ -189,7 +189,7 @@ class AccessibleSurfaceTest {
                 collectUnnamed(ChartOptionsDialog.content(
                                 new ChartOptionsController(
                                         ChartOptionsStore.forNode(node)),
-                                () -> { }, () -> { }),
+                                () -> { }, () -> false),
                         "Chart Options", unnamed);
                 // The Inspector is a surface a reader operates too,
                 // and since #197 it carries a control of its own.
