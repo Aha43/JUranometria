@@ -80,6 +80,9 @@ public final class InterfacePhotographers {
         GENERATORS.put("PlaceAndTimeSheetMain",
                 new Photographer("placeandtime-strings.md",
                         SheetCapture.Kind.APPLICATION_SIZED));
+        GENERATORS.put("CompanionSheetMain",
+                new Photographer("companion-strings.md",
+                        SheetCapture.Kind.APPLICATION_SIZED));
         // No window to size.
         GENERATORS.put("SettingsSheetMain",
                 new Photographer("settings-strings.md",

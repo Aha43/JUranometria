@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**463 promoted artifacts.**
+**471 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -229,6 +229,14 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/interface-language/chartoptions-nb-NO-2.png` | `731a4b6adf31c959bb19a2449c24fd8142fbe99510a9561924972fe1bbbeeca3` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/chartoptions-nb-NO-3.png` | `12fe8c02c0a91080df7e549aec110eb003c294c411fbaf1050d73e2845845e42` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/chartoptions-nb-NO-4.png` | `b35c6d6449eec5ab9f24cc1c6ef1ae56cb35efbebeaca89b9cc50686300a1fae` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/companion-en-1-open.png` | `8f1d54550d854212f0da7aa93171b88454c9eaba81b7edd712d3b0eb8259bc52` | 2026-10-03 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/companion-en-2-dark.png` | `82da4f56609554e2a16fb70ca142e9e035375ea8aeb03a217850b4da55ecab76` | 2026-10-03 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/companion-en-3-collapsed.png` | `1b35fd9a52f6a960e6087c657b52acb654368415060cb8e341a7833cca922347` | 2026-10-03 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/companion-en-4-refused.png` | `4da81ba591196939cfc1b0761607cf04dbcc4978b3b55297dfc5b0631c26dd29` | 2026-10-03 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/companion-nb-NO-1-open.png` | `ba61d6c5aa89c28262350b1c78f4bb9593b95f6ae5bbaffe307d6052749d5ecc` | 2026-10-03 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/companion-nb-NO-2-dark.png` | `ad97a370059149a4c12d23af86361dbe394af274fdfb6d8abe7074a53ceaa6f4` | 2026-10-03 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/companion-nb-NO-3-collapsed.png` | `1eb066767aa5729f8ffd5723162f7d9bfeb966fac98a08fde79e29406a36035b` | 2026-10-03 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/companion-nb-NO-4-refused.png` | `f8de1ca94c3d65e08bb96339d892e7fd82d667c8ed36e2317368c7396aa61225` | 2026-10-03 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/export-en-1-svg-a4.png` | `1c91ddcc41364c55ae91af3e4caedbc2541557d716da6c267586be4b5aee20c5` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/export-en-2-pdf-letter.png` | `048e0f80b773f5e5cd7d4f4d91eb1061a90a27fd389eef845085b12b5541689f` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/export-en-3-png-a4.png` | `c37c79445fb4cb178e794fc5129fb9177d8b21450bd2321e24b5a945237bde8c` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
