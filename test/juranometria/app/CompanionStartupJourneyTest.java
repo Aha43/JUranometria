@@ -69,6 +69,49 @@ class CompanionStartupJourneyTest {
                         assertEquals(frame, companion.getOwner(),
                                 "owned by the chart window");
 
+                        // Chart Options, the second section (#443): its
+                        // groups as first introduced, and a box pressed in
+                        // it is what the Chart Options dialog then shows.
+                        assertEquals(2, companion.sections().size(),
+                                "Place and Time, then Chart Options");
+                        assertEquals("Chart Options, expanded",
+                                companion.sections().get(1).heading()
+                                        .getAccessibleContext().getAccessibleName());
+                        assertFalse(((javax.swing.AbstractButton) named(
+                                companion.getContentPane(),
+                                "heading.chartoptions.deepsky")).isSelected(),
+                                "Deep sky is introduced collapsed");
+                        assertTrue(((javax.swing.AbstractButton) named(
+                                companion.getContentPane(),
+                                "heading.chartoptions.stars")).isSelected(),
+                                "Stars open");
+                        javax.swing.JCheckBox grid = ChartOptionsDialogTest.box(
+                                companion.getContentPane(),
+                                "Equatorial coordinate grid");
+                        javax.swing.SwingUtilities.invokeAndWait(() ->
+                                grid.scrollRectToVisible(new java.awt.Rectangle(
+                                        grid.getSize())));
+                        flush();
+                        juranometria.ui.ReaderInput.click(grid);
+                        flush();
+                        assertFalse(grid.isSelected(), "the grid switched off");
+                        SwingUtilities.invokeAndWait(() -> menuItem(frame,
+                                "Chart Options...").doClick());
+                        flush();
+                        javax.swing.JDialog options = (javax.swing.JDialog) Arrays
+                                .stream(Window.getWindows())
+                                .filter(w -> w instanceof javax.swing.JDialog d
+                                        && w.isDisplayable()
+                                        && "Chart Options".equals(d.getTitle()))
+                                .findFirst().orElseThrow();
+                        assertFalse(ChartOptionsDialogTest.box(
+                                        options.getContentPane(),
+                                        "Equatorial coordinate grid").isSelected(),
+                                "pressed in the companion, shown by the dialog");
+                        juranometria.ui.ReaderInput.click(ChartOptionsDialogTest.button(
+                                options.getContentPane(), "Close"));
+                        flush();
+
                         // With the dialog already open, Now pressed in the
                         // companion with the pointer is the instant the
                         // open dialog then shows - it follows, it is not

@@ -301,6 +301,16 @@ public final class JUranometriaMain {
                 companionWords.say("placeandtime.title"),
                 new juranometria.ui.placeandtime.PlaceAndTimePanel(meridian,
                         placeStore, java.time.Instant::now, companionWords));
+        // Chart Options (#443, ruled on #442): the same controls class the
+        // dialog holds, over the same controller, as remembered groups;
+        // Restore Defaults asks over the companion.
+        companion.addSection("chartoptions",
+                companionWords.say("chartoptions.title"),
+                new ChartOptionsControls(chartOptions,
+                        () -> ChartOptionsDialog.restoreConfirmed(companion,
+                                companionWords),
+                        companionWords).inCompanion(companionStore,
+                        companionWords));
         shutdown.onShutdown(companion::dispose);
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.addWindowListener(new java.awt.event.WindowAdapter() {

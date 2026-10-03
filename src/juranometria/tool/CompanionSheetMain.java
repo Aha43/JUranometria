@@ -52,14 +52,20 @@ public final class CompanionSheetMain {
 
     /** One arrangement, and what it shows. */
     private record State(String name, boolean dark, boolean collapsed,
-                         String refused) {
+                         String refused, boolean deepSkyOpen) {
     }
 
+    /**
+     * Both sections in every state, as the application holds them since
+     * #443: Place and Time, then Chart Options with its subject groups
+     * as first introduced - Deep sky collapsed, the rest open.
+     */
     private static final List<State> STATES = List.of(
-            new State("open", false, false, null),
-            new State("dark", true, false, null),
-            new State("collapsed", false, true, null),
-            new State("refused", false, false, "91"));
+            new State("open", false, false, null, false),
+            new State("dark", true, false, null, false),
+            new State("collapsed", false, true, null, false),
+            new State("refused", false, false, "91", false),
+            new State("deep-sky-open", false, true, null, true));
 
     private CompanionSheetMain() {
     }
@@ -122,7 +128,7 @@ public final class CompanionSheetMain {
         }
         Files.writeString(out.resolve("companion-strings.md"),
                 said.toString(), StandardCharsets.UTF_8);
-        System.out.println("companion sheets: 8 images and "
+        System.out.println("companion sheets: 10 images and "
                 + out.resolve("companion-strings.md"));
     }
 
@@ -152,8 +158,19 @@ public final class CompanionSheetMain {
                         () -> PlaceAndTimeSheetMain.WHEN, words);
                 window[0].addSection("placeandtime",
                         words.say("placeandtime.title"), panel[0]);
+                CompanionStore companionStore = CompanionStore.forNode(node);
+                window[0].addSection("chartoptions",
+                        words.say("chartoptions.title"),
+                        new juranometria.app.ChartOptionsControls(
+                                new juranometria.app.ChartOptionsController(
+                                        juranometria.app.ChartOptionsStore.forNode(node)),
+                                () -> false, words).inCompanion(companionStore,
+                                words));
                 if (state.collapsed()) {
                     window[0].sections().get(0).heading().doClick();
+                }
+                if (state.deepSkyOpen()) {
+                    deepSkyHeading(window[0].sections().get(1)).doClick();
                 }
                 if (state.refused() != null) {
                     JTextField latitude = (JTextField) named(panel[0],
@@ -210,6 +227,12 @@ public final class CompanionSheetMain {
                 // An empty node is a blemish, not a failure.
             }
         }
+    }
+
+    /** The Deep sky group's heading inside the Chart Options section. */
+    private static javax.swing.AbstractButton deepSkyHeading(Component root) {
+        return (javax.swing.AbstractButton) named(root,
+                "heading.chartoptions.deepsky");
     }
 
     private static Component named(Component root, String name) {

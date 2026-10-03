@@ -166,3 +166,4 @@ daf7e6d12102006e	app/AppMenuBar.java	moonOnChartItem	declared name used, but nev
 96e86526f116c7d6	ui/AtlasToolbar.java	zoomLock	declared name used, but never at a known sink	identifier	the zoom-lock toggle's component name, which tests find it by; no language changes it
 43f2af373668c4ab	ui/ZoomLockStore.java	zoomLocked	declared name used, but never at a known sink	identifier	a stable preference key; no language changes it
 95d5e414fafa608c	app/AppMenuBar.java	companionItem	declared name used, but never at a known sink	identifier	the Controls item's component name, which tests find it by; no language changes it
+8ba6f4a187ce1230	ui/companion/CompanionStore.java	companion.collapsed.	declared name used, but never at a known sink	identifier	the prefix of the companion's stored collapse keys; a stable preference key, no language changes it

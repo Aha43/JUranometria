@@ -196,145 +196,13 @@ public final class ChartOptionsDialog extends JDialog {
                               Runnable close,
                               java.util.function.BooleanSupplier restoreConfirmed,
                               juranometria.ui.language.InterfaceText said) {
-        ChartOptions initial = controller.options();
-
-        JCheckBox dsos = checkBox(
-                said.say("chartoptions.deepSkyObjects.label"), 'D',
-                initial.deepSkyObjects(),
-                said.say("chartoptions.deepSkyObjects.a11y"),
-                said.say("chartoptions.deepSkyObjects.explain"),
-                ChartKeys.DEEP_SKY, said);
-        JCheckBox labels = checkBox(said.say("chartoptions.deepSkyLabels.label"), 'l', initial.deepSkyLabels(),
-                said.say("chartoptions.deepSkyLabels.a11y"),
-                said.say("chartoptions.deepSkyLabels.explain"),
-                "chart.deepSkyLabels", said);
-        List<JCheckBox> families = new ArrayList<>();
-        for (SymbolFamily family : SymbolFamily.values()) {
-            // Through the shared family-text seam (owner ruling,
-            // #350): Chart Options, the Inspector, the legends and
-            // exported furniture all ask the same question, and a
-            // translation written twice is one that drifts.
-            juranometria.ui.language.SymbolFamilyText families_ =
-                    juranometria.ui.language.SymbolFamilyText.in(said);
-            families.add(checkBox(families_.label(family),
-                    family.mnemonic(), initial.family(family),
-                    families_.accessibleName(family),
-                    families_.description(family),
-                    familyKey(family), said));
-        }
-
-        JCheckBox figures = checkBox(
-                said.say("chartoptions.constellationFigures.label"), 'f',
-                initial.constellationFigures(),
-                said.say("chartoptions.constellationFigures.a11y"),
-                said.say("chartoptions.constellationFigures.explain"),
-                ChartKeys.FIGURES, said);
-        JCheckBox boundaries = checkBox(said.say("chartoptions.constellationBoundaries.label"), 'b', initial.constellationBoundaries(),
-                said.say("chartoptions.constellationBoundaries.a11y"),
-                said.say("chartoptions.constellationBoundaries.explain"),
-                "chart.constellationBoundaries", said);
-        JCheckBox names = checkBox(said.say("chartoptions.constellationNames.label"), 'n', initial.constellationNames(),
-                said.say("chartoptions.constellationNames.a11y"),
-                said.say("chartoptions.constellationNames.explain"),
-                "chart.constellationNames", said);
-        JCheckBox starNames = checkBox(said.say("chartoptions.starNames.label"), 'S', initial.starNames(),
-                said.say("chartoptions.starNames.a11y"),
-                said.say("chartoptions.starNames.explain"),
-                "chart.starNames", said);
-        JCheckBox bayerLetters = checkBox(said.say("chartoptions.bayerLetters.label"), 'y', initial.bayerLetters(),
-                said.say("chartoptions.bayerLetters.a11y"),
-                said.say("chartoptions.bayerLetters.explain"),
-                "chart.bayerLetters", said);
-        JCheckBox flamsteedNumbers = checkBox(said.say("chartoptions.flamsteedNumbers.label"), 'F', initial.flamsteedNumbers(),
-                said.say("chartoptions.flamsteedNumbers.a11y"),
-                said.say("chartoptions.flamsteedNumbers.explain"),
-                "chart.flamsteedNumbers", said);
-        JCheckBox grid = checkBox(
-                said.say("chartoptions.equatorialGrid.label"), 'E',
-                initial.equatorialGrid(),
-                said.say("chartoptions.equatorialGrid.a11y"),
-                said.say("chartoptions.equatorialGrid.explain"),
-                "chart.equatorialGrid", said);
-        JCheckBox titleBlock = checkBox(
-                said.say("chartoptions.titleBlock.label"), 'T',
-                initial.titleBlock(),
-                said.say("chartoptions.titleBlock.a11y"),
-                said.say("chartoptions.titleBlock.explain"),
-                "chart.titleBlock", said);
-        JCheckBox magnitudeKey = checkBox(
-                said.say("chartoptions.magnitudeKey.label"), 'k',
-                initial.magnitudeKey(),
-                said.say("chartoptions.magnitudeKey.a11y"),
-                said.say("chartoptions.magnitudeKey.explain"),
-                "chart.magnitudeKey", said);
-        JCheckBox blackSky = checkBox(
-                said.say("chartoptions.blackSky.label"), 'B',
-                initial.palette() == ChartPalette.BLACK_SKY,
-                said.say("chartoptions.blackSky.a11y"),
-                said.say("chartoptions.blackSky.explain"),
-                "chart.blackSky", said);
-
-        // Each box and the switch it is: its keyboard id, the one
-        // registry both routes read.
-        java.util.Map<JCheckBox, String> switches = new java.util.LinkedHashMap<>();
-        switches.put(dsos, ChartKeys.DEEP_SKY);
-        for (int i = 0; i < families.size(); i++) {
-            switches.put(families.get(i), familyKey(SymbolFamily.values()[i]));
-        }
-        switches.put(labels, "chart.deepSkyLabels");
-        switches.put(starNames, "chart.starNames");
-        switches.put(bayerLetters, "chart.bayerLetters");
-        switches.put(flamsteedNumbers, "chart.flamsteedNumbers");
-        switches.put(figures, ChartKeys.FIGURES);
-        switches.put(boundaries, "chart.constellationBoundaries");
-        switches.put(names, "chart.constellationNames");
-        switches.put(grid, "chart.equatorialGrid");
-        switches.put(titleBlock, "chart.titleBlock");
-        switches.put(magnitudeKey, "chart.magnitudeKey");
-        switches.put(blackSky, "chart.blackSky");
-        for (java.util.Map.Entry<JCheckBox, String> each : switches.entrySet()) {
-            JCheckBox box = each.getKey();
-            String id = each.getValue();
-            // One field, onto the controller's current value: never a
-            // whole value assembled from these boxes, which may have
-            // been built before a change made elsewhere.
-            box.addActionListener(event -> controller.accept(
-                    ChartSwitches.withChart(controller.options(), id,
-                            box.isSelected())));
-        }
-
+        // The controls are ChartOptionsControls' - the same class the
+        // companion holds (#443); this dialog is one host of them, its
+        // tabs and its Close the only things that are its own.
+        ChartOptionsControls controls =
+                new ChartOptionsControls(controller, restoreConfirmed, said);
         JPanel panel = new JPanel(new BorderLayout());
-        // Following the controller: the ticks, and the two decided
-        // dependencies with the five families, which the master
-        // governs while they remember. setSelected fires no action,
-        // so following never writes.
-        ChartOptionsController.Subscription following =
-                controller.onChange(current -> {
-                    for (java.util.Map.Entry<JCheckBox, String> each
-                            : switches.entrySet()) {
-                        each.getKey().setSelected(ChartSwitches.isOn(current,
-                                each.getValue()));
-                    }
-                    labels.setEnabled(current.deepSkyObjects());
-                    names.setEnabled(current.constellationFigures());
-                    for (JCheckBox family : families) {
-                        family.setEnabled(current.deepSkyObjects());
-                    }
-                });
-        // Released when the window holding it is disposed, so reopening
-        // adds no listener.
-        boolean[] shown = new boolean[1];
-        panel.addHierarchyListener(event -> {
-            if ((event.getChangeFlags()
-                    & java.awt.event.HierarchyEvent.DISPLAYABILITY_CHANGED) == 0) {
-                return;
-            }
-            if (panel.isDisplayable()) {
-                shown[0] = true;
-            } else if (shown[0]) {
-                following.cancel();
-            }
-        });
+        controls.releaseWith(panel);
 
         JTabbedPane tabs = new JTabbedPane();
         // One row of tabs, always. The default wrapping layout moves
@@ -348,35 +216,16 @@ public final class ChartOptionsDialog extends JDialog {
         // a tab's own word is a box in the way of reading it.
         juranometria.ui.Explain.selfExplanatory(tabs,
                 said.say("chartoptions.tabs.explain"));
-        tabs.addTab(said.say("chartoptions.tab.deepsky"),
-                scrolling(deepSkyTab(dsos, families, labels, said)));
-        tabs.addTab(said.say("chartoptions.tab.stars"), scrolling(column(starNames, bayerLetters,
-                flamsteedNumbers)));
-        tabs.addTab(said.say("chartoptions.tab.constellations"), scrolling(column(figures, boundaries,
-                names)));
-        tabs.addTab(said.say("chartoptions.tab.chart"), scrolling(column(grid, titleBlock,
-                magnitudeKey, blackSky)));
+        for (ChartOptionsControls.Subject subject : controls.subjects()) {
+            tabs.addTab(subject.title(), scrolling(subject.column()));
+        }
         // After the tabs, not before: the strip builds its overflow
         // controls when it has tabs to overflow, so naming them first
         // named nothing at all and left the one control on this
         // window a reader cannot guess unexplained (#311 audit).
         nameTabStripControls(tabs, said);
 
-        JButton restore = new JButton(said.say("chartoptions.defaults.label"));
-        restore.setMnemonic('R');
-        restore.getAccessibleContext().setAccessibleName(
-                said.say("chartoptions.defaults.a11y"));
-        juranometria.ui.Explain.control(restore,
-                said.say("chartoptions.defaults.hover"),
-                said.say("chartoptions.defaults.explain"));
-        // Asked first, with Cancel the safe answer (ruled on #442):
-        // confirmed, it is one accepted change, saved, and every
-        // presentation shows it through its subscription.
-        restore.addActionListener(event -> {
-            if (restoreConfirmed.getAsBoolean()) {
-                controller.restoreDefaults();
-            }
-        });
+        JButton restore = controls.restoreDefaults();
         JButton closeButton = new JButton(said.say("chartoptions.close.label"));
         closeButton.getAccessibleContext().setAccessibleName(
                 said.say("chartoptions.close.a11y"));
@@ -449,7 +298,7 @@ public final class ChartOptionsDialog extends JDialog {
     }
 
     /** The Deep sky tab: master, five families as legend and control. */
-    private static JComponent deepSkyTab(JCheckBox master,
+    static JComponent deepSkyTab(JCheckBox master,
                                          List<JCheckBox> families,
                                          JCheckBox labels,
                                          juranometria.ui.language.InterfaceText
@@ -517,7 +366,7 @@ public final class ChartOptionsDialog extends JDialog {
      * which master it waits for. The greying that tells a sighted
      * reader is not a sentence.
      */
-    private static JCheckBox checkBox(String text, char mnemonic,
+    static JCheckBox checkBox(String text, char mnemonic,
                                       boolean selected,
                                       String accessibleName,
                                       String description, String key,
@@ -677,7 +526,7 @@ public final class ChartOptionsDialog extends JDialog {
     }
 
     /** The registry's name for a symbol family's switch. */
-    private static String familyKey(SymbolFamily family) {
+    static String familyKey(SymbolFamily family) {
         return switch (family) {
             case GALAXIES -> "chart.galaxies";
             case OPEN_CLUSTERS -> "chart.openClusters";
@@ -687,7 +536,7 @@ public final class ChartOptionsDialog extends JDialog {
         };
     }
 
-    private static JPanel column(JComponent... rows) {
+    static JPanel column(JComponent... rows) {
         JPanel panel = new ScrollableColumn();
         panel.setOpaque(false);
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -781,6 +630,51 @@ public final class ChartOptionsDialog extends JDialog {
 
     /** Where a wrapped label keeps the words it is wrapping. */
     private static final String WRAPPED_TEXT = "juranometria.wrappedText";
+
+    /**
+     * Wraps every description at one stated width - for a host that
+     * lays the controls out narrower than this dialog does, before it
+     * knows how much room they get (#443). The dialog never calls it.
+     */
+    static void wrapDescriptions(JComponent root, int width) {
+        for (Component control : wrappedLabels(root)) {
+            JLabel label = (JLabel) control;
+            label.setText(wrapped((String) label.getClientProperty(WRAPPED_TEXT),
+                    width, label.getFontMetrics(label.getFont())));
+        }
+        root.revalidate();
+    }
+
+    /**
+     * Re-wraps every description to the room its own column gives it,
+     * at most the explanation width - for a host whose width the reader
+     * changes (#443). A wrapped label is only as wide as its words, so
+     * the room is read from the column it sits in, not from the label.
+     * The dialog never calls it.
+     */
+    static void rewrapToColumns(JComponent root) {
+        for (Component control : wrappedLabels(root)) {
+            JLabel label = (JLabel) control;
+            Container column = label.getParent();
+            if (column == null || column.getWidth() <= 0) {
+                continue;
+            }
+            Insets room = column.getInsets();
+            Insets own = label.getInsets();
+            int available = column.getWidth() - room.left - room.right
+                    - own.left - own.right;
+            if (available <= 40) {
+                continue;
+            }
+            String text = wrapped((String) label.getClientProperty(WRAPPED_TEXT),
+                    Math.min(EXPLANATION_WIDTH, available),
+                    label.getFontMetrics(label.getFont()));
+            if (!text.equals(label.getText())) {
+                label.setText(text);
+            }
+        }
+        root.revalidate();
+    }
 
     /**
      * Sizes a window around this content, for the screen it is on.
