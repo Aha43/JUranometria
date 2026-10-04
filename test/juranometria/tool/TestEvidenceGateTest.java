@@ -784,7 +784,12 @@ class TestEvidenceGateTest {
                         + " journey reaches View's Controls and Place and"
                         + " Time items by the recorded menu-item"
                         + " convention, and presses the companion's own"
-                        + " control for real. A bound that bends when it is"
+                        + " control for real; #443's ChartOptionsControlsTest"
+                        + " is a headless content test of the dialog"
+                        + " content's own kind, driving one controls class"
+                        + " in its two hosts, and it takes the place #443's"
+                        + " first pull request freed when the globe test"
+                        + " stopped pressing Restore Defaults by doClick. A bound that bends when it is"
                         + " inconvenient is not a bound: " + doClick);
         assertTrue(postAction <= 4,
                 "postActionEvent survives only in the named mechanism"

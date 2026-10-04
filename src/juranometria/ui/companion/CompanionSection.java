@@ -59,6 +59,22 @@ public final class CompanionSection extends JPanel {
     }
 
     /**
+     * A section that remembers its own collapse in the companion's store,
+     * opening as the reader last left it - or, never chosen, as the host
+     * says (#443: a subject group inside a section). Its collapse is
+     * presentation, held by the store, never by what it shows.
+     */
+    public static CompanionSection remembered(String id, String title,
+                                              JComponent content,
+                                              InterfaceText said,
+                                              CompanionStore store,
+                                              boolean collapsedIfNeverChosen) {
+        return new CompanionSection(id, title, content, said,
+                store.collapsed(id, collapsedIfNeverChosen),
+                collapsed -> store.saveCollapsed(id, collapsed));
+    }
+
+    /**
      * A section, open and remembering nothing, for the audit that reads
      * what every control says (#311): the window that would hold it
      * needs a display, and the audit does not have one.

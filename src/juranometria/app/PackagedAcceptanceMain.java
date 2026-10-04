@@ -647,12 +647,42 @@ public final class PackagedAcceptanceMain {
                             && optionsButton(content[0], "Cancel") == null
                             && optionsButton(content[0], "Close") != null,
                     "no OK and no Cancel: Close only closes");
+
+            // The companion's host of the same controls (#443, PR 2):
+            // its groups as first introduced, agreeing with the dialog,
+            // and its collapse never the chart's options.
+            juranometria.ui.companion.CompanionStore companionStore =
+                    juranometria.ui.companion.CompanionStore.forNode(scratch);
+            javax.swing.JComponent[] companion = new javax.swing.JComponent[1];
+            javax.swing.SwingUtilities.invokeAndWait(() -> companion[0] =
+                    new ChartOptionsControls(controller, () -> false,
+                            juranometria.ui.language.InterfaceText.forLanguage("en"))
+                            .inCompanion(companionStore,
+                                    juranometria.ui.language.InterfaceText.forLanguage("en")));
+            javax.swing.AbstractButton deepSky = (javax.swing.AbstractButton)
+                    namedIn(companion[0], "heading.chartoptions.deepsky");
+            require(deepSky != null && !deepSky.isSelected()
+                            && ((javax.swing.AbstractButton) namedIn(companion[0],
+                                    "heading.chartoptions.chart")).isSelected(),
+                    "the companion introduces Deep sky collapsed, Chart open");
+            javax.swing.SwingUtilities.invokeAndWait(() ->
+                    optionsBox(companion[0], "Equatorial coordinate grid").doClick());
+            require(!optionsBox(content[0], "Equatorial coordinate grid").isSelected()
+                            && !store.load().equatorialGrid(),
+                    "a box in the companion is the dialog's and is saved");
+            juranometria.render.ChartOptions held = controller.options();
+            javax.swing.SwingUtilities.invokeAndWait(deepSky::doClick);
+            require(controller.options().equals(held) && deepSky.isSelected()
+                            && companionStore.collapsed("chartoptions.deepsky", true) == false,
+                    "a group's collapse is the companion's, never the chart's options");
         } finally {
             scratch.removeNode();
         }
         System.out.println("chart options OK (the dialog follows the keyboard;"
                 + " a click writes its own field and is saved; Restore"
-                + " Defaults asked first; no OK, no Cancel)");
+                + " Defaults asked first; no OK, no Cancel; the companion holds"
+                + " the same controls, Deep sky introduced collapsed, its"
+                + " collapse never the chart's)");
     }
 
     private static javax.swing.JCheckBox optionsBox(java.awt.Component root,
