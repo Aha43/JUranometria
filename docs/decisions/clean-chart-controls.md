@@ -4,7 +4,9 @@ Sprint 41, issue #449. **Ruled by the owner (2026-10-05)** — see
 [The ruling](#the-ruling) at the end, which governs where it differs
 from the proposal. The study is `docs/studies/clean-chart-controls/`
 (`make clean-chart-study`); the real-window reproduction is quoted
-below. #450 builds it in two pull requests; #451 hands it over.
+below. **Built** by #450 in two pull requests (#453, #454) and
+accepted by the owner on the packaged candidate `ae927816`; the
+account of what was built is `docs/reviews/sprint-41-handover.md`.
 
 > Hiding chart chrome does not disable the instrument.
 
