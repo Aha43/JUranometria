@@ -42,6 +42,7 @@ View menu, the observer's lines in Place and Time.
 
 | what it does | where it is bound |
 |---|---|
+| Chart Toolbar | the View menu |
 | Export Chart Sheet... | the File menu |
 | Inspector | the View menu |
 | Zoom In | the View menu |
@@ -52,7 +53,7 @@ View menu, the observer's lines in Place and Time.
 | chart.zoomIn | the window's own keys |
 | chart.zoomOut | the window's own keys |
 | chart.zoomOut | the window's own keys |
-| **10 strokes** | |
+| **11 strokes** | |
 
 Every one of them carries the platform's own menu modifier, and a text field
 under this look and feel answers dozens of editing strokes of its own - every

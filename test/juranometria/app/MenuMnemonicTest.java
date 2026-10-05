@@ -172,7 +172,8 @@ class MenuMnemonicTest {
         SwingUtilities.invokeAndWait(() -> bar[0] = AppMenuBar.create(
                 new ChartViewController(), () -> { }, () -> { }, () -> { },
                 () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
-                () -> { }, () -> { }, () -> { }, () -> { }, said));
+                () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
+                () -> { }, said));
         SwingUtilities.invokeAndWait(() -> { });
         SwingUtilities.invokeAndWait(() -> check.on(bar[0]));
     }

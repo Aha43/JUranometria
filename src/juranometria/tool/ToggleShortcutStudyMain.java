@@ -454,10 +454,13 @@ public final class ToggleShortcutStudyMain {
         // English, stated: this study records the keystrokes the
         // released English surface binds, and asking the default
         // locale would make it change with the machine (#350).
+        // The whole bar the application composes (#450): a binding
+        // the study did not see would be a binding it could offer twice.
         JMenuBar bar = AppMenuBar.create(
                 new juranometria.ui.ChartViewController(),
                 () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
-                () -> { }, () -> { }, () -> { },
+                () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
+                () -> { }, () -> { }, () -> { }, () -> { },
                 juranometria.ui.language.InterfaceText.forLanguage("en"));
         for (int menu = 0; menu < bar.getMenuCount(); menu++) {
             JMenu each = bar.getMenu(menu);

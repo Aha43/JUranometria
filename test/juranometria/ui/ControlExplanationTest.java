@@ -248,9 +248,14 @@ class ControlExplanationTest {
 
     @Test
     void everyShortcutTheRegistryNamesIsOneTheMenuActuallyBinds() {
+        // The whole bar the application composes: the registry names
+        // the Chart Toolbar keystroke (#450), and only the full bar
+        // carries the item that answers it.
         JMenuBar bar = AppMenuBar.create(new ChartViewController(),
                 () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
-                () -> { }, () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
+                () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
+                () -> { }, () -> { }, () -> { }, () -> { },
+                juranometria.ui.language.InterfaceText.forLanguage("en"));
         for (Shortcuts.Shortcut shortcut : Shortcuts.all()) {
             assertTrue(accelerators(bar).contains(shortcut.stroke()),
                     shortcut.label() + " is named by the registry, so"

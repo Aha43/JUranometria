@@ -167,3 +167,6 @@ e78c0407f7115bd3	ui/ChartControls.java	zoomLock	declared name used, but never at
 43f2af373668c4ab	ui/ZoomLockStore.java	zoomLocked	declared name used, but never at a known sink	identifier	a stable preference key; no language changes it
 95d5e414fafa608c	app/AppMenuBar.java	companionItem	declared name used, but never at a known sink	identifier	the Controls item's component name, which tests find it by; no language changes it
 8ba6f4a187ce1230	ui/companion/CompanionStore.java	companion.collapsed.	declared name used, but never at a known sink	identifier	the prefix of the companion's stored collapse keys; a stable preference key, no language changes it
+39507186b064c914	app/AppMenuBar.java	toolbarItem	declared name used, but never at a known sink	identifier	the Chart Toolbar item's component name, which tests find it by; no language changes it
+3eeabcaef64ee8de	ui/ChartChromeStore.java	chartToolbarShown	declared name used, but never at a known sink	identifier	a stable preference key for whether the chart window shows its toolbar; no language changes it
+18d96f1c3a0a29b7	ui/Shortcuts.java	chartToolbar	declared name used, but never at a known sink	identifier	the registry id of the Chart Toolbar keystroke, which tooltips name it by; no language changes it

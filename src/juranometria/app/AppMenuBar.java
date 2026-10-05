@@ -259,6 +259,15 @@ public final class AppMenuBar {
     /** The name View's Controls switch carries, for tests (#434). */
     public static final String COMPANION_ITEM = "companionItem";
 
+    /** The name View's Chart Toolbar switch carries, for tests (#450). */
+    public static final String TOOLBAR_ITEM = "toolbarItem";
+
+    /** View's Chart Toolbar switch, or null when the bar has none (#450). */
+    public static javax.swing.JCheckBoxMenuItem toolbarItem(
+            javax.swing.JMenuBar bar) {
+        return checkBoxItem(bar, TOOLBAR_ITEM);
+    }
+
     /** View's Controls switch, or null when the bar has none (#434). */
     public static javax.swing.JCheckBoxMenuItem companionItem(
             javax.swing.JMenuBar bar) {
@@ -423,6 +432,38 @@ public final class AppMenuBar {
                                   Runnable toggleMoonOnChart,
                                   Runnable toggleCompanion,
                                   juranometria.ui.language.InterfaceText said) {
+        return create(navigation, openSettings, openChartOptions, openAbout,
+                toggleInspector, openPlaceAndTime, toggleEcliptic,
+                exportSheet, copyViewReport, openSunTable, openMoonTable,
+                toggleSunOnChart, toggleMoonOnChart, toggleCompanion, null,
+                said);
+    }
+
+    /**
+     * The same, with View's Chart Toolbar switch (Sprint 41, issue
+     * #450, ruled on #449): a checkbox beside Controls that shows or
+     * hides the chart window's toolbar, with the keystroke the
+     * registry names.
+     *
+     * @param toggleToolbar runs on View's Chart Toolbar item (may be
+     *     null, omitting the item)
+     */
+    public static JMenuBar create(ChartViewController navigation,
+                                  Runnable openSettings,
+                                  Runnable openChartOptions,
+                                  Runnable openAbout,
+                                  Runnable toggleInspector,
+                                  Runnable openPlaceAndTime,
+                                  Runnable toggleEcliptic,
+                                  Runnable exportSheet,
+                                  Runnable copyViewReport,
+                                  Runnable openSunTable,
+                                  Runnable openMoonTable,
+                                  Runnable toggleSunOnChart,
+                                  Runnable toggleMoonOnChart,
+                                  Runnable toggleCompanion,
+                                  Runnable toggleToolbar,
+                                  juranometria.ui.language.InterfaceText said) {
         if (said == null) {
             throw new IllegalArgumentException(
                     "the menu has to say its words in some language");
@@ -525,6 +566,26 @@ public final class AppMenuBar {
                         said.say("menu.companion.explain"));
                 companion.addActionListener(event -> toggleCompanion.run());
                 view.add(companion);
+            }
+            if (toggleToolbar != null) {
+                // The chart window's own toolbar (#450, ruled on #449):
+                // shown or hidden, and the tick says which. Beside
+                // Controls, which is where its controls remain while
+                // it is hidden; the keystroke from the registry, so the
+                // item and every tooltip that names it agree.
+                javax.swing.JCheckBoxMenuItem toolbar =
+                        new javax.swing.JCheckBoxMenuItem(
+                                said.say("menu.toolbar.label"));
+                toolbar.setName(TOOLBAR_ITEM);
+                letters.apply(toolbar, "menu.toolbar.mnemonic");
+                toolbar.setAccelerator(juranometria.ui.Shortcuts.of(
+                        juranometria.ui.Shortcuts.TOOLBAR).stroke());
+                toolbar.getAccessibleContext().setAccessibleName(
+                        said.say("menu.toolbar.a11y"));
+                juranometria.ui.Explain.selfExplanatory(toolbar,
+                        said.say("menu.toolbar.explain"));
+                toolbar.addActionListener(event -> toggleToolbar.run());
+                view.add(toolbar);
             }
             if (openSunTable != null) {
                 // The Sun table (#400): where the Sun is for the place

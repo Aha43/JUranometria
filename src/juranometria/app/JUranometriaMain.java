@@ -34,6 +34,37 @@ public final class JUranometriaMain {
     }
 
     /**
+     * Shows or hides the chart window's toolbar (#450, ruled on #449):
+     * layout only. The window keeps its size and the chart gains or
+     * gives back the bar's height; nothing the chart draws or
+     * remembers is touched. A control on a bar about to hide hands the
+     * keyboard to the chart, so focus never goes nowhere.
+     */
+    static void showToolbar(JFrame frame, AtlasToolbar toolbar,
+                            ChartComponent chart, boolean shown) {
+        if (toolbar.isVisible() == shown) {
+            return;
+        }
+        java.awt.Component focused = frame.getFocusOwner();
+        if (!shown && focused != null
+                && SwingUtilities.isDescendingFrom(focused, toolbar)) {
+            chart.requestFocusInWindow();
+        }
+        toolbar.setVisible(shown);
+        frame.revalidate();
+        frame.repaint();
+    }
+
+    /** The window's bounds, if they are ordinary ones worth remembering. */
+    private static void rememberOrdinary(JFrame frame,
+                                         juranometria.ui.ChartWindowStore store) {
+        if (frame.isShowing()
+                && juranometria.ui.ChartWindowPlacement.ordinary(frame)) {
+            store.saveBounds(frame.getBounds());
+        }
+    }
+
+    /**
      * The inspector's one navigating action (issue #170): explicit,
      * pressed by the reader, and using the same recentre path search
      * uses - so coverage and titling behave exactly as they always
@@ -347,6 +378,15 @@ public final class JUranometriaMain {
         // The reader's transient emphasis control (#361): the chart
         // is the truth it reads, and nothing about it is persisted.
         toolbar.attachEmphasis(chart);
+        // The bar's visibility (Sprint 41, issue #450, ruled on #449):
+        // the reader's choice, restored before the window is packed so
+        // a hidden bar never flashes, and saved on every change. Hiding
+        // it touches nothing else - not the companion, not the
+        // Inspector, not the chart's state - and its controls keep
+        // every subscription, so showing it again shows every change
+        // made meanwhile.
+        juranometria.ui.ChartChromeStore chromeStore = stores.chartChrome();
+        toolbar.setVisible(chromeStore.toolbarShownOrDefault());
 
         // The Solar System service reads an 8.9 MB pack; once, and
         // only when a reader first opens the Sun table (#400).
@@ -473,7 +513,10 @@ public final class JUranometriaMain {
                     } else {
                         companion.showCompanion(true);
                     }
-                }));
+                },
+                // View, Chart Toolbar (#450): the bar, shown or hidden,
+                // from the item or its keystroke.
+                () -> showToolbar(frame, toolbar, chart, !toolbar.isVisible())));
         // Both of these read the bar, so both come AFTER it is set.
         // They sat above the menu until the bar moved down to be
         // built in the session's language (#350), and reading a bar
@@ -504,6 +547,24 @@ public final class JUranometriaMain {
                 companionItem.setSelected(false);
             }
         });
+        // The Chart Toolbar tick follows the bar, however it was
+        // hidden, and the store follows it too (#450).
+        javax.swing.JCheckBoxMenuItem toolbarItem =
+                AppMenuBar.toolbarItem(frame.getJMenuBar());
+        toolbarItem.setSelected(toolbar.isVisible());
+        toolbar.addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentShown(java.awt.event.ComponentEvent event) {
+                toolbarItem.setSelected(true);
+                chromeStore.saveToolbarShown(true);
+            }
+
+            @Override
+            public void componentHidden(java.awt.event.ComponentEvent event) {
+                toolbarItem.setSelected(false);
+                chromeStore.saveToolbarShown(false);
+            }
+        });
         javax.swing.JCheckBoxMenuItem inspectorItem =
                 AppMenuBar.inspectorItem(frame.getJMenuBar());
         if (inspectorItem != null) {
@@ -522,7 +583,40 @@ public final class JUranometriaMain {
         frame.add(chart, BorderLayout.CENTER);
         frame.add(inspector, BorderLayout.EAST);
         frame.pack();
-        frame.setLocationRelativeTo(null);
+        // Where the window opens (#450, ruled on #449): where it was,
+        // if that is on a screen that exists now, else packed and
+        // centred as it always has been; then maximised if it was.
+        // The ordinary bounds are saved on every move and resize in
+        // the normal state - never a maximised window's, which the
+        // flag remembers, and never native full screen's, which is
+        // not remembered at all.
+        juranometria.ui.ChartWindowStore windowStore = stores.chartWindow();
+        java.util.Optional<java.awt.Rectangle> opening =
+                juranometria.ui.ChartWindowPlacement.opening(windowStore.bounds(),
+                        juranometria.ui.ChartWindowPlacement.screensNow(),
+                        frame.getMinimumSize());
+        if (opening.isPresent()) {
+            frame.setBounds(opening.get());
+        } else {
+            frame.setLocationRelativeTo(null);
+        }
+        if (windowStore.maximized()) {
+            frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        }
+        frame.addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentMoved(java.awt.event.ComponentEvent event) {
+                rememberOrdinary(frame, windowStore);
+            }
+
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent event) {
+                rememberOrdinary(frame, windowStore);
+            }
+        });
+        frame.addWindowStateListener(event -> windowStore.saveMaximized(
+                (event.getNewState() & JFrame.MAXIMIZED_BOTH)
+                        == JFrame.MAXIMIZED_BOTH));
         frame.setVisible(true);
         // Open at the last clean quit, open again (ruled on #433) -
         // after the chart window has its place on a screen, so the

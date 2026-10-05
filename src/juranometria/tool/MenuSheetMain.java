@@ -193,7 +193,7 @@ public final class MenuSheetMain {
                 bar[0] = chrome.menuBar(navigation, () -> { }, () -> { },
                         () -> { }, () -> { }, () -> { }, () -> { },
                         () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
-                        () -> { }, () -> { });
+                        () -> { }, () -> { }, () -> { });
 
                 JCheckBoxMenuItem inspector = AppMenuBar.inspectorItem(bar[0]);
                 if (inspector != null) {
@@ -206,6 +206,12 @@ public final class MenuSheetMain {
                 JCheckBoxMenuItem ecliptic = AppMenuBar.eclipticItem(bar[0]);
                 if (ecliptic != null) {
                     ecliptic.setSelected(state.checked());
+                }
+                // The chart window's toolbar (#450): checked with the
+                // rest, as the application ticks it while the bar shows.
+                JCheckBoxMenuItem toolbar = AppMenuBar.toolbarItem(bar[0]);
+                if (toolbar != null) {
+                    toolbar.setSelected(state.checked());
                 }
                 owner[0] = new JFrame("study");
                 owner[0].setJMenuBar(bar[0]);

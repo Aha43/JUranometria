@@ -139,7 +139,9 @@ class ChartControlsCompanionJourneyTest {
                 juranometria.ui.solar.SunChartStore.forNode(node),
                 juranometria.ui.solar.MoonChartStore.forNode(node),
                 ZoomLockStore.forNode(node),
-                juranometria.ui.companion.CompanionStore.forNode(node));
+                juranometria.ui.companion.CompanionStore.forNode(node),
+                juranometria.ui.ChartChromeStore.forNode(node),
+                juranometria.ui.ChartWindowStore.forNode(node));
         JFrame[] frame = new JFrame[1];
         try {
             SwingUtilities.invokeAndWait(() ->
