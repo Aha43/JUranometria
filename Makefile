@@ -72,6 +72,7 @@ help:
 	@echo "  solar-cartography-study  Measure the Sun and Moon on the atlas's pages, with mockups (issue #414)"
 	@echo "  companion-window-study  Measure Place and Time for a companion window, with mockups (issue #433)"
 	@echo "  chart-options-companion-study  Measure Chart Options for the companion, with mockups (issue #442)"
+	@echo "  clean-chart-study       Measure the toolbar's controls in the companion and the chart without its toolbar (issue #449)"
 	@echo "  sun-on-the-chart-study  The Sun on production pages through the module (issue #415)"
 	@echo "  moon-on-the-chart-study The Moon on production pages, and the lunation as a row of phases (issue #416)"
 	@echo "  pan-study         Measure the Sprint 8 grab-to-pan geometry and costs"
@@ -579,7 +580,7 @@ black-sky-study: classes
 		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BlackSkyStudyMain \
 		> docs/studies/black-sky/measurements.md
 
-.PHONY: evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study sun-on-the-chart-study moon-on-the-chart-study printable-chart-study
+.PHONY: evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study sun-on-the-chart-study moon-on-the-chart-study printable-chart-study
 # The heap is stated rather than inherited from whatever a machine's
 # ergonomics chose for it: the CI runner's default quarter-of-RAM is
 # not the same number as a developer's.
@@ -707,6 +708,17 @@ chart-options-companion-study: classes
 		juranometria.tool.ChartOptionsCompanionStudyMain \
 		> docs/studies/chart-options-companion/measurements.md
 	@echo "written to docs/studies/chart-options-companion/measurements.md"
+
+# The chart toolbar's controls in the companion, and the chart window
+# without its toolbar (issue #449): the production bar's own controls
+# in three arrangements, the states they show, the layout arithmetic
+# and the placement on two displays. Off screen; no display needed.
+clean-chart-study: classes
+	mkdir -p docs/studies/clean-chart-controls
+	$(JAVA) -Djava.awt.headless=true -cp "$(CLASSES_DIR):$(LIB_DIR)/*" \
+		juranometria.tool.CleanChartStudyMain \
+		> docs/studies/clean-chart-controls/measurements.md
+	@echo "written to docs/studies/clean-chart-controls/measurements.md"
 
 # The Sun on the chart (issue #415): the production composition's own
 # pages with the module attached - production ink, no study overlay.
