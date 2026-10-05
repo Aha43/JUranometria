@@ -150,29 +150,27 @@ class CompanionWindowTest {
     }
 
     @Test
-    void itRemembersWhereItWasAndWhetherItWasOpenButNotOnQuit()
+    void itRemembersWhereItWasButNotWhetherItWasOpen()
             throws Exception {
         needsADisplay();
         Rig rig = new Rig(node, "en");
         CompanionStore store = CompanionStore.forNode(node);
-        assertFalse(store.visible());
         rig.show();
-        assertTrue(store.visible(), "shown is remembered");
         Rectangle at = rig.companion.getBounds();
         assertEquals(at, store.bounds().orElseThrow(), "and where");
         assertTrue(rig.companion.getWidth()
                         >= rig.panel.getPreferredSize().width,
                 "never narrower than what it holds asks");
         SwingUtilities.invokeAndWait(rig.companion::dispose);
-        assertTrue(store.visible(), "disposed at quit, still remembered open,"
-                + " so it reopens on the next start");
+        for (String key : node.keys()) {
+            assertFalse(key.equals("companion.visible"),
+                    "whether it was open is not remembered (ruled on #455)");
+        }
 
         Rig next = new Rig(node, "en");
         next.show();
         assertEquals(at, next.companion.getBounds(),
                 "a new session opens it where it was");
-        SwingUtilities.invokeAndWait(next.companion::hideCompanion);
-        assertFalse(store.visible(), "hidden is remembered too");
     }
 
     @Test
@@ -216,8 +214,8 @@ class CompanionWindowTest {
     void itSaysWhatItIsInBothLanguages() throws Exception {
         needsADisplay();
         for (String[] said : new String[][] {
-                {"en", "Controls", "Place and Time, expanded"},
-                {"nb-NO", "Kontroller", "Sted og tid, utvidet"}}) {
+                {"en", "JUranometria Controller", "Place and Time, expanded"},
+                {"nb-NO", "JUranometria Kontroller", "Sted og tid, utvidet"}}) {
             Rig rig = new Rig(node, said[0]);
             assertEquals(said[1], rig.companion.getTitle());
             assertEquals(said[1], rig.companion.getAccessibleContext()

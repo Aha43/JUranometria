@@ -6,13 +6,14 @@ import java.util.prefs.Preferences;
 
 /**
  * What the companion window remembers about itself (#434, ruled on
- * #433): where it was, how large, whether it was open, and which of
- * its sections were collapsed.
+ * #433): where it was, how large, and which of its sections were
+ * collapsed. Not whether it was open: it starts closed at every
+ * launch (ruled on #455), so that it never covers the chart a reader
+ * came for, and View is one gesture away.
  *
  * <p>Only the window. The place, the instant and the lines it shows
  * are the module's and the place store's, and nothing here touches
- * them: visibility is remembered independently of the Place and Time
- * state, as ruled.
+ * them.
  *
  * <p>Anything unreadable is "never chosen": a rectangle with a
  * missing or non-positive side is no rectangle, and the window is
@@ -23,11 +24,6 @@ public interface CompanionStore {
     Optional<Rectangle> bounds();
 
     void saveBounds(Rectangle bounds);
-
-    /** Whether the companion was open; false when never chosen. */
-    boolean visible();
-
-    void saveVisible(boolean visible);
 
     /** Whether a section was collapsed; false when never chosen. */
     default boolean collapsed(String section) {
@@ -71,16 +67,6 @@ public interface CompanionStore {
                 node.putInt("companion.y", bounds.y);
                 node.putInt("companion.width", bounds.width);
                 node.putInt("companion.height", bounds.height);
-            }
-
-            @Override
-            public boolean visible() {
-                return "true".equals(node.get("companion.visible", null));
-            }
-
-            @Override
-            public void saveVisible(boolean visible) {
-                node.put("companion.visible", Boolean.toString(visible));
             }
 
             @Override

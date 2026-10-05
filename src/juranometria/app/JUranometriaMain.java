@@ -318,8 +318,7 @@ public final class JUranometriaMain {
         // once, holding the same Place and Time panel the dialog
         // holds, over the same module and place store. Released on
         // the shutdown path before the modules detach (newest first),
-        // so its panel lets go of the module it follows; disposing it
-        // does not forget that it was open.
+        // so its panel lets go of the module it follows.
         juranometria.ui.companion.CompanionStore companionStore =
                 stores.companion();
         juranometria.ui.language.InterfaceText companionWords =
@@ -618,14 +617,9 @@ public final class JUranometriaMain {
                 (event.getNewState() & JFrame.MAXIMIZED_BOTH)
                         == JFrame.MAXIMIZED_BOTH));
         frame.setVisible(true);
-        // Open at the last clean quit, open again (ruled on #433) -
-        // after the chart window has its place on a screen, so the
-        // companion is placed against real geometry, and without
-        // taking the keyboard the chart window is meant to have.
-        if (companionStore.visible()) {
-            javax.swing.SwingUtilities.invokeLater(
-                    () -> companion.showCompanion(false));
-        }
+        // The companion starts closed at every launch (ruled on #455):
+        // open, it tends to cover the chart a reader came for, and View
+        // is one gesture away. It opens where it was left.
         return frame;
     }
 }

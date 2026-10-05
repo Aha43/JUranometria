@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * scratch preference node. A fresh profile starts with the companion
  * closed; View, Controls opens it and the tick follows it however it
  * is closed; the instant Now sets in it is what the Place and Time
- * dialog shows; open at the end of a session, it reopens on the next start
+ * dialog shows; it starts closed at every launch (ruled on #455)
  * where it was and without asking for the keyboard; hidden at the end,
  * it stays hidden.
  */
@@ -151,7 +151,6 @@ class CompanionStartupJourneyTest {
                         flush();
                         assertFalse(companion.isShowing(), "the close box hid it");
                         assertFalse(item.isSelected(), "and the tick followed");
-                        assertFalse(CompanionStore.forNode(node).visible());
 
                         SwingUtilities.invokeAndWait(item::doClick);
                         flush();
@@ -159,30 +158,32 @@ class CompanionStartupJourneyTest {
                                 "opened again: the same window");
                         left[0] = companion.getBounds();
                     });
-                    assertTrue(CompanionStore.forNode(node).visible(),
-                            "open when the session ended, so remembered open");
 
-                    // Second session: restored, where it was, quietly.
+                    // Second session: open when the last one ended, and
+                    // still closed at the start (ruled on #455); View opens
+                    // it where it was left.
                     run(node, frame -> {
-                        CompanionWindow companion = companion();
-                        assertNotNull(companion, "reopened at startup");
-                        assertTrue(companion.isShowing());
-                        assertEquals(left[0], companion.getBounds(),
-                                "where it was left");
-                        assertFalse(companion.isAutoRequestFocus(),
-                                "without asking for the chart window's keyboard");
+                        assertEquals(null, companion(),
+                                "open at the end, closed at the start");
                         JCheckBoxMenuItem item = AppMenuBar.companionItem(
                                 frame.getJMenuBar());
-                        assertTrue(item.isSelected(), "and View says it is open");
+                        assertFalse(item.isSelected(), "and View says so");
+                        SwingUtilities.invokeAndWait(item::doClick);
+                        flush();
+                        CompanionWindow companion = companion();
+                        assertNotNull(companion, "View opens it");
+                        assertEquals(left[0], companion.getBounds(),
+                                "where it was left");
+                        assertTrue(item.isSelected());
                         SwingUtilities.invokeAndWait(item::doClick);
                         flush();
                         assertFalse(companion.isShowing(), "View closes it too");
                     });
 
-                    // Third session: hidden when the last one ended.
+                    // Third session: hidden when the last one ended; the same.
                     run(node, frame -> {
                         assertEquals(null, companion(),
-                                "hidden at the end, hidden at the start");
+                                "hidden at the end, closed at the start");
                         assertFalse(AppMenuBar.companionItem(frame.getJMenuBar())
                                 .isSelected());
                     });

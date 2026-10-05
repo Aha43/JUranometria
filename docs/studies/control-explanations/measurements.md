@@ -40,8 +40,8 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Menu bar | JMenu | View | &mdash; | What the chart draws, where you are looking from, and how far out | self-explanatory |
 | Menu bar | JMenuItem | Chart Options... | &mdash; | Opens the window that chooses what the chart draws and labels. Chart shortcuts begin wi... | self-explanatory |
 | Menu bar | JMenuItem | Place and Time... | &mdash; | Opens the window that sets your location and the instant used to draw the meridian, hor... | self-explanatory |
-| Menu bar | JCheckBoxMenuItem | Controls | &mdash; | Shows or hides the Controls window, which keeps Place and Time beside the chart; it ope... | self-explanatory |
-| Menu bar | JCheckBoxMenuItem | Chart Toolbar | &mdash; | Shows or hides the chart window's toolbar. Its controls remain in the Controls window; ... | self-explanatory |
+| Menu bar | JCheckBoxMenuItem | Controls | &mdash; | Shows or hides the JUranometria Controller window, which keeps the chart's controls bes... | self-explanatory |
+| Menu bar | JCheckBoxMenuItem | Chart Toolbar | &mdash; | Shows or hides the chart window's toolbar. Its controls remain in the JUranometria Cont... | self-explanatory |
 | Menu bar | JMenuItem | Sun... | Where the Sun is, for the place and instant set in Place and Time | Opens a table of the Sun's computed position, height above the horizon, distance and ap... | hovered |
 | Menu bar | JMenuItem | Moon... | Where the Moon is, for the place and instant set in Place and Time | Opens a table of the Moon's computed position, height above the horizon, distance, appa... | hovered |
 | Menu bar | JCheckBoxMenuItem | Inspector | &mdash; | Shows or hides the panel that describes the selected mark and what is on this page | self-explanatory |

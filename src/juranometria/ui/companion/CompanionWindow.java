@@ -40,8 +40,9 @@ import juranometria.ui.language.InterfaceText;
  * <p><strong>It owns no state but its own.</strong> Its sections show
  * the authorities they were built over; hiding the window changes
  * nothing they show and nothing on the chart. What it remembers -
- * where it was, how large, whether it was open, which sections were
- * collapsed - is in {@link CompanionStore}.
+ * where it was, how large, which sections were collapsed - is in
+ * {@link CompanionStore}. Whether it was open is not remembered: it
+ * starts closed at every launch (ruled on #455).
  *
  * <p>Owned by the chart window, so it stays above that window and not
  * above other applications, and it minimises with it.
@@ -168,16 +169,10 @@ public final class CompanionWindow extends JDialog {
         }
     }
 
-    /**
-     * Remembered as open or closed whenever it is shown or hidden - but
-     * not when it is disposed, which is how the application quits: a
-     * companion open at a clean quit is remembered open, and reopens on
-     * the next start (ruled on #433).
-     */
+    /** Where it is, remembered whenever it is shown. */
     @Override
     public void setVisible(boolean visible) {
         super.setVisible(visible);
-        store.saveVisible(visible);
         if (visible) {
             remember();
         }

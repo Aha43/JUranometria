@@ -22,7 +22,7 @@ arrangement at its frozen instant.
 
 | shown | hovered | spoken as | read out |
 |---|---|---|---|
-| Controls | — | Controls | Controls you can keep beside the chart while you read it |
+| JUranometria Controller | — | JUranometria Controller | Controls you can keep beside the chart while you read it |
 | ▾ Chart controls | Show or hide this section | Chart controls, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | — | Zoom in (⌘=) | Zoom in | Shows a narrower field, with fainter stars on it |
 | — | Zoom out (⌘-) | Zoom out | Shows a wider field, with fewer stars on it |
@@ -71,7 +71,7 @@ arrangement at its frozen instant.
 
 | shown | hovered | spoken as | read out |
 |---|---|---|---|
-| Controls | — | Controls | Controls you can keep beside the chart while you read it |
+| JUranometria Controller | — | JUranometria Controller | Controls you can keep beside the chart while you read it |
 | ▾ Chart controls | Show or hide this section | Chart controls, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | — | Zoom in (⌘=) | Zoom in | Shows a narrower field, with fainter stars on it |
 | — | Zoom out (⌘-) | Zoom out | Shows a wider field, with fewer stars on it |
@@ -120,7 +120,7 @@ arrangement at its frozen instant.
 
 | shown | hovered | spoken as | read out |
 |---|---|---|---|
-| Controls | — | Controls | Controls you can keep beside the chart while you read it |
+| JUranometria Controller | — | JUranometria Controller | Controls you can keep beside the chart while you read it |
 | ▾ Chart controls | Show or hide this section | Chart controls, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | — | Zoom in (⌘=) | Zoom in | Shows a narrower field, with fainter stars on it |
 | — | Zoom out (⌘-) | Zoom out | Shows a wider field, with fewer stars on it |
@@ -157,7 +157,7 @@ arrangement at its frozen instant.
 
 | shown | hovered | spoken as | read out |
 |---|---|---|---|
-| Controls | — | Controls | Controls you can keep beside the chart while you read it |
+| JUranometria Controller | — | JUranometria Controller | Controls you can keep beside the chart while you read it |
 | ▾ Chart controls | Show or hide this section | Chart controls, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | — | Zoom in (⌘=) | Zoom in | Shows a narrower field, with fainter stars on it |
 | — | Zoom out (⌘-) | Zoom out | Shows a wider field, with fewer stars on it |
@@ -207,7 +207,7 @@ arrangement at its frozen instant.
 
 | shown | hovered | spoken as | read out |
 |---|---|---|---|
-| Controls | — | Controls | Controls you can keep beside the chart while you read it |
+| JUranometria Controller | — | JUranometria Controller | Controls you can keep beside the chart while you read it |
 | ▾ Chart controls | Show or hide this section | Chart controls, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | — | Zoom in (⌘=) | Zoom in | Shows a narrower field, with fainter stars on it |
 | — | Zoom out (⌘-) | Zoom out | Shows a wider field, with fewer stars on it |
@@ -263,7 +263,7 @@ arrangement at its frozen instant.
 
 | shown | hovered | spoken as | read out |
 |---|---|---|---|
-| Kontroller | — | Kontroller | Kontroller du kan ha ved siden av kartet mens du leser det |
+| JUranometria Kontroller | — | JUranometria Kontroller | Kontroller du kan ha ved siden av kartet mens du leser det |
 | ▾ Kartkontroller | Vis eller skjul denne delen | Kartkontroller, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | — | Zoom inn (⌘=) | Zoom inn | Viser et smalere synsfelt med svakere stjerner |
 | — | Zoom ut (⌘-) | Zoom ut | Viser et større synsfelt med færre stjerner |
@@ -312,7 +312,7 @@ arrangement at its frozen instant.
 
 | shown | hovered | spoken as | read out |
 |---|---|---|---|
-| Kontroller | — | Kontroller | Kontroller du kan ha ved siden av kartet mens du leser det |
+| JUranometria Kontroller | — | JUranometria Kontroller | Kontroller du kan ha ved siden av kartet mens du leser det |
 | ▾ Kartkontroller | Vis eller skjul denne delen | Kartkontroller, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | — | Zoom inn (⌘=) | Zoom inn | Viser et smalere synsfelt med svakere stjerner |
 | — | Zoom ut (⌘-) | Zoom ut | Viser et større synsfelt med færre stjerner |
@@ -361,7 +361,7 @@ arrangement at its frozen instant.
 
 | shown | hovered | spoken as | read out |
 |---|---|---|---|
-| Kontroller | — | Kontroller | Kontroller du kan ha ved siden av kartet mens du leser det |
+| JUranometria Kontroller | — | JUranometria Kontroller | Kontroller du kan ha ved siden av kartet mens du leser det |
 | ▾ Kartkontroller | Vis eller skjul denne delen | Kartkontroller, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | — | Zoom inn (⌘=) | Zoom inn | Viser et smalere synsfelt med svakere stjerner |
 | — | Zoom ut (⌘-) | Zoom ut | Viser et større synsfelt med færre stjerner |
@@ -398,7 +398,7 @@ arrangement at its frozen instant.
 
 | shown | hovered | spoken as | read out |
 |---|---|---|---|
-| Kontroller | — | Kontroller | Kontroller du kan ha ved siden av kartet mens du leser det |
+| JUranometria Kontroller | — | JUranometria Kontroller | Kontroller du kan ha ved siden av kartet mens du leser det |
 | ▾ Kartkontroller | Vis eller skjul denne delen | Kartkontroller, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | — | Zoom inn (⌘=) | Zoom inn | Viser et smalere synsfelt med svakere stjerner |
 | — | Zoom ut (⌘-) | Zoom ut | Viser et større synsfelt med færre stjerner |
@@ -448,7 +448,7 @@ arrangement at its frozen instant.
 
 | shown | hovered | spoken as | read out |
 |---|---|---|---|
-| Kontroller | — | Kontroller | Kontroller du kan ha ved siden av kartet mens du leser det |
+| JUranometria Kontroller | — | JUranometria Kontroller | Kontroller du kan ha ved siden av kartet mens du leser det |
 | ▾ Kartkontroller | Vis eller skjul denne delen | Kartkontroller, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | — | Zoom inn (⌘=) | Zoom inn | Viser et smalere synsfelt med svakere stjerner |
 | — | Zoom ut (⌘-) | Zoom ut | Viser et større synsfelt med færre stjerner |
