@@ -172,8 +172,14 @@ class ToolbarVisibilityJourneyTest {
                             frame.setLocation(frame.getX() + 23, frame.getY() + 7);
                             frame.setSize(frame.getWidth() - 30, frame.getHeight() - 10);
                         });
-                        drain();
+                        // The move is reported by the peer in its own
+                        // time; it must be in the store before the window
+                        // is maximised, or the claim below is about a race.
+                        settle();
                         moved[0] = frame.getBounds();
+                        assertEquals(Optional.of(moved[0]),
+                                ChartWindowStore.forNode(node).bounds(),
+                                "the move was saved before anything else happens");
                         SwingUtilities.invokeAndWait(() ->
                                 frame.setExtendedState(JFrame.MAXIMIZED_BOTH));
                         settle();
