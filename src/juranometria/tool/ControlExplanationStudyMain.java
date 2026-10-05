@@ -326,11 +326,28 @@ public final class ControlExplanationStudyMain {
         juranometria.ui.SearchField search =
                 new juranometria.ui.SearchField(Atlas.search(),
                         Atlas.assembler(), navigation, english);
+        // The bar and the companion's section are two hosts of one
+        // controls class over one set of actions (#450): both are
+        // audited, so a word that reaches one host and not the other
+        // is found here.
+        juranometria.ui.ChartActions actions =
+                new juranometria.ui.ChartActions(navigation);
         surfaces.put("Toolbar", new juranometria.ui.AtlasToolbar(
                 navigation, search,
                 new juranometria.ui.InspectorToggle(), "0.0.0",
                 () -> { }, new juranometria.chart.SelectionMode(),
-                new juranometria.ui.ZoomLock(), english));
+                new juranometria.ui.ZoomLock(), actions, english));
+        juranometria.ui.ChartControls chartControls =
+                new juranometria.ui.ChartControls(navigation,
+                        new juranometria.ui.SearchField(Atlas.search(),
+                                Atlas.assembler(), navigation, english),
+                        new juranometria.ui.InspectorToggle(),
+                        new juranometria.chart.SelectionMode(),
+                        new juranometria.ui.ZoomLock(), actions, english);
+        chartControls.attachEmphasis(new juranometria.ui.ChartComponent(
+                Atlas.assembler(),
+                juranometria.ui.language.PageText.in(english)));
+        surfaces.put("Chart controls", chartControls.inCompanion());
         surfaces.put("Menu bar", AppMenuBar.create(navigation, () -> { },
                 () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
                 () -> { }, () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
