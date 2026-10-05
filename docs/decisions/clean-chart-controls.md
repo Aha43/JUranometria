@@ -1,9 +1,10 @@
 # A clean chart, with its controls kept at hand
 
-Sprint 41, issue #449. **Proposed; awaiting the owner's ruling.** The
-study is `docs/studies/clean-chart-controls/` (`make clean-chart-study`);
-the real-window reproduction is quoted below. #450 builds what is ruled;
-#451 hands it over.
+Sprint 41, issue #449. **Ruled by the owner (2026-10-05)** — see
+[The ruling](#the-ruling) at the end, which governs where it differs
+from the proposal. The study is `docs/studies/clean-chart-controls/`
+(`make clean-chart-study`); the real-window reproduction is quoted
+below. #450 builds it in two pull requests; #451 hands it over.
 
 > Hiding chart chrome does not disable the instrument.
 
@@ -322,3 +323,51 @@ checkpoint behind the whole change.
    separate issue does.
 7. The two-pull-request split, with the two-display checkpoint on the
    second.
+
+## The ruling
+
+The owner's rulings on the seven points, recorded as given:
+
+1. **One compact *Chart controls* section, introduced open.** The two
+   compact rows, the search field and the quiet readout form one
+   coherent instrument; four sections make the companion unnecessarily
+   tall and fragmented.
+2. **Keep the quiet readout**: field size and stellar magnitude limit
+   belong with navigation. **Exclude the version and Exit**; they are
+   application furniture, not chart controls.
+3. **Search text stays local; its effect is shared.** Typing and the
+   results popup belong to the field being used. Choosing a result moves
+   the shared chart. Using one field must not overwrite unfinished text
+   in the other. Home/reset clears the shared target and every search
+   field. **The Home and Emphasis actions are extracted once**, so the
+   toolbar, the menu, the shortcut and the companion cannot diverge.
+4. **Shift+⌘T on macOS and Ctrl+Shift+T elsewhere** for toolbar
+   visibility; the alternative with a known desktop conflict is avoided.
+   The menu item shows the current state, toolbar visibility is
+   remembered, and the default remains visible.
+5. **Chart-window placement is in #450**, because otherwise the intended
+   two-display setup must be rebuilt every launch: remember the last
+   ordinary bounds and maximised state; keep the last normal bounds even
+   while maximised; validate them against the displays present and
+   recover safely if a monitor disappears; **do not remember native
+   macOS full-screen state.** The supported observatory arrangement is a
+   maximised clean chart on the external monitor with Controls on the
+   laptop. Native macOS full screen is recorded as a known limitation;
+   window ownership is not weakened and no always-on-top trick is added
+   to work around Spaces.
+6. **Emphasis keyboard focus is fixed in this sprint.** It is directly
+   exposed by duplicating the chart controls and belongs to their
+   accessibility contract; keyboard access is proved in both the
+   existing toolbar and the new companion controls.
+7. **Two wide pull requests.** PR 1: the shared chart-control actions,
+   the compact companion section, the search semantics, the quiet
+   readout and the Emphasis accessibility repair - no toolbar hiding
+   yet. PR 2: toolbar visibility, the menu item, the shortcut, the
+   remembered toolbar state, safe chart-window placement and
+   maximisation, and the packaged two-display owner checkpoint.
+
+**The final packaged journey tests the principle itself:** the chart can
+become a clean sheet on the large monitor while every useful toolbar
+operation remains available in Controls on the laptop; the chart must
+remain fully usable with its toolbar hidden; and disconnecting the
+external monitor must recover both windows safely.
