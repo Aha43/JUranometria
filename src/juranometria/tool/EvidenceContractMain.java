@@ -119,6 +119,12 @@ public final class EvidenceContractMain {
         // answer, in the platform record registered below.
         REPORT_MAINS.put("juranometria.tool.CleanChartStudyMain",
                 "docs/studies/clean-chart-controls/measurements.md");
+        // The Sun and Moon tables in the Controller (issue #457): what
+        // the dialogs hold, the menu as it is and as proposed, the
+        // access letters and the keyboard stops. Heights are one
+        // machine's answer, in the platform record registered below.
+        REPORT_MAINS.put("juranometria.tool.SolarSystemControlsStudyMain",
+                "docs/studies/solar-system-controls/measurements.md");
         // The Sun on production pages (#415): the report is
         // deterministic; its pages are held through IMAGE_MAINS.
         REPORT_MAINS.put("juranometria.tool.SunOnTheChartStudyMain",
@@ -289,6 +295,8 @@ public final class EvidenceContractMain {
                 "docs/studies/chart-options-companion/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.CleanChartStudyMain",
                 "docs/studies/clean-chart-controls/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.SolarSystemControlsStudyMain",
+                "docs/studies/solar-system-controls/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.ToggleShortcutStudyMain",
                 "docs/studies/toggle-shortcuts/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.ControlExplanationStudyMain",
@@ -417,6 +425,10 @@ public final class EvidenceContractMain {
             // toolbar's controls in study-only arrangements; widget-
             // rendered inspection, the controls- prefix.
             "juranometria.tool.CleanChartStudyMain",
+            // The Solar System controls mock-ups (issue #457): the
+            // production table content in study-only arrangements;
+            // widget-rendered inspection, the controls- prefix.
+            "juranometria.tool.SolarSystemControlsStudyMain",
             // The Sun on the chart (issue #415): production pages
             // composed by the component with the module attached.
             "juranometria.tool.SunOnTheChartStudyMain",

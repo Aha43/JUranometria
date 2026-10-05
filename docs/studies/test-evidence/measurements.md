@@ -111,6 +111,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | src/juranometria/tool/PlaceAndTimeDialogStudyMain.java | look-and-feel, default-font, preferences | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/tool/PlaceAndTimeSheetMain.java | look-and-feel, preferences | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/SettingsSheetMain.java | look-and-feel | UNPROTECTED: look-and-feel |
+| src/juranometria/tool/SolarSystemControlsStudyMain.java | look-and-feel, default-font, preferences | protected-locally |
 | src/juranometria/tool/SunTableSheetMain.java | look-and-feel | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/SwingChromeSheetMain.java | look-and-feel | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/ToggleShortcutStudyMain.java | look-and-feel | UNPROTECTED: look-and-feel |
@@ -118,7 +119,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | src/juranometria/tool/WorkingSelectionMockupMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/app/PackagedAcceptanceMain.java | look-and-feel, locale, preferences | protected-locally |
 
-**27 evidence executables** touch process-wide state; 22 carry an unpaired touch.
+**28 evidence executables** touch process-wide state; 22 carry an unpaired touch.
 
 ## Display-dependent tests, their premises and their routes
 
@@ -215,11 +216,11 @@ Whether a particular read happens on the event thread is control flow, which tex
 
 | class | the contract | files |
 |---|---|---|
-| deterministic-report | regenerates byte-for-byte on the same tree | 84 |
+| deterministic-report | regenerates byte-for-byte on the same tree | 86 |
 | byte-exact-fixture | committed data with provenance; never regenerated casually | 42 |
 | captured-evidence | an operating-system screenshot, digest-pinned; a re-capture is a provenance event | 13 |
 | renderer-drawn | byte-reproducible per machine; production ink, no widgets | 473 |
-| widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 107 |
+| widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 133 |
 | session-photograph | a packed window on a display; drifts between desktop sessions | 3 |
 
 The byte-exact fixtures:
@@ -384,6 +385,32 @@ The widget-rendered artifacts (a new one arrives by a reviewed addition to the s
 - docs/studies/place-and-time/controls-dialog-enlarged.png
 - docs/studies/place-and-time/controls-dialog.png
 - docs/studies/place-and-time/controls-sidebar-240.png
+- docs/studies/solar-system-controls/controls-solar-en-1-sun-dialog.png
+- docs/studies/solar-system-controls/controls-solar-en-10-controller-sun-open-900.png
+- docs/studies/solar-system-controls/controls-solar-en-11-view-menu-today.png
+- docs/studies/solar-system-controls/controls-solar-en-12-view-menu-proposed.png
+- docs/studies/solar-system-controls/controls-solar-en-2-moon-dialog-range.png
+- docs/studies/solar-system-controls/controls-solar-en-3-sun-group-card.png
+- docs/studies/solar-system-controls/controls-solar-en-4-sun-group-table.png
+- docs/studies/solar-system-controls/controls-solar-en-5-moon-group-range.png
+- docs/studies/solar-system-controls/controls-solar-en-6-both-open-dark.png
+- docs/studies/solar-system-controls/controls-solar-en-6-both-open.png
+- docs/studies/solar-system-controls/controls-solar-en-7-sun-open-moon-closed.png
+- docs/studies/solar-system-controls/controls-solar-en-8-sun-closed-moon-open.png
+- docs/studies/solar-system-controls/controls-solar-en-9-controller-collapsed-900.png
+- docs/studies/solar-system-controls/controls-solar-nb-NO-1-sun-dialog.png
+- docs/studies/solar-system-controls/controls-solar-nb-NO-10-controller-sun-open-900.png
+- docs/studies/solar-system-controls/controls-solar-nb-NO-11-view-menu-today.png
+- docs/studies/solar-system-controls/controls-solar-nb-NO-12-view-menu-proposed.png
+- docs/studies/solar-system-controls/controls-solar-nb-NO-2-moon-dialog-range.png
+- docs/studies/solar-system-controls/controls-solar-nb-NO-3-sun-group-card.png
+- docs/studies/solar-system-controls/controls-solar-nb-NO-4-sun-group-table.png
+- docs/studies/solar-system-controls/controls-solar-nb-NO-5-moon-group-range.png
+- docs/studies/solar-system-controls/controls-solar-nb-NO-6-both-open-dark.png
+- docs/studies/solar-system-controls/controls-solar-nb-NO-6-both-open.png
+- docs/studies/solar-system-controls/controls-solar-nb-NO-7-sun-open-moon-closed.png
+- docs/studies/solar-system-controls/controls-solar-nb-NO-8-sun-closed-moon-open.png
+- docs/studies/solar-system-controls/controls-solar-nb-NO-9-controller-collapsed-900.png
 - docs/studies/working-selection/selection-accumulate.png
 - docs/studies/working-selection/selection-set-dark.png
 - docs/studies/working-selection/selection-set-enlarged.png
