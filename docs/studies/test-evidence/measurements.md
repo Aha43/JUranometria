@@ -94,6 +94,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | src/juranometria/tool/ChartKeyboardSheetMain.java | look-and-feel, preferences | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/ChartOptionsCompanionStudyMain.java | look-and-feel, default-font, preferences | protected-locally |
 | src/juranometria/tool/ChartOptionsSheetMain.java | look-and-feel, preferences | UNPROTECTED: look-and-feel |
+| src/juranometria/tool/CleanChartStudyMain.java | look-and-feel, default-font, preferences | protected-locally |
 | src/juranometria/tool/CompanionSheetMain.java | look-and-feel, default-font, preferences | protected-locally |
 | src/juranometria/tool/CompanionWindowStudyMain.java | look-and-feel, default-font, preferences | protected-locally |
 | src/juranometria/tool/ControlExplanationStudyMain.java | look-and-feel | UNPROTECTED: look-and-feel |
@@ -117,7 +118,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | src/juranometria/tool/WorkingSelectionMockupMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/app/PackagedAcceptanceMain.java | look-and-feel, locale, preferences | protected-locally |
 
-**26 evidence executables** touch process-wide state; 22 carry an unpaired touch.
+**27 evidence executables** touch process-wide state; 22 carry an unpaired touch.
 
 ## Display-dependent tests, their premises and their routes
 
@@ -212,11 +213,11 @@ Whether a particular read happens on the event thread is control flow, which tex
 
 | class | the contract | files |
 |---|---|---|
-| deterministic-report | regenerates byte-for-byte on the same tree | 82 |
+| deterministic-report | regenerates byte-for-byte on the same tree | 84 |
 | byte-exact-fixture | committed data with provenance; never regenerated casually | 42 |
 | captured-evidence | an operating-system screenshot, digest-pinned; a re-capture is a provenance event | 13 |
 | renderer-drawn | byte-reproducible per machine; production ink, no widgets | 473 |
-| widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 77 |
+| widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 107 |
 | session-photograph | a packed window on a display; drifts between desktop sessions | 3 |
 
 The byte-exact fixtures:
@@ -297,6 +298,36 @@ The widget-rendered artifacts (a new one arrives by a reviewed addition to the s
 - docs/studies/chart-options-companion/controls-co-companion-nb-NO-7-dialog-shared-immediate.png
 - docs/studies/chart-options-companion/controls-co-companion-nb-NO-8-dialog-transactional.png
 - docs/studies/chart-options-companion/controls-co-companion-nb-NO-9-companion-draft.png
+- docs/studies/clean-chart-controls/controls-clean-chart-en-1-wrapped.png
+- docs/studies/clean-chart-controls/controls-clean-chart-en-10-rows-inspector-showing.png
+- docs/studies/clean-chart-controls/controls-clean-chart-en-11-rows-emphases.png
+- docs/studies/clean-chart-controls/controls-clean-chart-en-12-sections-results.png
+- docs/studies/clean-chart-controls/controls-clean-chart-en-2-rows-dark.png
+- docs/studies/clean-chart-controls/controls-clean-chart-en-2-rows.png
+- docs/studies/clean-chart-controls/controls-clean-chart-en-3-sections-dark.png
+- docs/studies/clean-chart-controls/controls-clean-chart-en-3-sections.png
+- docs/studies/clean-chart-controls/controls-clean-chart-en-4-rows-with-both-900.png
+- docs/studies/clean-chart-controls/controls-clean-chart-en-5-sections-with-both-900.png
+- docs/studies/clean-chart-controls/controls-clean-chart-en-6-rows-results.png
+- docs/studies/clean-chart-controls/controls-clean-chart-en-7-rows-no-match.png
+- docs/studies/clean-chart-controls/controls-clean-chart-en-8-rows-zoom-end.png
+- docs/studies/clean-chart-controls/controls-clean-chart-en-9-rows-inspector-unavailable.png
+- docs/studies/clean-chart-controls/controls-clean-chart-nb-NO-1-wrapped.png
+- docs/studies/clean-chart-controls/controls-clean-chart-nb-NO-10-rows-inspector-showing.png
+- docs/studies/clean-chart-controls/controls-clean-chart-nb-NO-11-rows-emphases.png
+- docs/studies/clean-chart-controls/controls-clean-chart-nb-NO-12-sections-results.png
+- docs/studies/clean-chart-controls/controls-clean-chart-nb-NO-2-rows-dark.png
+- docs/studies/clean-chart-controls/controls-clean-chart-nb-NO-2-rows.png
+- docs/studies/clean-chart-controls/controls-clean-chart-nb-NO-3-sections-dark.png
+- docs/studies/clean-chart-controls/controls-clean-chart-nb-NO-3-sections.png
+- docs/studies/clean-chart-controls/controls-clean-chart-nb-NO-4-rows-with-both-900.png
+- docs/studies/clean-chart-controls/controls-clean-chart-nb-NO-5-sections-with-both-900.png
+- docs/studies/clean-chart-controls/controls-clean-chart-nb-NO-6-rows-results.png
+- docs/studies/clean-chart-controls/controls-clean-chart-nb-NO-7-rows-no-match.png
+- docs/studies/clean-chart-controls/controls-clean-chart-nb-NO-8-rows-zoom-end.png
+- docs/studies/clean-chart-controls/controls-clean-chart-nb-NO-9-rows-inspector-unavailable.png
+- docs/studies/clean-chart-controls/controls-clean-chart-placement-two-displays.png
+- docs/studies/clean-chart-controls/controls-clean-chart-window-shown-hidden.png
 - docs/studies/companion-window/controls-companion-en-collapsed-360.png
 - docs/studies/companion-window/controls-companion-en-dark-300.png
 - docs/studies/companion-window/controls-companion-en-dark-360.png
