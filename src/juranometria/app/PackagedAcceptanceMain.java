@@ -802,14 +802,16 @@ public final class PackagedAcceptanceMain {
             juranometria.ui.companion.CompanionStore store =
                     juranometria.ui.companion.CompanionStore.forNode(scratch);
             store.saveBounds(new java.awt.Rectangle(-40000, 40, 360, 330));
-            store.saveVisible(true);
             store.saveCollapsed("placeandtime", true);
             scratch.flush();
             juranometria.ui.companion.CompanionStore again =
                     juranometria.ui.companion.CompanionStore.forNode(scratch);
-            require(again.visible() && again.collapsed("placeandtime")
-                            && again.bounds().isPresent(),
+            require(again.collapsed("placeandtime") && again.bounds().isPresent(),
                     "the companion's own state round-trips");
+            for (String key : scratch.keys()) {
+                require(!key.equals("companion.visible"),
+                        "whether it was open is not remembered (ruled on #455)");
+            }
             java.awt.Rectangle placed = juranometria.ui.companion
                     .CompanionPlacement.place(again.bounds(),
                             java.util.List.of(new java.awt.Rectangle(0, 25, 1440, 875)),

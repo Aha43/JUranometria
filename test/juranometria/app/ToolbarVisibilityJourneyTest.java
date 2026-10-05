@@ -123,8 +123,14 @@ class ToolbarVisibilityJourneyTest {
                             frame.setLocation(frame.getX() + 37, frame.getY() + 11);
                             frame.setSize(frame.getWidth() - 40, frame.getHeight() - 20);
                         });
-                        drain();
+                        // The peer reports the move in its own time; it
+                        // must be in the store before the session ends,
+                        // or the claim after the quit is about a race.
+                        settle();
                         moved[0] = frame.getBounds();
+                        assertEquals(Optional.of(moved[0]),
+                                ChartWindowStore.forNode(node).bounds(),
+                                "the move was saved before the quit");
                     });
                     assertEquals(Optional.of(Boolean.FALSE),
                             ChartChromeStore.forNode(node).toolbarShown());

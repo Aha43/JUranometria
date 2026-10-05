@@ -27,17 +27,14 @@ class CompanionStoreTest {
     private void held(Preferences node) throws Exception {
         CompanionStore store = CompanionStore.forNode(node);
         assertEquals(Optional.empty(), store.bounds(), "never placed");
-        assertFalse(store.visible(), "never opened");
         assertFalse(store.collapsed("placeandtime"), "never collapsed");
 
         store.saveBounds(new Rectangle(-1200, 40, 360, 330));
-        store.saveVisible(true);
         store.saveCollapsed("placeandtime", true);
         CompanionStore again = CompanionStore.forNode(node);
         assertEquals(Optional.of(new Rectangle(-1200, 40, 360, 330)),
                 again.bounds(), "a display left of the main one is a"
                         + " negative x, and kept as one");
-        assertTrue(again.visible());
         assertTrue(again.collapsed("placeandtime"));
 
         for (String key : node.keys()) {
@@ -48,7 +45,8 @@ class CompanionStoreTest {
         node.putInt("companion.width", 0);
         assertEquals(Optional.empty(), again.bounds(),
                 "a rectangle with no width is no rectangle");
-        node.put("companion.visible", "perhaps");
-        assertFalse(again.visible(), "anything unreadable is never chosen");
+        node.put("companion.collapsed.placeandtime", "perhaps");
+        assertFalse(again.collapsed("placeandtime"),
+                "anything unreadable is never chosen");
     }
 }

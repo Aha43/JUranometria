@@ -266,3 +266,20 @@ The owner's answers to the five questions put at the checkpoint:
 
 No other panel, menu redesign, version work or new functionality
 enters the sprint.
+
+## Amended on #455 (Sprint 42)
+
+Two rulings the owner recorded on accepting Sprint 41's packaged
+candidate, after using the companion beside a clean chart on an
+external monitor:
+
+3. **Title: JUranometria Controller / JUranometria Kontroller.** On
+   the laptop screen it reads visually as an application of its own,
+   so its title says what it is. View's item stays *Controls /
+   Kontroller*.
+4. **It starts closed at every launch.** Open, it tends to cover the
+   chart a reader came for, and View is one gesture away. Whether it
+   was open is no longer remembered (`companion.visible` is neither
+   written nor read; a stale key is ignored); where it was, how large
+   and which sections were collapsed still are, and it opens where it
+   was left.
