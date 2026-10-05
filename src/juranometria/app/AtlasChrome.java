@@ -287,9 +287,32 @@ public final class AtlasChrome {
                                         Runnable toggleSunOnChart,
                                         Runnable toggleMoonOnChart,
                                         Runnable toggleCompanion) {
+        return menuBar(navigation, openSettings, openChartOptions,
+                openAbout, toggleInspector, openPlaceAndTime, toggleEcliptic,
+                exportSheet, copyViewReport, openSunTable, openMoonTable,
+                toggleSunOnChart, toggleMoonOnChart, toggleCompanion, null);
+    }
+
+    /** The same, with View's Chart Toolbar switch (#450). */
+    public javax.swing.JMenuBar menuBar(ChartViewController navigation,
+                                        Runnable openSettings,
+                                        Runnable openChartOptions,
+                                        Runnable openAbout,
+                                        Runnable toggleInspector,
+                                        Runnable openPlaceAndTime,
+                                        Runnable toggleEcliptic,
+                                        Runnable exportSheet,
+                                        Runnable copyViewReport,
+                                        Runnable openSunTable,
+                                        Runnable openMoonTable,
+                                        Runnable toggleSunOnChart,
+                                        Runnable toggleMoonOnChart,
+                                        Runnable toggleCompanion,
+                                        Runnable toggleToolbar) {
         return AppMenuBar.create(navigation, openSettings, openChartOptions,
                 openAbout, toggleInspector, openPlaceAndTime, toggleEcliptic,
                 exportSheet, copyViewReport, openSunTable, openMoonTable,
-                toggleSunOnChart, toggleMoonOnChart, toggleCompanion, said);
+                toggleSunOnChart, toggleMoonOnChart, toggleCompanion,
+                toggleToolbar, said);
     }
 }

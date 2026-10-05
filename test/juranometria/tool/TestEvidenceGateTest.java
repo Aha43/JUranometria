@@ -476,7 +476,9 @@ class TestEvidenceGateTest {
         // gap in a remembered list (review).
         assertEquals(List.of("AppShutdown.re" + "al(",
                         "AppearanceStore.us" + "er(",
+                        "ChartChromeStore.us" + "er(",
                         "ChartOptionsStore.us" + "er(",
+                        "ChartWindowStore.us" + "er(",
                         "CompanionStore.us" + "er(",
                         "EclipticStore.us" + "er(",
                         "MoonChartStore.us" + "er(",
@@ -486,7 +488,7 @@ class TestEvidenceGateTest {
                         "SunChartStore.us" + "er(",
                         "ZoomLockStore.us" + "er("),
                 TestEvidenceScan.realPreferenceDoors(),
-                "the eleven production entry points to the reader's"
+                "the thirteen production entry points to the reader's"
                         + " store - the sixth is #274's, which keeps"
                         + " one key for whether the ecliptic is shown,"
                         + " the seventh is #348's, which keeps the"
@@ -494,9 +496,12 @@ class TestEvidenceGateTest {
                         + " which keeps one key for whether the Sun is"
                         + " on the chart, the ninth is #416's, the"
                         + " same for the Moon, the tenth is #428's,"
-                        + " whether zoom is locked, and the eleventh is"
+                        + " whether zoom is locked, the eleventh is"
                         + " #434's, where the companion window was and"
-                        + " whether it was open. Each arrived by this"
+                        + " whether it was open, and the twelfth and"
+                        + " thirteenth are #450's, whether the chart"
+                        + " window shows its toolbar and where that"
+                        + " window was. Each arrived by this"
                         + " pin changing rather than by a silent gap"
                         + " in a remembered list, which is the whole"
                         + " reason the set is derived");
@@ -545,7 +550,7 @@ class TestEvidenceGateTest {
                         || f.premises().contains("focus-owner")).count();
         long reachPremise = display.stream().filter(f ->
                 f.premises().contains("point-reachable")).count();
-        assertEquals(54, display.size(),
+        assertEquals(55, display.size(),
                 "the display corpus is the twenty the decision names"
                         + " plus the black-sky journey (#246), the"
                         + " #261 pair - the surfaces journey and the"
@@ -682,7 +687,14 @@ class TestEvidenceGateTest {
                         + " reaches Emphasis is a question only a"
                         + " realised window answers, and the toolbar's"
                         + " Emphasis was the one control it did not"
-                        + " reach (#449)");
+                        + " reach (#449)"
+                        + "; and #450's toolbar visibility journey, which"
+                        + " starts the real application four times on one"
+                        + " node - hides the bar by its keystroke, moves"
+                        + " and maximises the window, and reads what each"
+                        + " restart opens with - because what a window"
+                        + " remembers about itself is proved only by a"
+                        + " window");
         assertTrue(focusPremise >= 14,
                 "focus premises spread under #243 and may not"
                         + " retreat: " + focusPremise + " of "

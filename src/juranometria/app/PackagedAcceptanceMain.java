@@ -449,6 +449,7 @@ public final class PackagedAcceptanceMain {
         companionJourney();
         chartOptionsJourney();
         chartControlsJourney();
+        cleanChartJourney();
 
         System.out.println("PACKAGED ACCEPTANCE OK");
     }
@@ -981,6 +982,172 @@ public final class PackagedAcceptanceMain {
                 + " other in the same words; search text local, its effect"
                 + " shared; Home clears the target and every field; every"
                 + " control keyboard-reachable, Emphasis included)");
+    }
+
+    /**
+     * The clean chart inside the packaged image (Sprint 41, issue
+     * #450, ruled on #449): the chart window without its toolbar.
+     * View carries a checked Chart Toolbar item with the keystroke the
+     * registry names and an explanation that says where the controls
+     * remain; hiding the bar in the window's own layout gives the
+     * chart the bar's height and nothing else; the companion's
+     * controls still reach the chart while it is hidden; the choice
+     * round-trips the bundled runtime's preference backend; and the
+     * window's placement arithmetic opens a window remembered on a
+     * display that has gone as it always has, keeps nothing from
+     * native full screen, and keeps the ordinary bounds apart from
+     * the maximised flag.
+     */
+    private static void cleanChartJourney() throws Exception {
+        Preferences scratch = Preferences.userRoot()
+                .node("juranometria-packaged-clean-chart-" + System.nanoTime());
+        try {
+            juranometria.ui.language.SkyLanguageStore languages =
+                    juranometria.ui.language.SkyLanguageStore.forNode(scratch);
+            languages.save(languages.choice(Atlas.languages()).withInterface("en"));
+            java.util.Set<String> languageKeys = java.util.Set.of(scratch.keys());
+            juranometria.ui.language.InterfaceText said =
+                    juranometria.ui.language.InterfaceText.forLanguage("en");
+            ChartViewController controller = new ChartViewController(
+                    Atlas.assembler()::fits);
+            juranometria.ui.InspectorToggle inspector =
+                    new juranometria.ui.InspectorToggle();
+            inspector.bind(() -> { }, () -> true);
+            juranometria.ui.ZoomLock lock = new juranometria.ui.ZoomLock();
+            AtlasChrome[] chrome = new AtlasChrome[1];
+            juranometria.ui.ChartComponent[] chart = new juranometria.ui.ChartComponent[1];
+            juranometria.ui.ChartControls[] section = new juranometria.ui.ChartControls[1];
+            javax.swing.JPanel[] window = new javax.swing.JPanel[1];
+            javax.swing.JMenuBar[] menu = new javax.swing.JMenuBar[1];
+            boolean[] toggled = new boolean[1];
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                chrome[0] = AtlasChrome.of(juranometria.ui.language.SkyLanguageSession
+                        .begin(languages, Atlas.languages()), controller,
+                        Atlas.search(), Atlas.assembler(), inspector, "0.0.0",
+                        () -> { }, new juranometria.chart.SelectionMode(), lock);
+                chart[0] = new juranometria.ui.ChartComponent(Atlas.assembler(),
+                        ENGLISH_PAGE);
+                controller.onChange(chart[0]::setViewState);
+                chrome[0].toolbar().attachEmphasis(chart[0]);
+                section[0] = chrome[0].companionControls(chart[0]);
+                section[0].inCompanion();
+                // The window's own layout: the bar north, the chart centre.
+                window[0] = new javax.swing.JPanel(new java.awt.BorderLayout());
+                window[0].add(chrome[0].toolbar(), java.awt.BorderLayout.NORTH);
+                window[0].add(chart[0], java.awt.BorderLayout.CENTER);
+                window[0].setSize(900, 700 + chrome[0].toolbar().getPreferredSize().height);
+                window[0].doLayout();
+                menu[0] = chrome[0].menuBar(controller, () -> { }, () -> { },
+                        () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
+                        () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
+                        () -> { }, () -> toggled[0] = true);
+            });
+
+            // View carries the item, with the registry's keystroke.
+            javax.swing.JCheckBoxMenuItem item = AppMenuBar.toolbarItem(menu[0]);
+            require(item != null && item.getAccelerator().equals(
+                            juranometria.ui.Shortcuts.of(
+                                    juranometria.ui.Shortcuts.TOOLBAR).stroke()),
+                    "View's Chart Toolbar item answers the keystroke the registry names: "
+                            + juranometria.ui.Shortcuts.text(juranometria.ui.Shortcuts.TOOLBAR));
+            require(item.getAccessibleContext().getAccessibleDescription()
+                            .contains(said.say("companion.title")),
+                    "and its explanation says where the controls remain");
+            javax.swing.SwingUtilities.invokeAndWait(item::doClick);
+            require(toggled[0], "the item asks the window to toggle the bar");
+
+            // Hidden in the window's own layout: the bar's height, nothing else.
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                lock.lock(true);
+                chart[0].toggleEmphasis(juranometria.render.ChartStructure.EQUATORIAL_GRID);
+                chrome[0].searchField().setText("M 31");
+            });
+            juranometria.chart.ChartViewState before = controller.state();
+            java.awt.Rectangle shown = chart[0].getBounds();
+            int barHeight = chrome[0].toolbar().getHeight();
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                chrome[0].toolbar().setVisible(false);
+                window[0].doLayout();
+            });
+            java.awt.Rectangle hidden = chart[0].getBounds();
+            require(hidden.y == 0 && hidden.height == shown.height + barHeight
+                            && hidden.width == shown.width,
+                    "hidden, the chart gains the bar's " + barHeight + " px and nothing"
+                            + " else: " + shown + " -> " + hidden);
+            require(controller.state().equals(before) && lock.locked()
+                            && chart[0].emphasizedSet().contains(
+                                    juranometria.render.ChartStructure.EQUATORIAL_GRID)
+                            && "M 31".equals(chrome[0].searchField().getText()),
+                    "and the centre, field, magnitude, target, lock, emphasis and"
+                            + " search text are untouched");
+
+            // The companion's controls reach the chart while the bar is hidden.
+            javax.swing.SwingUtilities.invokeAndWait(() -> section[0].zoomIn().doClick());
+            require(controller.state().fieldWidthDegrees() < before.fieldWidthDegrees()
+                            && chrome[0].toolbar().controls().readout().getText().equals(
+                                    section[0].readout().getText()),
+                    "a step in the companion reaches the chart with the bar hidden, and"
+                            + " the hidden bar follows: "
+                            + section[0].readout().getText());
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                chrome[0].toolbar().setVisible(true);
+                window[0].doLayout();
+            });
+            require(chart[0].getBounds().equals(shown), "shown again, the chart as before");
+
+            // The choice, and the window, round-trip the bundled runtime's backend.
+            juranometria.ui.ChartChromeStore chrome_ =
+                    juranometria.ui.ChartChromeStore.forNode(scratch);
+            require(chrome_.toolbarShownOrDefault(), "a fresh profile shows the bar");
+            chrome_.saveToolbarShown(false);
+            juranometria.ui.ChartWindowStore windows =
+                    juranometria.ui.ChartWindowStore.forNode(scratch);
+            windows.saveBounds(new java.awt.Rectangle(306, 75, 900, 785));
+            windows.saveMaximized(true);
+            scratch.flush();
+            require(!juranometria.ui.ChartChromeStore.forNode(scratch).toolbarShownOrDefault()
+                            && juranometria.ui.ChartWindowStore.forNode(scratch).maximized()
+                            && juranometria.ui.ChartWindowStore.forNode(scratch).bounds()
+                                    .equals(java.util.Optional.of(
+                                            new java.awt.Rectangle(306, 75, 900, 785))),
+                    "the bar's visibility, the ordinary bounds and the maximised flag"
+                            + " round-trip, kept apart");
+            for (String key : scratch.keys()) {
+                require(key.equals("chartToolbarShown") || key.startsWith("window.")
+                                || languageKeys.contains(key),
+                        "only the chrome's, the window's and the language's keys: " + key);
+            }
+
+            // Placement: a display that has gone, and what is never remembered.
+            java.awt.Rectangle laptop = new java.awt.Rectangle(0, 33, 1512, 868);
+            require(juranometria.ui.ChartWindowPlacement.opening(
+                            java.util.Optional.of(new java.awt.Rectangle(1700, -300, 1800, 1200)),
+                            java.util.List.of(laptop), new java.awt.Dimension(640, 480))
+                            .isEmpty(),
+                    "a window remembered on a monitor that has gone opens as it always has");
+            require(juranometria.ui.ChartWindowPlacement.opening(
+                            java.util.Optional.of(new java.awt.Rectangle(306, 75, 900, 785)),
+                            java.util.List.of(laptop), new java.awt.Dimension(640, 480))
+                            .equals(java.util.Optional.of(new java.awt.Rectangle(306, 75, 900, 785))),
+                    "and one on a screen that exists opens where it was");
+            java.awt.Rectangle screen = new java.awt.Rectangle(0, 0, 1512, 982);
+            java.awt.Insets bars = new java.awt.Insets(33, 0, 81, 0);
+            require(juranometria.ui.ChartWindowPlacement.ordinary(
+                            new java.awt.Rectangle(306, 75, 900, 785), true, screen, bars)
+                            && !juranometria.ui.ChartWindowPlacement.ordinary(
+                                    new java.awt.Rectangle(0, 33, 1512, 868), false, screen, bars)
+                            && !juranometria.ui.ChartWindowPlacement.ordinary(
+                                    new java.awt.Rectangle(0, 33, 1512, 949), true, screen, bars),
+                    "ordinary bounds are remembered; a maximised window's are the flag's;"
+                            + " native full screen's are not remembered (measured on #449)");
+        } finally {
+            scratch.removeNode();
+        }
+        System.out.println("clean chart OK (View's Chart Toolbar item with the registry's"
+                + " keystroke; hidden, the chart gains the bar's height and nothing else;"
+                + " the companion's controls reach the chart meanwhile; the choice, the"
+                + " ordinary bounds and the maximised flag round-trip; a gone display"
+                + " recovered; full screen never remembered)");
     }
 
     private static javax.swing.JMenuItem menuItem(javax.swing.JPopupMenu menu,

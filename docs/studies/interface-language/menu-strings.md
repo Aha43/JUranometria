@@ -40,7 +40,7 @@ open menu would cover the thing it explains.
 
 ![](menu-en-1-menus.png)
 
-Bar packed 575 × 310 px; widest popup 211 px.
+Bar packed 599 × 333 px; widest popup 211 px.
 
 | channel | words |
 |---|---|
@@ -70,6 +70,11 @@ Bar packed 575 × 310 px; widest popup 211 px.
 | item spoken name \| Controls |
 | item spoken description \| Shows or hides the Controls window, which keeps Place and Time beside the chart; it opens again where you left it. |
 | item access letter (language) \| R |
+| item label \| Chart Toolbar |
+| item spoken name \| Chart Toolbar |
+| item spoken description \| Shows or hides the chart window's toolbar. Its controls remain in the Controls window; the chart keeps its centre, field and everything it draws. |
+| item accelerator (platform notation) \| ⌘+⇧T |
+| item access letter (language) \| T |
 | item label \| Sun... |
 | item hover \| Where the Sun is, for the place and instant set in Place and Time |
 | item spoken name \| Sun table |
@@ -119,7 +124,7 @@ Bar packed 575 × 310 px; widest popup 211 px.
 
 ![](menu-en-2-checked.png)
 
-Bar packed 575 × 310 px; widest popup 211 px.
+Bar packed 599 × 333 px; widest popup 211 px.
 
 | channel | words |
 |---|---|
@@ -149,6 +154,11 @@ Bar packed 575 × 310 px; widest popup 211 px.
 | item spoken name \| Controls |
 | item spoken description \| Shows or hides the Controls window, which keeps Place and Time beside the chart; it opens again where you left it. |
 | item access letter (language) \| R |
+| item label [checked] \| Chart Toolbar |
+| item spoken name \| Chart Toolbar |
+| item spoken description \| Shows or hides the chart window's toolbar. Its controls remain in the Controls window; the chart keeps its centre, field and everything it draws. |
+| item accelerator (platform notation) \| ⌘+⇧T |
+| item access letter (language) \| T |
 | item label \| Sun... |
 | item hover \| Where the Sun is, for the place and instant set in Place and Time |
 | item spoken name \| Sun table |
@@ -198,7 +208,7 @@ Bar packed 575 × 310 px; widest popup 211 px.
 
 ![](menu-en-3-widest.png)
 
-Bar packed 575 × 310 px; widest popup 211 px.
+Bar packed 599 × 333 px; widest popup 211 px.
 
 | channel | words |
 |---|---|
@@ -228,6 +238,11 @@ Bar packed 575 × 310 px; widest popup 211 px.
 | item spoken name \| Controls |
 | item spoken description \| Shows or hides the Controls window, which keeps Place and Time beside the chart; it opens again where you left it. |
 | item access letter (language) \| R |
+| item label \| Chart Toolbar |
+| item spoken name \| Chart Toolbar |
+| item spoken description \| Shows or hides the chart window's toolbar. Its controls remain in the Controls window; the chart keeps its centre, field and everything it draws. |
+| item accelerator (platform notation) \| ⌘+⇧T |
+| item access letter (language) \| T |
 | item label \| Sun... |
 | item hover \| Where the Sun is, for the place and instant set in Place and Time |
 | item spoken name \| Sun table |
@@ -277,7 +292,7 @@ Bar packed 575 × 310 px; widest popup 211 px.
 
 ![](menu-en-4-narrowest.png)
 
-Bar packed 575 × 310 px; widest popup 211 px.
+Bar packed 599 × 333 px; widest popup 211 px.
 
 | channel | words |
 |---|---|
@@ -307,6 +322,11 @@ Bar packed 575 × 310 px; widest popup 211 px.
 | item spoken name \| Controls |
 | item spoken description \| Shows or hides the Controls window, which keeps Place and Time beside the chart; it opens again where you left it. |
 | item access letter (language) \| R |
+| item label \| Chart Toolbar |
+| item spoken name \| Chart Toolbar |
+| item spoken description \| Shows or hides the chart window's toolbar. Its controls remain in the Controls window; the chart keeps its centre, field and everything it draws. |
+| item accelerator (platform notation) \| ⌘+⇧T |
+| item access letter (language) \| T |
 | item label \| Sun... |
 | item hover \| Where the Sun is, for the place and instant set in Place and Time |
 | item spoken name \| Sun table |
@@ -358,7 +378,7 @@ Bar packed 575 × 310 px; widest popup 211 px.
 
 ![](menu-nb-NO-5-menus.png)
 
-Bar packed 578 × 310 px; widest popup 201 px.
+Bar packed 618 × 333 px; widest popup 201 px.
 
 | channel | words |
 |---|---|
@@ -388,6 +408,11 @@ Bar packed 578 × 310 px; widest popup 201 px.
 | item spoken name \| Kontroller |
 | item spoken description \| Viser eller skjuler vinduet Kontroller, som har Sted og tid ved siden av kartet; det åpnes igjen der du forlot det. |
 | item access letter (language) \| R |
+| item label \| Kartverktøylinje |
+| item spoken name \| Kartverktøylinje |
+| item spoken description \| Viser eller skjuler verktøylinjen i kartvinduet. Kontrollene finnes fortsatt i vinduet Kontroller; kartet beholder sentrum, synsfelt og alt det tegner. |
+| item accelerator (platform notation) \| ⌘+⇧T |
+| item access letter (language) \| V |
 | item label \| Solen... |
 | item hover \| Hvor Solen er, for stedet og tidspunktet satt i Sted og tid |
 | item spoken name \| Soltabell |
@@ -437,7 +462,7 @@ Bar packed 578 × 310 px; widest popup 201 px.
 
 ![](menu-nb-NO-6-checked.png)
 
-Bar packed 578 × 310 px; widest popup 201 px.
+Bar packed 618 × 333 px; widest popup 201 px.
 
 | channel | words |
 |---|---|
@@ -467,6 +492,11 @@ Bar packed 578 × 310 px; widest popup 201 px.
 | item spoken name \| Kontroller |
 | item spoken description \| Viser eller skjuler vinduet Kontroller, som har Sted og tid ved siden av kartet; det åpnes igjen der du forlot det. |
 | item access letter (language) \| R |
+| item label [checked] \| Kartverktøylinje |
+| item spoken name \| Kartverktøylinje |
+| item spoken description \| Viser eller skjuler verktøylinjen i kartvinduet. Kontrollene finnes fortsatt i vinduet Kontroller; kartet beholder sentrum, synsfelt og alt det tegner. |
+| item accelerator (platform notation) \| ⌘+⇧T |
+| item access letter (language) \| V |
 | item label \| Solen... |
 | item hover \| Hvor Solen er, for stedet og tidspunktet satt i Sted og tid |
 | item spoken name \| Soltabell |
@@ -516,7 +546,7 @@ Bar packed 578 × 310 px; widest popup 201 px.
 
 ![](menu-nb-NO-7-widest.png)
 
-Bar packed 578 × 310 px; widest popup 201 px.
+Bar packed 618 × 333 px; widest popup 201 px.
 
 | channel | words |
 |---|---|
@@ -546,6 +576,11 @@ Bar packed 578 × 310 px; widest popup 201 px.
 | item spoken name \| Kontroller |
 | item spoken description \| Viser eller skjuler vinduet Kontroller, som har Sted og tid ved siden av kartet; det åpnes igjen der du forlot det. |
 | item access letter (language) \| R |
+| item label \| Kartverktøylinje |
+| item spoken name \| Kartverktøylinje |
+| item spoken description \| Viser eller skjuler verktøylinjen i kartvinduet. Kontrollene finnes fortsatt i vinduet Kontroller; kartet beholder sentrum, synsfelt og alt det tegner. |
+| item accelerator (platform notation) \| ⌘+⇧T |
+| item access letter (language) \| V |
 | item label \| Solen... |
 | item hover \| Hvor Solen er, for stedet og tidspunktet satt i Sted og tid |
 | item spoken name \| Soltabell |
@@ -595,7 +630,7 @@ Bar packed 578 × 310 px; widest popup 201 px.
 
 ![](menu-nb-NO-8-narrowest.png)
 
-Bar packed 578 × 310 px; widest popup 201 px.
+Bar packed 618 × 333 px; widest popup 201 px.
 
 | channel | words |
 |---|---|
@@ -625,6 +660,11 @@ Bar packed 578 × 310 px; widest popup 201 px.
 | item spoken name \| Kontroller |
 | item spoken description \| Viser eller skjuler vinduet Kontroller, som har Sted og tid ved siden av kartet; det åpnes igjen der du forlot det. |
 | item access letter (language) \| R |
+| item label \| Kartverktøylinje |
+| item spoken name \| Kartverktøylinje |
+| item spoken description \| Viser eller skjuler verktøylinjen i kartvinduet. Kontrollene finnes fortsatt i vinduet Kontroller; kartet beholder sentrum, synsfelt og alt det tegner. |
+| item accelerator (platform notation) \| ⌘+⇧T |
+| item access letter (language) \| V |
 | item label \| Solen... |
 | item hover \| Hvor Solen er, for stedet og tidspunktet satt i Sted og tid |
 | item spoken name \| Soltabell |

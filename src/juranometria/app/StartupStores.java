@@ -15,9 +15,10 @@ import juranometria.ui.placeandtime.PlaceStore;
  * preferences, which the evidence gate forbids and which would be
  * wrong even if it did not.
  *
- * <p>So they are gathered and handed in - nine since the Sun and the
- * Moon joined the chart (#415, #416), zoom could be locked (#428) and
- * the companion window remembered itself (#434).
+ * <p>So they are gathered and handed in - eleven since the Sun and the
+ * Moon joined the chart (#415, #416), zoom could be locked (#428), the
+ * companion window remembered itself (#434) and the chart window
+ * remembered its toolbar and its place (#450).
  * {@link #user()} is the one place that reaches for the reader's
  * nodes, and {@code main} is the one caller of it. A journey that wants to prove the shipping
  * route supplies its own and gets the real
@@ -42,7 +43,9 @@ record StartupStores(AppearanceStore appearance,
                      juranometria.ui.solar.SunChartStore sunChart,
                      juranometria.ui.solar.MoonChartStore moonChart,
                      juranometria.ui.ZoomLockStore zoomLock,
-                     juranometria.ui.companion.CompanionStore companion) {
+                     juranometria.ui.companion.CompanionStore companion,
+                     juranometria.ui.ChartChromeStore chartChrome,
+                     juranometria.ui.ChartWindowStore chartWindow) {
 
     StartupStores {
         require(appearance, "appearance");
@@ -54,6 +57,8 @@ record StartupStores(AppearanceStore appearance,
         require(moonChart, "moon on the chart");
         require(zoomLock, "zoom lock");
         require(companion, "companion window");
+        require(chartChrome, "chart chrome");
+        require(chartWindow, "chart window");
     }
 
     /**
@@ -69,7 +74,9 @@ record StartupStores(AppearanceStore appearance,
                 juranometria.ui.solar.SunChartStore.user(),
                 juranometria.ui.solar.MoonChartStore.user(),
                 juranometria.ui.ZoomLockStore.user(),
-                juranometria.ui.companion.CompanionStore.user());
+                juranometria.ui.companion.CompanionStore.user(),
+                juranometria.ui.ChartChromeStore.user(),
+                juranometria.ui.ChartWindowStore.user());
     }
 
     private static void require(Object store, String what) {

@@ -20,6 +20,7 @@ Recorded on: `Mac OS X 27.0/aarch64/Homebrew 21.0.12.1`
 
 | keystroke | what it does | where it is bound |
 |---|---|---|
+| `⌃+⇧+T` | Chart Toolbar | the View menu |
 | `⌃+E` | Export Chart Sheet... | the File menu |
 | `⌃+I` | Inspector | the View menu |
 | `⌃+=` | Zoom In | the View menu |
@@ -30,7 +31,7 @@ Recorded on: `Mac OS X 27.0/aarch64/Homebrew 21.0.12.1`
 | `⌃+⌨ +` | chart.zoomIn | the window's own keys |
 | `⌃+-` | chart.zoomOut | the window's own keys |
 | `⌃+⌨ -` | chart.zoomOut | the window's own keys |
-| **10 strokes** | | |
+| **11 strokes** | | |
 
 And a text field, under this look and feel on this platform, answers
 **49 keystrokes** of its own. That number is not the same everywhere - a

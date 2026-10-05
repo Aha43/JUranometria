@@ -42,6 +42,14 @@ public final class Shortcuts {
     public static final String ZOOM_IN = "zoomIn";
     /** Zoom out one step. */
     public static final String ZOOM_OUT = "zoomOut";
+    /**
+     * Show or hide the chart window's toolbar (#450, ruled on #449).
+     * Not spelled "toolbar": this class is reached by the chart's
+     * platform record, and a literal that is a prefix of every
+     * toolbar key would make the classifier read all of them as the
+     * chart's.
+     */
+    public static final String TOOLBAR = "chartToolbar";
 
     /**
      * One keystroke the application answers.
@@ -77,7 +85,14 @@ public final class Shortcuts {
                             menuMask())),
             new Shortcut(ZOOM_OUT, "Zoom out",
                     KeyStroke.getKeyStroke(KeyEvent.VK_MINUS,
-                            menuMask())));
+                            menuMask())),
+            // Shift with the menu modifier (ruled on #449): the macOS
+            // convention for a toolbar is Option, but Ctrl+Alt+T opens
+            // a terminal on GNOME before any application sees it, and
+            // a keystroke a tooltip names must work where it is named.
+            new Shortcut(TOOLBAR, "Chart toolbar",
+                    KeyStroke.getKeyStroke(KeyEvent.VK_T,
+                            menuMask() | InputEvent.SHIFT_DOWN_MASK)));
 
     /** Every keystroke the application binds, in menu order. */
     public static List<Shortcut> all() {
