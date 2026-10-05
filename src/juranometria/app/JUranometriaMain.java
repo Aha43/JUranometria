@@ -297,6 +297,22 @@ public final class JUranometriaMain {
         juranometria.ui.companion.CompanionWindow companion =
                 new juranometria.ui.companion.CompanionWindow(frame,
                         companionWords, companionStore);
+        // Chart controls (Sprint 41, issue #450, ruled on #449): the
+        // chart's own controls as a compact section, first, because it
+        // is the one a reader reaches for while the chart is a clean
+        // sheet on another display. A second set of the same class the
+        // bar hosts, over the same authorities and the shared actions;
+        // its search field is its own, wired to the same selection
+        // services as the bar's, so what it finds joins the same
+        // working selection under the same mode.
+        juranometria.ui.ChartControls chartControls =
+                controls.companionControls(chart);
+        chartControls.search().setSelectionModel(selection);
+        chartControls.search().setWorkingSelection(modules.workingSelection(),
+                modules.selectionMode());
+        companion.addSection("chartcontrols",
+                companionWords.say("chartcontrols.title"),
+                chartControls.inCompanion());
         companion.addSection("placeandtime",
                 companionWords.say("placeandtime.title"),
                 new juranometria.ui.placeandtime.PlaceAndTimePanel(meridian,

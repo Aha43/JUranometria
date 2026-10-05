@@ -2,6 +2,7 @@ package juranometria.app;
 
 import juranometria.chart.SelectionMode;
 import juranometria.ui.AtlasToolbar;
+import juranometria.ui.ChartControls;
 import juranometria.ui.ChartViewController;
 import juranometria.ui.InspectorToggle;
 import juranometria.ui.SceneAssembler;
@@ -56,11 +57,23 @@ public final class AtlasChrome {
 
     private final InterfaceText said;
 
+    /** What a second host of the chart's controls is built over (#450). */
+    private record Authorities(ChartViewController controller,
+                               LocalSearch search, SceneAssembler assembler,
+                               InspectorToggle inspector,
+                               SelectionMode selectionMode,
+                               juranometria.ui.ZoomLock zoomLock,
+                               juranometria.ui.ChartActions actions) {
+    }
+
+    private final Authorities authorities;
+
     private AtlasChrome(SearchField searchField, AtlasToolbar toolbar,
-                          InterfaceText said) {
+                          InterfaceText said, Authorities authorities) {
         this.searchField = searchField;
         this.toolbar = toolbar;
         this.said = said;
+        this.authorities = authorities;
     }
 
     /**
@@ -102,9 +115,42 @@ public final class AtlasChrome {
                 InterfaceText.forLanguage(language.interfaceLanguage());
         SearchField field = new SearchField(search, assembler, controller,
                 said);
+        // The two actions that are more than one call, built once here
+        // and shared with every host the chrome composes (#450).
+        juranometria.ui.ChartActions actions =
+                new juranometria.ui.ChartActions(controller);
         AtlasToolbar bar = new AtlasToolbar(controller, field, inspector,
-                versionText, requestExit, selectionMode, zoomLock, said);
-        return new AtlasChrome(field, bar, said);
+                versionText, requestExit, selectionMode, zoomLock, actions,
+                said);
+        return new AtlasChrome(field, bar, said, new Authorities(controller,
+                search, assembler, inspector, selectionMode, zoomLock, actions));
+    }
+
+    /**
+     * The chart's controls for the Controls companion (Sprint 41,
+     * issue #450, ruled on #449): a second {@link ChartControls} over
+     * the same authorities the bar follows, with a search field of its
+     * own in the same language, and Emphasis attached to the chart.
+     *
+     * <p>Composed here for the reason the bar is: the companion's
+     * controls must speak the session's language, and a second host
+     * that quietly built its own field in a default language would be
+     * the #350 defect again. The field's selection services are the
+     * application's to wire, as the bar's are.
+     */
+    public ChartControls companionControls(juranometria.ui.ChartComponent chart) {
+        SearchField field = new SearchField(authorities.search(),
+                authorities.assembler(), authorities.controller(), said);
+        ChartControls controls = new ChartControls(authorities.controller(),
+                field, authorities.inspector(), authorities.selectionMode(),
+                authorities.zoomLock(), authorities.actions(), said);
+        controls.attachEmphasis(chart);
+        return controls;
+    }
+
+    /** The actions the bar and the companion share: Home and Emphasis. */
+    public juranometria.ui.ChartActions actions() {
+        return authorities.actions();
     }
 
     /** The field a reader types into. */

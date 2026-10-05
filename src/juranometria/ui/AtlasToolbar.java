@@ -1,17 +1,11 @@
 package juranometria.ui;
 
-import java.util.Locale;
-
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JToolBar;
 
-import com.formdev.flatlaf.extras.FlatSVGIcon;
-
-import juranometria.chart.ChartViewState;
 import juranometria.ui.language.InterfaceText;
-import juranometria.ui.language.ShortcutText;
 
 /**
  * The compact atlas toolbar: zoom, magnitude-limit, and reset controls
@@ -19,20 +13,19 @@ import juranometria.ui.language.ShortcutText;
  * competing with it; controls disable themselves at the fixture bounds
  * through the view state's can-queries, so the toolbar can never promise
  * data the fixture does not hold.
+ *
+ * <p>Since Sprint 41 (issue #450, ruled on #449) the bar is one
+ * <strong>host</strong> of {@link ChartControls}: the controls, their
+ * words, their enablement and their following of the authorities live
+ * there, and the Controls companion holds a second set of the same
+ * class. What is the bar's own is the arrangement, the version, the way
+ * out, and the responsive rule below.
  */
 public final class AtlasToolbar extends JToolBar {
 
     private final InterfaceText said;
-    private final ShortcutText shortcuts;
-    private final JButton zoomIn;
-    private final JButton zoomOut;
-    private final JButton fewerStars;
-    private final JButton moreStars;
-    private final JButton resetView;
-    private final JLabel readout = new JLabel();
-    private javax.swing.JToggleButton inspectorButton;
-    private javax.swing.JToggleButton accumulate;
-    private javax.swing.JToggleButton zoomLock;
+    private final ChartControls controls;
+    private final JLabel readout;
     /**
      * The running version, as status text (issue #198). The toolbar
      * is handed the string rather than looking it up, so it holds no
@@ -43,8 +36,7 @@ public final class AtlasToolbar extends JToolBar {
     private JLabel version;
     private JButton exit;
     private javax.swing.JComponent versionGap;
-    private JButton emphasis;
-    private SearchField searchFieldComponent;
+    private final SearchField searchFieldComponent;
 
     AtlasToolbar(ChartViewController controller,
                  SearchField searchField) {
@@ -86,18 +78,6 @@ public final class AtlasToolbar extends JToolBar {
                 (juranometria.chart.SelectionMode) null);
     }
 
-    /**
-     * The toolbar with the visible <strong>Accumulate</strong>
-     * control (issue #261, decided by the #258 gate): the switch
-     * that makes gestures add and remove instead of replace, placed
-     * beside search so it serves chart and table gestures alike. The
-     * control exists so the operation is discoverable and accessible
-     * without remembering a modifier - the platform's
-     * add-to-selection modifier always works regardless.
-     *
-     * <p>The toolbar reads and writes the shared mode and holds no
-     * state of its own, the same seam as every other control here.
-     */
     /**
      * The bar with a language, and without the optional parts.
      *
@@ -160,7 +140,8 @@ public final class AtlasToolbar extends JToolBar {
     /**
      * The bar with the zoom lock beside the zoom buttons (Sprint 38,
      * issue #428). A null lock leaves the toggle out, which is every
-     * earlier caller's bar.
+     * earlier caller's bar. The bar's own actions, shared with no other
+     * host: a harness's bar.
      */
     public AtlasToolbar(ChartViewController controller,
                         SearchField searchField,
@@ -170,104 +151,54 @@ public final class AtlasToolbar extends JToolBar {
                         juranometria.chart.SelectionMode selectionMode,
                         ZoomLock lock,
                         InterfaceText said) {
+        this(controller, searchField, inspector, versionText, requestExit,
+                selectionMode, lock, new ChartActions(controller), said);
+    }
+
+    /**
+     * The bar over actions another host shares (Sprint 41, issue
+     * #450): Home and Emphasis are the actions', so the bar and the
+     * companion cannot come to do different things.
+     */
+    public AtlasToolbar(ChartViewController controller,
+                        SearchField searchField,
+                        InspectorToggle inspector,
+                        String versionText,
+                        Runnable requestExit,
+                        juranometria.chart.SelectionMode selectionMode,
+                        ZoomLock lock,
+                        ChartActions actions,
+                        InterfaceText said) {
         if (said == null) {
             throw new IllegalArgumentException(
                     "the bar has to say its words in some language");
         }
         this.said = said;
-        this.shortcuts = ShortcutText.in(said);
         this.searchFieldComponent = searchField;
         setFloatable(false);
+        controls = new ChartControls(controller, searchField, inspector,
+                selectionMode, lock, actions, said);
+        readout = controls.readout();
 
-        // The keys are named from the one registry that binds them,
-        // so a tooltip cannot promise a stroke the menu does not
-        // answer, or spell a modifier this platform does not use.
-        zoomIn = iconButton("zoom-in", said.say("toolbar.zoomIn.a11y"),
-                shortcuts.withKeystroke(said.say("toolbar.zoomIn.hover"),
-                        Shortcuts.ZOOM_IN),
-                said.say("toolbar.zoomIn.explain"),
-                controller::zoomIn);
-        zoomOut = iconButton("zoom-out", said.say("toolbar.zoomOut.a11y"),
-                shortcuts.withKeystroke(said.say("toolbar.zoomOut.hover"),
-                        Shortcuts.ZOOM_OUT),
-                said.say("toolbar.zoomOut.explain"),
-                controller::zoomOut);
-        fewerStars = iconButton("minus", said.say("toolbar.fewerStars.a11y"),
-                said.say("toolbar.fewerStars.hover"),
-                said.say("toolbar.fewerStars.explain"),
-                controller::decreaseMagnitudeLimit);
-        moreStars = iconButton("plus", said.say("toolbar.moreStars.a11y"),
-                said.say("toolbar.moreStars.hover"),
-                said.say("toolbar.moreStars.explain"),
-                controller::increaseMagnitudeLimit);
-        resetView = iconButton("zoom-reset", said.say("toolbar.reset.a11y"),
-                said.say("toolbar.reset.hover"),
-                said.say("toolbar.reset.explain"),
-                () -> {
-                    controller.reset();
-                    searchField.clearSearch();
-                });
-
-        add(zoomIn);
-        add(zoomOut);
-        if (lock != null) {
+        add(controls.zoomIn());
+        add(controls.zoomOut());
+        if (controls.zoomLock() != null) {
             // Beside the controls it leaves working: a deliberate
             // press of either still zooms while the wheel is locked.
-            // The toggle asks the shared lock and shows what it says,
-            // so the remembered choice and the bar cannot disagree.
-            zoomLock = new javax.swing.JToggleButton(
-                    said.say("toolbar.zoomLock.label"), lock.locked());
-            zoomLock.setName(ZOOM_LOCK);
-            zoomLock.setFocusable(true);
-            zoomLock.getAccessibleContext().setAccessibleName(
-                    said.say("toolbar.zoomLock.a11y"));
-            Explain.control(zoomLock,
-                    said.say("toolbar.zoomLock.hover"),
-                    said.say("toolbar.zoomLock.explain"));
-            zoomLock.addActionListener(event -> {
-                lock.lock(zoomLock.isSelected());
-                zoomLock.setSelected(lock.locked());
-            });
-            lock.onChange(zoomLock::setSelected);
-            add(zoomLock);
+            add(controls.zoomLock());
         }
         addSeparator();
-        add(fewerStars);
-        add(moreStars);
+        add(controls.fewerStars());
+        add(controls.moreStars());
         addSeparator();
-        add(resetView);
+        add(controls.home());
         addSeparator();
-        if (inspector != null) {
-            inspectorButton = new javax.swing.JToggleButton(
-                    new FlatSVGIcon("resources/icons/list-details.svg", 16, 16));
-            inspectorButton.setFocusable(true);
-            inspectorButton.getAccessibleContext().setAccessibleName(
-                    said.say("toolbar.inspector.a11y"));
-            inspectorButton.addActionListener(event -> {
-                // Ask, then let the answer come back through the
-                // shared switch: pressing does not decide the state.
-                inspector.toggle();
-                syncInspector(inspector.state());
-            });
-            inspector.onChange(this::syncInspector);
-            add(inspectorButton);
+        if (controls.inspector() != null) {
+            add(controls.inspector());
             addSeparator();
         }
-        if (selectionMode != null) {
-            accumulate = new javax.swing.JToggleButton(
-                    said.say("toolbar.accumulate.label"));
-            accumulate.setFocusable(true);
-            accumulate.getAccessibleContext().setAccessibleName(
-                    said.say("toolbar.accumulate.a11y"));
-            Explain.control(accumulate,
-                    said.say("toolbar.accumulate.hover"),
-                    said.say("toolbar.accumulate.explain"));
-            accumulate.addActionListener(event ->
-                    selectionMode.accumulate(accumulate.isSelected()));
-            // The mode is the truth; the button says what it holds,
-            // however it was changed.
-            selectionMode.onChange(accumulate::setSelected);
-            add(accumulate);
+        if (controls.accumulate() != null) {
+            add(controls.accumulate());
             addSeparator();
         }
         add(searchField);
@@ -305,14 +236,25 @@ public final class AtlasToolbar extends JToolBar {
 
         }
         if (requestExit != null) {
-            exit = iconButton("door-exit", said.say("toolbar.exit.a11y"),
-                    said.say("toolbar.exit.hover"),
-                    said.say("toolbar.exit.explain"),
-                    requestExit);
+            // The bar's own, not the controls': the door is
+            // application furniture, and the companion has none
+            // (ruled on #449).
+            exit = new JButton(new com.formdev.flatlaf.extras.FlatSVGIcon(
+                    "resources/icons/door-exit.svg", 16, 16));
+            exit.getAccessibleContext().setAccessibleName(
+                    said.say("toolbar.exit.a11y"));
+            exit.setFocusable(true);
+            exit.addActionListener(e -> requestExit.run());
+            Explain.control(exit, said.say("toolbar.exit.hover"),
+                    said.say("toolbar.exit.explain"));
             add(exit);
         }
 
-        keepButtonsReachableByKeyboard();
+        // Every button here is built asking to be focusable, and the
+        // look and feel takes it away again when a button joins a
+        // toolbar. Re-asserted after everything is added, so the order
+        // of construction cannot decide it (#203 review).
+        ChartControls.keepReachableByKeyboard(this);
 
         // The bar watches its own width. The rule used to be wired
         // by the application, which meant every other window that
@@ -327,33 +269,6 @@ public final class AtlasToolbar extends JToolBar {
                 setAvailableWidth(getWidth());
             }
         });
-
-        // Enablement asks the controller, whose can-queries include the
-        // coverage predicate, so a zoom that would leave the bundled data
-        // is disabled rather than refused after the click.
-        controller.onChange(state -> sync(controller, state));
-    }
-
-    /**
-     * Every button here is built asking to be focusable, and the look
-     * and feel takes it away again: FlatLaf's toolbars make their
-     * buttons unfocusable by convention, which it applies when a
-     * button is added. The effect was that <em>no</em> control on
-     * this bar could be reached by keyboard, though the code had
-     * said it should be since the toolbar was written.
-     *
-     * <p>Re-asserted here, after everything is added, so the order of
-     * construction cannot decide it. Local to this toolbar rather
-     * than a change to the look and feel's defaults: what is claimed
-     * is that the atlas's own controls are reachable, not that every
-     * toolbar everywhere should be.
-     */
-    private void keepButtonsReachableByKeyboard() {
-        for (java.awt.Component child : getComponents()) {
-            if (child instanceof javax.swing.AbstractButton) {
-                child.setFocusable(true);
-            }
-        }
     }
 
     /**
@@ -435,16 +350,21 @@ public final class AtlasToolbar extends JToolBar {
     }
 
     /** The component name the zoom lock carries, for tests (#428). */
-    public static final String ZOOM_LOCK = "zoomLock";
+    public static final String ZOOM_LOCK = ChartControls.ZOOM_LOCK;
 
     /** The zoom lock, or null on a bar built without one (#428). */
     public javax.swing.JToggleButton zoomLockButton() {
-        return zoomLock;
+        return controls.zoomLock();
     }
 
     /** The Accumulate control, for tests that drive it as a reader would. */
     public javax.swing.JToggleButton accumulateButton() {
-        return accumulate;
+        return controls.accumulate();
+    }
+
+    /** The controls this bar hosts, for a host that checks what it shares. */
+    public ChartControls controls() {
+        return controls;
     }
 
     /**
@@ -471,209 +391,31 @@ public final class AtlasToolbar extends JToolBar {
     }
 
     /**
-     * The button says what is true: selected when the panel is
-     * showing, and disabled - never selected - when the window is too
-     * narrow to show it, so it cannot claim a panel that is not
-     * there.
-     */
-    private void syncInspector(InspectorToggle.State state) {
-        if (inspectorButton == null) {
-            return;
-        }
-        inspectorButton.setSelected(state.showing());
-        inspectorButton.setEnabled(state.available());
-        // Disabled is the case worth writing: a control that has gone
-        // grey and says nothing leaves a reader to guess whether the
-        // atlas is broken or the window is small.
-        if (!state.available()) {
-            Explain.dynamic(inspectorButton,
-                    said.say("toolbar.inspector.unavailable.hover"),
-                    said.say("toolbar.inspector.unavailable.explain"));
-        } else if (state.showing()) {
-            Explain.dynamic(inspectorButton,
-                    shortcuts.withKeystroke(
-                            said.say("toolbar.inspector.showing.hover"),
-                            Shortcuts.INSPECTOR),
-                    said.say("toolbar.inspector.showing.explain"));
-        } else {
-            Explain.dynamic(inspectorButton,
-                    shortcuts.withKeystroke(
-                            said.say("toolbar.inspector.hidden.hover"),
-                            Shortcuts.INSPECTOR),
-                    said.say("toolbar.inspector.hidden.explain"));
-        }
-    }
-
-    private void sync(ChartViewController controller, ChartViewState state) {
-        zoomIn.setEnabled(controller.canZoomIn());
-        zoomOut.setEnabled(controller.canZoomOut());
-        fewerStars.setEnabled(controller.canDecreaseMagnitudeLimit());
-        moreStars.setEnabled(controller.canIncreaseMagnitudeLimit());
-
-        // The values are notation and are spelled once, in ROOT, then
-        // handed over already written. A language places them; none
-        // re-formats them, so a decimal point cannot become a comma
-        // in a magnitude (#350).
-        String field = String.format(Locale.ROOT, "%.0f",
-                state.fieldWidthDegrees());
-        String limit = String.format(Locale.ROOT, "%.1f",
-                state.limitingMagnitude());
-        readout.setText(said.say("toolbar.readout", field, limit));
-
-        say(zoomOut, "toolbar.zoomOut", Shortcuts.ZOOM_OUT,
-                controller.canZoomOut() ? state.zoomOut() : null, state);
-        say(zoomIn, "toolbar.zoomIn", Shortcuts.ZOOM_IN,
-                controller.canZoomIn() ? state.zoomIn() : null, state);
-
-        // A step the ladder will not take must say so. Zoom has said
-        // it since #203; the magnitude controls went grey and went on
-        // describing what they would do, which told a reader at the
-        // end of the ladder that the control does something it will
-        // not (#350 inventory).
-        sayLimit(fewerStars, "toolbar.fewerStars",
-                controller.canDecreaseMagnitudeLimit(), limit);
-        sayLimit(moreStars, "toolbar.moreStars",
-                controller.canIncreaseMagnitudeLimit(), limit);
-    }
-
-    /** A magnitude step, and what it says at the end of its ladder. */
-    private void sayLimit(JButton button, String stem, boolean canStep,
-                          String limit) {
-        Explain.dynamic(button,
-                canStep ? said.say(stem + ".hover")
-                        : said.say(stem + ".end.hover", limit),
-                canStep ? said.say(stem + ".explain")
-                        : said.say(stem + ".end.explain", limit));
-    }
-
-    /**
-     * What a zoom control leads to, when it leads somewhere new.
-     *
-     * <p>The overview is another rung of the same ladder rather than
-     * a mode with a switch, which is the gate's decision and not a
-     * shortcut: a reader who had to be told which projection was
-     * drawing would be a reader being told about a problem they do
-     * not have (docs/decisions/overview-projection.md). But the
-     * <em>step</em> that leaves the detailed atlas is worth
-     * announcing, because it is the one step of the ladder where a
-     * reader gets a different kind of chart - wide, whole, and not
-     * for pointing a telescope at.
-     *
-     * <p>So the control says where it goes, and only at that step. A
-     * button that renamed itself at every rung would be a readout
-     * pretending to be a control.
-     */
-    private void say(JButton button, String stem, String id,
-                     ChartViewState next, ChartViewState state) {
-        // Four whole forms, one per situation, and no sentence built
-        // from pieces. The old end-of-ladder line was assembled by
-        // lowercasing the button's English label with Locale.ROOT -
-        // an English rule about English words, offered as though it
-        // were universal, and the same defect Chart Options had in
-        // its dependency clause (#350).
-        String hovered = shortcuts.withKeystroke(
-                said.say(stem + ".hover"), id);
-        String heard = said.say(stem + ".explain");
-        if (next == null) {
-            heard = said.say(stem + ".end");
-        } else if (next.overview() != state.overview()) {
-            // Whole keys, not a stem with a fragment glued on. The
-            // schema is explicit keys so that every one of them can
-            // be found by searching for it; a key assembled at
-            // runtime is a key no grep will ever locate.
-            hovered = shortcuts.withKeystroke(said.say(next.overview()
-                    ? "toolbar.zoomOut.overview.hover"
-                    : "toolbar.zoomIn.overview.hover"), id);
-            heard = said.say(next.overview()
-                    ? "toolbar.zoomOut.overview.explain"
-                    : "toolbar.zoomIn.overview.explain");
-        }
-        Explain.dynamic(button, hovered, heard);
-    }
-
-    /**
      * Installs the compact Emphasis control (issue #361), before the
-     * search field.
-     *
-     * <p>One button opening one radio menu: Normal and the six
-     * semantic structures, in the ruled order. The chart's transient
-     * state is the only truth - the menu is built fresh each time it
-     * opens, so it reads the chart rather than remembering it, and
-     * unavailable targets arrive disabled. Choosing Normal, or
-     * choosing the active target again, settles the page. Nothing
-     * here is persisted, and nothing here touches the selection.
+     * search field: the controls' button, over the one menu the shared
+     * actions build. Re-asserted focusable after it is added, because
+     * the look and feel takes focusability away from a button joining
+     * a toolbar, and this one joined after the bar had re-asserted its
+     * others - the one control a keyboard could not reach (#449).
      */
     public void attachEmphasis(ChartComponent chart) {
         if (chart == null) {
             throw new IllegalArgumentException("a chart is required");
         }
-        if (emphasis != null) {
-            throw new IllegalStateException(
-                    "the emphasis control is attached once");
-        }
-        emphasis = new JButton(said.say("toolbar.emphasis.label"));
-        emphasis.setFocusable(true);
-        emphasis.getAccessibleContext().setAccessibleName(
-                said.say("toolbar.emphasis.a11y"));
-        Explain.control(emphasis, said.say("toolbar.emphasis.hover"),
-                said.say("toolbar.emphasis.explain"));
-        emphasis.addActionListener(event -> emphasisMenu(chart)
-                .show(emphasis, 0, emphasis.getHeight()));
+        JButton emphasis = controls.attachEmphasis(chart);
         int before = getComponentIndex(searchFieldComponent);
         add(emphasis, before);
         add(new javax.swing.JToolBar.Separator(), before + 1);
+        emphasis.setFocusable(true);
     }
 
     /** The installed control; package-visible for its contracts. */
     JButton emphasisButton() {
-        return emphasis;
+        return controls.emphasis();
     }
 
     /** The menu, reading the chart at the moment it opens. */
     javax.swing.JPopupMenu emphasisMenu(ChartComponent chart) {
-        java.util.Set<juranometria.render.ChartStructure> raised =
-                chart.emphasizedSet();
-        javax.swing.JPopupMenu menu = new javax.swing.JPopupMenu();
-        javax.swing.JMenuItem normal = new javax.swing.JMenuItem(
-                said.say("emphasis.normal"));
-        normal.getAccessibleContext().setAccessibleName(
-                said.say("emphasis.normal"));
-        normal.setEnabled(!raised.isEmpty());
-        normal.addActionListener(event -> chart.clearEmphasis());
-        menu.add(normal);
-        menu.addSeparator();
-        for (juranometria.render.ChartStructure structure
-                : juranometria.render.ChartStructure.values()) {
-            String name = said.say("emphasis." + structure.token());
-            javax.swing.JCheckBoxMenuItem item =
-                    new javax.swing.JCheckBoxMenuItem(name,
-                            raised.contains(structure));
-            item.getAccessibleContext().setAccessibleName(name);
-            item.setEnabled(raised.contains(structure)
-                    || chart.emphasisAvailable(structure));
-            // Choosing a structure toggles only that structure
-            // (multiple-emphasis ruling).
-            item.addActionListener(event ->
-                    chart.toggleEmphasis(structure));
-            menu.add(item);
-        }
-        return menu;
-    }
-
-    /**
-     * An icon-only control, which is the kind that most needs both
-     * sentences: there are no visible words at all, so the tooltip
-     * is the only thing a sighted reader has and the description is
-     * the only thing anyone else has.
-     */
-    private static JButton iconButton(String icon, String name,
-                                      String hovered, String spoken,
-                                      Runnable action) {
-        JButton button = new JButton(
-                new FlatSVGIcon("resources/icons/" + icon + ".svg", 16, 16));
-        button.getAccessibleContext().setAccessibleName(name);
-        button.setFocusable(true);
-        button.addActionListener(e -> action.run());
-        return Explain.control(button, hovered, spoken);
+        return ChartActions.emphasisMenu(chart, said);
     }
 }

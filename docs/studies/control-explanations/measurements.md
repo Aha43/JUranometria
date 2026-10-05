@@ -24,6 +24,16 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Toolbar | JToggleButton | Accumulate | When on, choosing objects adds them to the working selection and choosing them again re... | Off, each object you choose replaces the working selection; on, it is added to it, and ... | hovered |
 | Toolbar | SearchField | (a field) | Find an object or coordinates, e.g. M 31, NGC 224, TYC 2801-2090-1, or 0:42:44 +41:16:09 | Type a Messier or NGC number, a star's catalogue identity, or a right ascension and dec... | hovered |
 | Toolbar | JButton | (icon only) | Exit JUranometria | Closes the atlas; what you chose is remembered | hovered |
+| Chart controls | JButton | (icon only) | Zoom in (<key:zoomIn>) | Shows a narrower field, with fainter stars on it | dynamic |
+| Chart controls | JButton | (icon only) | Zoom out (<key:zoomOut>) | Shows a wider field, with fewer stars on it | dynamic |
+| Chart controls | JToggleButton | Lock zoom | When on, the mouse wheel and the trackpad do not change the field. The zoom buttons and... | Off, scrolling over the chart zooms in and out; on, it does nothing, so a careless whee... | hovered |
+| Chart controls | JButton | (icon only) | Show fewer stars with a brighter magnitude limit | Draws only the brighter stars, one step at a time | dynamic |
+| Chart controls | JButton | (icon only) | Unavailable: V 8.0 is the faintest magnitude limit | Unavailable: V 8.0 is the faintest magnitude limit the atlas draws | dynamic |
+| Chart controls | JButton | (icon only) | Reset view: back to the atlas's first page | Returns the chart to where every reader begins, and clears the search; what the chart d... | hovered |
+| Chart controls | JToggleButton | (icon only) | Show the Inspector: what the selected mark is (<key:inspector>) | Hidden; press to open the panel that identifies what you selected and lists what is on ... | dynamic |
+| Chart controls | JToggleButton | Accumulate | When on, choosing objects adds them to the working selection and choosing them again re... | Off, each object you choose replaces the working selection; on, it is added to it, and ... | hovered |
+| Chart controls | JButton | Emphasis | Let one or more chart structures rise from the page | Temporarily strengthens chosen structures so they are easy to follow — the meridian, th... | hovered |
+| Chart controls | SearchField | (a field) | Find an object or coordinates, e.g. M 31, NGC 224, TYC 2801-2090-1, or 0:42:44 +41:16:09 | Type a Messier or NGC number, a star's catalogue identity, or a right ascension and dec... | hovered |
 | Menu bar | JMenu | File | &mdash; | Exporting the chart and changing application settings | self-explanatory |
 | Menu bar | JMenuItem | Export Chart Sheet... | &mdash; | Exports this chart as an SVG, PDF or PNG sheet | self-explanatory |
 | Menu bar | JMenuItem | Settings... | &mdash; | Opens the window for appearance and for the languages used by the application and chart | self-explanatory |
@@ -123,7 +133,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 
 ## The audit
 
-**106 operable controls** across 14 surfaces: **67** hovered, **7** dynamic, **32** left to their own visible words, **0 undecided**.
+**116 operable controls** across 15 surfaces: **72** hovered, **12** dynamic, **32** left to their own visible words, **0 undecided**.
 
 **0** say the same words twice - a tooltip read back as a description. The seam refuses it, so this is zero or a finding.
 

@@ -26,7 +26,7 @@ The authority is the object a second presentation would follow.
 | 6 | Reset view | JButton | yes | action | `ChartViewController.reset` and the search field's clearing | none | no |
 | 7 | Inspector | JToggleButton | yes | state | `InspectorToggle` | View ▸ Inspector, ⌘/Ctrl I | no |
 | 8 | Accumulate selection | JToggleButton | yes | state | `SelectionMode` | none; the platform's add-to-selection modifier | no |
-| 9 | Emphasis | JButton | no | state | `ChartComponent` (`toggleEmphasis`, `emphasizedSet`, `emphasisAvailable`) | none | no |
+| 9 | Emphasis | JButton | yes | state | `ChartComponent` (`toggleEmphasis`, `emphasizedSet`, `emphasisAvailable`) | none | no |
 | 10 | Search the atlas | SearchField | yes | action, with a local query | `LocalSearch`, `SearchNavigation`, the selection | none | no |
 | 11 | Field 8° · Stars to V 8.0 | JLabel | yes | readout | `ChartViewController` | the title block on the chart | no |
 | 12 | JUranometria version 2.0.0 | JLabel | no | furniture | `AppInfo` | Help ▸ About | no |
@@ -35,9 +35,10 @@ The authority is the object a second presentation would follow.
 **13 controls on the bar.** Every one is classified above; a control the study has not
 classified fails this generator. A label answers "focusable" with Swing's default, yes,
 but the layout focus policy skips a component with no focused-key bindings, so neither
-label is a keyboard stop. The Emphasis button answers **no**: it is attached after the
-bar re-asserts its buttons' focusability, and the look and feel takes it away again -
-the one control on the bar a keyboard cannot reach.
+label is a keyboard stop. The Emphasis button answered **no** when this was first measured
+(#449): it was attached after the bar re-asserted its buttons' focusability, and the look
+and feel took it away again - the one control on the bar a keyboard could not reach.
+Repaired in #450, ruled on #449; the row above reads what the bar answers now.
 
 ## The chart window without its toolbar
 

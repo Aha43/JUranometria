@@ -56,9 +56,10 @@ public final class CompanionSheetMain {
     }
 
     /**
-     * Both sections in every state, as the application holds them since
-     * #443: Place and Time, then Chart Options with its subject groups
-     * as first introduced - Deep sky collapsed, the rest open.
+     * All three sections in every state, as the application holds them
+     * since #450: Chart controls, then Place and Time, then Chart
+     * Options with its subject groups as first introduced - Deep sky
+     * collapsed, the rest open. "collapsed" collapses Place and Time.
      */
     private static final List<State> STATES = List.of(
             new State("open", false, false, null, false),
@@ -93,12 +94,13 @@ public final class CompanionSheetMain {
                 `juranometria.tool.CompanionSheetMain` from compiled
                 application classes and their classpath resources.
 
-                The production companion window, holding its one
-                production section - the same `PlaceAndTimePanel` the
-                Place and Time dialog holds - in a real window at the
-                size the companion's own policy states. Place and Time
-                is `PlaceAndTimeSheetMain`'s Oslo arrangement at its
-                frozen instant.
+                The production companion window, holding its three
+                production sections - the chart's controls, the same
+                class the toolbar hosts; the same `PlaceAndTimePanel`
+                the Place and Time dialog holds; and Chart Options - in
+                a real window at the size the companion's own policy
+                states. Place and Time is `PlaceAndTimeSheetMain`'s Oslo
+                arrangement at its frozen instant.
 
                 %s
 
@@ -154,6 +156,36 @@ public final class CompanionSheetMain {
                 owner[0] = new JFrame("study");
                 window[0] = new CompanionWindow(owner[0], words,
                         CompanionStore.forNode(node));
+                // Chart controls first (#450, ruled on #449), composed
+                // through AtlasChrome from a stored language as the
+                // toolbar sheet is, so the companion's controls are
+                // photographed in the language the application hands
+                // them, not one handed straight to them.
+                juranometria.ui.language.SkyLanguageStore languages =
+                        juranometria.ui.language.SkyLanguageStore.forNode(node);
+                languages.save(languages.choice(
+                        juranometria.app.Atlas.languages()).withInterface(language));
+                juranometria.ui.ChartViewController navigation =
+                        new juranometria.ui.ChartViewController(
+                                juranometria.app.Atlas.assembler()::fits);
+                juranometria.ui.InspectorToggle inspector =
+                        new juranometria.ui.InspectorToggle();
+                inspector.bind(() -> { }, () -> true);
+                juranometria.app.AtlasChrome chrome = juranometria.app.AtlasChrome.of(
+                        juranometria.ui.language.SkyLanguageSession.begin(languages,
+                                juranometria.app.Atlas.languages()),
+                        navigation, juranometria.app.Atlas.search(),
+                        juranometria.app.Atlas.assembler(), inspector, "2.0.0",
+                        () -> { }, new juranometria.chart.SelectionMode(),
+                        new juranometria.ui.ZoomLock());
+                juranometria.ui.ChartComponent chart =
+                        new juranometria.ui.ChartComponent(
+                                juranometria.app.Atlas.assembler(),
+                                juranometria.ui.language.PageText.in(words));
+                navigation.onChange(chart::setViewState);
+                window[0].addSection("chartcontrols",
+                        words.say("chartcontrols.title"),
+                        chrome.companionControls(chart).inCompanion());
                 panel[0] = new PlaceAndTimePanel(module, store,
                         () -> PlaceAndTimeSheetMain.WHEN, words);
                 window[0].addSection("placeandtime",
@@ -167,10 +199,10 @@ public final class CompanionSheetMain {
                                 () -> false, words).inCompanion(companionStore,
                                 words));
                 if (state.collapsed()) {
-                    window[0].sections().get(0).heading().doClick();
+                    window[0].sections().get(1).heading().doClick();
                 }
                 if (state.deepSkyOpen()) {
-                    deepSkyHeading(window[0].sections().get(1)).doClick();
+                    deepSkyHeading(window[0].sections().get(2)).doClick();
                 }
                 if (state.refused() != null) {
                     JTextField latitude = (JTextField) named(panel[0],

@@ -545,7 +545,7 @@ class TestEvidenceGateTest {
                         || f.premises().contains("focus-owner")).count();
         long reachPremise = display.stream().filter(f ->
                 f.premises().contains("point-reachable")).count();
-        assertEquals(53, display.size(),
+        assertEquals(54, display.size(),
                 "the display corpus is the twenty the decision names"
                         + " plus the black-sky journey (#246), the"
                         + " #261 pair - the surfaces journey and the"
@@ -673,7 +673,16 @@ class TestEvidenceGateTest {
                         + " startup is the claim, and presses the"
                         + " companion's Now with its reachability"
                         + " proven - the press that found it opening a"
-                        + " title bar short");
+                        + " title bar short"
+                        + "; and #450's chart controls journey, which"
+                        + " starts the real application, shows the"
+                        + " companion and presses its Zoom in with its"
+                        + " reachability proven, then walks both"
+                        + " windows' own focus traversal - whether Tab"
+                        + " reaches Emphasis is a question only a"
+                        + " realised window answers, and the toolbar's"
+                        + " Emphasis was the one control it did not"
+                        + " reach (#449)");
         assertTrue(focusPremise >= 14,
                 "focus premises spread under #243 and may not"
                         + " retreat: " + focusPremise + " of "

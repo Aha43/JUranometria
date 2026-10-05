@@ -669,10 +669,12 @@ public final class CleanChartStudyMain {
                 + " fails this generator. A label answers \"focusable\" with"
                 + " Swing's default, yes,\nbut the layout focus policy skips a"
                 + " component with no focused-key bindings, so neither\nlabel is"
-                + " a keyboard stop. The Emphasis button answers **no**: it is"
-                + " attached after the\nbar re-asserts its buttons'"
-                + " focusability, and the look and feel takes it away again -"
-                + "\nthe one control on the bar a keyboard cannot reach.\n\n");
+                + " a keyboard stop. The Emphasis button answered **no** when"
+                + " this was first measured\n(#449): it was attached after the"
+                + " bar re-asserted its buttons' focusability, and the look\nand"
+                + " feel took it away again - the one control on the bar a"
+                + " keyboard could not reach.\nRepaired in #450, ruled on #449;"
+                + " the row above reads what the bar answers now.\n\n");
     }
 
     /** class, authority, menu or key, remembered - per control. */

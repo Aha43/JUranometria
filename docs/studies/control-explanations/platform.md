@@ -35,6 +35,9 @@ Every one of them from the registry that binds it, so a tooltip cannot promise a
 | Toolbar | (icon only) | Zoom in (<key:zoomIn>) |
 | Toolbar | (icon only) | Zoom out (<key:zoomOut>) |
 | Toolbar | (icon only) | Show the Inspector: what the selected mark is (<key:inspector>) |
+| Chart controls | (icon only) | Zoom in (<key:zoomIn>) |
+| Chart controls | (icon only) | Zoom out (<key:zoomOut>) |
+| Chart controls | (icon only) | Show the Inspector: what the selected mark is (<key:inspector>) |
 | Chart Options | Deep-sky objects | Draw deep-sky objects on the chart at all. Shortcut: <prefix> then D. |
 | Chart Options | Galaxies | Galaxies, drawn at their catalogued size and orientation, including close pairs, triple... |
 | Chart Options | Open clusters | Loose clusters of young stars in the plane of the Milky Way. For example: M 45, M 44, N... |
@@ -56,7 +59,7 @@ Every one of them from the registry that binds it, so a tooltip cannot promise a
 | Place and Time | Mathematical horizon | Draw where the sky meets a perfectly flat, transparent Earth (<prefix> then H) |
 | Inspector | (icon only) | Close Inspector (<key:inspector>) |
 
-**23 explanations** name a key on this platform. The report beside this one
+**26 explanations** name a key on this platform. The report beside this one
 holds the same sentences with the modifier reduced to a token, so that what
 is pinned is which control quotes which switch rather than what this
 desktop calls a key.

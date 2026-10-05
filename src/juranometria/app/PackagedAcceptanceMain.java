@@ -448,6 +448,7 @@ public final class PackagedAcceptanceMain {
         zoomLockJourney();
         companionJourney();
         chartOptionsJourney();
+        chartControlsJourney();
 
         System.out.println("PACKAGED ACCEPTANCE OK");
     }
@@ -828,6 +829,180 @@ public final class PackagedAcceptanceMain {
                 + " either, or by the keyboard, shown in both; a refusal in the"
                 + " same words, reaching nothing; its own state round-trips;"
                 + " a lost display recovered)");
+    }
+
+    /**
+     * The chart's controls in both hosts inside the packaged image
+     * (Sprint 41, issue #450, ruled on #449): the bar the application
+     * composes and the companion's section, over the same authorities
+     * and the same actions, with the packaged catalogue and index. A
+     * change through either is shown by both in the same words; search
+     * text stays local while its effect is shared; Home clears the
+     * target and every field; Emphasis is one menu reading one chart;
+     * and every control, Emphasis included, is reachable by keyboard
+     * in both.
+     */
+    private static void chartControlsJourney() throws Exception {
+        Preferences scratch = Preferences.userRoot()
+                .node("juranometria-packaged-chart-controls-" + System.nanoTime());
+        try {
+            juranometria.ui.language.SkyLanguageStore languages =
+                    juranometria.ui.language.SkyLanguageStore.forNode(scratch);
+            languages.save(languages.choice(Atlas.languages()).withInterface("en"));
+            ChartViewController controller = new ChartViewController(
+                    Atlas.assembler()::fits);
+            juranometria.ui.InspectorToggle inspector =
+                    new juranometria.ui.InspectorToggle();
+            boolean[] showing = new boolean[1];
+            inspector.bind(() -> inspector.report(showing[0] = !showing[0]),
+                    () -> true);
+            juranometria.chart.SelectionMode mode = new juranometria.chart.SelectionMode();
+            juranometria.ui.ZoomLock lock = new juranometria.ui.ZoomLock();
+            AtlasChrome[] chrome = new AtlasChrome[1];
+            juranometria.ui.ChartComponent[] chart = new juranometria.ui.ChartComponent[1];
+            juranometria.ui.ChartControls[] section = new juranometria.ui.ChartControls[1];
+            javax.swing.JComponent[] rows = new javax.swing.JComponent[1];
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                chrome[0] = AtlasChrome.of(juranometria.ui.language.SkyLanguageSession
+                        .begin(languages, Atlas.languages()), controller,
+                        Atlas.search(), Atlas.assembler(), inspector, "0.0.0",
+                        () -> { }, mode, lock);
+                chart[0] = new juranometria.ui.ChartComponent(Atlas.assembler(),
+                        ENGLISH_PAGE);
+                controller.onChange(chart[0]::setViewState);
+                chrome[0].toolbar().attachEmphasis(chart[0]);
+                section[0] = chrome[0].companionControls(chart[0]);
+                rows[0] = section[0].inCompanion();
+            });
+            juranometria.ui.AtlasToolbar bar = chrome[0].toolbar();
+            require(bar.controls().getClass() == section[0].getClass()
+                            && bar.controls().actions() == section[0].actions(),
+                    "one controls class in both hosts, over one set of actions");
+            require(section[0].actions().fields().size() == 2,
+                    "Home knows one field per host");
+
+            // Navigation through the companion, shown by the bar.
+            javax.swing.SwingUtilities.invokeAndWait(() ->
+                    section[0].zoomIn().doClick());
+            require(controller.state().fieldWidthDegrees() < 8.0
+                            && bar.controls().readout().getText().equals(
+                                    section[0].readout().getText()),
+                    "a step taken in the companion is the bar's readout too: "
+                            + bar.controls().readout().getText());
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                while (controller.canZoomIn()) {
+                    bar.controls().zoomIn().doClick();
+                }
+            });
+            require(!section[0].zoomIn().isEnabled()
+                            && bar.controls().zoomIn().getToolTipText().equals(
+                                    section[0].zoomIn().getToolTipText())
+                            && bar.controls().zoomIn().getAccessibleContext()
+                                    .getAccessibleDescription().equals(
+                                            section[0].zoomIn().getAccessibleContext()
+                                                    .getAccessibleDescription()),
+                    "the end of the ladder disables both steps and says so in"
+                            + " the same words");
+
+            // Every switch, from each host, shown by the other.
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                section[0].zoomLock().doClick();
+                bar.accumulateButton().doClick();
+                section[0].inspector().doClick();
+            });
+            require(lock.locked() && bar.zoomLockButton().isSelected(),
+                    "the lock set in the companion is shown on the bar");
+            require(mode.accumulate() && section[0].accumulate().isSelected(),
+                    "Accumulate set on the bar is shown in the companion");
+            require(inspector.isShowing() && bar.controls().inspector().isSelected()
+                            && bar.controls().inspector().getToolTipText().equals(
+                                    section[0].inspector().getToolTipText()),
+                    "the Inspector asked for in the companion is shown on the bar,"
+                            + " in the same words");
+
+            // Emphasis: one menu, reading one chart, from either host.
+            javax.swing.JPopupMenu[] menus = new javax.swing.JPopupMenu[2];
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                menus[0] = section[0].actions().emphasisMenu(
+                        juranometria.ui.language.InterfaceText.forLanguage("en"));
+                menuItem(menus[0], "Equatorial grid").doClick();
+                menus[1] = bar.controls().actions().emphasisMenu(
+                        juranometria.ui.language.InterfaceText.forLanguage("en"));
+            });
+            require(chart[0].emphasizedSet().contains(
+                            juranometria.render.ChartStructure.EQUATORIAL_GRID)
+                            && menuItem(menus[1], "Equatorial grid").isSelected(),
+                    "an emphasis raised from one host is read by the other's menu");
+            javax.swing.SwingUtilities.invokeAndWait(() ->
+                    menuItem(menus[1], "Normal").doClick());
+            require(chart[0].emphasizedSet().isEmpty(), "and Normal settles it");
+
+            // Search: text local, effect shared; Home clears everything.
+            juranometria.ui.SearchField barField = chrome[0].searchField();
+            juranometria.ui.SearchField companionField = section[0].search();
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                barField.setText("M 3");
+                companionField.setText("NGC 221");
+                companionField.postActionEvent();
+            });
+            require("M 3".equals(barField.getText())
+                            && "NGC 221".equals(companionField.getText()),
+                    "a search in the companion leaves the bar's unfinished text");
+            require(controller.state().targetLabel() != null,
+                    "while the chart it moved is shared: "
+                            + controller.state().targetLabel());
+            javax.swing.SwingUtilities.invokeAndWait(() ->
+                    bar.controls().home().doClick());
+            require(controller.state().targetLabel() == null
+                            || !controller.state().targetLabel().contains("NGC 221"),
+                    "Home from the bar clears the shared target");
+            require(barField.getText().isEmpty() && companionField.getText().isEmpty(),
+                    "and every field");
+
+            // Keyboard: every control in both hosts, Emphasis included.
+            int unreachable = 0;
+            for (java.awt.Component host : new java.awt.Component[] {bar, rows[0]}) {
+                for (java.awt.Component control : allOf(host)) {
+                    if (control instanceof javax.swing.AbstractButton
+                            && !control.isFocusable()) {
+                        unreachable++;
+                    }
+                }
+            }
+            require(unreachable == 0 && bar.controls().emphasis().isFocusable()
+                            && section[0].emphasis().isFocusable(),
+                    "every button in both hosts is reachable by keyboard, Emphasis"
+                            + " included (ruled on #449)");
+        } finally {
+            scratch.removeNode();
+        }
+        System.out.println("chart controls OK (one controls class in both hosts;"
+                + " a step, a switch or an emphasis through either shown by the"
+                + " other in the same words; search text local, its effect"
+                + " shared; Home clears the target and every field; every"
+                + " control keyboard-reachable, Emphasis included)");
+    }
+
+    private static javax.swing.JMenuItem menuItem(javax.swing.JPopupMenu menu,
+                                                  String text) {
+        for (java.awt.Component component : menu.getComponents()) {
+            if (component instanceof javax.swing.JMenuItem item
+                    && text.equals(item.getText())) {
+                return item;
+            }
+        }
+        throw new IllegalStateException("no menu item " + text);
+    }
+
+    private static java.util.List<java.awt.Component> allOf(java.awt.Component root) {
+        java.util.List<java.awt.Component> found = new java.util.ArrayList<>();
+        found.add(root);
+        if (root instanceof java.awt.Container container) {
+            for (java.awt.Component child : container.getComponents()) {
+                found.addAll(allOf(child));
+            }
+        }
+        return found;
     }
 
     private static java.awt.Component namedIn(java.awt.Component root,
