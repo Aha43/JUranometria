@@ -501,7 +501,7 @@ class ChangeRouteTest {
         List<String> zoomLock = new ArrayList<>();
         StringBuilder base = new StringBuilder();
         for (String line : head.split("\n", -1)) {
-            if (line.startsWith("96e86526f116c7d6\tui/AtlasToolbar.java\tzoomLock\t")
+            if (line.startsWith("e78c0407f7115bd3\tui/ChartControls.java\tzoomLock\t")
                     || line.startsWith("43f2af373668c4ab\tui/ZoomLockStore.java\tzoomLocked\t")) {
                 zoomLock.add(line);
             } else {
