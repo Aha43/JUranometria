@@ -72,7 +72,7 @@ Bar packed 599 × 333 px; widest popup 211 px.
 | item access letter (language) \| R |
 | item label \| Chart Toolbar |
 | item spoken name \| Chart Toolbar |
-| item spoken description \| Shows or hides the chart window's toolbar. Its controls remain in the Controls window; the chart keeps its centre, field and everything it draws. |
+| item spoken description \| Shows or hides the chart window's toolbar. Its controls remain in the JUranometria Controller window; the chart keeps its centre, field and everything it draws. |
 | item accelerator (platform notation) \| ⌘+⇧T |
 | item access letter (language) \| T |
 | item label \| Sun... |
@@ -156,7 +156,7 @@ Bar packed 599 × 333 px; widest popup 211 px.
 | item access letter (language) \| R |
 | item label [checked] \| Chart Toolbar |
 | item spoken name \| Chart Toolbar |
-| item spoken description \| Shows or hides the chart window's toolbar. Its controls remain in the Controls window; the chart keeps its centre, field and everything it draws. |
+| item spoken description \| Shows or hides the chart window's toolbar. Its controls remain in the JUranometria Controller window; the chart keeps its centre, field and everything it draws. |
 | item accelerator (platform notation) \| ⌘+⇧T |
 | item access letter (language) \| T |
 | item label \| Sun... |
@@ -240,7 +240,7 @@ Bar packed 599 × 333 px; widest popup 211 px.
 | item access letter (language) \| R |
 | item label \| Chart Toolbar |
 | item spoken name \| Chart Toolbar |
-| item spoken description \| Shows or hides the chart window's toolbar. Its controls remain in the Controls window; the chart keeps its centre, field and everything it draws. |
+| item spoken description \| Shows or hides the chart window's toolbar. Its controls remain in the JUranometria Controller window; the chart keeps its centre, field and everything it draws. |
 | item accelerator (platform notation) \| ⌘+⇧T |
 | item access letter (language) \| T |
 | item label \| Sun... |
@@ -324,7 +324,7 @@ Bar packed 599 × 333 px; widest popup 211 px.
 | item access letter (language) \| R |
 | item label \| Chart Toolbar |
 | item spoken name \| Chart Toolbar |
-| item spoken description \| Shows or hides the chart window's toolbar. Its controls remain in the Controls window; the chart keeps its centre, field and everything it draws. |
+| item spoken description \| Shows or hides the chart window's toolbar. Its controls remain in the JUranometria Controller window; the chart keeps its centre, field and everything it draws. |
 | item accelerator (platform notation) \| ⌘+⇧T |
 | item access letter (language) \| T |
 | item label \| Sun... |
@@ -410,7 +410,7 @@ Bar packed 618 × 333 px; widest popup 201 px.
 | item access letter (language) \| R |
 | item label \| Kartverktøylinje |
 | item spoken name \| Kartverktøylinje |
-| item spoken description \| Viser eller skjuler verktøylinjen i kartvinduet. Kontrollene finnes fortsatt i vinduet Kontroller; kartet beholder sentrum, synsfelt og alt det tegner. |
+| item spoken description \| Viser eller skjuler verktøylinjen i kartvinduet. Kontrollene finnes fortsatt i vinduet JUranometria Kontroller; kartet beholder sentrum, synsfelt og alt det tegner. |
 | item accelerator (platform notation) \| ⌘+⇧T |
 | item access letter (language) \| V |
 | item label \| Solen... |
@@ -494,7 +494,7 @@ Bar packed 618 × 333 px; widest popup 201 px.
 | item access letter (language) \| R |
 | item label [checked] \| Kartverktøylinje |
 | item spoken name \| Kartverktøylinje |
-| item spoken description \| Viser eller skjuler verktøylinjen i kartvinduet. Kontrollene finnes fortsatt i vinduet Kontroller; kartet beholder sentrum, synsfelt og alt det tegner. |
+| item spoken description \| Viser eller skjuler verktøylinjen i kartvinduet. Kontrollene finnes fortsatt i vinduet JUranometria Kontroller; kartet beholder sentrum, synsfelt og alt det tegner. |
 | item accelerator (platform notation) \| ⌘+⇧T |
 | item access letter (language) \| V |
 | item label \| Solen... |
@@ -578,7 +578,7 @@ Bar packed 618 × 333 px; widest popup 201 px.
 | item access letter (language) \| R |
 | item label \| Kartverktøylinje |
 | item spoken name \| Kartverktøylinje |
-| item spoken description \| Viser eller skjuler verktøylinjen i kartvinduet. Kontrollene finnes fortsatt i vinduet Kontroller; kartet beholder sentrum, synsfelt og alt det tegner. |
+| item spoken description \| Viser eller skjuler verktøylinjen i kartvinduet. Kontrollene finnes fortsatt i vinduet JUranometria Kontroller; kartet beholder sentrum, synsfelt og alt det tegner. |
 | item accelerator (platform notation) \| ⌘+⇧T |
 | item access letter (language) \| V |
 | item label \| Solen... |
@@ -662,7 +662,7 @@ Bar packed 618 × 333 px; widest popup 201 px.
 | item access letter (language) \| R |
 | item label \| Kartverktøylinje |
 | item spoken name \| Kartverktøylinje |
-| item spoken description \| Viser eller skjuler verktøylinjen i kartvinduet. Kontrollene finnes fortsatt i vinduet Kontroller; kartet beholder sentrum, synsfelt og alt det tegner. |
+| item spoken description \| Viser eller skjuler verktøylinjen i kartvinduet. Kontrollene finnes fortsatt i vinduet JUranometria Kontroller; kartet beholder sentrum, synsfelt og alt det tegner. |
 | item accelerator (platform notation) \| ⌘+⇧T |
 | item access letter (language) \| V |
 | item label \| Solen... |
