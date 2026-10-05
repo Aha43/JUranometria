@@ -689,10 +689,10 @@ class TestEvidenceGateTest {
                         + " Emphasis was the one control it did not"
                         + " reach (#449)"
                         + "; and #450's toolbar visibility journey, which"
-                        + " starts the real application four times on one"
+                        + " starts the real application three times on one"
                         + " node - hides the bar by its keystroke, moves"
-                        + " and maximises the window, and reads what each"
-                        + " restart opens with - because what a window"
+                        + " the window, and reads what each restart opens"
+                        + " with - because what a window"
                         + " remembers about itself is proved only by a"
                         + " window");
         assertTrue(focusPremise >= 14,
