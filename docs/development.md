@@ -240,7 +240,9 @@ asked:
   cells, columns 206–216 and 222–231 of rows 33–47, with the dot
   between them untouched. At 4.0.0 one digit changed (3→4), and each
   image changed exactly 125 pixels in the first cell alone, columns
-  206–216 of rows 33–47.
+  206–216 of rows 33–47. At 5.0.0 (4→5) the same cell alone moved,
+  123 pixels in each dark image and 124 in each light one — the count
+  is the two glyphs' difference, the cell is the invariant.
 - **The articles.** Their footer names the release, and
   `scripts/build-articles.py` reads it from `VERSION` when the site is
   built rather than carrying a number - so there is nothing to

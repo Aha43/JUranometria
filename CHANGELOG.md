@@ -7,6 +7,150 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [5.0.0] - 2026-10-06
+
+**The Controller.** Sprints 38–42 — the usability programme: the
+field kept where you put it (#428), the controls kept at hand in one
+window (#433, #434), chart choices kept at hand and never rolled back
+(#442, #443), a clean chart with its controls kept (#449, #450), and
+the Solar System brought into the Controller (#455, #457, #458).
+
+At 4.0 the chart was right and using it was not easy. Every control
+lived in a dialog that was opened, used and closed, or on a toolbar
+that occupied the chart; a careless wheel notch threw away a field
+chosen on purpose; two windows on two displays did not remember
+themselves. This release changes nothing about what the atlas draws
+and everything about how it is operated.
+
+**JUranometria Controller.** View → Controls opens a window of its
+own, beside the chart, that stays above it and minimises with it. It
+holds four sections, each remembering whether it is open: **Chart
+controls** (zoom, Lock zoom, the star limit, Home, Inspector,
+Accumulate, Emphasis, search and the field-and-magnitude readout),
+**Place and Time**, **Solar System** and **Chart Options**. Every
+control in it is the same control as in its dialog or on the toolbar:
+one state, followed by every host, so nothing a reader sees is ever
+stale. The Controller remembers where it was and how large, and
+starts closed at every launch — only the chart opens, and the
+Controller is one gesture away.
+
+**A clean chart on one display, the controls on another.** View →
+Chart Toolbar (⇧⌘T, Ctrl+Shift+T) hides the toolbar and remembers it
+hidden; the chart window remembers its bounds and whether it was
+maximised, and uses them only on a display that still exists. The
+arrangement the programme was for — the chart maximised and clean on
+the external monitor, the Controller on the laptop — survives a
+restart and the loss of a display.
+
+**Chart choices are immediate.** Every accepted change to the chart
+options is the chart at once and is saved at once, whether it comes
+from a box in the Controller, a box in the dialog, the chart keyboard
+or Restore Defaults, which now asks first. The dialog's OK and Cancel
+are gone, because there is no transaction to confirm or roll back; at
+4.0 Cancel could undo a change the keyboard had already saved.
+
+**Lock zoom.** On the toolbar and in the Controller: locked, the wheel
+and the trackpad cannot change the field, and nothing is banked for
+later; the zoom buttons, View's items and their keys, search and
+recentring still can. The choice is remembered.
+
+**The Solar System in the Controller.** The Sun and Moon tables, with
+every control of their dialogs but Close, as two groups of one
+section, each with its own **Show on chart** box; an instant shown as
+a card, a range as the complete table scrolling sideways. A query
+applied in the Controller is what the dialog shows, and the other way
+round; nothing is computed until asked. View groups the four Solar
+System entries into **View → Solar System**: Sun on the chart, Moon on
+the chart, Sun…, Moon….
+
+**Everything reachable.** Every new control has a label, a hover and
+an explanation in English and Norwegian, an accessible name and a
+place in the Tab order; Emphasis, which the keyboard could not reach
+at 4.0, is reached in both hosts.
+
+**What it keeps.** The Place and Time, Chart Options, Sun and Moon
+dialogs remain, behaviour-compatible, until using the Controller says
+whether they should go. Every stored chart choice, place, instant and
+Sun or Moon switch is read under the key it always had.
+
+**What it does not do.** Native macOS full screen is a Space of its
+own that the Controller does not follow; the supported arrangement is
+a maximised chart. The chart keyboard (⌘/Ctrl-K) works while the
+chart window has focus, not while the Controller has it. The
+Controller's groups carry no access letters, since they would collide;
+Tab reaches everything. The collapsed Controller keeps a minimum
+height. Layout refinements noticed while using it are a later
+sprint's.
+
+**macOS downloads remain unsigned and not notarised.** A browser
+download is quarantined, and macOS may refuse it as "damaged" — the
+archive is not corrupt, and `SHA256SUMS.txt` answers that. Ordinary
+Finder installation is **not supported** for this release either;
+[#282](https://github.com/Aha43/JUranometria/issues/282) stays open,
+and the documented quarantine-removal step is a workaround rather
+than the accepted route. Nothing in this release changes how it is
+installed.
+
+**Still not printed.** No page has been read on paper, and no globe
+at arm's length.
+[#293](https://github.com/Aha43/JUranometria/issues/293) is open for
+anyone who prints one.
+
+### Added
+
+- **Lock zoom**, a toolbar toggle that stops the wheel and the trackpad
+  from changing the field while every deliberate route still can,
+  remembered between sessions (#428).
+- **View → Controls**, the modeless companion window beside the chart,
+  with Place and Time as its first section: one module that notifies,
+  two hosts that follow it, refused input explained in both (#433,
+  #434).
+- **Chart Options in the Controller**, as four groups that remember
+  their collapse, with Restore Defaults (#442, #443).
+- **Chart controls in the Controller**: zoom, Lock zoom, the star
+  limit, Home, Inspector, Accumulate, Emphasis, search and the readout
+  (#449, #450).
+- **View → Chart Toolbar** (⇧⌘T / Ctrl+Shift+T) to hide and show the
+  toolbar, remembered; the chart window's bounds and maximised state
+  remembered and validated against the displays that exist (#450).
+- **The Solar System section** of the Controller — the Sun and Moon
+  tables and their Show on chart boxes, sharing one applied query and
+  result per body with the dialogs — and **View → Solar System**,
+  grouping Sun on the chart, Moon on the chart, Sun… and Moon… (#457,
+  #458).
+
+### Changed
+
+- **Chart Options are shared and immediate.** A change in either host,
+  by the chart keyboard or by Restore Defaults is the chart at once and
+  saved at once; the dialog's OK and Cancel are gone, its footer is
+  Restore Defaults (which asks first) and Close (#443).
+- **The companion is titled JUranometria Controller** and **starts
+  closed at every launch**; whether it was open is no longer
+  remembered (#455).
+- **The Solar System entries moved** from View's top level into
+  View → Solar System; the preferences behind Sun on the chart and
+  Moon on the chart are unchanged (#458).
+- **Emphasis is reached by Tab** on the toolbar as well as in the
+  Controller (#449, #450).
+- Developer-facing: CI chooses a **narrow, interaction or wide** route
+  from the compiled dependency graph, so interface work no chart
+  producer reaches no longer re-draws every chart picture (#427, #428,
+  #432); the interaction route's contract puts back the platform
+  records it judged, so a green run leaves the tree as it found it
+  (#463).
+
+### Fixed
+
+- A meridian turned on by the chart keyboard while the Place and Time
+  dialog was open was turned back off by the next click in the dialog,
+  because the dialog never refreshed (#434).
+- Cancel in the Chart Options dialog rolled back a change the chart
+  keyboard had already saved, and a stale box re-applied options the
+  keyboard had changed (#443).
+- The toolbar's Emphasis control was skipped by the keyboard's Tab
+  order (#449, #450).
+
 ## [4.0.0] - 2026-10-01
 
 **The Sun and the Moon.** Sprints 35–37 — the Sun computed and
