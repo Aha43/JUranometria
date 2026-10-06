@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -824,15 +825,83 @@ public final class EvidenceContractMain {
                         + " machine's pixels"
                 : "canonical contract: renderings are compared with"
                         + " the committed references");
-        try {
-            generateUnderRestoration(Path.of("docs/studies"), committed,
-                    () -> run(committed, failures, verdicts, mode));
-        } catch (Breached breached) {
+        List<String> judgedRecords = new ArrayList<>();
+        if (!concludeUnderRestoration(Path.of("docs/studies"), mode,
+                committed, judgedRecords,
+                () -> run(committed, failures, verdicts, mode,
+                        judgedRecords))) {
             // The restoration has already run, which is the whole
             // point of coming out this way; the breaches are already
             // printed. All that is left is the exit status CI reads.
             System.exit(1);
         }
+    }
+
+    /**
+     * The whole run under its restorations, answering whether it was
+     * green (#463).
+     *
+     * <p>The inspection imagery goes back whatever happened, as
+     * before. The platform records are different: the run writes
+     * each one twice and holds the two writings to each other, and
+     * on the machine that recorded a record the second writing is
+     * the committed bytes - but on another machine it is not, and
+     * the interaction route's job then requires the tree unchanged
+     * as its proof that no chart picture moved. So on the
+     * interaction route a <em>green</em> run puts exactly the
+     * records it judged back to their pre-run bytes. Pre-run, not
+     * older: a record that was already changed when the run began
+     * stays changed, for the job's diff to name. A breached run
+     * restores no record at all - what it wrote is the evidence a
+     * reader needs to see why it breached, and a restoration that
+     * tidied it away would be the run hiding its own finding.
+     *
+     * @return true when the body ran without a breach
+     */
+    static boolean concludeUnderRestoration(Path root, Mode mode,
+            Map<String, Snapshot> committed,
+            Collection<String> judgedRecords, Generation body)
+            throws Exception {
+        try {
+            generateUnderRestoration(root, committed, body);
+        } catch (Breached breached) {
+            return false;
+        }
+        if (mode == Mode.INTERACTION) {
+            int restored = restorePlatformRecords(committed, judgedRecords);
+            System.out.println("interaction contract: " + judgedRecords.size()
+                    + " judged platform records, " + restored
+                    + " put back to their pre-run bytes so the tree is"
+                    + " as it went in");
+        }
+        return true;
+    }
+
+    /**
+     * Puts the judged platform records back to their snapshotted
+     * bytes and no other file (#463). A judged record the snapshot
+     * never held is a newcomer, which the run has already named as a
+     * breach, and is left where it is.
+     *
+     * @return how many records were moved back
+     */
+    static int restorePlatformRecords(Map<String, Snapshot> committed,
+            Collection<String> judgedRecords) throws IOException {
+        int restored = 0;
+        for (String record : new java.util.TreeSet<>(judgedRecords)) {
+            Snapshot was = committed.get(record);
+            if (was == null) {
+                continue;
+            }
+            Path path = Path.of(record);
+            if (!Files.exists(path)
+                    || !java.util.Arrays.equals(was.bytes(),
+                            Files.readAllBytes(path))) {
+                Files.write(path, was.bytes());
+                restored++;
+            }
+        }
+        return restored;
     }
 
     /**
@@ -1518,7 +1587,8 @@ public final class EvidenceContractMain {
     private static void run(Map<String, Snapshot> committed,
                             List<String> failures,
                             Map<String, Integer> verdicts,
-                            Mode mode)
+                            Mode mode,
+                            Collection<String> judgedRecords)
             throws Exception {
 
         // ---- every rendering, drawn twice, before anything else --
@@ -1751,6 +1821,7 @@ public final class EvidenceContractMain {
             } else {
                 tally(verdicts, "platform-recorded (reproduces here;"
                         + " not held across machines)");
+                judgedRecords.add(record.getValue());
             }
         }
 

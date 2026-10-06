@@ -168,7 +168,11 @@ jobs:
   # chart picture is held as committed with its provenance account.
   # No chart producer runs, so nothing chart is regenerated; and the
   # tree must come out of the run exactly as it went in, which is the
-  # proof that no chart picture or provenance row moved.
+  # proof that no chart picture or provenance row moved. The platform
+  # records the contract judges green are put back to their pre-run
+  # bytes by the contract itself (#463) - they reproduce here with
+  # this runner's words, which is not what is committed - so what the
+  # diff below names is a real move, never the run's own writing.
   interaction-evidence:
     needs: classify
     if: needs.classify.outputs.route == 'interaction'
