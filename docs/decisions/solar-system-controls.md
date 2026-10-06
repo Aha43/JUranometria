@@ -1,9 +1,10 @@
 # The Sun and Moon tables in the JUranometria Controller
 
-Sprint 42, issue #457. **Proposed; awaiting the owner's rulings.** The
-study is `docs/studies/solar-system-controls/`
-(`make solar-system-controls-study`). #458 builds what is ruled; #459
-hands it over.
+Sprint 42, issue #457. **Ruled by the owner (2026-10-06)** — see
+[The ruling](#the-ruling) at the end, which governs where it differs
+from the proposal. The study is `docs/studies/solar-system-controls/`
+(`make solar-system-controls-study`). #458 builds it in two pull
+requests; #459 hands it over.
 
 > The Controller is the coherent home for the Solar System tools; the
 > dialogs remain, and the two never drift apart.
@@ -219,3 +220,47 @@ The eight contract answers above, and:
    interaction).
 10. The two-pull-request split, with PR 1 attempting the interaction
     route and PR 2 carrying the checkpoint.
+
+## The ruling
+
+The owner's rulings, recorded as given:
+
+1. **Collapse defaults.** Solar System is introduced collapsed. On its
+   first expansion, Sun is open and Moon is collapsed. All three
+   collapse choices are remembered independently.
+2. **Controller contents.** Every useful Sun/Moon control except
+   Close, plus each body's Show on chart switch. Every result column:
+   a single instant as a key/value card; a range as the complete,
+   horizontally scrolling table.
+3. **State semantics.** Editor drafts remain local to each host.
+   Applying a query creates one shared applied query and result per
+   body through `SolarTableSession`; both hosts follow that result.
+   Receiving a shared result must not overwrite unfinished local
+   draft text.
+4. **Calculation.** Opening the Controller or expanding Solar System,
+   Sun or Moon never calculates. The legacy dialogs' front-pull
+   behaviour is preserved for compatibility: opening a dialog performs
+   its current Update, and that applied result then becomes visible in
+   the Controller.
+5. **Visibility authority: 5A.** `SolarSystemModule` remains the single
+   authority and gains notification. This is legitimately wide and
+   cannot be bypassed by another control surface.
+6. **Chart switches.** Each body group contains its own synchronised
+   Show on chart choice.
+7. **Menu.** View → Solar System, in this order: Sun on the chart,
+   Moon on the chart, separator, Sun…, Moon….
+8. **Persistence.** Collapse state only. No drafts, table scroll,
+   focus, selection or popup state.
+9. **Controller ordering:** Chart controls, Place and Time, Solar
+   System, Chart Options. A newly introduced Solar System header is
+   not hidden below Chart Options on a 900 px laptop display.
+10. **Keyboard.** No access-letter mnemonics inside the Controller
+    groups, since they collide; preserved in the legacy dialogs.
+    Complete Tab traversal, label association, accessible names and
+    submenu keyboard navigation are required.
+11. **Implementation split: two pull requests.** First, the shared
+    Sun/Moon control components, sessions and contracts without
+    production wiring, the classifier deciding whether it becomes the
+    first real interaction-route pull request. Second, the Controller
+    wiring, the authoritative visibility notification, the grouped
+    View submenu and the packaged owner checkpoint; wide.
