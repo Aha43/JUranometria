@@ -117,8 +117,18 @@ public final class CompanionWindow extends JDialog {
      */
     public CompanionSection addSection(String id, String title,
                                        JComponent content) {
+        return addSection(id, title, content, false);
+    }
+
+    /**
+     * Adds a section, collapsed as it was last left - or, never chosen,
+     * as the host says (#458: Solar System is introduced collapsed).
+     */
+    public CompanionSection addSection(String id, String title,
+                                       JComponent content,
+                                       boolean collapsedIfNeverChosen) {
         CompanionSection section = new CompanionSection(id, title, content,
-                said, store.collapsed(id), collapsed -> {
+                said, store.collapsed(id, collapsedIfNeverChosen), collapsed -> {
                     store.saveCollapsed(id, collapsed);
                     sections.revalidate();
                 });

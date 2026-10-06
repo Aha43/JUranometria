@@ -85,6 +85,24 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Place and Time | JButton | Now | Reads the clock once and freezes the chart at that instant | Freezes the reference lines at the present moment. The clock is read once; nothing move... | hovered |
 | Place and Time | JButton | Centre on zenith | Move the chart to the point overhead | Moves the page to the point directly above you. This is the only control in this window... | hovered |
 | Controls | JToggleButton | ▾ Place and Time | Show or hide this section | A hidden section keeps everything it is set to; whether it is hidden is remembered. | hovered |
+| Solar System | JToggleButton | ▾ Sun | Show or hide this section | A hidden section keeps everything it is set to; whether it is hidden is remembered. | hovered |
+| Solar System | JRadioButton | This instant | One row, at the instant set in Place and Time | Shows a single row: the Sun at the observing instant set in Place and Time. | hovered |
+| Solar System | JRadioButton | Over a range | A row for every step from a start to an end | Shows a row for every step from the start to the end, both included; an end that is not... | hovered |
+| Solar System | JTextField | (a field) | yyyy-mm-dd hh:mm or hh:mm:ss, in UTC | The first instant of the range, in UTC. Starts at the instant set in Place and Time. | hovered |
+| Solar System | JTextField | (a field) | yyyy-mm-dd hh:mm or hh:mm:ss, in UTC | The last instant of the range, in UTC, included; if it is not on the grid it is added a... | hovered |
+| Solar System | JComboBox | (Step between rows) | The elapsed time between rows | The elapsed time between rows, on the UTC timeline, so a daily range does not drift acr... | hovered |
+| Solar System | JButton | Compute | Fill the table for the range above | Computes a row for every step of the range above. | hovered |
+| Solar System | JCheckBox | Sun on the chart | &mdash; | Shows or hides the Sun on the chart, drawn at its true size where it stands for the pla... | self-explanatory |
+| Solar System | JButton | Update from Place and Time | Read the place and instant from Place and Time again | Reads the observing place and instant from Place and Time again and recomputes. The tab... | hovered |
+| Solar System | JToggleButton | ▸ Moon | Show or hide this section | A hidden section keeps everything it is set to; whether it is hidden is remembered. | hovered |
+| Solar System | JRadioButton | This instant | One row, at the instant set in Place and Time | Shows a single row: the Moon at the observing instant set in Place and Time. | hovered |
+| Solar System | JRadioButton | Over a range | A row for every step from a start to an end | Shows a row for every step from the start to the end, both included; an end that is not... | hovered |
+| Solar System | JTextField | (a field) | yyyy-mm-dd hh:mm or hh:mm:ss, in UTC | The first instant of the range, in UTC. Starts at the instant set in Place and Time. | hovered |
+| Solar System | JTextField | (a field) | yyyy-mm-dd hh:mm or hh:mm:ss, in UTC | The last instant of the range, in UTC, included; if it is not on the grid it is added a... | hovered |
+| Solar System | JComboBox | (Step between rows) | The elapsed time between rows | The elapsed time between rows, on the UTC timeline, so a daily range does not drift acr... | hovered |
+| Solar System | JButton | Compute | Fill the table for the range above | Computes a row for every step of the range above. | hovered |
+| Solar System | JCheckBox | Moon on the chart | &mdash; | Shows or hides the Moon on the chart, drawn at its true size where it stands for the pl... | self-explanatory |
+| Solar System | JButton | Update from Place and Time | Read the place and instant from Place and Time again | Reads the observing place and instant from Place and Time again and recomputes. The tab... | hovered |
 | Sun table | JRadioButton | This instant | One row, at the instant set in Place and Time | Shows a single row: the Sun at the observing instant set in Place and Time. | hovered |
 | Sun table | JRadioButton | Over a range | A row for every step from a start to an end | Shows a row for every step from the start to the end, both included; an end that is not... | hovered |
 | Sun table | JTextField | (a field) | yyyy-mm-dd hh:mm or hh:mm:ss, in UTC | The first instant of the range, in UTC. Starts at the instant set in Place and Time. | hovered |
@@ -134,7 +152,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 
 ## The audit
 
-**117 operable controls** across 15 surfaces: **72** hovered, **12** dynamic, **33** left to their own visible words, **0 undecided**.
+**135 operable controls** across 16 surfaces: **88** hovered, **12** dynamic, **35** left to their own visible words, **0 undecided**.
 
 **0** say the same words twice - a tooltip read back as a description. The seam refuses it, so this is zero or a finding.
 

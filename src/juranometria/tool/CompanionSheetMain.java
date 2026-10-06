@@ -52,21 +52,61 @@ public final class CompanionSheetMain {
 
     /** One arrangement, and what it shows. */
     private record State(String name, boolean dark, boolean collapsed,
-                         String refused, boolean deepSkyOpen) {
+                         String refused, boolean deepSkyOpen,
+                         boolean solarSystemOpen) {
+    }
+
+    /** A chart switch that stands still: the section's photograph is not the chart's. */
+    private static final class StillSwitch implements juranometria.ui.solar.BodyOnChart {
+        private boolean shown;
+        private final java.util.List<java.util.function.Consumer<Boolean>> listeners =
+                new java.util.ArrayList<>();
+
+        @Override
+        public boolean showing() {
+            return shown;
+        }
+
+        @Override
+        public void show(boolean wanted) {
+            shown = wanted;
+            for (java.util.function.Consumer<Boolean> l : java.util.List.copyOf(listeners)) {
+                l.accept(shown);
+            }
+        }
+
+        @Override
+        public void onChange(java.util.function.Consumer<Boolean> listener) {
+            listeners.add(listener);
+            listener.accept(shown);
+        }
+    }
+
+    private static juranometria.solar.SolarSystemService loaded;
+
+    /** The service, read once for every photograph. */
+    private static synchronized juranometria.solar.SolarSystemService solarSystem() {
+        if (loaded == null) {
+            loaded = juranometria.solar.SolarSystemService.load();
+        }
+        return loaded;
     }
 
     /**
-     * All three sections in every state, as the application holds them
-     * since #450: Chart controls, then Place and Time, then Chart
-     * Options with its subject groups as first introduced - Deep sky
-     * collapsed, the rest open. "collapsed" collapses Place and Time.
+     * All four sections in every state, as the application holds them
+     * since #458: Chart controls, Place and Time, Solar System (introduced
+     * collapsed; "solar-system-open" opens it, Sun open with its instant
+     * applied, Moon collapsed), then Chart Options with its subject
+     * groups as first introduced - Deep sky collapsed, the rest open.
+     * "collapsed" collapses Place and Time.
      */
     private static final List<State> STATES = List.of(
-            new State("open", false, false, null, false),
-            new State("dark", true, false, null, false),
-            new State("collapsed", false, true, null, false),
-            new State("refused", false, false, "91", false),
-            new State("deep-sky-open", false, true, null, true));
+            new State("open", false, false, null, false, false),
+            new State("dark", true, false, null, false, false),
+            new State("collapsed", false, true, null, false, false),
+            new State("refused", false, false, "91", false, false),
+            new State("deep-sky-open", false, true, null, true, false),
+            new State("solar-system-open", false, true, null, false, true));
 
     private CompanionSheetMain() {
     }
@@ -94,10 +134,12 @@ public final class CompanionSheetMain {
                 `juranometria.tool.CompanionSheetMain` from compiled
                 application classes and their classpath resources.
 
-                The production companion window, holding its three
+                The production companion window, holding its four
                 production sections - the chart's controls, the same
                 class the toolbar hosts; the same `PlaceAndTimePanel`
-                the Place and Time dialog holds; and Chart Options - in
+                the Place and Time dialog holds; Solar System, the same
+                controls the Sun and Moon dialogs host; and Chart
+                Options - in
                 a real window at the size the companion's own policy
                 states. Place and Time is `PlaceAndTimeSheetMain`'s Oslo
                 arrangement at its frozen instant.
@@ -130,7 +172,7 @@ public final class CompanionSheetMain {
         }
         Files.writeString(out.resolve("companion-strings.md"),
                 said.toString(), StandardCharsets.UTF_8);
-        System.out.println("companion sheets: 10 images and "
+        System.out.println("companion sheets: 12 images and "
                 + out.resolve("companion-strings.md"));
     }
 
@@ -191,6 +233,31 @@ public final class CompanionSheetMain {
                 window[0].addSection("placeandtime",
                         words.say("placeandtime.title"), panel[0]);
                 CompanionStore companionStore = CompanionStore.forNode(node);
+                // Solar System (#458, ruled on #457), third: the Sun and
+                // Moon groups over sessions of their own and a chart
+                // switch standing in for the module's - the photograph is
+                // of the section, not of the chart. Introduced collapsed,
+                // Sun open, Moon collapsed; opened for the state that
+                // shows it.
+                juranometria.sky.Observer observer = new juranometria.sky.Observer(
+                        place.latitude(), place.eastLongitude(),
+                        PlaceAndTimeSheetMain.WHEN);
+                juranometria.solar.SolarSystemService solar = solarSystem();
+                juranometria.ui.solar.SolarSystemSection solarSection =
+                        new juranometria.ui.solar.SolarSystemSection(
+                                new juranometria.ui.solar.SolarTableSession(
+                                        () -> observer, solar,
+                                        juranometria.ui.solar.SolarTable.sun()),
+                                new juranometria.ui.solar.SolarTableSession(
+                                        () -> observer, solar,
+                                        juranometria.ui.solar.SolarTable.moon()),
+                                new StillSwitch(), new StillSwitch(), words);
+                window[0].addSection("solarsystem", words.say("solarsystem.title"),
+                        solarSection.inController(companionStore, words), true);
+                if (state.solarSystemOpen()) {
+                    window[0].sections().get(2).heading().doClick();
+                    solarSection.sun().apply();
+                }
                 window[0].addSection("chartoptions",
                         words.say("chartoptions.title"),
                         new juranometria.app.ChartOptionsControls(
@@ -202,7 +269,7 @@ public final class CompanionSheetMain {
                     window[0].sections().get(1).heading().doClick();
                 }
                 if (state.deepSkyOpen()) {
-                    deepSkyHeading(window[0].sections().get(2)).doClick();
+                    deepSkyHeading(window[0].sections().get(3)).doClick();
                 }
                 if (state.refused() != null) {
                     JTextField latitude = (JTextField) named(panel[0],
