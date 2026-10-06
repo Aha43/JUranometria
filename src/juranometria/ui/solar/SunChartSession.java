@@ -61,6 +61,38 @@ public final class SunChartSession {
                     + " the Sun with no way for a reader to turn it off");
         }
         module.sunShowing(store.shownOrDefault());
-        item.setSelected(module.sunShowing());
+        // The item follows the module from here on (#458): a Controller
+        // box or a journey that switches the Sun is shown by the tick.
+        module.onSunChange(item::setSelected);
+    }
+
+    /**
+     * The Sun's chart switch as a control sees it (#458, ruled on
+     * #457): the module's own state, asked through the toggle that
+     * remembers the choice, followed from the module.
+     */
+    public static BodyOnChart switchOf(SolarSystemModule module, SunChartStore store) {
+        if (module == null || store == null) {
+            throw new IllegalArgumentException("the switch needs a module and a store");
+        }
+        return new BodyOnChart() {
+            @Override
+            public boolean showing() {
+                return module.sunShowing();
+            }
+
+            @Override
+            public void show(boolean shown) {
+                if (module.sunShowing() != shown) {
+                    module.sunShowing(shown);
+                    store.save(shown);
+                }
+            }
+
+            @Override
+            public void onChange(java.util.function.Consumer<Boolean> listener) {
+                module.onSunChange(listener);
+            }
+        };
     }
 }

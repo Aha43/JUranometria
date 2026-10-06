@@ -38,6 +38,33 @@ public final class MoonChartSession {
                     + " the Moon with no way for a reader to turn it off");
         }
         module.moonShowing(store.shownOrDefault());
-        item.setSelected(module.moonShowing());
+        // The item follows the module from here on (#458).
+        module.onMoonChange(item::setSelected);
+    }
+
+    /** The Moon's chart switch as a control sees it (#458, ruled on #457). */
+    public static BodyOnChart switchOf(SolarSystemModule module, MoonChartStore store) {
+        if (module == null || store == null) {
+            throw new IllegalArgumentException("the switch needs a module and a store");
+        }
+        return new BodyOnChart() {
+            @Override
+            public boolean showing() {
+                return module.moonShowing();
+            }
+
+            @Override
+            public void show(boolean shown) {
+                if (module.moonShowing() != shown) {
+                    module.moonShowing(shown);
+                    store.save(shown);
+                }
+            }
+
+            @Override
+            public void onChange(java.util.function.Consumer<Boolean> listener) {
+                module.onMoonChange(listener);
+            }
+        };
     }
 }

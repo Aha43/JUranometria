@@ -450,6 +450,7 @@ public final class PackagedAcceptanceMain {
         chartOptionsJourney();
         chartControlsJourney();
         cleanChartJourney();
+        solarSystemControlsJourney();
 
         System.out.println("PACKAGED ACCEPTANCE OK");
     }
@@ -1150,6 +1151,136 @@ public final class PackagedAcceptanceMain {
                 + " the companion's controls reach the chart meanwhile; the choice, the"
                 + " ordinary bounds and the maximised flag round-trip; a gone display"
                 + " recovered; full screen never remembered)");
+    }
+
+    /**
+     * The Sun and Moon tables in the Controller, inside the packaged
+     * image (Sprint 42, issue #458, ruled on #457): one session per
+     * body followed by two hosts - the dialog's content and the
+     * Controller's group - over the packaged pack; a draft applied in
+     * either shown by both, the other host's unfinished text untouched;
+     * building the Controller's groups computes nothing; each body's
+     * Show on chart box, the View item and the chart follow one switch
+     * the module notifies; opening a table toggles nothing and toggling
+     * computes nothing; the Sun's computation is not the Moon's; the
+     * saved visibility keys survive the menu move; View > Solar System
+     * holds its five entries in the ruled order.
+     */
+    private static void solarSystemControlsJourney() throws Exception {
+        Preferences scratch = Preferences.userRoot()
+                .node("juranometria-packaged-solar-controls-" + System.nanoTime());
+        try {
+            juranometria.ui.language.InterfaceText said =
+                    juranometria.ui.language.InterfaceText.forLanguage("en");
+            juranometria.sky.Observer oslo = new juranometria.sky.Observer(59.91, 10.75,
+                    java.time.Instant.parse("2026-06-21T10:00:00Z"));
+            juranometria.solar.SolarSystemService solar =
+                    juranometria.solar.SolarSystemService.load();
+            juranometria.ui.solar.SolarTableSession sun =
+                    new juranometria.ui.solar.SolarTableSession(() -> oslo, solar,
+                            juranometria.ui.solar.SolarTable.sun());
+            juranometria.ui.solar.SolarTableSession moon =
+                    new juranometria.ui.solar.SolarTableSession(() -> oslo, solar,
+                            juranometria.ui.solar.SolarTable.moon());
+            juranometria.solarchart.SolarSystemModule module =
+                    new juranometria.solarchart.SolarSystemModule(() -> oslo,
+                            () -> solar, () -> true);
+            juranometria.ui.solar.SunChartStore sunStore =
+                    juranometria.ui.solar.SunChartStore.forNode(scratch);
+            juranometria.ui.solar.MoonChartStore moonStore =
+                    juranometria.ui.solar.MoonChartStore.forNode(scratch);
+            juranometria.ui.solar.SolarSystemSection[] section =
+                    new juranometria.ui.solar.SolarSystemSection[1];
+            javax.swing.JComponent[] groups = new javax.swing.JComponent[1];
+            juranometria.ui.solar.SolarTableDialog.Content[] dialog =
+                    new juranometria.ui.solar.SolarTableDialog.Content[1];
+            javax.swing.JMenuBar[] bar = new javax.swing.JMenuBar[1];
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                section[0] = new juranometria.ui.solar.SolarSystemSection(sun, moon,
+                        juranometria.ui.solar.SunChartSession.switchOf(module, sunStore),
+                        juranometria.ui.solar.MoonChartSession.switchOf(module, moonStore),
+                        said);
+                groups[0] = section[0].inController(
+                        juranometria.ui.companion.CompanionStore.forNode(scratch), said);
+                bar[0] = AppMenuBar.create(new ChartViewController(), () -> { },
+                        () -> { }, () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
+                        () -> { }, () -> { }, () -> { },
+                        juranometria.ui.solar.SunChartSession.toggle(module, sunStore),
+                        juranometria.ui.solar.MoonChartSession.toggle(module, moonStore),
+                        () -> { }, () -> { }, said);
+                juranometria.ui.solar.SunChartSession.restore(module, sunStore,
+                        AppMenuBar.sunChartItem(bar[0]));
+                juranometria.ui.solar.MoonChartSession.restore(module, moonStore,
+                        AppMenuBar.moonChartItem(bar[0]));
+            });
+            require(sun.computations() == 0 && moon.computations() == 0,
+                    "building the Controller's groups computes nothing");
+
+            // The dialog opens on the Sun's session: its Update is shown by both.
+            javax.swing.SwingUtilities.invokeAndWait(() ->
+                    dialog[0] = juranometria.ui.solar.SolarTableDialog.content(sun, said));
+            require(sun.computations() == 1 && moon.computations() == 0,
+                    "the dialog computes on opening (ruled on #400), the Sun only");
+            require(section[0].sun().model.getRowCount() == 1
+                            && section[0].sun().status().equals(dialog[0].status()),
+                    "and the Controller's group shows that result: "
+                            + section[0].sun().status());
+
+            // A range applied from the Controller, with unfinished text in the dialog.
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                dialog[0].end.setText("2026-06-3");
+                section[0].sun().rangeView.setSelected(true);
+                section[0].sun().end.setText("2026-06-24 07:30");
+                section[0].sun().apply();
+            });
+            require(dialog[0].model.getRowCount() == 4
+                            && dialog[0].status().equals(section[0].sun().status()),
+                    "a range applied in the Controller is the dialog's table too: "
+                            + dialog[0].status());
+            require("2026-06-3".equals(dialog[0].end.getText()),
+                    "while the dialog's unfinished text is untouched");
+            require(moon.computations() == 0, "the Sun's range computed nothing for the Moon");
+
+            // One switch per body: the box, the View item and the chart agree.
+            javax.swing.AbstractButton sunBox = (javax.swing.AbstractButton)
+                    namedIn(groups[0], "sunOnChart");
+            javax.swing.JCheckBoxMenuItem sunItem = AppMenuBar.sunChartItem(bar[0]);
+            require(!sunBox.isSelected() && !sunItem.isSelected() && !module.sunShowing(),
+                    "hidden by default, everywhere");
+            javax.swing.SwingUtilities.invokeAndWait(sunItem::doClick);
+            require(module.sunShowing() && sunBox.isSelected(),
+                    "the View item's choice is the box's and the chart's");
+            javax.swing.SwingUtilities.invokeAndWait(sunBox::doClick);
+            require(!module.sunShowing() && !sunItem.isSelected(),
+                    "and the box's choice is the View item's and the chart's");
+            require(sun.computations() == 2 && moon.computations() == 0,
+                    "toggling computed no table");
+            require(!module.moonShowing(), "and the Moon's switch is its own");
+            require(sunStore.shownOrDefault() == false
+                            && java.util.Arrays.asList(scratch.keys()).contains("sunOnChartShown"),
+                    "the saved visibility key is the one it always was");
+
+            // View > Solar System, in the ruled order.
+            javax.swing.JMenu solarMenu = AppMenuBar.solarSystemMenu(bar[0]);
+            require(solarMenu != null, "View holds a Solar System submenu");
+            java.util.List<String> order = new java.util.ArrayList<>();
+            for (int i = 0; i < solarMenu.getItemCount(); i++) {
+                javax.swing.JMenuItem item = solarMenu.getItem(i);
+                order.add(item == null ? "—" : item.getText());
+            }
+            require(order.equals(java.util.List.of(said.say("menu.sunchart.label"),
+                            said.say("menu.moonchart.label"), "—", said.say("menu.sun.label"),
+                            said.say("menu.moon.label"))),
+                    "Sun on the chart, Moon on the chart, a separator, Sun..., Moon...: "
+                            + order);
+        } finally {
+            scratch.removeNode();
+        }
+        System.out.println("solar system controls OK (one session per body in two hosts;"
+                + " a draft applied in either shown by both, unfinished text untouched;"
+                + " the Controller's groups compute nothing; one switch per body for the"
+                + " box, the View item and the chart; toggling computes no table; the"
+                + " keys survive; View > Solar System in the ruled order)");
     }
 
     private static javax.swing.JMenuItem menuItem(javax.swing.JPopupMenu menu,

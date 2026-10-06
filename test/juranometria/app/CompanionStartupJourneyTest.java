@@ -73,13 +73,18 @@ class CompanionStartupJourneyTest {
                         // chart's controls came first (#450; #443): its
                         // groups as first introduced, and a box pressed in
                         // it is what the Chart Options dialog then shows.
-                        assertEquals(3, companion.sections().size(),
-                                "Chart controls, Place and Time, then Chart Options");
+                        assertEquals(4, companion.sections().size(),
+                                "Chart controls, Place and Time, Solar System, then"
+                                        + " Chart Options (ruled on #457)");
                         assertEquals("Chart controls, expanded",
                                 companion.sections().get(0).heading()
                                         .getAccessibleContext().getAccessibleName());
-                        assertEquals("Chart Options, expanded",
+                        assertEquals("Solar System, collapsed",
                                 companion.sections().get(2).heading()
+                                        .getAccessibleContext().getAccessibleName(),
+                                "introduced collapsed");
+                        assertEquals("Chart Options, expanded",
+                                companion.sections().get(3).heading()
                                         .getAccessibleContext().getAccessibleName());
                         assertFalse(((javax.swing.AbstractButton) named(
                                 companion.getContentPane(),

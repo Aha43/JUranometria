@@ -142,21 +142,27 @@ class MenuMnemonicTest {
             InterfaceText said = InterfaceText.forLanguage(language);
             inMenu(said, bar -> {
                 for (int m = 0; m < bar.getMenuCount(); m++) {
-                    JMenu menu = bar.getMenu(m);
-                    List<Integer> claimed = new ArrayList<>();
-                    for (int i = 0; i < menu.getItemCount(); i++) {
-                        JMenuItem item = menu.getItem(i);
-                        if (item == null || item.getMnemonic() == 0) {
-                            continue;
-                        }
-                        assertTrue(!claimed.contains(item.getMnemonic()),
-                                "two items on " + menu.getText() + " in "
-                                        + language + " claim '"
-                                        + (char) item.getMnemonic() + "'");
-                        claimed.add(item.getMnemonic());
-                    }
+                    noTwoLettersAlike(bar.getMenu(m), language);
                 }
             });
+        }
+    }
+
+    /** Letters do not collide at one level of a menu, nor inside any submenu of it (#458). */
+    private static void noTwoLettersAlike(JMenu menu, String language) {
+        List<Integer> claimed = new ArrayList<>();
+        for (int i = 0; i < menu.getItemCount(); i++) {
+            JMenuItem item = menu.getItem(i);
+            if (item == null || item.getMnemonic() == 0) {
+                continue;
+            }
+            assertTrue(!claimed.contains(item.getMnemonic()),
+                    "two items on " + menu.getText() + " in " + language
+                            + " claim '" + (char) item.getMnemonic() + "'");
+            claimed.add(item.getMnemonic());
+            if (item instanceof JMenu sub) {
+                noTwoLettersAlike(sub, language);
+            }
         }
     }
 
@@ -184,10 +190,24 @@ class MenuMnemonicTest {
             if (menu == null) {
                 continue;
             }
-            for (int i = 0; i < menu.getItemCount(); i++) {
-                JMenuItem item = menu.getItem(i);
-                if (item != null && label.equals(item.getText())) {
-                    return item;
+            JMenuItem found = itemLabelled(menu, label);
+            if (found != null) {
+                return found;
+            }
+        }
+        return null;
+    }
+
+    private static JMenuItem itemLabelled(JMenu menu, String label) {
+        for (int i = 0; i < menu.getItemCount(); i++) {
+            JMenuItem item = menu.getItem(i);
+            if (item != null && label.equals(item.getText())) {
+                return item;
+            }
+            if (item instanceof JMenu sub) {
+                JMenuItem inside = itemLabelled(sub, label);
+                if (inside != null) {
+                    return inside;
                 }
             }
         }

@@ -347,16 +347,6 @@ public final class JUranometriaMain {
                 companionWords.say("placeandtime.title"),
                 new juranometria.ui.placeandtime.PlaceAndTimePanel(meridian,
                         placeStore, java.time.Instant::now, companionWords));
-        // Chart Options (#443, ruled on #442): the same controls class the
-        // dialog holds, over the same controller, as remembered groups;
-        // Restore Defaults asks over the companion.
-        companion.addSection("chartoptions",
-                companionWords.say("chartoptions.title"),
-                new ChartOptionsControls(chartOptions,
-                        () -> ChartOptionsDialog.restoreConfirmed(companion,
-                                companionWords),
-                        companionWords).inCompanion(companionStore,
-                        companionWords));
         shutdown.onShutdown(companion::dispose);
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -415,6 +405,43 @@ public final class JUranometriaMain {
                 juranometria.ui.solar.SunChartSession.begin(modules,
                         () -> meridian.attached() ? meridian.observer() : null,
                         solarSystem, meridian::horizonShowing);
+        // The Sun's and the Moon's applied query and result (#458,
+        // ruled on #457): one session per body, shared by its dialog
+        // and the Controller's group, over Place and Time's observer
+        // and the same lazy pack. Nothing computes until a host asks.
+        java.util.function.Supplier<juranometria.sky.Observer> observerNow =
+                () -> meridian.attached() ? meridian.observer() : null;
+        juranometria.ui.solar.SolarTableSession sunTable =
+                new juranometria.ui.solar.SolarTableSession(observerNow,
+                        solarSystem, juranometria.ui.solar.SolarTable.sun());
+        juranometria.ui.solar.SolarTableSession moonTable =
+                new juranometria.ui.solar.SolarTableSession(observerNow,
+                        solarSystem, juranometria.ui.solar.SolarTable.moon());
+        // Solar System in the Controller, third (ruled on #457): the
+        // Sun and Moon groups over those sessions and the module's own
+        // switches, introduced collapsed, computing nothing on its own.
+        juranometria.ui.solar.SolarSystemSection solarSection =
+                new juranometria.ui.solar.SolarSystemSection(sunTable, moonTable,
+                        juranometria.ui.solar.SunChartSession.switchOf(sunOnChart,
+                                sunChartStore),
+                        juranometria.ui.solar.MoonChartSession.switchOf(sunOnChart,
+                                moonChartStore),
+                        companionWords);
+        companion.addSection(juranometria.ui.solar.SolarSystemSection.ID,
+                companionWords.say("solarsystem.title"),
+                solarSection.inController(companionStore, companionWords), true);
+        shutdown.onShutdown(solarSection::release);
+        // Chart Options (#443, ruled on #442), fourth since #458: the
+        // same controls class the dialog holds, over the same
+        // controller, as remembered groups; Restore Defaults asks over
+        // the companion.
+        companion.addSection("chartoptions",
+                companionWords.say("chartoptions.title"),
+                new ChartOptionsControls(chartOptions,
+                        () -> ChartOptionsDialog.restoreConfirmed(companion,
+                                companionWords),
+                        companionWords).inCompanion(companionStore,
+                        companionWords));
         // Built after the controls seam, because the menu
         // says its words in the same language the seam
         // derived from the session (#350).
@@ -483,20 +510,17 @@ public final class JUranometriaMain {
                 // instant the meridian module owns, as a table. The
                 // observer is read from the module when the table asks,
                 // never copied; the pack is read on first opening.
-                () -> juranometria.ui.solar.SolarTableDialog.open(frame,
-                        () -> meridian.attached() ? meridian.observer() : null,
-                        solarSystem.get(),
+                // Since #458 the dialog is a second host of the session
+                // the Controller's group follows, so both show the same
+                // applied result.
+                () -> juranometria.ui.solar.SolarTableDialog.open(frame, sunTable,
                         juranometria.ui.language.InterfaceText.forLanguage(
-                                language.interfaceLanguage()),
-                        juranometria.ui.solar.SolarTable.sun()),
+                                language.interfaceLanguage())),
                 // View, Moon (#408): the same table shell over the same
                 // observer and pack, for the Moon's own columns.
-                () -> juranometria.ui.solar.SolarTableDialog.open(frame,
-                        () -> meridian.attached() ? meridian.observer() : null,
-                        solarSystem.get(),
+                () -> juranometria.ui.solar.SolarTableDialog.open(frame, moonTable,
                         juranometria.ui.language.InterfaceText.forLanguage(
-                                language.interfaceLanguage()),
-                        juranometria.ui.solar.SolarTable.moon()),
+                                language.interfaceLanguage())),
                 // View, Sun on the chart (#415): the switch, remembered.
                 juranometria.ui.solar.SunChartSession.toggle(sunOnChart,
                         sunChartStore),

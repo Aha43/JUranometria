@@ -171,3 +171,4 @@ e78c0407f7115bd3	ui/ChartControls.java	zoomLock	declared name used, but never at
 3eeabcaef64ee8de	ui/ChartChromeStore.java	chartToolbarShown	declared name used, but never at a known sink	identifier	a stable preference key for whether the chart window shows its toolbar; no language changes it
 18d96f1c3a0a29b7	ui/Shortcuts.java	chartToolbar	declared name used, but never at a known sink	identifier	the registry id of the Chart Toolbar keystroke, which tooltips name it by; no language changes it
 8f151160794973bc	ui/solar/SolarSystemSection.java	solarsystem	declared name used, but never at a known sink	identifier	the Solar System section's id in the companion, under which its collapse is remembered; no language changes it
+eca567947e8b1ce1	app/AppMenuBar.java	solarSystemMenu	declared name used, but never at a known sink	identifier	the View > Solar System submenu's component name, which tests find it by; no language changes it
