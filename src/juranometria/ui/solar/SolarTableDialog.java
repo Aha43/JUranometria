@@ -6,22 +6,14 @@ import java.awt.Frame;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.time.format.ResolverStyle;
 import java.util.EnumMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.function.Supplier;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -33,13 +25,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
-import javax.swing.table.TableCellRenderer;
 
 import juranometria.sky.Observer;
 import juranometria.solar.SolarSystemService;
 import juranometria.solar.SolarSystemService.Body;
-import juranometria.solar.SolarSystemService.Observation;
-import juranometria.solar.TimeRange;
 import juranometria.ui.Explain;
 import juranometria.ui.language.InterfaceText;
 import juranometria.ui.language.MnemonicText;
@@ -67,6 +56,14 @@ import juranometria.ui.language.MnemonicText;
  * has a label, an access letter, a spoken name and an explanation;
  * every column heading says its unit and frame. Nothing is drawn on
  * the chart.
+ *
+ * <p>Since Sprint 42 (issue #458, ruled on #457) the dialog is one
+ * <strong>host</strong> of {@link SolarTableControls} over a
+ * {@link SolarTableSession}: the controls, their words and their
+ * following of the session live there, and the JUranometria
+ * Controller holds a second set of the same class. What is the
+ * dialog's own is this layout, the time note, Close, and its coming to
+ * the front being an Update.
  */
 public final class SolarTableDialog extends JDialog {
 
@@ -78,15 +75,15 @@ public final class SolarTableDialog extends JDialog {
 
     private final Content content;
 
-    private SolarTableDialog(Frame owner, Supplier<Observer> observer,
-                             SolarSystemService service, InterfaceText said,
-                             SolarTable table) {
-        super(owner, new SolarTableWords(said, table.stem()).say("title"), false);
-        SolarTableWords words = new SolarTableWords(said, table.stem());
+    private SolarTableDialog(Frame owner, SolarTableSession session,
+                             InterfaceText said) {
+        super(owner, new SolarTableWords(said, session.table().stem()).say("title"),
+                false);
+        SolarTableWords words = new SolarTableWords(said, session.table().stem());
         getAccessibleContext().setAccessibleName(words.say("a11y"));
         getAccessibleContext().setAccessibleDescription(words.say("explain"));
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        content = new Content(observer, service, said, table, this::dispose);
+        content = new Content(session, said, this::dispose);
         setContentPane(content);
         getRootPane().registerKeyboardAction(e -> dispose(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
@@ -101,19 +98,31 @@ public final class SolarTableDialog extends JDialog {
         setLocationRelativeTo(owner);
     }
 
-    /** Opens the one table of that body, or brings it to the front. */
+    /**
+     * Opens the one table of that body, or brings it to the front, over
+     * a session of its own - the dialog alone, as before #458.
+     */
     public static void open(Frame owner, Supplier<Observer> observer,
                             SolarSystemService service, InterfaceText said,
                             SolarTable table) {
-        SolarTableDialog open = current.get(table.body());
+        open(owner, new SolarTableSession(observer, service, table), said);
+    }
+
+    /**
+     * Opens the one table of that body over a shared session, or brings
+     * it to the front: what the application does once the Controller
+     * holds the same session (#458).
+     */
+    public static void open(Frame owner, SolarTableSession session,
+                            InterfaceText said) {
+        SolarTableDialog open = current.get(session.table().body());
         if (open != null && open.isDisplayable()) {
             open.toFront();
             open.requestFocus();
             return;
         }
-        SolarTableDialog dialog = new SolarTableDialog(owner, observer, service,
-                said, table);
-        current.put(table.body(), dialog);
+        SolarTableDialog dialog = new SolarTableDialog(owner, session, said);
+        current.put(session.table().body(), dialog);
         dialog.setVisible(true);
     }
 
@@ -123,14 +132,21 @@ public final class SolarTableDialog extends JDialog {
                                                   SolarSystemService service,
                                                   InterfaceText said,
                                                   SolarTable table) {
-        return new SolarTableDialog(owner, observer, service, said, table);
+        return new SolarTableDialog(owner,
+                new SolarTableSession(observer, service, table), said);
     }
 
-    /** The content, headless-constructible, for tests and studies. */
+    /** The content over a session of its own, headless-constructible, for tests and studies. */
     public static Content content(Supplier<Observer> observer,
                                   SolarSystemService service,
                                   InterfaceText said, SolarTable table) {
-        return new Content(observer, service, said, table, () -> { });
+        return new Content(new SolarTableSession(observer, service, table), said,
+                () -> { });
+    }
+
+    /** The content over a shared session, headless-constructible. */
+    public static Content content(SolarTableSession session, InterfaceText said) {
+        return new Content(session, said, () -> { });
     }
 
     /** This dialog's content. */
@@ -141,76 +157,64 @@ public final class SolarTableDialog extends JDialog {
     /**
      * Everything inside the dialog, with no window of its own: the
      * observer note, the two views, the range controls, the table
-     * and the notes under it. The words are looked up body first
-     * ({@link SolarTableWords}); the component names carry the
-     * body's prefix.
+     * and the notes under it - the dialog's layout of
+     * {@link SolarTableControls}, built with access letters. The
+     * component names carry the body's prefix.
      */
     public static final class Content extends JPanel {
 
         private static final long serialVersionUID = 1L;
 
-        private static final DateTimeFormatter SHOWN = DateTimeFormatter
-                .ofPattern("uuuu-MM-dd HH:mm:ss", Locale.ROOT)
-                .withResolverStyle(ResolverStyle.STRICT).withZone(ZoneOffset.UTC);
-        private static final DateTimeFormatter TYPED_SHORT = DateTimeFormatter
-                .ofPattern("uuuu-MM-dd HH:mm", Locale.ROOT)
-                .withResolverStyle(ResolverStyle.STRICT).withZone(ZoneOffset.UTC);
-
         /** The steps offered, in order, by key suffix and duration. */
-        static final List<String> STEP_KEYS = List.of("step.hour",
-                "step.sixHours", "step.day", "step.week", "step.month");
-        static final List<Duration> STEPS = List.of(Duration.ofHours(1),
-                Duration.ofHours(6), Duration.ofDays(1), Duration.ofDays(7),
-                Duration.ofDays(30));
+        static final List<String> STEP_KEYS = SolarTableSession.STEP_KEYS;
+        static final List<java.time.Duration> STEPS = SolarTableSession.STEPS;
 
-        private final Supplier<Observer> observer;
-        private final SolarSystemService service;
-        private final SolarTable body;
-        private final SolarTableWords said;
+        private final SolarTableControls controls;
+        private final SolarTableSession session;
         public final SolarTableModel model;
         public final JTable table;
-        public final JLabel observerNote = new JLabel();
+        public final JLabel observerNote;
         public final JRadioButton instantView;
         public final JRadioButton rangeView;
-        public final JTextField start = new JTextField(19);
-        public final JTextField end = new JTextField(19);
+        public final JTextField start;
+        public final JTextField end;
         public final JComboBox<String> step;
         public final JButton compute;
         public final JButton update;
         public final JButton close;
-        public final JLabel status = new JLabel(" ");
+        public final JLabel status;
         public final JLabel timeNote = new JLabel();
 
-        Content(Supplier<Observer> observer, SolarSystemService service,
-                InterfaceText language, SolarTable body, Runnable closeAction) {
-            if (observer == null || service == null || language == null
-                    || body == null) {
-                throw new IllegalArgumentException("the table reads an"
-                        + " observer, a service, a language and a body");
+        Content(SolarTableSession session, InterfaceText language, Runnable closeAction) {
+            if (session == null || language == null) {
+                throw new IllegalArgumentException("the table follows a"
+                        + " session, in a language");
             }
-            this.observer = observer;
-            this.service = service;
-            this.body = body;
-            this.said = new SolarTableWords(language, body.stem());
+            this.session = session;
+            controls = new SolarTableControls(session, language, null, true);
+            model = controls.model;
+            table = controls.table;
+            observerNote = controls.observerNote;
+            instantView = controls.instantView;
+            rangeView = controls.rangeView;
+            start = controls.start;
+            end = controls.end;
+            step = controls.step;
+            compute = controls.compute;
+            update = controls.update;
+            status = controls.status;
+            SolarTableWords said = controls.words();
             MnemonicText letters = MnemonicText.in(language);
-            String names = body.prefix();
+            String names = session.table().prefix();
             setLayout(new BorderLayout(0, 8));
             setBorder(javax.swing.BorderFactory.createEmptyBorder(12, 12, 12, 12));
 
             JPanel top = new JPanel();
             top.setLayout(new BoxLayout(top, BoxLayout.Y_AXIS));
-            observerNote.setName(names + "ObserverNote");
             observerNote.setAlignmentX(0.0f);
             top.add(observerNote);
             top.add(Box.createVerticalStrut(8));
 
-            instantView = view("view.instant", names + "InstantView",
-                    true, letters);
-            rangeView = view("view.range", names + "RangeView", false,
-                    letters);
-            ButtonGroup views = new ButtonGroup();
-            views.add(instantView);
-            views.add(rangeView);
             JPanel viewRow = new JPanel();
             viewRow.setLayout(new BoxLayout(viewRow, BoxLayout.X_AXIS));
             viewRow.setAlignmentX(0.0f);
@@ -220,24 +224,12 @@ public final class SolarTableDialog extends JDialog {
             top.add(viewRow);
             top.add(Box.createVerticalStrut(8));
 
-            start.setName(names + "RangeStart");
-            end.setName(names + "RangeEnd");
-            step = new JComboBox<>(STEP_KEYS.stream().map(said::say)
-                    .toArray(String[]::new));
-            step.setName(names + "RangeStep");
-            step.setSelectedIndex(2);
-            step.setMaximumSize(step.getPreferredSize());
-            step.getAccessibleContext().setAccessibleName(
-                    said.say("range.step.a11y"));
-            Explain.control(step, said.say("range.step.hover"),
-                    said.say("range.step.explain"));
-            compute = button("compute", names + "Compute", letters);
             JPanel rangeRow = new JPanel();
             rangeRow.setLayout(new BoxLayout(rangeRow, BoxLayout.X_AXIS));
             rangeRow.setAlignmentX(0.0f);
-            rangeRow.add(field("range.start", start, letters));
+            rangeRow.add(field(said, "range.start", start, letters));
             rangeRow.add(Box.createHorizontalStrut(12));
-            rangeRow.add(field("range.end", end, letters));
+            rangeRow.add(field(said, "range.end", end, letters));
             rangeRow.add(Box.createHorizontalStrut(12));
             JLabel every = new JLabel(said.say("range.step.label"));
             every.setLabelFor(step);
@@ -249,44 +241,12 @@ public final class SolarTableDialog extends JDialog {
             rangeRow.add(compute);
             top.add(rangeRow);
             top.add(Box.createVerticalStrut(6));
-            status.setName(names + "Status");
             status.setAlignmentX(0.0f);
             top.add(status);
             add(top, BorderLayout.NORTH);
 
-            model = new SolarTableModel(language, body);
-            this.table = new JTable(model);
-            this.table.setName(names + "Table");
-            this.table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-            this.table.setFillsViewportHeight(true);
-            this.table.getAccessibleContext().setAccessibleName(
-                    said.say("table.a11y"));
-            Explain.selfExplanatory(this.table, said.say("table.explain"));
-            // Each heading names its unit and frame for a screen reader
-            // and on hover, through the look-and-feel's own renderer:
-            // keyed by model index, so it travels with the column.
-            TableCellRenderer headings = (tbl, value, selected, focused,
-                                          row, column) -> {
-                java.awt.Component cell = tbl.getTableHeader()
-                        .getDefaultRenderer().getTableCellRendererComponent(
-                                tbl, value, selected, focused, row, column);
-                int index = tbl.getColumnModel().getColumn(column).getModelIndex();
-                cell.getAccessibleContext().setAccessibleName(
-                        model.getColumnName(index));
-                cell.getAccessibleContext().setAccessibleDescription(
-                        model.columnExplanation(index));
-                if (cell instanceof JComponent component) {
-                    component.setToolTipText(model.columnExplanation(index));
-                }
-                return cell;
-            };
-            int[] widths = body.widths();
-            for (int c = 0; c < model.getColumnCount(); c++) {
-                this.table.getColumnModel().getColumn(c).setHeaderRenderer(headings);
-                this.table.getColumnModel().getColumn(c).setPreferredWidth(widths[c]);
-            }
-            JScrollPane scroll = new JScrollPane(this.table);
-            scroll.setPreferredSize(new Dimension(body.preferredWidth(), 220));
+            JScrollPane scroll = new JScrollPane(table);
+            scroll.setPreferredSize(new Dimension(session.table().preferredWidth(), 220));
             add(scroll, BorderLayout.CENTER);
 
             JPanel bottom = new JPanel();
@@ -298,13 +258,12 @@ public final class SolarTableDialog extends JDialog {
             // the table, would then set the dialog's width.
             timeNote.setText("<html><body style='width: 720px'>"
                     + said.say("time.note",
-                            service.timeScales().exactFrom().toString(),
-                            service.timeScales().exactUntil().toString())
+                            session.timeScales().exactFrom().toString(),
+                            session.timeScales().exactUntil().toString())
                     + "</body></html>");
             bottom.add(timeNote);
             bottom.add(Box.createVerticalStrut(8));
-            update = button("update", names + "Update", letters);
-            close = button("close", names + "Close", letters);
+            close = button(said, "close", names + "Close", letters);
             JPanel buttons = new JPanel();
             buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
             buttons.setAlignmentX(0.0f);
@@ -314,187 +273,58 @@ public final class SolarTableDialog extends JDialog {
             bottom.add(buttons);
             add(bottom, BorderLayout.SOUTH);
 
-            instantView.addActionListener(e -> update());
-            rangeView.addActionListener(e -> update());
-            compute.addActionListener(e -> update());
-            update.addActionListener(e -> update());
-            start.addActionListener(e -> update());
-            end.addActionListener(e -> update());
             close.addActionListener(e -> closeAction.run());
 
-            Observer now = observer.get();
-            if (now != null) {
-                start.setText(shown(now.instant()));
-                end.setText(shown(now.instant().plus(Duration.ofDays(7))));
-            }
+            // The dialog computes when it is built (ruled on #400, kept
+            // on #457): an Update, which every host of the session shows.
             update();
         }
 
-        /** Reads the observer again and recomputes the current view. */
+        /** Reads the observer again and computes this content's view, for every host to see. */
         public void update() {
-            Observer now = observer.get();
-            boolean present = now != null;
-            for (JComponent c : List.of(instantView, rangeView, start, end,
-                    step, compute)) {
-                c.setEnabled(present);
-            }
-            if (!present) {
-                observerNote.setText(said.say("observer.absent"));
-                observerNote.getAccessibleContext().setAccessibleName(
-                        observerNote.getText());
-                model.show(List.of());
-                say(" ");
-                return;
-            }
-            observerNote.setText(said.say("observer.note",
-                    said.n(degrees(now.latitudeDegrees())),
-                    said.n(degrees(now.eastLongitudeFolded())),
-                    shown(now.instant())));
-            observerNote.getAccessibleContext().setAccessibleName(
-                    observerNote.getText());
-            if (instantView.isSelected()) {
-                showInstant(now);
-            } else {
-                showRange(now);
-            }
+            controls.apply();
         }
 
-        private void showInstant(Observer now) {
-            LocalDate day = now.instant().atOffset(ZoneOffset.UTC).toLocalDate();
-            if (day.isBefore(SolarSystemService.FIRST_DAY)
-                    || day.isAfter(SolarSystemService.LAST_DAY)) {
-                model.show(List.of());
-                say(said.say("refused.interval",
-                        SolarSystemService.FIRST_DAY.toString(),
-                        SolarSystemService.LAST_DAY.toString(),
-                        shown(now.instant())));
-                return;
-            }
-            Observation o = service.observe(body.body(), now);
-            model.show(List.of(new SolarTableModel.Row(
-                    new TimeRange.Sample(now.instant(), false), o)));
-            say(said.say("status.rows", "1"));
-        }
-
-        private void showRange(Observer now) {
-            Instant from = parse(start.getText());
-            Instant to = parse(end.getText());
-            if (from == null || to == null) {
-                model.show(List.of());
-                say(said.say("refused.instant",
-                        from == null ? start.getText().strip()
-                                : end.getText().strip()));
-                return;
-            }
-            Duration by = STEPS.get(step.getSelectedIndex());
-            if (to.isBefore(from)) {
-                model.show(List.of());
-                say(said.say("refused.backwards"));
-                return;
-            }
-            long rows = TimeRange.rowsOf(from, to, by);
-            if (rows > TimeRange.MAX_ROWS) {
-                model.show(List.of());
-                say(said.say("refused.rows", Long.toString(rows),
-                        Integer.toString(TimeRange.MAX_ROWS)));
-                return;
-            }
-            for (Instant edge : List.of(from, to)) {
-                LocalDate day = edge.atOffset(ZoneOffset.UTC).toLocalDate();
-                if (day.isBefore(SolarSystemService.FIRST_DAY)
-                        || day.isAfter(SolarSystemService.LAST_DAY)) {
-                    model.show(List.of());
-                    say(said.say("refused.interval",
-                            SolarSystemService.FIRST_DAY.toString(),
-                            SolarSystemService.LAST_DAY.toString(), shown(edge)));
-                    return;
-                }
-            }
-            TimeRange range = new TimeRange(from, to, by);
-            List<SolarSystemService.Row> answered =
-                    service.observe(body.body(), now, range);
-            model.show(answered, true);
-            boolean appended = answered.get(answered.size() - 1).sample()
-                    .appendedEnd();
-            say(appended
-                    ? said.say("status.appended",
-                            Integer.toString(answered.size()),
-                            said.say("appended"))
-                    : said.say("status.rows",
-                            Integer.toString(answered.size())));
-        }
-
-        private void say(String text) {
-            status.setText(text);
-            status.getAccessibleContext().setAccessibleName(text);
+        /** The controls this content hosts, for a host that checks what it shares. */
+        public SolarTableControls controls() {
+            return controls;
         }
 
         /** What the status line says now. */
         public String status() {
-            return status.getText();
+            return controls.status();
         }
 
         static Instant parse(String text) {
-            String typed = text == null ? "" : text.strip();
-            for (DateTimeFormatter format : List.of(SHOWN, TYPED_SHORT)) {
-                try {
-                    return Instant.from(format.parse(typed));
-                } catch (DateTimeParseException e) {
-                    // the other format may fit
-                }
-            }
-            return null;
+            return SolarTableSession.parse(text);
         }
 
         static String shown(Instant instant) {
-            return SHOWN.format(instant);
+            return SolarTableSession.shown(instant);
         }
 
-        private static String degrees(double value) {
-            String text = String.format(Locale.ROOT, "%.6f", value);
-            return text.contains(".")
-                    ? text.replaceAll("0+$", "").replaceAll("\\.$", "")
-                    : text;
-        }
-
-        private JRadioButton view(String stem, String name, boolean selected,
-                                  MnemonicText letters) {
-            JRadioButton button = new JRadioButton(said.say(stem + ".label"),
-                    selected);
-            button.setName(name);
-            button.getAccessibleContext().setAccessibleName(
-                    said.say(stem + ".a11y"));
-            letters.apply(button, said.key(stem + ".mnemonic"));
-            return Explain.control(button, said.say(stem + ".hover"),
-                    said.say(stem + ".explain"));
-        }
-
-        private JButton button(String stem, String name, MnemonicText letters) {
+        private static JButton button(SolarTableWords said, String stem, String name,
+                                      MnemonicText letters) {
             JButton button = new JButton(said.say(stem + ".label"));
             button.setName(name);
-            button.getAccessibleContext().setAccessibleName(
-                    said.say(stem + ".a11y"));
+            button.getAccessibleContext().setAccessibleName(said.say(stem + ".a11y"));
             letters.apply(button, said.key(stem + ".mnemonic"));
             String hover = said.sayIfDefined(stem + ".hover");
             if (hover != null && !hover.isBlank()) {
-                return Explain.control(button, hover,
-                        said.say(stem + ".explain"));
+                return Explain.control(button, hover, said.say(stem + ".explain"));
             }
             return Explain.selfExplanatory(button, said.say(stem + ".explain"));
         }
 
-        private JPanel field(String stem, JTextField field, MnemonicText letters) {
+        private static JPanel field(SolarTableWords said, String stem, JTextField field,
+                                    MnemonicText letters) {
             JPanel row = new JPanel();
             row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
             row.setAlignmentX(0.0f);
             JLabel name = new JLabel(said.say(stem + ".label"));
             name.setLabelFor(field);
             letters.apply(name, said.key(stem + ".mnemonic"));
-            field.getAccessibleContext().setAccessibleName(
-                    said.say(stem + ".label"));
             field.setMaximumSize(field.getPreferredSize());
-            Explain.control(field, said.say(stem + ".hover"),
-                    said.say(stem + ".explain"));
             row.add(name);
             row.add(Box.createHorizontalStrut(6));
             row.add(field);

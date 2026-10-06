@@ -276,6 +276,10 @@ class SunTableDialogTest {
     void theTableReadsNoClockAndRemembersNothing() throws Exception {
         for (String source : List.of(
                 "src/juranometria/ui/solar/SolarTableDialog.java",
+                "src/juranometria/ui/solar/SolarTableSession.java",
+                "src/juranometria/ui/solar/SolarTableControls.java",
+                "src/juranometria/ui/solar/SolarSystemSection.java",
+                "src/juranometria/ui/solar/BodyOnChart.java",
                 "src/juranometria/ui/solar/SolarTableModel.java",
                 "src/juranometria/ui/solar/SolarTable.java",
                 "src/juranometria/ui/solar/SolarTableWords.java",
