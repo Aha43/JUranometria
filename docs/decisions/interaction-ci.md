@@ -135,7 +135,20 @@ The interaction contract (`EvidenceContractMain interaction`) is the
 portable contract over the reproduced generators only. No chart
 producer runs; every chart picture is held as committed - compared
 byte for byte with what is committed, with its provenance account -
-and the job then requires the working tree unchanged. Locally it took
+and the job then requires the working tree unchanged.
+
+**The route's first real run (#462) and its repair (#463).** A
+platform record reproduces on the runner, as the contract asks, but
+with the runner's bytes: the contract passed and the tree-unchanged
+step then named eighteen rewritten records. Ruled: restoration, not
+exclusion - excluding platform records from the step would have let an
+unrelated change to one pass unnoticed. A *green* interaction run puts
+back exactly the records it judged, to their **pre-run** bytes, so a
+record already changed when the run began stays changed for the diff
+to name; a breached run restores no record, so what it wrote stays
+readable for diagnosis; nothing but judged platform records is
+touched. `InteractionRestorationTest` holds all four; the step itself
+is unchanged. Locally the contract took
 63 s (22 generators, twice each) against about 40 minutes for the
 full contract on CI. Expected wall clock for the route: about
 17–18 minutes, `display` remaining the critical path.
