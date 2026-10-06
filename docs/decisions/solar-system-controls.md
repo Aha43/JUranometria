@@ -3,8 +3,10 @@
 Sprint 42, issue #457. **Ruled by the owner (2026-10-06)** — see
 [The ruling](#the-ruling) at the end, which governs where it differs
 from the proposal. The study is `docs/studies/solar-system-controls/`
-(`make solar-system-controls-study`). #458 builds it in two pull
-requests; #459 hands it over.
+(`make solar-system-controls-study`). **Built** by #458 in two pull
+requests (#462, #465) and accepted by the owner on the packaged
+candidate `5718ab47`; the account of what was built is
+`docs/reviews/sprint-42-handover.md`.
 
 > The Controller is the coherent home for the Solar System tools; the
 > dialogs remain, and the two never drift apart.
