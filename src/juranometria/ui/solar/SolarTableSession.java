@@ -109,7 +109,7 @@ public final class SolarTableSession {
             .withResolverStyle(ResolverStyle.STRICT).withZone(ZoneOffset.UTC);
 
     private final Supplier<Observer> observer;
-    private final SolarSystemService service;
+    private final Supplier<SolarSystemService> service;
     private final SolarTable table;
     private final List<Consumer<Result>> listeners = new ArrayList<>();
     private Result result = Result.none();
@@ -117,6 +117,18 @@ public final class SolarTableSession {
 
     public SolarTableSession(Supplier<Observer> observer, SolarSystemService service,
                              SolarTable table) {
+        this(observer, () -> service, table);
+        if (service == null) {
+            throw new IllegalArgumentException("a session reads a service");
+        }
+    }
+
+    /**
+     * Over a service read when first needed - the application's 8.9 MB
+     * pack is loaded on the first table, never at startup (#400).
+     */
+    public SolarTableSession(Supplier<Observer> observer,
+                             Supplier<SolarSystemService> service, SolarTable table) {
         if (observer == null || service == null || table == null) {
             throw new IllegalArgumentException(
                     "a session reads an observer and a service, for a body");
@@ -138,7 +150,7 @@ public final class SolarTableSession {
 
     /** The service's time scales, for the note a host writes under its table. */
     public juranometria.solar.time.TimeScales timeScales() {
-        return service.timeScales();
+        return service.get().timeScales();
     }
 
     /** The last result, which is the empty one before any query. */
@@ -198,7 +210,7 @@ public final class SolarTableSession {
                     shown(now.instant()), 0);
         }
         computations++;
-        SolarSystemService.Observation o = service.observe(table.body(), now);
+        SolarSystemService.Observation o = service.get().observe(table.body(), now);
         return new Result(query, Outcome.ROWS, List.of(new SolarTableModel.Row(
                 new TimeRange.Sample(now.instant(), false), o)), now, "", 1);
     }
@@ -228,7 +240,7 @@ public final class SolarTableSession {
         }
         computations++;
         List<SolarSystemService.Row> answered =
-                service.observe(table.body(), now, new TimeRange(from, to, by));
+                service.get().observe(table.body(), now, new TimeRange(from, to, by));
         List<SolarTableModel.Row> shown = answered.stream()
                 .map(r -> new SolarTableModel.Row(r.sample(), r.observation())).toList();
         boolean appended = answered.get(answered.size() - 1).sample().appendedEnd();

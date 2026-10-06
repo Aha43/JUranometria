@@ -213,6 +213,16 @@ public final class MenuSheetMain {
                 if (toolbar != null) {
                     toolbar.setSelected(state.checked());
                 }
+                // The Sun and the Moon on the chart (#458), in View's
+                // Solar System submenu: ticked with the rest, as the
+                // module ticks them while the bar shows.
+                for (JCheckBoxMenuItem body : new JCheckBoxMenuItem[] {
+                        AppMenuBar.sunChartItem(bar[0]),
+                        AppMenuBar.moonChartItem(bar[0])}) {
+                    if (body != null) {
+                        body.setSelected(state.checked());
+                    }
+                }
                 owner[0] = new JFrame("study");
                 owner[0].setJMenuBar(bar[0]);
                 owner[0].pack();
@@ -247,15 +257,19 @@ public final class MenuSheetMain {
             // they overlapped, because a popup is wider than the
             // word that opens it - the first picture showed three
             // menus on top of each other.
+            // A submenu's popup (#458: View's Solar System) is a
+            // column of its own, after the menu that holds it.
+            List<javax.swing.JPopupMenu> popups = new java.util.ArrayList<>();
+            for (int m = 0; m < bar.getMenuCount(); m++) {
+                JMenu menu = bar.getMenu(m);
+                if (menu != null) {
+                    popupsOf(menu, popups);
+                }
+            }
             int height = bar.getHeight() + 8;
             int width = bar.getWidth();
             int at = 0;
-            for (int m = 0; m < bar.getMenuCount(); m++) {
-                JMenu menu = bar.getMenu(m);
-                if (menu == null) {
-                    continue;
-                }
-                Component popup = menu.getPopupMenu();
+            for (Component popup : popups) {
                 popup.setSize(popup.getPreferredSize());
                 popup.doLayout();
                 height = Math.max(height,
@@ -274,18 +288,13 @@ public final class MenuSheetMain {
                 g.fillRect(0, 0, drawn.getWidth(), drawn.getHeight());
                 bar.paint(g);
                 int column = 0;
-                for (int m = 0; m < bar.getMenuCount(); m++) {
-                    JMenu menu = bar.getMenu(m);
-                    if (menu == null) {
-                        continue;
-                    }
+                for (Component popup : popups) {
                     Graphics2D popupInk = (Graphics2D) g.create(
                             column, bar.getHeight() + 8,
-                            menu.getPopupMenu().getWidth(),
-                            menu.getPopupMenu().getHeight());
-                    menu.getPopupMenu().paint(popupInk);
+                            popup.getWidth(), popup.getHeight());
+                    popup.paint(popupInk);
                     popupInk.dispose();
-                    column += menu.getPopupMenu().getWidth() + 12;
+                    column += popup.getWidth() + 12;
                 }
             } finally {
                 g.dispose();
@@ -315,11 +324,29 @@ public final class MenuSheetMain {
                 continue;
             }
             record(menu, said, "menu");
-            for (int i = 0; i < menu.getItemCount(); i++) {
-                JMenuItem item = menu.getItem(i);
-                if (item != null) {
-                    record(item, said, "item");
-                }
+            items(menu, said);
+        }
+    }
+
+    /** A menu's popup, then each submenu's, in order (#458). */
+    private static void popupsOf(JMenu menu, List<javax.swing.JPopupMenu> into) {
+        into.add(menu.getPopupMenu());
+        for (Component item : menu.getMenuComponents()) {
+            if (item instanceof JMenu sub) {
+                popupsOf(sub, into);
+            }
+        }
+    }
+
+    /** Every item of a menu, and of any submenu inside it (#458). */
+    private static void items(JMenu menu, Set<String> said) {
+        for (int i = 0; i < menu.getItemCount(); i++) {
+            JMenuItem item = menu.getItem(i);
+            if (item instanceof JMenu sub) {
+                record(sub, said, "submenu");
+                items(sub, said);
+            } else if (item != null) {
+                record(item, said, "item");
             }
         }
     }

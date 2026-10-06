@@ -139,6 +139,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | juranometria/app/InspectorCloseButtonTest.java | control-showing | pointer-events |
 | juranometria/app/InspectorWrappingTest.java | none | none |
 | juranometria/app/PublicFaceJourneyTest.java | point-reachable, control-showing | back-door-click |
+| juranometria/app/SolarSystemCompanionJourneyTest.java | point-reachable, control-showing | none |
 | juranometria/app/SprintThirtyJourneyTest.java | focus-owner, point-reachable, control-showing | back-door-click |
 | juranometria/app/SprintThirtyOneJourneyTest.java | focus-owner, point-reachable, control-showing | back-door-click |
 | juranometria/app/SprintThirtyTwoJourneyTest.java | focus-owner, point-reachable, control-showing | none |
@@ -181,7 +182,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | juranometria/ui/placeandtime/PlaceAndTimeDialogLifecycleTest.java | focus-owner | back-door-click |
 | juranometria/ui/placeandtime/PlaceAndTimeSizeDeclarationTest.java | none | none |
 
-**55 display-dependent files.** 19 state a focused-window or focus-owner premise, 32 state a reachability premise, and 22 use a back-door action (doClick or postActionEvent) somewhere - each either a menu convention or a debt the discipline issue #243 owns.
+**56 display-dependent files.** 19 state a focused-window or focus-owner premise, 33 state a reachability premise, and 22 use a back-door action (doClick or postActionEvent) somewhere - each either a menu convention or a debt the discipline issue #243 owns.
 
 ## Input routes across the whole suite
 
@@ -210,7 +211,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 Whether a particular read happens on the event thread is control flow, which text cannot decide; issue #220 proved the cost of guessing, three times. What can be counted is the traffic:
 
 - reads of live chart state (currentScene, pageOffsetY, navigation.state): **456** across the suite
-- explicit event-thread hand-offs (invokeAndWait): **932**
+- explicit event-thread hand-offs (invokeAndWait): **937**
 
 ## Generated evidence, classified
 

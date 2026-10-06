@@ -42,12 +42,13 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Menu bar | JMenuItem | Place and Time... | &mdash; | Opens the window that sets your location and the instant used to draw the meridian, hor... | self-explanatory |
 | Menu bar | JCheckBoxMenuItem | Controls | &mdash; | Shows or hides the JUranometria Controller window, which keeps the chart's controls bes... | self-explanatory |
 | Menu bar | JCheckBoxMenuItem | Chart Toolbar | &mdash; | Shows or hides the chart window's toolbar. Its controls remain in the JUranometria Cont... | self-explanatory |
-| Menu bar | JMenuItem | Sun... | Where the Sun is, for the place and instant set in Place and Time | Opens a table of the Sun's computed position, height above the horizon, distance and ap... | hovered |
-| Menu bar | JMenuItem | Moon... | Where the Moon is, for the place and instant set in Place and Time | Opens a table of the Moon's computed position, height above the horizon, distance, appa... | hovered |
 | Menu bar | JCheckBoxMenuItem | Inspector | &mdash; | Shows or hides the panel that describes the selected mark and what is on this page | self-explanatory |
 | Menu bar | JCheckBoxMenuItem | Ecliptic | &mdash; | Shows or hides the ecliptic and its equinox and solstice marks. The chart shortcut is <... | self-explanatory |
+| Menu bar | JMenu | Solar System | &mdash; | The Sun and the Moon: whether each is drawn on the chart, and their tables | self-explanatory |
 | Menu bar | JCheckBoxMenuItem | Sun on the chart | &mdash; | Shows or hides the Sun on the chart, drawn at its true size where it stands for the pla... | self-explanatory |
 | Menu bar | JCheckBoxMenuItem | Moon on the chart | &mdash; | Shows or hides the Moon on the chart, drawn at its true size where it stands for the pl... | self-explanatory |
+| Menu bar | JMenuItem | Sun... | Where the Sun is, for the place and instant set in Place and Time | Opens a table of the Sun's computed position, height above the horizon, distance and ap... | hovered |
+| Menu bar | JMenuItem | Moon... | Where the Moon is, for the place and instant set in Place and Time | Opens a table of the Moon's computed position, height above the horizon, distance, appa... | hovered |
 | Menu bar | JMenuItem | Zoom In | &mdash; | Shows a narrower field, with fainter stars on it | self-explanatory |
 | Menu bar | JMenuItem | Zoom Out | &mdash; | Shows a wider field, with fewer stars on it | self-explanatory |
 | Menu bar | JMenu | Help | &mdash; | Information about this application and what it is built on | self-explanatory |
@@ -152,7 +153,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 
 ## The audit
 
-**135 operable controls** across 16 surfaces: **88** hovered, **12** dynamic, **35** left to their own visible words, **0 undecided**.
+**136 operable controls** across 16 surfaces: **88** hovered, **12** dynamic, **36** left to their own visible words, **0 undecided**.
 
 **0** say the same words twice - a tooltip read back as a description. The seam refuses it, so this is zero or a finding.
 

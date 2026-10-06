@@ -550,7 +550,7 @@ class TestEvidenceGateTest {
                         || f.premises().contains("focus-owner")).count();
         long reachPremise = display.stream().filter(f ->
                 f.premises().contains("point-reachable")).count();
-        assertEquals(55, display.size(),
+        assertEquals(56, display.size(),
                 "the display corpus is the twenty the decision names"
                         + " plus the black-sky journey (#246), the"
                         + " #261 pair - the surfaces journey and the"
@@ -694,7 +694,15 @@ class TestEvidenceGateTest {
                         + " the window, and reads what each restart opens"
                         + " with - because what a window"
                         + " remembers about itself is proved only by a"
-                        + " window");
+                        + " window; and #458's Solar System journey,"
+                        + " which starts the real application, opens"
+                        + " the Controller and presses the section's"
+                        + " heading, its Compute and its Show on chart"
+                        + " box with their reachability proven - a"
+                        + " press that computes nothing until asked is"
+                        + " a claim about a shown window - and walks"
+                        + " the Controller's own focus traversal to"
+                        + " the group's controls");
         assertTrue(focusPremise >= 14,
                 "focus premises spread under #243 and may not"
                         + " retreat: " + focusPremise + " of "

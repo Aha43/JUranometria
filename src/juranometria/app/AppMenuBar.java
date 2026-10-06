@@ -32,12 +32,25 @@ public final class AppMenuBar {
 
     private static JMenuItem named(JMenuBar bar, String name) {
         for (int menu = 0; menu < bar.getMenuCount(); menu++) {
-            JMenu each = bar.getMenu(menu);
-            for (int item = 0; item < each.getItemCount(); item++) {
-                JMenuItem candidate = each.getItem(item);
-                if (candidate != null
-                        && name.equals(candidate.getName())) {
-                    return candidate;
+            JMenuItem found = named(bar.getMenu(menu), name);
+            if (found != null) {
+                return found;
+            }
+        }
+        return null;
+    }
+
+    /** The item of that name in a menu, or in any submenu inside it (#458). */
+    private static JMenuItem named(JMenu each, String name) {
+        for (int item = 0; item < each.getItemCount(); item++) {
+            JMenuItem candidate = each.getItem(item);
+            if (candidate != null && name.equals(candidate.getName())) {
+                return candidate;
+            }
+            if (candidate instanceof JMenu sub) {
+                JMenuItem inside = named(sub, name);
+                if (inside != null) {
+                    return inside;
                 }
             }
         }
@@ -70,17 +83,8 @@ public final class AppMenuBar {
 
     private static javax.swing.JCheckBoxMenuItem checkBoxItem(
             javax.swing.JMenuBar bar, String name) {
-        for (int i = 0; i < bar.getMenuCount(); i++) {
-            JMenu menu = bar.getMenu(i);
-            for (int j = 0; j < menu.getItemCount(); j++) {
-                JMenuItem item = menu.getItem(j);
-                if (item instanceof javax.swing.JCheckBoxMenuItem box
-                        && name.equals(box.getName())) {
-                    return box;
-                }
-            }
-        }
-        return null;
+        JMenuItem found = named(bar, name);
+        return found instanceof javax.swing.JCheckBoxMenuItem box ? box : null;
     }
 
     private AppMenuBar() {
@@ -261,6 +265,15 @@ public final class AppMenuBar {
 
     /** The name View's Chart Toolbar switch carries, for tests (#450). */
     public static final String TOOLBAR_ITEM = "toolbarItem";
+
+    /** The name View's Solar System submenu carries, for tests (#458). */
+    public static final String SOLAR_SYSTEM_MENU = "solarSystemMenu";
+
+    /** View's Solar System submenu, or null when the bar has none (#458). */
+    public static JMenu solarSystemMenu(javax.swing.JMenuBar bar) {
+        JMenuItem found = named(bar, SOLAR_SYSTEM_MENU);
+        return found instanceof JMenu menu ? menu : null;
+    }
 
     /** View's Chart Toolbar switch, or null when the bar has none (#450). */
     public static javax.swing.JCheckBoxMenuItem toolbarItem(
@@ -587,36 +600,6 @@ public final class AppMenuBar {
                 toolbar.addActionListener(event -> toggleToolbar.run());
                 view.add(toolbar);
             }
-            if (openSunTable != null) {
-                // The Sun table (#400): where the Sun is for the place
-                // and instant Place and Time owns, as numbers. It sits
-                // beside Place and Time because that is what it reads;
-                // the hover says so before the reader chooses it.
-                JMenuItem sun = new JMenuItem(said.say("menu.sun.label"));
-                sun.setName(SUN_ITEM);
-                letters.apply(sun, "menu.sun.mnemonic");
-                sun.getAccessibleContext().setAccessibleName(
-                        said.say("menu.sun.a11y"));
-                juranometria.ui.Explain.control(sun,
-                        said.say("menu.sun.hover"),
-                        said.say("menu.sun.explain"));
-                sun.addActionListener(event -> openSunTable.run());
-                view.add(sun);
-            }
-            if (openMoonTable != null) {
-                // The Moon table (#408), under the Sun's, over the same
-                // Place and Time; the hover says so.
-                JMenuItem moon = new JMenuItem(said.say("menu.moon.label"));
-                moon.setName(MOON_ITEM);
-                letters.apply(moon, "menu.moon.mnemonic");
-                moon.getAccessibleContext().setAccessibleName(
-                        said.say("menu.moon.a11y"));
-                juranometria.ui.Explain.control(moon,
-                        said.say("menu.moon.hover"),
-                        said.say("menu.moon.explain"));
-                moon.addActionListener(event -> openMoonTable.run());
-                view.add(moon);
-            }
             if (toggleInspector != null) {
                 // A checkbox, because the reader must be able to see
                 // whether the inspector is showing - especially when
@@ -660,36 +643,85 @@ public final class AppMenuBar {
                 ecliptic.addActionListener(event -> toggleEcliptic.run());
                 view.add(ecliptic);
             }
-            if (toggleSunOnChart != null) {
-                // The Sun on the chart (#415): a layer like the
-                // ecliptic, switched like it, below it. No chart
-                // shortcut in 4.0, so the explanation names none.
-                javax.swing.JCheckBoxMenuItem sunOnChart =
-                        new javax.swing.JCheckBoxMenuItem(
-                                said.say("menu.sunchart.label"));
-                sunOnChart.setName(SUN_CHART_ITEM);
-                letters.apply(sunOnChart, "menu.sunchart.mnemonic");
-                sunOnChart.getAccessibleContext().setAccessibleName(
-                        said.say("menu.sunchart.a11y"));
-                juranometria.ui.Explain.selfExplanatory(sunOnChart,
-                        said.say("menu.sunchart.explain"));
-                sunOnChart.addActionListener(event -> toggleSunOnChart.run());
-                view.add(sunOnChart);
-            }
-            if (toggleMoonOnChart != null) {
-                // The Moon on the chart (#416): the Sun's kind of
-                // layer, directly below it, switched the same way.
-                javax.swing.JCheckBoxMenuItem moonOnChart =
-                        new javax.swing.JCheckBoxMenuItem(
-                                said.say("menu.moonchart.label"));
-                moonOnChart.setName(MOON_CHART_ITEM);
-                letters.apply(moonOnChart, "menu.moonchart.mnemonic");
-                moonOnChart.getAccessibleContext().setAccessibleName(
-                        said.say("menu.moonchart.a11y"));
-                juranometria.ui.Explain.selfExplanatory(moonOnChart,
-                        said.say("menu.moonchart.explain"));
-                moonOnChart.addActionListener(event -> toggleMoonOnChart.run());
-                view.add(moonOnChart);
+            if (openSunTable != null || openMoonTable != null
+                    || toggleSunOnChart != null || toggleMoonOnChart != null) {
+                // View > Solar System (#458, ruled on #457): the Sun and
+                // the Moon together - whether each is drawn on the chart,
+                // then their tables - in the ruled order. The items are
+                // the ones the flat menu held, with their names, letters
+                // and words; only their home moved.
+                JMenu solar = new JMenu(said.say("menu.solarsystem.label"));
+                solar.setName(SOLAR_SYSTEM_MENU);
+                letters.apply(solar, "menu.solarsystem.mnemonic");
+                solar.getAccessibleContext().setAccessibleName(
+                        said.say("menu.solarsystem.a11y"));
+                juranometria.ui.Explain.selfExplanatory(solar,
+                        said.say("menu.solarsystem.explain"));
+                if (toggleSunOnChart != null) {
+                    // The Sun on the chart (#415): a layer like the
+                    // ecliptic, switched like it. No chart shortcut in
+                    // 4.0, so the explanation names none.
+                    javax.swing.JCheckBoxMenuItem sunOnChart =
+                            new javax.swing.JCheckBoxMenuItem(
+                                    said.say("menu.sunchart.label"));
+                    sunOnChart.setName(SUN_CHART_ITEM);
+                    letters.apply(sunOnChart, "menu.sunchart.mnemonic");
+                    sunOnChart.getAccessibleContext().setAccessibleName(
+                            said.say("menu.sunchart.a11y"));
+                    juranometria.ui.Explain.selfExplanatory(sunOnChart,
+                            said.say("menu.sunchart.explain"));
+                    sunOnChart.addActionListener(event -> toggleSunOnChart.run());
+                    solar.add(sunOnChart);
+                }
+                if (toggleMoonOnChart != null) {
+                    // The Moon on the chart (#416): the Sun's kind of
+                    // layer, directly below it, switched the same way.
+                    javax.swing.JCheckBoxMenuItem moonOnChart =
+                            new javax.swing.JCheckBoxMenuItem(
+                                    said.say("menu.moonchart.label"));
+                    moonOnChart.setName(MOON_CHART_ITEM);
+                    letters.apply(moonOnChart, "menu.moonchart.mnemonic");
+                    moonOnChart.getAccessibleContext().setAccessibleName(
+                            said.say("menu.moonchart.a11y"));
+                    juranometria.ui.Explain.selfExplanatory(moonOnChart,
+                            said.say("menu.moonchart.explain"));
+                    moonOnChart.addActionListener(event -> toggleMoonOnChart.run());
+                    solar.add(moonOnChart);
+                }
+                if ((toggleSunOnChart != null || toggleMoonOnChart != null)
+                        && (openSunTable != null || openMoonTable != null)) {
+                    solar.addSeparator();
+                }
+                if (openSunTable != null) {
+                    // The Sun table (#400): where the Sun is for the place
+                    // and instant Place and Time owns, as numbers; the
+                    // hover says what it reads before the reader chooses it.
+                    JMenuItem sun = new JMenuItem(said.say("menu.sun.label"));
+                    sun.setName(SUN_ITEM);
+                    letters.apply(sun, "menu.sun.mnemonic");
+                    sun.getAccessibleContext().setAccessibleName(
+                            said.say("menu.sun.a11y"));
+                    juranometria.ui.Explain.control(sun,
+                            said.say("menu.sun.hover"),
+                            said.say("menu.sun.explain"));
+                    sun.addActionListener(event -> openSunTable.run());
+                    solar.add(sun);
+                }
+                if (openMoonTable != null) {
+                    // The Moon table (#408), under the Sun's, over the same
+                    // Place and Time; the hover says so.
+                    JMenuItem moon = new JMenuItem(said.say("menu.moon.label"));
+                    moon.setName(MOON_ITEM);
+                    letters.apply(moon, "menu.moon.mnemonic");
+                    moon.getAccessibleContext().setAccessibleName(
+                            said.say("menu.moon.a11y"));
+                    juranometria.ui.Explain.control(moon,
+                            said.say("menu.moon.hover"),
+                            said.say("menu.moon.explain"));
+                    moon.addActionListener(event -> openMoonTable.run());
+                    solar.add(moon);
+                }
+                view.add(solar);
             }
             if (navigation != null) {
                 // Centre-preserving zoom, exactly the toolbar's

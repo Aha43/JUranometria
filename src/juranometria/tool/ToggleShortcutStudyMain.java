@@ -463,15 +463,7 @@ public final class ToggleShortcutStudyMain {
                 () -> { }, () -> { }, () -> { }, () -> { },
                 juranometria.ui.language.InterfaceText.forLanguage("en"));
         for (int menu = 0; menu < bar.getMenuCount(); menu++) {
-            JMenu each = bar.getMenu(menu);
-            for (int at = 0; at < each.getItemCount(); at++) {
-                JMenuItem item = each.getItem(at);
-                if (item != null && item.getAccelerator() != null) {
-                    found.add(new Bound(platformName(item.getAccelerator()),
-                            item.getText(), "the " + each.getText()
-                                    + " menu"));
-                }
-            }
+            bound(bar.getMenu(menu), found);
         }
         JRootPane root = new JRootPane();
         AppMenuBar.installZoomShortcuts(root,
@@ -517,6 +509,19 @@ public final class ToggleShortcutStudyMain {
     }
 
     /** A keystroke as a reader would say it on this platform. */
+    /** Every accelerator in a menu, and in any submenu inside it (#458). */
+    private static void bound(JMenu each, List<Bound> found) {
+        for (int at = 0; at < each.getItemCount(); at++) {
+            JMenuItem item = each.getItem(at);
+            if (item instanceof JMenu sub) {
+                bound(sub, found);
+            } else if (item != null && item.getAccelerator() != null) {
+                found.add(new Bound(platformName(item.getAccelerator()),
+                        item.getText(), "the " + each.getText() + " menu"));
+            }
+        }
+    }
+
     private static String platformName(KeyStroke stroke) {
         String modifiers = java.awt.event.InputEvent.getModifiersExText(
                 stroke.getModifiers());

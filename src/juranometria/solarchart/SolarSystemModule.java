@@ -108,11 +108,18 @@ public final class SolarSystemModule implements ChartModule {
         return sunShowing;
     }
 
-    /** Shows or hides the Sun; the chart redraws. */
+    /** Shows or hides the Sun; the chart redraws, and every listener hears a change. */
     public void sunShowing(boolean showing) {
+        boolean changed = this.sunShowing != showing;
         this.sunShowing = showing;
         if (services != null) {
             services.redraw();
+        }
+        if (changed) {
+            for (java.util.function.Consumer<Boolean> listener
+                    : java.util.List.copyOf(sunListeners)) {
+                listener.accept(showing);
+            }
         }
     }
 
@@ -121,12 +128,48 @@ public final class SolarSystemModule implements ChartModule {
         return moonShowing;
     }
 
-    /** Shows or hides the Moon; the chart redraws. */
+    /** Shows or hides the Moon; the chart redraws, and every listener hears a change. */
     public void moonShowing(boolean showing) {
+        boolean changed = this.moonShowing != showing;
         this.moonShowing = showing;
         if (services != null) {
             services.redraw();
         }
+        if (changed) {
+            for (java.util.function.Consumer<Boolean> listener
+                    : java.util.List.copyOf(moonListeners)) {
+                listener.accept(showing);
+            }
+        }
+    }
+
+    private final java.util.List<java.util.function.Consumer<Boolean>> sunListeners =
+            new java.util.ArrayList<>();
+    private final java.util.List<java.util.function.Consumer<Boolean>> moonListeners =
+            new java.util.ArrayList<>();
+
+    /**
+     * Hears every change of whether the Sun is drawn (Sprint 42, issue
+     * #458, ruled on #457): the module is the one authority for the
+     * choice, so a menu item, a Controller box and the chart follow it
+     * from here and no control surface can bypass another. Told the
+     * current state at once.
+     */
+    public void onSunChange(java.util.function.Consumer<Boolean> listener) {
+        if (listener == null) {
+            throw new IllegalArgumentException("a listener is required");
+        }
+        sunListeners.add(listener);
+        listener.accept(sunShowing);
+    }
+
+    /** Hears every change of whether the Moon is drawn; told the current state at once. */
+    public void onMoonChange(java.util.function.Consumer<Boolean> listener) {
+        if (listener == null) {
+            throw new IllegalArgumentException("a listener is required");
+        }
+        moonListeners.add(listener);
+        listener.accept(moonShowing);
     }
 
     /** How many times the chart asked, for tests of pull-not-push. */
