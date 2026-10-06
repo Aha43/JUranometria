@@ -362,6 +362,46 @@ public final class ControlExplanationStudyMain {
         surfaces.put("Controls", juranometria.ui.companion.CompanionSection
                 .forStudy("placeandtime", english.say("placeandtime.title"),
                         new javax.swing.JPanel(), english));
+        // The Controller's Solar System groups (#458): the same controls
+        // the dialogs host, in the Controller's arrangement, without
+        // access letters, with each body's Show on chart box.
+        juranometria.sky.Observer stated = new juranometria.sky.Observer(59.91, 10.75,
+                java.time.Instant.parse("2026-06-21T10:00:00Z"));
+        juranometria.solar.SolarSystemService solar =
+                juranometria.solar.SolarSystemService.load();
+        juranometria.ui.solar.BodyOnChart still = new juranometria.ui.solar.BodyOnChart() {
+            @Override
+            public boolean showing() {
+                return false;
+            }
+
+            @Override
+            public void show(boolean shown) {
+            }
+
+            @Override
+            public void onChange(java.util.function.Consumer<Boolean> listener) {
+                listener.accept(false);
+            }
+        };
+        java.util.prefs.Preferences scratch = java.util.prefs.Preferences.userRoot()
+                .node("juranometria-study-explain-solar-" + System.nanoTime());
+        try {
+            surfaces.put("Solar System", new juranometria.ui.solar.SolarSystemSection(
+                    new juranometria.ui.solar.SolarTableSession(() -> stated, solar,
+                            juranometria.ui.solar.SolarTable.sun()),
+                    new juranometria.ui.solar.SolarTableSession(() -> stated, solar,
+                            juranometria.ui.solar.SolarTable.moon()),
+                    still, still, english).inController(
+                            juranometria.ui.companion.CompanionStore.forNode(scratch),
+                            english));
+        } finally {
+            try {
+                scratch.removeNode();
+            } catch (java.util.prefs.BackingStoreException leaving) {
+                // An empty node is a blemish, not a failure.
+            }
+        }
         // The Sun table (#400), over a stated observer: the audit is of
         // its controls, not its numbers.
         surfaces.put("Sun table", juranometria.ui.solar.SolarTableDialog.content(

@@ -97,7 +97,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | src/juranometria/tool/CleanChartStudyMain.java | look-and-feel, default-font, preferences | protected-locally |
 | src/juranometria/tool/CompanionSheetMain.java | look-and-feel, default-font, preferences | protected-locally |
 | src/juranometria/tool/CompanionWindowStudyMain.java | look-and-feel, default-font, preferences | protected-locally |
-| src/juranometria/tool/ControlExplanationStudyMain.java | look-and-feel | UNPROTECTED: look-and-feel |
+| src/juranometria/tool/ControlExplanationStudyMain.java | look-and-feel, preferences | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/DeepSkyVocabularyMockupMain.java | look-and-feel, default-font, preferences | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/tool/EclipticCandidateStudyMain.java | default-font | UNPROTECTED: default-font |
 | src/juranometria/tool/EclipticControlStudyMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
@@ -210,7 +210,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 Whether a particular read happens on the event thread is control flow, which text cannot decide; issue #220 proved the cost of guessing, three times. What can be counted is the traffic:
 
 - reads of live chart state (currentScene, pageOffsetY, navigation.state): **456** across the suite
-- explicit event-thread hand-offs (invokeAndWait): **923**
+- explicit event-thread hand-offs (invokeAndWait): **932**
 
 ## Generated evidence, classified
 
