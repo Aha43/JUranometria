@@ -76,6 +76,7 @@ help:
 	@echo "  solar-system-controls-study  Measure the Sun and Moon tables in the Controller, with mockups (issue #457)"
 	@echo "  jovian-system-study  Propose the Jupiter and Galilean-moons table from the kept Horizons fixtures, with mockups and diagrams (issue #472)"
 	@echo "  jovian-pack-study    Cut and measure the Jovian excerpt of jup365.bsp against its source (issue #472)"
+	@echo "  spk-boundary-fixture  Cut the JUP365 segment-split test fixture from jup365.bsp and prove it against its source (issue #473)"
 	@echo "  sun-on-the-chart-study  The Sun on production pages through the module (issue #415)"
 	@echo "  moon-on-the-chart-study The Moon on production pages, and the lunation as a row of phases (issue #416)"
 	@echo "  pan-study         Measure the Sprint 8 grab-to-pan geometry and costs"
@@ -583,7 +584,7 @@ black-sky-study: classes
 		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BlackSkyStudyMain \
 		> docs/studies/black-sky/measurements.md
 
-.PHONY: evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study sun-on-the-chart-study moon-on-the-chart-study printable-chart-study
+.PHONY: spk-boundary-fixture evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study sun-on-the-chart-study moon-on-the-chart-study printable-chart-study
 # The heap is stated rather than inherited from whatever a machine's
 # ergonomics chose for it: the CI runner's default quarter-of-RAM is
 # not the same number as a developer's.
@@ -740,6 +741,13 @@ jovian-system-study: classes
 jovian-pack-study: classes
 	$(JAVA) -Xmx6g -Djava.awt.headless=true -cp "$(CLASSES_DIR):$(LIB_DIR)/*" \
 		juranometria.tool.JovianPackStudyMain
+
+# The JUP365 segment-split fixture (#473): cuts twenty days each side of
+# the 1997 split from imports/raw/jovian-system/jup365.bsp, proves every
+# record identical to the source and writes the fixture and its README
+# under docs/studies/jovian-system/spk/.
+spk-boundary-fixture: classes
+	$(JAVA) -Xmx4g -cp "$(CLASSES_DIR)" juranometria.tool.SpkBoundaryFixtureMain
 
 solar-system-controls-study: classes
 	mkdir -p docs/studies/solar-system-controls

@@ -32,6 +32,15 @@ import java.util.List;
  * the kernel's own units - kilometres and kilometres per second - and
  * an epoch outside a segment's coverage is refused, never
  * extrapolated.
+ *
+ * <p>A kernel may carry several segments for one centre and target,
+ * each over its own interval - JUP365 keeps two per body, split at
+ * 1997-01-16 (issue #472, measured) - so a segment is selected by the
+ * epoch as well as the pair (issue #473). Where more than one segment
+ * covers an epoch, the one later in the file is used, which is the
+ * precedence NAIF's own readers give (SPK Required Reading, the search
+ * order of segments); a gap between a pair's segments is refused like
+ * any other uncovered epoch, naming what the kernel does cover.
  */
 public final class SpkKernel {
 
@@ -137,31 +146,93 @@ public final class SpkKernel {
         return segments;
     }
 
-    /** The one segment from {@code center} to {@code target}. */
-    public Segment segment(int center, int target) {
+    /**
+     * Every segment from {@code center} to {@code target}, in file
+     * order; empty if the kernel carries none.
+     */
+    public List<Segment> segments(int center, int target) {
+        List<Segment> of = new ArrayList<>();
         for (Segment s : segments) {
             if (s.center == center && s.target == target) {
-                return s;
+                of.add(s);
             }
         }
-        throw new IllegalArgumentException("the kernel has no segment "
-                + center + " -> " + target + "; it has " + segments);
+        return Collections.unmodifiableList(of);
+    }
+
+    /**
+     * The one segment from {@code center} to {@code target}, for a
+     * kernel that carries exactly one; a pair with several segments
+     * must be selected by epoch with {@link #segment(int, int, double)}.
+     *
+     * @throws IllegalArgumentException if the kernel has no such
+     *         segment, or more than one
+     */
+    public Segment segment(int center, int target) {
+        List<Segment> of = segments(center, target);
+        if (of.isEmpty()) {
+            throw noSegment(center, target);
+        }
+        if (of.size() > 1) {
+            throw new IllegalArgumentException("the kernel has "
+                    + of.size() + " segments " + center + " -> " + target
+                    + ", covering " + coverage(of)
+                    + "; select one by epoch");
+        }
+        return of.get(0);
+    }
+
+    /**
+     * The segment from {@code center} to {@code target} that covers a
+     * TDB epoch in seconds past J2000. Where several cover it, the one
+     * later in the file - NAIF's precedence.
+     *
+     * @throws IllegalArgumentException if the kernel has no such
+     *         segment, or none that covers the epoch
+     */
+    public Segment segment(int center, int target, double et) {
+        List<Segment> of = segments(center, target);
+        if (of.isEmpty()) {
+            throw noSegment(center, target);
+        }
+        for (int i = of.size() - 1; i >= 0; i--) {
+            if (of.get(i).covers(et)) {
+                return of.get(i);
+            }
+        }
+        throw new IllegalArgumentException(String.format(
+                "epoch %.3f s past J2000 (TDB) is outside the %d segment%s"
+                        + " %d -> %d, which cover%s %s",
+                et, of.size(), of.size() == 1 ? "" : "s", center, target,
+                of.size() == 1 ? "s" : "", coverage(of)));
+    }
+
+    private static IllegalArgumentException noSegment(int center, int target) {
+        return new IllegalArgumentException("the kernel has no segment "
+                + center + " -> " + target);
+    }
+
+    /** "[a to b], [c to d]" in seconds past J2000, in file order. */
+    private static String coverage(List<Segment> of) {
+        StringBuilder text = new StringBuilder();
+        for (Segment s : of) {
+            if (text.length() > 0) {
+                text.append(", ");
+            }
+            text.append(String.format("[%.3f to %.3f]", s.startEt, s.endEt));
+        }
+        return text.toString();
     }
 
     /**
      * The state of {@code target} relative to {@code center} at a TDB
-     * epoch in seconds past J2000, from the segment's coefficients.
+     * epoch in seconds past J2000, from the coefficients of the
+     * segment that covers it.
      *
      * @throws IllegalArgumentException if no segment covers the epoch
      */
     public State state(int center, int target, double et) {
-        Segment s = segment(center, target);
-        if (!s.covers(et)) {
-            throw new IllegalArgumentException(String.format(
-                    "epoch %.3f s past J2000 (TDB) is outside segment %s,"
-                            + " which covers %.3f to %.3f",
-                    et, s.name, s.startEt, s.endEt));
-        }
+        Segment s = segment(center, target, et);
         int last = s.lastAddress;
         double init = word(last - 3);
         double intlen = word(last - 2);
