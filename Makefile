@@ -77,6 +77,7 @@ help:
 	@echo "  jovian-system-study  Propose the Jupiter and Galilean-moons table from the kept Horizons fixtures, with mockups and diagrams (issue #472)"
 	@echo "  jovian-pack-study    Cut and measure the Jovian excerpt of jup365.bsp against its source (issue #472)"
 	@echo "  spk-boundary-fixture  Cut the JUP365 segment-split test fixture from jup365.bsp and prove it against its source (issue #473)"
+	@echo "  import-jovian-system  Build the Jovian System pack from jup365.bsp and pck00011.tpc, proved against the sources (issue #473)"
 	@echo "  sun-on-the-chart-study  The Sun on production pages through the module (issue #415)"
 	@echo "  moon-on-the-chart-study The Moon on production pages, and the lunation as a row of phases (issue #416)"
 	@echo "  pan-study         Measure the Sprint 8 grab-to-pan geometry and costs"
@@ -273,6 +274,13 @@ import-constellations: classes
 
 import-solar-system: classes
 	$(JAVA) -cp "$(CLASSES_DIR)" juranometria.tool.SolarSystemPackMain
+
+# The Jovian System pack (issue #473): two modified excerpts of jup365.bsp
+# proved against their source and against the released de440s.bsp, the
+# PCK constants copied into the manifest, the released Solar System pack
+# proved untouched.
+import-jovian-system: classes
+	$(JAVA) -Xmx6g -cp "$(CLASSES_DIR)" juranometria.tool.JovianPackMain
 
 import-star-identities: classes
 	$(JAVA) -cp "$(CLASSES_DIR)" juranometria.tool.StarIdentityPackMain
@@ -584,7 +592,7 @@ black-sky-study: classes
 		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BlackSkyStudyMain \
 		> docs/studies/black-sky/measurements.md
 
-.PHONY: spk-boundary-fixture evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study sun-on-the-chart-study moon-on-the-chart-study printable-chart-study
+.PHONY: spk-boundary-fixture import-jovian-system evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study sun-on-the-chart-study moon-on-the-chart-study printable-chart-study
 # The heap is stated rather than inherited from whatever a machine's
 # ergonomics chose for it: the CI runner's default quarter-of-RAM is
 # not the same number as a developer's.

@@ -610,6 +610,19 @@ public final class SolarSystemService {
      * its geodetic latitude at sea level and its local apparent
      * sidereal time, through the atlas's own of-date-to-J2000 rotation.
      */
+    /** The station as two vectors - position, velocity - for the Jovian service (#473). */
+    static Vector3[] stationVectors(double latitudeDegrees, double lastDegrees,
+                                    double jdTt) {
+        Station s = station(latitudeDegrees, lastDegrees, jdTt);
+        return new Vector3[] {s.position, s.velocity};
+    }
+
+    /** The horizontal place of an of-date direction, for the Jovian service (#473). */
+    static Horizontal horizontalOf(SkyPosition ofDate, double latitudeDegrees,
+                                   double lastDegrees) {
+        return horizontal(ofDate, latitudeDegrees, lastDegrees);
+    }
+
     private static Station station(double latitudeDegrees,
                                    double lastDegrees, double jdTt) {
         double phi = Math.toRadians(latitudeDegrees);
