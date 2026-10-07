@@ -61,7 +61,8 @@ NAMED = [
     ("2026-10-07 12:00:00", "today"),
     ("2026-12-11 22:30:00", "triple-transit-before-io-enters"),
     ("2026-12-11 22:45:00", "triple-transit-inside"),
-    ("2026-12-11 22:55:00", "triple-transit-after-callisto-leaves"),
+    ("2026-12-11 22:55:00", "triple-transit-callisto-centre-left-disc-overlapping"),
+    ("2026-12-11 23:00:00", "triple-transit-after-callisto-leaves"),
     ("2100-12-31 23:59:59", "boundary-end"),
 ]
 # Published configurations kept as additional candidates (Sky &

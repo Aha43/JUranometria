@@ -2,7 +2,9 @@
 
 **Sprint 44, issue #472.** The numerical contract for Jupiter and Io,
 Europa, Ganymede and Callisto, proposed from measurement before any
-production data or code exists, for the owner's ruling. It inherits
+production data or code exists. **Ruled by the owner (2026-10-07)** -
+see [The ruling](#the-ruling) at the end, which governs where it
+differs from the proposal. It inherits
 the Sun's and the Moon's contracts (`sun-computation.md`,
 `moon-computation.md`) wherever it does not say otherwise. The study
 is `docs/studies/jovian-system/` (`make jovian-system-study` for the
@@ -305,8 +307,8 @@ time-scale divergence, as the Sun's and the Moon's were):
 | X, Y, separation (apparent basis) | ≤ 0.05″ | ≤ 0.2″ |
 | position angle | ≤ 0.05° | ≤ 0.1° |
 | illuminated fraction | ≤ 0.01 point | ≤ 0.03 point |
-| visibility state against Horizons' code, equatorial-sphere definition | ≤ 1 row in 10 000 disagreeing, every disagreement a graze named | the same |
-| ingress and egress minutes on the named evening | Horizons' minute ± 1 (the figure's cost), IMCCE's centre-crossing minute inside the limb-to-limb interval | — |
+| visibility state against Horizons' code, equatorial-sphere definition | **an exact named allowlist**: the grazing Europa occultation at Oslo, 2026-12-06 17:00 (separation 20.37″ against a limb sum of 20.69″; the two implementations' light-time treatments differ by hundredths of an arcsecond at the graze) - any other disagreement is a new finding and stops the run | the same |
+| ingress and egress minutes on the named evening | Horizons' minute ± 1 (the figure's cost), IMCCE's centre-crossing minute inside the limb-to-limb interval; the production oblate-limb states compared separately from Horizons' spherical definition, every deliberate boundary difference named, never counted as an unexplained mismatch | — |
 
 Each number bounds a measured, explained cause and sits beside the
 maximum measured on 2026-10-07; the targets would be returned to the
@@ -338,10 +340,15 @@ up to nine minutes at Callisto's egress (22:50 centre, 22:53 Guide,
 definition rather than a time. The study's own geometry on JUP365 is
 held to both (below).
 
-The named contract instants are 22:30 UTC (before Io enters), 22:45
-(inside the common interval) and 22:55 (after Callisto has left by
-the centre-crossing definition and still on the disc limb-to-limb);
-each is held at the five observers and geocentrically. The 2024–2025
+The named contract instants, as ruled, are **22:30 UTC** (before Io's
+limb ingress), **22:45** (inside the common triple transit), **22:55**
+(the definition boundary: IMCCE's centre has left Jupiter while
+Callisto's disc still overlaps it under the limb-to-limb contract -
+kept as a boundary case, not as "after Callisto leaves") and **23:00**
+(the unambiguous post-Callisto case under the production oblate limb:
+Horizons' own code is clear there too, separation 21.20″ against a
+limb sum of 20.93″); Ganymede is clear at all four, 303″ west. Each is
+held at the five observers and geocentrically. The 2024–2025
 configurations Sky & Telescope (Joe Rao, 2024-12-05) and
 Astronomy.com (2025-12-01) described are kept as additional named
 cases with their Horizons rows (`published-*-geocentric.txt`); they
@@ -448,17 +455,90 @@ reached by the chart-producing `SunOnTheChartStudyMain` and
    cases.
 10. **Fixtures committed**: of the 28.1 MB Horizons corpus (61 files,
     kept whole under `~/juranometria-runs/jovian-study/horizons/` with
-    its README), this pull request commits the subset every claim about
-    the named fixture reads - the named instants for five observers and
+    its README), the proposal was the subset every claim about the
+    named fixture reads - the named instants for five observers and
     five bodies (25 files), the published 2024–2025 configurations (5),
     the 11 December 2026 minute series at Oslo and geocentrically (10),
-    December 2026 hourly at Oslo (5) and the daily 2026 year at Oslo (5):
-    **50 files, 3.0 MB**, each re-hashed by `JovianFixturesTest`. The
-    ten 7-day 1900–2100 matrices (24.5 MB) that the era table reads are
-    measured in `contract/authority-comparison.md` and retained
-    locally; the owner rules whether the five Oslo matrices (12.3 MB)
-    join the repository so a test can hold the era table, or the
-    comparison record stands alone. IMCCE: the quoted rows file only
+    December 2026 hourly at Oslo (5) and the daily 2026 year at Oslo
+    (5) - with the ten 7-day 1900–2100 matrices retained locally. **As
+    ruled, the five Oslo era matrices join them: 55 files, 15.6 MB**,
+    each re-hashed by `JovianFixturesTest`; the five geocentric
+    matrices stay outside the repository, their URLs and digests in
+    the durable study record. IMCCE: the quoted rows file only
     (`imcce-2026-12-11.txt`), never the catalogue.
 11. **Implementation split**: #473 pack and computation (wide), then
     #474 table (wide), as #471 orders them.
+
+## The ruling
+
+The owner's rulings (2026-10-07), recorded as given:
+
+1. **Authority approved.** JUP365 for Jupiter and the four Galilean
+   moons, with DE440's Jupiter barycentre from the released source;
+   Horizons for the dense implementation comparison; IMCCE for
+   independently published named-event rows.
+2. **Terms approved with the proposed boundary.** A modified, renamed
+   JUP365 excerpt under NAIF's rules, with JUranometria's modifier
+   identity, notice, manifest and provenance. Only the few IMCCE event
+   rows the fixtures require are quoted, with exact attribution, URL,
+   retrieval date and source digest; the IMCCE catalogue, software or
+   any IMCCE file is never redistributed inside the application, and
+   the application has no runtime dependency on IMCCE.
+3. **Pack layout A and the recommended interval.** The released
+   Sun/Moon pack stays byte-identical and untouched; a second Jovian
+   pack is added. Jupiter **1900–2100**; Io, Europa, Ganymede and
+   Callisto **2000–2100**. Outside the moon interval Jupiter remains
+   answerable while the four-moon configuration refuses explicitly and
+   names its supported interval. The cost - about 59 MB installed,
+   51 MB compressed - is accepted.
+4. **Epoch-aware SPK selection is mandatory.** #473 repairs both
+   `SpkKernel` and `SpkExcerpt` to select the segment covering the
+   requested epoch, holds the 1997 split with tests on both sides and
+   at the boundary, and leaves no "first segment for body" behaviour.
+5. **Frames and signs approved.** Horizons' apparent-of-date X/Y
+   definition verbatim: X positive toward increasing right ascension,
+   described to readers as east; Y positive north; words beside
+   magnitudes rather than bare signs; front or behind from
+   observer-line depth, never from X/Y.
+6. **Apparent figure approved.** The oblate IAU 2015 Jupiter spheroid
+   with the JUP365/PCK pole for limb tests and later cartography;
+   Horizons' equatorial sphere only as the comparison's definition.
+7. **Visibility model approved.** The disc relation and the shadow
+   relation as independent typed facts; the proposed composed-state
+   precedence; limb-to-limb contact including the moon's own radius;
+   the penumbra not a reader state in this release; no visibility
+   inferred from a two-dimensional offset.
+8. **Accuracy targets approved, with one tightening.** The Sun's
+   gravitational deflection is added to Jupiter's apparent position,
+   the astrometric J2000 place untouched; elongations at or below 1°
+   stay measured and printed, never asserted as observable accuracy;
+   every other target stands and returns for a ruling before widening.
+   The generic "one disagreement in 10 000" allowance is replaced by
+   an **exact named allowlist** pinning the grazing Europa case at
+   2026-12-06 17:00 and its cause; any further spherical-reference
+   disagreement is a new finding and stops the run. The production
+   oblate-limb states are compared separately from Horizons' spherical
+   definition, and deliberate boundary differences are named, never
+   counted as unexplained mismatches.
+9. **Table approved.** The Jupiter summary card; Io, Europa, Ganymede
+   and Callisto in fixed order; full offsets, separation, Jupiter radii
+   and the state in words; timestamp-grouped sampled ranges capped at
+   250 instants / 1 000 moon rows - sampling, not event search; Jupiter
+   enters the Controller collapsed, with no Show on chart choice until
+   cartography exists; the English and Norwegian wording as proposed.
+10. **Triple-transit fixture approved with corrected contract
+    instants.** 22:30 UTC before Io's limb ingress; 22:45 inside the
+    common triple transit; **22:55 is not "after Callisto leaves" under
+    the limb-to-limb contract** and is kept only as the
+    definition-boundary case (IMCCE's centre has left while the disc
+    still overlaps); **23:00 UTC** added as the unambiguous
+    post-Callisto case under the production oblate limb; Ganymede clear
+    throughout; the 2024–2025 configurations retained as secondary
+    fixtures, never as the club report.
+11. **Fixture boundary and implementation split approved.** The 50-file
+    named/dense-2026 subset and the five Oslo 7-day era matrices
+    (about 12.3 MB) are committed, so the principal long-era error
+    table is held by a test; the five geocentric era matrices stay
+    outside Git, retained with exact URLs and digests in the durable
+    study record; only the quoted IMCCE rows are committed. Then #473
+    computation and pack, then #474 table, both wide as predicted.

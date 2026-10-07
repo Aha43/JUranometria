@@ -1,8 +1,8 @@
 # JPL Horizons responses for Jupiter and the Galilean moons (#472)
 
-Each file is kept whole, exactly as returned, headed by its request URL with every query parameter, the UTC of the request and the SHA-256 of the body; `JovianFixturesTest` re-hashes each. Fetched once by `scripts/horizons-jupiter-fetch.py` (observers at sea level; Jupiter 599 with quantities 1,2,4,10,13,17,20,24,32,43; the moons 501-504 with 1,2,4,6,12,13,20,24). Study evidence only: nothing at build, test or run time depends on them beyond the tests reading them as fixtures, and the atlas never reaches Horizons.
+Each file is kept whole, exactly as returned, headed by its request URL with every query parameter, the UTC of the request and the SHA-256 of the body; `JovianFixturesTest` re-hashes each. Fetched by `scripts/horizons-jupiter-fetch.py` (observers at sea level; Jupiter 599 with quantities 1,2,4,10,13,17,20,24,32,43; the moons 501-504 with 1,2,4,6,12,13,20,24); the named instants were fetched again on the owner's ruling (23:00 UTC added, 22:55 relabelled the definition boundary). Study evidence only: nothing at build, test or run time depends on them beyond the tests reading them as fixtures, and the atlas never reaches Horizons.
 
-Committed here: the named instants (five observers, five bodies), the published 2024-2025 configurations (geocentric), the 11 December 2026 minute series (Oslo and geocentric), December 2026 hourly at Oslo and the daily 2026 year at Oslo. The 7-day 1900-2100 matrices (Oslo and geocentric, 24.5 MB) that the error matrix in `authority-comparison.md` reads are retained in the study area, not committed, pending the owner's ruling on #472.
+Committed here, as ruled on #472: the named instants (five observers, five bodies), the published 2024-2025 configurations (geocentric), the 11 December 2026 minute series (Oslo and geocentric), December 2026 hourly at Oslo, the daily 2026 year at Oslo, and the five 7-day 1900-2100 era matrices at Oslo. The five geocentric era matrices (12.3 MB) are retained outside the repository in the durable study record with their URLs and digests, and are measured in `../contract/authority-comparison.md`.
 
 | file | bytes | rows | requested (UTC) | body sha256 |
 |---|---:|---:|---|---|
@@ -16,31 +16,36 @@ Committed here: the named instants (five observers, five bodies), the published 
 | `dense-2026-ganymede-oslo.txt` | 96242 | 366 | 2026-10-07T13:53:37Z | `0e570c60b41d3351a4f0577bdf4118d3f8381d3f2726e8371dfe396ec1a70400` |
 | `dense-2026-io-oslo.txt` | 96240 | 366 | 2026-10-07T13:53:02Z | `7e1a8d501fa663767ddc654e3bc845515cbbee2f307428089a9a2afa5db3f65c` |
 | `dense-2026-jupiter-oslo.txt` | 108915 | 366 | 2026-10-07T13:52:39Z | `8058351c660b7529e7aaa77a031438eb86f5f1cf9cfa77f110598bc3635a1146` |
-| `named-callisto-alert.txt` | 14748 | 13 | 2026-10-07T13:52:09Z | `d6ecec36272e222f5e3630f726658f09a124b22a5763b35b6f3e3b8537eff12b` |
-| `named-callisto-cape-town.txt` | 14749 | 13 | 2026-10-07T13:52:05Z | `d102e8195e045994120acd26554932e3e07c1d2c2663c307be2e0b6752481efc` |
-| `named-callisto-chatham.txt` | 14749 | 13 | 2026-10-07T13:52:14Z | `8b9ac737e733eef5595113e654899bac7c9b8ef8601e90b778e06b4386fe3552` |
-| `named-callisto-oslo.txt` | 14748 | 13 | 2026-10-07T13:51:55Z | `34ef8437abfc5e1ff159f0be4384cc8ee39c0e5d82a134f5657026aaf08082d8` |
-| `named-callisto-quito.txt` | 14748 | 13 | 2026-10-07T13:52:01Z | `2e6ecb5480e20bc3fcd830d9a9813e3cac24e01c1fb97cb4462086bb25cc4513` |
-| `named-europa-alert.txt` | 14745 | 13 | 2026-10-07T13:52:08Z | `0409d339e7b4c96fae0ec9762a3af6397ebf917d99a5b5729ed0b26da891a9d6` |
-| `named-europa-cape-town.txt` | 14746 | 13 | 2026-10-07T13:52:04Z | `e48f64eea0bbaf464787e9cffc9196ee7f26aaf8ee4a744865a92a26a8d9f061` |
-| `named-europa-chatham.txt` | 14746 | 13 | 2026-10-07T13:52:12Z | `cc061575ecda87ffc591e2bf6ac39e804fb62de6166268419c69c136bbcd1744` |
-| `named-europa-oslo.txt` | 14745 | 13 | 2026-10-07T13:51:53Z | `ca8d9977424697373aa0cb9405e527c807a11a2550d764a18ddb3b6a406f6a9f` |
-| `named-europa-quito.txt` | 14745 | 13 | 2026-10-07T13:51:58Z | `2f280029c445d0f14772c259e6470dab5e45965b65724bab9b42cb37430b49d5` |
-| `named-ganymede-alert.txt` | 14745 | 13 | 2026-10-07T13:52:08Z | `a1a1a6c3d879403348b0c9c88f94755fad88d82d3fe1948818826b6b208360cc` |
-| `named-ganymede-cape-town.txt` | 14746 | 13 | 2026-10-07T13:52:04Z | `44d53aa927a15b2e81d740e62a8ec29707303cf4f6c105c8ada503d72ed0d664` |
-| `named-ganymede-chatham.txt` | 14746 | 13 | 2026-10-07T13:52:13Z | `c99793caa382ecdbc0393f479b4219a2c8686e743944d852cbee5c4706d3a4d8` |
-| `named-ganymede-oslo.txt` | 14745 | 13 | 2026-10-07T13:51:54Z | `eae0b9dc5bc70c6198bdd691fb23a3892853ce547a5db69dde993ee0d123c016` |
-| `named-ganymede-quito.txt` | 14745 | 13 | 2026-10-07T13:52:00Z | `0f6076483244b3cdd4e9c5a6cede53c31ebd8069bbbe3f4200143b0be168e424` |
-| `named-io-alert.txt` | 14743 | 13 | 2026-10-07T13:52:07Z | `5251a39c7897cfbc310ac8c76805e6c962103d48ec31e0c9873b390e32c28881` |
-| `named-io-cape-town.txt` | 14744 | 13 | 2026-10-07T13:52:03Z | `45bf72c90365e1651dedf89605232ff0dd327e01452c935ab8888e9746546719` |
-| `named-io-chatham.txt` | 14744 | 13 | 2026-10-07T13:52:11Z | `bcf8b9cfd79c92d304cec1843d8bfc44d7e20271c3b4c2a1d9f38383d73ddaad` |
-| `named-io-oslo.txt` | 14743 | 13 | 2026-10-07T13:51:53Z | `b6801e0c40f69200e2173f726f7d1dd9a026681da31c3da064efc01a4c553e52` |
-| `named-io-quito.txt` | 14743 | 13 | 2026-10-07T13:51:57Z | `2960d826fa2388bf93d229fc90c13e3ca8f8c576d5a695ece85fdc43af16bdf6` |
-| `named-jupiter-alert.txt` | 16121 | 13 | 2026-10-07T13:52:06Z | `e4a9700cf32fbe9435f02612fc4866499aecf79ae8740a4f8a7252fe0a354b96` |
-| `named-jupiter-cape-town.txt` | 16122 | 13 | 2026-10-07T13:52:02Z | `2f8aafc3604a7bddfc30b1e541261ee16058d80a4733d34d660bff33595b4251` |
-| `named-jupiter-chatham.txt` | 16122 | 13 | 2026-10-07T13:52:10Z | `cf07240a28e2e6400e47cd3562a893d5a4adcc9c658d0025e445b53996cf4d2b` |
-| `named-jupiter-oslo.txt` | 16121 | 13 | 2026-10-07T13:51:52Z | `167f30c8a932f5538c689c8daa8147dad74d5ac916a5c5d881d605f1a67b3c22` |
-| `named-jupiter-quito.txt` | 16121 | 13 | 2026-10-07T13:51:56Z | `539539b719ec573834d81ad859a30af868c710790825e687882bd8b4f2c0f3b9` |
+| `matrix-7d-callisto-oslo.txt` | 2444784 | 10489 | 2026-10-07T13:53:42Z | `884c8d21c0e47eed4a46ebd6f3f68a4bdeebad6da836863986fe0293117f5594` |
+| `matrix-7d-europa-oslo.txt` | 2444781 | 10489 | 2026-10-07T13:53:08Z | `b923d0570cdc6ec550b6eed85685cdb47f0d57a8241f13068251871f2d780410` |
+| `matrix-7d-ganymede-oslo.txt` | 2444781 | 10489 | 2026-10-07T13:53:25Z | `1d620229ba465638879a002da8f22592048a14cd60583c88539f356791e17fd5` |
+| `matrix-7d-io-oslo.txt` | 2444779 | 10489 | 2026-10-07T13:52:44Z | `10464a28c5027c64bdf3d8499a04a91da8d9ab4165a17fb04bf50c8d54788a70` |
+| `matrix-7d-jupiter-oslo.txt` | 2781389 | 10489 | 2026-10-07T13:52:14Z | `76b73849daf8fea09b3aca4a43c37df548a89da947e78807ba7c20c541397b77` |
+| `named-callisto-alert.txt` | 15018 | 14 | 2026-10-07T16:38:25Z | `6af116e1a7db51b2bab0728768b81e4b827560d78da5a5b816e7ba407afb6c9d` |
+| `named-callisto-cape-town.txt` | 15019 | 14 | 2026-10-07T16:38:21Z | `ad6bcd78049c3e63eb8f33c5669b1fb6c703ae7035ce76d48ca2e5ff1783c3a6` |
+| `named-callisto-chatham.txt` | 15019 | 14 | 2026-10-07T16:38:28Z | `547609045d084a4163eb85a03977348e0fffd4a05f1aa1d94eeff9a9e2131d37` |
+| `named-callisto-oslo.txt` | 15018 | 14 | 2026-10-07T16:38:14Z | `306aa2e496542144d522bf5d2e0ecfe216374bd0f722dfdc4f0e08282dc22504` |
+| `named-callisto-quito.txt` | 15018 | 14 | 2026-10-07T16:38:17Z | `594d0f800f1d99a6de148ed0aa877b618234ebaa2358183c15763bf8585f3b65` |
+| `named-europa-alert.txt` | 15015 | 14 | 2026-10-07T16:38:23Z | `468dd6c9bfaa70635d57a0d9d2fe9b8ffe3e6cd156bfb362e25b2ca2ddd56339` |
+| `named-europa-cape-town.txt` | 15016 | 14 | 2026-10-07T16:38:19Z | `216497d9e24b374d2a157972750bd8dc48236626119f4eaf7db9ca7b9049fe94` |
+| `named-europa-chatham.txt` | 15016 | 14 | 2026-10-07T16:38:27Z | `6f7b5e9250f15c70c66dcffbad8f4a6befbe9fe36d0fffa8b2f8928d93439424` |
+| `named-europa-oslo.txt` | 15015 | 14 | 2026-10-07T16:38:12Z | `eb4ac61154615e5e9a77c008e6544a0ec0c1ff1f6e3c0d17b8a8e39b1a767850` |
+| `named-europa-quito.txt` | 15015 | 14 | 2026-10-07T16:38:16Z | `661916fcc532a20e0bbc60efd51fa64120a5fb9f8343679a18d7005b3b0533e4` |
+| `named-ganymede-alert.txt` | 15015 | 14 | 2026-10-07T16:38:24Z | `3928e2613314ca397d497b2159362c03ba8adf005052bd9bbc9fa505e8c5d01e` |
+| `named-ganymede-cape-town.txt` | 15016 | 14 | 2026-10-07T16:38:20Z | `b8cfea05883a2bb8b1e680fe7bfa4b7270bc79c3eee9ebc3c6119e20e0462ca9` |
+| `named-ganymede-chatham.txt` | 15016 | 14 | 2026-10-07T16:38:28Z | `515528594cf70544d6f0042616462c9a4ef9c8f8986d0ddf3a536cabf097a98a` |
+| `named-ganymede-oslo.txt` | 15015 | 14 | 2026-10-07T16:38:13Z | `66d779856dae12eb1ce2052cabb2a17047ce2cb60a470f379dd0c360c4888ee9` |
+| `named-ganymede-quito.txt` | 15015 | 14 | 2026-10-07T16:38:16Z | `a0f14499e9e500d119940ea4ad0bb40ad8e2d710994da2c2c19569d175d67ace` |
+| `named-io-alert.txt` | 15013 | 14 | 2026-10-07T16:38:22Z | `31ab37d963f0866c49f5e245efe0e6e00e464ba9cdc51e655058518d01c76d88` |
+| `named-io-cape-town.txt` | 15014 | 14 | 2026-10-07T16:38:19Z | `cb796d1321cd6ea18d20bfc976065f1b95626cf2564e8e8ebc4da1638c960021` |
+| `named-io-chatham.txt` | 15014 | 14 | 2026-10-07T16:38:26Z | `62815a3942e468b5ad82f24efd695be34f5518b7079be97665347e371ba5c09f` |
+| `named-io-oslo.txt` | 15013 | 14 | 2026-10-07T16:38:11Z | `3a4b0f6e0a8534b57dfdb318334f31184c6214e0227f6ba361b195ed6074ae79` |
+| `named-io-quito.txt` | 15013 | 14 | 2026-10-07T16:38:15Z | `eddbcfbb5e3572181db0bac4c52f1c111b7ca605e3ccaf83f23b527032265bf1` |
+| `named-jupiter-alert.txt` | 16423 | 14 | 2026-10-07T16:38:21Z | `9cf11c3979f024ebb40c45155894b1044b81742a4b06a1ac71b41c1804e36da6` |
+| `named-jupiter-cape-town.txt` | 16424 | 14 | 2026-10-07T16:38:18Z | `79a942874c021d01487c5836e6ba697e65c8f959394bc966c60e50d015f4f1f4` |
+| `named-jupiter-chatham.txt` | 16424 | 14 | 2026-10-07T16:38:25Z | `86ea1649df84e42e99059f157128e3ddc3a172e612c9b6f84f567f7c950db729` |
+| `named-jupiter-oslo.txt` | 16423 | 14 | 2026-10-07T16:38:10Z | `b91400c613327123182a3c5e1bd7e9dea99fbfcf02fc3570ef254c6ea13aaba0` |
+| `named-jupiter-quito.txt` | 16423 | 14 | 2026-10-07T16:38:14Z | `b09239791b976e207382199c3bc923c5f208bff2ecb094613cd2e3252374458c` |
 | `published-callisto-geocentric.txt` | 12463 | 7 | 2026-10-07T13:54:08Z | `5e3843bd81604709de305de575b0b0448283fe94bcd222cbd4303006ecefdc76` |
 | `published-europa-geocentric.txt` | 12460 | 7 | 2026-10-07T13:54:07Z | `071671f0328603b6b3329269d438e0e88fd841bde2dc3be09ddc6f3919d98229` |
 | `published-ganymede-geocentric.txt` | 12460 | 7 | 2026-10-07T13:54:08Z | `28c8ea6254612c387f7b3a6cfe199cc4533ba9c8ab396ba28ef13b7f1f8b4fbd` |
@@ -57,4 +62,4 @@ Committed here: the named instants (five observers, five bodies), the published 
 | `triple-transit-2026-12-11-minutes-jupiter-geocentric.txt` | 123031 | 422 | 2026-10-07T13:52:43Z | `99e33890892c4516c7ba5fc32510ca60ba503460f3b9fd52cec8db935b942f00` |
 | `triple-transit-2026-12-11-minutes-jupiter-oslo.txt` | 124478 | 422 | 2026-10-07T13:52:42Z | `bfb85e5b58d76a9914065709c181100f5659a788c710803bb83114cc8644267c` |
 
-3000370 bytes in all.
+55 files, 15567794 bytes in all.

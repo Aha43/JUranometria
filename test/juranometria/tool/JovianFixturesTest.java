@@ -57,10 +57,11 @@ class JovianFixturesTest {
                 checked++;
             }
         }
-        assertEquals(50, checked, "fifty responses kept whole: the named instants for five"
+        assertEquals(55, checked, "fifty-five responses kept whole: the named instants for five"
                 + " observers and five bodies, the published configurations for five bodies,"
                 + " the named evening's minute series for five bodies at Oslo and geocentrically,"
-                + " December 2026 hourly and the daily 2026 year for five bodies at Oslo");
+                + " December 2026 hourly and the daily 2026 year for five bodies at Oslo, and the"
+                + " 7-day 1900-2100 era matrices for five bodies at Oslo (ruled on #472)");
     }
 
     @Test
@@ -68,18 +69,48 @@ class JovianFixturesTest {
         String named = Files.readString(HORIZONS.resolve("NAMED-CASES.txt"), StandardCharsets.UTF_8);
         for (String instant : List.of("2026-12-11 22:30:00  triple-transit-before-io-enters",
                 "2026-12-11 22:45:00  triple-transit-inside",
-                "2026-12-11 22:55:00  triple-transit-after-callisto-leaves")) {
+                "2026-12-11 22:55:00  triple-transit-callisto-centre-left-disc-overlapping",
+                "2026-12-11 23:00:00  triple-transit-after-callisto-leaves")) {
             assertTrue(named.contains(instant), "the named cases state " + instant);
         }
-        // and every named response holds all three rows
-        for (String body : List.of("jupiter", "io", "europa", "ganymede", "callisto")) {
-            String text = Files.readString(HORIZONS.resolve("named-" + body + "-oslo.txt"),
-                    StandardCharsets.UTF_8);
-            for (String stamp : List.of("2026-Dec-11 22:30:00", "2026-Dec-11 22:45:00",
-                    "2026-Dec-11 22:55:00")) {
-                assertTrue(text.contains(stamp), body + " at Oslo holds the row at " + stamp);
+        // every named response holds all four rows, at every observer
+        for (String site : List.of("oslo", "quito", "cape-town", "alert", "chatham")) {
+            for (String body : List.of("jupiter", "io", "europa", "ganymede", "callisto")) {
+                String text = Files.readString(HORIZONS.resolve("named-" + body + "-" + site + ".txt"),
+                        StandardCharsets.UTF_8);
+                for (String stamp : List.of("2026-Dec-11 22:30:00", "2026-Dec-11 22:45:00",
+                        "2026-Dec-11 22:55:00", "2026-Dec-11 23:00:00")) {
+                    assertTrue(text.contains(stamp), body + " at " + site + " holds the row at " + stamp);
+                }
             }
         }
+        // and Horizons' own codes on the evening, as the ruling states them: at 22:45 Io,
+        // Europa and Callisto in front and Ganymede clear; at 23:00 Callisto clear
+        // (its disc off Jupiter's even limb-to-limb), Ganymede clear at every instant
+        assertEquals("t", code("io", "2026-Dec-11 22:45:00"));
+        assertEquals("t", code("europa", "2026-Dec-11 22:45:00"));
+        assertEquals("t", code("callisto", "2026-Dec-11 22:45:00"));
+        assertEquals("t", code("callisto", "2026-Dec-11 22:55:00"),
+                "22:55 is the definition boundary: IMCCE's centre has left, the disc still overlaps");
+        assertEquals("*", code("callisto", "2026-Dec-11 23:00:00"));
+        for (String stamp : List.of("2026-Dec-11 22:30:00", "2026-Dec-11 22:45:00",
+                "2026-Dec-11 22:55:00", "2026-Dec-11 23:00:00")) {
+            assertEquals("*", code("ganymede", stamp), "Ganymede clear throughout");
+        }
+    }
+
+    /** Horizons' visibility code for a moon at Oslo at an instant: t, O, u, p, U, P or *. */
+    private static String code(String body, String stamp) throws Exception {
+        String text = Files.readString(HORIZONS.resolve("named-" + body + "-oslo.txt"),
+                StandardCharsets.UTF_8);
+        for (String line : text.lines().toList()) {
+            if (line.contains(stamp)) {
+                String[] f = line.split(",");
+                String code = f[13].replace("/", "").strip();
+                return code.isEmpty() ? "*" : code;
+            }
+        }
+        throw new AssertionError(body + " at Oslo holds no row at " + stamp);
     }
 
     @Test

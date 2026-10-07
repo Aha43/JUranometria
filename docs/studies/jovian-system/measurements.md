@@ -13,6 +13,7 @@ the arrangements are drawn is one machine's answer, in `platform.md` beside this
 | 2026-Dec-11 22:30:00 | 149.163528° | 13.429305° | 16.168° | 91.296° | 4.869051 | 40.490″ | 22.23° | 99.270 % |
 | 2026-Dec-11 22:45:00 | 149.163575° | 13.429337° | 18.051° | 94.580° | 4.868899 | 40.491″ | 22.23° | 99.270 % |
 | 2026-Dec-11 22:55:00 | 149.163605° | 13.429359° | 19.301° | 96.791° | 4.868797 | 40.492″ | 22.23° | 99.270 % |
+| 2026-Dec-11 23:00:00 | 149.163620° | 13.429369° | 19.925° | 97.904° | 4.868747 | 40.492″ | 22.23° | 99.270 % |
 
 | instant (UTC) | moon | X (″, +east) | Y (″, +north) | position angle | separation | Jupiter radii | Horizons code |
 |---|---|---|---|---|---|---|---|
@@ -28,6 +29,10 @@ the arrangements are drawn is one machine's answer, in `platform.md` beside this
 | 2026-Dec-11 22:55:00 | europa | +6.579 | +0.431 | 86.254° | 6.593″ | 0.326 | t |
 | 2026-Dec-11 22:55:00 | ganymede | -280.277 | +115.118 | 292.340° | 302.980″ | 14.965 | * |
 | 2026-Dec-11 22:55:00 | callisto | -16.783 | +11.795 | 305.100° | 20.513″ | 1.013 | t |
+| 2026-Dec-11 23:00:00 | io | +11.755 | -3.931 | 108.491° | 12.395″ | 0.612 | t |
+| 2026-Dec-11 23:00:00 | europa | +5.507 | +0.867 | 81.053° | 5.575″ | 0.275 | t |
+| 2026-Dec-11 23:00:00 | ganymede | -280.270 | +115.109 | 292.339° | 302.970″ | 14.964 | * |
+| 2026-Dec-11 23:00:00 | callisto | -17.434 | +12.058 | 304.669° | 21.197″ | 1.047 | * |
 
 A Jupiter radius here is Horizons' equatorial angular radius (half of `Ang-diam`); the Horizons code is
 limb-to-limb with equatorial radii (`t` in front, `O` behind, `u`/`p` total/partial umbral eclipse, `U`/`P` both,

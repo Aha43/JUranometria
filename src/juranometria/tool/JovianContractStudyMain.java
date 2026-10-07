@@ -61,7 +61,10 @@ public final class JovianContractStudyMain {
     private static final int WIDTH = 360;
     private static final String INSIDE = "2026-Dec-11 22:45:00";
     private static final String BEFORE = "2026-Dec-11 22:30:00";
-    private static final String AFTER = "2026-Dec-11 22:55:00";
+    /** IMCCE's centre has left Jupiter, the disc still overlaps: the definition boundary (ruled on #472). */
+    private static final String BOUNDARY = "2026-Dec-11 22:55:00";
+    /** Callisto clear of Jupiter under every definition: the post-Callisto case (ruled on #472). */
+    private static final String AFTER = "2026-Dec-11 23:00:00";
     private static final String[] MOONS = {"io", "europa", "ganymede", "callisto"};
 
     private JovianContractStudyMain() {
@@ -136,7 +139,7 @@ public final class JovianContractStudyMain {
         List<String> images = new ArrayList<>();
         Map<String, JupiterRow> jupiter = new LinkedHashMap<>();
         Map<String, Map<String, MoonRow>> moons = new LinkedHashMap<>();
-        for (String instant : new String[] {BEFORE, INSIDE, AFTER}) {
+        for (String instant : new String[] {BEFORE, INSIDE, BOUNDARY, AFTER}) {
             jupiter.put(instant, jupiterRow(instant));
             Map<String, MoonRow> at = new LinkedHashMap<>();
             for (String moon : MOONS) {
@@ -145,6 +148,12 @@ public final class JovianContractStudyMain {
             moons.put(instant, at);
         }
         preface(report, jupiter, moons);
+        // The range mock-ups sample the three unambiguous instants; the
+        // boundary case stays in the report's tables.
+        Map<String, JupiterRow> sampled = new LinkedHashMap<>(jupiter);
+        sampled.remove(BOUNDARY);
+        Map<String, Map<String, MoonRow>> sampledMoons = new LinkedHashMap<>(moons);
+        sampledMoons.remove(BOUNDARY);
         try {
             SwingUtilities.invokeAndWait(() -> UIManager.put("defaultFont", null));
             platform.append("## Widths and heights\n\n")
@@ -159,8 +168,8 @@ public final class JovianContractStudyMain {
                     names.add(write(card(w, jupiter.get(INSIDE), INSIDE), language, "1-jupiter-card", platform));
                     names.add(write(moonTable(w, jupiter.get(INSIDE), moons.get(INSIDE), true), language,
                             "2-moons-table", platform));
-                    names.add(write(grouped(w, jupiter, moons), language, "3-range-grouped", platform));
-                    names.add(write(flat(w, jupiter, moons), language, "4-range-flat", platform));
+                    names.add(write(grouped(w, sampled, sampledMoons), language, "3-range-grouped", platform));
+                    names.add(write(flat(w, sampled, sampledMoons), language, "4-range-flat", platform));
                     names.add(write(refused(w), language, "5-refused", platform));
                     names.add(write(group(w, jupiter.get(INSIDE), moons.get(INSIDE)), language,
                             "6-controller-group", platform));
