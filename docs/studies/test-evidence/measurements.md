@@ -218,8 +218,8 @@ Whether a particular read happens on the event thread is control flow, which tex
 
 | class | the contract | files |
 |---|---|---|
-| deterministic-report | regenerates byte-for-byte on the same tree | 97 |
-| byte-exact-fixture | committed data with provenance; never regenerated casually | 99 |
+| deterministic-report | regenerates byte-for-byte on the same tree | 98 |
+| byte-exact-fixture | committed data with provenance; never regenerated casually | 101 |
 | captured-evidence | an operating-system screenshot, digest-pinned; a re-capture is a provenance event | 13 |
 | renderer-drawn | byte-reproducible per machine; production ink, no widgets | 475 |
 | widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 150 |
@@ -284,6 +284,8 @@ The byte-exact fixtures:
 - docs/studies/jovian-system/horizons/triple-transit-2026-12-11-minutes-jupiter-geocentric.txt
 - docs/studies/jovian-system/horizons/triple-transit-2026-12-11-minutes-jupiter-oslo.txt
 - docs/studies/jovian-system/imcce-2026-12-11.txt
+- docs/studies/jovian-system/spk/jup365-boundary-1997.bsp
+- docs/studies/jovian-system/spk/spk-boundary-reference.txt
 - docs/studies/label-placement/census-before.tsv
 - docs/studies/label-placement/text-before.tsv
 - docs/studies/language-ledger/manual-review.tsv

@@ -842,6 +842,10 @@ class TestEvidenceGateTest {
                         + " not artwork");
         assertEquals("byte-exact-fixture",
                 TestEvidenceScan.artifactClass("reference-vectors.c"));
+        assertEquals("byte-exact-fixture",
+                TestEvidenceScan.artifactClass("jup365-boundary-1997.bsp"),
+                "a kernel kept as a fixture is committed data pinned by"
+                        + " digest (#473), never a renderer's drawing");
         assertEquals("renderer-drawn",
                 TestEvidenceScan.artifactClass("m31-08.png"),
                 "a chart study keeps its byte-reproducibility"

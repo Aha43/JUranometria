@@ -21,6 +21,15 @@ import java.util.List;
  * of the interval to the last that covers its end - and the four-word
  * directory that says how many there are and where they begin.
  *
+ * <p>A pick names a centre and target, not a segment: every source
+ * segment of that pair that has records inside the interval is kept,
+ * each cut to the interval, in the source's file order, so a reader of
+ * the excerpt selects among them exactly as it would in the source
+ * (issue #473; JUP365 keeps two segments per body). The pair's
+ * segments must together cover the whole interval - a gap inside it,
+ * or an interval reaching past them, is refused by name rather than
+ * written as a kernel that claims more than it holds.
+ *
  * <p>The output is deterministic: the same source bytes, segments,
  * interval, internal name and comment give the same output bytes, so
  * a committed pack can be proved by rebuilding it. Little-endian IEEE,
@@ -74,33 +83,30 @@ public final class SpkExcerpt {
         List<double[]> bounds = new ArrayList<>();
         List<SpkKernel.Segment> kept = new ArrayList<>();
         for (Pick pick : picks) {
-            SpkKernel.Segment s = kernel.segment(pick.center, pick.target);
-            if (!s.covers(startEt) || !s.covers(endEt)) {
-                throw new IllegalArgumentException("segment " + s.name()
-                        + " " + pick + " does not cover the whole interval");
+            for (SpkKernel.Segment s : covering(kernel, pick, startEt, endEt)) {
+                int last = s.lastAddress();
+                double init = word(in, last - 3);
+                double intlen = word(in, last - 2);
+                int rsize = (int) word(in, last - 1);
+                int n = (int) word(in, last);
+                int first = (int) Math.floor((startEt - init) / intlen);
+                int stop = (int) Math.ceil((endEt - init) / intlen) - 1;
+                first = Math.max(0, first);
+                stop = Math.min(n - 1, Math.max(stop, first));
+                int records = stop - first + 1;
+                double[] words = new double[records * rsize + 4];
+                for (int i = 0; i < records * rsize; i++) {
+                    words[i] = word(in, s.firstAddress() + first * rsize + i);
+                }
+                double newInit = init + first * intlen;
+                words[records * rsize] = newInit;
+                words[records * rsize + 1] = intlen;
+                words[records * rsize + 2] = rsize;
+                words[records * rsize + 3] = records;
+                data.add(words);
+                bounds.add(new double[] {newInit, newInit + records * intlen});
+                kept.add(s);
             }
-            int last = s.lastAddress();
-            double init = word(in, last - 3);
-            double intlen = word(in, last - 2);
-            int rsize = (int) word(in, last - 1);
-            int n = (int) word(in, last);
-            int first = (int) Math.floor((startEt - init) / intlen);
-            int stop = (int) Math.ceil((endEt - init) / intlen) - 1;
-            first = Math.max(0, first);
-            stop = Math.min(n - 1, Math.max(stop, first));
-            int records = stop - first + 1;
-            double[] words = new double[records * rsize + 4];
-            for (int i = 0; i < records * rsize; i++) {
-                words[i] = word(in, s.firstAddress() + first * rsize + i);
-            }
-            double newInit = init + first * intlen;
-            words[records * rsize] = newInit;
-            words[records * rsize + 1] = intlen;
-            words[records * rsize + 2] = rsize;
-            words[records * rsize + 3] = records;
-            data.add(words);
-            bounds.add(new double[] {newInit, newInit + records * intlen});
-            kept.add(s);
         }
 
         // Lay the file out: file record, comment records, one summary
@@ -163,6 +169,66 @@ public final class SpkExcerpt {
         int tail = (RECORD_BYTES - out.size() % RECORD_BYTES) % RECORD_BYTES;
         out.write(new byte[tail]);
         return out.toByteArray();
+    }
+
+    /**
+     * The pick's segments with records inside the interval, in file
+     * order, after proving that together they cover all of it.
+     */
+    private static List<SpkKernel.Segment> covering(SpkKernel kernel, Pick pick,
+                                                    double startEt, double endEt) {
+        List<SpkKernel.Segment> all = kernel.segments(pick.center, pick.target);
+        if (all.isEmpty()) {
+            throw new IllegalArgumentException("the kernel has no segment "
+                    + pick.center + " -> " + pick.target);
+        }
+        List<SpkKernel.Segment> inside = new ArrayList<>();
+        for (SpkKernel.Segment s : all) {
+            if (s.startEt() < endEt && s.endEt() > startEt) {
+                inside.add(s);
+            }
+        }
+        // Coverage: walk the kept segments by start and carry the
+        // farthest end reached; the first start must be at or before
+        // the interval's start, no start may lie beyond the reach, and
+        // the reach must pass the interval's end. The first stretch
+        // left uncovered - at the start, in a gap, or at the end - is
+        // named in the refusal.
+        List<SpkKernel.Segment> byStart = new ArrayList<>(inside);
+        byStart.sort((a, b) -> Double.compare(a.startEt(), b.startEt()));
+        double reach = startEt;
+        double uncoveredTo = endEt;
+        boolean covered = true;
+        for (SpkKernel.Segment s : byStart) {
+            if (s.startEt() > reach) {
+                uncoveredTo = s.startEt();
+                covered = false;
+                break;
+            }
+            reach = Math.max(reach, s.endEt());
+        }
+        if (covered && reach < endEt) {
+            covered = false;
+        }
+        if (!covered) {
+            throw new IllegalArgumentException(String.format(
+                    "the segments %d -> %d do not cover the whole interval"
+                            + " %.3f to %.3f: %.3f to %.3f is uncovered; they cover %s",
+                    pick.center, pick.target, startEt, endEt, reach, uncoveredTo,
+                    coverage(all)));
+        }
+        return inside;
+    }
+
+    private static String coverage(List<SpkKernel.Segment> of) {
+        StringBuilder text = new StringBuilder();
+        for (SpkKernel.Segment s : of) {
+            if (text.length() > 0) {
+                text.append(", ");
+            }
+            text.append(String.format("[%.3f to %.3f]", s.startEt(), s.endEt()));
+        }
+        return text.toString();
     }
 
     private static double word(ByteBuffer in, int address) {

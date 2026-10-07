@@ -7,6 +7,22 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Epoch-aware SPK selection (#473, the first of two changes).** The
+SPK reader and excerpt writer select a segment by centre, target and
+the epoch it covers: JUP365, the Galilean ephemeris chosen in #472,
+keeps two segments per body meeting at 1997-01-16, which the released
+"first segment for a body" could not read past. Where several segments
+cover an epoch the one later in the file is read, as NAIF reads; a gap
+between a pair's segments, or an epoch beyond them, is refused naming
+what the kernel covers; the writer keeps every segment of a pick that
+has records in the interval, in file order, and refuses an interval the
+segments do not cover together. The released Solar System pack is
+unchanged - the new writer reproduces its kernel byte for byte, in the
+suite and by rebuilding from the pinned source - and no Jovian
+ephemeris ships yet. A small modified excerpt of JUP365 across the
+split, with an independent reader's states from the unmodified source,
+holds the behaviour (`docs/studies/jovian-system/spk/`).
+
 ## [5.0.0] - 2026-10-06
 
 **The Controller.** Sprints 38–42 — the usability programme: the

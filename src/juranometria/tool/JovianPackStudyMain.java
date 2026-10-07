@@ -100,10 +100,10 @@ public final class JovianPackStudyMain {
         double splitEt = firsts.get(0).endEt();
         report.append(String.format(Locale.ROOT,
                 "%nEvery Galilean body and Jupiter has two segments, split at JD %.1f TDB (1997-01-16)."
-                        + " The released reader (`SpkKernel.segment`) and writer (`SpkExcerpt.of`) take the first"
-                        + " segment of a body, so an excerpt over 1900–2100 needs epoch-aware segment selection"
-                        + " in both - a #473 item. Here the first half is cut and proved with the released writer"
-                        + " and the second half is sized exactly from its directories.%n%n",
+                        + " The reader (`SpkKernel.segment`) and writer (`SpkExcerpt.of`) released at 5.0.0 took the first"
+                        + " segment of a body, so an excerpt over 1900–2100 needed epoch-aware segment selection"
+                        + " in both - repaired by #473's first change. Here, as in the study, the first half is cut"
+                        + " and proved and the second half is sized exactly from its directories.%n%n",
                 J2000_JD + splitEt / 86400.0));
 
         // Part B: the first half, with the released writer, proved bit-identical.
