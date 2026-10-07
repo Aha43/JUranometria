@@ -1,0 +1,22 @@
+# IMCCE, Phenomena of the Galilean satellites of Jupiter 2026 (UT), quoted rows for the 11 December 2026 triple transit (#472)
+# source: https://ftp.imcce.fr/pub/ephem/satel/phenjupiter/ftp_jupiter_Events_UT_2026.txt
+# retrieved: 2026-10-07T13:50:44Z  whole-file sha256: 049e6cc3a30fdb964c3a38373cbbf2f84d67ff3eb8a53d2369bc9786ec16462d  bytes: 73843
+# attribution: Institut de Mecanique Celeste et de Calcul des Ephemerides (IMCCE), Paris Observatory; predictions from Lainey (2021)'s theory; TT-UT = 69 s; times rounded to the minute, each event for the centre of the satellite (README, retrieved the same day, sha256 3218450b91111840e4eda69d1e554a5999270501170f22016d1ea58a6ef679f4)
+# terms: https://www.imcce.fr/mentions-legales - data may be used as examples to illustrate documents if the source is clearly identified; quoted here, not redistributed
+# layout: yymm, then four columns of 'dd hhmm sat event' (I Io, II Europa, III Ganymede, IV Callisto; EC eclipse, OC occultation, TR transit, SH shadow transit; D disappearance, R reappearance, I ingress, E egress)
+# lines 655-669 of the file, verbatim:
+655	2612                    11  0 8    I EC D  19  1 2   II SH E  27 19 4  III EC D
+656	2612  3  1 4    I SH I  11  337    I OC R  19  135    I SH E  27 1924   II EC D
+657	2612  3  140   IV EC R  11  720   IV SH I  19  238    I TR E  27 1940    I SH I
+658	2612  3  149  III TR E  11 12 7   IV SH E  19  313   II TR E  27 2036    I TR I
+659	2612  3  216    I TR I  11 1813   IV TR I  19 1446   IV EC D  27 2156    I SH E
+660	2612  3  321    I SH E  11 1933   II SH I  19 1939   IV EC R  27 2244  III EC R
+661	2612  3  344   II OC R  11 2125    I SH I  19 2030    I EC D  27 2253    I TR E
+662	2612  3  432    I TR E  11 2154   II TR I  19 2354    I OC R  27 23 0  III OC D
+663	2612  3  829   IV OC D  11 2226   II SH E                                      
+664	2612  3 1314   IV OC R  11 2233    I TR I  20  1 5   IV OC D  28  0 9   II OC R
+665	2612  3 2214    I EC D  11 2250   IV TR E  20  547   IV OC R  28  117   IV SH I
+666	2612                    11 2342    I SH E  20 15 6  III EC D  28  238  III OC R
+667	2612  4  147    I OC R                     20 1651   II EC D  28  6 4   IV SH E
+668	2612  4 1657   II SH I  12  046   II TR E  20 1747    I SH I  28 1019   IV TR I
+669	2612  4 1925   II TR I  12  050    I TR E  20 1846  III EC R  28 1454   IV TR E
