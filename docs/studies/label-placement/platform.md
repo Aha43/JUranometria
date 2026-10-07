@@ -18,7 +18,7 @@ section below.
 > without anything being wrong. Held to reproducing here, never to matching
 > another machine's recording. What each label is, where the policy allows it to go, which candidate it took and why a refusal was refused does not depend on a font, and is asserted by this study's gate.
 >
-> Recorded on: `Mac OS X 27.0/aarch64/Homebrew 21.0.12.1`
+> Recorded on: `Mac OS X 27.0.1/aarch64/Homebrew 21.0.12.1`
 
 ## What counts as a collision here
 

@@ -14,7 +14,7 @@ never across two - the portable half of this study is the document beside it.
 | Java | 21.0.12.1 |
 | headless | true |
 
-Recorded on: `Mac OS X 27.0/aarch64/Homebrew 21.0.12.1`
+Recorded on: `Mac OS X 27.0.1/aarch64/Homebrew 21.0.12.1`
 
 What a sheet weighs is what its fonts encode to: an SVG with its text as
 outlines carries the glyph paths of whatever font drew it, and a PNG carries

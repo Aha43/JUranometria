@@ -14,7 +14,7 @@ never across two - the portable half of this study is the document beside it.
 | Java | 21.0.12.1 |
 | headless | true |
 
-Recorded on: `Mac OS X 27.0/aarch64/Homebrew 21.0.12.1`
+Recorded on: `Mac OS X 27.0.1/aarch64/Homebrew 21.0.12.1`
 
 How much of the limb carries ink, and how heavy each candidate is against
 the paper, are read off rendered pages and are this desktop's answer. The

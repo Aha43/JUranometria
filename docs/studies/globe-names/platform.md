@@ -14,7 +14,7 @@ never across two - the portable half of this study is the document beside it.
 | Java | 21.0.12.1 |
 | headless | true |
 
-Recorded on: `Mac OS X 27.0/aarch64/Homebrew 21.0.12.1`
+Recorded on: `Mac OS X 27.0.1/aarch64/Homebrew 21.0.12.1`
 
 A label's fate is decided by the box its text needs, and that box is measured
 in a font this desktop supplies. So what was asked for is in the report
