@@ -378,9 +378,14 @@ public final class TestEvidenceScan {
         // for the provenance record a promoted IMAGE carries. The
         // default is only safe while every unlisted file happens to
         // be a picture, and it had quietly stopped being.
+        // A binary SPK kernel kept as a test fixture (#473, the
+        // JUP365 segment-split excerpt) is committed data pinned by
+        // digest too; the fallthrough would have asked a renderer's
+        // provenance row of it.
         if (fileName.endsWith(".txt") || fileName.endsWith(".c")
                 || fileName.endsWith(".tsv")
-                || fileName.endsWith(".manifest")) {
+                || fileName.endsWith(".manifest")
+                || fileName.endsWith(".bsp")) {
             return "byte-exact-fixture";
         }
         for (String prefix : new String[] {"screenshot-"}) {
