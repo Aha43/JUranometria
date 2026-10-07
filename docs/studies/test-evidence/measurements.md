@@ -103,6 +103,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | src/juranometria/tool/EclipticControlStudyMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/tool/ExportSheetDialogSheetMain.java | look-and-feel | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/InspectorSheetMain.java | look-and-feel, preferences | UNPROTECTED: look-and-feel |
+| src/juranometria/tool/JovianContractStudyMain.java | look-and-feel, default-font | protected-locally |
 | src/juranometria/tool/MenuSheetMain.java | look-and-feel, preferences | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/MoonTableSheetMain.java | look-and-feel | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/OnThisPageMockupMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
@@ -119,7 +120,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | src/juranometria/tool/WorkingSelectionMockupMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/app/PackagedAcceptanceMain.java | look-and-feel, locale, preferences | protected-locally |
 
-**28 evidence executables** touch process-wide state; 22 carry an unpaired touch.
+**29 evidence executables** touch process-wide state; 22 carry an unpaired touch.
 
 ## Display-dependent tests, their premises and their routes
 
@@ -217,15 +218,67 @@ Whether a particular read happens on the event thread is control flow, which tex
 
 | class | the contract | files |
 |---|---|---|
-| deterministic-report | regenerates byte-for-byte on the same tree | 86 |
-| byte-exact-fixture | committed data with provenance; never regenerated casually | 42 |
+| deterministic-report | regenerates byte-for-byte on the same tree | 94 |
+| byte-exact-fixture | committed data with provenance; never regenerated casually | 94 |
 | captured-evidence | an operating-system screenshot, digest-pinned; a re-capture is a provenance event | 13 |
 | renderer-drawn | byte-reproducible per machine; production ink, no widgets | 475 |
-| widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 133 |
+| widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 150 |
 | session-photograph | a packed window on a display; drifts between desktop sessions | 3 |
 
 The byte-exact fixtures:
 - docs/studies/ecliptic/reference-vectors.txt
+- docs/studies/jovian-system/horizons/NAMED-CASES.txt
+- docs/studies/jovian-system/horizons/december-2026-hourly-callisto-oslo.txt
+- docs/studies/jovian-system/horizons/december-2026-hourly-europa-oslo.txt
+- docs/studies/jovian-system/horizons/december-2026-hourly-ganymede-oslo.txt
+- docs/studies/jovian-system/horizons/december-2026-hourly-io-oslo.txt
+- docs/studies/jovian-system/horizons/december-2026-hourly-jupiter-oslo.txt
+- docs/studies/jovian-system/horizons/dense-2026-callisto-oslo.txt
+- docs/studies/jovian-system/horizons/dense-2026-europa-oslo.txt
+- docs/studies/jovian-system/horizons/dense-2026-ganymede-oslo.txt
+- docs/studies/jovian-system/horizons/dense-2026-io-oslo.txt
+- docs/studies/jovian-system/horizons/dense-2026-jupiter-oslo.txt
+- docs/studies/jovian-system/horizons/named-callisto-alert.txt
+- docs/studies/jovian-system/horizons/named-callisto-cape-town.txt
+- docs/studies/jovian-system/horizons/named-callisto-chatham.txt
+- docs/studies/jovian-system/horizons/named-callisto-oslo.txt
+- docs/studies/jovian-system/horizons/named-callisto-quito.txt
+- docs/studies/jovian-system/horizons/named-europa-alert.txt
+- docs/studies/jovian-system/horizons/named-europa-cape-town.txt
+- docs/studies/jovian-system/horizons/named-europa-chatham.txt
+- docs/studies/jovian-system/horizons/named-europa-oslo.txt
+- docs/studies/jovian-system/horizons/named-europa-quito.txt
+- docs/studies/jovian-system/horizons/named-ganymede-alert.txt
+- docs/studies/jovian-system/horizons/named-ganymede-cape-town.txt
+- docs/studies/jovian-system/horizons/named-ganymede-chatham.txt
+- docs/studies/jovian-system/horizons/named-ganymede-oslo.txt
+- docs/studies/jovian-system/horizons/named-ganymede-quito.txt
+- docs/studies/jovian-system/horizons/named-io-alert.txt
+- docs/studies/jovian-system/horizons/named-io-cape-town.txt
+- docs/studies/jovian-system/horizons/named-io-chatham.txt
+- docs/studies/jovian-system/horizons/named-io-oslo.txt
+- docs/studies/jovian-system/horizons/named-io-quito.txt
+- docs/studies/jovian-system/horizons/named-jupiter-alert.txt
+- docs/studies/jovian-system/horizons/named-jupiter-cape-town.txt
+- docs/studies/jovian-system/horizons/named-jupiter-chatham.txt
+- docs/studies/jovian-system/horizons/named-jupiter-oslo.txt
+- docs/studies/jovian-system/horizons/named-jupiter-quito.txt
+- docs/studies/jovian-system/horizons/published-callisto-geocentric.txt
+- docs/studies/jovian-system/horizons/published-europa-geocentric.txt
+- docs/studies/jovian-system/horizons/published-ganymede-geocentric.txt
+- docs/studies/jovian-system/horizons/published-io-geocentric.txt
+- docs/studies/jovian-system/horizons/published-jupiter-geocentric.txt
+- docs/studies/jovian-system/horizons/triple-transit-2026-12-11-minutes-callisto-geocentric.txt
+- docs/studies/jovian-system/horizons/triple-transit-2026-12-11-minutes-callisto-oslo.txt
+- docs/studies/jovian-system/horizons/triple-transit-2026-12-11-minutes-europa-geocentric.txt
+- docs/studies/jovian-system/horizons/triple-transit-2026-12-11-minutes-europa-oslo.txt
+- docs/studies/jovian-system/horizons/triple-transit-2026-12-11-minutes-ganymede-geocentric.txt
+- docs/studies/jovian-system/horizons/triple-transit-2026-12-11-minutes-ganymede-oslo.txt
+- docs/studies/jovian-system/horizons/triple-transit-2026-12-11-minutes-io-geocentric.txt
+- docs/studies/jovian-system/horizons/triple-transit-2026-12-11-minutes-io-oslo.txt
+- docs/studies/jovian-system/horizons/triple-transit-2026-12-11-minutes-jupiter-geocentric.txt
+- docs/studies/jovian-system/horizons/triple-transit-2026-12-11-minutes-jupiter-oslo.txt
+- docs/studies/jovian-system/imcce-2026-12-11.txt
 - docs/studies/label-placement/census-before.tsv
 - docs/studies/label-placement/text-before.tsv
 - docs/studies/language-ledger/manual-review.tsv
@@ -374,6 +427,23 @@ The widget-rendered artifacts (a new one arrives by a reviewed addition to the s
 - docs/studies/ecliptic/controls-view-menu-default.png
 - docs/studies/ecliptic/controls-view-menu-enlarged.png
 - docs/studies/ecliptic/controls-view-menu.png
+- docs/studies/jovian-system/controls-jovian-7-frames-light-time.png
+- docs/studies/jovian-system/controls-jovian-8-visibility-states.png
+- docs/studies/jovian-system/controls-jovian-9-apparent-figure.png
+- docs/studies/jovian-system/controls-jovian-en-1-jupiter-card.png
+- docs/studies/jovian-system/controls-jovian-en-2-moons-table-dark.png
+- docs/studies/jovian-system/controls-jovian-en-2-moons-table.png
+- docs/studies/jovian-system/controls-jovian-en-3-range-grouped.png
+- docs/studies/jovian-system/controls-jovian-en-4-range-flat.png
+- docs/studies/jovian-system/controls-jovian-en-5-refused.png
+- docs/studies/jovian-system/controls-jovian-en-6-controller-group.png
+- docs/studies/jovian-system/controls-jovian-nb-NO-1-jupiter-card.png
+- docs/studies/jovian-system/controls-jovian-nb-NO-2-moons-table-dark.png
+- docs/studies/jovian-system/controls-jovian-nb-NO-2-moons-table.png
+- docs/studies/jovian-system/controls-jovian-nb-NO-3-range-grouped.png
+- docs/studies/jovian-system/controls-jovian-nb-NO-4-range-flat.png
+- docs/studies/jovian-system/controls-jovian-nb-NO-5-refused.png
+- docs/studies/jovian-system/controls-jovian-nb-NO-6-controller-group.png
 - docs/studies/on-this-page/sidebar-dense-enlarged.png
 - docs/studies/on-this-page/sidebar-dense.png
 - docs/studies/on-this-page/sidebar-empty.png

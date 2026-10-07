@@ -74,6 +74,8 @@ help:
 	@echo "  chart-options-companion-study  Measure Chart Options for the companion, with mockups (issue #442)"
 	@echo "  clean-chart-study       Measure the toolbar's controls in the companion and the chart without its toolbar (issue #449)"
 	@echo "  solar-system-controls-study  Measure the Sun and Moon tables in the Controller, with mockups (issue #457)"
+	@echo "  jovian-system-study  Propose the Jupiter and Galilean-moons table from the kept Horizons fixtures, with mockups and diagrams (issue #472)"
+	@echo "  jovian-pack-study    Cut and measure the Jovian excerpt of jup365.bsp against its source (issue #472)"
 	@echo "  sun-on-the-chart-study  The Sun on production pages through the module (issue #415)"
 	@echo "  moon-on-the-chart-study The Moon on production pages, and the lunation as a row of phases (issue #416)"
 	@echo "  pan-study         Measure the Sprint 8 grab-to-pan geometry and costs"
@@ -581,7 +583,7 @@ black-sky-study: classes
 		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BlackSkyStudyMain \
 		> docs/studies/black-sky/measurements.md
 
-.PHONY: evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study sun-on-the-chart-study moon-on-the-chart-study printable-chart-study
+.PHONY: evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study sun-on-the-chart-study moon-on-the-chart-study printable-chart-study
 # The heap is stated rather than inherited from whatever a machine's
 # ergonomics chose for it: the CI runner's default quarter-of-RAM is
 # not the same number as a developer's.
@@ -725,6 +727,20 @@ clean-chart-study: classes
 # table content in the dialogs' own layout and in narrow arrangements,
 # the Controller with four sections, the View menu as it is and as
 # proposed, access letters, keyboard stops. Off screen; no display needed.
+jovian-system-study: classes
+	mkdir -p docs/studies/jovian-system
+	$(JAVA) -Djava.awt.headless=true -cp "$(CLASSES_DIR):$(LIB_DIR)/*" \
+		juranometria.tool.JovianContractStudyMain \
+		> docs/studies/jovian-system/measurements.md
+	@echo "written to docs/studies/jovian-system/measurements.md"
+
+# The Jovian pack excerpt, measured (#472): cuts jup365.bsp and de440s.bsp
+# from imports/raw, proves the excerpts bit-identical to their sources
+# and reports sizes and layouts under build/jovian-pack-study/.
+jovian-pack-study: classes
+	$(JAVA) -Xmx6g -Djava.awt.headless=true -cp "$(CLASSES_DIR):$(LIB_DIR)/*" \
+		juranometria.tool.JovianPackStudyMain
+
 solar-system-controls-study: classes
 	mkdir -p docs/studies/solar-system-controls
 	$(JAVA) -Djava.awt.headless=true -cp "$(CLASSES_DIR):$(LIB_DIR)/*" \

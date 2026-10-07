@@ -126,6 +126,8 @@ public final class EvidenceContractMain {
         // machine's answer, in the platform record registered below.
         REPORT_MAINS.put("juranometria.tool.SolarSystemControlsStudyMain",
                 "docs/studies/solar-system-controls/measurements.md");
+        REPORT_MAINS.put("juranometria.tool.JovianContractStudyMain",
+                "docs/studies/jovian-system/measurements.md");
         // The Sun on production pages (#415): the report is
         // deterministic; its pages are held through IMAGE_MAINS.
         REPORT_MAINS.put("juranometria.tool.SunOnTheChartStudyMain",
@@ -298,6 +300,8 @@ public final class EvidenceContractMain {
                 "docs/studies/clean-chart-controls/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.SolarSystemControlsStudyMain",
                 "docs/studies/solar-system-controls/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.JovianContractStudyMain",
+                "docs/studies/jovian-system/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.ToggleShortcutStudyMain",
                 "docs/studies/toggle-shortcuts/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.ControlExplanationStudyMain",
@@ -430,6 +434,7 @@ public final class EvidenceContractMain {
             // production table content in study-only arrangements;
             // widget-rendered inspection, the controls- prefix.
             "juranometria.tool.SolarSystemControlsStudyMain",
+            "juranometria.tool.JovianContractStudyMain",
             // The Sun on the chart (issue #415): production pages
             // composed by the component with the module attached.
             "juranometria.tool.SunOnTheChartStudyMain",
