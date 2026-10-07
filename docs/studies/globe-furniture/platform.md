@@ -14,7 +14,7 @@ never across two - the portable half of this study is the document beside it.
 | Java | 21.0.12.1 |
 | headless | true |
 
-Recorded on: `Mac OS X 27.0/aarch64/Homebrew 21.0.12.1`
+Recorded on: `Mac OS X 27.0.1/aarch64/Homebrew 21.0.12.1`
 
 Every number here is a share of a rendered page's pixels, so every number
 here is this desktop's. What the report beside this one carries is what was

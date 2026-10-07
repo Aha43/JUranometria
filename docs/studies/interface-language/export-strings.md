@@ -24,7 +24,7 @@ held by `ExportLanguageTest`.
 | architecture | aarch64 |
 | Java | 21.0.12.1 |
 
-Recorded on: `Mac OS X 27.0/aarch64/Homebrew 21.0.12.1`
+Recorded on: `Mac OS X 27.0.1/aarch64/Homebrew 21.0.12.1`
 
 The folder named in the replace question is
 `~/Documents` - example reader data, chosen because it
