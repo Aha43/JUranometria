@@ -17,8 +17,9 @@ north pole's position angle - and Io, Europa, Ganymede and Callisto
 in that order, each with its side of Jupiter, its east–west and
 north–south offsets, its separation in arcseconds and in Jupiter
 radii, and whether it is clear of Jupiter, in front of it, behind it
-or in its shadow. Over a range, the four moons grouped under each
-sampled instant, at most 250 instants. Opening or expanding computes
+or in its shadow. Over a range, each sampled instant as one group:
+Jupiter's position and figure, then its four moons, at most 250
+instants. Opening or expanding computes
 nothing; every value is the service's; English and Norwegian. Before
 2000 Jupiter answers and the moons' configuration is refused, naming
 its years; after the exact civil-time interval instants are marked

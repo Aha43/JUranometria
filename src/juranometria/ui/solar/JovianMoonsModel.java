@@ -18,8 +18,11 @@ import juranometria.solar.time.TimeScales;
  * #472): Io, Europa, Ganymede and Callisto in that fixed order - the
  * moon, its side, the east–west and north–south offsets with their
  * letters, the separation in arcseconds and in Jupiter radii, and the
- * state in words. For a range the rows are grouped by instant: a
- * heading line for each sampled instant, its four moons beneath.
+ * state in words. For a range the rows are grouped by instant, and
+ * each group is one Jupiter result and its four moons (the owner's
+ * checkpoint finding on #474): a heading line naming the instant, two
+ * lines of Jupiter's summary - the card's eight values, labelled - and
+ * the four moon rows beneath.
  *
  * <p>The model holds what it was given and computes nothing: every
  * number is the service's, rounded; every word is the language's.
@@ -40,10 +43,30 @@ public final class JovianMoonsModel extends AbstractTableModel {
             "state.behind", "state.inFront", "state.shadow", "state.partlyShadow",
             "state.clear");
 
-    /** One line: a heading for an instant, or a moon at it. */
-    public record Line(String heading, MoonPlace moon) {
+    /** What a line is. */
+    public enum Kind {
+        /** A range group's instant. */
+        HEADING,
+        /** Jupiter at the instant: position and height. */
+        JUPITER_POSITION,
+        /** Jupiter at the instant: distance and figure. */
+        JUPITER_FIGURE,
+        /** One moon. */
+        MOON
+    }
+
+    /** One line: an instant's heading, a line of Jupiter's summary, or a moon. */
+    public record Line(Kind kind, String text, MoonPlace moon,
+                       juranometria.solar.JovianSystemService.JupiterObservation jupiter) {
+
+        /** Whether the line spans the table rather than filling its columns. */
         public boolean isHeading() {
-            return heading != null;
+            return kind != Kind.MOON;
+        }
+
+        /** The text a spanning line shows; null for a moon. */
+        public String heading() {
+            return text;
         }
     }
 
@@ -71,10 +94,15 @@ public final class JovianMoonsModel extends AbstractTableModel {
                 continue;
             }
             if (grouped) {
-                next.add(new Line(heading(entry), null));
+                List<String> v = jupiterValues(entry.jupiter(), words);
+                next.add(new Line(Kind.HEADING, heading(entry), null, entry.jupiter()));
+                next.add(new Line(Kind.JUPITER_POSITION, words.say("range.jupiter.position",
+                        v.get(0), v.get(1), v.get(2), v.get(3)), null, entry.jupiter()));
+                next.add(new Line(Kind.JUPITER_FIGURE, words.say("range.jupiter.figure",
+                        v.get(4), v.get(5), v.get(6), v.get(7)), null, entry.jupiter()));
             }
             for (MoonPlace moon : entry.configuration().moons()) {
-                next.add(new Line(null, moon));
+                next.add(new Line(Kind.MOON, null, moon, entry.jupiter()));
             }
         }
         lines = List.copyOf(next);
@@ -157,6 +185,34 @@ public final class JovianMoonsModel extends AbstractTableModel {
             case 6 -> stateWords(m.state(), w);
             default -> throw new IndexOutOfBoundsException(column);
         };
+    }
+
+    /**
+     * Jupiter's eight summary values, spelled for the reader - the
+     * card's lines in {@link JovianTableControls#CARD_LINES} order, and
+     * the same values a range group shows: right ascension, declination,
+     * altitude, azimuth, distance, diameters, illuminated fraction, the
+     * pole's position angle.
+     */
+    public static List<String> jupiterValues(
+            juranometria.solar.JovianSystemService.JupiterObservation j, SolarTableWords w) {
+        return List.of(
+                w.n(SunTableFormat.hms(j.astrometricJ2000())),
+                SunTableFormat.dms(j.astrometricJ2000()),
+                SunTableFormat.altitude(w.n(JovianTableFormat.tenthDegree(
+                        j.horizontal().altitudeDegrees())),
+                        j.horizontal().altitudeDegrees(), w.say("below")),
+                w.n(JovianTableFormat.tenthDegree(j.horizontal().azimuthDegrees())),
+                w.n(JovianTableFormat.astronomicalUnits(j.distanceAu())),
+                w.n(JovianTableFormat.diameters(j.equatorialDiameterArcseconds(),
+                        j.polarDiameterArcseconds())),
+                w.n(MoonTableFormat.percent(j.illuminatedFraction())),
+                w.n(JovianTableFormat.tenthDegree(j.poleAngleDegrees())));
+    }
+
+    /** How many instants the lines group (a range's headings). */
+    public int groups() {
+        return (int) lines.stream().filter(l -> l.kind() == Kind.HEADING).count();
     }
 
     /** A moon's name in the language. */

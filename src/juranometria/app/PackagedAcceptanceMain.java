@@ -1256,10 +1256,20 @@ public final class PackagedAcceptanceMain {
                 shown.step.setSelectedIndex(0);
                 shown.apply();
             });
-            require(group.model.getRowCount() == 10 && group.model.moonRows() == 8
+            require(group.model.getRowCount() == 14 && group.model.moonRows() == 8
+                            && group.model.groups() == 2
                             && "2026-12-11 22:3".equals(group.start.getText()),
                     "a range from the dialog is the Controller's, grouped by instant,"
                             + " its unfinished text untouched");
+            for (int g = 0; g < 2; g++) {
+                juranometria.ui.solar.JovianTableSession.Entry entry =
+                        jupiter.result().entries().get(g);
+                java.util.List<String> values = juranometria.ui.solar.JovianMoonsModel
+                        .jupiterValues(entry.jupiter(), group.words());
+                String position = (String) group.model.getValueAt(g * 7 + 1, 0);
+                require(position.contains(values.get(0)) && position.contains(values.get(1)),
+                        "each instant of the range carries Jupiter's position: " + position);
+            }
 
             // Before 2000 Jupiter answers and the moons refuse, naming their years.
             at[0] = new juranometria.sky.Observer(59.91, 10.75,
@@ -1294,7 +1304,8 @@ public final class PackagedAcceptanceMain {
         System.out.println("jupiter table OK (one session in two hosts, building and opening"
                 + " compute nothing; the 2026-12-11 22:45 UTC triple transit reads Io, Europa"
                 + " and Callisto in front and Ganymede clear in English and Norwegian; a range"
-                + " grouped by instant, unfinished text untouched; Jupiter before 2000 with the"
+                + " grouped by instant, each group Jupiter's position and its four moons,"
+                + " unfinished text untouched; Jupiter before 2000 with the"
                 + " moons refused; View > Solar System ends in Jupiter...)");
     }
 

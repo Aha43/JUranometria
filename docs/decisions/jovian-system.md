@@ -713,10 +713,19 @@ accepted service (`JovianTableSession`, `JovianTableControls`,
   separation in arcseconds and in Jupiter radii, the state in words,
   the rounding of the ruled mock-ups. Every value is the service's
   result, rounded; the table recomputes nothing.
-- **A range**, timestamp-grouped as ruled: a heading for each sampled
-  instant spanning the table, its four moons beneath, in one table a
-  keyboard walks; at most 250 instants (1 000 moon rows), refused with
-  the count beyond. It samples; nothing searches for an ingress.
+- **A range**, timestamp-grouped as ruled: **each group is one
+  Jupiter result and its four moons** - a heading naming the sampled
+  instant, two lines of Jupiter's summary with the card's eight values
+  labelled (right ascension, declination, altitude, azimuth; distance,
+  diameters, illuminated fraction, the pole's angle), then the four
+  moon rows - every line spanning or filling one table a keyboard
+  walks, whose spoken name says how it is grouped; at most 250
+  instants (1 000 moon rows), refused with the count beyond. It
+  samples; nothing searches for an ingress. *The first build grouped
+  only the moons under each instant; the owner's packaged checkpoint
+  found that a range then answered how the moons stand around Jupiter,
+  not where Jupiter is, against the ruled contract - corrected before
+  the checkpoint was accepted, and held by a contract test.*
 - **Refusals**, with the years named: no observer; Jupiter outside
   1900–2100; a single instant before 2000 shows Jupiter's card and
   says the configuration is refused for 2000–2100; a range leaving the
@@ -733,7 +742,12 @@ accepted service (`JovianTableSession`, `JovianTableControls`,
 - **Proof**: `JovianTableTest` - zero computations and no pack read
   from building and expanding; one result in two hosts with drafts
   untouched; every cell the service's answer; the triple transit in
-  both languages; **every December 2026 hour at Oslo reads Horizons'
+  both languages; every range group one Jupiter result and its four
+  moons, Jupiter's eight values spelled as the card spells them and
+  its position moving across seven weekly instants, in both languages
+  (Jupiter is near its stationary point in December 2026 - about
+  0.05 s of right ascension an hour, measured - so hourly positions
+  repeat at the table's rounding); **every December 2026 hour at Oslo reads Horizons'
   state in words, in both languages, but the allowlisted graze**, every
   one of Horizons' seven codes occurring; the refusals; a range grouped
   and capped at exactly 250 instants; the estimate mark.

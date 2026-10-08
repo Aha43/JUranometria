@@ -303,10 +303,11 @@ class JovianTableTest {
             c.step.setSelectedIndex(0); // 1 hour: 22:30, then the end appended
             c.apply();
             assertEquals(JovianTableSession.Outcome.APPENDED, session.result().outcome());
-            assertEquals(10, c.model.getRowCount(), "two headings, four moons each");
+            assertEquals(14, c.model.getRowCount(),
+                    "two groups: a heading, two lines of Jupiter, four moons each");
             assertEquals("2026-12-11 22:30 UTC", c.model.getValueAt(0, 0));
-            assertEquals("2026-12-11 23:00 UTC †", c.model.getValueAt(5, 0));
-            assertEquals("clear of Jupiter", c.model.getValueAt(9, 6), "Callisto has left at 23:00");
+            assertEquals("2026-12-11 23:00 UTC †", c.model.getValueAt(7, 0));
+            assertEquals("clear of Jupiter", c.model.getValueAt(13, 6), "Callisto has left at 23:00");
             assertEquals(" ", c.cardTitle.getText(), "a range shows no Jupiter card");
             // exactly 250 instants is answered
             c.start.setText("2026-12-01 00:00");
@@ -314,6 +315,91 @@ class JovianTableTest {
             c.apply();
             assertEquals(250, session.result().entries().size());
             assertEquals(1000, c.model.moonRows());
+        });
+    }
+
+    /**
+     * The owner's checkpoint finding on #474: a range answered only how
+     * the moons stand around Jupiter, not where Jupiter is. Every group
+     * is now one Jupiter result and its four moons - the instant's
+     * heading, Jupiter's eight summary values as the instant's card
+     * spells them, then Io, Europa, Ganymede and Callisto - and Jupiter's
+     * coordinates move across the range, in both languages.
+     */
+    @Test
+    void everyRangeGroupIsOneJupiterResultAndItsFourMoonsInBothLanguages() throws Exception {
+        JovianTableSession session = new JovianTableSession(() -> oslo(TRIPLE), () -> service);
+        onEdt(() -> {
+            JovianTableControls en = new JovianTableControls(session, EN, false);
+            JovianTableControls nb = new JovianTableControls(session, NB, false);
+            en.rangeView.setSelected(true);
+            // Seven weeks at a week's step: Jupiter is near its stationary
+            // point in December 2026 (measured: about 0.05 s of right
+            // ascension an hour on the 11th), so hourly positions repeat
+            // at the table's rounding; weekly ones cannot.
+            en.start.setText("2026-10-30 22:45");
+            en.end.setText("2026-12-11 22:45");
+            en.step.setSelectedIndex(3);
+            en.apply();
+            List<JovianTableSession.Entry> entries = session.result().entries();
+            assertEquals(7, entries.size(), "seven weekly instants");
+            for (JovianTableControls c : List.of(en, nb)) {
+                SolarTableWords w = c.words();
+                assertEquals(7, c.model.groups());
+                assertEquals(7 * 7, c.model.getRowCount(), "seven lines a group");
+                List<String> rightAscensions = new ArrayList<>();
+                List<String> declinations = new ArrayList<>();
+                for (int g = 0; g < entries.size(); g++) {
+                    JovianTableSession.Entry entry = entries.get(g);
+                    int at = g * 7;
+                    List<JovianMoonsModel.Line> lines = c.model.lines();
+                    assertEquals(JovianMoonsModel.Kind.HEADING, lines.get(at).kind());
+                    assertEquals(JovianMoonsModel.Kind.JUPITER_POSITION, lines.get(at + 1).kind());
+                    assertEquals(JovianMoonsModel.Kind.JUPITER_FIGURE, lines.get(at + 2).kind());
+                    for (int m = 0; m < 4; m++) {
+                        assertEquals(JovianMoonsModel.Kind.MOON, lines.get(at + 3 + m).kind());
+                        assertSame(entry.configuration().moons().get(m), lines.get(at + 3 + m).moon(),
+                                "the group's moons are its instant's");
+                    }
+                    for (int k = 0; k < 7; k++) {
+                        assertSame(entry.jupiter(), lines.get(at + k).jupiter(),
+                                "every line of a group is one Jupiter result");
+                    }
+                    // Jupiter's eight values, exactly as the instant's card spells them.
+                    List<String> v = JovianMoonsModel.jupiterValues(entry.jupiter(), w);
+                    String position = (String) c.model.getValueAt(at + 1, 0);
+                    String figure = (String) c.model.getValueAt(at + 2, 0);
+                    assertEquals(w.say("range.jupiter.position", v.get(0), v.get(1), v.get(2), v.get(3)),
+                            position);
+                    assertEquals(w.say("range.jupiter.figure", v.get(4), v.get(5), v.get(6), v.get(7)),
+                            figure);
+                    assertTrue(position.contains(v.get(0)) && position.contains(v.get(1)),
+                            "right ascension and declination present: " + position);
+                    rightAscensions.add(v.get(0));
+                    declinations.add(v.get(1));
+                }
+                assertEquals(7, new java.util.HashSet<>(rightAscensions).size(),
+                        "Jupiter's right ascension moves across the range: " + rightAscensions);
+                assertTrue(new java.util.HashSet<>(declinations).size() > 1,
+                        "and its declination: " + declinations);
+            }
+            // the words a reader of each language reads
+            assertTrue(((String) en.model.getValueAt(1, 0)).startsWith("Jupiter: right ascension "));
+            assertTrue(((String) nb.model.getValueAt(1, 0)).startsWith("Jupiter: rektascensjon "));
+            assertTrue(((String) nb.model.getValueAt(2, 0)).contains("nordpol"));
+            assertEquals("Jupiter and its four moons, by instant", en.moonsHeading.getText());
+            assertEquals("Jupiter og de fire månene, etter tidspunkt", nb.moonsHeading.getText());
+            assertTrue(en.table.getAccessibleContext().getAccessibleName()
+                    .startsWith("Jupiter and the four Galilean moons, grouped by instant"));
+            // and the card's own values for one of those instants are the same strings
+            en.instantView.setSelected(true);
+            en.apply();
+            List<String> card = new ArrayList<>();
+            for (String line : JovianTableControls.CARD_LINES) {
+                card.add(en.cardValue(line));
+            }
+            assertEquals(JovianMoonsModel.jupiterValues(
+                    session.result().entries().get(0).jupiter(), en.words()), card);
         });
     }
 

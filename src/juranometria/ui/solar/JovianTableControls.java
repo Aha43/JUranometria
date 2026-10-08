@@ -161,11 +161,12 @@ public final class JovianTableControls {
         moonsHeading.setText(said.say("moons.heading"));
         moonsHeading.setFont(moonsHeading.getFont().deriveFont(Font.BOLD));
         model = new JovianMoonsModel(said);
-        // A range's instant headings span the table's width, so each
-        // group reads as one under its whole heading: the cells of a
-        // heading row paint nothing, and the table paints the heading
-        // across the row. The model still answers the heading in the
-        // first column, which is what a screen reader reads.
+        // A range's group lines - the instant's heading and the two
+        // lines of Jupiter's summary - span the table's width, so each
+        // group reads as one Jupiter result and its four moons: the
+        // cells of a spanning row paint nothing, and the table paints
+        // the line across the row. The model still answers the line's
+        // text in the first column, which is what a screen reader reads.
         table = new JTable(model) {
             private static final long serialVersionUID = 1L;
 
@@ -178,12 +179,14 @@ public final class JovianTableControls {
                     g2.setRenderingHint(java.awt.RenderingHints.KEY_TEXT_ANTIALIASING,
                             java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
                     Font bold = getFont().deriveFont(Font.BOLD);
-                    g2.setFont(bold);
-                    java.awt.FontMetrics fm = g2.getFontMetrics();
                     for (int row = 0; row < model.getRowCount(); row++) {
-                        if (!model.lines().get(row).isHeading()) {
+                        JovianMoonsModel.Line line = model.lines().get(row);
+                        if (!line.isHeading()) {
                             continue;
                         }
+                        g2.setFont(line.kind() == JovianMoonsModel.Kind.HEADING
+                                ? bold : getFont());
+                        java.awt.FontMetrics fm = g2.getFontMetrics();
                         java.awt.Rectangle r = getCellRect(row, 0, true);
                         r.width = getWidth();
                         if (clip != null && !clip.intersects(r)) {
@@ -193,7 +196,8 @@ public final class JovianTableControls {
                         g2.setColor(selected ? getSelectionBackground() : getBackground());
                         g2.fillRect(r.x, r.y, r.width, r.height - 1);
                         g2.setColor(selected ? getSelectionForeground() : getForeground());
-                        g2.drawString(model.lines().get(row).heading(), r.x + 3,
+                        int indent = line.kind() == JovianMoonsModel.Kind.HEADING ? 3 : 12;
+                        g2.drawString(line.heading(), r.x + indent,
                                 r.y + (r.height - fm.getHeight()) / 2 + fm.getAscent());
                     }
                 } finally {
@@ -336,6 +340,13 @@ public final class JovianTableControls {
         model.show(result.entries());
         boolean single = result.entries().size() == 1
                 && result.query().mode() == Mode.INSTANT;
+        // An instant: the four moons under the card. A range: each group
+        // is one Jupiter result and its four moons, and the heading and
+        // the table's spoken name say so.
+        boolean ranged = result.query() != null && result.query().mode() == Mode.RANGE;
+        moonsHeading.setText(said.say(ranged ? "range.heading" : "moons.heading"));
+        table.getAccessibleContext().setAccessibleName(
+                said.say(ranged ? "range.table.a11y" : "table.a11y"));
         showCard(single ? result.entries().get(0) : null);
         boolean estimated = result.entries().stream().anyMatch(e ->
                 e.jupiter().timeConfidence() != TimeScales.Confidence.EXACT);
@@ -389,18 +400,7 @@ public final class JovianTableControls {
         }
         cardTitle.setText(title.toString());
         cardTitle.getAccessibleContext().setAccessibleName(title.toString());
-        List<String> values = List.of(
-                said.n(SunTableFormat.hms(j.astrometricJ2000())),
-                SunTableFormat.dms(j.astrometricJ2000()),
-                SunTableFormat.altitude(said.n(JovianTableFormat.tenthDegree(
-                        j.horizontal().altitudeDegrees())),
-                        j.horizontal().altitudeDegrees(), said.say("below")),
-                said.n(JovianTableFormat.tenthDegree(j.horizontal().azimuthDegrees())),
-                said.n(JovianTableFormat.astronomicalUnits(j.distanceAu())),
-                said.n(JovianTableFormat.diameters(j.equatorialDiameterArcseconds(),
-                        j.polarDiameterArcseconds())),
-                said.n(MoonTableFormat.percent(j.illuminatedFraction())),
-                said.n(JovianTableFormat.tenthDegree(j.poleAngleDegrees())));
+        List<String> values = JovianMoonsModel.jupiterValues(j, said);
         for (int i = 0; i < values.size(); i++) {
             JLabel value = cardValues.get(i);
             value.setText(values.get(i));
