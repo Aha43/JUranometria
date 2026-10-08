@@ -19,4 +19,9 @@ Solsystemefemeride: et utdrag av NASA/JPLs DE440, endret av
 JUranometria etter NAIF-reglene for endrede SPICE-kjerner (ingen
 avgift eller lisens), og IERS' skuddsekundfil, uendret.
 
+Jupitersystemefemeride: to utdrag av NASA/JPLs JUP365 (med
+Jupiters barysenter fra DE440), endret av JUranometria etter
+NAIF-reglene for endrede SPICE-kjerner (ingen avgift eller lisens);
+IAU 2015-konstantene kopiert fra NAIFs planetkonstantkjerne.
+
 Verktøylinjeikoner fra ikonsettet Tabler: MIT-lisens.

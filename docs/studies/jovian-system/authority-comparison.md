@@ -310,3 +310,5 @@ Where the worst rows are:
 - jupiter, after, horizontal: 405.96512 at oslo 2100-07-26 00:00
 - jupiter, after, illuminated %: 0.00047 at oslo 2070-07-21 00:00
 - jupiter, after, phase angle deg: 0.00835 at oslo 2085-01-01 00:00
+
+Correction (#473, 2026-10-08): the limb sum printed for the one Europa disagreement above, 20.69", was the study's arithmetic; Horizons' own row gives Jupiter's diameter 39.85758" and the separation 20.3635", and the service reproduces both, so the limb sum is 20.3640" and the graze's margin half a milliarcsecond (`service-accuracy.md`, `JovianReferenceVectorTest`).

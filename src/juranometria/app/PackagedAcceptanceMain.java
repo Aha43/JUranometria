@@ -3775,6 +3775,49 @@ public final class PackagedAcceptanceMain {
         require("2".equals(juranometria.solar.SolarSystemPack.load().manifest()
                         .get("pack.version")),
                 "the packaged pack is v2, the one with the Moon");
+        // The Jovian pack (issue #473), inside the packaged image: both
+        // kernels load through the image's own classpath and verify
+        // their checksums; Jupiter for the same Oslo instant agrees
+        // with Horizons' astrometric row for that request
+        // (docs/studies/jovian-system/horizons/named-jupiter-oslo.txt,
+        // 2026-Jun-21 10:00, R.A. 119.942516379, DEC 21.025417122) to
+        // the exact-era target; and the named triple transit of
+        // 2026-12-11 22:45 UTC reads as ruled: Io, Europa and Callisto
+        // in front, Ganymede clear.
+        juranometria.solar.JovianSystemService jovian =
+                juranometria.solar.JovianSystemService.load();
+        juranometria.solar.JovianSystemService.JupiterObservation jupiterSample =
+                jovian.observeJupiter(new juranometria.sky.Observer(59.91, 10.75,
+                        java.time.Instant.parse("2026-06-21T10:00:00Z")));
+        double jupiterOff = jupiterSample.astrometricJ2000().separationDegrees(
+                new juranometria.chart.SkyPosition(119.942516379, 21.025417122))
+                * 3600.0;
+        require(jupiterOff < 0.05, "the packaged Jupiter agrees with Horizons for"
+                + " Oslo, 2026-06-21 10:00 UTC, within 0.05 arcsecond: " + jupiterOff);
+        juranometria.solar.JovianSystemService.Configuration triple =
+                jovian.observeMoons(new juranometria.sky.Observer(59.91, 10.75,
+                        java.time.Instant.parse("2026-12-11T22:45:00Z")));
+        for (juranometria.solar.JovianSystemService.Moon moon : java.util.List.of(
+                juranometria.solar.JovianSystemService.Moon.IO,
+                juranometria.solar.JovianSystemService.Moon.EUROPA,
+                juranometria.solar.JovianSystemService.Moon.CALLISTO)) {
+            require(triple.moon(moon).state() == juranometria.solar.JovianSystemService
+                    .VisibilityState.IN_FRONT_OF_JUPITER, moon + " is in front of Jupiter"
+                    + " at 22:45 UTC on 2026-12-11: " + triple.moon(moon).state());
+        }
+        require(triple.moon(juranometria.solar.JovianSystemService.Moon.GANYMEDE).state()
+                        == juranometria.solar.JovianSystemService.VisibilityState.CLEAR_OF_JUPITER,
+                "and Ganymede is clear");
+        require(PackagedAcceptanceMain.class.getResourceAsStream(
+                        "/resources/jovian-system/NOTICE-jovian-system.md") != null
+                        && PackagedAcceptanceMain.class.getResourceAsStream(
+                                "/resources/jovian-system/PROVENANCE.md") != null,
+                "the Jovian pack's notice and provenance travel with it");
+        System.out.println("jovian system pack OK (JUP365 excerpts v"
+                + jovian.pack().manifest().get("pack.version") + ", Jupiter at Oslo within "
+                + String.format(java.util.Locale.ROOT, "%.4f", jupiterOff)
+                + " arcsecond of Horizons; the 2026-12-11 22:45 UTC triple transit reads"
+                + " Io, Europa and Callisto in front, Ganymede clear)");
         System.out.println("solar system pack OK (DE440 excerpt v2 "
                 + solar.timeScales().exactFrom() + " exact until "
                 + solar.timeScales().exactUntil() + ", Sun at Oslo within "

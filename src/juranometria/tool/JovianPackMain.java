@@ -366,6 +366,18 @@ public final class JovianPackMain {
             System pack, which it does not change: the Sun and the Moon are
             computed from that pack alone, as released.
 
+            ## One pack, two kernel files
+
+            The two kernels are one logical, versioned pack: one manifest,
+            one validation boundary, one notice and one provenance. They are
+            two files because their intervals differ, as ruled on #472:
+            Jupiter answers over 1900 to 2100, the years the Sun and the Moon
+            answer for, while the four moons answer over 2000 to 2100 - the
+            Galilean excerpt over the whole 1900-2100 would be 91 MB, and the
+            ruled interval keeps it at 39 MB. Outside the moons' years Jupiter
+            still answers and the moon configuration refuses, naming its
+            interval.
+
             ## The ephemeris excerpts
 
             `juranometria-jup365-jupiter-1900-2100.bsp` and

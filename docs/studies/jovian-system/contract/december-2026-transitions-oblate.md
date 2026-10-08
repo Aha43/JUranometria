@@ -116,3 +116,5 @@ Disc test: the oblate apparent figure with the PCK pole (--oblate). Deflection: 
 - 22:59 Horizons -> *
 
 Where the worst rows are:
+
+Correction (#473, 2026-10-08): this study's oblate disc test took the moon's lateral offset at Jupiter's distance rather than its own; the service makes the test in angles. Its minutes on the named evening: Io 22:32-00:52, Europa 21:53-00:49, Callisto 18:09-22:57, Ganymede clear (`../service-accuracy.md`).

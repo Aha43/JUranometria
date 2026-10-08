@@ -125,6 +125,16 @@ class PlaceAndTimeGateTest {
     private static final Path SOLAR_SYSTEM_PACK =
             Path.of("src/resources/solar-system");
 
+    /**
+     * The second ephemeris pack, ruled on #472 (layout A) and built in
+     * #473: Jupiter and the Galilean moons, owned by the Jovian
+     * service and carrying its own source, digests, coverage and terms
+     * beside its data. It carries no time scales - the Jovian service
+     * reads the Solar System pack's.
+     */
+    private static final Path JOVIAN_SYSTEM_PACK =
+            Path.of("src/resources/jovian-system");
+
     private static final List<String> TIME_AND_EPHEMERIS_NAMES =
             List.of("leap", "ut1", "ephemeris", "iers", "horizon",
                     "de440", "delta-t", "deltat", ".bsp", ".tls");
@@ -147,7 +157,10 @@ class PlaceAndTimeGateTest {
                         .toLowerCase(java.util.Locale.ROOT);
                 boolean astronomical = TIME_AND_EPHEMERIS_NAMES.stream()
                         .anyMatch(name::contains);
-                if (astronomical && !path.startsWith(SOLAR_SYSTEM_PACK)) {
+                boolean jovianEphemeris = path.startsWith(JOVIAN_SYSTEM_PACK)
+                        && name.endsWith(".bsp");
+                if (astronomical && !path.startsWith(SOLAR_SYSTEM_PACK)
+                        && !jovianEphemeris) {
                     strays.add(path.toString());
                 }
             }
@@ -155,7 +168,8 @@ class PlaceAndTimeGateTest {
         assertEquals(List.of(), strays,
                 "no time-scale table, no ephemeris, nothing with a"
                         + " provenance of its own outside "
-                        + SOLAR_SYSTEM_PACK);
+                        + SOLAR_SYSTEM_PACK + ", and nothing but ephemeris in "
+                        + JOVIAN_SYSTEM_PACK);
     }
 
     /**

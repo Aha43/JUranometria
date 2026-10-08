@@ -15,6 +15,7 @@ this archive.
 | Constellation geography (d3-celestial) | BSD-3-Clause | [`licenses/NOTICE-constellations.md`](licenses/NOTICE-constellations.md), [full text](licenses/LICENSE-BSD-3-Clause.txt) |
 | Star-identity data (d3-celestial) | BSD-3-Clause | [`licenses/NOTICE-star-identities.md`](licenses/NOTICE-star-identities.md), [full text](licenses/LICENSE-BSD-3-Clause.txt) |
 | Solar System ephemeris (a JUranometria-modified excerpt of NASA/JPL DE440; IERS leap seconds) | NAIF rules for modified SPICE kernels (no fee or licence); IERS public data | [`licenses/NOTICE-solar-system.md`](licenses/NOTICE-solar-system.md) |
+| Jovian System ephemeris (two JUranometria-modified excerpts of NASA/JPL JUP365 with DE440; IAU 2015 constants copied from NAIF's PCK) | NAIF rules for modified SPICE kernels (no fee or licence) | [`licenses/NOTICE-jovian-system.md`](licenses/NOTICE-jovian-system.md) |
 | Toolbar icons (Tabler) | MIT | [`licenses/LICENSE-Tabler-MIT.txt`](licenses/LICENSE-Tabler-MIT.txt) |
 | Application mark | MIT (JUranometria's own) | this repository's `LICENSE` |
 

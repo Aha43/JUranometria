@@ -128,6 +128,13 @@ public final class EvidenceContractMain {
                 "docs/studies/solar-system-controls/measurements.md");
         REPORT_MAINS.put("juranometria.tool.JovianContractStudyMain",
                 "docs/studies/jovian-system/measurements.md");
+        // The Jovian service against Horizons (#473): the worst
+        // differences, every state disagreement and every
+        // figure-against-sphere row named, the named evening's
+        // minutes - deterministic over the bundled packs and the
+        // committed fixtures, rounded as printed.
+        REPORT_MAINS.put("juranometria.tool.JovianAccuracyReportMain",
+                "docs/studies/jovian-system/service-accuracy.md");
         // The Sun on production pages (#415): the report is
         // deterministic; its pages are held through IMAGE_MAINS.
         REPORT_MAINS.put("juranometria.tool.SunOnTheChartStudyMain",

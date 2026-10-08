@@ -68,6 +68,9 @@ public final class JovianSystemService {
     private static final int JUPITER = 599;
 
     private static final double C = SolarSystemService.C_KM_PER_S;
+
+    /** J2000.0 (2000-01-01 12:00 TT) written as an instant, for ephemeris-time reports. */
+    private static final Instant J2000_TT_AS_INSTANT = Instant.ofEpochSecond(946_728_000L);
     private static final double ARCSEC = 3600.0;
 
     /** The four Galilean moons, in the ruled table order. */
@@ -289,6 +292,24 @@ public final class JovianSystemService {
         requireInside(instant, jovian.moonsFirstDay(), jovian.moonsLastDay(),
                 "the Galilean moons");
         return configuration(geocentricFrame(instant), instant);
+    }
+
+    /**
+     * The configuration from the Earth's centre at a TDB epoch in
+     * seconds past J2000 - pure ephemeris time, no civil-time reading -
+     * for the geometry tests that hold the states, relations and
+     * interval boundaries independently of any ΔT prediction (#473).
+     * The instant reported is the epoch read as TT.
+     */
+    Configuration configurationAtEt(double et) {
+        double jdTt = TimeScales.J2000_JD + et / 86400.0;
+        Instant instant = J2000_TT_AS_INSTANT.plusMillis(Math.round(et * 1000.0));
+        TimeScales.Epoch epoch = new TimeScales.Epoch(jdTt,
+                TimeScales.Confidence.EXACT, 0.0);
+        SpkKernel.State emb = solar.kernel().state(SSB, EARTH_MOON_BARYCENTRE, et);
+        SpkKernel.State earth = solar.kernel().state(EARTH_MOON_BARYCENTRE, EARTH, et);
+        return configuration(new Frame(epoch, emb.position().plus(earth.position()),
+                emb.velocity().plus(earth.velocity()), 0.0, 0.0, false), instant);
     }
 
     private static void requireInside(Instant instant, LocalDate first,
@@ -560,11 +581,17 @@ public final class JovianSystemService {
     }
 
     /**
-     * The moon's offset in Jupiter's own sky basis against the
+     * The moon's direction in Jupiter's own sky basis against the
      * projected ellipse of the oblate figure - semi-axes R_e and
      * b′ = sqrt(R_p² cos² B + R_e² sin² B) for sub-observer latitude
-     * B - limb to limb, the moon's radius scaled to Jupiter's
-     * distance along the offset direction.
+     * B - limb to limb, all in angle: the moon's offset is the angle
+     * between the two light-time-corrected directions, resolved along
+     * the projected pole and its perpendicular; the figure's edge and
+     * the moon's radius are each seen at their own distance. (#473
+     * corrected the study's shortcut, which took the moon's lateral
+     * offset in kilometres at Jupiter's distance and so misplaced a
+     * moon nearer or farther than Jupiter by the ratio of the two
+     * distances - up to 0.02″ at a graze.)
      */
     private static boolean insideTheFigure(Sight jupiter, Sight moon, Vector3 pole,
                                            double moonRadiusKm,
@@ -576,22 +603,23 @@ public final class JovianSystemService {
         }
         up = up.unit();
         Vector3 east = up.cross(los);
-        Vector3 d = moon.range.minus(jupiter.range);
-        double px = d.dot(east);
-        double py = d.dot(up);
+        Vector3 m = moon.direction();
+        double ax = Math.atan2(m.dot(east), m.dot(los));
+        double ay = Math.atan2(m.dot(up), m.dot(los));
         double subLatitude = Math.asin(clamp(pole.dot(los.times(-1.0))));
         double re = k.jupiterEquatorialRadiusKm();
         double rp = k.jupiterPolarRadiusKm();
         double b = Math.sqrt(rp * rp * Math.cos(subLatitude) * Math.cos(subLatitude)
                 + re * re * Math.sin(subLatitude) * Math.sin(subLatitude));
-        double rho = Math.hypot(px, py);
+        double rho = Math.hypot(ax, ay);
         if (rho == 0.0) {
             return true;
         }
-        double ux = px / rho;
-        double uy = py / rho;
-        double edge = 1.0 / Math.sqrt((ux / re) * (ux / re) + (uy / b) * (uy / b));
-        return rho < edge + moonRadiusKm * (jupiter.distanceKm() / moon.distanceKm());
+        double ux = ax / rho;
+        double uy = ay / rho;
+        double edgeKm = 1.0 / Math.sqrt((ux / re) * (ux / re) + (uy / b) * (uy / b));
+        return rho < Math.asin(edgeKm / jupiter.distanceKm())
+                + Math.asin(moonRadiusKm / moon.distanceKm());
     }
 
     /**

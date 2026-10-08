@@ -91,7 +91,7 @@ public final class JovianComparison {
     }
 
     /** A state disagreement, or a row where the two disc definitions differ. */
-    public record Case(String body, String site, Instant when, String ours,
+    public record Case(String body, String era, String site, Instant when, String ours,
                        String theirs, double separationArcsec,
                        double sphereLimbSumArcsec, double figureNote) {
         public String tag() {
@@ -114,6 +114,8 @@ public final class JovianComparison {
         public final List<Case> disagreements = new ArrayList<>();
         public final List<Case> figureDifferences = new ArrayList<>();
         public final Map<String, Integer> figureRows = new TreeMap<>();
+        /** Rows where the X/Y residual could turn the position angle by more than 0.05°. */
+        public final Map<String, Integer> positionAnglesIllConditioned = new TreeMap<>();
         public final List<Transition> transitions = new ArrayList<>();
         public int outsideTheMoonsInterval;
 
@@ -127,6 +129,14 @@ public final class JovianComparison {
 
         public int rowsOf(String body, String era) {
             return rows.getOrDefault(body + "|" + era, 0);
+        }
+
+        public int statesAgreed(String body, String exactness) {
+            return statesAgreed.getOrDefault(body + "|" + exactness, 0);
+        }
+
+        public int statesDisagreed(String body, String exactness) {
+            return statesDisagreed.getOrDefault(body + "|" + exactness, 0);
         }
     }
 
@@ -172,7 +182,7 @@ public final class JovianComparison {
         return name.substring(name.indexOf("-" + body + "-") + body.length() + 2);
     }
 
-    static Instant stamp(String field) {
+    public static Instant stamp(String field) {
         String stamp = field.strip();
         if (!stamp.contains(".")) {
             stamp += ".000";
@@ -180,7 +190,7 @@ public final class JovianComparison {
         return LocalDateTime.parse(stamp, STAMP).toInstant(ZoneOffset.UTC);
     }
 
-    static List<String[]> rows(String name) throws IOException {
+    public static List<String[]> rows(String name) throws IOException {
         String text = Files.readString(HORIZONS.resolve(name + ".txt"), StandardCharsets.UTF_8);
         String table = text.substring(text.indexOf("$$SOE") + 5, text.indexOf("$$EOE")).strip();
         List<String[]> rows = new ArrayList<>();
@@ -241,7 +251,7 @@ public final class JovianComparison {
         return c;
     }
 
-    static Observer observer(String site, Instant when) {
+    public static Observer observer(String site, Instant when) {
         double[] o = OBSERVERS.get(site);
         if (o == null) {
             throw new IllegalArgumentException("no observer named " + site);
@@ -316,8 +326,23 @@ public final class JovianComparison {
             w.note("X", p.xArcseconds() - d(f[9]), at);
             w.note("Y", p.yArcseconds() - d(f[10]), at);
             w.note("separation", p.separationArcseconds() - d(f[12]), at);
-            w.note("position angle deg", wrapped(p.positionAngleDegrees() - d(f[11])), at);
-
+            double paResidual = wrapped(p.positionAngleDegrees() - d(f[11]));
+            w.note("position angle deg", paResidual, at);
+            // The position angle is X and Y's direction, and X and Y are
+            // authoritative: at a separation where their residual could
+            // turn the angle by more than the ruled 0.05 degrees, the
+            // angle is ill-conditioned (the separation approaching zero)
+            // and its residual is not a disagreement. No cutoff: the
+            // cone follows each row's own residual and separation.
+            double displacement = Math.hypot(p.xArcseconds() - d(f[9]),
+                    p.yArcseconds() - d(f[10]));
+            double cone = Math.toDegrees(Math.atan2(displacement, d(f[12])));
+            if (cone > 0.05) {
+                result.positionAnglesIllConditioned.merge(body + "|" + era, 1, Integer::sum);
+                w.note("position angle deg, ill-conditioned rows", paResidual, at);
+            } else {
+                w.note("position angle deg, well-conditioned rows", paResidual, at);
+            }
             // The state, on Horizons' definition and on the reader's.
             String theirs = f[13].replace("/", "").strip();
             if (theirs.isEmpty()) {
@@ -328,16 +353,17 @@ public final class JovianComparison {
                     service.pack().constants().jupiterEquatorialRadiusKm()
                             / (c.jupiter().distanceKm()))) * ARCSEC
                     + p.angularDiameterArcseconds() / 2.0;
+            String exactness = era.equals("after") ? "after" : "exact";
             if (ours.equals(theirs)) {
-                result.statesAgreed.merge(body, 1, Integer::sum);
+                result.statesAgreed.merge(body + "|" + exactness, 1, Integer::sum);
             } else {
-                result.statesDisagreed.merge(body, 1, Integer::sum);
-                result.disagreements.add(new Case(body, site, when, ours, theirs,
+                result.statesDisagreed.merge(body + "|" + exactness, 1, Integer::sum);
+                result.disagreements.add(new Case(body, era, site, when, ours, theirs,
                         p.separationArcseconds(), sphereLimbs, p.depthKm()));
             }
             result.figureRows.merge(body, 1, Integer::sum);
             if (p.discRelation() != p.sphericalDiscRelation()) {
-                result.figureDifferences.add(new Case(body, site, when,
+                result.figureDifferences.add(new Case(body, era, site, when,
                         code(p.discRelation(), p.shadowRelation()), ours,
                         p.separationArcseconds(), sphereLimbs,
                         c.jupiter().subObserverLatitudeDegrees()));
@@ -414,20 +440,43 @@ public final class JovianComparison {
         }
         md.append(String.format(Locale.ROOT, "Moon rows before the moons' interval"
                 + " (skipped, Jupiter alone answers there): %d.\n\n", r.outsideTheMoonsInterval));
-        md.append("## Visibility states against Horizons' codes (equatorial sphere, limb to limb)\n\n");
-        md.append("| body | agree | disagree |\n|---|---:|---:|\n");
+        md.append("## Position angle: conditioning\n\n")
+                .append("The angle is X and Y's direction, and X and Y are authoritative; a row")
+                .append(" is ill-conditioned where their residual could turn the angle by more")
+                .append(" than the ruled 0.05 degrees at the row's separation (the separation")
+                .append(" approaching zero). The worst residuals above are given for all rows")
+                .append(" and for the well- and ill-conditioned rows apart.\n\n")
+                .append("| body | era | rows | ill-conditioned |\n|---|---|---:|---:|\n");
         for (String body : List.of("io", "europa", "ganymede", "callisto")) {
-            md.append(String.format(Locale.ROOT, "| %s | %d | %d |\n", body,
-                    r.statesAgreed.getOrDefault(body, 0), r.statesDisagreed.getOrDefault(body, 0)));
+            for (String era : ERAS) {
+                if (r.rowsOf(body, era) == 0) {
+                    continue;
+                }
+                md.append(String.format(Locale.ROOT, "| %s | %s | %d | %d |\n", body, era,
+                        r.rowsOf(body, era),
+                        r.positionAnglesIllConditioned.getOrDefault(body + "|" + era, 0)));
+            }
+        }
+        md.append("\n## Visibility states against Horizons' codes (equatorial sphere, limb to limb)\n\n");
+        md.append("Through the exact civil-time interval the states are held to the single")
+                .append(" allowlisted row; after it the two implementations' dT predictions")
+                .append(" name different instants, so the states are measured output, not assertions.\n\n");
+        md.append("| body | exact: agree | exact: disagree | after: agree | after: disagree |\n|---|---:|---:|---:|---:|\n");
+        for (String body : List.of("io", "europa", "ganymede", "callisto")) {
+            md.append(String.format(Locale.ROOT, "| %s | %d | %d | %d | %d |\n", body,
+                    r.statesAgreed.getOrDefault(body + "|exact", 0),
+                    r.statesDisagreed.getOrDefault(body + "|exact", 0),
+                    r.statesAgreed.getOrDefault(body + "|after", 0),
+                    r.statesDisagreed.getOrDefault(body + "|after", 0)));
         }
         md.append("\nDisagreements, every one:\n\n");
         if (r.disagreements.isEmpty()) {
             md.append("- none\n");
         }
         for (Case c : r.disagreements) {
-            md.append(String.format(Locale.ROOT, "- %s at %s: ours %s, Horizons %s;"
-                    + " separation %.2f\" against a limb sum of %.2f\"; depth %+.0f km\n",
-                    c.body(), c.tag(), c.ours(), c.theirs(), c.separationArcsec(),
+            md.append(String.format(Locale.ROOT, "- %s (%s) at %s: ours %s, Horizons %s;"
+                    + " separation %.4f\" against a limb sum of %.4f\"; depth %+.0f km\n",
+                    c.body(), c.era(), c.tag(), c.ours(), c.theirs(), c.separationArcsec(),
                     c.sphereLimbSumArcsec(), c.figureNote()));
         }
         md.append("\n## The reader's oblate figure against the sphere\n\n");
@@ -438,9 +487,9 @@ public final class JovianComparison {
             md.append("- none\n");
         }
         for (Case c : r.figureDifferences) {
-            md.append(String.format(Locale.ROOT, "- %s at %s: figure %s, sphere %s;"
-                    + " separation %.2f\" against the sphere's limb sum %.2f\";"
-                    + " sub-observer latitude %+.2f deg\n", c.body(), c.tag(), c.ours(),
+            md.append(String.format(Locale.ROOT, "- %s (%s) at %s: figure %s, sphere %s;"
+                    + " separation %.4f\" against the sphere's limb sum %.4f\";"
+                    + " sub-observer latitude %+.2f deg\n", c.body(), c.era(), c.tag(), c.ours(),
                     c.theirs(), c.separationArcsec(), c.sphereLimbSumArcsec(), c.figureNote()));
         }
         md.append("\n## The named evening, 2026-12-11: first and last minute in front of Jupiter\n\n");
