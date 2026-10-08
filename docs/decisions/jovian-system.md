@@ -685,3 +685,78 @@ Jupiter's figure and phase stay within what the geometry allows over
 of their ends, Jupiter answering where the moons refuse, a missing
 pack refusing the service and leaving the Sun and the Moon as
 released.
+
+## #474, the table, as built
+
+The table ruled in 9 above, built on `main` at `193c72fe` over the
+accepted service (`JovianTableSession`, `JovianTableControls`,
+`JovianMoonsModel`, `JovianTableFormat`, `JovianTableDialog`):
+
+- **One applied query and result, two hosts.** The Controller's
+  Solar System section gains a Jupiter group after the Moon's,
+  introduced collapsed; View > Solar System gains *Jupiter...* after
+  *Moon...*, the dialog host kept for dogfooding as the Sun's and the
+  Moon's are. Both follow one session; each keeps its own draft, and a
+  result applied in either never writes into the other's fields. No
+  Show on chart box: nothing Jovian is drawn.
+- **Nothing computes from building, opening or expanding** (#474,
+  required). This differs from the Sun's and the Moon's dialogs, which
+  compute when they open and come to the front (ruled on #400): the
+  Jupiter dialog shows what the session holds and computes only on
+  Compute, a view, Enter or Update from Place and Time. The 53 MB pack
+  is read on the first computation, never at startup.
+- **One instant**: the Jupiter card - right ascension and declination
+  (J2000), altitude, azimuth, distance (AU), apparent diameter equator
+  / poles, illuminated fraction, the north pole's position angle - and
+  the four moons in the fixed order Io, Europa, Ganymede, Callisto:
+  side, east–west and north–south offsets with their letters,
+  separation in arcseconds and in Jupiter radii, the state in words,
+  the rounding of the ruled mock-ups. Every value is the service's
+  result, rounded; the table recomputes nothing.
+- **A range**, timestamp-grouped as ruled: **each group is one
+  Jupiter result and its four moons** - a heading naming the sampled
+  instant, two lines of Jupiter's summary with the card's eight values
+  labelled (right ascension, declination, altitude, azimuth; distance,
+  diameters, illuminated fraction, the pole's angle), then the four
+  moon rows - every line spanning or filling one table a keyboard
+  walks, whose spoken name says how it is grouped; at most 250
+  instants (1 000 moon rows), refused with the count beyond. It
+  samples; nothing searches for an ingress. *The first build grouped
+  only the moons under each instant; the owner's packaged checkpoint
+  found that a range then answered how the moons stand around Jupiter,
+  not where Jupiter is, against the ruled contract - corrected before
+  the checkpoint was accepted, and held by a contract test.*
+- **Refusals**, with the years named: no observer; Jupiter outside
+  1900–2100; a single instant before 2000 shows Jupiter's card and
+  says the configuration is refused for 2000–2100; a range leaving the
+  moons' years is refused whole; a range running backwards or an
+  unreadable instant as the Sun's and the Moon's.
+- **After the exact civil-time interval** (ruling 8 of #473): the
+  instant and each group heading carry *est.*, and the status says the
+  moons' states there are geometry at an estimated instant, not
+  predicted times of events; the time note says so too.
+- **Words**: English and Norwegian, the study's proposed wording as
+  ruled (*Ganymedes*, *foran Jupiter*, *bak Jupiter*, *i Jupiters
+  skygge*, *klar av Jupiter*), the letters e/w/n/s and ø/v/n/s; the
+  remaining Norwegian sentences are new and await review.
+- **Proof**: `JovianTableTest` - zero computations and no pack read
+  from building and expanding; one result in two hosts with drafts
+  untouched; every cell the service's answer; the triple transit in
+  both languages; every range group one Jupiter result and its four
+  moons, Jupiter's eight values spelled as the card spells them and
+  its position moving across seven weekly instants, in both languages
+  (Jupiter is near its stationary point in December 2026 - about
+  0.05 s of right ascension an hour, measured - so hourly positions
+  repeat at the table's rounding); **every December 2026 hour at Oslo reads Horizons'
+  state in words, in both languages, but the allowlisted graze**, every
+  one of Horizons' seven codes occurring; the refusals; a range grouped
+  and capped at exactly 250 instants; the estimate mark.
+  `SolarSystemCompanionJourneyTest` in the real application: Jupiter
+  after the Moon, collapsed, opened computing nothing, reached by the
+  Controller's own focus traversal, Compute showing the card and the
+  four moons; View > Solar System ending in *Jupiter...*. The packaged
+  acceptance runs the same journey in every native image
+  (`jupiter table OK`).
+- **Evidence**: no chart, export, sheet or gallery byte moves; the
+  Controller's photographers build the section without Jupiter, as
+  before.

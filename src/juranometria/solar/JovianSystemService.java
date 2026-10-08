@@ -224,6 +224,16 @@ public final class JovianSystemService {
         }
     }
 
+    /**
+     * The civil days the bundled pack answers for, inclusive, as its
+     * manifest states them (held equal by {@code JovianPackTest}): a
+     * host reads these to phrase its refusals without loading the pack.
+     */
+    public static final LocalDate JUPITER_FIRST_DAY = LocalDate.of(1900, 1, 1);
+    public static final LocalDate JUPITER_LAST_DAY = LocalDate.of(2100, 12, 31);
+    public static final LocalDate MOONS_FIRST_DAY = LocalDate.of(2000, 1, 1);
+    public static final LocalDate MOONS_LAST_DAY = LocalDate.of(2100, 12, 31);
+
     private final SolarSystemPack solar;
     private final JovianPack jovian;
     private final TimeScales timeScales;

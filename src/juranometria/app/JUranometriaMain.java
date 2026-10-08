@@ -417,16 +417,37 @@ public final class JUranometriaMain {
         juranometria.ui.solar.SolarTableSession moonTable =
                 new juranometria.ui.solar.SolarTableSession(observerNow,
                         solarSystem, juranometria.ui.solar.SolarTable.moon());
+        // Jupiter and the four Galilean moons (#474): one session shared
+        // by the Controller's Jupiter group and the Jupiter dialog, over
+        // the same observer; the 53 MB Jovian pack is read once, when a
+        // host first computes - never at startup, never on opening.
+        java.util.function.Supplier<juranometria.solar.JovianSystemService>
+                jovianSystem = new java.util.function.Supplier<>() {
+                    private juranometria.solar.JovianSystemService loaded;
+
+                    @Override
+                    public synchronized juranometria.solar.JovianSystemService get() {
+                        if (loaded == null) {
+                            loaded = new juranometria.solar.JovianSystemService(
+                                    juranometria.solar.SolarSystemPack.load(),
+                                    juranometria.solar.JovianPack.load());
+                        }
+                        return loaded;
+                    }
+                };
+        juranometria.ui.solar.JovianTableSession jupiterTable =
+                new juranometria.ui.solar.JovianTableSession(observerNow, jovianSystem);
         // Solar System in the Controller, third (ruled on #457): the
-        // Sun and Moon groups over those sessions and the module's own
-        // switches, introduced collapsed, computing nothing on its own.
+        // Sun, Moon and Jupiter groups over those sessions and the
+        // module's own switches, introduced collapsed, computing nothing
+        // on its own.
         juranometria.ui.solar.SolarSystemSection solarSection =
                 new juranometria.ui.solar.SolarSystemSection(sunTable, moonTable,
                         juranometria.ui.solar.SunChartSession.switchOf(sunOnChart,
                                 sunChartStore),
                         juranometria.ui.solar.MoonChartSession.switchOf(sunOnChart,
                                 moonChartStore),
-                        companionWords);
+                        jupiterTable, companionWords);
         companion.addSection(juranometria.ui.solar.SolarSystemSection.ID,
                 companionWords.say("solarsystem.title"),
                 solarSection.inController(companionStore, companionWords), true);
@@ -540,6 +561,14 @@ public final class JUranometriaMain {
                 // View, Chart Toolbar (#450): the bar, shown or hidden,
                 // from the item or its keystroke.
                 () -> showToolbar(frame, toolbar, chart, !toolbar.isVisible())));
+        // View > Solar System > Jupiter... (#474), after Moon...: the
+        // dialog host of the same Jupiter session the Controller holds.
+        AppMenuBar.addJupiterTable(frame.getJMenuBar(),
+                juranometria.ui.language.InterfaceText.forLanguage(
+                        language.interfaceLanguage()),
+                () -> juranometria.ui.solar.JovianTableDialog.open(frame, jupiterTable,
+                        juranometria.ui.language.InterfaceText.forLanguage(
+                                language.interfaceLanguage())));
         // Both of these read the bar, so both come AFTER it is set.
         // They sat above the menu until the bar moved down to be
         // built in the session's language (#350), and reading a bar

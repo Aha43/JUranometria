@@ -7,6 +7,25 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Jupiter and the Galilean moons in the Controller (#474).** A Jupiter
+group under Solar System, after the Moon's and introduced collapsed,
+and *View > Solar System > Jupiter...* as its dialog host during
+dogfooding, both over one shared result. For the instant set in Place
+and Time: a Jupiter card - position, height, distance, apparent
+diameter at the equator and the poles, illuminated fraction, the
+north pole's position angle - and Io, Europa, Ganymede and Callisto
+in that order, each with its side of Jupiter, its east–west and
+north–south offsets, its separation in arcseconds and in Jupiter
+radii, and whether it is clear of Jupiter, in front of it, behind it
+or in its shadow. Over a range, each sampled instant as one group:
+Jupiter's position and figure, then its four moons, at most 250
+instants. Opening or expanding computes
+nothing; every value is the service's; English and Norwegian. Before
+2000 Jupiter answers and the moons' configuration is refused, naming
+its years; after the exact civil-time interval instants are marked
+estimated and the states are not offered as predicted event times.
+Nothing is drawn on the chart.
+
 **Jupiter and the Galilean moons computed (#473, the second of two
 changes).** A second ephemeris pack beside the Solar System pack, which
 stays byte for byte as released: two JUranometria-modified excerpts of

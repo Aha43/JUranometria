@@ -38,8 +38,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * group's Compute computes the Sun alone; a real press on its Show on
  * chart box ticks View's item and is remembered under the key it always
  * had; the window's own focus traversal reaches the group's controls;
- * and View holds the Solar System submenu with its five entries in the
- * ruled order.
+ * and View holds the Solar System submenu with its entries in the
+ * ruled order - Jupiter... last since #474, whose group follows the
+ * Moon's, introduced collapsed, and opened computes nothing.
  */
 class SolarSystemCompanionJourneyTest {
 
@@ -87,6 +88,22 @@ class SolarSystemCompanionJourneyTest {
                             "the Moon, opened, has computed nothing");
                     assertNull(find(content, "moonTable"));
 
+                    // Jupiter (#474): after the Moon, introduced collapsed;
+                    // opened, it has computed nothing.
+                    AbstractButton jupiterHeading = (AbstractButton) named(content,
+                            "heading.solarsystem.jupiter");
+                    assertFalse(jupiterHeading.isSelected(), "Jupiter introduced collapsed");
+                    reveal(jupiterHeading);
+                    ReaderInput.click(jupiterHeading);
+                    drain();
+                    assertTrue(jupiterHeading.isSelected(), "Jupiter opened");
+                    assertNull(find(content, "jupiterCard"),
+                            "Jupiter, opened, has computed nothing: no card");
+                    assertNull(find(content, "jupiterTable"), "and no moons");
+                    assertNotNull(find(content, "jupiterCompute"), "but its controls are there");
+                    assertNull(find(content, "jupiterOnChart"),
+                            "and no Show on chart: nothing Jovian is drawn");
+
                     // Show on chart, pressed for real: View's item follows,
                     // and the key is the one it always was.
                     JComponent sunBox = (JComponent) named(content, "sunOnChart");
@@ -110,7 +127,7 @@ class SolarSystemCompanionJourneyTest {
                         order.add(solar.getItem(i) == null ? "—" : solar.getItem(i).getText());
                     }
                     assertEquals(List.of("Sun on the chart", "Moon on the chart", "—",
-                            "Sun...", "Moon..."), order);
+                            "Sun...", "Moon...", "Jupiter..."), order);
 
                     // The window's own focus traversal reaches the group: the
                     // chosen view (its sibling is reached by the arrow keys,
@@ -121,6 +138,19 @@ class SolarSystemCompanionJourneyTest {
                             "From (UTC)", "To (UTC)", "Step between rows", "Compute the range",
                             "Read the observer and instant from Place and Time again",
                             "Sun on the chart");
+
+                    // Jupiter's group the same way, by its own spoken names;
+                    // then Compute, pressed for real: the card and the four
+                    // moons appear, and the table is reached too (#474).
+                    assertReachable(companion, content,
+                            "Show Jupiter and its moons at the instant set in Place and Time");
+                    reveal((JComponent) named(content, "jupiterCompute"));
+                    ReaderInput.click((JComponent) named(content, "jupiterCompute"));
+                    drain();
+                    assertNotNull(find(content, "jupiterCard"), "Jupiter's card, computed");
+                    assertEquals(4, ((javax.swing.JTable) named(content, "jupiterTable"))
+                            .getRowCount(), "and the four moons");
+                    assertReachable(companion, content, "The four Galilean moons");
                 })));
     }
 
