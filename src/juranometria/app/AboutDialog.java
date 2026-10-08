@@ -82,6 +82,8 @@ public final class AboutDialog extends JDialog {
                     "/resources/geo/constellations/LICENSE-BSD-3-Clause.txt"),
             new Notice("solarsystem",
                     "/resources/solar-system/NOTICE-solar-system.md"),
+            new Notice("joviansystem",
+                    "/resources/jovian-system/NOTICE-jovian-system.md"),
             new Notice("tabler", "/resources/icons/LICENSE"));
 
     private final juranometria.ui.language.AboutText said;

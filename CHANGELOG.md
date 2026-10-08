@@ -7,6 +7,26 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Jupiter and the Galilean moons computed (#473, the second of two
+changes).** A second ephemeris pack beside the Solar System pack, which
+stays byte for byte as released: two JUranometria-modified excerpts of
+NASA/JPL's JUP365 - Jupiter with DE440's barycentre over 1900–2100, Io,
+Europa, Ganymede and Callisto over 2000–2100 - one manifest carrying the
+IAU 2015 radii and pole verbatim from NAIF's planetary-constants kernel,
+every excerpt proved identical to its source. A Jovian service computes
+Jupiter as the Sun and the Moon are computed, with the Sun's
+gravitational deflection in the apparent place, its two diameters, pole
+angle, sub-observer latitude and phase; and for each moon the
+plane-of-sky offset in Horizons' own apparent-of-date definition, the
+separation in arcseconds and Jupiter radii, the position angle, the
+depth, the disc relation against the oblate figure, the shadow relation
+against the umbra and the composed state in the ruled precedence.
+Measured against JPL Horizons on 29 000 moon rows and 12 500 Jupiter
+rows and held by tests to the targets ruled on #472 as amended on
+#473; the 11 December 2026 triple transit reads as published, to the
+minute. Nothing is shown yet: no table, Controller group, menu item or
+chart mark - those are #474's.
+
 **Epoch-aware SPK selection (#473, the first of two changes).** The
 SPK reader and excerpt writer select a segment by centre, target and
 the epoch it covers: JUP365, the Galilean ephemeris chosen in #472,

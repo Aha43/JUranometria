@@ -36,6 +36,7 @@ $name/licenses/LICENSE-CC-BY-SA-4.0.txt
 $name/licenses/LICENSE-JSVG-MIT.txt
 $name/licenses/LICENSE-Tabler-MIT.txt
 $name/licenses/NOTICE-constellations.md
+$name/licenses/NOTICE-jovian-system.md
 $name/licenses/NOTICE-openngc.md
 $name/licenses/NOTICE-runtime-libraries.md
 $name/licenses/NOTICE-solar-system.md

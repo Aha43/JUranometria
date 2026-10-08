@@ -111,6 +111,48 @@ class BundledNoticesTest {
     }
 
     @Test
+    void theJovianSystemPackShipsWithItsNoticeAndProvenance() {
+        String notice = resourceText(
+                "/resources/jovian-system/NOTICE-jovian-system.md");
+        assertTrue(notice.contains("modified kernels"),
+                "the excerpts are called what NAIF's rules call them");
+        assertTrue(notice.contains("not original JPL files"),
+                "and never presented as JPL's own");
+        assertTrue(notice.contains("NAIF") && notice.contains("JUP365")
+                && notice.contains("DE440"));
+        assertTrue(notice.contains("Jacobson") && notice.contains("doi:10.3847/1538-3881/abd414"),
+                "the ephemeris authors are acknowledged");
+        assertTrue(notice.contains("pck00011.tpc") && notice.contains("not redistributed"),
+                "the constants' source is named and the file is not shipped");
+        assertTrue(notice.contains("IMCCE") && notice.contains("no dependency on IMCCE"),
+                "nothing of IMCCE's, stated");
+        assertTrue(notice.contains("One pack, two kernel files"),
+                "the split is explained: Jupiter 1900-2100, the moons 2000-2100");
+        assertTrue(notice.contains("does not change"),
+                "the Solar System pack beside it is untouched");
+        String provenance = resourceText("/resources/jovian-system/PROVENANCE.md");
+        for (String required : new String[] {"naif.jpl.nasa.gov", "SHA-256", "SpkExcerpt",
+                "Validation", "identical to the source", "identical to the released de440s.bsp",
+                "untouched", "pck00011.tpc"}) {
+            assertTrue(provenance.contains(required),
+                    "the provenance records " + required);
+        }
+    }
+
+    @Test
+    void everyJovianSystemResourceShipsOnTheClasspath() {
+        for (String resource : new String[] {
+                "manifest.properties",
+                "juranometria-jup365-jupiter-1900-2100.bsp",
+                "juranometria-jup365-galilean-2000-2100.bsp",
+                "NOTICE-jovian-system.md", "PROVENANCE.md"}) {
+            assertNotNull(BundledNoticesTest.class.getResource(
+                            "/resources/jovian-system/" + resource),
+                    resource + " must ship as a resource");
+        }
+    }
+
+    @Test
     void everySolarSystemResourceShipsOnTheClasspath() {
         for (String resource : new String[] {
                 "manifest.properties",

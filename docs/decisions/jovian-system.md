@@ -280,8 +280,11 @@ What the numbers are:
   definition Horizons states, the study's geometry agrees with
   Horizons' code on **91 971 of 91 972 rows** - the one disagreement
   a grazing Europa occultation (2026-12-06 17:00 at Oslo, separation
-  20.37″ against a limb sum of 20.69″, where the two implementations'
-  light-time treatments differ by a few hundredths of an arcsecond) -
+  20.3635″ against a limb sum of 20.3640″ - corrected on #473 from the
+  study's 20.37″ against 20.69″: Horizons' own row gives Jupiter's
+  diameter 39.85758″ and the separation 20.3635″, the service the same,
+  so the margin is half a milliarcsecond, where the two
+  implementations' light-time treatments differ) -
   and on the named evening every ingress and egress minute of every
   moon, geocentric and at Oslo, is Horizons' minute.
   With the **oblate apparent figure and the PCK pole** in place of
@@ -308,7 +311,7 @@ time-scale divergence, as the Sun's and the Moon's were):
 | X, Y, separation (apparent basis) | ≤ 0.05″ | ≤ 0.2″ |
 | position angle | ≤ 0.05° | ≤ 0.1° |
 | illuminated fraction | ≤ 0.01 point | ≤ 0.03 point |
-| visibility state against Horizons' code, equatorial-sphere definition | **an exact named allowlist**: the grazing Europa occultation at Oslo, 2026-12-06 17:00 (separation 20.37″ against a limb sum of 20.69″; the two implementations' light-time treatments differ by hundredths of an arcsecond at the graze) - any other disagreement is a new finding and stops the run | the same |
+| visibility state against Horizons' code, equatorial-sphere definition | **an exact named allowlist**: the grazing Europa occultation at Oslo, 2026-12-06 17:00 (separation 20.3635″ against a limb sum of 20.3640″, as corrected on #473; the two implementations' light-time treatments differ at the graze) - any other disagreement is a new finding and stops the run | measured output, not asserted (amended on #473: the two ΔT predictions name different instants) |
 | ingress and egress minutes on the named evening | Horizons' minute ± 1 (the figure's cost), IMCCE's centre-crossing minute inside the limb-to-limb interval; the production oblate-limb states compared separately from Horizons' spherical definition, every deliberate boundary difference named, never counted as an unexplained mismatch | — |
 
 Each number bounds a measured, explained cause and sits beside the
@@ -587,3 +590,98 @@ Ruling 4, built before any Jovian resource or service behaviour, on
   (`SpkAssembly`, test-only).
 - **Route:** wide, by the classifier - the reader and writer are
   chart-reached through the Solar System service.
+
+## #473, the second change: the pack and the computation, as built
+
+Built on `main` at `f49dc2ff` (the first change merged), measured on
+2026-10-08 and returned before any widening; the owner's amendments
+of 2026-10-08, recorded as given, and the record as built:
+
+**The pack** (`src/resources/jovian-system/`, `JovianPackMain`,
+`make import-jovian-system`): one logical, versioned pack of two
+kernel files behind one manifest and one validation boundary -
+`juranometria-jup365-jupiter-1900-2100.bsp` (0 → 5 and both of
+Jupiter's 5 → 599 segments, 13 550 592 bytes) and
+`juranometria-jup365-galilean-2000-2100.bsp` (5 → 501 … 504, the
+later segments, 39 294 976 bytes) - with the released 31-day margins.
+Two files because the ruled intervals differ (Jupiter 1900–2100, the
+moons 2000–2100; the Galilean excerpt over 1900–2100 would be 91 MB);
+the notice says so. The builder proves every excerpt identical to its
+source (86 370 and 86 800 states), the barycentre identical to the
+released `de440s.bsp` (43 222 states: NAIF merged DE440's own
+segment), and the released Solar System kernel untouched (sha256
+`63fbf570…`) before writing; the PCK's radii and pole are copied
+verbatim into the manifest, the PCK itself not redistributed.
+
+**The service** (`JovianSystemService`): Jupiter as the Sun and the
+Moon are computed, plus the Sun's gravitational deflection in the
+apparent place only (the NOVAS one-body formula as Skyfield 1.55
+writes it, the Sun where it was when the ray passed closest); the
+equatorial and polar diameters by asin; the pole position angle from
+true-of-date north and the sub-observer latitude; the phase angle and
+illuminated fraction as the Moon's. Each moon: X and Y as ruled,
+separation on the same apparent basis (the targets table's "apparent
+basis"; from the light-time-corrected directions the difference from
+Horizons was 0.062″ at Jupiter's conjunction, from the apparent places
+0.0004″), the position angle from X and Y, depth, the disc relation on
+the oblate figure, the sphere's beside it for the comparison, the
+shadow relation at the moon's emission instant with the up-leg light
+time, the composed state. Pure ephemeris-time entry for the geometry
+tests.
+
+**Measured against Horizons** (`docs/studies/jovian-system/service-accuracy.md`,
+`JovianReferenceVectorTest`), through the exact civil-time interval:
+astrometric 0.011″; apparent with deflection 0.134″ (0.095″ before
+1962); X, Y and separation 0.0007″; position angle 0.036°; diameters
+0.0000″; illuminated 0.00001; pole angle 0.002°; distance 0.22 km from
+1972, 4.95 km in 1962–71; the state on the sphere's definition agreeing
+on every row but the allowlisted graze; the named evening's minutes
+Horizons' on the sphere, within one minute on the figure (Europa's
+ingress 21:53, Callisto's ingress 18:09 and egress 22:57); IMCCE's centre-crossing
+minutes inside the limb-to-limb intervals. **Exceeded and amended by
+ruling**, each the atlas's own frozen civil-time model: horizontal
+11.85″ (Place and Time's UT1 = UTC beside leap seconds; the released
+Moon shows 11.58″ on the same 1994 date) → **≤ 20″** as the Sun's and
+the Moon's; distance in 1900–1961 32.6 km (the ΔT model about 1.2 s
+from the record at 28 km/s of range rate) → **≤ 40 km**; after the
+exact interval, where the two ΔT predictions name instants up to 133 s
+apart: astrometric 1.7″ and apparent 1.8″ → **≤ 3″**, X, Y and
+separation 0.71″ → **≤ 1″**, distance 5 522 km → **≤ 7 000 km**, the
+states **measured output, not assertions** (17 further rows from 2041
+on), the position angle **printed and classified by conditioning** -
+ill-conditioned where the authoritative X/Y residual could turn it by
+more than 0.05° at the row's separation, no cutoff - with the 36.6°
+residual at a 0.5″ separation not a physical disagreement. The pole
+position angle, a quantity without a ruled target, **≤ 0.01°**
+(measured 0.002°). The flat position angle from X and Y against
+Horizons' spherical one differs by second order in the separation
+(0.036° at ten arcminutes), inside the ruled 0.05°, and the definition
+stands.
+
+**Presentation** (ruling 8): quantities after the exact civil-time
+interval inherit the Sun's and the Moon's estimate qualification
+(`timeConfidence` on every observation); the state labels there are
+geometry at an estimated instant, never a prediction with exact event
+timing - a rule for #474's table.
+
+**A correction found by the geometry test.** The study's oblate disc
+test (and the first port of it) took the moon's lateral offset in
+kilometres and compared it with Jupiter's limb at Jupiter's distance;
+a moon nearer or farther than Jupiter subtends that offset at its own
+distance, so the offset was misplaced by the ratio of the two
+distances - up to 0.02″ at a graze, enough to put a transiting moon
+on the figure where the sphere had it clear. The test is now made in
+angles throughout. The study's oblate minutes
+(`contract/december-2026-transitions-oblate.md`) carried the shortcut;
+the service's, above, do not.
+
+**Full-range geometry** (`JovianGeometryTest`): every four hours over
+2000–2100 at fixed ephemeris time, in front is nearer and sunlit,
+behind and shadowed are farther, every overlap lies within the limb
+sums, the figure only ever frees a limb the sphere holds and only at a
+graze, every composed state occurs for Io, Europa and Ganymede; and
+Jupiter's figure and phase stay within what the geometry allows over
+1900–2100. Boundaries (`JovianBoundaryTest`): the intervals inclusive
+of their ends, Jupiter answering where the moons refuse, a missing
+pack refusing the service and leaving the Sun and the Moon as
+released.
