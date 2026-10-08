@@ -378,7 +378,7 @@ Text cannot decide whether a read runs on the event thread — that
 is control flow, and #220 proved the cost of guessing, three times
 (the journey's mark derivation, its page offset, and finally its
 own premise capture). The measurements count the traffic: **456
-reads of live chart state** against **937 explicit hand-offs**
+reads of live chart state** against **938 explicit hand-offs**
 suite-wide (requoted for the #261 reader-surface tests, which read
 scenes and marks under the same one-hand-off discipline; for #275's
 closing journey, which reads the page's own objects and takes its
@@ -436,7 +436,9 @@ Defaults question on the event thread, and for the companion window
 test that lays Chart Options out beside Place and Time and reads every
 control's drawn size on the event thread; and for #458's Solar System
 journey, which shows the Controller, expands its Solar System section
-and reads what each press computed on the event thread). The discipline
+and reads what each press computed on the event thread; and for #474's
+Jupiter table test, which builds both hosts of one session and reads
+what each shows on the event thread). The discipline
 that closed #220 — derive, read and act
 in **one** `invokeAndWait`, with the deterministic queued-change
 race tests holding it — is the named pattern; its mutations already

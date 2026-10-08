@@ -451,6 +451,7 @@ public final class PackagedAcceptanceMain {
         chartControlsJourney();
         cleanChartJourney();
         solarSystemControlsJourney();
+        jupiterTableJourney();
 
         System.out.println("PACKAGED ACCEPTANCE OK");
     }
@@ -1166,6 +1167,137 @@ public final class PackagedAcceptanceMain {
      * saved visibility keys survive the menu move; View > Solar System
      * holds its five entries in the ruled order.
      */
+    /**
+     * Jupiter and the four Galilean moons in the packaged image (issue
+     * #474): the Controller's Jupiter group and the Jupiter dialog over
+     * one session, building and opening computing nothing; an instant
+     * applied from the Controller shown by both; the named triple
+     * transit of 2026-12-11 22:45 UTC reading as ruled, in English and
+     * Norwegian; a range grouped by instant with the dialog's unfinished
+     * text untouched; Jupiter answering before 2000 while the moons
+     * refuse; and View > Solar System ending in Jupiter....
+     */
+    private static void jupiterTableJourney() throws Exception {
+        Preferences scratch = Preferences.userRoot()
+                .node("juranometria-packaged-jupiter-" + System.nanoTime());
+        try {
+            juranometria.ui.language.InterfaceText en =
+                    juranometria.ui.language.InterfaceText.forLanguage("en");
+            juranometria.ui.language.InterfaceText nb =
+                    juranometria.ui.language.InterfaceText.forLanguage("nb-NO");
+            juranometria.sky.Observer[] at = {new juranometria.sky.Observer(59.91, 10.75,
+                    java.time.Instant.parse("2026-12-11T22:45:00Z"))};
+            juranometria.solar.JovianSystemService jovian =
+                    juranometria.solar.JovianSystemService.load();
+            juranometria.ui.solar.JovianTableSession jupiter =
+                    new juranometria.ui.solar.JovianTableSession(() -> at[0], () -> jovian);
+            juranometria.solar.SolarSystemService solar =
+                    juranometria.solar.SolarSystemService.load();
+            juranometria.ui.solar.SolarTableSession sun =
+                    new juranometria.ui.solar.SolarTableSession(() -> at[0], solar,
+                            juranometria.ui.solar.SolarTable.sun());
+            juranometria.ui.solar.SolarTableSession moon =
+                    new juranometria.ui.solar.SolarTableSession(() -> at[0], solar,
+                            juranometria.ui.solar.SolarTable.moon());
+            juranometria.solarchart.SolarSystemModule module =
+                    new juranometria.solarchart.SolarSystemModule(() -> at[0],
+                            () -> solar, () -> true);
+            juranometria.ui.solar.SolarSystemSection[] section =
+                    new juranometria.ui.solar.SolarSystemSection[1];
+            juranometria.ui.solar.JovianTableDialog.Content[] dialog =
+                    new juranometria.ui.solar.JovianTableDialog.Content[1];
+            juranometria.ui.solar.JovianTableDialog.Content[] norsk =
+                    new juranometria.ui.solar.JovianTableDialog.Content[1];
+            javax.swing.JMenuBar[] bar = new javax.swing.JMenuBar[1];
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                section[0] = new juranometria.ui.solar.SolarSystemSection(sun, moon,
+                        juranometria.ui.solar.SunChartSession.switchOf(module,
+                                juranometria.ui.solar.SunChartStore.forNode(scratch)),
+                        juranometria.ui.solar.MoonChartSession.switchOf(module,
+                                juranometria.ui.solar.MoonChartStore.forNode(scratch)),
+                        jupiter, en);
+                section[0].inController(
+                        juranometria.ui.companion.CompanionStore.forNode(scratch), en);
+                dialog[0] = juranometria.ui.solar.JovianTableDialog.content(jupiter, en);
+                norsk[0] = juranometria.ui.solar.JovianTableDialog.content(jupiter, nb);
+            });
+            require(jupiter.computations() == 0,
+                    "building the Jupiter group and opening the dialog compute nothing");
+
+            javax.swing.SwingUtilities.invokeAndWait(() -> section[0].jupiter().update.doClick());
+            juranometria.ui.solar.JovianTableControls group = section[0].jupiter();
+            juranometria.ui.solar.JovianTableControls shown = dialog[0].controls();
+            require(jupiter.computations() == 1 && group.shown() == shown.shown()
+                            && shown.model.getRowCount() == 4,
+                    "one Update in the Controller is the dialog's result too");
+            java.util.List<String> states = new java.util.ArrayList<>();
+            java.util.List<String> tilstand = new java.util.ArrayList<>();
+            for (int row = 0; row < 4; row++) {
+                states.add((String) shown.model.getValueAt(row, 6));
+                tilstand.add((String) norsk[0].controls().model.getValueAt(row, 6));
+            }
+            require(states.equals(java.util.List.of("in front of Jupiter", "in front of Jupiter",
+                            "clear of Jupiter", "in front of Jupiter")),
+                    "the triple transit at 22:45 UTC reads Io, Europa and Callisto in front,"
+                            + " Ganymede clear: " + states);
+            require(tilstand.equals(java.util.List.of("foran Jupiter", "foran Jupiter",
+                            "klar av Jupiter", "foran Jupiter"))
+                            && "Ganymedes".equals(norsk[0].controls().model.getValueAt(2, 0)),
+                    "and in Norwegian: " + tilstand);
+            require(shown.cardTitle.getText().equals("Jupiter · 2026-12-11 22:45:00 UTC"),
+                    "the Jupiter card names its instant: " + shown.cardTitle.getText());
+
+            // A range applied in the dialog, with unfinished text in the Controller.
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                group.start.setText("2026-12-11 22:3");
+                shown.rangeView.setSelected(true);
+                shown.start.setText("2026-12-11 22:30");
+                shown.end.setText("2026-12-11 23:00");
+                shown.step.setSelectedIndex(0);
+                shown.apply();
+            });
+            require(group.model.getRowCount() == 10 && group.model.moonRows() == 8
+                            && "2026-12-11 22:3".equals(group.start.getText()),
+                    "a range from the dialog is the Controller's, grouped by instant,"
+                            + " its unfinished text untouched");
+
+            // Before 2000 Jupiter answers and the moons refuse, naming their years.
+            at[0] = new juranometria.sky.Observer(59.91, 10.75,
+                    java.time.Instant.parse("1950-06-01T00:00:00Z"));
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                group.instantView.setSelected(true);
+                group.apply();
+            });
+            require(group.cardTitle.getText().startsWith("Jupiter · 1950-06-01")
+                            && group.model.getRowCount() == 0
+                            && group.status().contains("2000-01-01"),
+                    "Jupiter answers in 1950, the moons refuse: " + group.status());
+
+            // View > Solar System, ending in Jupiter....
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                bar[0] = AppMenuBar.create(new ChartViewController(), () -> { },
+                        () -> { }, () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
+                        () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
+                        () -> { }, () -> { }, en);
+                AppMenuBar.addJupiterTable(bar[0], en, () -> { });
+            });
+            javax.swing.JMenu solarMenu = AppMenuBar.solarSystemMenu(bar[0]);
+            javax.swing.JMenuItem last = solarMenu.getItem(solarMenu.getItemCount() - 1);
+            require(last != null && en.say("menu.jupiter.label").equals(last.getText())
+                            && en.say("menu.moon.label").equals(
+                                    solarMenu.getItem(solarMenu.getItemCount() - 2).getText()),
+                    "View > Solar System ends Moon..., Jupiter...");
+            section[0].release();
+        } finally {
+            scratch.removeNode();
+        }
+        System.out.println("jupiter table OK (one session in two hosts, building and opening"
+                + " compute nothing; the 2026-12-11 22:45 UTC triple transit reads Io, Europa"
+                + " and Callisto in front and Ganymede clear in English and Norwegian; a range"
+                + " grouped by instant, unfinished text untouched; Jupiter before 2000 with the"
+                + " moons refused; View > Solar System ends in Jupiter...)");
+    }
+
     private static void solarSystemControlsJourney() throws Exception {
         Preferences scratch = Preferences.userRoot()
                 .node("juranometria-packaged-solar-controls-" + System.nanoTime());

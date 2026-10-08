@@ -872,4 +872,28 @@ public final class AppMenuBar {
     public static int menuShortcutMask() {
         return juranometria.ui.Shortcuts.menuMask();
     }
+
+    /**
+     * Adds View > Solar System > Jupiter... after Moon... (#474): the
+     * Jupiter table's dialog, kept beside the Controller's Jupiter group
+     * during dogfooding as the Sun's and the Moon's are. Does nothing on
+     * a bar without the Solar System submenu.
+     */
+    public static void addJupiterTable(javax.swing.JMenuBar bar,
+                                       juranometria.ui.language.InterfaceText said,
+                                       Runnable openJupiterTable) {
+        JMenu solar = solarSystemMenu(bar);
+        if (solar == null || openJupiterTable == null) {
+            return;
+        }
+        JMenuItem jupiter = new JMenuItem(said.say("menu.jupiter.label"));
+        jupiter.setName("jupiterTableItem");
+        juranometria.ui.language.MnemonicText.in(said).apply(jupiter,
+                "menu.jupiter.mnemonic");
+        jupiter.getAccessibleContext().setAccessibleName(said.say("menu.jupiter.a11y"));
+        juranometria.ui.Explain.control(jupiter, said.say("menu.jupiter.hover"),
+                said.say("menu.jupiter.explain"));
+        jupiter.addActionListener(event -> openJupiterTable.run());
+        solar.add(jupiter);
+    }
 }

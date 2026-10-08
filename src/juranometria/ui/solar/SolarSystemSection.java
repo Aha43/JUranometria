@@ -15,7 +15,10 @@ import juranometria.ui.language.InterfaceText;
  * each holding one {@link SolarTableControls} in the Controller's
  * arrangement over its body's shared session and chart switch. The
  * section itself is introduced collapsed; the host adds it with that
- * default.
+ * default. Since #474 a third group, Jupiter, follows the Moon,
+ * introduced collapsed, holding one {@link JovianTableControls} over
+ * Jupiter's shared session - and no Show on chart box, because nothing
+ * Jovian is drawn.
  *
  * <p>Building the section computes nothing: each set of controls
  * reads the observer for its note and seeds, and shows whatever its
@@ -30,10 +33,19 @@ public final class SolarSystemSection {
 
     private final SolarTableControls sun;
     private final SolarTableControls moon;
+    /** Jupiter's controls, or null for a host built without Jupiter. */
+    private final JovianTableControls jupiter;
 
     public SolarSystemSection(SolarTableSession sunSession, SolarTableSession moonSession,
                               BodyOnChart sunOnChart, BodyOnChart moonOnChart,
                               InterfaceText said) {
+        this(sunSession, moonSession, sunOnChart, moonOnChart, null, said);
+    }
+
+    /** With Jupiter's group after the Moon's (#474); a null session leaves it out. */
+    public SolarSystemSection(SolarTableSession sunSession, SolarTableSession moonSession,
+                              BodyOnChart sunOnChart, BodyOnChart moonOnChart,
+                              JovianTableSession jupiterSession, InterfaceText said) {
         if (sunSession.table().body() != juranometria.solar.SolarSystemService.Body.SUN
                 || moonSession.table().body()
                         != juranometria.solar.SolarSystemService.Body.MOON) {
@@ -41,6 +53,13 @@ public final class SolarSystemSection {
         }
         sun = new SolarTableControls(sunSession, said, sunOnChart, false);
         moon = new SolarTableControls(moonSession, said, moonOnChart, false);
+        jupiter = jupiterSession == null ? null
+                : new JovianTableControls(jupiterSession, said, false);
+    }
+
+    /** Jupiter's controls, or null for a host built without Jupiter. */
+    public JovianTableControls jupiter() {
+        return jupiter;
     }
 
     /** The Sun's controls, for a host that checks what it shares. */
@@ -61,6 +80,11 @@ public final class SolarSystemSection {
                 said.say("solarsystem.sun"), sun.inController(), said, store, false));
         groups.add(CompanionSection.remembered(ID + ".moon",
                 said.say("solarsystem.moon"), moon.inController(), said, store, true));
+        if (jupiter != null) {
+            groups.add(CompanionSection.remembered(ID + ".jupiter",
+                    said.say("solarsystem.jupiter"), jupiter.inController(), said, store,
+                    true));
+        }
         return groups;
     }
 
@@ -68,5 +92,8 @@ public final class SolarSystemSection {
     public void release() {
         sun.release();
         moon.release();
+        if (jupiter != null) {
+            jupiter.release();
+        }
     }
 }
