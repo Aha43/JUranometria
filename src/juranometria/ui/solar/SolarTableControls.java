@@ -34,7 +34,8 @@ import juranometria.ui.language.MnemonicText;
  * #458, ruled on #457): the observer note, the two views, the range's
  * start, end and step, Compute, the status line, the table, and - when
  * a host has a chart switch to offer - the body's <em>Show on
- * chart</em> box. The Sun and Moon dialogs each hold one set in their
+ * chart</em> box, and - when a host has the application's action -
+ * <em>Centre on chart</em> (#483). The Sun and Moon dialogs each hold one set in their
  * own layout; the JUranometria Controller holds one set per body in
  * its narrow arrangement. Neither host copies the other.
  *
@@ -77,6 +78,8 @@ public final class SolarTableControls {
     public final JLabel status = new JLabel(" ");
     /** The body's Show on chart box, or null for a host without a switch. */
     public final JCheckBox onChart;
+    /** Centre on chart (#483), or null for a host built without the action. */
+    public final JButton centreOnChart;
     private final SolarTableSession.Subscription following;
     private SolarTableSession.Result shown;
     private JPanel resultHolder;
@@ -90,6 +93,20 @@ public final class SolarTableControls {
      */
     public SolarTableControls(SolarTableSession session, InterfaceText language,
                               BodyOnChart onChart, boolean letters) {
+        this(session, language, onChart, letters, null, null);
+    }
+
+    /**
+     * With Centre on chart (#483): the application's one action, and the
+     * body's chart layer it turns on - the same switch whichever host
+     * presses it, whether or not this host shows a Show on chart box.
+     *
+     * @param centre the shared action, or null for no button
+     * @param layer  the body's chart layer, required with an action
+     */
+    public SolarTableControls(SolarTableSession session, InterfaceText language,
+                              BodyOnChart onChart, boolean letters,
+                              CentreOnChart centre, BodyOnChart layer) {
         if (session == null || language == null) {
             throw new IllegalArgumentException(
                     "the controls follow a session, in a language");
@@ -198,7 +215,55 @@ public final class SolarTableControls {
         start.addActionListener(e -> apply());
         end.addActionListener(e -> apply());
 
+        if (centre != null) {
+            if (layer == null) {
+                throw new IllegalArgumentException("Centre on chart turns a layer on");
+            }
+            centreOnChart = centre.button(target(layer), said, names + "CentreOnChart", access);
+        } else {
+            centreOnChart = null;
+        }
+
         following = session.onChange(this::show);
+    }
+
+    /**
+     * This host's body for Centre on chart: its typed draft applied to
+     * the shared session, and the J2000 place of the first row the
+     * session answered - the instant, or a range's first instant - or
+     * null when the session refused.
+     */
+    public CentreOnChart.Target target(BodyOnChart layer) {
+        CentreOnChart.Body which = body.body() == juranometria.solar.SolarSystemService.Body.SUN
+                ? CentreOnChart.Body.SUN : CentreOnChart.Body.MOON;
+        return new CentreOnChart.Target() {
+            @Override
+            public CentreOnChart.Body body() {
+                return which;
+            }
+
+            @Override
+            public juranometria.chart.SkyPosition applyTypedAndLocate() {
+                apply();
+                SolarTableSession.Result result = session.result();
+                boolean answered = result.outcome() == SolarTableSession.Outcome.ROWS
+                        || result.outcome() == SolarTableSession.Outcome.APPENDED;
+                if (!answered || result.rows().isEmpty()) {
+                    return null;
+                }
+                return switch (result.rows().get(0).observation()) {
+                    case juranometria.solar.SolarSystemService.SunObservation sun ->
+                            sun.astrometricJ2000();
+                    case juranometria.solar.SolarSystemService.MoonObservation moon ->
+                            moon.astrometricJ2000();
+                };
+            }
+
+            @Override
+            public BodyOnChart layer() {
+                return layer;
+            }
+        };
     }
 
     /** This host's draft, as a query. */
@@ -351,6 +416,10 @@ public final class SolarTableControls {
         column.add(Box.createVerticalStrut(6));
         if (onChart != null) {
             column.add(leading(onChart));
+            column.add(Box.createVerticalStrut(4));
+        }
+        if (centreOnChart != null) {
+            column.add(leading(centreOnChart));
             column.add(Box.createVerticalStrut(4));
         }
         column.add(leading(update));

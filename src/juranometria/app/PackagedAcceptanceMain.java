@@ -452,6 +452,7 @@ public final class PackagedAcceptanceMain {
         cleanChartJourney();
         solarSystemControlsJourney();
         jupiterTableJourney();
+        centreOnChartJourney();
 
         System.out.println("PACKAGED ACCEPTANCE OK");
     }
@@ -1167,6 +1168,158 @@ public final class PackagedAcceptanceMain {
      * saved visibility keys survive the menu move; View > Solar System
      * holds its five entries in the ruled order.
      */
+    /**
+     * Centre on chart in the packaged image (issue #483): one action for
+     * the Sun and the Moon from the Controller's group and the dialog,
+     * over the real chart controller and the Solar System module - the
+     * typed query computed first, the layer switched on through the
+     * module, the chart centred on the table's J2000 place at the normal
+     * minimum field, the chart window brought forward - and Jupiter's
+     * seam with no button.
+     */
+    private static void centreOnChartJourney() throws Exception {
+        Preferences scratch = Preferences.userRoot()
+                .node("juranometria-packaged-centre-" + System.nanoTime());
+        try {
+            juranometria.ui.language.InterfaceText en =
+                    juranometria.ui.language.InterfaceText.forLanguage("en");
+            juranometria.ui.language.InterfaceText nb =
+                    juranometria.ui.language.InterfaceText.forLanguage("nb-NO");
+            juranometria.sky.Observer[] at = {new juranometria.sky.Observer(59.91, 10.75,
+                    java.time.Instant.parse("2026-06-21T10:00:00Z"))};
+            juranometria.solar.SolarSystemService solar =
+                    juranometria.solar.SolarSystemService.load();
+            juranometria.ui.solar.SolarTableSession sun =
+                    new juranometria.ui.solar.SolarTableSession(() -> at[0], solar,
+                            juranometria.ui.solar.SolarTable.sun());
+            juranometria.ui.solar.SolarTableSession moon =
+                    new juranometria.ui.solar.SolarTableSession(() -> at[0], solar,
+                            juranometria.ui.solar.SolarTable.moon());
+            juranometria.solarchart.SolarSystemModule module =
+                    new juranometria.solarchart.SolarSystemModule(() -> at[0],
+                            () -> solar, () -> true);
+            juranometria.ui.solar.BodyOnChart sunLayer =
+                    juranometria.ui.solar.SunChartSession.switchOf(module,
+                            juranometria.ui.solar.SunChartStore.forNode(scratch));
+            juranometria.ui.solar.BodyOnChart moonLayer =
+                    juranometria.ui.solar.MoonChartSession.switchOf(module,
+                            juranometria.ui.solar.MoonChartStore.forNode(scratch));
+            ChartViewController navigation = new ChartViewController();
+            int[] forward = {0};
+            juranometria.ui.solar.CentreOnChart action =
+                    new juranometria.ui.solar.CentreOnChart(
+                            new juranometria.ui.solar.CentreOnChart.Chart() {
+                                @Override
+                                public void centre(juranometria.chart.SkyPosition j2000,
+                                                   double fieldWidthDegrees) {
+                                    navigation.recenter(j2000, fieldWidthDegrees);
+                                }
+
+                                @Override
+                                public void bringForward() {
+                                    forward[0]++;
+                                }
+
+                                @Override
+                                public double normalMinimumFieldDegrees() {
+                                    return juranometria.chart.ChartViewState
+                                            .normalMinimumFieldDegrees();
+                                }
+                            });
+            juranometria.ui.solar.SolarSystemSection[] section =
+                    new juranometria.ui.solar.SolarSystemSection[1];
+            juranometria.ui.solar.SolarTableDialog.Content[] moonDialog =
+                    new juranometria.ui.solar.SolarTableDialog.Content[1];
+            juranometria.ui.solar.SolarTableDialog.Content[] sunDialog =
+                    new juranometria.ui.solar.SolarTableDialog.Content[1];
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                section[0] = new juranometria.ui.solar.SolarSystemSection(sun, moon,
+                        sunLayer, moonLayer, null, action, en);
+                section[0].inController(
+                        juranometria.ui.companion.CompanionStore.forNode(scratch), en);
+                moonDialog[0] = juranometria.ui.solar.SolarTableDialog.content(moon, nb,
+                        action, moonLayer);
+                sunDialog[0] = juranometria.ui.solar.SolarTableDialog.content(sun, en,
+                        action, sunLayer);
+            });
+            require(!module.moonShowing() && !module.sunShowing(), "both layers start off");
+
+            // The Moon from the dialog, its layer off, a typed range not yet applied.
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                juranometria.ui.solar.SolarTableControls d = moonDialog[0].controls();
+                d.rangeView.setSelected(true);
+                d.start.setText("2026-06-22 21:00");
+                d.end.setText("2026-06-23 03:00");
+                d.step.setSelectedIndex(0);
+                d.centreOnChart.doClick();
+            });
+            juranometria.solar.SolarSystemService.MoonObservation first =
+                    (juranometria.solar.SolarSystemService.MoonObservation)
+                            moon.result().rows().get(0).observation();
+            require(module.moonShowing(), "Centre on chart turned the Moon's layer on");
+            require(navigation.state().centre().equals(first.astrometricJ2000())
+                            && navigation.state().fieldWidthDegrees() == 1.0
+                            && java.time.Instant.parse("2026-06-22T21:00:00Z")
+                                    .equals(first.instant()),
+                    "the chart is on the typed range's first Moon, at 1°: "
+                            + navigation.state());
+            require(section[0].moon().model.getRowCount() == moon.result().rows().size(),
+                    "and the Controller's group shows what the dialog computed");
+
+            // The Moon again from the Controller, its layer already on, after the
+            // chart was taken elsewhere.
+            navigation.recenter(new juranometria.chart.SkyPosition(83.8, -5.4), 24.0);
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                section[0].moon().instantView.setSelected(true);
+                section[0].moon().centreOnChart.doClick();
+            });
+            juranometria.solar.SolarSystemService.MoonObservation now =
+                    (juranometria.solar.SolarSystemService.MoonObservation)
+                            moon.result().rows().get(0).observation();
+            require(module.moonShowing()
+                            && navigation.state().centre().equals(now.astrometricJ2000())
+                            && navigation.state().fieldWidthDegrees() == 1.0,
+                    "found again from the Controller, the layer still on");
+
+            // The Sun from both hosts.
+            navigation.recenter(new juranometria.chart.SkyPosition(37.95, 89.26), 36.0);
+            javax.swing.SwingUtilities.invokeAndWait(() ->
+                    section[0].sun().centreOnChart.doClick());
+            juranometria.solar.SolarSystemService.SunObservation sunNow =
+                    (juranometria.solar.SolarSystemService.SunObservation)
+                            sun.result().rows().get(0).observation();
+            require(module.sunShowing()
+                            && navigation.state().centre().equals(sunNow.astrometricJ2000())
+                            && navigation.state().fieldWidthDegrees() == 1.0,
+                    "the Sun from the Controller, its layer turned on");
+            navigation.recenter(new juranometria.chart.SkyPosition(279.2, 38.8), 12.0);
+            javax.swing.SwingUtilities.invokeAndWait(() ->
+                    sunDialog[0].controls().centreOnChart.doClick());
+            require(navigation.state().centre().equals(sunNow.astrometricJ2000())
+                            && navigation.state().fieldWidthDegrees() == 1.0,
+                    "and from the dialog");
+            require(action.presses(juranometria.ui.solar.CentreOnChart.Body.MOON) == 2
+                            && action.presses(juranometria.ui.solar.CentreOnChart.Body.SUN) == 2
+                            && forward[0] == 4,
+                    "one action, both hosts, the chart window brought forward each time");
+            require("Sentrer på kartet".equals(moonDialog[0].controls().centreOnChart.getText())
+                            && "Centre on chart".equals(
+                                    section[0].sun().centreOnChart.getText()),
+                    "in both languages");
+            section[0].release();
+            moonDialog[0].controls().release();
+            sunDialog[0].controls().release();
+            require(moon.subscribers() == 0 && sun.subscribers() == 0,
+                    "every host let go of its session");
+        } finally {
+            scratch.removeNode();
+        }
+        System.out.println("centre on chart OK (the Sun and the Moon from the Controller and"
+                + " the dialog through one action; the typed query computed first; a layer"
+                + " that was off turned on, one that was on left on; the chart on the table's"
+                + " J2000 place at 1°, brought forward; English and Norwegian)");
+    }
+
     /**
      * Jupiter and the four Galilean moons in the packaged image (issue
      * #474): the Controller's Jupiter group and the Jupiter dialog over

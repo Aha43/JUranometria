@@ -313,6 +313,46 @@ public final class JovianTableControls {
         following.cancel();
     }
 
+    /**
+     * The seam for Centre on chart (#483), prepared and not shown:
+     * Jupiter's button completes with its chart module (#484), so the
+     * application never offers to centre on something it does not
+     * draw. The target applies this host's typed draft and answers
+     * Jupiter's J2000 place, or null when the session refused; its
+     * field is the caller's, so Jupiter may later ask for a field
+     * smaller than the Sun's and the Moon's (#481).
+     */
+    public CentreOnChart.Target target(BodyOnChart layer,
+                                       java.util.function.DoubleUnaryOperator field) {
+        return new CentreOnChart.Target() {
+            @Override
+            public CentreOnChart.Body body() {
+                return CentreOnChart.Body.JUPITER;
+            }
+
+            @Override
+            public juranometria.chart.SkyPosition applyTypedAndLocate() {
+                apply();
+                JovianTableSession.Result result = session.result();
+                boolean answered = result.outcome() == JovianTableSession.Outcome.ROWS
+                        || result.outcome() == JovianTableSession.Outcome.APPENDED
+                        || result.outcome() == JovianTableSession.Outcome.MOONS_OUTSIDE;
+                return answered && !result.entries().isEmpty()
+                        ? result.entries().get(0).jupiter().astrometricJ2000() : null;
+            }
+
+            @Override
+            public BodyOnChart layer() {
+                return layer;
+            }
+
+            @Override
+            public double fieldWidthDegrees(double normalMinimumFieldDegrees) {
+                return field.applyAsDouble(normalMinimumFieldDegrees);
+            }
+        };
+    }
+
     private void show(JovianTableSession.Result result) {
         shown = result;
         Observer now = result.applied() ? result.observer() : session.observerNow();

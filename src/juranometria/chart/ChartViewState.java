@@ -48,6 +48,15 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
             {180.0, 120.0, 90.0, 60.0,
              42.0, 36.0, 24.0, 18.0, 12.0, 8.0, 6.0, 4.0, 3.0, 2.0, 1.0};
 
+    /**
+     * The narrowest field the reader's zoom reaches (#483): the last rung
+     * of the field steps, read from them rather than written twice, so a
+     * finer rung (#481) moves it with them.
+     */
+    public static double normalMinimumFieldDegrees() {
+        return FIELD_WIDTH_STEPS[FIELD_WIDTH_STEPS.length - 1];
+    }
+
     /** Magnitude-limit sequence, brightest first; fainter walks toward 8. */
     private static final double[] MAGNITUDE_LIMIT_STEPS = {4.0, 5.0, 6.0, 7.0, 8.0};
 

@@ -266,3 +266,53 @@ The owner's rulings, recorded as given:
     first real interaction-route pull request. Second, the Controller
     wiring, the authoritative visibility notification, the grouped
     View submenu and the packaged owner checkpoint; wide.
+
+## Centre on chart (#483, Sprint 45)
+
+One navigation action, `CentreOnChart`, built once by the application
+over the chart's controller and window, and pressed from every host:
+the Sun's and the Moon's groups in the Controller and their dialogs.
+What is body-specific is a `Target` - the host's typed query applied
+to the body's shared session, the place it answered, and the body's
+chart layer; nothing else is copied per body or per host.
+
+Pressing it:
+
+1. applies the host's **typed** query to the shared session - the
+   press is also a Compute, so a result displayed earlier is never
+   used, and every host shows what was computed; a range centres on
+   its first instant;
+2. stops when the session refused - no observer, a date outside the
+   body's years, an unreadable or backward range - leaving the chart
+   and the layer as they were, the refusal already in the status line;
+3. turns the body's layer on when it is off, through the body's own
+   switch, so persistence and notification are the switch's (the
+   Controller's box and View's item follow); a layer already on is not
+   asked again;
+4. centres the chart on the result's **astrometric J2000** place - the
+   frame the chart is drawn in - in one notification with the field;
+5. at the chart's **normal minimum field**, read from its own field
+   steps (1° today), so a finer rung (#481) moves it without touching
+   the action; a target may ask for its own field, which is the seam
+   Jupiter will use;
+6. brings the chart window forward, closing neither the Controller nor
+   the dialog.
+
+The action subscribes to nothing, so building a host again adds no
+listener; the Sun's and the Moon's dialogs now also let go of their
+session when they close, which they did not before (each reopening had
+left a subscriber behind). The button carries the body's spoken name
+(*Centre the chart on the Moon* / *Sentrer kartet på Månen*), an
+explanation, the letter H / S in the dialogs, and Enter as well as
+Space presses it.
+
+**Jupiter's seam is prepared and not shown**: `JovianTableControls`
+offers a target, with a field of its own, and no button - #484 adds it
+with Jupiter's chart module, so the application never offers to centre
+on something it does not draw.
+
+**Deferred, recorded on the owner's word**: *Update from Place and
+Time* was easy to miss again at #474's checkpoint, for the Sun, the
+Moon and Jupiter alike. A general redesign of that interaction is left
+to a later shared review; #483 adds Centre on chart beside it and
+changes nothing of it.
