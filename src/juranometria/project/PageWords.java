@@ -181,4 +181,12 @@ public interface PageWords {
 
     /** The status appended to a body's name when it stands below the drawn horizon. */
     String bodyBelowHorizon();
+
+    /**
+     * What a reader who cannot see the page is told when a body is drawn
+     * at its cartographic minimum rather than its true size (#484, ruling
+     * 2 on #482): for Jupiter, that the mark is a cartographic symbol,
+     * not its apparent diameter.
+     */
+    String bodySymbol(String bodyIdentity);
 }

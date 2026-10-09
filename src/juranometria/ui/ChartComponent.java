@@ -382,13 +382,20 @@ public final class ChartComponent extends JComponent {
 
     /** The description, then each drawn body by its name on the page (#415). */
     static String withBodies(String base,
-            java.util.List<ReferenceInk.BodyPlacement> bodies) {
+            java.util.List<ReferenceInk.BodyPlacement> bodies,
+            juranometria.project.PageWords words) {
         if (bodies.isEmpty()) {
             return base;
         }
         StringBuilder said = new StringBuilder(base);
         for (ReferenceInk.BodyPlacement body : bodies) {
-            said.append(' ').append(body.name()).append('.');
+            said.append(' ').append(body.name());
+            // A mark drawn at its minimum says so (#484): it is a
+            // cartographic symbol, never offered as the body's size.
+            if (body.symbol()) {
+                said.append(' ').append(words.bodySymbol(body.identity()));
+            }
+            said.append('.');
         }
         return said.toString();
     }
@@ -603,7 +610,7 @@ public final class ChartComponent extends JComponent {
             // accessibility exists to prevent.
             getAccessibleContext().setAccessibleDescription(
                     withBodies(withDirections(describe(scene), spokenDirections),
-                            drawnBodies));
+                            drawnBodies, words));
             // One ring per selected drawn member (issue #261): the
             // renderer draws nothing for an identity the page does
             // not draw, so an on-page undrawn member is left to its

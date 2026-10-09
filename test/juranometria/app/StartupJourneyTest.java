@@ -225,6 +225,7 @@ class StartupJourneyTest {
                             ecliptic,
                             juranometria.ui.solar.SunChartStore.forNode(node),
                             juranometria.ui.solar.MoonChartStore.forNode(node),
+                            juranometria.ui.solar.JovianChartStore.forNode(node),
                             juranometria.ui.ZoomLockStore.forNode(node),
                             juranometria.ui.companion.CompanionStore.forNode(node),
                             juranometria.ui.ChartChromeStore.forNode(node),

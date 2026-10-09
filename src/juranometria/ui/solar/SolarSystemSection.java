@@ -52,13 +52,26 @@ public final class SolarSystemSection {
     /**
      * With the application's Centre on chart (#483) on the Sun's and the
      * Moon's groups, each turning on its own Show on chart switch; a
-     * null action leaves the buttons out. Jupiter gets no button until
-     * something Jovian is drawn (#484).
+     * null action leaves the buttons out. Jupiter has no switch here.
      */
     public SolarSystemSection(SolarTableSession sunSession, SolarTableSession moonSession,
                               BodyOnChart sunOnChart, BodyOnChart moonOnChart,
                               JovianTableSession jupiterSession, CentreOnChart centre,
                               InterfaceText said) {
+        this(sunSession, moonSession, sunOnChart, moonOnChart, jupiterSession, null, centre,
+                said);
+    }
+
+    /**
+     * With Jupiter drawn (#484): Jupiter's group carries the Jovian
+     * module's Show on chart box where {@code jupiterOnChart} is given,
+     * and Centre on chart, turning that switch on, where {@code centre}
+     * is given too.
+     */
+    public SolarSystemSection(SolarTableSession sunSession, SolarTableSession moonSession,
+                              BodyOnChart sunOnChart, BodyOnChart moonOnChart,
+                              JovianTableSession jupiterSession, BodyOnChart jupiterOnChart,
+                              CentreOnChart centre, InterfaceText said) {
         if (sunSession.table().body() != juranometria.solar.SolarSystemService.Body.SUN
                 || moonSession.table().body()
                         != juranometria.solar.SolarSystemService.Body.MOON) {
@@ -69,7 +82,8 @@ public final class SolarSystemSection {
         moon = new SolarTableControls(moonSession, said, moonOnChart, false, centre,
                 centre == null ? null : moonOnChart);
         jupiter = jupiterSession == null ? null
-                : new JovianTableControls(jupiterSession, said, false);
+                : new JovianTableControls(jupiterSession, said, false, jupiterOnChart,
+                        jupiterOnChart == null ? null : centre, jupiterOnChart);
     }
 
     /** Jupiter's controls, or null for a host built without Jupiter. */

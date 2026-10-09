@@ -481,6 +481,7 @@ class TestEvidenceGateTest {
                         "ChartWindowStore.us" + "er(",
                         "CompanionStore.us" + "er(",
                         "EclipticStore.us" + "er(",
+                        "JovianChartStore.us" + "er(",
                         "MoonChartStore.us" + "er(",
                         "PackagedAcceptanceMain.ma" + "in(",
                         "PlaceStore.us" + "er(",
@@ -488,7 +489,7 @@ class TestEvidenceGateTest {
                         "SunChartStore.us" + "er(",
                         "ZoomLockStore.us" + "er("),
                 TestEvidenceScan.realPreferenceDoors(),
-                "the thirteen production entry points to the reader's"
+                "the fourteen production entry points to the reader's"
                         + " store - the sixth is #274's, which keeps"
                         + " one key for whether the ecliptic is shown,"
                         + " the seventh is #348's, which keeps the"
@@ -501,7 +502,9 @@ class TestEvidenceGateTest {
                         + " whether it was open, and the twelfth and"
                         + " thirteenth are #450's, whether the chart"
                         + " window shows its toolbar and where that"
-                        + " window was. Each arrived by this"
+                        + " window was, and the fourteenth is #484's,"
+                        + " whether Jupiter and its moons are on the"
+                        + " chart. Each arrived by this"
                         + " pin changing rather than by a silent gap"
                         + " in a remembered list, which is the whole"
                         + " reason the set is derived");

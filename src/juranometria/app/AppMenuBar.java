@@ -879,6 +879,37 @@ public final class AppMenuBar {
      * during dogfooding as the Sun's and the Moon's are. Does nothing on
      * a bar without the Solar System submenu.
      */
+    /**
+     * Adds View > Solar System > Jupiter and moons on the chart directly
+     * after Moon on the chart (#484; ruling 1 on #482): the one
+     * remembered switch for the Jovian module, toggled like the Sun's
+     * and the Moon's. Returns the item, which the session then keeps in
+     * step with the module, or null on a bar without the submenu.
+     */
+    public static javax.swing.JCheckBoxMenuItem addJupiterOnChart(javax.swing.JMenuBar bar,
+            juranometria.ui.language.InterfaceText said, Runnable toggleJupiterOnChart) {
+        JMenu solar = solarSystemMenu(bar);
+        if (solar == null || toggleJupiterOnChart == null) {
+            return null;
+        }
+        javax.swing.JCheckBoxMenuItem item = new javax.swing.JCheckBoxMenuItem(
+                said.say("menu.jupiterchart.label"));
+        item.setName("jupiterOnChartItem");
+        juranometria.ui.language.MnemonicText.in(said).apply(item, "menu.jupiterchart.mnemonic");
+        item.getAccessibleContext().setAccessibleName(said.say("menu.jupiterchart.a11y"));
+        juranometria.ui.Explain.selfExplanatory(item, said.say("menu.jupiterchart.explain"));
+        item.addActionListener(event -> toggleJupiterOnChart.run());
+        int after = -1;
+        for (int i = 0; i < solar.getMenuComponentCount(); i++) {
+            java.awt.Component c = solar.getMenuComponent(i);
+            if (MOON_CHART_ITEM.equals(c.getName()) || SUN_CHART_ITEM.equals(c.getName())) {
+                after = i;
+            }
+        }
+        solar.insert(item, after + 1);
+        return item;
+    }
+
     public static void addJupiterTable(javax.swing.JMenuBar bar,
                                        juranometria.ui.language.InterfaceText said,
                                        Runnable openJupiterTable) {

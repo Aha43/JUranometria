@@ -525,6 +525,29 @@ public final class JovianSystemService {
         return jupiterState(et).position();
     }
 
+    /**
+     * Jupiter's north pole as the chart draws it (#482's frame
+     * contract): the position angle, from J2000 north through east,
+     * of the PCK pole vector at Jupiter's astrometric J2000 place, in
+     * [0°, 360°). The table's {@link JupiterObservation#poleAngleDegrees()}
+     * is apparent and of date and is never rotated into this; the two
+     * agree, carried through the atlas's own rotation, to 0.003° over
+     * the century (docs/studies/jovian-cartography/measurements.md).
+     */
+    public double poleAngleJ2000Degrees(JupiterObservation jupiter) {
+        if (jupiter == null) {
+            throw new IllegalArgumentException("an observation of Jupiter is required");
+        }
+        Vector3 p = pole(timeScales().tt(jupiter.instant()).jdTt());
+        double a = Math.toRadians(jupiter.astrometricJ2000().raDegrees());
+        double d = Math.toRadians(jupiter.astrometricJ2000().decDegrees());
+        double north = -Math.sin(d) * Math.cos(a) * p.x() - Math.sin(d) * Math.sin(a) * p.y()
+                + Math.cos(d) * p.z();
+        double east = -Math.sin(a) * p.x() + Math.cos(a) * p.y();
+        double angle = Math.toDegrees(Math.atan2(east, north));
+        return angle < 0.0 ? angle + 360.0 : angle;
+    }
+
     /** Jupiter's north pole in the ICRS at a TT Julian date, from the PCK terms. */
     Vector3 pole(double jdTt) {
         JovianPack.Constants k = jovian.constants();

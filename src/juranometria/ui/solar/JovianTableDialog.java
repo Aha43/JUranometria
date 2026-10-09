@@ -41,13 +41,14 @@ public final class JovianTableDialog extends JDialog {
 
     private final Content content;
 
-    private JovianTableDialog(Frame owner, JovianTableSession session, InterfaceText said) {
+    private JovianTableDialog(Frame owner, JovianTableSession session, InterfaceText said,
+                              CentreOnChart centre, BodyOnChart layer) {
         super(owner, new SolarTableWords(said, "jupitertable").say("title"), false);
         SolarTableWords words = new SolarTableWords(said, "jupitertable");
         getAccessibleContext().setAccessibleName(words.say("a11y"));
         getAccessibleContext().setAccessibleDescription(words.say("explain"));
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        content = new Content(session, said, this::dispose);
+        content = new Content(session, said, this::dispose, centre, layer);
         setContentPane(content);
         getRootPane().registerKeyboardAction(e -> dispose(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
@@ -64,18 +65,33 @@ public final class JovianTableDialog extends JDialog {
 
     /** Opens the one Jupiter table over the shared session, or brings it to the front. */
     public static void open(Frame owner, JovianTableSession session, InterfaceText said) {
+        open(owner, session, said, null, null);
+    }
+
+    /**
+     * With Centre on chart (#484): the dialog's button turns {@code layer},
+     * the Jovian module's switch, on and centres the chart on Jupiter.
+     */
+    public static void open(Frame owner, JovianTableSession session, InterfaceText said,
+                            CentreOnChart centre, BodyOnChart layer) {
         if (current != null && current.isDisplayable()) {
             current.toFront();
             current.requestFocus();
             return;
         }
-        current = new JovianTableDialog(owner, session, said);
+        current = new JovianTableDialog(owner, session, said, centre, layer);
         current.setVisible(true);
     }
 
     /** The content over a session, headless-constructible, for tests and studies. */
     public static Content content(JovianTableSession session, InterfaceText said) {
-        return new Content(session, said, () -> { });
+        return new Content(session, said, () -> { }, null, null);
+    }
+
+    /** The content with Centre on chart, headless-constructible. */
+    public static Content content(JovianTableSession session, InterfaceText said,
+                                  CentreOnChart centre, BodyOnChart layer) {
+        return new Content(session, said, () -> { }, centre, layer);
     }
 
     /** This dialog's content. */
@@ -92,8 +108,9 @@ public final class JovianTableDialog extends JDialog {
         public final JLabel timeNote = new JLabel();
         public final JButton close;
 
-        Content(JovianTableSession session, InterfaceText language, Runnable closeAction) {
-            controls = new JovianTableControls(session, language, true);
+        Content(JovianTableSession session, InterfaceText language, Runnable closeAction,
+                CentreOnChart centre, BodyOnChart layer) {
+            controls = new JovianTableControls(session, language, true, null, centre, layer);
             SolarTableWords said = controls.words();
             MnemonicText letters = MnemonicText.in(language);
             setLayout(new BorderLayout(0, 8));
@@ -119,6 +136,10 @@ public final class JovianTableDialog extends JDialog {
             JPanel buttons = new JPanel();
             buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
             buttons.setAlignmentX(0f);
+            if (controls.centreOnChart != null) {
+                buttons.add(controls.centreOnChart);
+                buttons.add(Box.createHorizontalStrut(8));
+            }
             buttons.add(controls.update);
             buttons.add(Box.createHorizontalGlue());
             buttons.add(close);
