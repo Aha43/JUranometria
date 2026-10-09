@@ -46,13 +46,28 @@ public final class SolarSystemSection {
     public SolarSystemSection(SolarTableSession sunSession, SolarTableSession moonSession,
                               BodyOnChart sunOnChart, BodyOnChart moonOnChart,
                               JovianTableSession jupiterSession, InterfaceText said) {
+        this(sunSession, moonSession, sunOnChart, moonOnChart, jupiterSession, null, said);
+    }
+
+    /**
+     * With the application's Centre on chart (#483) on the Sun's and the
+     * Moon's groups, each turning on its own Show on chart switch; a
+     * null action leaves the buttons out. Jupiter gets no button until
+     * something Jovian is drawn (#484).
+     */
+    public SolarSystemSection(SolarTableSession sunSession, SolarTableSession moonSession,
+                              BodyOnChart sunOnChart, BodyOnChart moonOnChart,
+                              JovianTableSession jupiterSession, CentreOnChart centre,
+                              InterfaceText said) {
         if (sunSession.table().body() != juranometria.solar.SolarSystemService.Body.SUN
                 || moonSession.table().body()
                         != juranometria.solar.SolarSystemService.Body.MOON) {
             throw new IllegalArgumentException("the Sun's session, then the Moon's");
         }
-        sun = new SolarTableControls(sunSession, said, sunOnChart, false);
-        moon = new SolarTableControls(moonSession, said, moonOnChart, false);
+        sun = new SolarTableControls(sunSession, said, sunOnChart, false, centre,
+                centre == null ? null : sunOnChart);
+        moon = new SolarTableControls(moonSession, said, moonOnChart, false, centre,
+                centre == null ? null : moonOnChart);
         jupiter = jupiterSession == null ? null
                 : new JovianTableControls(jupiterSession, said, false);
     }

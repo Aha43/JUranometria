@@ -77,14 +77,27 @@ public final class SolarTableDialog extends JDialog {
 
     private SolarTableDialog(Frame owner, SolarTableSession session,
                              InterfaceText said) {
+        this(owner, session, said, null, null);
+    }
+
+    private SolarTableDialog(Frame owner, SolarTableSession session,
+                             InterfaceText said, CentreOnChart centre, BodyOnChart layer) {
         super(owner, new SolarTableWords(said, session.table().stem()).say("title"),
                 false);
         SolarTableWords words = new SolarTableWords(said, session.table().stem());
         getAccessibleContext().setAccessibleName(words.say("a11y"));
         getAccessibleContext().setAccessibleDescription(words.say("explain"));
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        content = new Content(session, said, this::dispose);
+        content = new Content(session, said, this::dispose, centre, layer);
         setContentPane(content);
+        // Closing lets go of the session, so a table opened again
+        // follows it once (#483: reopening adds no listener).
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                content.controls().release();
+            }
+        });
         getRootPane().registerKeyboardAction(e -> dispose(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
@@ -115,15 +128,30 @@ public final class SolarTableDialog extends JDialog {
      */
     public static void open(Frame owner, SolarTableSession session,
                             InterfaceText said) {
+        open(owner, session, said, null, null);
+    }
+
+    /**
+     * Opens the one table of that body over a shared session with
+     * Centre on chart (#483), or brings it to the front.
+     */
+    public static void open(Frame owner, SolarTableSession session,
+                            InterfaceText said, CentreOnChart centre, BodyOnChart layer) {
         SolarTableDialog open = current.get(session.table().body());
         if (open != null && open.isDisplayable()) {
             open.toFront();
             open.requestFocus();
             return;
         }
-        SolarTableDialog dialog = new SolarTableDialog(owner, session, said);
+        SolarTableDialog dialog = new SolarTableDialog(owner, session, said, centre, layer);
         current.put(session.table().body(), dialog);
         dialog.setVisible(true);
+    }
+
+    /** The one open table of a body, or null - for a test that closes and reopens it. */
+    static SolarTableDialog openTable(Body body) {
+        SolarTableDialog open = current.get(body);
+        return open != null && open.isDisplayable() ? open : null;
     }
 
     /** A packed dialog for a photographer; never shown by this class. */
@@ -147,6 +175,12 @@ public final class SolarTableDialog extends JDialog {
     /** The content over a shared session, headless-constructible. */
     public static Content content(SolarTableSession session, InterfaceText said) {
         return new Content(session, said, () -> { });
+    }
+
+    /** The content over a shared session with Centre on chart, headless-constructible (#483). */
+    public static Content content(SolarTableSession session, InterfaceText said,
+                                  CentreOnChart centre, BodyOnChart layer) {
+        return new Content(session, said, () -> { }, centre, layer);
     }
 
     /** This dialog's content. */
@@ -186,12 +220,17 @@ public final class SolarTableDialog extends JDialog {
         public final JLabel timeNote = new JLabel();
 
         Content(SolarTableSession session, InterfaceText language, Runnable closeAction) {
+            this(session, language, closeAction, null, null);
+        }
+
+        Content(SolarTableSession session, InterfaceText language, Runnable closeAction,
+                CentreOnChart centre, BodyOnChart layer) {
             if (session == null || language == null) {
                 throw new IllegalArgumentException("the table follows a"
                         + " session, in a language");
             }
             this.session = session;
-            controls = new SolarTableControls(session, language, null, true);
+            controls = new SolarTableControls(session, language, null, true, centre, layer);
             model = controls.model;
             table = controls.table;
             observerNote = controls.observerNote;
@@ -268,6 +307,10 @@ public final class SolarTableDialog extends JDialog {
             buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
             buttons.setAlignmentX(0.0f);
             buttons.add(update);
+            if (controls.centreOnChart != null) {
+                buttons.add(Box.createHorizontalStrut(8));
+                buttons.add(controls.centreOnChart);
+            }
             buttons.add(Box.createHorizontalGlue());
             buttons.add(close);
             bottom.add(buttons);

@@ -119,6 +119,85 @@ class SolarSystemCompanionJourneyTest {
                     assertNotNull(find(content, "sunCard"), "and toggling computed nothing new");
                     assertNull(find(content, "sunTable"));
 
+                    // Centre on chart (#483), pressed for real: hunting the
+                    // Moon from an unrelated part of the sky with its layer
+                    // off, then again with it on; then the Sun.
+                    juranometria.ui.ChartComponent chart = chartOf(frame);
+                    assertFalse(AppMenuBar.moonChartItem(frame.getJMenuBar()).isSelected(),
+                            "the Moon's layer starts off");
+                    for (int hunt = 0; hunt < 2; hunt++) {
+                        awayFromTheMoon(chart, hunt);
+                        JComponent centre = (JComponent) named(content, "moonCentreOnChart");
+                        reveal(centre);
+                        ReaderInput.click(centre);
+                        drain();
+                        assertTrue(AppMenuBar.moonChartItem(frame.getJMenuBar()).isSelected(),
+                                "the Moon's layer is on (hunt " + hunt + ")");
+                        assertCentredOnTheCard(chart, content, "moonCard");
+                    }
+                    awayFromTheMoon(chart, 2);
+                    JComponent sunCentre = (JComponent) named(content, "sunCentreOnChart");
+                    reveal(sunCentre);
+                    ReaderInput.click(sunCentre);
+                    drain();
+                    assertCentredOnTheCard(chart, content, "sunCard");
+
+                    // Reopening a dialog adds no listener (#483): the Moon's
+                    // table over a session of its own, opened and closed four
+                    // times over the application's chart window.
+                    juranometria.ui.solar.SolarTableSession reopened =
+                            new juranometria.ui.solar.SolarTableSession(
+                                    () -> new juranometria.sky.Observer(59.91, 10.75,
+                                            java.time.Instant.parse("2026-06-21T10:00:00Z")),
+                                    juranometria.solar.SolarSystemService.load(),
+                                    juranometria.ui.solar.SolarTable.moon());
+                    juranometria.ui.solar.CentreOnChart nowhere =
+                            new juranometria.ui.solar.CentreOnChart(
+                                    new juranometria.ui.solar.CentreOnChart.Chart() {
+                                        @Override
+                                        public void centre(juranometria.chart.SkyPosition p,
+                                                           double f) {
+                                        }
+
+                                        @Override
+                                        public void bringForward() {
+                                        }
+
+                                        @Override
+                                        public double normalMinimumFieldDegrees() {
+                                            return 1.0;
+                                        }
+                                    });
+                    for (int round = 0; round < 4; round++) {
+                        SwingUtilities.invokeAndWait(() ->
+                                juranometria.ui.solar.SolarTableDialog.open(frame, reopened,
+                                        juranometria.ui.language.InterfaceText.forLanguage("en"),
+                                        nowhere, new juranometria.ui.solar.BodyOnChart() {
+                                            @Override
+                                            public boolean showing() {
+                                                return true;
+                                            }
+
+                                            @Override
+                                            public void show(boolean shown) {
+                                            }
+
+                                            @Override
+                                            public void onChange(
+                                                    java.util.function.Consumer<Boolean> l) {
+                                            }
+                                        }));
+                        drain();
+                        assertEquals(1, reopened.subscribers(), "an open dialog follows once");
+                        SwingUtilities.invokeAndWait(() -> java.util.Arrays.stream(
+                                        java.awt.Window.getWindows())
+                                .filter(w -> w instanceof juranometria.ui.solar.SolarTableDialog
+                                        && w.isDisplayable())
+                                .forEach(java.awt.Window::dispose));
+                        drain();
+                        assertEquals(0, reopened.subscribers(), "closed, it has let go");
+                    }
+
                     // View > Solar System, in the ruled order.
                     javax.swing.JMenu solar = AppMenuBar.solarSystemMenu(frame.getJMenuBar());
                     assertNotNull(solar, "View holds the submenu");
@@ -238,6 +317,52 @@ class SolarSystemCompanionJourneyTest {
             }
         }
         return found;
+    }
+
+    private static juranometria.ui.ChartComponent chartOf(JFrame frame) {
+        return (juranometria.ui.ChartComponent) all(frame.getContentPane()).stream()
+                .filter(c -> c instanceof juranometria.ui.ChartComponent)
+                .findFirst().orElseThrow();
+    }
+
+    /**
+     * Takes the chart away the way a reader does: the first hunt starts
+     * from wherever the application opened (unrelated sky); before the
+     * others the chart is dragged across most of its width, which pans
+     * it through its controller.
+     */
+    private static void awayFromTheMoon(juranometria.ui.ChartComponent chart, int hunt)
+            throws Exception {
+        if (hunt == 0) {
+            return;
+        }
+        juranometria.chart.ChartViewState before = chart.viewState();
+        int w = chart.getWidth();
+        int h = chart.getHeight();
+        ReaderInput.drag(chart, w / 10, h / 2, w * 9 / 10, h / 3);
+        drain();
+        assertTrue(!chart.viewState().centre().equals(before.centre()),
+                "the drag moved the chart away (hunt " + hunt + ")");
+    }
+
+    /** The chart's centre is the card's right ascension and declination, at 1°. */
+    private static void assertCentredOnTheCard(juranometria.ui.ChartComponent chart,
+                                               Container content, String card) throws Exception {
+        juranometria.chart.ChartViewState view = chart.viewState();
+        assertEquals(1.0, view.fieldWidthDegrees(), "the normal minimum field");
+        List<String> spoken = new ArrayList<>();
+        for (Component c : all((Container) named(content, card))) {
+            if (c instanceof javax.swing.JLabel label && label.getAccessibleContext() != null
+                    && label.getAccessibleContext().getAccessibleName() != null) {
+                spoken.add(label.getAccessibleContext().getAccessibleName());
+            }
+        }
+        String ra = juranometria.ui.solar.SunTableFormat.hms(view.centre());
+        String dec = juranometria.ui.solar.SunTableFormat.dms(view.centre());
+        assertTrue(spoken.stream().anyMatch(s -> s.startsWith("Right ascension") && s.endsWith(ra)),
+                "the chart's centre is the card's right ascension " + ra + ": " + spoken);
+        assertTrue(spoken.stream().anyMatch(s -> s.startsWith("Declination") && s.endsWith(dec)),
+                "and its declination " + dec + ": " + spoken);
     }
 
     private static Component find(Container from, String name) {

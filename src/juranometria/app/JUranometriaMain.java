@@ -437,17 +437,42 @@ public final class JUranometriaMain {
                 };
         juranometria.ui.solar.JovianTableSession jupiterTable =
                 new juranometria.ui.solar.JovianTableSession(observerNow, jovianSystem);
+        // Centre on chart (#483): one action for every body and host.
+        // It centres through the chart's own controller - the centre and
+        // the field in one notification - at the chart's normal minimum
+        // field, and brings the chart window forward, closing nothing.
+        juranometria.ui.solar.CentreOnChart centreOnChart =
+                new juranometria.ui.solar.CentreOnChart(
+                        new juranometria.ui.solar.CentreOnChart.Chart() {
+                            @Override
+                            public void centre(juranometria.chart.SkyPosition j2000,
+                                               double fieldWidthDegrees) {
+                                controller.recenter(j2000, fieldWidthDegrees);
+                            }
+
+                            @Override
+                            public void bringForward() {
+                                frame.toFront();
+                                chart.requestFocusInWindow();
+                            }
+
+                            @Override
+                            public double normalMinimumFieldDegrees() {
+                                return juranometria.chart.ChartViewState
+                                        .normalMinimumFieldDegrees();
+                            }
+                        });
+        juranometria.ui.solar.BodyOnChart sunLayer =
+                juranometria.ui.solar.SunChartSession.switchOf(sunOnChart, sunChartStore);
+        juranometria.ui.solar.BodyOnChart moonLayer =
+                juranometria.ui.solar.MoonChartSession.switchOf(sunOnChart, moonChartStore);
         // Solar System in the Controller, third (ruled on #457): the
         // Sun, Moon and Jupiter groups over those sessions and the
         // module's own switches, introduced collapsed, computing nothing
-        // on its own.
+        // on its own; the Sun and the Moon with Centre on chart.
         juranometria.ui.solar.SolarSystemSection solarSection =
                 new juranometria.ui.solar.SolarSystemSection(sunTable, moonTable,
-                        juranometria.ui.solar.SunChartSession.switchOf(sunOnChart,
-                                sunChartStore),
-                        juranometria.ui.solar.MoonChartSession.switchOf(sunOnChart,
-                                moonChartStore),
-                        jupiterTable, companionWords);
+                        sunLayer, moonLayer, jupiterTable, centreOnChart, companionWords);
         companion.addSection(juranometria.ui.solar.SolarSystemSection.ID,
                 companionWords.say("solarsystem.title"),
                 solarSection.inController(companionStore, companionWords), true);
@@ -536,12 +561,12 @@ public final class JUranometriaMain {
                 // applied result.
                 () -> juranometria.ui.solar.SolarTableDialog.open(frame, sunTable,
                         juranometria.ui.language.InterfaceText.forLanguage(
-                                language.interfaceLanguage())),
+                                language.interfaceLanguage()), centreOnChart, sunLayer),
                 // View, Moon (#408): the same table shell over the same
                 // observer and pack, for the Moon's own columns.
                 () -> juranometria.ui.solar.SolarTableDialog.open(frame, moonTable,
                         juranometria.ui.language.InterfaceText.forLanguage(
-                                language.interfaceLanguage())),
+                                language.interfaceLanguage()), centreOnChart, moonLayer),
                 // View, Sun on the chart (#415): the switch, remembered.
                 juranometria.ui.solar.SunChartSession.toggle(sunOnChart,
                         sunChartStore),

@@ -7,6 +7,16 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Centre on chart, for the Sun and the Moon (#483).** A button in the
+Sun's and the Moon's groups in the Controller and in their tables
+finds the body on the chart: it computes what is typed, turns the
+body on the chart if it is off, centres the chart on it at a 1° field
+and brings the chart window forward, leaving the Controller or the
+table open. A range centres on its first instant; a date the table
+refuses moves nothing. English and Norwegian, with the keyboard. The
+Sun's and the Moon's tables also stop following their result once
+closed, so reopening them adds nothing behind the scenes.
+
 **Jupiter and the Galilean moons in the Controller (#474).** A Jupiter
 group under Solar System, after the Moon's and introduced collapsed,
 and *View > Solar System > Jupiter...* as its dialog host during
