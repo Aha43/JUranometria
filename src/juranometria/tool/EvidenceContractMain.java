@@ -135,6 +135,10 @@ public final class EvidenceContractMain {
         // committed fixtures, rounded as printed.
         REPORT_MAINS.put("juranometria.tool.JovianAccuracyReportMain",
                 "docs/studies/jovian-system/service-accuracy.md");
+        // Jupiter and the moons on the page (#482): the report is
+        // deterministic; its mockups are held through IMAGE_MAINS.
+        REPORT_MAINS.put("juranometria.tool.JovianCartographyStudyMain",
+                "docs/studies/jovian-cartography/measurements.md");
         // The Sun on production pages (#415): the report is
         // deterministic; its pages are held through IMAGE_MAINS.
         REPORT_MAINS.put("juranometria.tool.SunOnTheChartStudyMain",
@@ -309,6 +313,17 @@ public final class EvidenceContractMain {
                 "docs/studies/solar-system-controls/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.JovianContractStudyMain",
                 "docs/studies/jovian-system/platform.md");
+        // Sprint 45 (#482). The cartography study's label outcomes:
+        // production placement sizes each label with this desktop's
+        // real font metrics, so how many moon labels are placed, moved
+        // or refused is the machine's answer (CI on aa142b99 measured
+        // 236 refusals at 1° where this machine measured 225, neither
+        // wrong). The portable report keeps the geometry, the per-moon
+        // decisions and the rules; the invariant that no configuration
+        // loses every moon label is held on each platform by the
+        // study itself and by JovianLabelInvariantTest.
+        PLATFORM_REPORTS.put("juranometria.tool.JovianCartographyStudyMain",
+                "docs/studies/jovian-cartography/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.ToggleShortcutStudyMain",
                 "docs/studies/toggle-shortcuts/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.ControlExplanationStudyMain",
@@ -425,6 +440,10 @@ public final class EvidenceContractMain {
             // pages composed by the component, with the study's own
             // candidate marks drawn over them; renderer-drawn contract.
             "juranometria.tool.SolarCartographyStudyMain",
+            // The Jovian cartography mockups (issue #482): production pages
+            // composed by the component, the study's candidate marks drawn
+            // over them; renderer-drawn contract, as #414's.
+            "juranometria.tool.JovianCartographyStudyMain",
             // The companion-window mock-ups (issue #433): the production
             // Place and Time content in a study-only shell, painted off
             // screen; widget-rendered inspection, the controls- prefix.

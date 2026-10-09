@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**475 promoted artifacts.**
+**495 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -323,6 +323,26 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/interface-language/toolbar-nb-NO-6-results.png` | `86bb3d37eb4ba15c30753149667d33b8a2320d8e8e0dd7b7d7be368d9da53f1a` | 2026-10-01 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/toolbar-nb-NO-7-nomatch.png` | `071ba764e79474941d5d3e847012b0b30734d267386d96b51055db905240069c` | 2026-10-01 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/toolbar-nb-NO-8-nofit.png` | `3c81e037799ec5b09360873a4b2becceaa84b4f0b6d60fa64af7364d705ecb64` | 2026-10-01 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/jovian-cartography/behind-1.png` | `1b63c97ba54eae4d9cebe3de5f921d06e91d754f5bb5c3f49cbc57a0e883edb3` | 2026-10-09 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/jovian-cartography/field-1.png` | `7e1fe123c929f59708764b22de75759a3d2c4977449b06b12d91321a1abd65a1` | 2026-10-09 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/jovian-cartography/field-3.png` | `62036f9693145842614548a0e0f836fb5f51ab33244afa75cfe91f2193510d1d` | 2026-10-09 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/jovian-cartography/field-36.png` | `8da0faa0180cde0478f5bd582fabad8f089c9d1e3a923b4f8a2ba50f44efc272` | 2026-10-09 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/jovian-cartography/field-8.png` | `c0e8bb9c362f23cde26948da6513b4281b5823ec9ee528e12d34c7a847f840e0` | 2026-10-09 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/jovian-cartography/horizon-drawn-8.png` | `a61157ee4247a482ac006d6cfab1a2a663ec836a625200c441e4b959798d5935` | 2026-10-09 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/jovian-cartography/horizon-hidden-8.png` | `df03edbc601d76bd2f8bef4efb6409f623f955f7a40ee663ed827807bd60376b` | 2026-10-09 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/jovian-cartography/independent-suppression-3.png` | `0e21173a7c98b9cd60f54ac5dde12138b9350b1f6dae6d808bb47f317b88884e` | 2026-10-09 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/jovian-cartography/labels-around-1.png` | `aec8787acd21833f213d77dda2634cab8c91b744888c0568b93413d4d5502c8b` | 2026-10-09 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/jovian-cartography/labels-crowded-3.png` | `33238176a308cdb082f0a6b8f2ecec6faeee5adf5b7dbb5a990fffc79120429a` | 2026-10-09 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/jovian-cartography/labels-regulus-8.png` | `7e0a473f5bf565a233dda018e9a45c0673ba3f18a7dae4431163886c9ef22bfb` | 2026-10-09 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/jovian-cartography/page-edge-3.png` | `be6f38704e4fb31350a3b23cc49b09e895a0e176f4b3e43e3af4760a0e5c09fe` | 2026-10-09 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/jovian-cartography/printable-a4-8.png` | `d8ec0f8d1f9571737b602dd868783dc983f6a360f3159eb7432c0335f74877dd` | 2026-10-09 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/jovian-cartography/shadow-full-1.png` | `cc31ebde03e52ba07c9ee429051aa3520d5c1115590cebd073c279237764281c` | 2026-10-09 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/jovian-cartography/shadow-partial-1.png` | `e9a8f661782e5a85acc8d2adbc0eb0b1338a89d1386958d6239eb541a7f349a6` | 2026-10-09 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/jovian-cartography/states-vocabulary.png` | `57cfbbe892fc9c7d34f1bb9e1059342b428fbb036c5d89ada70c5991e7e54799` | 2026-10-09 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/jovian-cartography/triple-2230.png` | `daeddc994b288057e61101678a9d35ab05862ba51d4c8bb6149b0f378768f53d` | 2026-10-09 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/jovian-cartography/triple-2245.png` | `7e1fe123c929f59708764b22de75759a3d2c4977449b06b12d91321a1abd65a1` | 2026-10-09 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/jovian-cartography/triple-2255.png` | `8f4991bd819f1885cf07e6edacfc78121ab8467c5da9a5218d99e6cde710c118` | 2026-10-09 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/jovian-cartography/triple-2300.png` | `fc0a98104e8b7604015e03f221b74effc4d22dd5632f80d323d3734cd0d34cdd` | 2026-10-09 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/label-placement/home-candidate.png` | `312aa21899e3478e250e446e8bc9659ad24300f0c686abcb5b441e8730cbd1f7` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/label-placement/home-today.png` | `f32c7d18e449d89272b9a9c72634cadbb806044e59060a8d1bb3aad9281fa57f` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/label-placement/orion-90-candidate.png` | `df9850a212744e0c78ef3bf1bad5b721ce15c22b1e088adb3f202cabf703d6f2` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
