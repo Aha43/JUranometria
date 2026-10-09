@@ -79,6 +79,7 @@ help:
 	@echo "  spk-boundary-fixture  Cut the JUP365 segment-split test fixture from jup365.bsp and prove it against its source (issue #473)"
 	@echo "  import-jovian-system  Build the Jovian System pack from jup365.bsp and pck00011.tpc, proved against the sources (issue #473)"
 	@echo "  jovian-accuracy-report  The Jovian service against Horizons, the report the tests hold (issue #473)"
+	@echo "  jovian-cartography-study  Measure Jupiter and the moons on the atlas's pages, with mockups (issue #482)"
 	@echo "  sun-on-the-chart-study  The Sun on production pages through the module (issue #415)"
 	@echo "  moon-on-the-chart-study The Moon on production pages, and the lunation as a row of phases (issue #416)"
 	@echo "  pan-study         Measure the Sprint 8 grab-to-pan geometry and costs"
@@ -601,7 +602,7 @@ black-sky-study: classes
 		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BlackSkyStudyMain \
 		> docs/studies/black-sky/measurements.md
 
-.PHONY: spk-boundary-fixture import-jovian-system jovian-accuracy-report evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study sun-on-the-chart-study moon-on-the-chart-study printable-chart-study
+.PHONY: spk-boundary-fixture import-jovian-system jovian-accuracy-report jovian-cartography-study evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study sun-on-the-chart-study moon-on-the-chart-study printable-chart-study
 # The heap is stated rather than inherited from whatever a machine's
 # ergonomics chose for it: the CI runner's default quarter-of-RAM is
 # not the same number as a developer's.
@@ -765,6 +766,15 @@ jovian-pack-study: classes
 # under docs/studies/jovian-system/spk/.
 spk-boundary-fixture: classes
 	$(JAVA) -Xmx4g -cp "$(CLASSES_DIR)" juranometria.tool.SpkBoundaryFixtureMain
+
+# Jupiter and the Galilean moons on the atlas's pages (issue #482): true
+# scale, thresholds, the frame contract and mockups over production pages.
+jovian-cartography-study: classes
+	mkdir -p docs/studies/jovian-cartography
+	$(JAVA) -Xmx3g -Djava.awt.headless=true -cp "$(CLASSES_DIR):$(LIB_DIR)/*" \
+		juranometria.tool.JovianCartographyStudyMain \
+		> docs/studies/jovian-cartography/measurements.md
+	@echo "written to docs/studies/jovian-cartography/measurements.md"
 
 solar-system-controls-study: classes
 	mkdir -p docs/studies/solar-system-controls
