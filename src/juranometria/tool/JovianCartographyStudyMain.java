@@ -96,6 +96,13 @@ public final class JovianCartographyStudyMain {
     private static final PageText NORSK = PageText.in(InterfaceText.forLanguage("nb-NO"));
 
     private static final StringBuilder REPORT = new StringBuilder();
+    /**
+     * This machine's half (#482, the owner's ruling after CI on aa142b99):
+     * label outcomes depend on the platform's real font metrics, which
+     * production placement uses, so their counts live here, beside the
+     * portable report, held to reproduce within an environment only.
+     */
+    private static final StringBuilder PLATFORM = new StringBuilder();
     private static JovianSystemService service;
     /** The observer a page's drawn horizon is for, set before a horizon page. */
     private static Observer horizonObserver = OSLO;
@@ -109,8 +116,12 @@ public final class JovianCartographyStudyMain {
 
     public static void main(String[] args) throws Exception {
         REPORT.setLength(0);
+        PLATFORM.setLength(0);
         DIR.mkdirs();
         service = JovianSystemService.load();
+        PlatformEvidence.preface(PLATFORM,
+                "Jupiter's moon labels, as this desktop's fonts place them",
+                "Sprint 45, issue #482.");
         p("# Jupiter and the Galilean moons on the page: measurements and mockups");
         p("");
         p("Sprint 45, issue #482. What a cartography rule would mean on the atlas's own"
@@ -129,6 +140,11 @@ public final class JovianCartographyStudyMain {
         rulings(ranges);
         System.out.print(REPORT);
         System.out.flush();
+        PlatformEvidence.write(PLATFORM, new File(DIR, "platform.md").toString());
+    }
+
+    private static void q(String line) {
+        PLATFORM.append(line).append('\n');
     }
 
     // ---- the century's ranges ------------------------------------------
@@ -347,6 +363,11 @@ public final class JovianCartographyStudyMain {
                     100.0 * anyDrawn / year.size(), independent));
             labelRows.add(String.format(Locale.ROOT, "| %s° | %d | %d | %d | %d | %d |", fmt(field),
                     placed, moved, refused, mixed, allRefused));
+            if (allRefused > 0) {
+                throw new IllegalStateException(String.format(Locale.ROOT,
+                        "at %s° %d configurations lose every moon label (ruling 6 forbids it)",
+                        fmt(field), allRefused));
+            }
         }
         p("");
         p("**Labels, decided separately from marks (the ruled rule 6).** For every drawn moon,"
@@ -355,16 +376,54 @@ public final class JovianCartographyStudyMain {
                 + " and Jupiter's label as obstacles, on an otherwise empty 900 × 700 page; a"
                 + " label is refused when none of its candidates is free - where production"
                 + " would place it under duress over the least ink - and withdrawn, so it"
-                + " blocks no other label. *Moved* counts"
-                + " labels that took a candidate other than the right-hand one.");
+                + " blocks no other label. How many labels are placed, moved or refused"
+                + " depends on how wide this desktop's font draws each name, which is what"
+                + " production uses, so those counts are **this machine's answer** and are"
+                + " recorded in `platform.md` beside this report, not here. What holds on"
+                + " every platform, and is enforced each time this study runs (it refuses to"
+                + " finish otherwise) and by `JovianLabelInvariantTest`: **no configuration at"
+                + " any field loses every moon label.**");
         p("");
-        p("| field | moon labels placed | of which moved | refused | configurations with both | configurations with every moon label refused |");
-        p("|---:|---:|---:|---:|---:|---:|");
-        labelRows.forEach(JovianCartographyStudyMain::p);
-        p("");
+        q("## Moon labels over 2026, by field");
+        q("");
+        q("Every 6 hours at Oslo, 1 460 configurations, each moon decided by the portable"
+                + " report's rule; the label font is " + fontIdentity(font) + ". *Moved* counts"
+                + " labels that took a candidate other than the right-hand one; a refused"
+                + " label is one production would have placed under duress.");
+        q("");
+        q("| field | moon labels placed | of which moved | refused | configurations with both | configurations with every moon label refused |");
+        q("|---:|---:|---:|---:|---:|---:|");
+        labelRows.forEach(JovianCartographyStudyMain::q);
+        q("");
+        q("**No configuration loses every moon label** at any field on this machine: the"
+                + " invariant the portable report states and `JovianLabelInvariantTest` holds.");
+        q("");
         p("The rejected all-or-nothing rule (every moon drawn only when the whole system is"
                 + " separable) is no longer measured; its figures are in the history of PR #489.");
         p("");
+    }
+
+    /**
+     * Whether, at a field, a configuration's drawn moons have labels and
+     * every one of them is refused - the outcome ruling 6 forbids. Held
+     * on each platform by {@code JovianLabelInvariantTest}.
+     */
+    static boolean losesEveryMoonLabel(double field, Configuration c, java.awt.FontMetrics font) {
+        double perArcsec = pxPerArcsec(field, PAGE_W, PAGE_H);
+        double jupiterPx = Math.max(JUPITER_MARK_PX, c.jupiter().equatorialDiameterArcseconds() * perArcsec);
+        List<double[]> off = pageOffsets(c, perArcsec);
+        int[] l = labels(jupiterPx, c, off,
+                decide(field, ChartViewState.normalMinimumFieldDegrees(), jupiterPx, c.moons(), off), font);
+        return l[0] == 0 && l[1] > 0;
+    }
+
+    /** The label font, named as this platform resolves it. */
+    static String fontIdentity(java.awt.FontMetrics font) {
+        java.awt.Font f = font.getFont();
+        return String.format(Locale.ROOT, "`%s` (family `%s`, %s %.1f pt; ascent %d, height %d px)",
+                f.getFontName(Locale.ROOT), f.getFamily(Locale.ROOT),
+                f.isBold() ? "bold" : f.isItalic() ? "italic" : "plain", f.getSize2D(),
+                font.getAscent(), font.getHeight());
     }
 
     /** The label outcome for one configuration on an empty page: placed, refused, moved off the right. */
@@ -482,8 +541,9 @@ public final class JovianCartographyStudyMain {
                 + " and marks as obstacles, each refused alone when no candidate is free. Where"
                 + " the true system is a few pixels across, an inset magnifies it - a **study"
                 + " magnification, not a field the atlas offers** - so the states can be"
-                + " judged; the page itself is unmagnified, and every caption ends with what"
-                + " the page itself drew.");
+                + " judged; the page itself is unmagnified, and every caption ends with the"
+                + " marks the page itself drew. Where each page's labels went depends on this"
+                + " desktop's fonts and is recorded in `platform.md`.");
         p("");
 
         Instant triple = Instant.parse("2026-12-11T22:45:00Z");
@@ -997,6 +1057,7 @@ public final class JovianCartographyStudyMain {
         boolean dark = palette == ChartPalette.BLACK_SKY;
         Graphics2D g = image.createGraphics();
         StringBuilder note = new StringBuilder();
+        StringBuilder labelNote = new StringBuilder();
         try {
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -1018,7 +1079,8 @@ public final class JovianCartographyStudyMain {
             }
             drawSystem(g, projection, mapping, marks, scene.viewport().fieldWidthDegrees(), 1.0, 0, 0,
                     dark, obstacles, new juranometria.render.LabelPlacement.Page(
-                            new Rectangle2D.Double(0, 0, w, h), "the paper"), tm.labels(), note, w, h);
+                            new Rectangle2D.Double(0, 0, w, h), "the paper"), tm.labels(), note,
+                    labelNote, w, h);
             if (inset > 0) {
                 PixelPoint c = mapping.toPixel(projection.project(marks.get(0).at()).orElseThrow());
                 int box = 300;
@@ -1035,7 +1097,7 @@ public final class JovianCartographyStudyMain {
                         bx + box / 2.0 - c.x() * inset, by + box / 2.0 - c.y() * inset, dark,
                         new ArrayList<>(), new juranometria.render.LabelPlacement.Page(
                                 new Rectangle2D.Double(bx + 2, by + 2, box - 4, box - 20), "the inset"),
-                        tm.labels(), insetNote, w, h);
+                        tm.labels(), insetNote, new StringBuilder(), w, h);
                 gi.dispose();
                 g.setColor(dark ? Color.LIGHT_GRAY : Color.DARK_GRAY);
                 g.setFont(g.getFont().deriveFont(10f));
@@ -1053,8 +1115,19 @@ public final class JovianCartographyStudyMain {
         p("");
         p("![](" + name + ".png)");
         p("");
-        p(caption + " Drawn on the page: " + note.toString().strip());
+        p(caption + " Drawn on the page: " + note.toString().strip()
+                + " Where its labels went on this machine is in `platform.md`.");
         p("");
+        if (PLATFORM.indexOf("## Labels on the mock-up pages") < 0) {
+            q("## Labels on the mock-up pages");
+            q("");
+            q("Each page's labels as this desktop's fonts placed them; a label not named took"
+                    + " its first (right-hand) candidate.");
+            q("");
+        }
+        q("- **" + title + "** (`" + name + ".png`): "
+                + (labelNote.length() == 0 ? "every label at its first candidate."
+                        : labelNote.toString().strip().replaceAll(";$", ".")));
     }
 
     /**
@@ -1068,7 +1141,8 @@ public final class JovianCartographyStudyMain {
                                    double oy, boolean dark,
                                    List<juranometria.render.LabelPlacement.Obstacle> obstacles,
                                    juranometria.render.LabelPlacement.Page paper,
-                                   java.awt.FontMetrics font, StringBuilder note, int w, int h) {
+                                   java.awt.FontMetrics font, StringBuilder note,
+                                   StringBuilder labelNote, int w, int h) {
         Mark jupiter = marks.get(0);
         var projected = projection.project(jupiter.at());
         if (projected.isEmpty()) {
@@ -1175,7 +1249,7 @@ public final class JovianCartographyStudyMain {
                 : placeRefusing(w, h, occupied, paper, requests)) {
             if (placed.omitted()) {
                 if (zoom == 1.0) {
-                    note.append(placed.request().text()).append("'s label refused; ");
+                    labelNote.append(placed.request().text()).append("'s label refused; ");
                 }
                 continue;
             }
@@ -1184,7 +1258,7 @@ public final class JovianCartographyStudyMain {
             g.drawString(placed.request().text(), (float) box.getX(),
                     (float) (box.getY() + font.getAscent()));
             if (zoom == 1.0 && placed.candidate() != 0) {
-                note.append(String.format(Locale.ROOT, "%s's label at candidate %d; ",
+                labelNote.append(String.format(Locale.ROOT, "%s's label at candidate %d; ",
                         placed.request().text(), placed.candidate()));
             }
         }

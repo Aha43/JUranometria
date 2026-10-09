@@ -313,6 +313,17 @@ public final class EvidenceContractMain {
                 "docs/studies/solar-system-controls/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.JovianContractStudyMain",
                 "docs/studies/jovian-system/platform.md");
+        // Sprint 45 (#482). The cartography study's label outcomes:
+        // production placement sizes each label with this desktop's
+        // real font metrics, so how many moon labels are placed, moved
+        // or refused is the machine's answer (CI on aa142b99 measured
+        // 236 refusals at 1° where this machine measured 225, neither
+        // wrong). The portable report keeps the geometry, the per-moon
+        // decisions and the rules; the invariant that no configuration
+        // loses every moon label is held on each platform by the
+        // study itself and by JovianLabelInvariantTest.
+        PLATFORM_REPORTS.put("juranometria.tool.JovianCartographyStudyMain",
+                "docs/studies/jovian-cartography/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.ToggleShortcutStudyMain",
                 "docs/studies/toggle-shortcuts/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.ControlExplanationStudyMain",

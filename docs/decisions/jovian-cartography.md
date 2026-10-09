@@ -55,8 +55,15 @@ both from the production star policy.
   separable, drew the moons in 56 % of configurations at 1°, 11 % at 3°
   and 0.1 % at 8°. Decided one moon at a time (section B of the
   report), 22 % of the visible moon places are drawn at 8° and 60 % at
-  3°. At 1° every one is drawn, and production's adjacent candidates
-  place 96 % of their labels. No configuration loses every moon label.
+  3°. At 1° every one is drawn.
+- **Label counts belong to the machine, the invariant does not.**
+  Production placement sizes each label with the desktop's real font
+  metrics, so how many moon labels are placed, moved or refused differs
+  between machines. CI's Linux run on `aa142b99` refused 236 at 1°
+  where macOS refused 225, and neither is wrong. Those counts are in the
+  study's platform record, not its portable report. On every platform,
+  no configuration loses every moon label. The study enforces this
+  each time it runs, and `JovianLabelInvariantTest` holds it.
 
 **The frame.** Measured over the century:
 
@@ -168,8 +175,14 @@ languages.
   (`make jovian-cartography-study`), with
   `src/juranometria/tool/JovianChartGeometry.java` holding the frame
   contract's arithmetic.
-- **The contract test:** `test/juranometria/tool/JovianChartFrameTest.java`.
+- **The contract tests:** `test/juranometria/tool/JovianChartFrameTest.java`
+  for the frame, and `test/juranometria/tool/JovianLabelInvariantTest.java`
+  for ruling 6's invariant on whichever platform runs it.
 - **The report and mock-ups:** `docs/studies/jovian-cartography/`. The
-  report is a registered deterministic report. The 20 mock-ups are
+  report is a registered deterministic report, holding the geometry,
+  the per-moon decisions, the candidates and the rules. Its
+  `platform.md` is a registered platform record, holding the label
+  counts, the label font and each mock-up's label outcomes on the
+  machine that generated it. The 20 mock-ups are
   registered image generators under the renderer-drawn contract, with
   their provenance rows, as #414's were.

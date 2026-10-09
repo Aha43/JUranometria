@@ -45,17 +45,7 @@ Pixels on the 900 × 700 page at its centre (each field's own projection); milli
 | 2° | 72.5 % | 15.1 % | 9.3 % | 3.1 % | 99.9 % | 1150 |
 | 1° | 100.0 % | 0.0 % | 0.0 % | 0.0 % | 100.0 % | 0 |
 
-**Labels, decided separately from marks (the ruled rule 6).** For every drawn moon, a label request through the production `LabelPlacement`, with production's eight adjacent candidates (LabelGeometry's order, 3 px gap), every drawn mark and Jupiter's label as obstacles, on an otherwise empty 900 × 700 page; a label is refused when none of its candidates is free - where production would place it under duress over the least ink - and withdrawn, so it blocks no other label. *Moved* counts labels that took a candidate other than the right-hand one.
-
-| field | moon labels placed | of which moved | refused | configurations with both | configurations with every moon label refused |
-|---:|---:|---:|---:|---:|---:|
-| 12° | 646 | 337 | 0 | 0 | 0 |
-| 8° | 1271 | 814 | 0 | 0 | 0 |
-| 6° | 1840 | 1361 | 1 | 1 | 0 |
-| 4° | 2661 | 2133 | 49 | 49 | 0 |
-| 3° | 3319 | 2647 | 84 | 84 | 0 |
-| 2° | 4031 | 3014 | 73 | 72 | 0 |
-| 1° | 5437 | 3245 | 225 | 223 | 0 |
+**Labels, decided separately from marks (the ruled rule 6).** For every drawn moon, a label request through the production `LabelPlacement`, with production's eight adjacent candidates (LabelGeometry's order, 3 px gap), every drawn mark and Jupiter's label as obstacles, on an otherwise empty 900 × 700 page; a label is refused when none of its candidates is free - where production would place it under duress over the least ink - and withdrawn, so it blocks no other label. How many labels are placed, moved or refused depends on how wide this desktop's font draws each name, which is what production uses, so those counts are **this machine's answer** and are recorded in `platform.md` beside this report, not here. What holds on every platform, and is enforced each time this study runs (it refuses to finish otherwise) and by `JovianLabelInvariantTest`: **no configuration at any field loses every moon label.**
 
 The rejected all-or-nothing rule (every moon drawn only when the whole system is separable) is no longer measured; its figures are in the history of PR #489.
 
@@ -71,73 +61,73 @@ The chart is J2000 (ICRS); the table's X/Y and pole angle are apparent and of da
 
 ## D. Mockups on the atlas's own pages
 
-Each page is painted by the production composition (`ChartComponent` over the bundled catalogue, with the meridian module where the page has a horizon). Over it this study draws, from the service's J2000 places for the instant and observer stated, by the owner's rulings (section E): **Jupiter** as a disc at its true equatorial diameter or the 6 px minimum - a cartographic symbol, not Jupiter's apparent diameter - whichever is larger, its outline turning from a circle to the true oblate ellipse as the true disc grows past the minimum, the minor axis along the pole derived in the chart's frame; **each moon** as a 3 px symbol at its own J2000 place, decided on its own (section B), in state vocabulary A; **labels** through the production `LabelPlacement` with its eight adjacent candidates and the page's own text and marks as obstacles, each refused alone when no candidate is free. Where the true system is a few pixels across, an inset magnifies it - a **study magnification, not a field the atlas offers** - so the states can be judged; the page itself is unmagnified, and every caption ends with what the page itself drew.
+Each page is painted by the production composition (`ChartComponent` over the bundled catalogue, with the meridian module where the page has a horizon). Over it this study draws, from the service's J2000 places for the instant and observer stated, by the owner's rulings (section E): **Jupiter** as a disc at its true equatorial diameter or the 6 px minimum - a cartographic symbol, not Jupiter's apparent diameter - whichever is larger, its outline turning from a circle to the true oblate ellipse as the true disc grows past the minimum, the minor axis along the pole derived in the chart's frame; **each moon** as a 3 px symbol at its own J2000 place, decided on its own (section B), in state vocabulary A; **labels** through the production `LabelPlacement` with its eight adjacent candidates and the page's own text and marks as obstacles, each refused alone when no candidate is free. Where the true system is a few pixels across, an inset magnifies it - a **study magnification, not a field the atlas offers** - so the states can be judged; the page itself is unmagnified, and every caption ends with the marks the page itself drew. Where each page's labels went depends on this desktop's fonts and is recorded in `platform.md`.
 
 ### The triple transit, 2026-12-11 22:45 UTC at Oslo, 36° field
 
 ![](field-36.png)
 
-Jupiter's true disc is 0.3 px here; above the normal minimum field each moon is drawn only where its own mark is distinguishable; the inset shows the arrangement. Drawn on the page: Jupiter at (450, 350), true 0.3 × 0.3 px, drawn 6.0 × 6.0 px (the minimum mark: a cartographic symbol); Io in front unresolved, not drawn; Europa in front unresolved, not drawn; Ganymede at jupiter, not drawn; Callisto in front unresolved, not drawn; Jupiter's label at candidate 1;
+Jupiter's true disc is 0.3 px here; above the normal minimum field each moon is drawn only where its own mark is distinguishable; the inset shows the arrangement. Drawn on the page: Jupiter at (450, 350), true 0.3 × 0.3 px, drawn 6.0 × 6.0 px (the minimum mark: a cartographic symbol); Io in front unresolved, not drawn; Europa in front unresolved, not drawn; Ganymede at jupiter, not drawn; Callisto in front unresolved, not drawn; Where its labels went on this machine is in `platform.md`.
 
 ### The triple transit, 2026-12-11 22:45 UTC at Oslo, 8° field
 
 ![](field-8.png)
 
-Jupiter's true disc is 1.3 px here; above the normal minimum field each moon is drawn only where its own mark is distinguishable; the inset shows the arrangement. Drawn on the page: Jupiter at (450, 350), true 1.3 × 1.2 px, drawn 6.0 × 6.0 px (the minimum mark: a cartographic symbol); Io in front unresolved, not drawn; Europa in front unresolved, not drawn; Ganymede at (459, 346) clear; Callisto in front unresolved, not drawn; Jupiter's label at candidate 1;
+Jupiter's true disc is 1.3 px here; above the normal minimum field each moon is drawn only where its own mark is distinguishable; the inset shows the arrangement. Drawn on the page: Jupiter at (450, 350), true 1.3 × 1.2 px, drawn 6.0 × 6.0 px (the minimum mark: a cartographic symbol); Io in front unresolved, not drawn; Europa in front unresolved, not drawn; Ganymede at (459, 346) clear; Callisto in front unresolved, not drawn; Where its labels went on this machine is in `platform.md`.
 
 ### The triple transit, 2026-12-11 22:45 UTC at Oslo, 3° field
 
 ![](field-3.png)
 
-Jupiter's true disc is 3.4 px here; above the normal minimum field each moon is drawn only where its own mark is distinguishable; the inset shows the arrangement. Drawn on the page: Jupiter at (450, 350), true 3.4 × 3.2 px, drawn 6.0 × 6.0 px (the minimum mark: a cartographic symbol); Io in front unresolved, not drawn; Europa in front unresolved, not drawn; Ganymede at (473, 340) clear; Callisto in front unresolved, not drawn; Ganymede's label at candidate 2;
+Jupiter's true disc is 3.4 px here; above the normal minimum field each moon is drawn only where its own mark is distinguishable; the inset shows the arrangement. Drawn on the page: Jupiter at (450, 350), true 3.4 × 3.2 px, drawn 6.0 × 6.0 px (the minimum mark: a cartographic symbol); Io in front unresolved, not drawn; Europa in front unresolved, not drawn; Ganymede at (473, 340) clear; Callisto in front unresolved, not drawn; Where its labels went on this machine is in `platform.md`.
 
 ### The triple transit, 2026-12-11 22:45 UTC at Oslo, 1° field
 
 ![](field-1.png)
 
-Jupiter's true disc is 10.1 px here; at the normal minimum field every moon not behind Jupiter is drawn at its exact place, the three in front overlapping Jupiter's mark on purpose. Drawn on the page: Jupiter at (450, 350), true 10.1 × 9.5 px, drawn 10.1 × 9.7 px; Io at (446, 351) in front; Europa at (448, 350) in front; Ganymede at (520, 321) clear; Callisto at (454, 347) in front; Io's label at candidate 1; Europa's label refused; Callisto's label at candidate 2;
+Jupiter's true disc is 10.1 px here; at the normal minimum field every moon not behind Jupiter is drawn at its exact place, the three in front overlapping Jupiter's mark on purpose. Drawn on the page: Jupiter at (450, 350), true 10.1 × 9.5 px, drawn 10.1 × 9.7 px; Io at (446, 351) in front; Europa at (448, 350) in front; Ganymede at (520, 321) clear; Callisto at (454, 347) in front; Where its labels went on this machine is in `platform.md`.
 
 ### The 11 December 2026 sequence at 22:30 UTC, Oslo, 1° field
 
 ![](triple-2230.png)
 
-States: Io clear of jupiter; Europa in front of jupiter; Ganymede clear of jupiter; Callisto in front of jupiter; Drawn on the page: Jupiter at (450, 350), true 10.1 × 9.5 px, drawn 10.1 × 9.7 px; Io at (445, 352) clear; Europa at (447, 350) in front; Ganymede at (520, 321) clear; Callisto at (453, 347) in front; Io's label at candidate 1; Europa's label refused; Callisto's label at candidate 2;
+States: Io clear of jupiter; Europa in front of jupiter; Ganymede clear of jupiter; Callisto in front of jupiter; Drawn on the page: Jupiter at (450, 350), true 10.1 × 9.5 px, drawn 10.1 × 9.7 px; Io at (445, 352) clear; Europa at (447, 350) in front; Ganymede at (520, 321) clear; Callisto at (453, 347) in front; Where its labels went on this machine is in `platform.md`.
 
 ### The 11 December 2026 sequence at 22:45 UTC, Oslo, 1° field
 
 ![](triple-2245.png)
 
-States: Io in front of jupiter; Europa in front of jupiter; Ganymede clear of jupiter; Callisto in front of jupiter; Drawn on the page: Jupiter at (450, 350), true 10.1 × 9.5 px, drawn 10.1 × 9.7 px; Io at (446, 351) in front; Europa at (448, 350) in front; Ganymede at (520, 321) clear; Callisto at (454, 347) in front; Io's label at candidate 1; Europa's label refused; Callisto's label at candidate 2;
+States: Io in front of jupiter; Europa in front of jupiter; Ganymede clear of jupiter; Callisto in front of jupiter; Drawn on the page: Jupiter at (450, 350), true 10.1 × 9.5 px, drawn 10.1 × 9.7 px; Io at (446, 351) in front; Europa at (448, 350) in front; Ganymede at (520, 321) clear; Callisto at (454, 347) in front; Where its labels went on this machine is in `platform.md`.
 
 ### The 11 December 2026 sequence at 22:55 UTC, Oslo, 1° field
 
 ![](triple-2255.png)
 
-States: Io in front of jupiter; Europa in front of jupiter; Ganymede clear of jupiter; Callisto in front of jupiter; Drawn on the page: Jupiter at (450, 350), true 10.1 × 9.5 px, drawn 10.1 × 9.7 px; Io at (447, 351) in front; Europa at (448, 350) in front; Ganymede at (520, 321) clear; Callisto at (454, 347) in front; Io's label at candidate 1; Europa's label refused; Callisto's label at candidate 2;
+States: Io in front of jupiter; Europa in front of jupiter; Ganymede clear of jupiter; Callisto in front of jupiter; Drawn on the page: Jupiter at (450, 350), true 10.1 × 9.5 px, drawn 10.1 × 9.7 px; Io at (447, 351) in front; Europa at (448, 350) in front; Ganymede at (520, 321) clear; Callisto at (454, 347) in front; Where its labels went on this machine is in `platform.md`.
 
 ### The 11 December 2026 sequence at 23:00 UTC, Oslo, 1° field
 
 ![](triple-2300.png)
 
-States: Io in front of jupiter; Europa in front of jupiter; Ganymede clear of jupiter; Callisto clear of jupiter; Drawn on the page: Jupiter at (450, 350), true 10.1 × 9.5 px, drawn 10.1 × 9.7 px; Io at (447, 351) in front; Europa at (449, 350) in front; Ganymede at (520, 321) clear; Callisto at (454, 347) clear; Io's label at candidate 1; Europa's label refused; Callisto's label at candidate 2;
+States: Io in front of jupiter; Europa in front of jupiter; Ganymede clear of jupiter; Callisto clear of jupiter; Drawn on the page: Jupiter at (450, 350), true 10.1 × 9.5 px, drawn 10.1 × 9.7 px; Io at (447, 351) in front; Europa at (449, 350) in front; Ganymede at (520, 321) clear; Callisto at (454, 347) clear; Where its labels went on this machine is in `platform.md`.
 
 ### Io behind Jupiter (Horizons O at this hour), 2026-12-02 07:00 UTC, 1° field
 
 ![](behind-1.png)
 
-States: Io behind jupiter; Europa clear of jupiter; Ganymede clear of jupiter; Callisto clear of jupiter; Drawn on the page: Jupiter at (450, 350), true 9.8 × 9.2 px, drawn 9.8 × 9.4 px; Io behind, not drawn; Europa at (492, 333) clear; Ganymede at (410, 366) clear; Callisto at (501, 331) clear; Europa's label at candidate 1;
+States: Io behind jupiter; Europa clear of jupiter; Ganymede clear of jupiter; Callisto clear of jupiter; Drawn on the page: Jupiter at (450, 350), true 9.8 × 9.2 px, drawn 9.8 × 9.4 px; Io behind, not drawn; Europa at (492, 333) clear; Ganymede at (410, 366) clear; Callisto at (501, 331) clear; Where its labels went on this machine is in `platform.md`.
 
 ### Io wholly in Jupiter's shadow (Horizons u), 2026-12-02 04:00 UTC, 1° field
 
 ![](shadow-full-1.png)
 
-States: Io in jupiters shadow; Europa clear of jupiter; Ganymede clear of jupiter; Callisto clear of jupiter; Drawn on the page: Jupiter at (450, 350), true 9.8 × 9.2 px, drawn 9.8 × 9.4 px; Io at (458, 347) shadowed; Europa at (493, 333) clear; Ganymede at (404, 368) clear; Callisto at (506, 329) clear; Jupiter's label at candidate 1; Europa's label at candidate 1;
+States: Io in jupiters shadow; Europa clear of jupiter; Ganymede clear of jupiter; Callisto clear of jupiter; Drawn on the page: Jupiter at (450, 350), true 9.8 × 9.2 px, drawn 9.8 × 9.4 px; Io at (458, 347) shadowed; Europa at (493, 333) clear; Ganymede at (404, 368) clear; Callisto at (506, 329) clear; Where its labels went on this machine is in `platform.md`.
 
 ### Io partly in Jupiter's shadow (Horizons p), 2026-12-21 15:00 UTC, 1° field
 
 ![](shadow-partial-1.png)
 
-States: Io partly in jupiters shadow; Europa clear of jupiter; Ganymede clear of jupiter; Callisto clear of jupiter; Drawn on the page: Jupiter at (450, 350), true 10.4 × 9.7 px, drawn 10.4 × 9.9 px; Io at (459, 347) shadowed; Europa at (406, 368) clear; Ganymede at (407, 368) clear; Callisto at (383, 378) clear; Jupiter's label at candidate 1; Ganymede's label at candidate 1; Callisto's label at candidate 4;
+States: Io partly in jupiters shadow; Europa clear of jupiter; Ganymede clear of jupiter; Callisto clear of jupiter; Drawn on the page: Jupiter at (450, 350), true 10.4 × 9.7 px, drawn 10.4 × 9.9 px; Io at (459, 347) shadowed; Europa at (406, 368) clear; Ganymede at (407, 368) clear; Callisto at (383, 378) clear; Where its labels went on this machine is in `platform.md`.
 
 ### State vocabulary A, as ruled, on both palettes
 
@@ -149,49 +139,49 @@ One cell per state, each a real configuration at Oslo (Horizons' visibility code
 
 ![](horizon-drawn-8.png)
 
-Jupiter at -1.2° altitude, drawn in the ground's dimmed ink with its status, as the Sun's and the Moon's ruling (C4) has it. Drawn on the page: Jupiter at (510, 468), true 1.2 × 1.1 px, drawn 6.0 × 6.0 px (the minimum mark: a cartographic symbol); Io at jupiter, not drawn; Europa at jupiter, not drawn; Ganymede at (502, 471) clear; Callisto at (520, 464) clear; Jupiter (below the horizon)'s label at candidate 2; Ganymede's label at candidate 1; Callisto's label at candidate 3;
+Jupiter at -1.2° altitude, drawn in the ground's dimmed ink with its status, as the Sun's and the Moon's ruling (C4) has it. Drawn on the page: Jupiter at (510, 468), true 1.2 × 1.1 px, drawn 6.0 × 6.0 px (the minimum mark: a cartographic symbol); Io at jupiter, not drawn; Europa at jupiter, not drawn; Ganymede at (502, 471) clear; Callisto at (520, 464) clear; Where its labels went on this machine is in `platform.md`.
 
 ### The same instant with the horizon hidden
 
 ![](horizon-hidden-8.png)
 
-With no horizon drawn the celestial chart draws Jupiter normally (C4). Drawn on the page: Jupiter at (510, 468), true 1.2 × 1.1 px, drawn 6.0 × 6.0 px (the minimum mark: a cartographic symbol); Io at jupiter, not drawn; Europa at jupiter, not drawn; Ganymede at (502, 471) clear; Callisto at (520, 464) clear; Jupiter's label at candidate 2; Ganymede's label at candidate 1; Callisto's label at candidate 3;
+With no horizon drawn the celestial chart draws Jupiter normally (C4). Drawn on the page: Jupiter at (510, 468), true 1.2 × 1.1 px, drawn 6.0 × 6.0 px (the minimum mark: a cartographic symbol); Io at jupiter, not drawn; Europa at jupiter, not drawn; Ganymede at (502, 471) clear; Callisto at (520, 464) clear; Where its labels went on this machine is in `platform.md`.
 
 ### The most crowded 2026 configuration with all four moons clear, 3° field
 
 ![](labels-crowded-3.png)
 
-Each mark and each label is decided on its own: a label with no free candidate is refused alone, and the others stand; the inset shows the moons. Drawn on the page: Jupiter at (450, 350), true 2.7 × 2.5 px, drawn 6.0 × 6.0 px (the minimum mark: a cartographic symbol); Io at jupiter, not drawn; Europa at jupiter, not drawn; Ganymede at (469, 346) clear; Callisto at (428, 355) clear; Jupiter's label at candidate 3; Callisto's label at candidate 1;
+Each mark and each label is decided on its own: a label with no free candidate is refused alone, and the others stand; the inset shows the moons. Drawn on the page: Jupiter at (450, 350), true 2.7 × 2.5 px, drawn 6.0 × 6.0 px (the minimum mark: a cartographic symbol); Io at jupiter, not drawn; Europa at jupiter, not drawn; Ganymede at (469, 346) clear; Callisto at (428, 355) clear; Where its labels went on this machine is in `platform.md`.
 
 ### A crowded pair at 3°: only the lower-priority mark is suppressed
 
 ![](independent-suppression-3.png)
 
-2026-01-01 06:00 UTC at Oslo. Two moons collide at this field: the lower-priority one is not drawn, while every other distinguishable moon is. Drawn on the page: Jupiter at (450, 350), true 3.9 × 3.6 px, drawn 6.0 × 6.0 px (the minimum mark: a cartographic symbol); Io collides, not drawn; Europa at jupiter, not drawn; Ganymede at (475, 346) clear; Callisto at (464, 346) clear; Jupiter's label at candidate 1; Callisto's label at candidate 3;
+2026-01-01 06:00 UTC at Oslo. Two moons collide at this field: the lower-priority one is not drawn, while every other distinguishable moon is. Drawn on the page: Jupiter at (450, 350), true 3.9 × 3.6 px, drawn 6.0 × 6.0 px (the minimum mark: a cartographic symbol); Io collides, not drawn; Europa at jupiter, not drawn; Ganymede at (475, 346) clear; Callisto at (464, 346) clear; Where its labels went on this machine is in `platform.md`.
 
 ### Labels on adjacent candidates around Jupiter, 1° field
 
 ![](labels-around-1.png)
 
-2026-03-06 06:00 UTC at Oslo. Each label takes the first of its eight adjacent candidates that covers no mark or text; a crowded one is refused alone. Drawn on the page: Jupiter at (450, 350), true 10.5 × 9.9 px, drawn 10.5 × 10.0 px; Io at (463, 348) clear; Europa at (469, 348) clear; Ganymede at (508, 344) clear; Callisto at (578, 332) clear; Jupiter's label at candidate 1; Io's label at candidate 2; Europa's label at candidate 4;
+2026-03-06 06:00 UTC at Oslo. Each label takes the first of its eight adjacent candidates that covers no mark or text; a crowded one is refused alone. Drawn on the page: Jupiter at (450, 350), true 10.5 × 9.9 px, drawn 10.5 × 10.0 px; Io at (463, 348) clear; Europa at (469, 348) clear; Ganymede at (508, 344) clear; Callisto at (578, 332) clear; Where its labels went on this machine is in `platform.md`.
 
 ### Jupiter beside Regulus's label, 2027-01-15 22:00 UTC, 8° field
 
 ![](labels-regulus-8.png)
 
-Jupiter 5.0° from Regulus: its label takes a free adjacent place or is refused; it never overwrites the star's. Drawn on the page: Jupiter at (702, 225), true 1.4 × 1.3 px, drawn 6.0 × 6.0 px (the minimum mark: a cartographic symbol); Io at jupiter, not drawn; Europa at jupiter, not drawn; Ganymede at (710, 222) clear; Callisto collides, not drawn; Jupiter's label at candidate 1;
+Jupiter 5.0° from Regulus: its label takes a free adjacent place or is refused; it never overwrites the star's. Drawn on the page: Jupiter at (702, 225), true 1.4 × 1.3 px, drawn 6.0 × 6.0 px (the minimum mark: a cartographic symbol); Io at jupiter, not drawn; Europa at jupiter, not drawn; Ganymede at (710, 222) clear; Callisto collides, not drawn; Where its labels went on this machine is in `platform.md`.
 
 ### The system near the page's left edge, 3° field
 
 ![](page-edge-3.png)
 
-Bodies off the page are not drawn, as stars are not (C4). Drawn on the page: Jupiter at (30, 348), true 3.4 × 3.2 px, drawn 6.0 × 6.0 px (the minimum mark: a cartographic symbol); Io in front unresolved, not drawn; Europa in front unresolved, not drawn; Ganymede at (53, 338) clear; Callisto in front unresolved, not drawn; Ganymede's label at candidate 2;
+Bodies off the page are not drawn, as stars are not (C4). Drawn on the page: Jupiter at (30, 348), true 3.4 × 3.2 px, drawn 6.0 × 6.0 px (the minimum mark: a cartographic symbol); Io in front unresolved, not drawn; Europa in front unresolved, not drawn; Ganymede at (53, 338) clear; Callisto in front unresolved, not drawn; Where its labels went on this machine is in `platform.md`.
 
 ### The A4 sheet's chart area at 150 dpi (1754 × 1090 px), 8° field
 
 ![](printable-a4-8.png)
 
-Jupiter's true disc is 0.38 mm on the sheet: the minimum mark stands for it. Drawn on the page: Jupiter at (877, 545), true 2.5 × 2.3 px, drawn 6.0 × 6.0 px (the minimum mark: a cartographic symbol); Io in front unresolved, not drawn; Europa in front unresolved, not drawn; Ganymede at (894, 538) clear; Callisto in front unresolved, not drawn; Jupiter's label at candidate 1;
+Jupiter's true disc is 0.38 mm on the sheet: the minimum mark stands for it. Drawn on the page: Jupiter at (877, 545), true 2.5 × 2.3 px, drawn 6.0 × 6.0 px (the minimum mark: a cartographic symbol); Io in front unresolved, not drawn; Europa in front unresolved, not drawn; Ganymede at (894, 538) clear; Callisto in front unresolved, not drawn; Where its labels went on this machine is in `platform.md`.
 
 ## E. The owner's rulings, with their measured reasons
 
