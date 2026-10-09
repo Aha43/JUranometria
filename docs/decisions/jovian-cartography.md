@@ -1,10 +1,10 @@
 # Drawing Jupiter and the Galilean moons
 
-**Sprint 45, issue #482.** The proposed cartography contract for Jupiter
-and its four Galilean moons, from the measured study
-(`docs/studies/jovian-cartography/`). This record is a **proposal
-awaiting the owner's rulings**. No production rendering exists, and none
-begins before the rulings.
+**Sprint 45, issue #482.** The cartography contract for Jupiter and its
+four Galilean moons, from the measured study
+(`docs/studies/jovian-cartography/`), as the owner ruled it on #482. The
+study's first proposal was amended to these rulings before it merged. No
+production rendering exists here: that is #484.
 
 ## The question
 
@@ -50,10 +50,13 @@ both from the production star policy.
   (#481), or paper, where A4 at 300 dpi resolves it from 2.9°.
 - **A moon's mark is always a symbol.** Every moon's true disc is
   below a pixel at every field.
-- **The moons are rarely separable.** Over 2026, a 3 px symbol for each
-  moon is clear of every other and of Jupiter's mark in 56 % of
-  configurations at 1°, 11 % at 3°, and 0.1 % at 8°. A label line
-  between every pair fits in 21 % at 1°.
+- **The whole system is rarely separable, but a moon often is.** Over
+  2026 the first proposal's rule, all moons only when every mark is
+  separable, drew the moons in 56 % of configurations at 1°, 11 % at 3°
+  and 0.1 % at 8°. Decided one moon at a time (section B of the
+  report), 22 % of the visible moon places are drawn at 8° and 60 % at
+  3°. At 1° every one is drawn, and production's adjacent candidates
+  place 96 % of their labels. No configuration loses every moon label.
 
 **The frame.** Measured over the century:
 
@@ -66,7 +69,7 @@ both from the production star policy.
 
 So neither the table's angle nor its offsets can be drawn as they stand.
 
-## The frame contract, proposed and held
+## The frame contract, as ruled and held
 
 `JovianChartFrameTest` holds this contract:
 
@@ -84,51 +87,80 @@ So neither the table's angle nor its offsets can be drawn as they stand.
   - Jupiter moves under 0.01 px per second at 1° across its JUP365
     segment boundary at 1997-01-16.
 
-## For the rulings
+## The rulings
 
-The issue's eight product questions. Each proposal is drawn in the study's
-mock-ups over production pages, in both palettes and both languages.
+The owner ruled on the issue's product questions on #482. Each is drawn
+in the study's mock-ups over production pages, in both palettes and both
+languages.
 
-1. **One remembered switch, *Jupiter and moons on the chart*, off by
-   default.** It follows the Sun's and the Moon's model.
-2. **Jupiter at ordinary fields gets a cartographic mark and its label.**
-   The mark is a disc of 6 px or its true size, whichever is larger,
-   stated as a symbol. This departs from C1 because true scale loses
-   Jupiter.
-3. **Jupiter once resolvable is drawn as its true oblate disc**, with no
-   bands, Great Red Spot or rotation.
+1. **One switch, *Jupiter and moons on the chart*, off by default and
+   remembered.** It follows the Sun's and the Moon's model.
+2. **Jupiter's mark is 6 px or its true size, whichever is larger.**
+   True scale alone would lose Jupiter at most fields, so this departs
+   from C1. Evidence and accessible text call the minimum *a
+   cartographic symbol, not Jupiter's apparent diameter*.
+3. **The true figure and pole are drawn**, through the continuous
+   transition and the J2000-derived pole.
+   - The mark is a circle at the 6 px minimum and reaches the true axis
+     ratio as the true disc grows to 12 px.
    - The minor axis lies along the pole derived in the chart's frame.
-   - The transition is continuous: a circle at the 6 px minimum, reaching
-     the true axis ratio as the true disc grows to 12 px.
-4. **The moons are symbols, never apparent diameters.** Each is a 3 px
-   dot, drawn only where the system is separable. Elsewhere Jupiter's
-   mark alone stands for the system.
-5. **The moons' states, candidate A.**
+   - No bands, Great Red Spot or rotation.
+   - **The flattening is not claimed to be visibly resolved at the
+     current 1° floor.** There the two axes are under a pixel apart.
+4. **The moons are 3 px symbolic marks, each decided on its own.**
+   - At the normal minimum field, 1° today, every moon that can be drawn
+     is drawn at its exact J2000 position, and overlap is allowed.
+   - A moon in front of Jupiter overlaps it on purpose.
+   - A moon behind Jupiter is omitted.
+   - Clear or shadowed moons outside the disc are decided independently.
+     A collision suppresses only the lower-priority mark or label.
+   - Above the normal minimum, a moon is drawn only when its own mark is
+     distinguishable.
+   - Labels are decided separately from marks.
+   - The 22:45 triple transit of 11 December 2026 keeps its three
+     in-front moon marks at 1°.
+5. **State vocabulary A.**
    - Clear: a filled dot.
-   - In front of Jupiter: a filled dot ringed in paper over the disc.
-   - Behind Jupiter: not drawn, and its label refused.
-   - Wholly or partly in shadow: a hollow ring.
-
-   The alternative, B, draws a dashed ghost behind and grey in shadow.
-   Satellite shadow spots on Jupiter are not drawn, because the service
-   does not compute them.
-6. **Moon labels** are drawn only where they have room. Each goes to the
-   right of its mark and is refused rather than overlapping. Jupiter's
-   label follows C4: adjacent candidates, never overwriting a star's.
-7. **Horizon, page edge, stars, clicking and export follow C4 and C6.**
-   - Below a drawn horizon, Jupiter is dimmed with its status; with the
+   - In front of Jupiter: a filled dot with a paper or background ring.
+   - Behind Jupiter: omitted.
+   - Wholly or partly in shadow: a hollow ring, shared by both. The
+     table keeps the difference.
+   - No ghost. Satellite shadow spots on Jupiter are not drawn, because
+     the service does not compute them.
+6. **Labels use adjacent candidates and the existing collision
+   machinery.** A label is refused when it has no room, where production
+   would otherwise place it under duress. One crowded pair never
+   suppresses every moon label.
+7. **Horizon, page edge, stars, clicks and export follow C4 and C6.**
+   - Below a drawn horizon, Jupiter is dimmed with its status. With the
      horizon hidden, it is drawn normally.
    - Off the page, nothing is drawn.
-   - No star is hidden while Jupiter is a symbol.
-   - A click may consume the hit but never exposes a hidden star.
-   - An exported sheet draws what the page draws.
+   - The symbolic mark must not erase a real star.
+   - Its hit area must not expose a hidden star.
+   - Export draws through the same module.
 8. ***Centre on chart* for Jupiter** uses #483's accepted action through
    its prepared seam. Its button lands with the visible module (#484).
+9. **Future close zoom (#481).** No geometry, label or evidence code may
+   assume that 1° is permanent. The study reads the chart's normal
+   minimum field rather than naming 1°.
 
-**A smaller field later (#481).** The mark's minimum, the transition and
-the separability thresholds are all measured in pixels, and the
-positions in J2000. A field below 1° therefore needs none of them
-changed. None is exposed here.
+**Rejected from the first proposal:**
+
+- drawing all moons only when the whole system is separable, which hid
+  the triple transit behind a lone Jupiter mark at 1°;
+- vocabulary B, which drew a dashed ghost behind Jupiter and grey in
+  shadow;
+- a fixed rule placing every moon label to the right of its mark.
+
+**What the amended study demonstrates:**
+
+- the 22:45 triple transit at 1°, with the three in-front moon marks
+  present on the page;
+- independent suppression at 3°, where one colliding moon is not drawn
+  and the two clear moons beyond it are;
+- labels on adjacent candidates around Jupiter, and a crowded label
+  refused alone;
+- state vocabulary A on white paper and on black sky.
 
 ## Evidence
 
@@ -138,6 +170,6 @@ changed. None is exposed here.
   contract's arithmetic.
 - **The contract test:** `test/juranometria/tool/JovianChartFrameTest.java`.
 - **The report and mock-ups:** `docs/studies/jovian-cartography/`. The
-  report is a registered deterministic report. The 18 mock-ups are
+  report is a registered deterministic report. The 20 mock-ups are
   registered image generators under the renderer-drawn contract, with
   their provenance rows, as #414's were.
