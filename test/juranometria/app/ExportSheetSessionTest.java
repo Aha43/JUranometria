@@ -181,6 +181,50 @@ class ExportSheetSessionTest {
         assertTrue(with.contains(">Moon<"), "and the Moon");
     }
 
+    @Test
+    void theSheetCarriesTheJupiterAndMoonsTheScreenShows(@TempDir Path folder)
+            throws Exception {
+        SwingSession.scratchPreferences("export-jovian", node ->
+                sheetCarriesJupiter(folder, node));
+    }
+
+    /** #486: the export draws the Jovian module's ink from the same contributions. */
+    private void sheetCarriesJupiter(Path folder, java.util.prefs.Preferences node)
+            throws Exception {
+        juranometria.sky.Observer oslo = new juranometria.sky.Observer(59.913, 10.752,
+                juranometria.tool.JupiterOnTheChartStudyMain.SHEET_MOMENT);
+        juranometria.solar.JovianSystemService service =
+                juranometria.solar.JovianSystemService.load();
+        ChartViewController navigation = new ChartViewController();
+        navigation.recenter(service.observeJupiter(oslo).astrometricJ2000(),
+                juranometria.tool.JupiterOnTheChartStudyMain.sheetField(service));
+        ChartComponent chart = chart(navigation);
+        juranometria.jovianchart.JovianModule module =
+                new juranometria.jovianchart.JovianModule(() -> oslo, () -> service,
+                        () -> false);
+        SwingUtilities.invokeAndWait(() -> chart.overlays().offer(
+                juranometria.jovianchart.JovianModule.ID, module::contributedGeometry));
+        ChartOptionsController options = new ChartOptionsController(
+                ChartOptionsStore.forNode(node));
+        ExportSheet.Request request = new ExportSheet.Request(SheetFormat.SVG,
+                PaperSize.A4, 300, false);
+        juranometria.ui.language.InterfaceText english =
+                juranometria.ui.language.InterfaceText.forLanguage("en");
+        ExportSheetSession.exportTo(folder.resolve("without").toFile(), request,
+                navigation, chart, options, new WorkingSelection(), file -> true, english);
+        String without = Files.readString(folder.resolve("without.svg"));
+        assertTrue(!without.contains(">Jupiter<") && !without.contains(">Ganymede<"),
+                "switched off, the sheet carries no Jovian ink");
+        SwingUtilities.invokeAndWait(() -> module.showing(true));
+        ExportSheetSession.exportTo(folder.resolve("with").toFile(), request,
+                navigation, chart, options, new WorkingSelection(), file -> true, english);
+        String with = Files.readString(folder.resolve("with.svg"));
+        for (String name : List.of("Jupiter", "Io", "Europa", "Ganymede", "Callisto")) {
+            assertTrue(with.contains(">" + name + "<"),
+                    "the sheet names " + name + ", as the screen does at the triple transit");
+        }
+    }
+
     private static SkyPosition halfway(SkyPosition a, SkyPosition b) {
         double x = 0.0;
         double y = 0.0;

@@ -29,6 +29,11 @@
       "id": "sun-and-moon",
       "name": "The Sun and the Moon",
       "lead": "One removable module that draws the Sun and the Moon for Place and Time's single moment: each at its true angular size, never enlarged; the Sun a ring with its centre dot, the Moon a disc lit on the side the Moon table states; dimmed and saying so when below a drawn horizon."
+    },
+    {
+      "id": "jupiter",
+      "name": "Jupiter and its moons",
+      "lead": "One removable module that draws Jupiter and its four Galilean moons for Place and Time's single moment, each at its own computed place: Jupiter at its true size once that reaches six pixels, and otherwise as a six-pixel cartographic symbol beneath the stars; each moon always as a three-pixel symbol, never its apparent size, drawn only where it can be told apart."
     }
   ],
   "slides": [
@@ -200,6 +205,32 @@
       "source": "docs/studies/gallery/sun-and-moon-horizon.png",
       "produced": "Composed by the production chart component with the real meridian and Solar System modules and reference-ink and body painters (GalleryPageMain); regenerated and compared by make evidence-contracts. Sprint 37 tree.",
       "alt": "A star chart of Pisces with Aries, Andromeda and Pegasus at the edges, a dashed line labelled Mathematical horizon crossing the upper left, a small pale disc labelled Moon (below the horizon) left of centre, and a small pale ring labelled Sun (below the horizon) near the lower right corner."
+    },
+    {
+      "slug": "jupiter-and-moons",
+      "room": "jupiter",
+      "kind": "chart",
+      "title": "Jupiter and four moons at 1°",
+      "caption": "The gallery's moment — Oslo, 2026-03-20 21:33 UTC — on a 1° page, the chart's narrowest normal field: Jupiter's disc at its true size, 40.3″ across, 41.2° above the horizon, with Io east of it and Europa, Ganymede and Callisto to the west, at 5.7, 8.7, 13.6 and 23.7 Jupiter radii. A moon's disc is far below a pixel, so each is drawn as a three-pixel symbol at its own place, not at its apparent size.",
+      "region": "Gemini",
+      "field": "1°",
+      "ink": "Jupiter's disc, the four moon marks and their names are Jupiter-and-moons module ink; everything else is the core chart.",
+      "source": "docs/studies/gallery/jupiter-and-moons.png",
+      "produced": "Composed by the production chart component with the real Jovian module and body painter (GalleryPageMain); regenerated and compared by make evidence-contracts. Sprint 45 tree.",
+      "alt": "A star chart in Gemini at a 1 degree field, centred on a small circle labelled Jupiter, with four small dots in a line beside it labelled Io to the left and Europa, Ganymede and Callisto to the right."
+    },
+    {
+      "slug": "jupiter-in-gemini",
+      "room": "jupiter",
+      "kind": "chart",
+      "title": "A symbol, not a size",
+      "caption": "The same moment on an 8° page in Gemini. Jupiter's true disc would be 1.3 pixels, smaller than the faintest star mark, so it is drawn as a six-pixel cartographic symbol, beneath the stars. Only Ganymede and Callisto stand far enough out to be told apart from it; Io and Europa are left undrawn rather than enlarged.",
+      "region": "Gemini",
+      "field": "8°",
+      "ink": "Jupiter's symbol, the two moon marks and their names are Jupiter-and-moons module ink; everything else is the core chart.",
+      "source": "docs/studies/gallery/jupiter-in-gemini.png",
+      "produced": "Composed by the production chart component with the real Jovian module, its reference-ink and body painters (GalleryPageMain); regenerated and compared by make evidence-contracts. Sprint 45 tree.",
+      "alt": "A star chart of part of Gemini at an 8 degree field with the stars Wasat and Mekbuda labelled, and at the centre a small ring labelled Jupiter with two dots just to its right labelled Ganymede and Callisto."
     }
   ]
 }

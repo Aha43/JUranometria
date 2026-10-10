@@ -53,7 +53,7 @@ public final class CompanionSheetMain {
     /** One arrangement, and what it shows. */
     private record State(String name, boolean dark, boolean collapsed,
                          String refused, boolean deepSkyOpen,
-                         boolean solarSystemOpen) {
+                         boolean solarSystemOpen, boolean jupiterOpen) {
     }
 
     /** A chart switch that stands still: the section's photograph is not the chart's. */
@@ -101,12 +101,15 @@ public final class CompanionSheetMain {
      * "collapsed" collapses Place and Time.
      */
     private static final List<State> STATES = List.of(
-            new State("open", false, false, null, false, false),
-            new State("dark", true, false, null, false, false),
-            new State("collapsed", false, true, null, false, false),
-            new State("refused", false, false, "91", false, false),
-            new State("deep-sky-open", false, true, null, true, false),
-            new State("solar-system-open", false, true, null, false, true));
+            new State("open", false, false, null, false, false, false),
+            new State("dark", true, false, null, false, false, false),
+            new State("collapsed", false, true, null, false, false, false),
+            new State("refused", false, false, "91", false, false, false),
+            new State("deep-sky-open", false, true, null, true, false, false),
+            new State("solar-system-open", false, true, null, false, true, false),
+            // #486: Jupiter's group open, the Sun's collapsed, nothing
+            // computed - the Jovian module's Show on chart box in place.
+            new State("jupiter-open", false, true, null, false, true, true));
 
     private CompanionSheetMain() {
     }
@@ -172,7 +175,7 @@ public final class CompanionSheetMain {
         }
         Files.writeString(out.resolve("companion-strings.md"),
                 said.toString(), StandardCharsets.UTF_8);
-        System.out.println("companion sheets: 12 images and "
+        System.out.println("companion sheets: " + 2 * STATES.size() + " images and "
                 + out.resolve("companion-strings.md"));
     }
 
@@ -243,6 +246,12 @@ public final class CompanionSheetMain {
                         place.latitude(), place.eastLongitude(),
                         PlaceAndTimeSheetMain.WHEN);
                 juranometria.solar.SolarSystemService solar = solarSystem();
+                if (state.jupiterOpen()) {
+                    companionStore.saveCollapsed(
+                            juranometria.ui.solar.SolarSystemSection.ID + ".sun", true);
+                    companionStore.saveCollapsed(
+                            juranometria.ui.solar.SolarSystemSection.ID + ".jupiter", false);
+                }
                 juranometria.ui.solar.SolarSystemSection solarSection =
                         new juranometria.ui.solar.SolarSystemSection(
                                 new juranometria.ui.solar.SolarTableSession(
@@ -251,12 +260,23 @@ public final class CompanionSheetMain {
                                 new juranometria.ui.solar.SolarTableSession(
                                         () -> observer, solar,
                                         juranometria.ui.solar.SolarTable.moon()),
-                                new StillSwitch(), new StillSwitch(), words);
+                                new StillSwitch(), new StillSwitch(),
+                                // Jupiter's group (#474) with the Jovian
+                                // module's switch (#484, #486), as the
+                                // application's Controller holds it;
+                                // introduced collapsed, it computes nothing,
+                                // so the pack is never read.
+                                new juranometria.ui.solar.JovianTableSession(
+                                        () -> observer,
+                                        juranometria.solar.JovianSystemService::load),
+                                new StillSwitch(), null, words);
                 window[0].addSection("solarsystem", words.say("solarsystem.title"),
                         solarSection.inController(companionStore, words), true);
                 if (state.solarSystemOpen()) {
                     window[0].sections().get(2).heading().doClick();
-                    solarSection.sun().apply();
+                    if (!state.jupiterOpen()) {
+                        solarSection.sun().apply();
+                    }
                 }
                 window[0].addSection("chartoptions",
                         words.say("chartoptions.title"),

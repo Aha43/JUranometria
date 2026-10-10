@@ -7,6 +7,13 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Jupiter in the gallery and on paper (#486).** The gallery gains a room,
+*Jupiter and its moons*, drawn by the application at the gallery's own
+moment. An exported sheet of Jupiter is drawn exactly as the screen draws
+it, moons, states and names included. The A4 sheet's scale was measured:
+the moons in front of Jupiter can be told apart on paper only at the 1°
+field.
+
 **Jupiter's four moons on the chart (#485).** With *Jupiter and moons
 on the chart* on, Io, Europa, Ganymede and Callisto are drawn as
 3-pixel symbols at their own computed places, never at their true size,

@@ -262,6 +262,61 @@ languages.
 - **Not drawn:** satellite shadow spots on Jupiter. Nor are moons in
   1900–1999, which have no numbers.
 
+## The evidence, integrated once (#486)
+
+- **Production pages.** `JupiterOnTheChartStudyMain`
+  (`make jupiter-on-the-chart-study`, `docs/studies/jupiter-on-the-chart/`)
+  draws the merged module through the real `ChartComponent`. It covers
+  the journeys #485 names:
+  - the triple transit at 36°, 8°, 3° and 1°;
+  - the 11 December 2026 sequence at 22:30, 22:55 and 23:00;
+  - a normal spread at 1° and 3°;
+  - Io behind Jupiter, wholly in shadow and partly in shadow;
+  - Jupiter below a drawn horizon and with the horizon hidden.
+
+  Both palettes and both languages are covered. The portable report
+  holds each body's place against the service, every moon's page
+  decision and state, and the spoken text. Every drawn centre is
+  0.0000 px from the service's own projection.
+- **What does not resolve, recorded and never enlarged.** At each field
+  from 36° to 1°, at the triple transit and at the spread, the report
+  states why each undrawn moon is not drawn. The reasons are: in front
+  of a disc too small to hold its mark, at Jupiter's edge, or colliding.
+  The page's decision is published read-only
+  (`ReferenceInk.satelliteDecisions`) so the evidence states it rather
+  than infers it.
+- **The sheet, at a measured scale.** The 42° two-body sheet does not
+  resolve the moons. The study measures each supported field on the A4
+  sheet's own page at the triple transit and takes the widest at which
+  every moon not behind Jupiter is drawn. That is the normal minimum
+  field, 1°. `sheet-a4-jovian.png` (300 dpi) and `.pdf` are written
+  there.
+  - **Pixel for pixel:** the packaged journey *jovian sheet OK* holds
+    the application's own export equal to the inspected recording.
+  - **Screen and paper:** they draw the same Jupiter disc and figure,
+    the same four moons with the same states, and the same names at the
+    same places.
+  - `ExportSheetSessionTest` holds that the sheet names all five bodies
+    only when the switch is on.
+  - The journey restates the moment and field, and
+    `PackagedJovianSheetTest` holds them to the study's.
+- **Platform records.** Where each name went depends on the desktop's
+  fonts, so it is the study's `platform.md`, as for the cartography
+  study.
+- **Interface.** The Controller photographs (`CompanionSheetMain`) now
+  show Jupiter's group, as the application holds it. A new state,
+  `companion-*-7-jupiter-open`, shows the Jovian module's Show on chart
+  box open, with nothing computed.
+- **Gallery, awaiting publication approval.** A room *Jupiter and its
+  moons* at the gallery's own moment (Oslo, 2026-03-20 21:33 UTC), when
+  Jupiter stands 41° up in Gemini with all four moons clear:
+  - `jupiter-and-moons`: 1°, the true disc and four moon symbols;
+  - `jupiter-in-gemini`: 8°, the 6 px symbol with only Ganymede and
+    Callisto told apart.
+
+  Both are drawn by `GalleryPageMain` through the production module.
+  Merging publishes them.
+
 ## Evidence
 
 - **The study:** `src/juranometria/tool/JovianCartographyStudyMain.java`
