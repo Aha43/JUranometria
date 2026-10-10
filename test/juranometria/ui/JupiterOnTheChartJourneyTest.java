@@ -115,7 +115,8 @@ class JupiterOnTheChartJourneyTest {
         SwingUtilities.invokeAndWait(() -> module.showing(true));
         paint();
         List<ReferenceInk.BodyPlacement> drawn = chart.renderedBodies();
-        assertEquals(1, drawn.size(), "Jupiter alone; its moons are #485's");
+        assertEquals(JovianModule.JUPITER, drawn.get(0).identity(),
+                "Jupiter first; its moons (#485) after it, each decided on its own");
         JupiterObservation jupiter = service.observeJupiter(OSLO);
         DrawnPage page = DrawnPage.of(chart.currentScene());
         PixelPoint expected = new ViewportMapping(page).toPixel(
@@ -125,7 +126,7 @@ class JupiterOnTheChartJourneyTest {
         assertEquals(expected.y(), placed.centre().y(), 1e-6);
         assertTrue(placed.symbol(), "1-2 px true at 8°: the 6 px minimum stands in for it");
         assertEquals("Jupiter", placed.name());
-        assertTrue(chart.getAccessibleContext().getAccessibleDescription().endsWith(
+        assertTrue(chart.getAccessibleContext().getAccessibleDescription().contains(
                 " Jupiter (a cartographic symbol, not Jupiter's apparent diameter)."),
                 chart.getAccessibleContext().getAccessibleDescription());
         assertTrue(chart.bodyAt(placed.centre().x(), placed.centre().y()).isEmpty(),
@@ -139,7 +140,7 @@ class JupiterOnTheChartJourneyTest {
         paint();
         ReferenceInk.BodyPlacement placed = chart.renderedBodies().get(0);
         assertFalse(placed.symbol(), "about 10 px at 1°: the true disc");
-        assertTrue(chart.getAccessibleContext().getAccessibleDescription().endsWith(" Jupiter."),
+        assertTrue(chart.getAccessibleContext().getAccessibleDescription().contains(" Jupiter. "),
                 chart.getAccessibleContext().getAccessibleDescription());
         assertTrue(chart.bodyAt(placed.centre().x(), placed.centre().y()).isPresent(),
                 "the opaque disc consumes a click, so no hidden star is offered");

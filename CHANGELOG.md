@@ -7,6 +7,23 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Jupiter's four moons on the chart (#485).** With *Jupiter and moons
+on the chart* on, Io, Europa, Ganymede and Callisto are drawn as
+3-pixel symbols at their own computed places, never at their true size,
+which is less than a pixel. Each is drawn as follows:
+
+- clear of Jupiter: a filled dot;
+- in front of it: a dot ringed in the page's ground, over the disc;
+- in its shadow: a hollow ring;
+- behind it: not drawn at all.
+
+At the 1° field every moon not behind Jupiter is drawn, even where they
+crowd together, so a triple transit shows all three moons crossing.
+At wider fields only the moons whose marks can be told apart are
+drawn, each decided on its own. The moons never hide a star. Their
+names go around them or are left off one at a time, and the chart
+speaks each with where it stands. Before 2000 Jupiter is drawn alone.
+
 **Jupiter on the chart (#484).** *View > Solar System > Jupiter and
 moons on the chart*, off until chosen and remembered, and the same
 switch in the Controller's Jupiter group, draw Jupiter where it stands
@@ -20,8 +37,7 @@ axis along its pole. Below a drawn horizon it is dimmed and says so; its
 name takes a free place beside it or is left off. Exported sheets draw
 it too. *Centre on chart* in the Jupiter group and the Jupiter table
 turns the switch on and centres the chart on Jupiter at 1°. From 1900
-Jupiter is drawn; outside 1900–2100 nothing is. The four moons come
-next.
+Jupiter is drawn; outside 1900–2100 nothing is.
 
 **Centre on chart, for the Sun and the Moon (#483).** A button in the
 Sun's and the Moon's groups in the Controller and in their tables

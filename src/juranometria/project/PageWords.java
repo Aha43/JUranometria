@@ -189,4 +189,11 @@ public interface PageWords {
      * not its apparent diameter.
      */
     String bodySymbol(String bodyIdentity);
+
+    /**
+     * A drawn moon's state, as a reader who cannot see the page is told it
+     * (#485, state vocabulary A on #482): {@code jovian.inFront} or
+     * {@code jovian.shadowed}; a clear moon has none.
+     */
+    String bodyState(String state);
 }

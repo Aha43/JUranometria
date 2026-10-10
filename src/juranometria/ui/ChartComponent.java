@@ -389,7 +389,13 @@ public final class ChartComponent extends JComponent {
         }
         StringBuilder said = new StringBuilder(base);
         for (ReferenceInk.BodyPlacement body : bodies) {
-            said.append(' ').append(body.name());
+            said.append(' ').append(body.name() != null ? body.name()
+                    : words.bodyName(body.identity()));
+            // A moon says where it stands (#485): in front of Jupiter, or
+            // in its shadow; a clear moon needs no word.
+            if (body.state() != null) {
+                said.append(", ").append(words.bodyState(body.state()));
+            }
             // A mark drawn at its minimum says so (#484): it is a
             // cartographic symbol, never offered as the body's size.
             if (body.symbol()) {
