@@ -7,109 +7,117 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-**Jupiter in the gallery and on paper (#486).** The gallery gains a room,
-*Jupiter and its moons*, drawn by the application at the gallery's own
-moment. An exported sheet of Jupiter is drawn exactly as the screen draws
-it, moons, states and names included. The A4 sheet's scale was measured:
-the moons in front of Jupiter can be told apart on paper only at the 1°
-field.
+## [5.1.0] - 2026-10-10
 
-**Jupiter's four moons on the chart (#485).** With *Jupiter and moons
-on the chart* on, Io, Europa, Ganymede and Callisto are drawn as
-3-pixel symbols at their own computed places, never at their true size,
-which is less than a pixel. Each is drawn as follows:
+**Jupiter.** Sprints 44 and 45 bring Jupiter and its four large
+moons, Io, Europa, Ganymede and Callisto, into the atlas. They are
+computed offline, explained in tables, found on the chart with one
+button, drawn honestly at every scale, exported to paper and shown
+in the public gallery (#472–#475, #482–#487).
 
-- clear of Jupiter: a filled dot;
-- in front of it: a dot ringed in the page's ground, over the disc;
-- in its shadow: a hollow ring;
-- behind it: not drawn at all.
+Until now the Solar System stopped at the Sun and the Moon. This
+release adds the first planet the way the atlas adds anything. Its
+numbers are measured against JPL's own and kept to the precision
+that measurement supports. Its marks are drawn at their true size
+where that can be seen, and say they are symbols where it cannot.
+Its limits are written down rather than hidden. Nothing else the
+atlas draws has changed.
 
-At the 1° field every moon not behind Jupiter is drawn, even where they
-crowd together, so a triple transit shows all three moons crossing.
-At wider fields only the moons whose marks can be told apart are
-drawn, each decided on its own. The moons never hide a star. Their
-names go around them or are left off one at a time, and the chart
-speaks each with where it stands. Before 2000 Jupiter is drawn alone.
+**Computed offline, from JPL's own ephemeris.** A second bundled pack
+holds two modified excerpts of NASA/JPL's JUP365 ephemeris. Jupiter
+is covered from 1900 to 2100, and the four moons from 2000 to 2100.
+The IAU 2015 size and pole of Jupiter are copied verbatim from NAIF's
+planetary constants. Jupiter is computed the way the Sun and the
+Moon are, for your place and instant: where it is, how high, how
+far, how large across the equator and the poles, how much of it is
+lit, and where its north pole points. Each moon's place beside
+Jupiter is given in the same terms as JPL Horizons' own. Measured
+against Horizons on tens of thousands of rows, Jupiter's position
+agrees within about a tenth of an arcsecond, and the moons'
+positions relative to Jupiter within a thousandth of one. The
+pack's notice is in the About window, in English and Norwegian.
 
-**Jupiter on the chart (#484).** *View > Solar System > Jupiter and
-moons on the chart*, off until chosen and remembered, and the same
-switch in the Controller's Jupiter group, draw Jupiter where it stands
-for the place and instant set in Place and Time. At ordinary fields its
-disc is smaller than the faintest star mark, so it is drawn as a 6-pixel
-cartographic symbol, beneath the stars and never hiding one, and the
-chart says it is a symbol and not Jupiter's apparent diameter. From
-6 pixels across, at the 1° field, it is Jupiter's true disc: opaque, its
-outline turning towards the planet's flattened figure with the short
-axis along its pole. Below a drawn horizon it is dimmed and says so; its
-name takes a free place beside it or is left off. Exported sheets draw
-it too. *Centre on chart* in the Jupiter group and the Jupiter table
-turns the switch on and centres the chart on Jupiter at 1°. From 1900
-Jupiter is drawn; outside 1900–2100 nothing is.
+**The Jupiter table.** A Jupiter group in the Controller's Solar
+System section, and *View → Solar System → Jupiter...*, show one
+shared result in English and Norwegian.
+- **For an instant:** a Jupiter card, and the four moons in order.
+  Each moon shows which side of Jupiter it is on, how far east or
+  west and north or south, its distance from Jupiter in arcseconds
+  and in Jupiter radii, and whether it is clear of Jupiter, in front
+  of it, behind it or in its shadow.
+- **Over a range:** each sampled instant is one group, Jupiter's full
+  summary and then its four moons, up to 250 instants.
+- **What it refuses:** before 2000 Jupiter answers and the moons are
+  refused, naming their years. Outside 1900–2100 Jupiter is refused
+  too.
 
-**Centre on chart, for the Sun and the Moon (#483).** A button in the
-Sun's and the Moon's groups in the Controller and in their tables
-finds the body on the chart: it computes what is typed, turns the
-body on the chart if it is off, centres the chart on it at a 1° field
-and brings the chart window forward, leaving the Controller or the
-table open. A range centres on its first instant; a date the table
-refuses moves nothing. English and Norwegian, with the keyboard. The
-Sun's and the Moon's tables also stop following their result once
-closed, so reopening them adds nothing behind the scenes.
+**Centre on chart.** A button beside the Sun, the Moon and Jupiter, in
+the Controller and in each table, finds the body on the chart. It
+computes what is typed, turns the body on the chart if it is off,
+centres the chart on it at 1° and brings the chart window forward,
+leaving the Controller or table open. A range centres on its first
+instant.
 
-**Jupiter and the Galilean moons in the Controller (#474).** A Jupiter
-group under Solar System, after the Moon's and introduced collapsed,
-and *View > Solar System > Jupiter...* as its dialog host during
-dogfooding, both over one shared result. For the instant set in Place
-and Time: a Jupiter card - position, height, distance, apparent
-diameter at the equator and the poles, illuminated fraction, the
-north pole's position angle - and Io, Europa, Ganymede and Callisto
-in that order, each with its side of Jupiter, its east–west and
-north–south offsets, its separation in arcseconds and in Jupiter
-radii, and whether it is clear of Jupiter, in front of it, behind it
-or in its shadow. Over a range, each sampled instant as one group:
-Jupiter's position and figure, then its four moons, at most 250
-instants. Opening or expanding computes
-nothing; every value is the service's; English and Norwegian. Before
-2000 Jupiter answers and the moons' configuration is refused, naming
-its years; after the exact civil-time interval instants are marked
-estimated and the states are not offered as predicted event times.
-Nothing is drawn on the chart.
+**Jupiter on the chart.** *View → Solar System → Jupiter and moons on
+the chart*, or the same switch in the Jupiter group, draws Jupiter
+where it stands. The switch is off until you choose it, and it is
+remembered.
+- **At ordinary fields** Jupiter's disc is smaller than the faintest
+  star, so it is drawn as a 6-pixel cartographic symbol. The symbol
+  sits beneath the stars and never hides one, and the chart says it
+  is a symbol, not Jupiter's apparent diameter.
+- **From 6 pixels across, at the 1° field,** it is Jupiter's true disc.
+  It is opaque, and its outline turns towards the planet's flattened
+  figure, with the short axis along the pole.
+- **Below a drawn horizon** it is dimmed and says so. Its name takes a
+  free place beside it, or is left off.
 
-**Jupiter and the Galilean moons computed (#473, the second of two
-changes).** A second ephemeris pack beside the Solar System pack, which
-stays byte for byte as released: two JUranometria-modified excerpts of
-NASA/JPL's JUP365 - Jupiter with DE440's barycentre over 1900–2100, Io,
-Europa, Ganymede and Callisto over 2000–2100 - one manifest carrying the
-IAU 2015 radii and pole verbatim from NAIF's planetary-constants kernel,
-every excerpt proved identical to its source. A Jovian service computes
-Jupiter as the Sun and the Moon are computed, with the Sun's
-gravitational deflection in the apparent place, its two diameters, pole
-angle, sub-observer latitude and phase; and for each moon the
-plane-of-sky offset in Horizons' own apparent-of-date definition, the
-separation in arcseconds and Jupiter radii, the position angle, the
-depth, the disc relation against the oblate figure, the shadow relation
-against the umbra and the composed state in the ruled precedence.
-Measured against JPL Horizons on 29 000 moon rows and 12 500 Jupiter
-rows and held by tests to the targets ruled on #472 as amended on
-#473; the 11 December 2026 triple transit reads as published, to the
-minute. Nothing is shown yet: no table, Controller group, menu item or
-chart mark - those are #474's.
+**The four moons on the chart.** Each moon is drawn as a 3-pixel
+symbol at its own computed place. Its true disc is smaller than a
+pixel.
+- **Clear of Jupiter:** a filled dot.
+- **In front of Jupiter:** a dot ringed in the page's colour, over the
+  disc.
+- **In Jupiter's shadow:** a hollow ring.
+- **Behind Jupiter:** not drawn at all.
 
-**Epoch-aware SPK selection (#473, the first of two changes).** The
-SPK reader and excerpt writer select a segment by centre, target and
-the epoch it covers: JUP365, the Galilean ephemeris chosen in #472,
-keeps two segments per body meeting at 1997-01-16, which the released
-"first segment for a body" could not read past. Where several segments
-cover an epoch the one later in the file is read, as NAIF reads; a gap
-between a pair's segments, or an epoch beyond them, is refused naming
-what the kernel covers; the writer keeps every segment of a pick that
-has records in the interval, in file order, and refuses an interval the
-segments do not cover together. The released Solar System pack is
-unchanged - the new writer reproduces its kernel byte for byte, in the
-suite and by rebuilding from the pinned source - and no Jovian
-ephemeris ships yet. A small modified excerpt of JUP365 across the
-split, with an independent reader's states from the unmodified source,
-holds the behaviour (`docs/studies/jovian-system/spk/`).
+At 1° every moon not behind Jupiter is drawn, even where moons crowd
+together. On the evening of 11 December 2026, three moons cross
+Jupiter at once, and all three are shown. At wider fields a moon is
+drawn only where its mark can be told apart from the others. Each
+moon is decided on its own, so a crowded pair never removes the rest.
+Names go around the marks or are left off one at a time, and the
+chart speaks each moon with where it stands.
+
+**On paper and in the gallery.** An exported sheet draws Jupiter and
+its moons exactly as the screen does, with the same places, states
+and names. On an A4 sheet the moons in front of Jupiter can be told
+apart only at the 1° field, and that is the scale this release
+measured and checked. The public gallery gains a room, *Jupiter and
+its moons*, at the gallery's shared moment.
+
+**Honest limits.**
+- **Estimated instants.** After mid-2027 the atlas's clock model can
+  only estimate the instant, so Jupiter's position is good to about two
+  arcseconds. The table marks those instants *est.*, and its states
+  are not offered as predicted event times. The chart draws them
+  without that mark.
+- **No surface or shadows.** There are no cloud belts, no Great Red
+  Spot, no rotation and no moon shadows on Jupiter's disc.
+- **No events and no closer zoom.** There is no event search, no
+  notification and no zoom below 1°.
+- **One planet.** Jupiter is the only planet in this release.
+
+**Unchanged.** The Sun and Moon pack is byte for byte as 5.0.0 shipped
+it, and every released chart, sheet and gallery image other than the
+new room draws exactly as before. Everything still works offline, with no
+network request of any kind.
+
+**Under the hood.** The ephemeris reader now selects a segment by the
+epoch it covers, as NAIF's own reader does. JUP365 splits each body at
+1997, and the reader previously could not read past that point. After
+a pull request merges, a check now verifies that the merged tree is
+the one CI already tested, instead of rebuilding it (#494).
 
 ## [5.0.0] - 2026-10-06
 
