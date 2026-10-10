@@ -92,3 +92,32 @@ jobs:
             --base build/base \
             --github-output "$GITHUB_OUTPUT" \
             --summary "$GITHUB_STEP_SUMMARY"
+      # The trial merge this run qualifies (issue #494). A pull request's
+      # jobs check out GitHub's merge of the head into the base, not the
+      # head, and every job in the run checks out the same commit. Its ID
+      # and route are kept, so a later merge to main can be compared with
+      # it by scripts/verify-merge-identity.sh, which reads the parents
+      # and the tree from git rather than from this file.
+      - name: Record the trial merge this run qualifies
+        if: github.event_name == 'pull_request'
+        run: |
+          {
+            echo "merge=$(git rev-parse HEAD)"
+            echo "parents=$(git rev-list --parents -n 1 HEAD | cut -d' ' -f2-)"
+            echo "tree=$(git rev-parse 'HEAD^{tree}')"
+            echo "pr=${{ github.event.pull_request.number }}"
+            echo "head=${{ github.event.pull_request.head.sha }}"
+            echo "base=${{ github.event.pull_request.base.sha }}"
+            echo "route=${{ steps.route.outputs.route }}"
+            echo "workflow=${{ github.workflow }}"
+            echo "run=${{ github.run_id }}"
+          } > build/qualified-merge.txt
+          { echo '### The trial merge this run qualifies'; echo;
+            sed 's/^/    /' build/qualified-merge.txt; } >> "$GITHUB_STEP_SUMMARY"
+      - name: Keep the trial merge's identity
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v6
+        with:
+          name: qualified-merge
+          path: build/qualified-merge.txt
+          retention-days: 90

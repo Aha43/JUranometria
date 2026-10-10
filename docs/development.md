@@ -66,6 +66,16 @@ hold the measured design gates.
    contributor runs locally. Branch protection on `main` requires the
    check (administrators included), so a red or absent `test` status
    technically blocks the merge, not just culturally.
+
+   After the merge, run only the checks the merge needs. A pull
+   request's CI already qualified GitHub's trial merge of its head into
+   `main`. When the landed commit is proved to be that exact tree,
+   `main`'s `test` verifies it in its `landing` job instead of rerunning
+   the suites, and no `app-image` is dispatched. Main-only deployments
+   such as `pages` and the release workflow always run. Anything
+   unproved runs the full route. The rule and its proof are in
+   `docs/decisions/post-merge-qualification.md` (#494), and
+   `scripts/verify-merge-identity.sh <merge>` answers it locally.
 9. Know which route the change takes before pushing: `make classify`
    (against `origin/main`, or `BASE=<ref>`) prints, path by path,
    which of three routes it takes and why, and CI's `classify` job
@@ -198,7 +208,12 @@ Use semantic versions:
 2. Run all tests and exercise the packaged application.
 3. Move the accumulated changelog entries into a dated version section.
 4. Update `VERSION` in a release pull request, **and regenerate what
-   `VERSION` feeds** — see below — and merge it.
+   `VERSION` feeds** — see below — and merge it. Then record the
+   post-merge result the rule in
+   `docs/decisions/post-merge-qualification.md` gives: a structural
+   verification by run ID, or the full runs, plus any main-only
+   deployment. It never stands in for the rehearsal or the tag's
+   release checks.
 5. Create and push an annotated tag on the merged commit:
    `git tag -a v1.2.3 -m "JUranometria 1.2.3" && git push origin v1.2.3`
 6. Watch the `release` workflow, then check the published downloads.

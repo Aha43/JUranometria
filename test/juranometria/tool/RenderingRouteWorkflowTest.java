@@ -121,8 +121,16 @@ class RenderingRouteWorkflowTest {
         String test = read("test.yml");
         for (String name : List.of("test", "display")) {
             String block = job(test, name);
-            assertFalse(block.contains("needs:"),
-                    name + " depends on nothing");
+            // #494: the one dependency allowed is the landing check, which
+            // runs only on a push to main and is skipped for every pull
+            // request - so on a pull request both suites still run
+            // unconditionally, and on main they run unless the landed tree
+            // is proved to be the one already qualified.
+            assertTrue(block.contains("needs: landing\n"),
+                    name + " depends on the landing check alone");
+            assertTrue(block.contains("if: ${{ !cancelled() && "
+                            + "needs.landing.outputs.qualified != 'true' }}"),
+                    name + " runs unless the landing is proved qualified, fail-closed");
             assertFalse(block.contains("needs.classify"),
                     name + " never reads the route");
         }

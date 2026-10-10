@@ -30,7 +30,46 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # The landing (issue #494, docs/decisions/post-merge-qualification.md).
+  # A push to main is a merge whose tree its pull request's runs may
+  # already have qualified: GitHub tested the trial merge of the accepted
+  # head into the base. When scripts/verify-merge-identity.sh proves the
+  # landed commit is that exact trial merge - second parent the accepted
+  # head, first parent the qualified base, the same tree, and the test,
+  # app-image and dist runs all green on it with the route's required
+  # jobs - the jobs below are not run again merely because the commit ID
+  # changed, and this job's summary is the post-merge result. Anything
+  # unproved, or this job failing, leaves the output empty, and every job
+  # below runs as it always has. Pull requests skip this job entirely.
+  landing:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+    outputs:
+      qualified: ${{ steps.verify.outputs.qualified }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Is this the tree the pull request already qualified?
+        id: verify
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          scripts/verify-merge-identity.sh "${{ github.sha }}" \
+            --github-output "$GITHUB_OUTPUT" --summary "$GITHUB_STEP_SUMMARY"
+
   test:
+    needs: landing
+    if: ${{ !cancelled() && needs.landing.outputs.qualified != 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -81,6 +120,8 @@ jobs:
   # that asks for focus gets it. #209 was exactly a focus request
   # refused because another application held the desktop.
   display:
+    needs: landing
+    if: ${{ !cancelled() && needs.landing.outputs.qualified != 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -159,6 +200,8 @@ jobs:
   # Everything above runs whatever the answer; only the evidence jobs
   # below read it.
   classify:
+    needs: landing
+    if: ${{ !cancelled() && needs.landing.outputs.qualified != 'true' }}
     uses: ./.github/workflows/classify.yml
 
   # The interaction route's evidence (#427/#428). Interface work that
