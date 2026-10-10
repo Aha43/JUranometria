@@ -45,6 +45,25 @@ public final class JovianModule implements ChartModule {
      * language names it from {@code page.body.jovian.jupiter}.
      */
     public static final String JUPITER = "jovian.jupiter";
+    /** Ruling 4 on #482: each moon is a symbol of this size, never its apparent diameter. */
+    public static final double MOON_MARK_PX = 3.0;
+    /**
+     * The order a collision between moons of the same state is settled in
+     * (the study's, #482 section B): the larger moon keeps its mark.
+     */
+    static final List<JovianSystemService.Moon> PRECEDENCE = List.of(
+            JovianSystemService.Moon.GANYMEDE, JovianSystemService.Moon.CALLISTO,
+            JovianSystemService.Moon.IO, JovianSystemService.Moon.EUROPA);
+
+    /** A moon's identity on the page, {@code jovian.io} and so on. */
+    public static String identityOf(JovianSystemService.Moon moon) {
+        return switch (moon) {
+            case IO -> "jovian.io";
+            case EUROPA -> "jovian.europa";
+            case GANYMEDE -> "jovian.ganymede";
+            case CALLISTO -> "jovian.callisto";
+        };
+    }
     /** Ruling 2 on #482: Jupiter's mark is this or its true size, whichever is larger. */
     public static final double MINIMUM_MARK_PX = 6.0;
 
@@ -160,9 +179,41 @@ public final class JovianModule implements ChartModule {
         }
         boolean below = horizonDrawn.getAsBoolean()
                 && jupiter.horizontal().altitudeDegrees() < 0.0;
-        return List.of(new OverlayContribution.OblateBody(JUPITER, "Jupiter",
+        List<OverlayContribution> offered = new ArrayList<>();
+        offered.add(new OverlayContribution.OblateBody(JUPITER, "Jupiter",
                 jupiter.astrometricJ2000(), jupiter.equatorialDiameterArcseconds(),
                 jupiter.polarDiameterArcseconds(), jovian.poleAngleJ2000Degrees(jupiter),
                 MINIMUM_MARK_PX, below, jupiter.distanceKm(), InkRole.BODY));
+        // The four Galilean moons (#485), where they have numbers
+        // (2000-2100): each at its own astrometric J2000 place - never the
+        // table's of-date X/Y offsets - with its state, for the page to
+        // decide moon by moon.
+        JovianSystemService.Configuration moons;
+        try {
+            moons = jovian.observeMoons(now);
+        } catch (IllegalArgumentException outsideTheMoonsYears) {
+            return List.copyOf(offered);
+        }
+        for (JovianSystemService.MoonPlace moon : moons.moons()) {
+            OverlayContribution.Satellite.Relation relation = switch (moon.discRelation()) {
+                case CLEAR -> OverlayContribution.Satellite.Relation.CLEAR;
+                case IN_FRONT -> OverlayContribution.Satellite.Relation.IN_FRONT;
+                case BEHIND -> OverlayContribution.Satellite.Relation.BEHIND;
+            };
+            offered.add(new OverlayContribution.Satellite(identityOf(moon.moon()),
+                    nameOf(moon.moon()), moon.astrometricJ2000(), JUPITER, relation,
+                    moon.shadowRelation() != JovianSystemService.ShadowRelation.SUNLIT,
+                    PRECEDENCE.indexOf(moon.moon()), MOON_MARK_PX, below, InkRole.BODY));
+        }
+        return List.copyOf(offered);
+    }
+
+    private static String nameOf(JovianSystemService.Moon moon) {
+        return switch (moon) {
+            case IO -> "Io";
+            case EUROPA -> "Europa";
+            case GANYMEDE -> "Ganymede";
+            case CALLISTO -> "Callisto";
+        };
     }
 }

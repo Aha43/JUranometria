@@ -454,6 +454,7 @@ public final class PackagedAcceptanceMain {
         jupiterTableJourney();
         centreOnChartJourney();
         jupiterOnTheChartJourney();
+        jovianMoonsOnTheChartJourney();
 
         System.out.println("PACKAGED ACCEPTANCE OK");
     }
@@ -2060,6 +2061,96 @@ public final class PackagedAcceptanceMain {
     }
 
     /**
+     * The four Galilean moons inside the packaged image (issue #485, ruled
+     * on #482): at the 22:45 triple transit of 11 December 2026 and the
+     * normal minimum field, every moon not behind Jupiter is drawn at its
+     * own J2000 place - the three in front over Jupiter's disc, never a
+     * lone Jupiter mark - each spoken with its state and as a symbol; at a
+     * 36° field none is distinguishable from Jupiter's mark and none is
+     * drawn, while Jupiter stays.
+     */
+    private static void jovianMoonsOnTheChartJourney() throws Exception {
+        juranometria.solar.JovianSystemService jovian =
+                juranometria.solar.JovianSystemService.load();
+        juranometria.sky.Observer oslo = new juranometria.sky.Observer(59.913, 10.752,
+                java.time.Instant.parse("2026-12-11T22:45:00Z"));
+        juranometria.solar.JovianSystemService.Configuration c = jovian.observeMoons(oslo);
+        int[] moonsDrawn = new int[2];
+        String spoken = null;
+        double[] fields = {juranometria.chart.ChartViewState.normalMinimumFieldDegrees(), 36.0};
+        for (int f = 0; f < fields.length; f++) {
+            double field = fields[f];
+            juranometria.ui.ChartComponent[] chart = new juranometria.ui.ChartComponent[1];
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                chart[0] = new juranometria.ui.ChartComponent(Atlas.assembler(),
+                        juranometria.ui.language.PageText.in(
+                                juranometria.ui.language.InterfaceText.forLanguage("en")));
+                chart[0].setSize(900, 700);
+                chart[0].setViewState(new juranometria.chart.ChartViewState(
+                        c.jupiter().astrometricJ2000(), field, 8.0, null, null));
+                juranometria.jovianchart.JovianModule module =
+                        new juranometria.jovianchart.JovianModule(() -> oslo, () -> jovian,
+                                () -> false);
+                module.showing(true);
+                chart[0].overlays().offer(juranometria.jovianchart.JovianModule.ID,
+                        module::contributedGeometry);
+            });
+            javax.swing.SwingUtilities.invokeAndWait(() -> { });
+            java.awt.image.BufferedImage image = new java.awt.image.BufferedImage(
+                    900, 700, java.awt.image.BufferedImage.TYPE_INT_RGB);
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                java.awt.Graphics2D g = image.createGraphics();
+                try {
+                    chart[0].paint(g);
+                } finally {
+                    g.dispose();
+                }
+            });
+            java.util.List<juranometria.ui.ReferenceInk.BodyPlacement> drawn =
+                    chart[0].renderedBodies();
+            require(!drawn.isEmpty() && juranometria.jovianchart.JovianModule.JUPITER.equals(
+                    drawn.get(0).identity()), "Jupiter is drawn at " + field + "°");
+            juranometria.project.DrawnPage page =
+                    juranometria.project.DrawnPage.of(chart[0].currentScene());
+            juranometria.project.ViewportMapping mapping =
+                    new juranometria.project.ViewportMapping(page);
+            int inFront = 0;
+            for (juranometria.ui.ReferenceInk.BodyPlacement p : drawn.subList(1, drawn.size())) {
+                moonsDrawn[f]++;
+                juranometria.solar.JovianSystemService.MoonPlace m = null;
+                for (juranometria.solar.JovianSystemService.MoonPlace each : c.moons()) {
+                    if (juranometria.jovianchart.JovianModule.identityOf(each.moon())
+                            .equals(p.identity())) {
+                        m = each;
+                    }
+                }
+                require(m != null && m.discRelation()
+                                != juranometria.solar.JovianSystemService.DiscRelation.BEHIND,
+                        "a drawn moon is a moon not behind Jupiter: " + p.identity());
+                juranometria.project.PixelPoint expected = mapping.toPixel(
+                        page.projection().project(m.astrometricJ2000()).orElseThrow());
+                require(Math.hypot(p.centre().x() - expected.x(), p.centre().y() - expected.y())
+                        < 0.01, p.identity() + " at its own J2000 place");
+                require(p.symbol(), p.identity() + " is a symbol");
+                inFront += "jovian.inFront".equals(p.state()) ? 1 : 0;
+            }
+            if (f == 0) {
+                require(inFront == 3, "the triple transit keeps its three marks in front: "
+                        + inFront);
+                spoken = chart[0].getAccessibleContext().getAccessibleDescription();
+                require(spoken.contains(" Io, in front of Jupiter (a cartographic symbol, not"
+                        + " Io's apparent diameter)."), "spoken with its state: " + spoken);
+            }
+        }
+        require(moonsDrawn[1] == 0, "at 36° no moon is distinguishable, and none is drawn: "
+                + moonsDrawn[1]);
+        System.out.println("jovian moons on the chart OK (the packaged component draws"
+                + " " + moonsDrawn[0] + " Galilean moons at the 22:45 triple transit at the normal"
+                + " minimum field, each at its own J2000 place, the three in front over"
+                + " Jupiter's disc and spoken as in front of it; at 36° none is drawn)");
+    }
+
+    /**
      * Jupiter on the chart inside the packaged image (issue #484, ruled
      * on #482): the Jovian module over the packaged Jovian pack draws
      * Jupiter where the service puts it - at 8° as the 6 px cartographic
@@ -2111,7 +2202,9 @@ public final class PackagedAcceptanceMain {
             });
             java.util.List<juranometria.ui.ReferenceInk.BodyPlacement> drawn =
                     chart[0].renderedBodies();
-            require(drawn.size() == 1 && juranometria.jovianchart.JovianModule.JUPITER.equals(drawn.get(0).identity()),
+            // Jupiter first; its moons (#485), each decided on its own, after it.
+            require(!drawn.isEmpty() && juranometria.jovianchart.JovianModule.JUPITER.equals(
+                            drawn.get(0).identity()),
                     "the packaged chart drew Jupiter at " + field + "°: " + drawn);
             juranometria.project.DrawnPage page =
                     juranometria.project.DrawnPage.of(chart[0].currentScene());
@@ -2130,13 +2223,14 @@ public final class PackagedAcceptanceMain {
                 double width = drawn.get(0).disc().getBounds2D().getWidth();
                 require(Math.abs(width - juranometria.jovianchart.JovianModule.MINIMUM_MARK_PX) < 0.05,
                         "the 6 px minimum: " + width);
-                require(said.endsWith(" Jupiter (a cartographic symbol, not Jupiter's apparent"
+                require(said.contains(" Jupiter (a cartographic symbol, not Jupiter's apparent"
                         + " diameter)."), "spoken as a symbol: " + said);
                 require(chart[0].bodyAt(centre.x(), centre.y()).isEmpty(),
                         "a click through the symbol is not consumed");
                 symbolSaid = said;
             } else {
-                require(said.endsWith(" Jupiter."), "spoken as Jupiter: " + said);
+                require(said.contains(" Jupiter. ") || said.endsWith(" Jupiter."),
+                        "spoken as Jupiter: " + said);
                 int cx = (int) Math.round(centre.x()) + chart[0].pageOffsetX();
                 int cy = (int) Math.round(centre.y()) + chart[0].pageOffsetY();
                 for (int id : new int[] {java.awt.event.MouseEvent.MOUSE_PRESSED,

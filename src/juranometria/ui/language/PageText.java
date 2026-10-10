@@ -79,6 +79,11 @@ public final class PageText implements PageWords {
     }
 
     @Override
+    public String bodyState(String state) {
+        return said.say(STEM + "body.state." + state);
+    }
+
+    @Override
     public String chartInstructions() {
         return said.say(STEM + "chart.explain");
     }

@@ -352,6 +352,55 @@ public sealed interface OverlayContribution {
     }
 
     /**
+     * A satellite of an {@link OblateBody} (issue #485, the owner's
+     * rulings 4 and 5 on #482): a Galilean moon. Its true disc is below
+     * a pixel on every page, so the page draws a symbol of
+     * {@code markPx}, never its apparent diameter, at its own J2000
+     * place.
+     *
+     * <p>Whether a page draws it is decided by the page, moon by moon,
+     * because it depends on the page's scale: behind its primary it is
+     * omitted; at the chart's normal minimum field every other moon is
+     * drawn at its exact place, overlap allowed; above it, a moon is drawn
+     * only where its own mark is distinguishable, and a collision
+     * suppresses only the lower-precedence mark - never the whole system.
+     *
+     * @param primary the identity of the body it belongs to
+     * @param relation where it stands against its primary's disc
+     * @param shadowed whether it stands wholly or partly in the primary's
+     *                 shadow
+     * @param precedence the order collisions are settled in among moons
+     *                   of the same state, lowest first
+     */
+    record Satellite(String identity, String accessibleName, SkyPosition at,
+                     String primary, Relation relation, boolean shadowed,
+                     int precedence, double markPx, boolean belowHorizon,
+                     InkRole role)
+            implements OverlayContribution {
+
+        /** Where a satellite stands against its primary's disc. */
+        public enum Relation {
+            CLEAR, IN_FRONT, BEHIND
+        }
+
+        public Satellite {
+            requireIdentified(identity, accessibleName, role);
+            if (at == null || primary == null || relation == null) {
+                throw new IllegalArgumentException("a satellite is somewhere, of"
+                        + " something, in some relation to it: " + identity);
+            }
+            if (!(markPx > 0.0) || !Double.isFinite(markPx)) {
+                throw new IllegalArgumentException("a satellite's mark is a positive"
+                        + " size: " + identity);
+            }
+            if (role != InkRole.BODY) {
+                throw new IllegalArgumentException("a body is drawn in the body role: "
+                        + identity);
+            }
+        }
+    }
+
+    /**
      * How a disc is lit (issue #416): the illuminated fraction, the
      * bright limb's position angle from celestial north through east,
      * and the phase angle whose cosine is the terminator's axis ratio.

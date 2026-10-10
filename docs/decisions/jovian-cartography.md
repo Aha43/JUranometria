@@ -218,6 +218,50 @@ languages.
   under duress. No moon rendering begins until Jupiter passes its
   packaged checkpoint.
 
+## The Galilean moons on the chart, as built (#485)
+
+- **Offered by the same module and switch.** For 2000–2100,
+  `JovianModule` offers each moon as an `OverlayContribution.Satellite`
+  of Jupiter. Each carries the service's own astrometric J2000 place,
+  never the table's of-date X/Y. It also carries its disc relation,
+  whether it is wholly or partly in shadow, and the 3 px mark. The
+  identities are `jovian.io`, `jovian.europa`, `jovian.ganymede` and
+  `jovian.callisto`, so a moon can never be mistaken for the Moon.
+- **Decided by the page, moon by moon (ruling 4).**
+  `juranometria.ui.SatelliteMarks` is the study's rule in production:
+  - behind is omitted;
+  - at the chart's normal minimum field, read and never assumed, every
+    other moon is drawn, and overlap is allowed;
+  - above it, a moon in front is drawn only over a disc at least 12 px
+    wide;
+  - a clear or shadowed moon is drawn only when its mark stands 6 px
+    clear of Jupiter's drawn edge and of every higher-precedence moon.
+    A collision suppresses only the lower-precedence mark.
+  - Precedence is in front, then clear, then shadowed, then Ganymede,
+    Callisto, Io and Europa.
+  - The 22:45 triple transit keeps its three in-front marks at 1°.
+- **Vocabulary A (ruling 5).**
+  - clear: a filled dot in star ink;
+  - in front: a filled dot ringed in the page's ground, painted over
+    Jupiter's disc;
+  - wholly or partly in shadow: a hollow ring;
+  - behind: nothing, and no ghost.
+  `JovianMoonsInkTest` holds this on both palettes.
+- **Layers (ruling 7).** A moon's mark is a symbol. A mark clear of
+  Jupiter's opaque disc is painted beneath the catalogue's marks, so it
+  never erases a star. A mark in front of the disc, or touching it, is
+  painted with the disc, over it. No mark consumes a click.
+- **Labels, decided after the marks (ruling 6).** Each moon is named in
+  precedence order through the bodies' adjacent boxes, around its own
+  mark. It is refused on its own when no box is clean, and never
+  overlaps. One crowded pair never takes every name with it.
+- **Spoken.** Each drawn moon is spoken with its state and as a symbol,
+  for example "Io, in front of Jupiter (a cartographic symbol, not Io's
+  apparent diameter)". In Norwegian the states are *foran Jupiter* and
+  *i Jupiters skygge*, and the names follow the table (*Ganymedes*).
+- **Not drawn:** satellite shadow spots on Jupiter. Nor are moons in
+  1900–1999, which have no numbers.
+
 ## Evidence
 
 - **The study:** `src/juranometria/tool/JovianCartographyStudyMain.java`

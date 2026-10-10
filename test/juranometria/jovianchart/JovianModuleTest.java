@@ -62,7 +62,7 @@ class JovianModuleTest {
         JovianModule module = module(new Observer[] {at}, new boolean[] {false});
         module.showing(true);
         List<OverlayContribution> offered = module.contributedGeometry();
-        assertEquals(1, offered.size());
+        assertEquals(5, offered.size(), "Jupiter first, then its four moons (#485)");
         OverlayContribution.OblateBody jupiter = (OverlayContribution.OblateBody) offered.get(0);
         JupiterObservation expected = service.observeJupiter(at);
         assertEquals(JovianModule.JUPITER, jupiter.identity());
@@ -107,6 +107,30 @@ class JovianModuleTest {
         horizon[0] = false;
         assertFalse(((OverlayContribution.OblateBody) module.contributedGeometry().get(0))
                 .belowHorizon(), "with the horizon hidden it is drawn normally");
+    }
+
+    @Test
+    void theFourMoonsAreOfferedAtTheirOwnJ2000PlacesWithTheirStates() {
+        Observer at = oslo("2026-12-11T22:45:00Z");
+        JovianModule module = module(new Observer[] {at}, new boolean[] {false});
+        module.showing(true);
+        List<OverlayContribution> offered = module.contributedGeometry();
+        assertEquals(5, offered.size(), "Jupiter, then Io, Europa, Ganymede and Callisto");
+        JovianSystemService.Configuration c = service.observeMoons(at);
+        for (int i = 0; i < 4; i++) {
+            OverlayContribution.Satellite moon = (OverlayContribution.Satellite) offered.get(i + 1);
+            JovianSystemService.MoonPlace expected = c.moons().get(i);
+            assertEquals(JovianModule.identityOf(expected.moon()), moon.identity());
+            assertEquals(expected.astrometricJ2000(), moon.at(),
+                    "its own astrometric J2000 place, never the table's of-date X/Y");
+            assertEquals(JovianModule.JUPITER, moon.primary());
+            assertEquals(expected.discRelation().name(), moon.relation().name());
+            assertEquals(expected.shadowRelation() != JovianSystemService.ShadowRelation.SUNLIT,
+                    moon.shadowed());
+            assertEquals(3.0, moon.markPx(), "ruling 4: a 3 px symbol");
+        }
+        assertTrue(offered.stream().skip(1).allMatch(o -> o.identity().startsWith("jovian.")),
+                "namespaced, never to be mistaken for the Moon");
     }
 
     @Test

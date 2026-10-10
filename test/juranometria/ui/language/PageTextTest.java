@@ -236,6 +236,11 @@ class PageTextTest {
             public String bodySymbol(String bodyIdentity) {
                 return EN.bodySymbol(bodyIdentity);
             }
+
+            @Override
+            public String bodyState(String state) {
+                return EN.bodyState(state);
+            }
         };
 
         assertEquals("spherical Mercator",

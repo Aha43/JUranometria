@@ -117,9 +117,11 @@ class ChartModuleBoundaryTest {
         // #484 added the oblate body: Jupiter, its true equatorial and
         // polar diameters, its pole in the chart's frame and the
         // ruled minimum mark - still typed geometry, and the page, not
-        // the module, decides when the minimum is a symbol.
+        // the module, decides when the minimum is a symbol. #485 added
+        // the satellite: a Galilean moon's place and state, for the page
+        // to decide moon by moon - typed geometry still.
         assertEquals(java.util.List.of("GreatCircle", "Point", "Path",
-                        "Region", "DirectionMark", "Body", "OblateBody"),
+                        "Region", "DirectionMark", "Body", "OblateBody", "Satellite"),
                 java.util.Arrays.stream(OverlayContribution.class
                                 .getPermittedSubclasses())
                         .map(Class::getSimpleName).sorted(
@@ -127,10 +129,10 @@ class ChartModuleBoundaryTest {
                                         java.util.List.of("GreatCircle",
                                                 "Point", "Path", "Region",
                                                 "DirectionMark", "Body",
-                                                "OblateBody")::indexOf))
+                                                "OblateBody", "Satellite")::indexOf))
                         .toList(),
                 "a great circle, a point, a path, a region, a"
-                        + "direction mark, a body and an oblate body - the geometry a module may"
+                        + "direction mark, a body, an oblate body and a satellite - the geometry a module may"
                         + " contribute, and nothing else");
     }
 
