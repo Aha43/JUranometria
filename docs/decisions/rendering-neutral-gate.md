@@ -20,7 +20,11 @@ suite only — when a guard proves that it touches no renderer, chart
 contribution, rendering or evidence generator, committed generated
 image or provenance row. Anything else, or any doubt, is **wide**, and
 the whole regime applies. Pushes to `main`, tags and manual dispatches
-are wide by event, whatever they changed.
+are wide by event, whatever they changed. The one exception is a push
+to `main` that is proved to be the trial merge its pull request already
+qualified on its route: that is verified, not rerun. The proof is
+fail-closed, and the authority is
+`docs/decisions/post-merge-qualification.md` (#494).
 
 This is permanent and body-agnostic: the Moon and later the planets use
 it unchanged. It is not a shortcut to be reverted after a sprint.
