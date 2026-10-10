@@ -1332,6 +1332,59 @@ public final class ReferenceInk {
         return systems;
     }
 
+    /**
+     * Why each satellite on this page is or is not drawn (#486): the
+     * page's own decision, published so evidence can state what cannot
+     * resolve at a scale rather than leave it silent. Keyed by identity;
+     * {@code DRAWN}, {@code BEHIND}, {@code AT_PRIMARY}, {@code COLLIDES},
+     * {@code IN_FRONT_UNRESOLVED}, or {@code OFF_PAGE} for a moon whose
+     * mark would leave the paper.
+     */
+    public static java.util.Map<String, String> satelliteDecisions(DrawnPage page,
+            List<OverlayRegistry.Owned> contributions) {
+        java.util.Map<String, String> out = new java.util.LinkedHashMap<>();
+        List<OverlayContribution> offered = new ArrayList<>();
+        for (OverlayRegistry.Owned owned : contributions) {
+            offered.add(owned.geometry());
+        }
+        for (OverlayContribution c : offered) {
+            if (!(c instanceof OverlayContribution.OblateBody primary)) {
+                continue;
+            }
+            OblateMark mark = oblateOn(page, primary);
+            if (mark == null) {
+                continue;
+            }
+            List<OverlayContribution.Satellite> satellites =
+                    SatelliteMarks.of(primary.identity(), offered);
+            List<double[]> offsets = new ArrayList<>();
+            List<OverlayContribution.Satellite> placed = new ArrayList<>();
+            ViewportMapping mapping = new ViewportMapping(page);
+            for (OverlayContribution.Satellite s : satellites) {
+                page.projection().project(s.at()).ifPresent(p -> {
+                    PixelPoint at = mapping.toPixel(p);
+                    placed.add(s);
+                    offsets.add(new double[] {at.x() - mark.centre().x(),
+                            at.y() - mark.centre().y()});
+                });
+            }
+            boolean atFloor = page.scene().viewport().fieldWidthDegrees()
+                    <= juranometria.chart.ChartViewState.normalMinimumFieldDegrees() + 1e-9;
+            List<SatelliteMarks.Decision> decisions = SatelliteMarks.decide(atFloor,
+                    2.0 * mark.radius(), placed, offsets);
+            java.util.Set<String> drawn = new java.util.HashSet<>();
+            for (SatelliteMark m : satellitesOn(page, mark, satellites)) {
+                drawn.add(m.satellite().identity());
+            }
+            for (int i = 0; i < placed.size(); i++) {
+                String id = placed.get(i).identity();
+                String decided = decisions.get(i).name();
+                out.put(id, decided.equals("DRAWN") && !drawn.contains(id) ? "OFF_PAGE" : decided);
+            }
+        }
+        return out;
+    }
+
     private static List<SatelliteMark> satellitesOn(DrawnPage page, OblateMark primary,
             List<OverlayContribution.Satellite> satellites) {
         if (satellites.isEmpty()) {

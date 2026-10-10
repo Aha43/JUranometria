@@ -455,6 +455,7 @@ public final class PackagedAcceptanceMain {
         centreOnChartJourney();
         jupiterOnTheChartJourney();
         jovianMoonsOnTheChartJourney();
+        jovianSheetJourney();
 
         System.out.println("PACKAGED ACCEPTANCE OK");
     }
@@ -2058,6 +2059,150 @@ public final class PackagedAcceptanceMain {
                 + " the first-quarter Moon at true scale where the service puts it,"
                 + " lit towards the table's bright limb, names it, speaks it, and a"
                 + " click on the disc selects nothing behind it)");
+    }
+
+    /**
+     * The Jovian sheet's moment and measured field (#486), restated from
+     * {@code juranometria.tool.JupiterOnTheChartStudyMain} because the
+     * packaged journeys do not reach into the study tools;
+     * {@code PackagedJovianSheetTest} holds them equal to the study's.
+     */
+    static final java.time.Instant JOVIAN_SHEET_MOMENT =
+            java.time.Instant.parse("2026-12-11T22:45:00Z");
+    static final double JOVIAN_SHEET_FIELD = 1.0;
+
+    /**
+     * The Jovian sheet inside the packaged image (issue #486): at the triple
+     * transit and the sheet's measured field, the application's own A4 export
+     * is pixel for pixel the inspected recording of the same layers, and the
+     * screen at the sheet's size and the paper agree on Jupiter's centre,
+     * figure and pole, every moon's position and state, and every name.
+     */
+    private static void jovianSheetJourney() throws Exception {
+        juranometria.solar.JovianSystemService jovian =
+                juranometria.solar.JovianSystemService.load();
+        juranometria.sky.Observer oslo = new juranometria.sky.Observer(59.913, 10.752,
+                JOVIAN_SHEET_MOMENT);
+        double field = JOVIAN_SHEET_FIELD;
+        juranometria.sheet.PaperSize paper = juranometria.sheet.PaperSize.A4;
+        ChartViewController navigation = new ChartViewController();
+        navigation.recenter(jovian.observeJupiter(oslo).astrometricJ2000(), field);
+        juranometria.ui.ChartComponent[] chart = new juranometria.ui.ChartComponent[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            chart[0] = new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
+            chart[0].setSize(paper.chartWideUnits(), paper.chartHighUnits());
+            chart[0].setViewState(navigation.state());
+            juranometria.jovianchart.JovianModule module =
+                    new juranometria.jovianchart.JovianModule(() -> oslo, () -> jovian,
+                            () -> false);
+            module.showing(true);
+            chart[0].overlays().offer(juranometria.jovianchart.JovianModule.ID,
+                    module::contributedGeometry);
+        });
+        javax.swing.SwingUtilities.invokeAndWait(() -> { });
+        javax.swing.SwingUtilities.invokeAndWait(() -> { });
+        java.awt.image.BufferedImage screen = new java.awt.image.BufferedImage(
+                paper.chartWideUnits(), paper.chartHighUnits(),
+                java.awt.image.BufferedImage.TYPE_INT_RGB);
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            java.awt.Graphics2D g = screen.createGraphics();
+            try {
+                chart[0].paint(g);
+            } finally {
+                g.dispose();
+            }
+        });
+        java.util.List<juranometria.ui.ReferenceInk.BodyPlacement> onScreen =
+                chart[0].renderedBodies();
+
+        java.nio.file.Path folder = java.nio.file.Files.createTempDirectory(
+                "juranometria-jovian-sheet");
+        Preferences scratch = Preferences.userRoot()
+                .node("juranometria-packaged-jovian-sheet-" + System.nanoTime());
+        java.awt.image.BufferedImage exported;
+        try {
+            ExportSheet.Outcome outcome = ExportSheetSession.exportTo(
+                    folder.resolve("jovian").toFile(),
+                    new ExportSheet.Request(juranometria.sheet.SheetFormat.PNG, paper, 300,
+                            false),
+                    navigation, chart[0],
+                    new ChartOptionsController(ChartOptionsStore.forNode(scratch)),
+                    new juranometria.chart.WorkingSelection(), file -> true,
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+            require(outcome instanceof ExportSheet.Outcome.Written,
+                    "the Jovian sheet is written: " + outcome);
+            exported = javax.imageio.ImageIO.read(folder.resolve("jovian.png").toFile());
+        } finally {
+            scratch.removeNode();
+            try (var files = java.nio.file.Files.list(folder)) {
+                for (java.nio.file.Path file : files.toList()) {
+                    java.nio.file.Files.delete(file);
+                }
+            }
+            java.nio.file.Files.delete(folder);
+        }
+
+        java.util.List<juranometria.ui.ReferenceInk.BodyPlacement> onPaper =
+                new java.util.ArrayList<>();
+        juranometria.sheet.SheetRecording inspected = juranometria.sheet.ChartSheet.record(
+                chart[0].assembler()::assemble, navigation.state(), chart[0].chartOptions(),
+                juranometria.ui.SheetInk.reference(chart[0], java.util.Set.of()),
+                (g, scene, reserved) -> {
+                    juranometria.project.DrawnPage page =
+                            juranometria.project.DrawnPage.of(scene);
+                    var offered = chart[0].overlays().collect();
+                    onPaper.addAll(juranometria.ui.ReferenceInk.paintBodies(g, page, offered,
+                            juranometria.render.ChartPalette.WHITE_PAPER, ENGLISH_PAGE, reserved,
+                            juranometria.ui.ReferenceInk.referenceBoxes(page, offered,
+                                    ENGLISH_PAGE, reserved, structure -> false)));
+                },
+                juranometria.render.ChartRenderer.ReferenceLayer.NONE, paper, ENGLISH_PAGE,
+                java.util.Set.of());
+        java.awt.image.BufferedImage expected = javax.imageio.ImageIO.read(
+                new java.io.ByteArrayInputStream(
+                        juranometria.sheet.PngSheetWriter.write(inspected, 300)));
+        require(exported.getWidth() == expected.getWidth()
+                        && exported.getHeight() == expected.getHeight(),
+                "the exported Jovian sheet is the inspected sheet's size");
+        long differing = 0;
+        for (int y = 0; y < expected.getHeight(); y++) {
+            for (int x = 0; x < expected.getWidth(); x++) {
+                if (exported.getRGB(x, y) != expected.getRGB(x, y)) {
+                    differing++;
+                }
+            }
+        }
+        require(differing == 0, "the export is the inspected recording, pixel for pixel: "
+                + differing + " differ");
+
+        // Screen and paper: the same Jupiter, the same moons, the same names.
+        require(onScreen.size() == onPaper.size() && !onScreen.isEmpty(),
+                "the same bodies on screen and paper: " + onScreen.size() + " and "
+                        + onPaper.size());
+        int inFront = 0;
+        for (int i = 0; i < onScreen.size(); i++) {
+            juranometria.ui.ReferenceInk.BodyPlacement a = onScreen.get(i);
+            juranometria.ui.ReferenceInk.BodyPlacement b = onPaper.get(i);
+            require(a.identity().equals(b.identity())
+                            && Math.abs(a.centre().x() - b.centre().x()) < 1e-9
+                            && Math.abs(a.centre().y() - b.centre().y()) < 1e-9
+                            && a.disc().getBounds2D().equals(b.disc().getBounds2D())
+                            && a.symbol() == b.symbol()
+                            && java.util.Objects.equals(a.state(), b.state())
+                            && java.util.Objects.equals(a.name(), b.name())
+                            && java.util.Objects.equals(a.box(), b.box()),
+                    "screen and paper agree on " + a.identity() + ": " + a + " / " + b);
+            inFront += "jovian.inFront".equals(b.state()) ? 1 : 0;
+        }
+        require(juranometria.jovianchart.JovianModule.JUPITER.equals(onPaper.get(0).identity())
+                        && !onPaper.get(0).symbol(),
+                "Jupiter's true disc on the sheet: " + onPaper.get(0));
+        require(inFront == 3, "the three in front of Jupiter on paper: " + inFront);
+        System.out.println("jovian sheet OK (the application's A4 export at the triple transit"
+                + " and the measured " + field + "° field is the inspected recording pixel"
+                + " for pixel; screen and paper draw the same Jupiter disc and figure and"
+                + " the same " + (onPaper.size() - 1) + " moons, three in front, at the same"
+                + " places with the same states and names)");
     }
 
     /**

@@ -135,7 +135,52 @@ public final class GalleryPageMain {
         bodiesSlide(new ChartViewState(meanOf(sun, moon, horizonAboveTheMoon),
                 36.0, 8.0, null, null), true, solar, "sun-and-moon-horizon", 2);
 
+        // --- Jupiter and its moons (#486): the same moment ----------
+        // At the gallery's instant Jupiter stands high in Gemini over
+        // Oslo with all four Galilean moons clear of it. First the
+        // normal minimum field, where Jupiter is its true disc and every
+        // moon is drawn as a symbol at its own place; then a wider page,
+        // where Jupiter is the 6 px cartographic symbol and only the moons
+        // whose marks can be told apart are drawn.
+        juranometria.solar.JovianSystemService jovian =
+                juranometria.solar.JovianSystemService.load();
+        SkyPosition jupiter = jovian.observeJupiter(OSLO).astrometricJ2000();
+        jovianSlide(new ChartViewState(jupiter,
+                ChartViewState.normalMinimumFieldDegrees(), 8.0, null, null), jovian,
+                "jupiter-and-moons", 5);
+        jovianSlide(new ChartViewState(jupiter, 8.0, 8.0, null, null), jovian,
+                "jupiter-in-gemini", 2);
+
         System.out.println("gallery slides written to " + DIR.getPath());
+    }
+
+    /**
+     * One Jupiter slide through the production composition (#486): the
+     * Jovian module over the gallery's observer, switched on. Refuses to
+     * write a slide that draws fewer bodies than it is about.
+     */
+    private static void jovianSlide(ChartViewState state,
+                                    juranometria.solar.JovianSystemService jovian,
+                                    String name, int bodiesAtLeast) throws Exception {
+        ChartComponent chart = component(state);
+        SwingUtilities.invokeAndWait(() -> {
+            juranometria.jovianchart.JovianModule module =
+                    new juranometria.jovianchart.JovianModule(() -> OSLO, () -> jovian,
+                            () -> false);
+            module.showing(true);
+            chart.overlays().offer(juranometria.jovianchart.JovianModule.ID,
+                    module::contributedGeometry);
+        });
+        write(chart, name);
+        if (chart.renderedBodies().size() < bodiesAtLeast) {
+            throw new IllegalStateException(name + " drew " + chart.renderedBodies()
+                    + ", not the " + bodiesAtLeast + " bodies it is about");
+        }
+        for (juranometria.ui.ReferenceInk.BodyPlacement b : chart.renderedBodies()) {
+            System.out.println(name + ": " + b.identity() + " at " + b.centre()
+                    + (b.symbol() ? " symbol" : " disc") + " name "
+                    + (b.box() == null ? "refused" : "placed"));
+        }
     }
 
     /**

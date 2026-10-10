@@ -81,6 +81,7 @@ help:
 	@echo "  jovian-accuracy-report  The Jovian service against Horizons, the report the tests hold (issue #473)"
 	@echo "  jovian-cartography-study  Measure Jupiter and the moons on the atlas's pages, with mockups (issue #482)"
 	@echo "  sun-on-the-chart-study  The Sun on production pages through the module (issue #415)"
+	@echo "  jupiter-on-the-chart-study  Jupiter and its moons on production pages (issue #486)"
 	@echo "  moon-on-the-chart-study The Moon on production pages, and the lunation as a row of phases (issue #416)"
 	@echo "  pan-study         Measure the Sprint 8 grab-to-pan geometry and costs"
 	@echo "  chart-options-study  Render the Sprint 12 chart-options candidates"
@@ -602,7 +603,7 @@ black-sky-study: classes
 		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BlackSkyStudyMain \
 		> docs/studies/black-sky/measurements.md
 
-.PHONY: spk-boundary-fixture import-jovian-system jovian-accuracy-report jovian-cartography-study evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study sun-on-the-chart-study moon-on-the-chart-study printable-chart-study
+.PHONY: spk-boundary-fixture import-jovian-system jovian-accuracy-report jovian-cartography-study evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study sun-on-the-chart-study moon-on-the-chart-study jupiter-on-the-chart-study printable-chart-study
 # The heap is stated rather than inherited from whatever a machine's
 # ergonomics chose for it: the CI runner's default quarter-of-RAM is
 # not the same number as a developer's.
@@ -790,6 +791,15 @@ sun-on-the-chart-study: classes
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.SunOnTheChartStudyMain \
 		> docs/studies/sun-on-the-chart/measurements.md
 	@echo "written to docs/studies/sun-on-the-chart/measurements.md"
+
+# Jupiter and the Galilean moons on the chart (issue #486): production
+# pages with the Jovian module attached - production ink, no study mark.
+jupiter-on-the-chart-study: classes
+	mkdir -p docs/studies/jupiter-on-the-chart
+	$(JAVA) -Xmx2g -Djava.awt.headless=true -cp "$(CLASSES_DIR):$(LIB_DIR)/*" \
+		juranometria.tool.JupiterOnTheChartStudyMain \
+		> docs/studies/jupiter-on-the-chart/measurements.md
+	@echo "written to docs/studies/jupiter-on-the-chart/measurements.md"
 
 # The Moon on the chart (issue #416): production pages with the module
 # attached, and the June 2026 lunation measured from its own pixels.

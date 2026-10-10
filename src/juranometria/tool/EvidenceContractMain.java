@@ -146,6 +146,11 @@ public final class EvidenceContractMain {
         // The Moon on production pages (#416), the same way.
         REPORT_MAINS.put("juranometria.tool.MoonOnTheChartStudyMain",
                 "docs/studies/moon-on-the-chart/measurements.md");
+        // Jupiter and the moons on production pages (#486): the report
+        // is deterministic, its pages held through IMAGE_MAINS, and where
+        // each name went is the platform record (PLATFORM_REPORTS).
+        REPORT_MAINS.put("juranometria.tool.JupiterOnTheChartStudyMain",
+                "docs/studies/jupiter-on-the-chart/measurements.md");
         REPORT_MAINS.put("juranometria.tool.PrintableChartStudyMain",
                 "docs/studies/printable-chart/measurements.md");
         // Not prose but an oracle: the released pages' own pixels
@@ -322,6 +327,9 @@ public final class EvidenceContractMain {
         // decisions and the rules; the invariant that no configuration
         // loses every moon label is held on each platform by the
         // study itself and by JovianLabelInvariantTest.
+        // #486: the production pages' name placements, the same reason.
+        PLATFORM_REPORTS.put("juranometria.tool.JupiterOnTheChartStudyMain",
+                "docs/studies/jupiter-on-the-chart/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.JovianCartographyStudyMain",
                 "docs/studies/jovian-cartography/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.ToggleShortcutStudyMain",
@@ -467,6 +475,10 @@ public final class EvidenceContractMain {
             // The Moon on the chart (issue #416): the same, and the
             // lunation strip cut from production pages.
             "juranometria.tool.MoonOnTheChartStudyMain",
+            // Jupiter and the Galilean moons on the chart (issue #486):
+            // production pages composed by the component with the Jovian
+            // module attached.
+            "juranometria.tool.JupiterOnTheChartStudyMain",
             // The working-selection surface mock-ups (issue #258):
             // widget-rendered inspection, the selection- prefix.
             "juranometria.tool.WorkingSelectionMockupMain",
