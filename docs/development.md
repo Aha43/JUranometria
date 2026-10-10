@@ -233,7 +233,11 @@ asked:
   element, the PDF `/Producer` entry, the PNG text chunk — so every
   sheet under `docs/studies/chart-sheet/` (ten at 4.0.0, with the
   solar-system sheet's three) carries the version that drew them. `make chart-sheet-study`, then `make evidence-provenance`,
-  which re-dates only the rows whose bytes moved.
+  which re-dates only the rows whose bytes moved. The Jovian study's
+  A4 sheet (`docs/studies/jupiter-on-the-chart/sheet-a4-jovian.*`,
+  #486) carries it too: `make jupiter-on-the-chart-study`. At 5.1.0
+  every sheet PNG stayed pixel-identical and each PDF differed by one
+  byte, the version digit.
 - **The gallery.** `docs/gallery/manifest.json` carries `release` and
   `downloads` by hand; `GalleryMain` only reads them. Update both, run
   `make gallery`, and commit the regenerated pages — the `pages`
@@ -257,7 +261,9 @@ asked:
   image changed exactly 125 pixels in the first cell alone, columns
   206–216 of rows 33–47. At 5.0.0 (4→5) the same cell alone moved,
   123 pixels in each dark image and 124 in each light one — the count
-  is the two glyphs' difference, the cell is the invariant.
+  is the two glyphs' difference, the cell is the invariant. At 5.1.0
+  (0→1) the second cell alone moved, 127 pixels in each image,
+  columns 222–231 of rows 33–47.
 - **The articles.** Their footer names the release, and
   `scripts/build-articles.py` reads it from `VERSION` when the site is
   built rather than carrying a number - so there is nothing to

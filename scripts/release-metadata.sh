@@ -170,7 +170,11 @@ Tycho-2 Catalogue under **CC BY-NC 3.0 IGO**, so **the packaged
 application may be used and redistributed non-commercially only**
 for as long as that data is included. Deep-sky data from OpenNGC
 (CC BY-SA 4.0); constellation geography and star identities from
-d3-celestial (BSD-3-Clause); Tabler icons (MIT). The four
+d3-celestial (BSD-3-Clause); Tabler icons (MIT). The Solar System
+and Jovian ephemerides are JUranometria-modified excerpts of the
+NASA/JPL DE440 and JUP365 ephemerides, under the NAIF rules for
+modified SPICE kernels (no fee or licence), with the IAU 2015
+constants copied from the NAIF planetary-constants kernel. The four
 self-contained downloads bundle an Eclipse Temurin 21 runtime
 (GPLv2 with the Classpath Exception) with its complete legal
 notices inside. Every archive carries the full licensing map, and

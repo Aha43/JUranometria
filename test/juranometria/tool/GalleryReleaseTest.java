@@ -48,11 +48,22 @@ class GalleryReleaseTest {
      * name. Each release adds the one it replaces.
      */
     private static final List<String> EARLIER =
-            List.of("1.11.0", "1.12.0", "2.0.0", "2.1.0", "3.0.0");
+            List.of("1.11.0", "1.12.0", "2.0.0", "2.1.0", "3.0.0",
+                    // 4.0.0 and 5.0.0 were not added when they were
+                    // replaced; 5.1.0 adds both (#495).
+                    "4.0.0", "5.0.0");
 
     /** The chart-sheet study: SVG metadata, PDF producer, PNG text. */
     private static final Path SHEETS =
             Path.of("docs/studies/chart-sheet");
+
+    /**
+     * Every study that commits exported sheets: the chart-sheet study, and
+     * the Jovian study's A4 sheet (#486), which carries the producer line
+     * like any other and was not named here until 5.1.0 (#495).
+     */
+    private static final List<Path> SHEET_STUDIES = List.of(SHEETS,
+            Path.of("docs/studies/jupiter-on-the-chart"));
 
     /** The page-language study's committed companion. */
     private static final Path PAGE_LANGUAGE = Path.of(
@@ -193,24 +204,27 @@ class GalleryReleaseTest {
         // Every sheet the study writes, not a remembered list: the
         // three solar-system files (#418) carried the version for a
         // sprint before a release noticed the list did not name them.
-        List<String> sheets;
-        try (var files = Files.list(SHEETS)) {
-            sheets = files.map(f -> f.getFileName().toString())
-                    .filter(name -> name.startsWith("sheet-")
-                            && (name.endsWith(".svg") || name.endsWith(".pdf")
-                                    || name.endsWith(".png")))
-                    .sorted().toList();
+        List<Path> sheets = new ArrayList<>();
+        for (Path study : SHEET_STUDIES) {
+            try (var files = Files.list(study)) {
+                files.filter(f -> {
+                    String name = f.getFileName().toString();
+                    return name.startsWith("sheet-") && (name.endsWith(".svg")
+                            || name.endsWith(".pdf") || name.endsWith(".png"));
+                }).sorted().forEach(sheets::add);
+            }
         }
-        assertTrue(sheets.size() >= 10, "the study's sheets are all found: " + sheets);
+        assertTrue(sheets.size() >= 12, "the studies' sheets are all found: " + sheets);
+        assertTrue(sheets.contains(Path.of("docs/studies/jupiter-on-the-chart/sheet-a4-jovian.pdf")),
+                "the Jovian sheet is among them");
 
         List<String> current = new ArrayList<>();
         List<String> stale = new ArrayList<>();
-        for (String sheet : sheets) {
-            String bytes = new String(
-                    Files.readAllBytes(SHEETS.resolve(sheet)),
+        for (Path sheet : sheets) {
+            String bytes = new String(Files.readAllBytes(sheet),
                     StandardCharsets.ISO_8859_1);
             if (!bytes.contains("JUranometria " + version)) {
-                current.add(sheet);
+                current.add(sheet.toString());
             }
             for (String older : EARLIER) {
                 if (!older.equals(version)
@@ -222,7 +236,8 @@ class GalleryReleaseTest {
         assertEquals(List.of(), current,
                 "every committed chart sheet names the release it was"
                         + " drawn at. Regenerate them with"
-                        + " `make chart-sheet-study`, then"
+                        + " `make chart-sheet-study` and"
+                        + " `make jupiter-on-the-chart-study`, then"
                         + " `make evidence-provenance`, after changing"
                         + " VERSION");
         assertEquals(List.of(), stale,
