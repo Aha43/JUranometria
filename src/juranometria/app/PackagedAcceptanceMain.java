@@ -2202,7 +2202,9 @@ public final class PackagedAcceptanceMain {
             });
             java.util.List<juranometria.ui.ReferenceInk.BodyPlacement> drawn =
                     chart[0].renderedBodies();
-            require(drawn.size() == 1 && juranometria.jovianchart.JovianModule.JUPITER.equals(drawn.get(0).identity()),
+            // Jupiter first; its moons (#485), each decided on its own, after it.
+            require(!drawn.isEmpty() && juranometria.jovianchart.JovianModule.JUPITER.equals(
+                            drawn.get(0).identity()),
                     "the packaged chart drew Jupiter at " + field + "°: " + drawn);
             juranometria.project.DrawnPage page =
                     juranometria.project.DrawnPage.of(chart[0].currentScene());
@@ -2221,13 +2223,14 @@ public final class PackagedAcceptanceMain {
                 double width = drawn.get(0).disc().getBounds2D().getWidth();
                 require(Math.abs(width - juranometria.jovianchart.JovianModule.MINIMUM_MARK_PX) < 0.05,
                         "the 6 px minimum: " + width);
-                require(said.endsWith(" Jupiter (a cartographic symbol, not Jupiter's apparent"
+                require(said.contains(" Jupiter (a cartographic symbol, not Jupiter's apparent"
                         + " diameter)."), "spoken as a symbol: " + said);
                 require(chart[0].bodyAt(centre.x(), centre.y()).isEmpty(),
                         "a click through the symbol is not consumed");
                 symbolSaid = said;
             } else {
-                require(said.endsWith(" Jupiter."), "spoken as Jupiter: " + said);
+                require(said.contains(" Jupiter. ") || said.endsWith(" Jupiter."),
+                        "spoken as Jupiter: " + said);
                 int cx = (int) Math.round(centre.x()) + chart[0].pageOffsetX();
                 int cy = (int) Math.round(centre.y()) + chart[0].pageOffsetY();
                 for (int id : new int[] {java.awt.event.MouseEvent.MOUSE_PRESSED,
