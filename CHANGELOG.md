@@ -7,6 +7,22 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Jupiter on the chart (#484).** *View > Solar System > Jupiter and
+moons on the chart*, off until chosen and remembered, and the same
+switch in the Controller's Jupiter group, draw Jupiter where it stands
+for the place and instant set in Place and Time. At ordinary fields its
+disc is smaller than the faintest star mark, so it is drawn as a 6-pixel
+cartographic symbol, beneath the stars and never hiding one, and the
+chart says it is a symbol and not Jupiter's apparent diameter. From
+6 pixels across, at the 1° field, it is Jupiter's true disc: opaque, its
+outline turning towards the planet's flattened figure with the short
+axis along its pole. Below a drawn horizon it is dimmed and says so; its
+name takes a free place beside it or is left off. Exported sheets draw
+it too. *Centre on chart* in the Jupiter group and the Jupiter table
+turns the switch on and centres the chart on Jupiter at 1°. From 1900
+Jupiter is drawn; outside 1900–2100 nothing is. The four moons come
+next.
+
 **Centre on chart, for the Sun and the Moon (#483).** A button in the
 Sun's and the Moon's groups in the Controller and in their tables
 finds the body on the chart: it computes what is typed, turns the

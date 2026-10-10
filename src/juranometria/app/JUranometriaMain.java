@@ -437,6 +437,14 @@ public final class JUranometriaMain {
                 };
         juranometria.ui.solar.JovianTableSession jupiterTable =
                 new juranometria.ui.solar.JovianTableSession(observerNow, jovianSystem);
+        // Jupiter on the chart (#484, ruled on #482): one Jovian module
+        // over the same observer and the same lazy pack, with its one
+        // remembered switch, off by default. The pack loads only when
+        // the switch is on and a page asks.
+        juranometria.ui.solar.JovianChartStore jovianChartStore = stores.jovianChart();
+        juranometria.jovianchart.JovianModule jovianOnChart = modules.attach(
+                new juranometria.jovianchart.JovianModule(observerNow, jovianSystem,
+                        meridian::horizonShowing));
         // Centre on chart (#483): one action for every body and host.
         // It centres through the chart's own controller - the centre and
         // the field in one notification - at the chart's normal minimum
@@ -466,13 +474,17 @@ public final class JUranometriaMain {
                 juranometria.ui.solar.SunChartSession.switchOf(sunOnChart, sunChartStore);
         juranometria.ui.solar.BodyOnChart moonLayer =
                 juranometria.ui.solar.MoonChartSession.switchOf(sunOnChart, moonChartStore);
+        juranometria.ui.solar.BodyOnChart jupiterLayer =
+                juranometria.ui.solar.JovianChartSession.switchOf(jovianOnChart,
+                        jovianChartStore);
         // Solar System in the Controller, third (ruled on #457): the
         // Sun, Moon and Jupiter groups over those sessions and the
         // module's own switches, introduced collapsed, computing nothing
         // on its own; the Sun and the Moon with Centre on chart.
         juranometria.ui.solar.SolarSystemSection solarSection =
                 new juranometria.ui.solar.SolarSystemSection(sunTable, moonTable,
-                        sunLayer, moonLayer, jupiterTable, centreOnChart, companionWords);
+                        sunLayer, moonLayer, jupiterTable, jupiterLayer, centreOnChart,
+                        companionWords);
         companion.addSection(juranometria.ui.solar.SolarSystemSection.ID,
                 companionWords.say("solarsystem.title"),
                 solarSection.inController(companionStore, companionWords), true);
@@ -593,7 +605,15 @@ public final class JUranometriaMain {
                         language.interfaceLanguage()),
                 () -> juranometria.ui.solar.JovianTableDialog.open(frame, jupiterTable,
                         juranometria.ui.language.InterfaceText.forLanguage(
-                                language.interfaceLanguage())));
+                                language.interfaceLanguage()), centreOnChart, jupiterLayer));
+        // View > Solar System > Jupiter and moons on the chart (#484),
+        // directly after Moon on the chart: the Jovian module's switch.
+        javax.swing.JCheckBoxMenuItem jupiterOnChartItem = AppMenuBar.addJupiterOnChart(
+                frame.getJMenuBar(),
+                juranometria.ui.language.InterfaceText.forLanguage(
+                        language.interfaceLanguage()),
+                juranometria.ui.solar.JovianChartSession.toggle(jovianOnChart,
+                        jovianChartStore));
         // Both of these read the bar, so both come AFTER it is set.
         // They sat above the menu until the bar moved down to be
         // built in the session's language (#350), and reading a bar
@@ -610,6 +630,8 @@ public final class JUranometriaMain {
                 sunChartStore, AppMenuBar.sunChartItem(frame.getJMenuBar()));
         juranometria.ui.solar.MoonChartSession.restore(sunOnChart,
                 moonChartStore, AppMenuBar.moonChartItem(frame.getJMenuBar()));
+        juranometria.ui.solar.JovianChartSession.restore(jovianOnChart,
+                jovianChartStore, jupiterOnChartItem);
         // The tick follows the window, however it was closed.
         javax.swing.JCheckBoxMenuItem companionItem =
                 AppMenuBar.companionItem(frame.getJMenuBar());

@@ -101,8 +101,10 @@ class SolarSystemCompanionJourneyTest {
                             "Jupiter, opened, has computed nothing: no card");
                     assertNull(find(content, "jupiterTable"), "and no moons");
                     assertNotNull(find(content, "jupiterCompute"), "but its controls are there");
-                    assertNull(find(content, "jupiterOnChart"),
-                            "and no Show on chart: nothing Jovian is drawn");
+                    assertNotNull(find(content, "jupiterOnChart"),
+                            "Jupiter and moons on the chart, in Jupiter's group (#484)");
+                    assertFalse(((javax.swing.JCheckBox) find(content, "jupiterOnChart"))
+                            .isSelected(), "off by default: opening draws nothing");
 
                     // Show on chart, pressed for real: View's item follows,
                     // and the key is the one it always was.
@@ -205,7 +207,8 @@ class SolarSystemCompanionJourneyTest {
                     for (int i = 0; i < solar.getItemCount(); i++) {
                         order.add(solar.getItem(i) == null ? "—" : solar.getItem(i).getText());
                     }
-                    assertEquals(List.of("Sun on the chart", "Moon on the chart", "—",
+                    assertEquals(List.of("Sun on the chart", "Moon on the chart",
+                            "Jupiter and moons on the chart", "—",
                             "Sun...", "Moon...", "Jupiter..."), order);
 
                     // The window's own focus traversal reaches the group: the
@@ -222,7 +225,8 @@ class SolarSystemCompanionJourneyTest {
                     // then Compute, pressed for real: the card and the four
                     // moons appear, and the table is reached too (#474).
                     assertReachable(companion, content,
-                            "Show Jupiter and its moons at the instant set in Place and Time");
+                            "Show Jupiter and its moons at the instant set in Place and Time",
+                            "Jupiter and moons on the chart", "Centre the chart on Jupiter");
                     reveal((JComponent) named(content, "jupiterCompute"));
                     ReaderInput.click((JComponent) named(content, "jupiterCompute"));
                     drain();
@@ -271,6 +275,7 @@ class SolarSystemCompanionJourneyTest {
                 juranometria.ui.ecliptic.EclipticStore.forNode(node),
                 SunChartStore.forNode(node),
                 juranometria.ui.solar.MoonChartStore.forNode(node),
+                juranometria.ui.solar.JovianChartStore.forNode(node),
                 ZoomLockStore.forNode(node),
                 juranometria.ui.companion.CompanionStore.forNode(node),
                 ChartChromeStore.forNode(node),

@@ -208,6 +208,10 @@ public final class ReferenceInk {
         if (contributions.isEmpty()) {
             return List.of();
         }
+        // Jupiter's cartographic symbol (#484, ruling 7 on #482): this
+        // layer paints beneath every catalogue mark, so a symbol drawn
+        // here can never erase a real star.
+        paintSymbols(g, page, contributions, palette);
         List<OverlayRegistry.Owned> reference = new ArrayList<>();
         for (OverlayRegistry.Owned owned : contributions) {
             if (owned.geometry().role() == InkRole.REFERENCE_LINE) {
@@ -1268,10 +1272,118 @@ public final class ReferenceInk {
      */
     public record BodyPlacement(String identity, PixelPoint centre,
                                 Shape disc, String name, Rectangle2D box,
-                                boolean belowHorizon) {
-        /** Whether a page point lies on this body's opaque ink. */
+                                boolean belowHorizon, boolean symbol) {
+        /**
+         * Whether a page point lies on this body's opaque ink. A
+         * cartographic symbol (#484) is no opaque ink: it hides nothing,
+         * so a click through it reaches what is under it.
+         */
         public boolean covers(double x, double y) {
-            return disc.contains(x, y);
+            return !symbol && disc.contains(x, y);
+        }
+    }
+
+    /**
+     * Where an oblate body lands on a page (#484): its centre, its
+     * outline - the larger of its true size and the minimum mark, turned
+     * from a circle at the minimum to the true axis ratio at twice it,
+     * the minor axis along the pole through the page's own north and
+     * east at the body - its drawn equatorial radius, and whether it is
+     * a cartographic symbol (its true disc below the minimum).
+     */
+    record OblateMark(PixelPoint centre, Shape outline, double radius,
+                      boolean symbol) {
+    }
+
+    /** The oblate body's mark on this page, or null when none of it is there. */
+    static OblateMark oblateOn(DrawnPage page, OverlayContribution.OblateBody body) {
+        Projection projection = page.projection();
+        ViewportMapping mapping = new ViewportMapping(page);
+        Rectangle2D paper = ChartRenderer.paperOf(page.scene());
+        PageRegion region = mapping.regionFor(page.scene().viewport(), projection);
+        Shape sky = skyOf(region, paper);
+        Optional<juranometria.project.PlanePoint> projected = projection.project(body.at());
+        if (projected.isEmpty()) {
+            return null;
+        }
+        PixelPoint centre = mapping.toPixel(projected.get());
+        double trueEquatorial = 2.0 * radiusPx(projection, mapping, body.at(),
+                body.equatorialDiameterArcseconds() / 3600.0 / 2.0);
+        double minimum = body.minimumMarkPx();
+        double drawnEquatorial = Math.max(trueEquatorial, minimum);
+        double ratio = body.polarDiameterArcseconds() / body.equatorialDiameterArcseconds();
+        double blend = Math.max(0.0, Math.min(1.0, (trueEquatorial - minimum) / minimum));
+        double drawnPolar = drawnEquatorial * (1.0 - (1.0 - ratio) * blend);
+        if (discOn(centre, drawnEquatorial / 2.0, paper, sky, region.bounded()) == null) {
+            return null;
+        }
+        double[] up = PageBasis.at(page, body.at())
+                .map(basis -> basis.direction(body.poleAngleDegrees()))
+                .orElse(new double[] {0.0, -1.0});
+        java.awt.geom.AffineTransform turn = new java.awt.geom.AffineTransform();
+        turn.translate(centre.x(), centre.y());
+        // Local x is the equator, local y the pole: turned so that y
+        // lies along the pole's page direction.
+        turn.rotate(Math.atan2(up[1], up[0]) + Math.PI / 2.0);
+        Shape outline = turn.createTransformedShape(new Ellipse2D.Double(
+                -drawnEquatorial / 2.0, -drawnPolar / 2.0, drawnEquatorial, drawnPolar));
+        return new OblateMark(centre, outline, drawnEquatorial / 2.0,
+                trueEquatorial < minimum);
+    }
+
+    /** An oblate body's ink: its lit face filled, its limb drawn; dimmed below a drawn horizon. */
+    private static void paintOblate(Graphics2D g2, OblateMark mark,
+            juranometria.render.ChartPalette palette, boolean belowHorizon) {
+        Color face = brightness(palette.ground()) >= brightness(palette.starInk())
+                ? palette.ground() : palette.starInk();
+        Color limb = palette.starInk();
+        if (belowHorizon) {
+            face = ChartRenderer.quiet(face, palette.ground());
+            limb = ChartRenderer.quiet(limb, palette.ground());
+        }
+        g2.setColor(face);
+        g2.fill(mark.outline());
+        g2.setColor(limb);
+        g2.setStroke(new BasicStroke(1.0f));
+        g2.draw(mark.outline());
+    }
+
+    /** The ink an oblate mark keeps clear of words: its outline grown by its stroke and a pixel. */
+    private static Shape inkOf(OblateMark mark) {
+        double grown = mark.radius() + 1.5;
+        return new Ellipse2D.Double(mark.centre().x() - grown, mark.centre().y() - grown,
+                2.0 * grown, 2.0 * grown);
+    }
+
+    /** Every oblate body that is a symbol on this page, painted beneath the catalogue's marks. */
+    private static void paintSymbols(Graphics2D g, DrawnPage page,
+            List<OverlayRegistry.Owned> contributions,
+            juranometria.render.ChartPalette palette) {
+        Graphics2D g2 = null;
+        try {
+            for (OverlayRegistry.Owned owned : contributions) {
+                if (!(owned.geometry() instanceof OverlayContribution.OblateBody body)) {
+                    continue;
+                }
+                OblateMark mark = oblateOn(page, body);
+                if (mark == null || !mark.symbol()) {
+                    continue;
+                }
+                if (g2 == null) {
+                    g2 = (Graphics2D) g.create();
+                    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                            RenderingHints.VALUE_ANTIALIAS_ON);
+                    ViewportMapping mapping = new ViewportMapping(page);
+                    Rectangle2D paper = ChartRenderer.paperOf(page.scene());
+                    g2.clip(skyOf(mapping.regionFor(page.scene().viewport(),
+                            page.projection()), paper));
+                }
+                paintOblate(g2, mark, palette, body.belowHorizon());
+            }
+        } finally {
+            if (g2 != null) {
+                g2.dispose();
+            }
         }
     }
 
@@ -1305,10 +1417,11 @@ public final class ReferenceInk {
             juranometria.render.ChartPalette palette,
             juranometria.project.PageWords words, List<Shape> reserved,
             List<Rectangle2D> referenceBoxes) {
-        List<OverlayContribution.Body> bodies = new ArrayList<>();
+        List<OverlayContribution> bodies = new ArrayList<>();
         for (OverlayRegistry.Owned owned : contributions) {
-            if (owned.geometry() instanceof OverlayContribution.Body body) {
-                bodies.add(body);
+            if (owned.geometry() instanceof OverlayContribution.Body
+                    || owned.geometry() instanceof OverlayContribution.OblateBody) {
+                bodies.add(owned.geometry());
             }
         }
         if (bodies.isEmpty()) {
@@ -1316,9 +1429,9 @@ public final class ReferenceInk {
         }
         // Farthest first; identity breaks a tie, so the page never
         // depends on the order the modules happened to offer.
-        bodies.sort(Comparator.comparingDouble(OverlayContribution.Body::distanceKm)
+        bodies.sort(Comparator.comparingDouble(ReferenceInk::distanceOf)
                 .reversed()
-                .thenComparing(OverlayContribution.Body::identity));
+                .thenComparing(OverlayContribution::identity));
         ChartScene scene = page.scene();
         Projection projection = page.projection();
         ViewportMapping mapping = new ViewportMapping(page);
@@ -1328,11 +1441,25 @@ public final class ReferenceInk {
         boolean bounded = region.bounded();
 
         // Pass one: where each disc lands, and how large it is.
-        List<OverlayContribution.Body> drawn = new ArrayList<>();
+        List<OverlayContribution> drawn = new ArrayList<>();
         List<PixelPoint> centres = new ArrayList<>();
-        List<Ellipse2D> discs = new ArrayList<>();
+        List<Shape> discs = new ArrayList<>();
         List<Shape> inks = new ArrayList<>();
-        for (OverlayContribution.Body body : bodies) {
+        List<OblateMark> oblates = new ArrayList<>();
+        for (OverlayContribution contribution : bodies) {
+            if (contribution instanceof OverlayContribution.OblateBody oblate) {
+                OblateMark mark = oblateOn(page, oblate);
+                if (mark == null) {
+                    continue;
+                }
+                drawn.add(oblate);
+                centres.add(mark.centre());
+                discs.add(mark.outline());
+                inks.add(inkOf(mark));
+                oblates.add(mark);
+                continue;
+            }
+            OverlayContribution.Body body = (OverlayContribution.Body) contribution;
             Optional<juranometria.project.PlanePoint> projected =
                     projection.project(body.at());
             if (projected.isEmpty()) {
@@ -1349,6 +1476,7 @@ public final class ReferenceInk {
             centres.add(centre);
             discs.add(disc);
             inks.add(inkOf(disc, body.lit() != null));
+            oblates.add(null);
         }
         String[] names = new String[drawn.size()];
         Rectangle2D[] boxes = new Rectangle2D[drawn.size()];
@@ -1356,10 +1484,18 @@ public final class ReferenceInk {
         try {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON);
-            // Pass two: the discs, farthest first.
+            // Pass two: the discs, farthest first. A symbol is not
+            // painted here: the reference layer drew it beneath the
+            // stars (#484).
             for (int i = 0; i < drawn.size(); i++) {
-                OverlayContribution.Body body = drawn.get(i);
-                Ellipse2D disc = discs.get(i);
+                if (drawn.get(i) instanceof OverlayContribution.OblateBody oblate) {
+                    if (!oblates.get(i).symbol()) {
+                        paintOblate(g2, oblates.get(i), palette, oblate.belowHorizon());
+                    }
+                    continue;
+                }
+                OverlayContribution.Body body = (OverlayContribution.Body) drawn.get(i);
+                Ellipse2D disc = (Ellipse2D) discs.get(i);
                 double radius = disc.getWidth() / 2.0;
                 if (body.lit() == null) {
                     paintSun(g2, disc, centres.get(i), radius, palette,
@@ -1370,16 +1506,18 @@ public final class ReferenceInk {
                             body.lit(), palette, body.belowHorizon());
                 }
             }
-            // Pass three: the names, nearest first.
+            // Pass three: the names, nearest first. A name with no clean
+            // adjacent box is refused on its own; it never overlaps.
             g2.setFont(EquatorialGrid.GRID_LABEL_FONT);
             FontMetrics metrics = g2.getFontMetrics();
             List<Rectangle2D> taken = new ArrayList<>(referenceBoxes);
             List<Shape> obstacles = new ArrayList<>(reserved);
             obstacles.addAll(inks);
             for (int i = drawn.size() - 1; i >= 0; i--) {
-                OverlayContribution.Body body = drawn.get(i);
+                OverlayContribution body = drawn.get(i);
+                boolean below = belowHorizonOf(body);
                 String name = words.bodyName(body.identity());
-                if (body.belowHorizon()) {
+                if (below) {
                     name = name + " " + words.bodyBelowHorizon();
                 }
                 names[i] = name;
@@ -1391,7 +1529,7 @@ public final class ReferenceInk {
                 if (box != null) {
                     taken.add(box);
                     boxes[i] = box;
-                    g2.setColor(body.belowHorizon()
+                    g2.setColor(below
                             ? ChartRenderer.quiet(palette.textInk(), palette.ground())
                             : palette.textInk());
                     g2.drawString(name, (float) box.getMinX(),
@@ -1404,9 +1542,20 @@ public final class ReferenceInk {
         List<BodyPlacement> placed = new ArrayList<>();
         for (int i = 0; i < drawn.size(); i++) {
             placed.add(new BodyPlacement(drawn.get(i).identity(), centres.get(i),
-                    discs.get(i), names[i], boxes[i], drawn.get(i).belowHorizon()));
+                    discs.get(i), names[i], boxes[i], belowHorizonOf(drawn.get(i)),
+                    oblates.get(i) != null && oblates.get(i).symbol()));
         }
         return List.copyOf(placed);
+    }
+
+    private static double distanceOf(OverlayContribution body) {
+        return body instanceof OverlayContribution.OblateBody oblate
+                ? oblate.distanceKm() : ((OverlayContribution.Body) body).distanceKm();
+    }
+
+    private static boolean belowHorizonOf(OverlayContribution body) {
+        return body instanceof OverlayContribution.OblateBody oblate
+                ? oblate.belowHorizon() : ((OverlayContribution.Body) body).belowHorizon();
     }
 
     /** The Sun: the ground, then the ring and its centre dot in star ink. */
@@ -1568,6 +1717,13 @@ public final class ReferenceInk {
         Shape sky = null;
         boolean bounded = false;
         for (OverlayRegistry.Owned owned : contributions) {
+            if (owned.geometry() instanceof OverlayContribution.OblateBody oblate) {
+                OblateMark mark = oblateOn(page, oblate);
+                if (mark != null) {
+                    discs.add(inkOf(mark));
+                }
+                continue;
+            }
             if (!(owned.geometry() instanceof OverlayContribution.Body body)) {
                 continue;
             }

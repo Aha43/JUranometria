@@ -292,6 +292,66 @@ public sealed interface OverlayContribution {
     }
 
     /**
+     * An oblate body drawn with a cartographic minimum (issue #484, the
+     * owner's rulings on #482): Jupiter.
+     *
+     * <p>Unlike a {@link Body}, true scale alone would lose it: at most
+     * of the atlas's fields its disc is smaller than the smallest star
+     * mark. So the page draws it at its true size or at
+     * {@code minimumMarkPx}, whichever is larger. While the true disc is
+     * below the minimum, the mark is <em>a cartographic symbol, not the
+     * body's apparent diameter</em>: it is painted beneath the stars,
+     * never erasing one, and a click through it reaches what is under
+     * it. Once the true disc reaches the minimum it is the body itself:
+     * opaque, in the bodies layer, hiding what it covers, and a click on
+     * it reaches no hidden star. Its outline turns continuously from a
+     * circle at the minimum to the true axis ratio as the true disc grows
+     * to twice the minimum, the minor axis along the pole.
+     *
+     * @param poleAngleDegrees the north pole's position angle at the
+     *                         body's J2000 place, from J2000 north through
+     *                         east - the chart's own frame, never an
+     *                         apparent of-date angle rotated by an assumed
+     *                         correction
+     * @param minimumMarkPx the smallest mark the page draws, in pixels
+     */
+    record OblateBody(String identity, String accessibleName, SkyPosition at,
+                      double equatorialDiameterArcseconds,
+                      double polarDiameterArcseconds, double poleAngleDegrees,
+                      double minimumMarkPx, boolean belowHorizon,
+                      double distanceKm, InkRole role)
+            implements OverlayContribution {
+        public OblateBody {
+            requireIdentified(identity, accessibleName, role);
+            if (at == null) {
+                throw new IllegalArgumentException("a body is somewhere: " + identity);
+            }
+            if (!(equatorialDiameterArcseconds > 0.0)
+                    || !Double.isFinite(equatorialDiameterArcseconds)
+                    || !(polarDiameterArcseconds > 0.0)
+                    || !(polarDiameterArcseconds <= equatorialDiameterArcseconds)) {
+                throw new IllegalArgumentException("an oblate body has a positive"
+                        + " equatorial diameter no smaller than its polar one: " + identity);
+            }
+            if (!Double.isFinite(poleAngleDegrees)) {
+                throw new IllegalArgumentException("a pole has an angle: " + identity);
+            }
+            if (!(minimumMarkPx > 0.0) || !Double.isFinite(minimumMarkPx)) {
+                throw new IllegalArgumentException("a minimum mark is a positive size: "
+                        + identity);
+            }
+            if (!(distanceKm > 0.0) || !Double.isFinite(distanceKm)) {
+                throw new IllegalArgumentException("a body is at a positive distance: "
+                        + identity);
+            }
+            if (role != InkRole.BODY) {
+                throw new IllegalArgumentException("a body is drawn in the body role: "
+                        + identity);
+            }
+        }
+    }
+
+    /**
      * How a disc is lit (issue #416): the illuminated fraction, the
      * bright limb's position angle from celestial north through east,
      * and the phase angle whose cosine is the terminator's axis ratio.

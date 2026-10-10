@@ -82,6 +82,10 @@ public final class JovianTableControls {
     public final JComboBox<String> step;
     public final JButton compute;
     public final JButton update;
+    /** The Controller's Show on chart box (#484), or null where the host has none. */
+    public final javax.swing.JCheckBox onChart;
+    /** Centre on chart (#484, through #483's seam), or null where the host has none. */
+    public final JButton centreOnChart;
     public final JLabel status = new JLabel(" ");
     /** The card's title: Jupiter, the instant, its marks. */
     public final JLabel cardTitle = new JLabel(" ");
@@ -98,6 +102,18 @@ public final class JovianTableControls {
     /** @param letters whether the controls carry access letters (the dialog's do) */
     public JovianTableControls(JovianTableSession session, InterfaceText language,
                                boolean letters) {
+        this(session, language, letters, null, null, null);
+    }
+
+    /**
+     * With the Jovian module's switch (#484): a Show on chart box where
+     * {@code onChart} is given (the Controller's group), and Centre on
+     * chart where {@code centre} is given, turning {@code layer} on and
+     * choosing the chart's normal minimum field.
+     */
+    public JovianTableControls(JovianTableSession session, InterfaceText language,
+                               boolean letters, BodyOnChart onChart, CentreOnChart centre,
+                               BodyOnChart layer) {
         if (session == null || language == null) {
             throw new IllegalArgumentException(
                     "the controls follow a session, in a language");
@@ -269,6 +285,28 @@ public final class JovianTableControls {
         start.addActionListener(e -> apply());
         end.addActionListener(e -> apply());
 
+        if (onChart != null) {
+            String stem = "solarsystem.jupiter.onChart";
+            this.onChart = new javax.swing.JCheckBox(language.say(stem + ".label"),
+                    onChart.showing());
+            this.onChart.setName("jupiterOnChart");
+            this.onChart.getAccessibleContext().setAccessibleName(language.say(stem + ".a11y"));
+            Explain.selfExplanatory(this.onChart, language.say(stem + ".explain"));
+            // Ask, then let the answer come back through the switch.
+            this.onChart.addActionListener(e -> onChart.show(this.onChart.isSelected()));
+            onChart.onChange(this.onChart::setSelected);
+        } else {
+            this.onChart = null;
+        }
+        if (centre != null) {
+            if (layer == null) {
+                throw new IllegalArgumentException("Centre on chart turns a layer on");
+            }
+            centreOnChart = centre.button(target(layer, java.util.function.DoubleUnaryOperator.identity()),
+                    said, "jupiterCentreOnChart", access);
+        } else {
+            centreOnChart = null;
+        }
         following = session.onChange(this::show);
     }
 
@@ -568,6 +606,14 @@ public final class JovianTableControls {
         resultHolder.setAlignmentX(0f);
         column.add(resultHolder);
         column.add(Box.createVerticalStrut(6));
+        if (onChart != null) {
+            column.add(leading(onChart));
+            column.add(Box.createVerticalStrut(4));
+        }
+        if (centreOnChart != null) {
+            column.add(leading(centreOnChart));
+            column.add(Box.createVerticalStrut(4));
+        }
         column.add(leading(update));
         refreshResult();
         return column;

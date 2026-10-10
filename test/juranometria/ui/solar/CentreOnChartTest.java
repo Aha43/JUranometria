@@ -332,7 +332,58 @@ class CentreOnChartTest {
             assertNotNull(section.moon().centreOnChart);
             javax.swing.JComponent jupiterGroup = section.jupiter().inController();
             assertNull(find(jupiterGroup, "jupiterCentreOnChart"),
-                    "no Jupiter button until something Jovian is drawn (#484)");
+                    "no Jupiter button without the Jovian module's switch");
+        });
+    }
+
+    @Test
+    void jupiterCentresFromBothHostsTurningItsOwnSwitchOnAtTheNormalMinimum() throws Exception {
+        JovianSystemService jovian = JovianSystemService.load();
+        Observer at = oslo(Instant.parse("2026-12-11T22:45:00Z"));
+        JovianTableSession session = new JovianTableSession(() -> at, () -> jovian);
+        FakeChart chart = new FakeChart();
+        chart.minimum = 1.0;
+        CentreOnChart action = new CentreOnChart(chart);
+        FakeLayer jupiterLayer = new FakeLayer(false);
+        FakeLayer other = new FakeLayer(false);
+        onEdt(() -> {
+            // The Controller's group: the switch's box and the button.
+            SolarSystemSection section = new SolarSystemSection(
+                    new SolarTableSession(() -> oslo(WHEN), solar, SolarTable.sun()),
+                    new SolarTableSession(() -> oslo(WHEN), solar, SolarTable.moon()),
+                    other, other, session, jupiterLayer, action, EN);
+            javax.swing.JComponent group = section.jupiter().inController();
+            javax.swing.JCheckBox box = (javax.swing.JCheckBox) find(group, "jupiterOnChart");
+            assertNotNull(box, "Jupiter and moons on the chart, in Jupiter's own group");
+            assertEquals("Jupiter and moons on the chart",
+                    box.getAccessibleContext().getAccessibleName());
+            assertFalse(box.isSelected(), "off by default");
+            JButton centre = (JButton) find(group, "jupiterCentreOnChart");
+            assertNotNull(centre);
+            assertEquals("Centre the chart on Jupiter", centre.getAccessibleContext().getAccessibleName());
+            press(centre);
+            assertEquals(session.result().entries().get(0).jupiter().astrometricJ2000(), chart.centre,
+                    "Jupiter's J2000 place, the one the table computed");
+            assertEquals(1.0, chart.field, "the chart's normal minimum field");
+            assertEquals(1, chart.forward, "the chart comes forward");
+            assertTrue(jupiterLayer.shown, "its own switch turned on");
+            assertFalse(other.shown, "and no other body's");
+            assertTrue(box.isSelected(), "the box follows the switch");
+            jupiterLayer.show(false);
+            assertFalse(box.isSelected());
+            // The dialog: the button beside Update, Norwegian too.
+            JovianTableDialog.Content dialog = JovianTableDialog.content(session, NB, action,
+                    jupiterLayer);
+            JButton inDialog = (JButton) find(dialog, "jupiterCentreOnChart");
+            assertNotNull(inDialog, "the Jupiter dialog carries Centre on chart");
+            assertEquals("Sentrer kartet på Jupiter",
+                    inDialog.getAccessibleContext().getAccessibleName());
+            assertNull(find(dialog, "jupiterOnChart"), "the dialog has no switch, as the Sun's");
+            press(inDialog);
+            assertEquals(2, action.centred(CentreOnChart.Body.JUPITER));
+            assertTrue(jupiterLayer.shown);
+            section.release();
+            dialog.controls().release();
         });
     }
 

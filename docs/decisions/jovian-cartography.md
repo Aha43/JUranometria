@@ -169,6 +169,55 @@ languages.
   refused alone;
 - state vocabulary A on white paper and on black sky.
 
+## Jupiter on the chart, as built (#484)
+
+- **One module, one switch.** `juranometria.jovianchart.JovianModule`
+  offers Jupiter while *Jupiter and moons on the chart* is on. The
+  switch is off by default and remembered (`JovianChartStore`). View >
+  Solar System carries it directly after Moon on the chart, and the
+  Controller's Jupiter group carries the same switch as a box. All of
+  them follow the module, the single visibility authority of #458.
+- **The contribution.** Jupiter is an `OverlayContribution.OblateBody`.
+  It carries the service's astrometric J2000 place, the true equatorial
+  and polar diameters, the 6 px minimum, and the pole's position angle
+  from `JovianSystemService.poleAngleJ2000Degrees`. That angle is the
+  study's frame contract moved into production, and
+  `JovianModuleTest` holds it equal to the study's derivation over the
+  century.
+- **Ruling 7: the symbol never erases a star.** While the true disc is
+  under the 6 px minimum, the mark is painted in the reference layer,
+  which lies beneath every catalogue mark. So a star over the symbol
+  stays on top. The symbol hides nothing, so a click through it reaches
+  what is under it. Once the true disc reaches the minimum, it is
+  painted in the bodies layer like the Sun and the Moon: opaque, and a
+  click on it is the empty sky there. On the 900 px screen page that
+  happens at the 1° field.
+- **Ruling 3: the figure.** The outline is a circle at the minimum and
+  reaches the true axis ratio as the true disc grows to 12 px. Its minor
+  axis is turned onto the page through `PageBasis`, the page's own north
+  and east at Jupiter. At 1° the flattening is drawn but not claimed to
+  be visible.
+- **Ruling 2: the accessible text.** A symbol is spoken as "Jupiter (a
+  cartographic symbol, not Jupiter's apparent diameter)", or in
+  Norwegian "Jupiter (et kartografisk symbol, ikke Jupiters
+  tilsynelatende diameter)". A true disc is spoken as "Jupiter".
+- **Ruling 6: the name.** Jupiter's name goes through the bodies'
+  existing collision machinery. It takes the first clean adjacent box
+  and is refused on its own when none is clean. That machinery never
+  falls back to an overlap. The catalogue's `LabelPlacement` does fall
+  back, placing a crowded label "under duress" over the least ink, and
+  #485's moon labels must not use that fallback.
+- **The years.** Outside 1900–2100 the module offers nothing and the
+  table keeps its refusal. From 1900 to 1999 Jupiter is drawn. The
+  moons are not, because they have no numbers there.
+- **Export** draws both layers from the same contributions, so a sheet
+  carries what the screen carries.
+- **Carried to #485.** One crowded pair never suppresses the whole
+  system: each moon is decided on its own, as section B of the study
+  measures. A crowded moon label is refused on its own, never placed
+  under duress. No moon rendering begins until Jupiter passes its
+  packaged checkpoint.
+
 ## Evidence
 
 - **The study:** `src/juranometria/tool/JovianCartographyStudyMain.java`
