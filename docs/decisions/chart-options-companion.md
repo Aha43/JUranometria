@@ -303,3 +303,30 @@ and CI without another ruling **only when all of these hold**:
    with zero failures, aborts or skips.
 
 If any condition is unclear, stop for a ruling.
+
+**Clarified by the owner**, recorded here in the Sprint 45 handover
+(#487):
+
+- **Any gate, not only gate 1** (#443, 2026-10-03). The precedent
+  attaches to the kind of failure. A safe capture refusal in a later
+  gate qualifies too, for example in `InterfaceEvidenceGateTest`'s run.
+  Only the remaining gates then continue, and the refused gate is never
+  rerun.
+- **"Generator behaviour" in condition 5** means the generator involved
+  in the refusal, or shared machinery able to affect it. A change to a
+  different photographer still qualifies.
+- **The kind of transition, not its widths** (#482 on `aa142b99`,
+  2026-10-09). Gate 1 refused `PlaceAndTimeSheetMain` at 420→326 and
+  gate 2 refused it again at 420→324. Condition 2's "known fail-closed
+  geometry transition" means the known **kind** of transition: the
+  application-sized window replacing the declared content before proof.
+  It is not an allowlist of exact rollback widths. **Exact rollback
+  dimensions are diagnostic evidence, not the identity of the known
+  transition.**
+  - A second refusal in a later gate on the same head is recorded
+    incomplete in the same way, with none of the refused tests counted
+    as passed locally.
+  - Restarting from gate 1 is refused, because it would only seek a
+    luckier capture and would erase the first run's record.
+  - CI's first `display` run must then execute every refused test with
+    zero failures, aborts or skips. On `aa142b99` it did.
