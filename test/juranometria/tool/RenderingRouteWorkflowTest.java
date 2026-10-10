@@ -37,7 +37,8 @@ class RenderingRouteWorkflowTest {
             "uses: ./.github/workflows/classify.yml";
 
     private static final String GATE =
-            "if: needs.classify.outputs.route == 'wide'";
+            "if: ${{ !cancelled() && needs.classify.result == 'success'"
+                    + " && needs.classify.outputs.route == 'wide' }}";
 
     private static final String NOT_NARROW =
             "if: needs.classify.outputs.route != 'narrow'";
@@ -106,7 +107,8 @@ class RenderingRouteWorkflowTest {
         String job = job(read("test.yml"), "interaction-evidence");
         assertTrue(job.contains("needs: classify"));
         assertTrue(job.contains(
-                "if: needs.classify.outputs.route == 'interaction'"),
+                "if: ${{ !cancelled() && needs.classify.result == 'success'"
+                        + " && needs.classify.outputs.route == 'interaction' }}"),
                 "only the interaction route runs it (#428)");
         assertTrue(job.contains("make evidence-contracts-interaction"),
                 "the contract over the generators that own no chart picture");

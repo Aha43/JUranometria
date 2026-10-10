@@ -218,7 +218,11 @@ jobs:
   # diff below names is a real move, never the run's own writing.
   interaction-evidence:
     needs: classify
-    if: needs.classify.outputs.route == 'interaction'
+    # !cancelled() and classify's own result (#494): `landing` is skipped on
+    # every pull request, and GitHub skips a job downstream of a skipped one
+    # unless its condition says otherwise - which would silently drop this
+    # job. It runs exactly when the classification succeeded and says so.
+    if: ${{ !cancelled() && needs.classify.result == 'success' && needs.classify.outputs.route == 'interaction' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -257,7 +261,9 @@ jobs:
   # it. A classifier that failed skips this job and fails the run.
   evidence:
     needs: classify
-    if: needs.classify.outputs.route == 'wide'
+    # As above (#494): runs exactly when the classification succeeded and
+    # says wide, never dropped because `landing` above it was skipped.
+    if: ${{ !cancelled() && needs.classify.result == 'success' && needs.classify.outputs.route == 'wide' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7

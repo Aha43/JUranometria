@@ -66,8 +66,17 @@ class PostMergeQualificationWorkflowTest {
                     "if: ${{ !cancelled() && needs.landing.outputs.qualified != 'true' }}"),
                     name + " is skipped only when the landing is proved: anything else runs it");
         }
-        assertTrue(job(test, "evidence").contains("needs: classify"),
-                "the evidence jobs follow the classification, as before");
+        // PR #496's first CI run: with `landing` skipped on a pull request,
+        // GitHub skipped `evidence` too, because a job downstream of a
+        // skipped one is skipped unless its condition says otherwise. Every
+        // job below classify must therefore name classify's own result.
+        for (String name : new String[] {"evidence", "interaction-evidence"}) {
+            String block = job(test, name);
+            assertTrue(block.contains("needs: classify"), name + " follows the classification");
+            assertTrue(block.contains("if: ${{ !cancelled() && needs.classify.result == 'success'"),
+                    name + " runs whenever the classification succeeded, never dropped because"
+                            + " the skipped landing check sits above it");
+        }
     }
 
     @Test
