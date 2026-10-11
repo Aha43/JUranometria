@@ -160,7 +160,13 @@ public final class Explain {
                             + " is heard twice and says nothing the"
                             + " second time - " + spoken);
         }
-        control.setToolTipText(readable(hovered));
+        // A menu item's tooltip is drawn by the platform, not by Swing:
+        // under the macOS screen menu bar the system shows it as plain
+        // text, so the HTML that wraps a long Swing tooltip appears as
+        // source there (#508). Menu help is plain text, and the platform
+        // wraps it; every other control keeps the wrapped form.
+        control.setToolTipText(control instanceof javax.swing.JMenuItem
+                ? hovered : readable(hovered));
         control.getAccessibleContext().setAccessibleDescription(spoken);
         control.putClientProperty(MARK, how);
         return control;

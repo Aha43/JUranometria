@@ -199,6 +199,17 @@ public final class MenuSheetMain {
                 // meets, with its letter, hover and spoken name.
                 AppMenuBar.addVenusTable(bar[0], juranometria.ui.language.InterfaceText.forLanguage(language),
                         () -> { });
+                // Jupiter's two items (#474, #484), which the application also
+                // adds after the bar is built: Jupiter... after Moon..., and
+                // Jupiter and moons on the chart after Moon on the chart -
+                // absent from this photograph until #508.
+                AppMenuBar.addJupiterTable(bar[0],
+                        juranometria.ui.language.InterfaceText.forLanguage(language), () -> { });
+                JCheckBoxMenuItem jupiterOnChart = AppMenuBar.addJupiterOnChart(bar[0],
+                        juranometria.ui.language.InterfaceText.forLanguage(language), () -> { });
+                if (jupiterOnChart != null) {
+                    jupiterOnChart.setSelected(state.checked());
+                }
 
                 JCheckBoxMenuItem inspector = AppMenuBar.inspectorItem(bar[0]);
                 if (inspector != null) {
@@ -361,7 +372,11 @@ public final class MenuSheetMain {
         String on = item instanceof JCheckBoxMenuItem box && box.isSelected()
                 ? " [checked]" : "";
         add(said, what + " label" + off + on, item.getText());
-        add(said, what + " hover" + off, item.getToolTipText());
+        // The hover is recorded as the platform receives it, never
+        // cleaned: a menu item's tooltip is drawn by the system as plain
+        // text, so markup here is what a reader would see (#508), and a
+        // companion that stripped it once hid exactly that.
+        raw(said, what + " hover" + off, item.getToolTipText());
         if (item.getAccessibleContext() != null) {
             add(said, what + " spoken name" + off,
                     item.getAccessibleContext().getAccessibleName());
@@ -377,6 +392,14 @@ public final class MenuSheetMain {
             add(said, what + " access letter (language)",
                     String.valueOf((char) item.getMnemonic()));
         }
+    }
+
+    /** A value exactly as set; the table escapes its own separator when it is written. */
+    private static void raw(Set<String> said, String kind, String text) {
+        if (text == null || text.isBlank()) {
+            return;
+        }
+        said.add(kind + " | " + text);
     }
 
     private static void add(Set<String> said, String kind, String text) {

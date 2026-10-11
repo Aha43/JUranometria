@@ -7,6 +7,13 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Fixed: menu help showed HTML source (#508).** On macOS the help for
+View > Solar System > Sun..., Venus..., Moon... and Jupiter..., and for
+Help > Copy View Report, appeared as markup (`<html><body …>`) because a
+long tooltip was wrapped for Swing while the system draws menu tooltips
+as plain text. Menu help is now plain text, in both languages; the
+words, the spoken descriptions and every other tooltip are unchanged.
+
 **Venus, computed offline (#499–#501).** A third bundled pack, the
 `planets` pack, holds one JUranometria-modified excerpt of NASA/JPL's
 DE440 per planet, Venus first, from the released Solar System pack's
