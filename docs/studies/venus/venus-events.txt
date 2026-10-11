@@ -1,0 +1,21 @@
+# Venus named cases (#500): conjunctions and greatest elongations, quoted rows
+#
+# Source: Fred Espenak, Sky Event Almanacs, GMT editions
+#   "Sky Event Almanacs Courtesy of Fred Espenak, www.AstroPixels.com"
+#   https://astropixels.com/almanac/almanac01/almanac2012gmt.html  sha256 251a85e49504212df9391af58daec07b72f4fee86c77fe22b443e44c1018b307  36080 B
+#   https://astropixels.com/almanac/almanac21/almanac2026gmt.html  sha256 4236c51d23297c270a42a3cb7a17c82881c1e5020de06b890594a1f40d80ce17  37476 B
+#   https://astropixels.com/almanac/almanac81/almanac2100gmt.html  sha256 1178bd6d049593e5a3f40a94e6dbdf4210637587b09a25c3972b4d79b81aecd6  37241 B
+#   retrieved 2026-10-11T01:22Z; times are UTC to the hour as published.
+# Used for named-case timing only; JPL Horizons remains the numerical
+# comparison authority (owner ruling C). Not a runtime or build input.
+#
+# name	instant (UTC, to the hour)	published row
+2012-greatest-elongation-east	2012-03-27T07:00Z	Mar 27 07 Venus at Greatest Elong: 46.0°E
+2012-inferior-conjunction	2012-06-06T01:00Z	Jun 06 01 Venus at Inferior Conjunction
+2012-greatest-elongation-west	2012-08-15T10:00Z	Aug 15 10 Venus at Greatest Elong: 45.8°W
+2026-superior-conjunction	2026-01-06T16:00Z	Jan 06 16 Venus at Superior Conjunction
+2026-greatest-elongation-east	2026-08-15T06:00Z	Aug 15 06 Venus at Greatest Elong: 45.9°E
+2026-inferior-conjunction	2026-10-24T03:00Z	Oct 24 03 Venus at Inferior Conjunction
+2100-greatest-elongation-east	2100-03-02T06:00Z	Mar 02 06 Venus at Greatest Elong: 46.5°E
+2100-inferior-conjunction	2100-05-12T12:00Z	May 12 12 Venus at Inferior Conjunction
+2100-greatest-elongation-west	2100-07-21T16:00Z	Jul 21 16 Venus at Greatest Elong: 45.7°W
