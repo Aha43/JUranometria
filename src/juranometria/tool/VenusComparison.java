@@ -87,8 +87,15 @@ public final class VenusComparison {
         private final Map<String, Double> values = new TreeMap<>();
         private final Map<String, String> where = new TreeMap<>();
 
+        /**
+         * Magnitudes compare at 1e-7 of their unit, so rows that tie at
+         * the fixtures' own precision - the diameter's 0.000005″ is
+         * Horizons' rounding on most rows - tie exactly and the first in
+         * file order stands on every platform, rather than the last bit
+         * of one machine's arithmetic choosing (CI on #505).
+         */
         void note(String quantity, double value, String at) {
-            double magnitude = Math.abs(value);
+            double magnitude = Math.round(Math.abs(value) * 1e7) / 1e7;
             if (!values.containsKey(quantity) || magnitude > values.get(quantity)) {
                 values.put(quantity, magnitude);
                 where.put(quantity, at);
@@ -376,13 +383,15 @@ public final class VenusComparison {
         return chi < 0.0 ? chi + 360.0 : chi;
     }
 
+    /**
+     * The angle between two directions, arcseconds, by the atlas's own
+     * haversine (as {@code JovianComparison}): well conditioned at the
+     * milliarcsecond differences the exact era measures, where the arc
+     * cosine of a dot product is quantised at machine precision and
+     * rounds differently on different hardware (found by CI on #505).
+     */
     static double separation(SkyPosition p, double raDeg, double decDeg) {
-        double a1 = Math.toRadians(p.raDegrees());
-        double d1 = Math.toRadians(p.decDegrees());
-        double a2 = Math.toRadians(raDeg);
-        double d2 = Math.toRadians(decDeg);
-        double c = Math.sin(d1) * Math.sin(d2) + Math.cos(d1) * Math.cos(d2) * Math.cos(a1 - a2);
-        return Math.toDegrees(Math.acos(Math.max(-1.0, Math.min(1.0, c)))) * ARCSEC;
+        return p.separationDegrees(new SkyPosition(raDeg, decDeg)) * ARCSEC;
     }
 
     static double wrap(double deg) {

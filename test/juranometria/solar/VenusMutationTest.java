@@ -43,12 +43,8 @@ class VenusMutationTest {
     }
 
     private static double sep(SkyPosition p, String ra, String dec) {
-        double a1 = Math.toRadians(p.raDegrees());
-        double d1 = Math.toRadians(p.decDegrees());
-        double a2 = Math.toRadians(Double.parseDouble(ra));
-        double d2 = Math.toRadians(Double.parseDouble(dec));
-        double c = Math.sin(d1) * Math.sin(d2) + Math.cos(d1) * Math.cos(d2) * Math.cos(a1 - a2);
-        return Math.toDegrees(Math.acos(Math.max(-1.0, Math.min(1.0, c)))) * 3600.0;
+        return p.separationDegrees(new SkyPosition(Double.parseDouble(ra),
+                Double.parseDouble(dec))) * 3600.0;
     }
 
     private static Observer oslo(String instant) {

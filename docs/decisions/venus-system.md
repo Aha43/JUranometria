@@ -556,7 +556,7 @@ held by `VenusReferenceVectorTest`):
 
 | quantity | 1900–1961 | 1962–1971 | 1972 → 2027-06-28 | after |
 |---|---|---|---|---|
-| astrometric | 0.061″ | 0.020″ | **0.003″** | 7.118″ |
+| astrometric | 0.061″ | 0.020″ | **0.001″** | 7.118″ |
 | apparent, elongation > 1° | 0.134″ | 0.086″ | **0.129″** | 7.231″ |
 | horizontal | 0.906″ | 1.977″ | 11.680″ | 6.607″ (not asserted) |
 | distance | 15.9 km | 2.6 km | **0.2 km** | 1 857.9 km |
@@ -566,7 +566,12 @@ held by `VenusReferenceVectorTest`):
 | illuminated, points | 0.0035 | 0.0035 | 0.0035 | 0.0047 |
 | χ, k in [2 %, 98 %) | 0.039″ | 0.000″ | 0.053″ | 3.900″ |
 
-**Every value is inside its ruled target; no target is amended.** The
+**Every value is inside its ruled target; no target is amended.** The astrometric
+differences are measured by the atlas's own haversine: the first CI run
+(#505) found the arc cosine of a dot product quantised at machine
+precision for angles of a few milliarcseconds, rounding to 0.003″ on
+one machine and 0.004″ on another; the study's 0.003″ for this era was
+that quantisation too. Measured stably the exact era agrees to 0.001″. The
 one number above the study's stand-in is the exact interval's apparent
 place, 0.129″ against 0.055″: the service precesses and nutates with
 the atlas's own IAU 1976/1980 models, where the stand-in used IAU 2000A
