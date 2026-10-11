@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**525 promoted artifacts.**
+**539 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -547,5 +547,19 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/sun-on-the-chart/horizon-below-36.png` | `8386547bcd034e4f3e5baee0475d3cebc7228cd1b9ce902a4578fae06b1ddf2f` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/sun-on-the-chart/horizon-hidden-36.png` | `27c9afcb6ed185d6c08217a9c24bf1a634242f4fd20225e52ca115d014a6d09c` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/sun-on-the-chart/september-equinox-6.png` | `c183d15a64f8ea7c6d7305827f15775736e0987ac9c2c1f8764468277205eccf` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/venus-cartography/appearance-1.png` | `7c60c152aab5ae9d013d5a167cd45f71f1c511ffd27d9a5d1a302186a8bb53a5` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/venus-cartography/appearance-2.png` | `41d720cf9ed4d7fe9e8c43d841c60cf913c975e1b9a41ca41fc5137ac3425ec5` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/venus-cartography/appearance-3.png` | `a53a26fc0805c81d38efc6c48cd3a462a207df798bcba266f3b4ddbf32bd2d03` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/venus-cartography/appearance-4.png` | `c9c50ec6061a14e10d6be0bcf5824bab0678182fc65f29c67e7eedb613faf275` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/venus-cartography/closer-fields.png` | `7ed66386ddc238793abdf24599c566fdce1054135173954f8c6bdea7e340d083` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/venus-cartography/elongation-mark-3.png` | `ad66f29cb781a563709885f3b9c412963d0e23cc7ab561800a48d48c1d001a47` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/venus-cartography/elongation-mark-8.png` | `b3ef36e0b26813cc670f6ca01330d94b26c1930d01fd814e2883366b7e9e90b1` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/venus-cartography/elongation-true-1.png` | `0d5450977719954d1678b3918aca54f40a732d2a628ef74fb62bdb1eeb674077` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/venus-cartography/elongation-true-3.png` | `d9458d8695adc1317d60a688c67ec612646b0f7a18be31d1fcc491ae35185507` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/venus-cartography/elongation-true-8.png` | `f874d5a187646b57df0b48ae5059b86dd035043f9e8da3d7b2f23f555e812114` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/venus-cartography/inferior-conjunction-1.png` | `5cd38bd709dc5c9780b58656122f30724aca959526ea7c188dd5de4496b0d0dc` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/venus-cartography/printable-a4-1.png` | `1da1e1ca377f812147d7808666275e7e71a6cd8b23ee969509ad4b6c10e9e63f` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/venus-cartography/superior-conjunction-1.png` | `0bb827e40f5db6f225dfd4cd8fdd976cf0d3de1321a457247686c9eedb27a87f` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/venus-cartography/transit-1.png` | `8978d8c3bb861093cb5752ffba0d193deb104a01442f74f3a5df948a1efd600f` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/working-selection/decided-members.png` | `2db34e7aa922b3f75c0cd4c8903c2620b24a7f83d92608ee6ae1a9775c32c527` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/working-selection/today-two-leads.png` | `306cf50272170cbcbbb50e8385789143b59b5fb43ee98081f248eb08be7f80f0` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
