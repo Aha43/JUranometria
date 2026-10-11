@@ -2,7 +2,8 @@
 
 A draft for the owner's pack ruling, not a released file. The numbers are
 `pack-measurements.md`'s (`make venus-pack-study`). Nothing below is in
-`src/resources/` until #501 builds it on the ruled layout.
+`src/resources/` until #501 builds it on the ruled layout. The owner returned
+the pack once (ruling 2) for Layout C, measured in `pack-measurements.md`.
 
 ## The terms, re-verified (2026-10-11)
 
@@ -35,28 +36,34 @@ The AstroPixels rows quoted in `venus-events.txt` are named-case timing only:
 quoted with attribution, URL, retrieval date and digest, never bundled,
 never a build or run-time dependency.
 
-## Layout A (proposed): a Venus pack beside the released ones
+## Layout C (recommended, returned for the pack ruling): one `planets` pack, a kernel per planet
 
 The released Solar System and Jovian packs stay byte-identical (their digests
-are in `pack-measurements.md`). One new pack, `venus`, version 1:
+are in `pack-measurements.md`). One new logical pack, `planets`, version 1,
+first holding Venus, gaining one kernel file per planet across later 5.x
+releases (Mercury, Mars, Saturn, Uranus, Neptune, Pluto), each released
+file never rewritten:
 
-- `juranometria-de440-venus-1900-2100.bsp` - 1 180 672 bytes
-  (1 110 054 gzipped), segments 0 → 2 and 2 → 299, 1899-12-01 to 2101-02-01
-  TDB, every coefficient the source's.
-- `NOTICE-venus.md`, `PROVENANCE.md`, `manifest.properties`.
+- `juranometria-de440-venus-1900-2100.bsp` - 1 241 088 bytes with the
+  builder's comment area (1 129 895 gzipped), segments 0 → 2 and 2 → 299,
+  1899-12-01 to 2101-02-01 TDB, every coefficient the source's.
+- `NOTICE-planets.md`, `PROVENANCE.md`, `manifest.properties`, grown by
+  addition at each release.
 
-### `NOTICE-venus.md`, drafted
+### `NOTICE-planets.md`, drafted
 
-> # Notice: Venus ephemeris pack
+> # Notice: planets ephemeris pack
 >
-> This pack carries a **JUranometria-modified excerpt of the JPL planetary
-> ephemeris DE440**, so the atlas can compute where Venus is, how large it
-> looks and how much of it is lit, without any network access at build, test
-> or run time. It stands beside the Solar System pack, which it does not
-> change: the Sun, the Earth and the Moon are computed from that pack alone,
-> as released, and Venus's place is measured from them.
+> This pack carries **JUranometria-modified excerpts of the JPL planetary
+> ephemeris DE440**, one file per planet, so the atlas can compute where the
+> planets are, how large they look and how much of each is lit, without any
+> network access at build, test or run time. It stands beside the Solar
+> System pack and the Jovian System pack, which it does not change: the Sun,
+> the Earth and the Moon are computed from the Solar System pack alone, as
+> released, and each planet's place is measured from them. A planet's file,
+> once released, is never rewritten; a later release adds files.
 >
-> ## The ephemeris excerpt
+> ## The ephemeris excerpts
 >
 > `juranometria-de440-venus-1900-2100.bsp` was produced by JUranometria from
 > the official kernel `de440s.bsp` distributed by NASA/JPL's Navigation and
@@ -86,36 +93,37 @@ are in `pack-measurements.md`). One new pack, `venus`, version 1:
 >
 > ## Provenance
 >
-> `PROVENANCE.md` beside this notice records the source URL, retrieval date,
-> upstream digest, the exact extraction and its validation, the output
-> digest and the coverage. The manifest pins every file's SHA-256, verified
-> before use.
+> `PROVENANCE.md` beside this notice records, for each planet's file, the
+> source URL, retrieval date, upstream digest, the exact extraction and its
+> validation, the output digest and the coverage. The manifest pins every
+> file's SHA-256, verified before use.
 
-### `PROVENANCE.md`, the facts it will carry
+### `PROVENANCE.md`, the facts it will carry for Venus
 
 - Source: `de440s.bsp`, <https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de440s.bsp>,
   retrieved 2026-09-28 (the released pack's pinned download), sha256 `c1c7feea…49f2`.
 - Radius: `pck00011.tpc`, <https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/pck00011.tpc>,
   retrieved 2026-10-07 (the Jovian pack's pinned download), sha256 `3dff7b1d…bb1`.
-- Extraction: `juranometria.tool.VenusPackMain` (#501), using `SpkExcerpt`;
-  segments 0 → 2 and 2 → 299, SPK Type 2; 1900-01-01 to 2101-01-01 TDB with
-  the released 31-day margin; whole records, coefficients unchanged.
+- Extraction: the planets pack builder (#501), using `SpkExcerpt`; segments
+  0 → 2 and 2 → 299, SPK Type 2; 1900-01-01 to 2101-01-01 TDB with the
+  released 31-day margin; whole records, coefficients unchanged.
 - Validation: every state on a 1.7-day grid identical to the source (the
   study: 86 446 states, worst difference 0), and 2 → 299 identically zero.
 - Output: the kernel's bytes and sha256; the coverage of each segment.
 
-### `manifest.properties`, the keys
+### `manifest.properties`, the keys (per-planet keys stand once released)
 
 ```properties
 format.version=1
-pack.name=venus
+pack.name=planets
 pack.version=1
 ephemeris=DE440
-ephemeris.bodies=2,299
-ephemeris.kernel=juranometria-de440-venus-1900-2100.bsp
-ephemeris.coverage.start.jd=2415020.5
-ephemeris.coverage.end.jd=2488434.5
-ephemeris.segments=2
+planets=venus
+ephemeris.venus.bodies=2,299
+ephemeris.venus.kernel=juranometria-de440-venus-1900-2100.bsp
+ephemeris.venus.coverage.start.jd=2415020.5
+ephemeris.venus.coverage.end.jd=2488434.5
+ephemeris.venus.segments=2
 pck.BODY299_RADII=6051.8,6051.8,6051.8
 pck.BODY10_RADII=695700.,695700.,695700.
 source.de440s.url=https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de440s.bsp
@@ -126,6 +134,16 @@ terms=NAIF rules for modified kernels
 checksum.<file>=<sha256>  (one per file)
 ```
 
+A later release adds `planets=venus,mercury`, the `ephemeris.mercury.*` keys,
+its radius and its checksum, and raises `pack.version`; no Venus line changes.
+
+## Layout A (first proposed, superseded): a Venus-named pack
+
+The same Venus kernel in a pack named `venus`. Returned by the owner (#500,
+ruling 2) because the road now includes every planet: a pack per planet is
+Layout D in `pack-measurements.md` - the same files with three text files
+per planet.
+
 ## Layout B (not proposed): the Solar System pack regenerated as v3
 
 Six segments in one kernel, `juranometria-de440-sun-emb-earth-moon-venus-1900-2100.bsp`,
@@ -133,11 +151,12 @@ Six segments in one kernel, `juranometria-de440-sun-emb-earth-moon-venus-1900-21
 than A because one header is shared. The four released segments give the
 released states bit for bit (172 892 states), but the released file, its
 name, its digest and `SunInvarianceTest`'s byte identity all change, and the
-Sun and Moon would be re-released to add a planet. A keeps the released
-bytes literally unchanged for 66 KB more; the study proposes **A**, as #472
-proposed and the owner ruled for Jupiter.
+Sun and Moon would be re-released to add a planet. C keeps the released
+bytes literally unchanged; B does not.
 
 ## What the downloads gain
 
-About 1.1 MB compressed on every archive under either layout; the five
-released archives are 44-49 MB each.
+Venus adds about 1.1 MB compressed to every archive under any layout; all
+seven planets' barycentre kernels about 6.4 MB (`pack-measurements.md`,
+before the outer planets' centres are measured). The five released archives
+are 44-49 MB each.

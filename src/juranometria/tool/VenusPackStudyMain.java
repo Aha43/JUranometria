@@ -33,6 +33,13 @@ import juranometria.solar.spk.Vector3;
  * untouched, which their digests show. Both layouts leave the Jovian
  * pack's files as released.
  *
+ * <p>Layout C, asked for by the owner's ruling on #500: one logical
+ * {@code planets} pack over the whole road - Venus, then Mercury, Mars,
+ * Saturn, Uranus, Neptune and Pluto - measured both as a kernel file
+ * per planet and as one kernel regenerated at each release, with the
+ * per-planet packs (D) beside them: sizes, bit identity on
+ * regeneration, file stability and the bytes each release changes.
+ *
  * <p>Inputs: the released pack's pinned {@code de440s.bsp} (gitignored
  * download) and the committed packs. Output: the study excerpts under
  * {@code build/venus-pack-study/} and a report on stdout. Study
@@ -158,6 +165,8 @@ public final class VenusPackStudyMain {
                 + " Earth and Sun come from the released kernel) are the released bytes in A; in B they"
                 + " are the same coefficients in a new file, held bit for bit above.\n");
 
+        layoutC(report, source, full, startEt, endEt, released);
+
         Files.writeString(OUT.resolve("report.md"), report, StandardCharsets.UTF_8);
         System.out.print(report);
     }
@@ -184,10 +193,14 @@ public final class VenusPackStudyMain {
     }
 
     private static String zero(SpkKernel kernel, double startEt, double endEt) {
+        return zero(kernel, VENUS, startEt, endEt);
+    }
+
+    private static String zero(SpkKernel kernel, SpkExcerpt.Pick pick, double startEt, double endEt) {
         int states = 0;
         double worst = 0.0;
         for (double et = startEt; et <= endEt; et += 1.7 * 86400.0) {
-            SpkKernel.State s = kernel.state(VENUS.center(), VENUS.target(), et);
+            SpkKernel.State s = kernel.state(pick.center(), pick.target(), et);
             worst = Math.max(worst, Math.max(s.position().length(), s.velocity().length()));
             states++;
         }
@@ -216,4 +229,166 @@ public final class VenusPackStudyMain {
         }
         return out.size();
     }
+
+    // ---- Layout C: one logical planets pack, measured over the whole road -------
+
+    /** A planet of the road, its de440s segments, and where its centre is. */
+    private record Planet(String name, List<SpkExcerpt.Pick> picks, String centre) {
+    }
+
+    /**
+     * The road's planets in the order the owner named them (#500, ruling 2):
+     * Venus now, then Mercury, Mars, Saturn, Uranus, Neptune and Pluto across
+     * later 5.x releases; Jupiter is the Jovian pack's. de440s carries every
+     * barycentre, and a planet's own centre only for Mercury and Venus
+     * (1 -> 199 and 2 -> 299, identically zero). The other centres are in
+     * NAIF's satellite kernels, as NAIF's {@code aa_summaries.txt} lists
+     * them; they are named here and not measured.
+     */
+    private static final List<Planet> ROAD = List.of(
+            new Planet("venus", List.of(new SpkExcerpt.Pick(0, 2), new SpkExcerpt.Pick(2, 299)),
+                    "in de440s (2 -> 299, zero)"),
+            new Planet("mercury", List.of(new SpkExcerpt.Pick(0, 1), new SpkExcerpt.Pick(1, 199)),
+                    "in de440s (1 -> 199, zero)"),
+            new Planet("mars", List.of(new SpkExcerpt.Pick(0, 4)), "499 about 4: a Mars satellite kernel"),
+            new Planet("saturn", List.of(new SpkExcerpt.Pick(0, 6)), "699 about 6: a Saturn satellite kernel"),
+            new Planet("uranus", List.of(new SpkExcerpt.Pick(0, 7)), "799 about 7: a Uranus satellite kernel"),
+            new Planet("neptune", List.of(new SpkExcerpt.Pick(0, 8)), "899 about 8: a Neptune satellite kernel"),
+            new Planet("pluto", List.of(new SpkExcerpt.Pick(0, 9)), "999 about 9: a Pluto satellite kernel"));
+
+    /** The released builder's comment shape: its own header, then de440s's comment area. */
+    private static String comment(String header, String sourceComments) {
+        StringBuilder text = new StringBuilder(header);
+        text.append("\n---- de440s.bsp comment area, as distributed by NAIF ----\n");
+        for (String line : sourceComments.split("\n", -1)) {
+            StringBuilder printable = new StringBuilder();
+            for (char c : line.toCharArray()) {
+                printable.append(c >= 0x20 && c <= 0x7e ? c : '?');
+            }
+            text.append(printable).append('\n');
+        }
+        return text.append("---- end of the source kernel's comment area ----").toString();
+    }
+
+    private static byte[] kernel(byte[] source, SpkKernel full, List<SpkExcerpt.Pick> picks, String label,
+                                 double startEt, double endEt) throws IOException {
+        return SpkExcerpt.of(source, picks, startEt, endEt,
+                "JURANOMETRIA DE440 " + label.toUpperCase(Locale.ROOT) + " 1900-2100 STUDY",
+                comment("JUranometria planets pack, study excerpt (#500): " + label
+                        + ".\nMODIFIED by JUranometria; not an original JPL/NAIF file.\n", full.comments()));
+    }
+
+    /** The text files a pack carries beside its kernels, measured on the released Jovian pack. */
+    private static long packText() throws IOException {
+        long bytes = 0;
+        for (String name : List.of("NOTICE-jovian-system.md", "PROVENANCE.md", "manifest.properties")) {
+            bytes += Files.size(JOVIAN.resolve(name));
+        }
+        return bytes;
+    }
+
+    private static void layoutC(StringBuilder report, byte[] source, SpkKernel full, double startEt,
+                                double endEt, byte[] released) throws Exception {
+        report.append("\n## Layout C: one logical `planets` pack over the whole road (#500, ruling 2)\n\n");
+        report.append("The road's planets in the order the owner named them - Venus now, then Mercury, Mars,"
+                + " Saturn, Uranus, Neptune\nand Pluto across later 5.x releases; Jupiter stays the Jovian"
+                + " pack's. Every kernel carries the released builder's\ncomment area (its own header and"
+                + " de440s's comments), so a size here is a size it would ship at.\n\n");
+
+        // C1: one logical pack, one kernel file per planet.
+        report.append("### Each planet's kernel, cut alone over 1900-2100\n\n");
+        report.append("| planet | segments | bytes | gzip -9 | sha256 | cut again | centre |\n"
+                + "|---|---|---:|---:|---|---|---|\n");
+        List<byte[]> members = new ArrayList<>();
+        List<String> proofs = new ArrayList<>();
+        for (Planet p : ROAD) {
+            byte[] once = kernel(source, full, p.picks(), p.name(), startEt, endEt);
+            byte[] again = kernel(source, full, p.picks(), p.name(), startEt, endEt);
+            members.add(once);
+            Files.write(OUT.resolve("juranometria-de440-" + p.name() + "-1900-2100-study.bsp"), once);
+            StringBuilder segs = new StringBuilder();
+            for (SpkExcerpt.Pick pick : p.picks()) {
+                segs.append(segs.length() == 0 ? "" : ", ").append(pick.center()).append(" -> ").append(pick.target());
+            }
+            report.append(String.format(Locale.ROOT, "| %s | %s | %,d | %,d | `%s` | %s | %s |%n",
+                    p.name(), segs, once.length, gzipSize(once), sha256(once),
+                    java.util.Arrays.equals(once, again) ? "byte-identical" : "DIFFERENT", p.centre()));
+            proofs.add(p.name() + " against de440s: " + prove(full, SpkKernel.read(once), p.picks(), startEt, endEt));
+        }
+        report.append('\n');
+        for (String proof : proofs) {
+            report.append("- ").append(proof).append('\n');
+        }
+        report.append("- 1 -> 199 is identically zero, as 2 -> 299 is: ")
+                .append(zero(full, new SpkExcerpt.Pick(1, 199), startEt, endEt)).append('\n');
+
+        // C2: one kernel regenerated at every release.
+        report.append("\n### One growing kernel, regenerated at each release\n\n");
+        report.append("| release adds | planets | kernel bytes | gzip -9 | sha256 | earlier planets against the previous release's kernel |\n"
+                + "|---|---:|---:|---:|---|---|\n");
+        List<SpkExcerpt.Pick> grown = new ArrayList<>();
+        SpkKernel previous = null;
+        List<SpkExcerpt.Pick> previousPicks = new ArrayList<>();
+        long growingChurn = 0;
+        byte[] last = null;
+        for (int i = 0; i < ROAD.size(); i++) {
+            grown.addAll(ROAD.get(i).picks());
+            byte[] k = kernel(source, full, grown, "planets " + (i + 1), startEt, endEt);
+            SpkKernel kk = SpkKernel.read(k);
+            growingChurn += k.length;
+            String held = previous == null ? "-" : prove(previous, kk, previousPicks, startEt, endEt);
+            report.append(String.format(Locale.ROOT, "| %s | %d | %,d | %,d | `%s` | %s |%n",
+                    ROAD.get(i).name(), i + 1, k.length, gzipSize(k), sha256(k), held));
+            previous = kk;
+            previousPicks = new ArrayList<>(grown);
+            last = k;
+        }
+        Files.write(OUT.resolve("juranometria-de440-planets-1900-2100-study.bsp"), last);
+
+        // The comparison.
+        long text = packText();
+        long memberTotal = 0;
+        long memberGzip = 0;
+        long memberChurn = 0;
+        long memberFiles = 0;
+        for (byte[] m : members) {
+            memberTotal += m.length;
+            memberGzip += gzipSize(m);
+        }
+        report.append(String.format(Locale.ROOT, "%n### The three layouts over the seven releases%n%n"
+                + "A pack's notice, provenance and manifest are measured on the released Jovian pack: %,d bytes"
+                + " together.%n%n", text));
+        report.append("| layout | files when complete | bytes when complete (gzip -9) | a planet's kernel when a later one is added |"
+                + " bytes changed per release (kernel + text) | kernel bytes committed over the road |\n"
+                + "|---|---|---|---|---|---|\n");
+        StringBuilder perRelease = new StringBuilder();
+        for (int i = 0; i < members.size(); i++) {
+            memberChurn += members.get(i).length;
+            perRelease.append(i == 0 ? "" : ", ").append(String.format(Locale.ROOT, "%,d", members.get(i).length));
+        }
+        memberFiles = members.size();
+        report.append(String.format(Locale.ROOT,
+                "| **C, one logical pack, a kernel file per planet** | %d kernels + 3 text | %,d (%,d) |"
+                        + " the same file, same name, same digest | one new kernel (%s) + the 3 text files rewritten |"
+                        + " %,d |%n",
+                memberFiles, memberTotal + text, memberGzip, perRelease, memberChurn));
+        report.append(String.format(Locale.ROOT,
+                "| C', one logical pack, one growing kernel | 1 kernel + 3 text | %,d (%,d) |"
+                        + " the same states (proved above), a new file: new bytes, new digest |"
+                        + " the whole kernel again + the 3 text files | %,d |%n",
+                last.length + text, gzipSize(last), growingChurn));
+        report.append(String.format(Locale.ROOT,
+                "| D, a pack per planet | %d kernels + %d text | %,d (%,d) |"
+                        + " the same file, untouched | one new kernel + 3 new text files; no earlier pack touched |"
+                        + " %,d |%n",
+                memberFiles, 3 * memberFiles, memberTotal + 3 * memberFiles * text, memberGzip, memberChurn));
+        report.append(String.format(Locale.ROOT,
+                "%nWhat is not measured: the planets' own centres for Mars, Saturn, Uranus, Neptune and Pluto"
+                        + " (499, 699, 799, 899, 999),%nwhich are in NAIF's satellite kernels, not in de440s;"
+                        + " each layout would add them as further segments\n(C, D: in that planet's own file)."
+                        + " Measuring them needs those kernels, which are not downloaded.%n%n"
+                        + "The released Solar System kernel is untouched by every layout here: sha256 %s.%n",
+                sha256(released)));
+    }
+
 }

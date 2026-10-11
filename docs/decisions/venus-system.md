@@ -1,8 +1,10 @@
 # Knowing where Venus is and how it is lit
 
 **Sprint 47, issue #500.** The numerical contract for Venus, proposed
-from measurement before any production data or code exists. **A
-proposal for the owner's rulings**: nothing here is ruled, and no
+from measurement before any production data or code exists. **Ruled
+by the owner (2026-10-11)** - see [The ruling](#the-ruling) at the
+end, which governs where it differs from the proposal; the pack was
+returned once for a third layout, measured in *The pack* below. No
 production Venus service, table, selection or rendering exists. It
 inherits the Sun's, the Moon's and Jupiter's contracts
 (`sun-computation.md`, `moon-computation.md`, `jovian-system.md`)
@@ -86,8 +88,69 @@ Cut with the released excerpt writer and proved against the source
   with the same margins and refusals. Unlike the Galilean moons there
   is nothing to save by shortening it.
 
-The study proposes **A** - the same reasoning the owner ruled for
-Jupiter on #472, for 66 KB more than B.
+The study first proposed **A** - the same reasoning the owner ruled
+for Jupiter on #472, for 66 KB more than B. The owner returned it once
+(ruling 2): the road now includes every planet, so a Venus-named pack
+should not be frozen before a third layout is measured.
+
+**Layout C, measured over the whole road** (`pack-measurements.md`,
+section *Layout C*): one logical `planets` pack, gaining Mercury,
+Mars, Saturn, Uranus, Neptune and Pluto across later 5.x releases in
+that order, Jupiter staying the Jovian pack's. Every kernel carries the
+released builder's comment area, so each size is a shipping size:
+
+| planet | de440s segments | kernel | gzip -9 |
+|---|---|---:|---:|
+| Venus | 0 → 2, 2 → 299 (zero) | 1 241 088 | 1 129 895 |
+| Mercury | 0 → 1, 1 → 199 (zero) | 3 298 304 | 3 112 272 |
+| Mars | 0 → 4 | 708 608 | 630 770 |
+| Saturn | 0 → 6 | 487 424 | 412 106 |
+| Uranus | 0 → 7 | 433 152 | 356 328 |
+| Neptune | 0 → 8 | 433 152 | 356 545 |
+| Pluto | 0 → 9 | 433 152 | 356 632 |
+
+- **The final size**: about **7.0 MB** for all seven (6.35 MB
+  gzipped) with a kernel per planet; 6.65 MB as one kernel - the
+  repeated comment area is the 0.39 MB difference. Mercury is the
+  largest because its fast orbit needs short records.
+- **Not measured: the outer planets' own centres.** de440s carries
+  every barycentre but a planet's centre only for Mercury and Venus
+  (1 → 199 and 2 → 299, identically zero, proved). Mars, Saturn,
+  Uranus, Neptune and Pluto (499 … 999 about their barycentres) are in
+  NAIF's satellite kernels (`aa_summaries.txt`, retrieved 2026-10-11),
+  which are not downloaded; each planet's own study measures and asks
+  for them, and the layout takes them as further segments in that
+  planet's file.
+- **Bit identity on regeneration**: every planet's kernel, cut twice,
+  is byte-identical, and bit-identical to de440s on 43 223-86 446
+  states. As one growing kernel regenerated at each release, the
+  earlier planets' states stay bit-identical at every step (up to
+  345 784 states) - **but the file's bytes and digest change at every
+  release**.
+- **Filename and manifest stability**: with a kernel per planet, a
+  released planet's file keeps its name, bytes and digest for ever;
+  the manifest gains a planet's keys (`ephemeris.<planet>.kernel`, its
+  coverage and checksum) and a new pack version, and its earlier lines
+  stand. With one growing kernel, the kernel's digest - and every test
+  pinning it - moves with each planet added.
+- **The cost of re-releasing**: a kernel per planet changes one new
+  file and the three text files (10 KB, measured on the Jovian pack)
+  per release, **7.0 MB of kernels committed over the whole road**;
+  one growing kernel re-commits the whole kernel each time, **35.2
+  MB**.
+- **Separate packs per planet (D)** keep the same kernel files and add
+  three text files per planet: 21 text files and 0.2 MB more, seven
+  manifests, notices and provenances to keep in step, and no gain in
+  identity over one logical pack whose members never change.
+
+**The study's recommendation, returned for the pack ruling**: Layout
+C as **one logical `planets` pack with a kernel file per planet** -
+the released Solar System and Jovian packs byte-identical, every
+released planet's file byte-identical for ever, the manifest and notice
+growing by addition. The measurement supports the owner's stated
+preference for C; within C it favours a kernel per planet over one
+growing kernel. The drafted notice and manifest
+are `docs/studies/venus/notice-draft.md`.
 
 ## Time, and the observer: inherited, and what they cost Venus
 
@@ -289,16 +352,16 @@ about 135 s), not implementation error.
   apparition (gibbous evening 2026-06-15, crescent evening 2026-09-21,
   crescent morning 2026-11-30, gibbous morning 2027-03-08), each the
   weekly Oslo row nearest a quarter or three quarters lit.
-- **The fixture boundary**: committed now, as the registered study
-  needs them - the named instants and appearances at Oslo, the hourly
-  2026 inferior conjunction at Oslo, the fortnightly 2026–27
-  apparition at Oslo (each with the Sun) and the 7-day 1900–2100
-  matrix at Oslo: **3.1 MB**. Retained outside Git with URLs and
-  digests (`horizons-kept.md`): the other observers' named instants
-  and appearances, the geocentric matrices, the 30-day matrices and
-  the other dense windows, 8.2 MB. The owner's approval said to commit
-  only the ruled set: the committed part is a proposal and is trimmed
-  or extended to the ruling before anything merges.
+- **The fixture boundary, as ruled** (ruling 6): committed - the
+  named instants and the four appearances for **all five observers and
+  geocentrically** (Venus and Sun), so production tests hold parallax,
+  polar, southern, horizon and date-line behaviour; the hourly 2026
+  inferior conjunction, the fortnightly 2026–27 apparition (each with
+  the Sun) and the 7-day 1900–2100 matrix, at Oslo: **29 files,
+  3.44 MB**, indexed with their digests in `horizons/README.md` by
+  `scripts/venus-fixture-index.py`. Retained outside Git with URLs
+  and digests (`horizons-kept.md`): the other observers' 30-day
+  matrices, the geocentric matrices and the other dense windows.
 
 ## The reader's table, proposed
 
@@ -398,3 +461,61 @@ handoff*):
 7. **Targets**: the table above.
 8. **Cartography handoff**: the readability criterion, #481's role,
    the identity/time contract.
+
+## The ruling
+
+The owner's rulings (2026-10-11), recorded as given:
+
+1. **Authority accepted.** Keep DE440. DE442 changes Venus by only
+   0.006″ and offers no measured Venus benefit; it stays comparison
+   evidence only.
+2. **Pack returned once with a third layout.** Do not yet freeze a
+   Venus-named pack. Measure Layout C - one new logical `planets` pack,
+   initially containing Venus, designed to gain Mercury, Mars, Saturn,
+   Uranus, Neptune and Pluto across later 5.x releases - against the
+   final estimated size with all planned planets, the incremental size
+   per planet, whether existing planetary states remain bit-identical
+   when the pack is regenerated, filename and manifest stability, the
+   cost of repeatedly re-releasing the growing pack, and separate
+   per-planet packs against one growing planetary pack. The released
+   Solar System and Jovian packs stay byte-identical either way. The
+   owner's current preference is Layout C; measurement settles it.
+   *Measured in [The pack](#the-pack-measured); returned for the
+   ruling.*
+3. **Interval and meanings accepted.** 1900–2100; topocentric
+   quantities; the Sun's deflection for the apparent place; east and
+   west by right ascension of date; the Moon's S-T-O phase definition
+   and its illuminated-fraction definition; χ apparent of date, rotated
+   later into the J2000 page. The side changing before Espenak's
+   ecliptic-longitude conjunction is honest: the table states east or
+   west and does not claim to announce a conjunction.
+4. **Radius: the solid body.** 6051.8 km, the result called the
+   *solid-body apparent diameter* in the explanation, which states that
+   the visible cloud deck is about 1.22 % larger, wavelength-dependent,
+   and at most 0.77″ larger in the measured interval. The uncertain
+   cloud radius is never drawn.
+5. **Phase vocabulary accepted**: the proposed bands and both
+   languages, the geometric *in front of the Sun* and *behind the Sun*
+   states taking precedence.
+6. **Fixtures extended before freezing.** The Oslo matrices and dense
+   windows as proposed, and also the named-instant and
+   representative-appearance responses for all five observers and
+   geocentrically, so production tests hold parallax, polar, southern,
+   horizon and date-line behaviour. The other observers' long matrices
+   and the exploratory dense windows stay outside Git with their URLs
+   and digests. The Espenak assertions accepted: a conjunction falls
+   within the listed hour; a greatest elongation agrees to 0.1° and
+   occurs within ±2 hours; the record says why the maximum is too flat
+   for a sharper time assertion (within 0.04″ of its maximum the
+   instant is 27–81 minutes from the listed hour).
+7. **Accuracy targets accepted.** They separate the exact civil-time
+   interval from the measured ΔT cost afterward; none is widened later
+   without returning.
+8. **Cartography handoff accepted.** The 1-pixel lit/dark and
+   6-pixel-disc readability criterion stays a study measure, not a
+   rendering rule. #481 is decided during Venus cartography: Venus can
+   be drawn honestly without closer zoom, but closer zoom is needed to
+   make its phase readable at most dates. A selected Venus is an
+   occurrence with shared chart context - stable identity plus instant
+   and observer; the chart core still owns no clock.
+

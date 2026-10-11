@@ -221,7 +221,7 @@ Whether a particular read happens on the event thread is control flow, which tex
 | class | the contract | files |
 |---|---|---|
 | deterministic-report | regenerates byte-for-byte on the same tree | 110 |
-| byte-exact-fixture | committed data with provenance; never regenerated casually | 111 |
+| byte-exact-fixture | committed data with provenance; never regenerated casually | 131 |
 | captured-evidence | an operating-system screenshot, digest-pinned; a re-capture is a provenance event | 13 |
 | renderer-drawn | byte-reproducible per machine; production ink, no widgets | 515 |
 | widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 163 |
@@ -327,13 +327,33 @@ The byte-exact fixtures:
 - docs/studies/solar-system/sun-invariance.txt
 - docs/studies/venus/horizons/apparition-2026-oslo-10.txt
 - docs/studies/venus/horizons/apparition-2026-oslo-299.txt
+- docs/studies/venus/horizons/appearances-alert-10.txt
+- docs/studies/venus/horizons/appearances-alert-299.txt
+- docs/studies/venus/horizons/appearances-cape-town-10.txt
+- docs/studies/venus/horizons/appearances-cape-town-299.txt
+- docs/studies/venus/horizons/appearances-chatham-10.txt
+- docs/studies/venus/horizons/appearances-chatham-299.txt
+- docs/studies/venus/horizons/appearances-geocentric-10.txt
+- docs/studies/venus/horizons/appearances-geocentric-299.txt
 - docs/studies/venus/horizons/appearances-oslo-10.txt
 - docs/studies/venus/horizons/appearances-oslo-299.txt
+- docs/studies/venus/horizons/appearances-quito-10.txt
+- docs/studies/venus/horizons/appearances-quito-299.txt
 - docs/studies/venus/horizons/dense-2026-inferior-conjunction-oslo-10.txt
 - docs/studies/venus/horizons/dense-2026-inferior-conjunction-oslo-299.txt
 - docs/studies/venus/horizons/matrix-7d-oslo.txt
+- docs/studies/venus/horizons/named-alert-10.txt
+- docs/studies/venus/horizons/named-alert-299.txt
+- docs/studies/venus/horizons/named-cape-town-10.txt
+- docs/studies/venus/horizons/named-cape-town-299.txt
+- docs/studies/venus/horizons/named-chatham-10.txt
+- docs/studies/venus/horizons/named-chatham-299.txt
+- docs/studies/venus/horizons/named-geocentric-10.txt
+- docs/studies/venus/horizons/named-geocentric-299.txt
 - docs/studies/venus/horizons/named-oslo-10.txt
 - docs/studies/venus/horizons/named-oslo-299.txt
+- docs/studies/venus/horizons/named-quito-10.txt
+- docs/studies/venus/horizons/named-quito-299.txt
 - docs/studies/venus/venus-events.txt
 - docs/studies/wider-field/released-pages.txt
 - docs/studies/wider-field/released-text.txt
