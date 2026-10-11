@@ -453,6 +453,7 @@ public final class PackagedAcceptanceMain {
         sunTableJourney();
         moonTableJourney();
         venusTableJourney();
+        menuHelpJourney();
         sunOnTheChartJourney();
         moonOnTheChartJourney();
         solarSystemSheetJourney();
@@ -606,6 +607,65 @@ public final class PackagedAcceptanceMain {
      * computing nothing when built, with no chart switch and no Centre
      * on chart.
      */
+    /**
+     * Menu help inside the packaged image (issue #508): the bar the
+     * application builds, with the items it adds afterwards, in both
+     * languages - every menu tooltip is plain text, because the platform
+     * draws it, and the five helped items say their language file's
+     * words exactly.
+     */
+    private static void menuHelpJourney() throws Exception {
+        int checked = 0;
+        for (String language : java.util.List.of("en", "nb-NO")) {
+            juranometria.ui.language.InterfaceText said =
+                    juranometria.ui.language.InterfaceText.forLanguage(language);
+            javax.swing.JMenuBar[] bar = new javax.swing.JMenuBar[1];
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                bar[0] = AppMenuBar.create(new juranometria.ui.ChartViewController(),
+                        () -> { }, () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
+                        () -> { }, () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
+                        () -> { }, () -> { }, said);
+                AppMenuBar.addVenusTable(bar[0], said, () -> { });
+                AppMenuBar.addJupiterTable(bar[0], said, () -> { });
+                AppMenuBar.addJupiterOnChart(bar[0], said, () -> { });
+            });
+            java.util.Deque<javax.swing.JMenuItem> walk = new java.util.ArrayDeque<>();
+            for (int m = 0; m < bar[0].getMenuCount(); m++) {
+                if (bar[0].getMenu(m) != null) {
+                    walk.add(bar[0].getMenu(m));
+                }
+            }
+            java.util.Map<String, String> hovers = new java.util.HashMap<>();
+            while (!walk.isEmpty()) {
+                javax.swing.JMenuItem item = walk.poll();
+                String tip = item.getToolTipText();
+                if (tip != null) {
+                    require(!tip.contains("<") && !tip.contains("&lt;") && !tip.contains("&amp;"),
+                            "menu help is plain text in " + language + ": " + item.getText()
+                                    + " says " + tip);
+                    hovers.put(item.getText(), tip);
+                }
+                if (item instanceof javax.swing.JMenu menu) {
+                    for (int i = 0; i < menu.getItemCount(); i++) {
+                        if (menu.getItem(i) != null) {
+                            walk.add(menu.getItem(i));
+                        }
+                    }
+                }
+            }
+            for (String stem : java.util.List.of("menu.sun", "menu.venus", "menu.moon",
+                    "menu.jupiter", "menu.viewReport")) {
+                require(said.say(stem + ".hover").equals(hovers.get(said.say(stem + ".label"))),
+                        stem + " in " + language + " says its words exactly: "
+                                + hovers.get(said.say(stem + ".label")));
+                checked++;
+            }
+        }
+        System.out.println("menu help OK (" + checked + " helped menu items in English and"
+                + " Norwegian say their words as plain text, and no menu tooltip carries"
+                + " markup, inside the image)");
+    }
+
     private static void venusTableJourney() throws Exception {
         juranometria.solar.SolarSystemService solar =
                 juranometria.solar.SolarSystemService.load();
