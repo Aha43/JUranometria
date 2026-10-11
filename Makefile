@@ -884,6 +884,7 @@ dist: app
 	   $(CLASSES_DIR)/resources/catalog/star-identities/LICENSE-BSD-3-Clause.txt \
 	   $(CLASSES_DIR)/resources/solar-system/NOTICE-solar-system.md \
 	   $(CLASSES_DIR)/resources/jovian-system/NOTICE-jovian-system.md \
+	   $(CLASSES_DIR)/resources/planets/NOTICE-planets.md \
 	   $(DIST_STAGE)/licenses/
 	cp $(CLASSES_DIR)/resources/icons/LICENSE \
 	   $(DIST_STAGE)/licenses/LICENSE-Tabler-MIT.txt
