@@ -15,21 +15,19 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
-import javax.swing.ScrollPaneConstants;
 
 import juranometria.ui.language.InterfaceText;
 
 /**
  * Controls kept beside the chart (#434, ruled on #433): one owned,
  * modeless window per application, holding a list of collapsible
- * sections. This sprint it holds one, Place and Time.
+ * sections. This sprint it holds one, Place and Time. Since #507 the
+ * sections are the Chart tab of a {@link CompanionTabs} strip, and the
+ * Solar System's bodies are a tab of their own.
  *
  * <p><strong>One instance, never rebuilt.</strong> Closing it - the
  * close box or Escape - hides it; showing it again shows the same
@@ -40,8 +38,8 @@ import juranometria.ui.language.InterfaceText;
  * <p><strong>It owns no state but its own.</strong> Its sections show
  * the authorities they were built over; hiding the window changes
  * nothing they show and nothing on the chart. What it remembers -
- * where it was, how large, which sections were collapsed - is in
- * {@link CompanionStore}. Whether it was open is not remembered: it
+ * where it was, how large, which sections were collapsed, which tab
+ * was chosen - is in {@link CompanionStore}. Whether it was open is not remembered: it
  * starts closed at every launch (ruled on #455).
  *
  * <p>Owned by the chart window, so it stays above that window and not
@@ -61,10 +59,7 @@ public final class CompanionWindow extends JDialog {
     static final int DEFAULT_MAX_HEIGHT = 900;
 
     private final CompanionStore store;
-    private final InterfaceText said;
-    private final JPanel sections = new JPanel();
-    private final JScrollPane scroll;
-    private final List<CompanionSection> held = new ArrayList<>();
+    private final CompanionTabs tabs;
     private boolean placed;
 
     public CompanionWindow(Frame owner, InterfaceText said,
@@ -75,7 +70,6 @@ public final class CompanionWindow extends JDialog {
                     "the companion remembers itself somewhere");
         }
         this.store = store;
-        this.said = said;
         getAccessibleContext().setAccessibleName(said.say("companion.a11y"));
         getAccessibleContext().setAccessibleDescription(
                 said.say("companion.explain"));
@@ -86,13 +80,9 @@ public final class CompanionWindow extends JDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
 
-        sections.setLayout(new BoxLayout(sections, BoxLayout.Y_AXIS));
-        scroll = new JScrollPane(new WidthTracking(sections),
-                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scroll.setBorder(BorderFactory.createEmptyBorder());
+        tabs = new CompanionTabs(said, store);
         JPanel content = new JPanel(new BorderLayout());
-        content.add(scroll, BorderLayout.CENTER);
+        content.add(tabs, BorderLayout.CENTER);
         setContentPane(content);
 
         addComponentListener(new ComponentAdapter() {
@@ -109,7 +99,7 @@ public final class CompanionWindow extends JDialog {
     }
 
     /**
-     * Adds a section, collapsed as it was last left.
+     * Adds a section to the Chart tab, collapsed as it was last left.
      *
      * @param id      a stable name, under which its collapse is remembered
      * @param title   its heading, in the window's language
@@ -127,20 +117,30 @@ public final class CompanionWindow extends JDialog {
     public CompanionSection addSection(String id, String title,
                                        JComponent content,
                                        boolean collapsedIfNeverChosen) {
-        CompanionSection section = new CompanionSection(id, title, content,
-                said, store.collapsed(id, collapsedIfNeverChosen), collapsed -> {
-                    store.saveCollapsed(id, collapsed);
-                    sections.revalidate();
-                });
-        held.add(section);
-        sections.add(section);
+        CompanionSection section = tabs.addSection(id, title, content,
+                collapsedIfNeverChosen);
         updateMinimum();
         return section;
     }
 
-    /** The sections, in order. */
+    /** The Chart tab's sections, in order. */
     public List<CompanionSection> sections() {
-        return List.copyOf(held);
+        return tabs.sections();
+    }
+
+    /**
+     * Adds a tab after Chart (#507), holding content the host built -
+     * the Solar System's body groups, remembered apart, with no outer
+     * group of their own. Chosen at once if it is the tab last chosen.
+     */
+    public void addTab(String id, String title, JComponent content) {
+        tabs.addPage(id, title, content);
+        updateMinimum();
+    }
+
+    /** The strip, for a reader's press or arrow key to be aimed at. */
+    public CompanionTabs tabs() {
+        return tabs;
     }
 
     /**
@@ -195,23 +195,21 @@ public final class CompanionWindow extends JDialog {
     }
 
     /**
-     * The narrowest the window may be: its sections' own preferred
-     * width, so no control in them is ever drawn narrower than it
+     * The narrowest the window may be: the widest tab's own preferred
+     * width, so no control on any tab is ever drawn narrower than it
      * asks (the study measured 342 px in English on one machine; it
      * is read here, not written down).
      */
     private void updateMinimum() {
         Insets chrome = getInsets();
-        int width = sections.getPreferredSize().width
-                + scroll.getVerticalScrollBar().getPreferredSize().width
-                + chrome.left + chrome.right;
+        int width = tabs.contentWidth() + chrome.left + chrome.right;
         setMinimumSize(new Dimension(width, 120));
     }
 
     /** The size it opens at when nothing is remembered. */
     public Dimension sizePolicySize() {
         Insets chrome = getInsets();
-        Dimension wanted = sections.getPreferredSize();
+        Dimension wanted = tabs.wanted();
         return new Dimension(
                 Math.max(DEFAULT_WIDTH, getMinimumSize().width),
                 Math.max(getMinimumSize().height, Math.min(DEFAULT_MAX_HEIGHT,

@@ -320,6 +320,147 @@ class CompanionWindowTest {
         }
     }
 
+    /**
+     * The strip (#507): named and explained in both languages, its two
+     * tabs titled as the language file says, Chart chosen on a profile
+     * that never chose, and walked by the keyboard for real.
+     */
+    @Test
+    void tabsAreNamedAndWalkedByTheKeyboardInBothLanguages() throws Exception {
+        needsADisplay();
+        for (String[] said : new String[][] {
+                {"en", "Controller tabs", "Chart", "Solar System"},
+                {"nb-NO", "Kontrollerens faner", "Kart", "Solsystemet"}}) {
+            Rig rig = new Rig(node, said[0]);
+            InterfaceText words = InterfaceText.forLanguage(said[0]);
+            SwingUtilities.invokeAndWait(() -> rig.companion.addTab("solarsystem",
+                    words.say("companion.tab.solarsystem"),
+                    new javax.swing.JLabel("groups")));
+            rig.show();
+            juranometria.ui.companion.CompanionTabs tabs = rig.companion.tabs();
+            assertEquals(said[1], tabs.getAccessibleContext().getAccessibleName());
+            assertFalse(tabs.getAccessibleContext().getAccessibleDescription().isBlank());
+            assertEquals(List.of(said[2], said[3]),
+                    List.of(tabs.getTitleAt(0), tabs.getTitleAt(1)));
+            for (int i = 0; i < 2; i++) {
+                assertEquals(said[2 + i], tabs.getAccessibleContext().getAccessibleChild(i)
+                        .getAccessibleContext().getAccessibleName(),
+                        "tab " + i + " is spoken by its title");
+            }
+            assertEquals(juranometria.ui.companion.CompanionTabs.CHART, tabs.chosen(),
+                    "a profile that never chose opens Chart");
+            assertTrue(tabs.isFocusable(), "the strip is reached by the keyboard");
+            juranometria.ui.ReaderInput.shortcutOn(tabs, KeyEvent.VK_PAGE_DOWN,
+                    java.awt.event.InputEvent.CTRL_DOWN_MASK);
+            assertEquals("solarsystem", tabs.chosen(), "Ctrl-PageDown chose Solar System");
+            juranometria.ui.ReaderInput.shortcutOn(tabs, KeyEvent.VK_PAGE_UP,
+                    java.awt.event.InputEvent.CTRL_DOWN_MASK);
+            assertEquals(juranometria.ui.companion.CompanionTabs.CHART, tabs.chosen(),
+                    "Ctrl-PageUp chose Chart again");
+            SwingUtilities.invokeAndWait(rig.companion::dispose);
+            flush();
+        }
+    }
+
+    /**
+     * The tab chosen is remembered as presentation (#507): a strip built
+     * again over the same store opens on it before it is even shown,
+     * a fresh profile opens Chart, and choosing touches no section's
+     * collapse.
+     */
+    @Test
+    void theTabChosenIsRememberedAndAFreshProfileOpensChart() throws Exception {
+        needsADisplay();
+        Rig rig = new Rig(node, "en");
+        InterfaceText said = InterfaceText.forLanguage("en");
+        SwingUtilities.invokeAndWait(() -> rig.companion.addTab("solarsystem",
+                said.say("companion.tab.solarsystem"), new javax.swing.JLabel("groups")));
+        rig.show();
+        juranometria.ui.ReaderInput.chooseTab(rig.companion.tabs(), "Solar System");
+        assertEquals(java.util.Optional.of("solarsystem"),
+                CompanionStore.forNode(node).tab(), "remembered by id");
+        assertFalse(CompanionStore.forNode(node).collapsed("placeandtime"),
+                "and no section's collapse moved");
+        SwingUtilities.invokeAndWait(rig.companion::dispose);
+        flush();
+
+        Rig next = new Rig(node, "en");
+        SwingUtilities.invokeAndWait(() -> next.companion.addTab("solarsystem",
+                said.say("companion.tab.solarsystem"), new javax.swing.JLabel("groups")));
+        assertEquals("solarsystem", next.companion.tabs().chosen(),
+                "built again over the same store: on the tab last chosen");
+        SwingUtilities.invokeAndWait(next.companion::dispose);
+        flush();
+
+        Preferences fresh = Preferences.userRoot().node(
+                "juranometria-test-companion-fresh-" + System.nanoTime());
+        try {
+            Rig other = new Rig(fresh, "en");
+            SwingUtilities.invokeAndWait(() -> other.companion.addTab("solarsystem",
+                    said.say("companion.tab.solarsystem"), new javax.swing.JLabel("groups")));
+            assertEquals(juranometria.ui.companion.CompanionTabs.CHART,
+                    other.companion.tabs().chosen(), "a fresh profile: Chart");
+            SwingUtilities.invokeAndWait(other.companion::dispose);
+        } finally {
+            fresh.removeNode();
+        }
+    }
+
+    /**
+     * Both tabs fit (#507): with Chart Options on Chart and a tall page
+     * on Solar System, the window's policy stays within the height
+     * ruled to fit a 900-tall screen, a laptop screen of that height
+     * holds it whole beside a two-display layout, and on either tab
+     * nothing is drawn narrower than it asks.
+     */
+    @Test
+    void bothTabsFitAScreen900TallAndDrawNothingNarrow() throws Exception {
+        needsADisplay();
+        Rig rig = new Rig(node, "en");
+        juranometria.app.ChartOptionsController options =
+                new juranometria.app.ChartOptionsController(
+                        juranometria.app.ChartOptionsStore.forNode(node));
+        InterfaceText said = InterfaceText.forLanguage("en");
+        javax.swing.JPanel tall = new javax.swing.JPanel();
+        tall.setLayout(new javax.swing.BoxLayout(tall, javax.swing.BoxLayout.Y_AXIS));
+        for (int i = 0; i < 40; i++) {
+            tall.add(new javax.swing.JButton("A control that asks for its width " + i));
+        }
+        SwingUtilities.invokeAndWait(() -> {
+            rig.companion.addSection("chartoptions", said.say("chartoptions.title"),
+                    new juranometria.app.ChartOptionsControls(options, () -> false,
+                            said).inCompanion(CompanionStore.forNode(node), said));
+            rig.companion.addTab("solarsystem", said.say("companion.tab.solarsystem"), tall);
+        });
+        rig.show();
+        java.awt.Dimension policy = rig.companion.sizePolicySize();
+        assertTrue(policy.height <= 900, "the policy's height fits a 900-tall screen: "
+                + policy.height);
+        Rectangle laptop = new Rectangle(0, 25, 1440, 875);
+        Rectangle monitor = new Rectangle(1440, 0, 2560, 1415);
+        Rectangle placed = juranometria.ui.companion.CompanionPlacement.place(
+                java.util.Optional.empty(), List.of(laptop, monitor),
+                new Rectangle(100, 60, 900, 760), policy, rig.companion.getMinimumSize());
+        assertTrue(laptop.contains(placed) || monitor.contains(placed),
+                "placed whole on one of two displays: " + placed);
+        Rectangle alone = juranometria.ui.companion.CompanionPlacement.place(
+                java.util.Optional.empty(), List.of(laptop),
+                new Rectangle(100, 60, 900, 760), policy, rig.companion.getMinimumSize());
+        assertTrue(laptop.contains(alone), "and whole on the 900-tall laptop alone: " + alone);
+        for (String tab : List.of(juranometria.ui.companion.CompanionTabs.CHART,
+                "solarsystem")) {
+            SwingUtilities.invokeAndWait(() -> rig.companion.tabs().choose(tab));
+            flush();
+            flush();
+            List<String> narrow = new java.util.ArrayList<>();
+            SwingUtilities.invokeAndWait(() -> collectNarrow(
+                    rig.companion.getContentPane(), narrow));
+            assertEquals(List.of(), narrow, "on " + tab + " at " + rig.companion.getWidth()
+                    + " px nothing is drawn narrower or shorter than it asks");
+        }
+        SwingUtilities.invokeAndWait(rig.companion::dispose);
+    }
+
     @Test
     void escapeHides() throws Exception {
         needsADisplay();

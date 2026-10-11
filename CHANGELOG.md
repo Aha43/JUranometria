@@ -7,6 +7,14 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**The Controller has two tabs (#507).** JUranometria Controller now
+opens on a Chart tab holding Chart controls, Place and Time and Chart
+Options as before, and a Solar System tab holding the Sun, Venus, Moon
+and Jupiter groups directly, each still collapsing on its own; in
+Norwegian the tabs are Kart and Solsystemet. Choosing a tab computes
+nothing, the Controller still starts closed, and the tab last chosen
+is remembered. The Sun, Venus, Moon and Jupiter dialogs are unchanged.
+
 **Fixed: menu help showed HTML source (#508).** On macOS the help for
 View > Solar System > Sun..., Venus..., Moon... and Jupiter..., and for
 Help > Copy View Report, appeared as markup (`<html><body …>`) because a

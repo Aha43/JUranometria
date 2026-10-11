@@ -6,6 +6,7 @@ import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.WindowEvent;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
@@ -69,22 +70,27 @@ class CompanionStartupJourneyTest {
                         assertEquals(frame, companion.getOwner(),
                                 "owned by the chart window");
 
-                        // Chart Options, the third section since the
+                        // Two tabs (#507), Chart chosen on a fresh profile;
+                        // Chart Options the third section on it since the
                         // chart's controls came first (#450; #443): its
                         // groups as first introduced, and a box pressed in
                         // it is what the Chart Options dialog then shows.
-                        assertEquals(4, companion.sections().size(),
-                                "Chart controls, Place and Time, Solar System, then"
-                                        + " Chart Options (ruled on #457)");
+                        assertEquals(List.of(juranometria.ui.companion.CompanionTabs.CHART,
+                                "solarsystem"), companion.tabs().ids(),
+                                "Chart, then Solar System");
+                        assertEquals(juranometria.ui.companion.CompanionTabs.CHART,
+                                companion.tabs().chosen(), "a fresh profile opens Chart");
+                        assertEquals(List.of("Chart", "Solar System"),
+                                List.of(companion.tabs().getTitleAt(0),
+                                        companion.tabs().getTitleAt(1)));
+                        assertEquals(3, companion.sections().size(),
+                                "on Chart: Chart controls, Place and Time, then"
+                                        + " Chart Options");
                         assertEquals("Chart controls, expanded",
                                 companion.sections().get(0).heading()
                                         .getAccessibleContext().getAccessibleName());
-                        assertEquals("Solar System, collapsed",
-                                companion.sections().get(2).heading()
-                                        .getAccessibleContext().getAccessibleName(),
-                                "introduced collapsed");
                         assertEquals("Chart Options, expanded",
-                                companion.sections().get(3).heading()
+                                companion.sections().get(2).heading()
                                         .getAccessibleContext().getAccessibleName());
                         assertFalse(((javax.swing.AbstractButton) named(
                                 companion.getContentPane(),

@@ -459,6 +459,7 @@ public final class PackagedAcceptanceMain {
         solarSystemSheetJourney();
         zoomLockJourney();
         companionJourney();
+        controllerTabsJourney();
         chartOptionsJourney();
         chartControlsJourney();
         cleanChartJourney();
@@ -814,6 +815,140 @@ public final class PackagedAcceptanceMain {
      * subscription is released when it is. Headless, on a scratch
      * store in the bundled runtime's preferences.
      */
+    /**
+     * The Controller's tabs inside the packaged image (#507): Chart and
+     * Solar System over one strip, the Solar System's groups standing on
+     * their tab with no outer group; building and choosing compute
+     * nothing; Venus computed there, Chart chosen and the field changed
+     * through the chart's own controls, Solar System chosen again and
+     * the Venus result the very card it was; the tab chosen remembered,
+     * a strip built again over the same store opening on it, a profile
+     * that never chose opening Chart. Headless, as this acceptance runs:
+     * the window itself is the display suite's and its photographer's.
+     */
+    private static void controllerTabsJourney() throws Exception {
+        Preferences scratch = Preferences.userRoot()
+                .node("juranometria-packaged-controller-tabs-" + System.nanoTime());
+        juranometria.ui.solar.SolarSystemSection[] section =
+                new juranometria.ui.solar.SolarSystemSection[1];
+        try {
+            juranometria.ui.language.InterfaceText en =
+                    juranometria.ui.language.InterfaceText.forLanguage("en");
+            juranometria.ui.companion.CompanionStore store =
+                    juranometria.ui.companion.CompanionStore.forNode(scratch);
+            juranometria.ui.language.SkyLanguageStore languages =
+                    juranometria.ui.language.SkyLanguageStore.forNode(scratch);
+            languages.save(languages.choice(Atlas.languages()).withInterface("en"));
+            juranometria.solar.SolarSystemService solar =
+                    juranometria.solar.SolarSystemService.load();
+            juranometria.sky.Observer oslo = new juranometria.sky.Observer(
+                    59.91, 10.75, VENUS_SAMPLE_INSTANT);
+            juranometria.ui.solar.BodyOnChart still = new juranometria.ui.solar.BodyOnChart() {
+                @Override
+                public boolean showing() {
+                    return false;
+                }
+
+                @Override
+                public void show(boolean wanted) {
+                }
+
+                @Override
+                public void onChange(java.util.function.Consumer<Boolean> listener) {
+                    listener.accept(false);
+                }
+            };
+            ChartViewController controller = new ChartViewController(
+                    Atlas.assembler()::fits);
+            juranometria.ui.InspectorToggle inspector =
+                    new juranometria.ui.InspectorToggle();
+            inspector.bind(() -> { }, () -> true);
+            juranometria.ui.companion.CompanionTabs[] tabs =
+                    new juranometria.ui.companion.CompanionTabs[1];
+            juranometria.ui.ChartControls[] chartControls =
+                    new juranometria.ui.ChartControls[1];
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                tabs[0] = new juranometria.ui.companion.CompanionTabs(en, store);
+                AtlasChrome chrome = AtlasChrome.of(juranometria.ui.language
+                        .SkyLanguageSession.begin(languages, Atlas.languages()),
+                        controller, Atlas.search(), Atlas.assembler(), inspector, "0.0.0",
+                        () -> { }, new juranometria.chart.SelectionMode(),
+                        new juranometria.ui.ZoomLock());
+                juranometria.ui.ChartComponent chart = new juranometria.ui.ChartComponent(
+                        Atlas.assembler(), ENGLISH_PAGE);
+                controller.onChange(chart::setViewState);
+                chartControls[0] = chrome.companionControls(chart);
+                tabs[0].addSection("chartcontrols", en.say("chartcontrols.title"),
+                        chartControls[0].inCompanion(), false);
+                section[0] = new juranometria.ui.solar.SolarSystemSection(
+                        new juranometria.ui.solar.SolarTableSession(() -> oslo, solar,
+                                juranometria.ui.solar.SolarTable.sun()),
+                        new juranometria.ui.solar.SolarTableSession(() -> oslo, solar,
+                                juranometria.ui.solar.SolarTable.venus()),
+                        new juranometria.ui.solar.SolarTableSession(() -> oslo, solar,
+                                juranometria.ui.solar.SolarTable.moon()),
+                        still, still, null, null, null, en);
+                tabs[0].addPage("solarsystem", en.say("companion.tab.solarsystem"),
+                        section[0].inController(store, en));
+            });
+            require(tabs[0].ids().equals(java.util.List.of(
+                            juranometria.ui.companion.CompanionTabs.CHART, "solarsystem"))
+                            && juranometria.ui.companion.CompanionTabs.CHART.equals(tabs[0].chosen())
+                            && "Chart".equals(tabs[0].getTitleAt(0))
+                            && "Solar System".equals(tabs[0].getTitleAt(1))
+                            && "Controller tabs".equals(tabs[0].getAccessibleContext()
+                                    .getAccessibleName()),
+                    "two tabs, Chart first and chosen on a profile that never chose");
+            javax.swing.JComponent page = tabs[0].content("solarsystem");
+            require(namedIn(page, "section.solarsystem") == null
+                            && namedIn(page, "heading.solarsystem.sun") != null
+                            && namedIn(page, "heading.solarsystem.venus") != null
+                            && namedIn(page, "heading.solarsystem.moon") != null,
+                    "the bodies' groups stand on the tab with no outer group");
+            require(namedIn(page, "sunCard") == null && namedIn(page, "venusCard") == null,
+                    "building the tabs computed nothing");
+            javax.swing.SwingUtilities.invokeAndWait(() -> tabs[0].choose("solarsystem"));
+            require("solarsystem".equals(tabs[0].chosen())
+                            && namedIn(page, "venusCard") == null,
+                    "choosing the tab computed nothing");
+            javax.swing.SwingUtilities.invokeAndWait(() -> section[0].venus().apply());
+            java.awt.Component card = namedIn(page, "venusCard");
+            require(card != null, "Venus computed on its tab");
+            double field = controller.state().fieldWidthDegrees();
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                tabs[0].choose(juranometria.ui.companion.CompanionTabs.CHART);
+                chartControls[0].zoomIn().doClick();
+            });
+            require(juranometria.ui.companion.CompanionTabs.CHART.equals(tabs[0].chosen())
+                            && controller.state().fieldWidthDegrees() < field,
+                    "the field changed through the Chart tab's controls");
+            javax.swing.SwingUtilities.invokeAndWait(() -> tabs[0].choose("solarsystem"));
+            require(namedIn(page, "venusCard") == card,
+                    "back on Solar System the Venus result is the very card it was");
+            require(java.util.Optional.of("solarsystem").equals(
+                            juranometria.ui.companion.CompanionStore.forNode(scratch).tab()),
+                    "the tab chosen is remembered");
+            juranometria.ui.companion.CompanionTabs[] again =
+                    new juranometria.ui.companion.CompanionTabs[1];
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                again[0] = new juranometria.ui.companion.CompanionTabs(en, store);
+                again[0].addPage("solarsystem", en.say("companion.tab.solarsystem"),
+                        new javax.swing.JPanel());
+            });
+            require("solarsystem".equals(again[0].chosen()),
+                    "a strip built again over the same store opens on it");
+        } finally {
+            if (section[0] != null) {
+                section[0].release();
+            }
+            scratch.removeNode();
+        }
+        System.out.println("controller tabs OK (Chart and Solar System; the bodies'"
+                + " groups with no outer group; building and choosing compute nothing;"
+                + " Venus computed, the field changed on Chart, Venus intact on return;"
+                + " the tab chosen remembered, a fresh profile opening Chart)");
+    }
+
     private static void chartOptionsJourney() throws Exception {
         Preferences scratch = Preferences.userRoot()
                 .node("juranometria-packaged-chartoptions-" + System.nanoTime());

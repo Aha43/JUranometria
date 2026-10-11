@@ -283,3 +283,47 @@ external monitor:
    written nor read; a stale key is ignored); where it was, how large
    and which sections were collapsed still are, and it opens where it
    was left.
+
+## Amended on #507 (Sprint 47)
+
+Recorded on accepting the Venus table checkpoint (#502): with the
+Sun, Venus, the Moon and Jupiter in it, the Solar System section had
+become an instrument of its own, and the chart's controls and the
+moving sky were competing in one long scroll.
+
+5. **Two tabs: Chart / Kart and Solar System / Solsystemet.** The
+   window's content is a `CompanionTabs` strip. Chart holds the
+   sections the window has had - Chart controls, Place and Time and
+   Chart Options, in that order, unchanged in behaviour. Solar System
+   holds the bodies' groups outward from the Sun - Sun, Venus, Moon,
+   Jupiter - each still collapsing on its own and remembered under
+   the key it always was (`companion.collapsed.solarsystem.sun` and so
+   on). There is no outer collapsible group named Solar System on
+   that tab: the tab is that identity, so the old
+   `companion.collapsed.solarsystem` key is neither written nor read
+   and a stale one is ignored.
+6. **Choosing a tab computes nothing.** Every tab's content is built
+   when the Controller is, over authorities it shows and never drives;
+   the strip shows one page and hides the rest, and what a hidden
+   page's controls hold - a computed Venus, a typed instant - stays
+   as it was. The Controller still starts closed (ruling 4), and
+   expanding a body still computes nothing (#458).
+7. **The tab chosen is remembered as presentation**, under
+   `companion.tab`, beside the sections' collapse; a profile that
+   never chose opens Chart. This is the candidate's behaviour at the
+   checkpoint; the owner decides there whether it stays or the
+   Controller always opens on Chart - a one-line change in
+   `CompanionTabs.addPage`, and nothing of chart or numerical state
+   either way.
+8. **The strip is a control.** It is reached by the window's own
+   focus traversal, walked by Ctrl-PageUp / Ctrl-PageDown as every
+   Swing strip is, spoken as *Controller tabs / Kontrollerens faner*
+   with each tab spoken by its title, and explained once; the titles
+   are the whole meaning, so it carries no tooltip. Both legacy
+   dialogs remain and share the same sessions.
+9. **Size.** The window's minimum width is the widest tab's own
+   preferred width with its scroll bar; its opening height is the
+   tallest page under the strip, still capped at 900 px for a
+   900-tall screen (ruling on #443), and each page scrolls on its
+   own. The companion sheets photograph both tabs: the Chart states as
+   before, the Solar System states with that tab chosen.

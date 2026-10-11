@@ -53,18 +53,28 @@ class SolarSystemCompanionJourneyTest {
                     CompanionWindow companion = companionOf(frame);
                     SwingUtilities.invokeAndWait(() -> companion.showCompanion(true));
                     drain();
+                    // Since #507 the Solar System is the Controller's second
+                    // tab, its groups standing on it with no outer group;
+                    // Chart Options is the Chart tab's third section.
+                    juranometria.ui.companion.CompanionTabs tabs = companion.tabs();
+                    assertEquals(List.of(juranometria.ui.companion.CompanionTabs.CHART, "solarsystem"),
+                            tabs.ids());
+                    assertEquals(juranometria.ui.companion.CompanionTabs.CHART, tabs.chosen(),
+                            "a fresh profile opens Chart");
                     List<CompanionSection> sections = companion.sections();
-                    assertEquals("section.solarsystem", sections.get(2).getName(),
-                            "Solar System is the third section");
-                    assertFalse(sections.get(2).expanded(), "introduced collapsed");
-                    assertEquals("section.chartoptions", sections.get(3).getName(),
-                            "Chart Options follows it");
+                    assertEquals("section.chartoptions", sections.get(2).getName(),
+                            "Chart Options is the Chart tab's third section");
+                    JComponent content = tabs.content("solarsystem");
+                    assertFalse(content.isShowing(), "not shown until its tab is chosen");
+                    assertNull(find(companion.getContentPane(), "section.solarsystem"),
+                            "no outer Solar System group: the tab is that identity");
 
-                    // Expanding reveals; nothing is computed.
-                    ReaderInput.click(sections.get(2).heading());
+                    // Choosing the tab, a real press on its header, reveals;
+                    // nothing is computed.
+                    ReaderInput.chooseTab(tabs, "Solar System");
                     drain();
-                    assertTrue(sections.get(2).expanded());
-                    JComponent content = sections.get(2).content();
+                    assertEquals("solarsystem", tabs.chosen());
+                    assertTrue(content.isShowing());
                     AbstractButton sunHeading = (AbstractButton) named(content,
                             "heading.solarsystem.sun");
                     AbstractButton moonHeading = (AbstractButton) named(content,
@@ -259,6 +269,44 @@ class SolarSystemCompanionJourneyTest {
                     assertEquals(4, ((javax.swing.JTable) named(content, "jupiterTable"))
                             .getRowCount(), "and the four moons");
                     assertReachable(companion, content, "The four Galilean moons");
+
+                    // The strip is reached by the Controller's own traversal,
+                    // and walked by the keyboard for real (#507): Ctrl-PageUp
+                    // to Chart, Ctrl-PageDown back - and what was computed is
+                    // intact on return, the very cards, nothing computed anew.
+                    assertReachable(companion, (Container) companion.getContentPane(),
+                            "Controller tabs");
+                    Component sunCard = find(content, "sunCard");
+                    Component jupiterCard = find(content, "jupiterCard");
+                    ReaderInput.shortcutOn(tabs, java.awt.event.KeyEvent.VK_PAGE_UP,
+                            java.awt.event.InputEvent.CTRL_DOWN_MASK);
+                    drain();
+                    assertEquals(juranometria.ui.companion.CompanionTabs.CHART, tabs.chosen(),
+                            "Ctrl-PageUp chose Chart");
+                    assertFalse(content.isShowing());
+                    assertTrue(sections.get(0).content().isShowing(),
+                            "the chart's controls are shown instead");
+                    ReaderInput.shortcutOn(tabs, java.awt.event.KeyEvent.VK_PAGE_DOWN,
+                            java.awt.event.InputEvent.CTRL_DOWN_MASK);
+                    drain();
+                    assertEquals("solarsystem", tabs.chosen(), "Ctrl-PageDown chose it back");
+                    assertTrue(sunCard == find(content, "sunCard")
+                            && jupiterCard == find(content, "jupiterCard"),
+                            "the Sun's and Jupiter's cards are the ones computed before");
+                    assertEquals(4, ((javax.swing.JTable) named(content, "jupiterTable"))
+                            .getRowCount(), "and the moons are still there");
+                    assertEquals(java.util.Optional.of("solarsystem"),
+                            juranometria.ui.companion.CompanionStore.forNode(node).tab(),
+                            "the tab chosen is remembered");
+
+                    // Hidden and shown again: the same strip, no tab added.
+                    SwingUtilities.invokeAndWait(companion::hideCompanion);
+                    drain();
+                    SwingUtilities.invokeAndWait(() -> companion.showCompanion(true));
+                    drain();
+                    assertTrue(tabs == companion.tabs() && tabs.getTabCount() == 2,
+                            "one strip, two tabs, however often it is shown");
+                    assertEquals("solarsystem", tabs.chosen(), "still on Solar System");
                 })));
     }
 

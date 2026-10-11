@@ -6,8 +6,8 @@ import java.util.prefs.Preferences;
 
 /**
  * What the companion window remembers about itself (#434, ruled on
- * #433): where it was, how large, and which of its sections were
- * collapsed. Not whether it was open: it starts closed at every
+ * #433): where it was, how large, which of its sections were
+ * collapsed and, since #507, which tab was chosen. Not whether it was open: it starts closed at every
  * launch (ruled on #455), so that it never covers the chart a reader
  * came for, and View is one gesture away.
  *
@@ -39,6 +39,15 @@ public interface CompanionStore {
     boolean collapsed(String section, boolean ifNeverChosen);
 
     void saveCollapsed(String section, boolean collapsed);
+
+    /**
+     * The tab last chosen (#507), by id; empty when never chosen, and
+     * the Controller then opens Chart. Presentation, like a collapse:
+     * nothing the chart draws or a body computes depends on it.
+     */
+    Optional<String> tab();
+
+    void saveTab(String id);
 
     /** The reader's own store, beside the application's other preferences. */
     static CompanionStore user() {
@@ -85,6 +94,17 @@ public interface CompanionStore {
             public void saveCollapsed(String section, boolean collapsed) {
                 node.put("companion.collapsed." + section,
                         Boolean.toString(collapsed));
+            }
+
+            @Override
+            public Optional<String> tab() {
+                return Optional.ofNullable(node.get("companion.tab", null))
+                        .filter(id -> !id.isBlank());
+            }
+
+            @Override
+            public void saveTab(String id) {
+                node.put("companion.tab", id);
             }
         };
     }
