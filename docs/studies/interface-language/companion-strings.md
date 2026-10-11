@@ -315,6 +315,7 @@ arrangement at its frozen instant.
 | 32′ 06.1″ | — | Apparent diameter: 32′ 06.1″ | — |
 | Sun on the chart | — | Sun on the chart | Shows or hides the Sun on the chart, drawn at its true size where it stands for the place and instant set in Place and Time; the same choice as View's. |
 | Update from Place and Time | Read the place and instant from Place and Time again | Read the observer and instant from Place and Time again | Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
+| ▸ Venus | Show or hide this section | Venus, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Moon | Show or hide this section | Moon, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Jupiter | Show or hide this section | Jupiter, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▾ Chart Options | Show or hide this section | Chart Options, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
@@ -356,6 +357,7 @@ arrangement at its frozen instant.
 | ▸ Place and Time | Show or hide this section | Place and Time, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▾ Solar System | Show or hide this section | Solar System, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Sun | Show or hide this section | Sun, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
+| ▸ Venus | Show or hide this section | Venus, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Moon | Show or hide this section | Moon, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▾ Jupiter | Show or hide this section | Jupiter, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | Observer at latitude 59.913, longitude 10.752 east; instant 2026-03-20 21:33:00 UTC, from Place and Time. | — | Observer at latitude 59.913, longitude 10.752 east; instant 2026-03-20 21:33:00 UTC, from Place and Time. | — |
@@ -687,6 +689,7 @@ arrangement at its frozen instant.
 | 32′ 06,1″ | — | Tilsynelatende diameter: 32′ 06,1″ | — |
 | Solen på kartet | — | Solen på kartet | Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid; samme valg som i Vis-menyen. |
 | Oppdater fra Sted og tid | Les sted og tidspunkt fra Sted og tid på nytt | Les observatør og tidspunkt fra Sted og tid på nytt | Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
+| ▸ Venus | Vis eller skjul denne delen | Venus, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Månen | Vis eller skjul denne delen | Månen, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Jupiter | Vis eller skjul denne delen | Jupiter, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▾ Kartvalg | Vis eller skjul denne delen | Kartvalg, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
@@ -728,6 +731,7 @@ arrangement at its frozen instant.
 | ▸ Sted og tid | Vis eller skjul denne delen | Sted og tid, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▾ Solsystem | Vis eller skjul denne delen | Solsystem, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Solen | Vis eller skjul denne delen | Solen, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
+| ▸ Venus | Vis eller skjul denne delen | Venus, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Månen | Vis eller skjul denne delen | Månen, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▾ Jupiter | Vis eller skjul denne delen | Jupiter, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | Observatør på bredde 59,913, lengde 10,752 øst; tidspunkt 2026-03-20 21:33:00 UTC, fra Sted og tid. | — | Observatør på bredde 59,913, lengde 10,752 øst; tidspunkt 2026-03-20 21:33:00 UTC, fra Sted og tid. | — |

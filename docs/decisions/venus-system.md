@@ -604,3 +604,43 @@ Horizons row the image restates (held to the committed row by
 `PackagedVenusSampleTest`), the 2026 greatest eastern elongation near
 half lit in the evening sky, and the 2012 transit in front of the Sun.
 No dialog, Controller section, selection or chart mark exists yet.
+
+## #502, the table, as built
+
+Venus joins the Sun's and the Moon's table family, as ruled: one more
+`SolarTable` (`SolarTable.venus()`, stem `venustable`, prefix `venus`)
+over the same shell, session, refusals and range cap. The service seam
+is the one #501 named - Venus is added to the Solar System service:
+`Body.VENUS`, answered by `VenusService` over the planets pack, which
+`SolarSystemService` builds the first time Venus is asked for, so the
+Sun's and the Moon's answers never read the planets pack and a missing
+one refuses Venus alone.
+
+- **Columns**: instant; right ascension and declination (J2000);
+  altitude; azimuth; distance in AU and million km; the solid body's
+  apparent diameter, its explanation stating the cloud deck about
+  1.22 % larger, wavelength-dependent, at most 0.77″, never drawn
+  (ruling 4); illuminated; phase, in the ruled words with the
+  geometric states first; elongation with E or W by right ascension,
+  its explanation saying it announces no conjunction (ruling 3); lit
+  side, χ of date with the nearest of sixteen points, *not
+  well-defined (near inferior conjunction)* below 2 % and *(near
+  full)* from 98 %.
+- **Hosts**: View > Solar System > Venus... between Sun... and
+  Moon...; the Controller's Venus group between the Sun's and the
+  Moon's, introduced collapsed. One shared session, each host's draft
+  its own; building, opening or expanding computes nothing; Update
+  from Place and Time and Compute apply. No Show on chart and no
+  Centre on chart: no Venus is drawn.
+- **Words**: `venustable.*` in both languages; the compass points, the
+  side letters and the lit-side pattern moved from `moontable.*` to
+  the shared `solartable.*`, which the Moon reads unchanged through
+  the family's fallback. The time note states the measured after-2027
+  cost: below 8″ through 2100.
+- **Evidence**: `VenusTableTest` (the named cases in both languages,
+  the range and its refusals, two hosts over one session, no chart
+  layer); the Controller journey and the menu order; the packaged
+  journey *venus table OK*; the Venus table photographed in both
+  languages (`venustable-*`, a registered photographer), and the menu
+  and Controller sheets retaken with Venus in them.
+

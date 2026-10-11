@@ -319,12 +319,14 @@ class TestEvidenceGateTest {
                         "src/juranometria/tool/SwingChromeSheetMain.java",
                         "src/juranometria/tool/ToggleShortcutStudyMain.java",
                         "src/juranometria/tool/ToolbarSheetMain.java",
+                        "src/juranometria/tool/VenusTableSheetMain.java",
                         "src/juranometria/tool/WorkingSelectionMockupMain.java"),
                 unpaired,
-                "the twenty-two widget photographers - the twenty-first"
+                "the twenty-three widget photographers - the twenty-first"
                         + " is #400's Sun table sheet and the twenty-second"
                         + " #408's Moon table sheet, arriving by this"
-                        + " decision - whose font and theme"
+                        + " decision, and the twenty-third #502's Venus table"
+                        + " sheet, the Moon's twin, by the same - whose font and theme"
                         + " setting dies with the JVM - benign by"
                         + " construction, and pinned so the next one"
                         + " arrives by decision; the fifth arrived by"

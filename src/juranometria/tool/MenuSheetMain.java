@@ -194,6 +194,11 @@ public final class MenuSheetMain {
                         () -> { }, () -> { }, () -> { }, () -> { },
                         () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
                         () -> { }, () -> { }, () -> { });
+                // Venus... (#502), which the application adds after the bar
+                // is built, between Sun... and Moon...: the item a reader
+                // meets, with its letter, hover and spoken name.
+                AppMenuBar.addVenusTable(bar[0], juranometria.ui.language.InterfaceText.forLanguage(language),
+                        () -> { });
 
                 JCheckBoxMenuItem inspector = AppMenuBar.inspectorItem(bar[0]);
                 if (inspector != null) {

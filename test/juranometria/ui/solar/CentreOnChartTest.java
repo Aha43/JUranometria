@@ -138,6 +138,7 @@ class CentreOnChartTest {
         return switch (session.result().rows().get(0).observation()) {
             case SolarSystemService.SunObservation s -> s.astrometricJ2000();
             case SolarSystemService.MoonObservation m -> m.astrometricJ2000();
+            case juranometria.solar.VenusService.VenusObservation v -> v.astrometricJ2000();
         };
     }
 

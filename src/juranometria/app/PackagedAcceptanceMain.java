@@ -452,6 +452,7 @@ public final class PackagedAcceptanceMain {
                 cardinalLandmarkJourney());
         sunTableJourney();
         moonTableJourney();
+        venusTableJourney();
         sunOnTheChartJourney();
         moonOnTheChartJourney();
         solarSystemSheetJourney();
@@ -591,6 +592,154 @@ public final class PackagedAcceptanceMain {
         System.out.println("moon table OK (Oslo's midsummer morning as a waxing"
                 + " crescent with its lit side, a four-row range with its"
                 + " appended end, and the Norwegian surface, all inside the"
+                + " image)");
+    }
+
+    /**
+     * The Venus table inside the packaged image (issue #502): the Sun's
+     * and the Moon's shell over Venus's columns, through the service's
+     * Venus and the planets pack, in both languages, at the named cases
+     * the contract ruled on #500 - Espenak's 2026 greatest eastern
+     * elongation, a daily range through the 2026 inferior conjunction in
+     * which the side of the Sun changes, and the 2012 transit - and the
+     * Controller's Venus group between the Sun's and the Moon's,
+     * computing nothing when built, with no chart switch and no Centre
+     * on chart.
+     */
+    private static void venusTableJourney() throws Exception {
+        juranometria.solar.SolarSystemService solar =
+                juranometria.solar.SolarSystemService.load();
+        juranometria.sky.Observer[] observer = {new juranometria.sky.Observer(
+                59.91, 10.75, java.time.Instant.parse("2026-08-15T06:00:00Z"))};
+        juranometria.ui.solar.SolarTableDialog.Content[] table =
+                new juranometria.ui.solar.SolarTableDialog.Content[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> table[0] =
+                juranometria.ui.solar.SolarTableDialog.content(() -> observer[0], solar,
+                        juranometria.ui.language.InterfaceText.forLanguage("en"),
+                        juranometria.ui.solar.SolarTable.venus()));
+        String litSide = String.valueOf(table[0].model.getValueAt(0, 10));
+        require(table[0].model.getRowCount() == 1
+                        && table[0].model.getColumnCount() == 11
+                        && "near half lit".equals(table[0].model.getValueAt(0, 8))
+                        && String.valueOf(table[0].model.getValueAt(0, 9)).endsWith("\u00b0 E")
+                        && litSide.endsWith("(west-northwest)")
+                        && String.valueOf(table[0].model.getValueAt(0, 5)).contains(" AU ("),
+                "the packaged Venus table shows the 2026 greatest eastern elongation near"
+                        + " half lit, east of the Sun, its lit side to the west-northwest: "
+                        + table[0].model.getValueAt(0, 8) + ", "
+                        + table[0].model.getValueAt(0, 9) + ", " + litSide);
+        observer[0] = new juranometria.sky.Observer(59.91, 10.75,
+                java.time.Instant.parse("2026-10-20T03:00:00Z"));
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            table[0].rangeView.setSelected(true);
+            table[0].start.setText("2026-10-20 03:00:00");
+            table[0].end.setText("2026-10-27 09:30");
+            table[0].update();
+        });
+        StringBuilder sides = new StringBuilder();
+        for (int r = 0; r < table[0].model.getRowCount(); r++) {
+            String e = String.valueOf(table[0].model.getValueAt(r, 9));
+            sides.append(e.substring(e.length() - 1));
+        }
+        require(table[0].model.getRowCount() == 9
+                        && String.valueOf(table[0].model.getValueAt(8, 0)).endsWith("\u2020")
+                        && sides.toString().matches("E+W+")
+                        && "near inferior conjunction".equals(table[0].model.getValueAt(4, 8)),
+                "the range through the 2026 inferior conjunction: nine rows, the appended end"
+                        + " marked, the side changing once from E to W: " + sides + ", "
+                        + table[0].status());
+        observer[0] = new juranometria.sky.Observer(59.91, 10.75,
+                java.time.Instant.parse("2012-06-06T01:00:00Z"));
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            table[0].instantView.setSelected(true);
+            table[0].update();
+        });
+        require("in front of the Sun".equals(table[0].model.getValueAt(0, 8))
+                        && "not well-defined (near inferior conjunction)"
+                                .equals(table[0].model.getValueAt(0, 10)),
+                "the 2012 transit reads in front of the Sun, its lit side not well-defined: "
+                        + table[0].model.getValueAt(0, 8) + ", "
+                        + table[0].model.getValueAt(0, 10));
+        juranometria.ui.solar.SolarTableDialog.Content[] norsk =
+                new juranometria.ui.solar.SolarTableDialog.Content[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> norsk[0] =
+                juranometria.ui.solar.SolarTableDialog.content(() -> observer[0], solar,
+                        juranometria.ui.language.InterfaceText.forLanguage("nb-NO"),
+                        juranometria.ui.solar.SolarTable.venus()));
+        require("Fase".equals(norsk[0].model.getColumnName(8))
+                        && "foran Solen".equals(norsk[0].model.getValueAt(0, 8))
+                        && String.valueOf(norsk[0].model.getValueAt(0, 9)).endsWith("\u00b0 V")
+                        && "1 rader.".equals(norsk[0].status()),
+                "and speaks Norwegian: " + norsk[0].model.getValueAt(0, 8) + ", "
+                        + norsk[0].model.getValueAt(0, 9));
+
+        // The Controller's Venus group, between the Sun's and the Moon's.
+        java.util.prefs.Preferences scratch = java.util.prefs.Preferences.userRoot()
+                .node("juranometria-packaged-venus-" + System.nanoTime());
+        try {
+            juranometria.ui.language.InterfaceText en =
+                    juranometria.ui.language.InterfaceText.forLanguage("en");
+            juranometria.ui.solar.SolarTableSession sun = new juranometria.ui.solar
+                    .SolarTableSession(() -> observer[0], solar,
+                    juranometria.ui.solar.SolarTable.sun());
+            juranometria.ui.solar.SolarTableSession venus = new juranometria.ui.solar
+                    .SolarTableSession(() -> observer[0], solar,
+                    juranometria.ui.solar.SolarTable.venus());
+            juranometria.ui.solar.SolarTableSession moon = new juranometria.ui.solar
+                    .SolarTableSession(() -> observer[0], solar,
+                    juranometria.ui.solar.SolarTable.moon());
+            juranometria.ui.solar.BodyOnChart still = new juranometria.ui.solar.BodyOnChart() {
+                @Override
+                public boolean showing() {
+                    return false;
+                }
+
+                @Override
+                public void show(boolean wanted) {
+                }
+
+                @Override
+                public void onChange(java.util.function.Consumer<Boolean> listener) {
+                    listener.accept(false);
+                }
+            };
+            javax.swing.JComponent[] groups = new javax.swing.JComponent[1];
+            juranometria.ui.solar.SolarSystemSection[] section =
+                    new juranometria.ui.solar.SolarSystemSection[1];
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                section[0] = new juranometria.ui.solar.SolarSystemSection(sun, venus, moon,
+                        still, still, null, null, null, en);
+                groups[0] = section[0].inController(
+                        juranometria.ui.companion.CompanionStore.forNode(scratch), en);
+            });
+            java.util.List<String> order = new java.util.ArrayList<>();
+            java.util.Deque<java.awt.Component> walk = new java.util.ArrayDeque<>();
+            walk.add(groups[0]);
+            while (!walk.isEmpty()) {
+                java.awt.Component c = walk.poll();
+                if (c.getName() != null && c.getName().startsWith("heading.solarsystem.")) {
+                    order.add(c.getName());
+                }
+                if (c instanceof java.awt.Container container) {
+                    walk.addAll(java.util.List.of(container.getComponents()));
+                }
+            }
+            require(order.equals(java.util.List.of("heading.solarsystem.sun",
+                            "heading.solarsystem.venus", "heading.solarsystem.moon")),
+                    "the Controller orders the groups outward from the Sun: " + order);
+            require(venus.computations() == 0 && section[0].venus().onChart == null
+                            && section[0].venus().centreOnChart == null,
+                    "Venus's group computes nothing when built and offers no chart switch"
+                            + " and no Centre on chart");
+            javax.swing.SwingUtilities.invokeAndWait(section[0]::release);
+        } finally {
+            scratch.removeNode();
+        }
+        System.out.println("venus table OK (the 2026 greatest eastern elongation near half"
+                + " lit in the evening sky, a nine-row range through the 2026 inferior"
+                + " conjunction with the side changing from E to W and its appended end, the"
+                + " 2012 transit in front of the Sun, the Norwegian surface, and the"
+                + " Controller's Venus group between the Sun and the Moon, all inside the"
                 + " image)");
     }
 

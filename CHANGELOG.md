@@ -17,8 +17,19 @@ fraction, phase word and bright-limb direction are computed the way
 the Sun's, the Moon's and Jupiter's are, and held to JPL Horizons and
 to Espenak's published conjunctions and elongations at the targets
 the numerical contract set (#500). The Sun, the Moon and Jupiter are
-unchanged: their packs are byte-identical. No table, chart mark or
-selection yet; the About dialog lists the new pack's notice.
+unchanged: their packs are byte-identical. The About dialog lists the
+new pack's notice.
+
+**The Venus table (#502).** View > Solar System > Venus... and a Venus
+group in the Controller, between the Sun and the Moon: Venus at the
+instant Place and Time holds or over a range, in English and Norwegian
+- its place, height, distance, solid-body apparent diameter (the cloud
+deck stated, not drawn), illuminated fraction, phase in the words the
+contract ruled (in front of or behind the Sun, near inferior
+conjunction, crescent, near half lit, gibbous, near full), elongation
+with the side of the Sun, and lit side. One session shared by both
+hosts; opening or expanding computes nothing. No chart mark, Show on
+chart or Centre on chart yet - no Venus is drawn.
 
 ## [5.1.0] - 2026-10-10
 

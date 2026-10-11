@@ -257,6 +257,12 @@ public final class CompanionSheetMain {
                                 new juranometria.ui.solar.SolarTableSession(
                                         () -> observer, solar,
                                         juranometria.ui.solar.SolarTable.sun()),
+                                // Venus's group (#502), between the Sun's
+                                // and the Moon's, as the application holds
+                                // it: introduced collapsed, computing nothing.
+                                new juranometria.ui.solar.SolarTableSession(
+                                        () -> observer, solar,
+                                        juranometria.ui.solar.SolarTable.venus()),
                                 new juranometria.ui.solar.SolarTableSession(
                                         () -> observer, solar,
                                         juranometria.ui.solar.SolarTable.moon()),

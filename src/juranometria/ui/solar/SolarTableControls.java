@@ -234,8 +234,14 @@ public final class SolarTableControls {
      * null when the session refused.
      */
     public CentreOnChart.Target target(BodyOnChart layer) {
-        CentreOnChart.Body which = body.body() == juranometria.solar.SolarSystemService.Body.SUN
-                ? CentreOnChart.Body.SUN : CentreOnChart.Body.MOON;
+        CentreOnChart.Body which = switch (body.body()) {
+            case SUN -> CentreOnChart.Body.SUN;
+            case MOON -> CentreOnChart.Body.MOON;
+            // No Venus is drawn yet (#502): nothing to centre on, and no
+            // host offers the button for it.
+            case VENUS -> throw new IllegalStateException(
+                    "Venus has no chart layer to centre on");
+        };
         return new CentreOnChart.Target() {
             @Override
             public CentreOnChart.Body body() {
@@ -256,6 +262,8 @@ public final class SolarTableControls {
                             sun.astrometricJ2000();
                     case juranometria.solar.SolarSystemService.MoonObservation moon ->
                             moon.astrometricJ2000();
+                    case juranometria.solar.VenusService.VenusObservation venus ->
+                            venus.astrometricJ2000();
                 };
             }
 

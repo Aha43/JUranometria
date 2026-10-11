@@ -88,6 +88,31 @@ class SolarSystemCompanionJourneyTest {
                             "the Moon, opened, has computed nothing");
                     assertNull(find(content, "moonTable"));
 
+                    // Venus (#502): between the Sun and the Moon, introduced
+                    // collapsed; opened, it has computed nothing, and it offers
+                    // neither Show on chart nor Centre on chart - no Venus is drawn.
+                    AbstractButton venusHeading = (AbstractButton) named(content,
+                            "heading.solarsystem.venus");
+                    java.util.List<String> headings = new java.util.ArrayList<>();
+                    for (java.awt.Component c : all(content)) {
+                        if (c.getName() != null && c.getName().startsWith("heading.solarsystem.")) {
+                            headings.add(c.getName());
+                        }
+                    }
+                    assertEquals(List.of("heading.solarsystem.sun", "heading.solarsystem.venus",
+                            "heading.solarsystem.moon", "heading.solarsystem.jupiter"), headings,
+                            "outward from the Sun, the bodies the atlas has");
+                    assertFalse(venusHeading.isSelected(), "Venus introduced collapsed");
+                    reveal(venusHeading);
+                    ReaderInput.click(venusHeading);
+                    drain();
+                    assertTrue(venusHeading.isSelected(), "Venus opened");
+                    assertNull(find(content, "venusCard"), "Venus, opened, has computed nothing");
+                    assertNull(find(content, "venusTable"));
+                    assertNotNull(find(content, "venusCompute"), "but its controls are there");
+                    assertNull(find(content, "venusOnChart"), "no Show on chart for Venus");
+                    assertNull(find(content, "venusCentreOnChart"), "and no Centre on chart");
+
                     // Jupiter (#474): after the Moon, introduced collapsed;
                     // opened, it has computed nothing.
                     AbstractButton jupiterHeading = (AbstractButton) named(content,
@@ -209,7 +234,7 @@ class SolarSystemCompanionJourneyTest {
                     }
                     assertEquals(List.of("Sun on the chart", "Moon on the chart",
                             "Jupiter and moons on the chart", "—",
-                            "Sun...", "Moon...", "Jupiter..."), order);
+                            "Sun...", "Venus...", "Moon...", "Jupiter..."), order);
 
                     // The window's own focus traversal reaches the group: the
                     // chosen view (its sibling is reached by the arrow keys,

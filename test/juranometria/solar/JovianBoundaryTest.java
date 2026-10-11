@@ -65,8 +65,11 @@ class JovianBoundaryTest {
         assertThrows(IllegalArgumentException.class,
                 () -> new JovianSystemService(SolarSystemPack.load(), null));
         SolarSystemService solar = SolarSystemService.load();
-        assertEquals(SolarSystemService.Body.values().length, 2,
-                "the Sun and the Moon, as released; Jupiter is the Jovian service's");
+        assertEquals(java.util.List.of(SolarSystemService.Body.SUN, SolarSystemService.Body.MOON,
+                        SolarSystemService.Body.VENUS),
+                java.util.List.of(SolarSystemService.Body.values()),
+                "the Sun and the Moon, as released, and Venus (#502) over the planets pack;"
+                        + " Jupiter is the Jovian service's");
         assertTrue(((SolarSystemService.SunObservation) solar.observe(
                 SolarSystemService.Body.SUN, OSLO_1950)).distanceKm() > 0.0);
     }

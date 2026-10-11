@@ -100,6 +100,11 @@ Bar packed 766 × 264 px; widest popup 211 px.
 | item spoken name \| Sun table |
 | item spoken description \| Opens a table of the Sun's computed position, height above the horizon, distance and apparent size for the observing place and instant set in Place and Time, at that instant or over a range of instants. Nothing is drawn on the chart. |
 | item access letter (language) \| S |
+| item label \| Venus... |
+| item hover \| Where Venus is, for the place and instant set in Place and Time |
+| item spoken name \| Venus table |
+| item spoken description \| Opens a table of Venus's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the observing place and instant set in Place and Time, at that instant or over a range of instants. |
+| item access letter (language) \| V |
 | item label \| Moon... |
 | item hover \| Where the Moon is, for the place and instant set in Place and Time |
 | item spoken name \| Moon table |
@@ -188,6 +193,11 @@ Bar packed 766 × 264 px; widest popup 211 px.
 | item spoken name \| Sun table |
 | item spoken description \| Opens a table of the Sun's computed position, height above the horizon, distance and apparent size for the observing place and instant set in Place and Time, at that instant or over a range of instants. Nothing is drawn on the chart. |
 | item access letter (language) \| S |
+| item label \| Venus... |
+| item hover \| Where Venus is, for the place and instant set in Place and Time |
+| item spoken name \| Venus table |
+| item spoken description \| Opens a table of Venus's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the observing place and instant set in Place and Time, at that instant or over a range of instants. |
+| item access letter (language) \| V |
 | item label \| Moon... |
 | item hover \| Where the Moon is, for the place and instant set in Place and Time |
 | item spoken name \| Moon table |
@@ -276,6 +286,11 @@ Bar packed 766 × 264 px; widest popup 211 px.
 | item spoken name \| Sun table |
 | item spoken description \| Opens a table of the Sun's computed position, height above the horizon, distance and apparent size for the observing place and instant set in Place and Time, at that instant or over a range of instants. Nothing is drawn on the chart. |
 | item access letter (language) \| S |
+| item label \| Venus... |
+| item hover \| Where Venus is, for the place and instant set in Place and Time |
+| item spoken name \| Venus table |
+| item spoken description \| Opens a table of Venus's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the observing place and instant set in Place and Time, at that instant or over a range of instants. |
+| item access letter (language) \| V |
 | item label \| Moon... |
 | item hover \| Where the Moon is, for the place and instant set in Place and Time |
 | item spoken name \| Moon table |
@@ -364,6 +379,11 @@ Bar packed 766 × 264 px; widest popup 211 px.
 | item spoken name \| Sun table |
 | item spoken description \| Opens a table of the Sun's computed position, height above the horizon, distance and apparent size for the observing place and instant set in Place and Time, at that instant or over a range of instants. Nothing is drawn on the chart. |
 | item access letter (language) \| S |
+| item label \| Venus... |
+| item hover \| Where Venus is, for the place and instant set in Place and Time |
+| item spoken name \| Venus table |
+| item spoken description \| Opens a table of Venus's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the observing place and instant set in Place and Time, at that instant or over a range of instants. |
+| item access letter (language) \| V |
 | item label \| Moon... |
 | item hover \| Where the Moon is, for the place and instant set in Place and Time |
 | item spoken name \| Moon table |
@@ -454,6 +474,10 @@ Bar packed 775 × 264 px; widest popup 201 px.
 | item spoken name \| Soltabell |
 | item spoken description \| Åpner en tabell over Solens beregnede posisjon, høyde over horisonten, avstand og tilsynelatende størrelse for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. Ingenting tegnes på kartet. |
 | item access letter (language) \| O |
+| item label \| Venus... |
+| item hover \| Hvor Venus er, for stedet og tidspunktet satt i Sted og tid |
+| item spoken name \| Venustabell |
+| item spoken description \| Åpner en tabell over Venus' beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. |
 | item label \| Månen... |
 | item hover \| Hvor Månen er, for stedet og tidspunktet satt i Sted og tid |
 | item spoken name \| Månetabell |
@@ -542,6 +566,10 @@ Bar packed 775 × 264 px; widest popup 201 px.
 | item spoken name \| Soltabell |
 | item spoken description \| Åpner en tabell over Solens beregnede posisjon, høyde over horisonten, avstand og tilsynelatende størrelse for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. Ingenting tegnes på kartet. |
 | item access letter (language) \| O |
+| item label \| Venus... |
+| item hover \| Hvor Venus er, for stedet og tidspunktet satt i Sted og tid |
+| item spoken name \| Venustabell |
+| item spoken description \| Åpner en tabell over Venus' beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. |
 | item label \| Månen... |
 | item hover \| Hvor Månen er, for stedet og tidspunktet satt i Sted og tid |
 | item spoken name \| Månetabell |
@@ -630,6 +658,10 @@ Bar packed 775 × 264 px; widest popup 201 px.
 | item spoken name \| Soltabell |
 | item spoken description \| Åpner en tabell over Solens beregnede posisjon, høyde over horisonten, avstand og tilsynelatende størrelse for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. Ingenting tegnes på kartet. |
 | item access letter (language) \| O |
+| item label \| Venus... |
+| item hover \| Hvor Venus er, for stedet og tidspunktet satt i Sted og tid |
+| item spoken name \| Venustabell |
+| item spoken description \| Åpner en tabell over Venus' beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. |
 | item label \| Månen... |
 | item hover \| Hvor Månen er, for stedet og tidspunktet satt i Sted og tid |
 | item spoken name \| Månetabell |
@@ -718,6 +750,10 @@ Bar packed 775 × 264 px; widest popup 201 px.
 | item spoken name \| Soltabell |
 | item spoken description \| Åpner en tabell over Solens beregnede posisjon, høyde over horisonten, avstand og tilsynelatende størrelse for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. Ingenting tegnes på kartet. |
 | item access letter (language) \| O |
+| item label \| Venus... |
+| item hover \| Hvor Venus er, for stedet og tidspunktet satt i Sted og tid |
+| item spoken name \| Venustabell |
+| item spoken description \| Åpner en tabell over Venus' beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. |
 | item label \| Månen... |
 | item hover \| Hvor Månen er, for stedet og tidspunktet satt i Sted og tid |
 | item spoken name \| Månetabell |
