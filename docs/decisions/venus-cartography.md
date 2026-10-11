@@ -160,3 +160,30 @@ public so the study draws with the page's geometry rather than a copy
 - a visibility change, no behaviour. No chart, table-result or export
 bytes move; no production Venus ink, selection or Controller change; no
 language key; no download.
+
+## The ruling
+
+The owner's rulings (2026-10-12), accepting the six proposals as
+written, recorded as given:
+
+1. **Rule M.** Venus is drawn as the larger of its true scale and a
+   phased 6 px mark. Venus must remain findable like Jupiter, but its
+   phase must remain honest. The mark represents Venus
+   cartographically, not a claim about apparent size.
+2. **The Moon's phase geometry**: χ of date rotated into the page's
+   basis. No sliver is invented near inferior conjunction or near
+   full.
+3. **No special conjunction drawing rule.** Painting order handles
+   transit and occultation. The table's geometric state is appended to
+   the spoken description when applicable.
+4. **C4–C6 inherited.** Venus is added to `SolarSystemModule`; Show on
+   chart and Centre on chart arrive with the production layer in #514.
+5. **#481 stays open.** Venus ships on the ordinary field ladder in
+   5.2.0. This study's measurement is attached to #481 for the later
+   object-dependent closer-zoom design.
+6. **Phase readability stays a study measurement**, not a production
+   threshold or suppression rule.
+
+Nothing in the proposal was amended; the study's report and mock-ups
+stand as measured. #513 (the shared occurrence identity and selection
+context) and #514 (Venus on the chart) build on these rulings.
