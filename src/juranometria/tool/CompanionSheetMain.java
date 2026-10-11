@@ -93,11 +93,11 @@ public final class CompanionSheetMain {
     }
 
     /**
-     * All four sections in every state, as the application holds them
-     * since #458: Chart controls, Place and Time, Solar System (introduced
-     * collapsed; "solar-system-open" opens it, Sun open with its instant
-     * applied, Moon collapsed), then Chart Options with its subject
-     * groups as first introduced - Deep sky collapsed, the rest open.
+     * Both tabs in every state, as the application holds them since
+     * #507: Chart with Chart controls, Place and Time and Chart Options
+     * (its subject groups as first introduced - Deep sky collapsed, the
+     * rest open); Solar System, chosen by "solar-system-open", Sun open
+     * with its instant applied, Venus, Moon and Jupiter collapsed.
      * "collapsed" collapses Place and Time.
      */
     private static final List<State> STATES = List.of(
@@ -137,14 +137,14 @@ public final class CompanionSheetMain {
                 `juranometria.tool.CompanionSheetMain` from compiled
                 application classes and their classpath resources.
 
-                The production companion window, holding its four
-                production sections - the chart's controls, the same
-                class the toolbar hosts; the same `PlaceAndTimePanel`
-                the Place and Time dialog holds; Solar System, the same
-                controls the Sun and Moon dialogs host; and Chart
-                Options - in
-                a real window at the size the companion's own policy
-                states. Place and Time is `PlaceAndTimeSheetMain`'s Oslo
+                The production companion window on its two tabs (#507):
+                Chart, holding its three production sections - the
+                chart's controls, the same class the toolbar hosts; the
+                same `PlaceAndTimePanel` the Place and Time dialog
+                holds; and Chart Options - and Solar System, holding the
+                same controls the Sun, Venus, Moon and Jupiter dialogs
+                host as groups of their own, in a real window at the
+                size the companion's own policy states. Place and Time is `PlaceAndTimeSheetMain`'s Oslo
                 arrangement at its frozen instant.
 
                 %s
@@ -236,12 +236,11 @@ public final class CompanionSheetMain {
                 window[0].addSection("placeandtime",
                         words.say("placeandtime.title"), panel[0]);
                 CompanionStore companionStore = CompanionStore.forNode(node);
-                // Solar System (#458, ruled on #457), third: the Sun and
-                // Moon groups over sessions of their own and a chart
-                // switch standing in for the module's - the photograph is
-                // of the section, not of the chart. Introduced collapsed,
-                // Sun open, Moon collapsed; opened for the state that
-                // shows it.
+                // Solar System (#458, ruled on #457): the Sun and Moon
+                // groups over sessions of their own and a chart switch
+                // standing in for the module's - the photograph is of
+                // the groups, not of the chart. Sun open, Moon collapsed;
+                // its tab chosen for the state that shows it.
                 juranometria.sky.Observer observer = new juranometria.sky.Observer(
                         place.latitude(), place.eastLongitude(),
                         PlaceAndTimeSheetMain.WHEN);
@@ -276,10 +275,13 @@ public final class CompanionSheetMain {
                                         () -> observer,
                                         juranometria.solar.JovianSystemService::load),
                                 new StillSwitch(), null, words);
-                window[0].addSection("solarsystem", words.say("solarsystem.title"),
-                        solarSection.inController(companionStore, words), true);
+                // Since #507 the Solar System is a tab after Chart, its
+                // groups standing on it directly; "solar-system-open"
+                // chooses that tab.
+                window[0].addTab("solarsystem", words.say("companion.tab.solarsystem"),
+                        solarSection.inController(companionStore, words));
                 if (state.solarSystemOpen()) {
-                    window[0].sections().get(2).heading().doClick();
+                    window[0].tabs().choose("solarsystem");
                     if (!state.jupiterOpen()) {
                         solarSection.sun().apply();
                     }
@@ -295,7 +297,7 @@ public final class CompanionSheetMain {
                     window[0].sections().get(1).heading().doClick();
                 }
                 if (state.deepSkyOpen()) {
-                    deepSkyHeading(window[0].sections().get(3)).doClick();
+                    deepSkyHeading(window[0].sections().get(2)).doClick();
                 }
                 if (state.refused() != null) {
                     JTextField latitude = (JTextField) named(panel[0],
@@ -335,6 +337,7 @@ public final class CompanionSheetMain {
                     .append(cell(window[0].getAccessibleContext()
                             .getAccessibleDescription()))
                     .append(" |\n")
+                    .append(tabRows(window[0].tabs()))
                     .append(describe(content)).append('\n');
             return rows.toString();
         } finally {
@@ -352,6 +355,30 @@ public final class CompanionSheetMain {
                 // An empty node is a blemish, not a failure.
             }
         }
+    }
+
+    /**
+     * The strip and its tabs (#507): the strip's spoken name and
+     * explanation, then each tab's title as shown and as spoken, the
+     * chosen one marked - a tab is not a component, so the walk below
+     * never meets it.
+     */
+    private static String tabRows(juranometria.ui.companion.CompanionTabs tabs) {
+        StringBuilder rows = new StringBuilder();
+        rows.append("| — | — | ")
+                .append(cell(tabs.getAccessibleContext().getAccessibleName()))
+                .append(" | ")
+                .append(cell(tabs.getAccessibleContext().getAccessibleDescription()))
+                .append(" |\n");
+        for (int i = 0; i < tabs.getTabCount(); i++) {
+            rows.append("| ").append(i == tabs.getSelectedIndex() ? "\u25be " : "")
+                    .append(cell(tabs.getTitleAt(i)))
+                    .append(" | — | ")
+                    .append(cell(tabs.getAccessibleContext().getAccessibleChild(i)
+                            .getAccessibleContext().getAccessibleName()))
+                    .append(" | — |\n");
+        }
+        return rows.toString();
     }
 
     /** The Deep sky group's heading inside the Chart Options section. */
@@ -379,7 +406,9 @@ public final class CompanionSheetMain {
     private static String describe(Component from) {
         StringBuilder rows = new StringBuilder();
         for (Component control : reading(from)) {
-            if (!(control instanceof JComponent said) || !control.isVisible()) {
+            if (!(control instanceof JComponent said) || !control.isVisible()
+                    || control instanceof juranometria.ui.companion.CompanionTabs) {
+                // The strip and its tabs are the rows above (#507).
                 continue;
             }
             String shown = control instanceof AbstractButton button

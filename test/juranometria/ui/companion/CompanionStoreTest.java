@@ -36,6 +36,10 @@ class CompanionStoreTest {
                 again.bounds(), "a display left of the main one is a"
                         + " negative x, and kept as one");
         assertTrue(again.collapsed("placeandtime"));
+        // The tab chosen (#507): never chosen, then remembered by id.
+        assertEquals(Optional.empty(), store.tab(), "never chose a tab");
+        store.saveTab("solarsystem");
+        assertEquals(Optional.of("solarsystem"), again.tab());
 
         for (String key : node.keys()) {
             assertTrue(key.startsWith("companion."),
@@ -48,5 +52,7 @@ class CompanionStoreTest {
         node.put("companion.collapsed.placeandtime", "perhaps");
         assertFalse(again.collapsed("placeandtime"),
                 "anything unreadable is never chosen");
+        node.put("companion.tab", " ");
+        assertEquals(Optional.empty(), again.tab(), "a blank tab is no tab");
     }
 }

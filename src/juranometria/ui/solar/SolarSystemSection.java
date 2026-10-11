@@ -14,8 +14,9 @@ import juranometria.ui.language.InterfaceText;
  * remember their own collapse - Sun introduced open, Moon collapsed -
  * each holding one {@link SolarTableControls} in the Controller's
  * arrangement over its body's shared session and chart switch. The
- * section itself is introduced collapsed; the host adds it with that
- * default. Since #474 a third group, Jupiter, follows the Moon,
+ * section itself was introduced collapsed; since #507 it is the
+ * Controller's Solar System tab, the groups standing directly on it
+ * with no outer group of their own. Since #474 a third group, Jupiter, follows the Moon,
  * introduced collapsed, holding one {@link JovianTableControls} over
  * Jupiter's shared session - and no Show on chart box, because nothing
  * Jovian is drawn. Since #502 a Venus group stands between the Sun and
@@ -130,7 +131,7 @@ public final class SolarSystemSection {
         return venus;
     }
 
-    /** The two groups, remembered apart, as the section's content. */
+    /** The groups, remembered apart, as the tab's content. */
     public JComponent inController(CompanionStore store, InterfaceText said) {
         JPanel groups = new JPanel();
         groups.setLayout(new BoxLayout(groups, BoxLayout.Y_AXIS));

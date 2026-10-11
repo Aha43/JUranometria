@@ -484,22 +484,24 @@ public final class JUranometriaMain {
         juranometria.ui.solar.BodyOnChart jupiterLayer =
                 juranometria.ui.solar.JovianChartSession.switchOf(jovianOnChart,
                         jovianChartStore);
-        // Solar System in the Controller, third (ruled on #457): the
-        // Sun, Venus (#502), Moon and Jupiter groups over those sessions and the
-        // module's own switches, introduced collapsed, computing nothing
-        // on its own; the Sun and the Moon with Centre on chart.
+        // Solar System in the Controller (ruled on #457), since #507 a
+        // tab of its own after Chart: the Sun, Venus (#502), Moon and
+        // Jupiter groups over those sessions and the module's own
+        // switches, each remembering its own collapse, with no outer
+        // group repeating the tab's name; building and choosing the
+        // tab compute nothing; the Sun and the Moon with Centre on chart.
         juranometria.ui.solar.SolarSystemSection solarSection =
                 new juranometria.ui.solar.SolarSystemSection(sunTable, venusTable,
                         moonTable, sunLayer, moonLayer, jupiterTable, jupiterLayer,
                         centreOnChart, companionWords);
-        companion.addSection(juranometria.ui.solar.SolarSystemSection.ID,
-                companionWords.say("solarsystem.title"),
-                solarSection.inController(companionStore, companionWords), true);
+        companion.addTab(juranometria.ui.solar.SolarSystemSection.ID,
+                companionWords.say("companion.tab.solarsystem"),
+                solarSection.inController(companionStore, companionWords));
         shutdown.onShutdown(solarSection::release);
-        // Chart Options (#443, ruled on #442), fourth since #458: the
-        // same controls class the dialog holds, over the same
-        // controller, as remembered groups; Restore Defaults asks over
-        // the companion.
+        // Chart Options (#443, ruled on #442), third on the Chart tab
+        // since #507 (fourth section since #458): the same controls
+        // class the dialog holds, over the same controller, as
+        // remembered groups; Restore Defaults asks over the companion.
         companion.addSection("chartoptions",
                 companionWords.say("chartoptions.title"),
                 new ChartOptionsControls(chartOptions,
