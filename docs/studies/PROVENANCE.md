@@ -199,13 +199,13 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/gallery/place-and-time-zenith.png` | `4f50707e9f8e78cc429df7ba74e9e82b09134c5e76902bac317b69b4d7ebc249` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/gallery/sun-and-moon-crescent.png` | `b3b05987db7cda875a97581c8ea1af5cf00ab61183139ff812296c935dc571e4` | 2026-10-01 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/gallery/sun-and-moon-horizon.png` | `6072f6b9911cc308846c9d1e94ca2a2d343ce472716ea95677dd7bcb5bb3a6f5` | 2026-10-01 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/about-en-1-compact-light.png` | `d407e55caaf14681ebd05f71fe70f27789ba4f40aa452a1e9a8ede773730cfad` | 2026-10-10 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/about-en-1-compact-light.png` | `aca5b245d09e5d070c2beafb317ee90a54f0dcf9b5664db821a49030458aec71` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/about-en-2-notices-light.png` | `4e77229c21ad64603fe5c22e3f4d70f9824ebbceeaa199465fe06411bf808914` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/about-en-3-compact-dark.png` | `a4dbd810fb7ba5d818304871ee0455b8ba291f6d79c8a1d7742b661d0e63714b` | 2026-10-10 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/about-en-3-compact-dark.png` | `89bbc78792642c9feff729f89411e65506d481035b71b35c632243f1b6e6a767` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/about-en-4-notices-dark.png` | `4d8cf2718f716a90b13eff01adacc8ac2494fc603d2b40bc78872b536d6f44ba` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/about-nb-NO-5-compact-light.png` | `d17776f4f85ed583fee5cf6b54667e99119210c8cebc196a37f3be2a4764c802` | 2026-10-10 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/about-nb-NO-5-compact-light.png` | `8c74d4895c3b51783bbf4c353d070b6a55748d237aaaf227bbbf69e9ddd4bca4` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/about-nb-NO-6-notices-light.png` | `9ba22416a2697ad4b5b6976d7564979a5b8447ede04c4ba3418a7b9fd8798738` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/about-nb-NO-7-compact-dark.png` | `050880b23e95e6f935bb423b29b15a0df966f5f9c959ced62884de3d87fc0ae1` | 2026-10-10 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/about-nb-NO-7-compact-dark.png` | `95135b17d4333d944e5ce37c1b687e73963eed2f2e1c3f0021b9a9098bbb9244` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/about-nb-NO-8-notices-dark.png` | `ea0c15fabba7c1e765ea4746cdc6a937e6e87a4937bc429bb6007773d2021d7f` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/chartkeyboard-en-1-all-off-light.png` | `2ff1dbda15f16f921c0961dc8344046e63a24adb9ea4b84ea6aa7d7d2ca87137` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/chartkeyboard-en-2-all-on-light.png` | `ddc3ce7c5efef05a53aeea1111179d2100b3ff9d10ed37a0be73b5e19e67f850` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |

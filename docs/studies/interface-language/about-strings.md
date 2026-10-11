@@ -55,6 +55,7 @@ with it paragraph by paragraph.
 | `bsd3` | BSD-3-Clause licence text |
 | `solarsystem` | Solar System ephemeris |
 | `joviansystem` | Jovian System ephemeris |
+| `planets` | Planets ephemeris |
 | `tabler` | Tabler icons licence |
 
 ### Light
@@ -72,7 +73,7 @@ with it paragraph by paragraph.
 | shown | *(the application mark: decorative, no text, no spoken name)* |
 | shown | JUranometria 5.1.0 |
 | shown | A quiet, interactive atlas for learning the geography of the sky. |
-| shown | *(read-only document, 1133 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 1355 characters — printed in full below or listed by path)* |
 | shown | Full notices and licences... |
 | shown | Close |
 
@@ -86,7 +87,7 @@ with it paragraph by paragraph.
 |---|---|
 | window title | About JUranometria |
 | window, spoken | Application identity, version, and licensing information |
-| shown | *(read-only document, 32409 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 35577 characters — printed in full below or listed by path)* |
 | shown | Close |
 
 
@@ -105,7 +106,7 @@ with it paragraph by paragraph.
 | shown | *(the application mark: decorative, no text, no spoken name)* |
 | shown | JUranometria 5.1.0 |
 | shown | A quiet, interactive atlas for learning the geography of the sky. |
-| shown | *(read-only document, 1133 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 1355 characters — printed in full below or listed by path)* |
 | shown | Full notices and licences... |
 | shown | Close |
 
@@ -119,13 +120,13 @@ with it paragraph by paragraph.
 |---|---|
 | window title | About JUranometria |
 | window, spoken | Application identity, version, and licensing information |
-| shown | *(read-only document, 32409 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 35577 characters — printed in full below or listed by path)* |
 | shown | Close |
 
 
 ### The compact licensing summary, in full
 
-Its own document (1133 characters), the canonical English one, used whole because this language has not written its own. Every licence identifier below is exact and untranslated.
+Its own document (1355 characters), the canonical English one, used whole because this language has not written its own. Every licence identifier below is exact and untranslated.
 
 ```
 Code and documentation: MIT license, copyright JUranometria
@@ -153,6 +154,11 @@ Jovian System ephemeris: two excerpts of NASA/JPL's JUP365 (with
 DE440's Jupiter barycentre), modified by JUranometria under NAIF's
 rules for modified SPICE kernels (no fee or licence); the IAU 2015
 constants copied from NAIF's planetary-constants kernel.
+
+Planets ephemeris: one excerpt of NASA/JPL's DE440 per planet,
+modified by JUranometria under NAIF's rules for modified SPICE
+kernels (no fee or licence); the IAU 2015 radii copied from NAIF's
+planetary-constants kernel.
 
 Toolbar icons from the Tabler icon set: MIT license.
 ```
@@ -189,6 +195,7 @@ Toolbar icons from the Tabler icon set: MIT license.
 | `bsd3` | Lisensteksten for BSD-3-Clause |
 | `solarsystem` | Solsystemefemeride |
 | `joviansystem` | Jupitersystemefemeride |
+| `planets` | Planetefemeride |
 | `tabler` | Lisens for Tabler-ikonene |
 
 ### Light
@@ -206,7 +213,7 @@ Toolbar icons from the Tabler icon set: MIT license.
 | shown | *(the application mark: decorative, no text, no spoken name)* |
 | shown | JUranometria 5.1.0 |
 | shown | Et rolig, interaktivt atlas for å lære himmelens geografi. |
-| shown | *(read-only document, 1126 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 1340 characters — printed in full below or listed by path)* |
 | shown | Merknader og lisenser... |
 | shown | Lukk |
 
@@ -220,7 +227,7 @@ Toolbar icons from the Tabler icon set: MIT license.
 |---|---|
 | window title | Om JUranometria |
 | window, spoken | Programmets navn, versjon og lisensopplysninger |
-| shown | *(read-only document, 32429 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 35595 characters — printed in full below or listed by path)* |
 | shown | Lukk |
 
 
@@ -239,7 +246,7 @@ Toolbar icons from the Tabler icon set: MIT license.
 | shown | *(the application mark: decorative, no text, no spoken name)* |
 | shown | JUranometria 5.1.0 |
 | shown | Et rolig, interaktivt atlas for å lære himmelens geografi. |
-| shown | *(read-only document, 1126 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 1340 characters — printed in full below or listed by path)* |
 | shown | Merknader og lisenser... |
 | shown | Lukk |
 
@@ -253,13 +260,13 @@ Toolbar icons from the Tabler icon set: MIT license.
 |---|---|
 | window title | Om JUranometria |
 | window, spoken | Programmets navn, versjon og lisensopplysninger |
-| shown | *(read-only document, 32429 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 35595 characters — printed in full below or listed by path)* |
 | shown | Lukk |
 
 
 ### The compact licensing summary, in full
 
-Its own document (1126 characters), written in this language. Every licence identifier below is exact and untranslated.
+Its own document (1340 characters), written in this language. Every licence identifier below is exact and untranslated.
 
 ```
 Kode og dokumentasjon: MIT-lisens. Opphavsrett: JUranometria
@@ -288,6 +295,11 @@ Jupiters barysenter fra DE440), endret av JUranometria etter
 NAIF-reglene for endrede SPICE-kjerner (ingen avgift eller lisens);
 IAU 2015-konstantene kopiert fra NAIFs planetkonstantkjerne.
 
+Planetefemeride: ett utdrag av NASA/JPLs DE440 per planet, endret
+av JUranometria etter NAIF-reglene for endrede SPICE-kjerner (ingen
+avgift eller lisens); IAU 2015-radiene kopiert fra NAIFs
+planetkonstantkjerne.
+
 Verktøylinjeikoner fra ikonsettet Tabler: MIT-lisens.
 ```
 
@@ -305,8 +317,9 @@ Not reproduced here: they are upstream text, and a copy in a study is a copy tha
 | `bsd3` | `/resources/geo/constellations/LICENSE-BSD-3-Clause.txt` | 1480 |
 | `solarsystem` | `/resources/solar-system/NOTICE-solar-system.md` | 2353 |
 | `joviansystem` | `/resources/jovian-system/NOTICE-jovian-system.md` | 3759 |
+| `planets` | `/resources/planets/NOTICE-planets.md` | 3049 |
 | `tabler` | `/resources/icons/LICENSE` | 1072 |
-| **seven** | | **31300** |
+| **seven** | | **34349** |
 
 ## The application mark
 

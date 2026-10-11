@@ -24,4 +24,9 @@ DE440's Jupiter barycentre), modified by JUranometria under NAIF's
 rules for modified SPICE kernels (no fee or licence); the IAU 2015
 constants copied from NAIF's planetary-constants kernel.
 
+Planets ephemeris: one excerpt of NASA/JPL's DE440 per planet,
+modified by JUranometria under NAIF's rules for modified SPICE
+kernels (no fee or licence); the IAU 2015 radii copied from NAIF's
+planetary-constants kernel.
+
 Toolbar icons from the Tabler icon set: MIT license.

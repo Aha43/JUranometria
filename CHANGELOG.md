@@ -7,6 +7,19 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Venus, computed offline (#499–#501).** A third bundled pack, the
+`planets` pack, holds one JUranometria-modified excerpt of NASA/JPL's
+DE440 per planet, Venus first, from the released Solar System pack's
+own source; a later planet adds its own file and a released one is
+never rewritten. Venus's place, distance, solid-body apparent
+diameter, elongation and side of the Sun, phase angle, illuminated
+fraction, phase word and bright-limb direction are computed the way
+the Sun's, the Moon's and Jupiter's are, and held to JPL Horizons and
+to Espenak's published conjunctions and elongations at the targets
+the numerical contract set (#500). The Sun, the Moon and Jupiter are
+unchanged: their packs are byte-identical. No table, chart mark or
+selection yet; the About dialog lists the new pack's notice.
+
 ## [5.1.0] - 2026-10-10
 
 **Jupiter.** Sprints 44 and 45 bring Jupiter and its four large

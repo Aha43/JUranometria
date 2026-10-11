@@ -173,6 +173,7 @@ for resource in \
         resources/catalog/star-identities/LICENSE-BSD-3-Clause.txt \
         resources/solar-system/NOTICE-solar-system.md \
         resources/jovian-system/NOTICE-jovian-system.md \
+        resources/planets/NOTICE-planets.md \
         resources/icons/LICENSE; do
     echo "$jarlist" | grep -q " $resource\$" || {
         echo "build-app-image: packaged licensing inventory missing" \
@@ -188,7 +189,7 @@ for module in java.base java.datatransfer java.xml java.prefs \
         exit 1
     }
 done
-echo "packaged licensing inventory: complete (11 resources, 6 module"
+echo "packaged licensing inventory: complete (12 resources, 6 module"
 echo "legal directories)"
 
 # The packaged headless smoke path through the NATIVE image: the

@@ -153,6 +153,43 @@ class BundledNoticesTest {
     }
 
     @Test
+    void thePlanetsPackShipsWithItsNoticeAndProvenance() {
+        String notice = resourceText("/resources/planets/NOTICE-planets.md");
+        assertTrue(notice.contains("modified kernel"),
+                "the excerpts are called what NAIF's rules call them");
+        assertTrue(notice.contains("not an original JPL") && notice.contains("JPL did not produce it"),
+                "and never presented as JPL's own");
+        assertTrue(notice.contains("NAIF") && notice.contains("DE440"));
+        assertTrue(notice.contains("doi:10.3847/1538-3881/abd414"),
+                "the ephemeris authors are acknowledged");
+        assertTrue(notice.contains("pck00011.tpc") && notice.contains("not redistributed"),
+                "the constants' source is named and the file is not shipped");
+        assertTrue(notice.contains("One pack, one file per planet")
+                        && notice.contains("never rewritten"),
+                "the layout ruled on #500 is explained: a released planet's file stands");
+        assertTrue(notice.contains("does not change"),
+                "the Solar System and Jovian packs beside it are untouched");
+        assertTrue(notice.contains("solid body") && notice.contains("never draws"),
+                "the radius is the solid body's, the cloud deck stated, not drawn");
+        String provenance = resourceText("/resources/planets/PROVENANCE.md");
+        for (String required : new String[] {"naif.jpl.nasa.gov", "SHA-256", "SpkExcerpt",
+                "Validation", "identical to the source", "identically zero", "untouched",
+                "never rewritten", "pck00011.tpc"}) {
+            assertTrue(provenance.contains(required), "the provenance records " + required);
+        }
+    }
+
+    @Test
+    void everyPlanetsResourceShipsOnTheClasspath() {
+        for (String resource : new String[] {
+                "manifest.properties", "juranometria-de440-venus-1900-2100.bsp",
+                "NOTICE-planets.md", "PROVENANCE.md"}) {
+            assertNotNull(BundledNoticesTest.class.getResource("/resources/planets/" + resource),
+                    resource + " must ship as a resource");
+        }
+    }
+
+    @Test
     void everySolarSystemResourceShipsOnTheClasspath() {
         for (String resource : new String[] {
                 "manifest.properties",

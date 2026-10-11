@@ -80,6 +80,9 @@ help:
 	@echo "  venus-pack-study venus-system-study     Cut and measure the Venus excerpt of de440s.bsp in both layouts, with the released packs held (issue #500)"
 	@echo "  spk-boundary-fixture  Cut the JUP365 segment-split test fixture from jup365.bsp and prove it against its source (issue #473)"
 	@echo "  import-jovian-system  Build the Jovian System pack from jup365.bsp and pck00011.tpc, proved against the sources (issue #473)"
+	@echo "  venus-table-study    Write the first Venus table from the bundled packs (issue #501)"
+	@echo "  venus-accuracy-report  The Venus service against Horizons and Espenak, the report the tests hold (issue #501)"
+	@echo "  import-planets       Build the planets pack (one DE440 kernel per planet) from de440s.bsp and pck00011.tpc, proved against the sources (issue #501)"
 	@echo "  jovian-accuracy-report  The Jovian service against Horizons, the report the tests hold (issue #473)"
 	@echo "  jovian-cartography-study  Measure Jupiter and the moons on the atlas's pages, with mockups (issue #482)"
 	@echo "  sun-on-the-chart-study  The Sun on production pages through the module (issue #415)"
@@ -294,6 +297,23 @@ jovian-accuracy-report: classes
 # proved untouched.
 import-jovian-system: classes
 	$(JAVA) -Xmx6g -cp "$(CLASSES_DIR)" juranometria.tool.JovianPackMain
+
+import-planets: classes
+	$(JAVA) -cp "$(CLASSES_DIR)" juranometria.tool.PlanetsPackMain
+
+# The first Venus table (issue #501): the service's answers in the Moon
+# table's columns and rounding, for the owner to read before any surface.
+venus-table-study: classes
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.VenusTableStudyMain \
+		> docs/studies/venus/table-measurements.md
+	@echo "written to docs/studies/venus/table-measurements.md"
+
+# The Venus service against Horizons and Espenak (#501): the kept report the
+# tests hold to the targets ruled on #500.
+venus-accuracy-report: classes
+	$(JAVA) -cp "$(CLASSES_DIR)" juranometria.tool.VenusAccuracyReportMain \
+		> docs/studies/venus/service-accuracy.md
+	@echo "written to docs/studies/venus/service-accuracy.md"
 
 import-star-identities: classes
 	$(JAVA) -cp "$(CLASSES_DIR)" juranometria.tool.StarIdentityPackMain
@@ -605,7 +625,7 @@ black-sky-study: classes
 		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BlackSkyStudyMain \
 		> docs/studies/black-sky/measurements.md
 
-.PHONY: spk-boundary-fixture import-jovian-system jovian-accuracy-report jovian-cartography-study evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study venus-pack-study sun-on-the-chart-study moon-on-the-chart-study jupiter-on-the-chart-study printable-chart-study
+.PHONY: spk-boundary-fixture import-jovian-system import-planets venus-accuracy-report venus-table-study jovian-accuracy-report jovian-cartography-study evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study venus-pack-study sun-on-the-chart-study moon-on-the-chart-study jupiter-on-the-chart-study printable-chart-study
 # The heap is stated rather than inherited from whatever a machine's
 # ergonomics chose for it: the CI runner's default quarter-of-RAM is
 # not the same number as a developer's.
@@ -864,6 +884,7 @@ dist: app
 	   $(CLASSES_DIR)/resources/catalog/star-identities/LICENSE-BSD-3-Clause.txt \
 	   $(CLASSES_DIR)/resources/solar-system/NOTICE-solar-system.md \
 	   $(CLASSES_DIR)/resources/jovian-system/NOTICE-jovian-system.md \
+	   $(CLASSES_DIR)/resources/planets/NOTICE-planets.md \
 	   $(DIST_STAGE)/licenses/
 	cp $(CLASSES_DIR)/resources/icons/LICENSE \
 	   $(DIST_STAGE)/licenses/LICENSE-Tabler-MIT.txt

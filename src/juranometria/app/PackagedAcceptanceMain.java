@@ -32,6 +32,16 @@ import juranometria.ui.ChartViewController;
  */
 public final class PackagedAcceptanceMain {
 
+    /**
+     * The packaged Venus journey's sample (#501), restated once from
+     * docs/studies/venus/horizons/named-oslo-299.txt and held equal to
+     * that row by {@code PackagedVenusSampleTest}.
+     */
+    static final java.time.Instant VENUS_SAMPLE_INSTANT =
+            java.time.Instant.parse("2026-08-15T06:00:00Z");
+    static final double VENUS_SAMPLE_RA = 186.752756659;
+    static final double VENUS_SAMPLE_DEC = -4.447125032;
+
     /** M31's catalogue identity: the opening page's own galaxy. */
     private static final String ANDROMEDA_ID = "NGC 224";
 
@@ -4512,6 +4522,40 @@ public final class PackagedAcceptanceMain {
                         && PackagedAcceptanceMain.class.getResourceAsStream(
                                 "/resources/jovian-system/PROVENANCE.md") != null,
                 "the Jovian pack's notice and provenance travel with it");
+        // The planets pack (issue #501), inside the packaged image: Venus's
+        // kernel loads through the image's own classpath and verifies its
+        // checksum; Venus for Oslo at the 2026 greatest eastern elongation
+        // agrees with Horizons' astrometric row for that request
+        // (docs/studies/venus/horizons/named-oslo-299.txt, 2026-Aug-15
+        // 06:00, R.A. 186.752756659, DEC -4.447125032) to the exact-era
+        // target, near half lit in the evening sky; and the 2012 transit
+        // reads in front of the Sun.
+        juranometria.solar.VenusService venusService = juranometria.solar.VenusService.load();
+        juranometria.solar.VenusService.VenusObservation venusSample = venusService.observe(
+                new juranometria.sky.Observer(59.91, 10.75, VENUS_SAMPLE_INSTANT));
+        double venusOff = venusSample.astrometricJ2000().separationDegrees(
+                new juranometria.chart.SkyPosition(VENUS_SAMPLE_RA, VENUS_SAMPLE_DEC)) * 3600.0;
+        require(venusOff < 0.05, "the packaged Venus agrees with Horizons for Oslo,"
+                + " 2026-08-15 06:00 UTC, within 0.05 arcsecond: " + venusOff);
+        require(venusSample.phase() == juranometria.solar.VenusService.Phase.NEAR_HALF_LIT
+                        && venusSample.side() == juranometria.solar.SolarSystemService.Side.EAST_OF_SUN,
+                "at its greatest eastern elongation Venus is near half lit in the evening sky: "
+                        + venusSample.phase() + ", " + venusSample.side());
+        require(venusService.observe(new juranometria.sky.Observer(59.91, 10.75,
+                        java.time.Instant.parse("2012-06-06T01:00:00Z"))).phase()
+                        == juranometria.solar.VenusService.Phase.IN_FRONT_OF_SUN,
+                "the 2012 transit reads in front of the Sun");
+        require(PackagedAcceptanceMain.class.getResourceAsStream(
+                        "/resources/planets/NOTICE-planets.md") != null
+                        && PackagedAcceptanceMain.class.getResourceAsStream(
+                                "/resources/planets/PROVENANCE.md") != null,
+                "the planets pack's notice and provenance travel with it");
+        System.out.println("planets pack OK (DE440 Venus excerpt v"
+                + juranometria.solar.PlanetsPack.load().manifest().get("pack.version")
+                + ", Venus at Oslo within "
+                + String.format(java.util.Locale.ROOT, "%.4f", venusOff)
+                + " arcsecond of Horizons; near half lit in the evening sky on 2026-08-15;"
+                + " the 2012 transit in front of the Sun)");
         System.out.println("jovian system pack OK (JUP365 excerpts v"
                 + jovian.pack().manifest().get("pack.version") + ", Jupiter at Oslo within "
                 + String.format(java.util.Locale.ROOT, "%.4f", jupiterOff)
