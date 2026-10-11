@@ -519,3 +519,83 @@ The owner's rulings (2026-10-11), recorded as given:
    occurrence with shared chart context - stable identity plus instant
    and observer; the chart core still owns no clock.
 
+
+## #501, as built
+
+**The pack, as ruled (layout C).** `src/resources/planets/`: one logical
+`planets` pack, version 1 - `juranometria-de440-venus-1900-2100.bsp`
+(1 242 112 bytes; segments 0 → 2 and 2 → 299 from the released pack's
+pinned `de440s.bsp`, every state on a 1.7-day grid identical to the
+source, 2 → 299 identically zero), `NOTICE-planets.md`, `PROVENANCE.md`
+and `manifest.properties`, built by `make import-planets`
+(`PlanetsPackMain`). The manifest lists its planets under
+`pack.planets` and keys each planet's facts `ephemeris.<planet>.*`; a
+later planet adds its file and its keys and raises the pack version.
+The builder refuses to write a pack in which a released planet's file
+would change, and proves the Solar System kernel (`63fbf570…`) and both
+Jovian kernels (`efddb718…`, `6ad781a4…`) untouched before writing;
+rebuilt twice, the pack is byte-identical. The drafted notice's key
+`planets` became `pack.planets` so the language scanner reads it as an
+identifier - the ledger gains no row (it holds 149 of its 150).
+
+**The service.** `VenusService` reads the Solar System pack's Sun, Earth
+and time scales and the planets pack's Venus, and answers the ruled
+meanings: astrometric J2000; apparent of date deflected by the Sun
+(the one-body formula Jupiter's service applies, held equal to it by
+`VenusServiceTest`) and aberrated; airless horizontal; distance; the
+solid-body apparent diameter; the Moon's S-T-O and k; elongation and
+the side of the Sun by apparent right ascension of date; the phase word
+with the geometric states first; χ of date with its conditioning. The
+Sun, the Moon and Jupiter are untouched: `SolarSystemService` and
+`JovianSystemService` are unchanged, and their packs byte-identical
+(`PlanetsPackTest`).
+
+**Measured, against Horizons, every committed fixture** (10 771 rows;
+`docs/studies/venus/service-accuracy.md`, `make venus-accuracy-report`,
+held by `VenusReferenceVectorTest`):
+
+| quantity | 1900–1961 | 1962–1971 | 1972 → 2027-06-28 | after |
+|---|---|---|---|---|
+| astrometric | 0.061″ | 0.020″ | **0.003″** | 7.118″ |
+| apparent, elongation > 1° | 0.134″ | 0.086″ | **0.129″** | 7.231″ |
+| horizontal | 0.906″ | 1.977″ | 11.680″ | 6.607″ (not asserted) |
+| distance | 15.9 km | 2.6 km | **0.2 km** | 1 857.9 km |
+| diameter | 0.0000″ | 0.0000″ | 0.0000″ | 0.0011″ |
+| elongation, > 1° | 0.214″ | 0.181″ | 0.180″ | 7.977″ |
+| phase angle (S-T-O), > 1° | 0.251″ | 0.186″ | 0.180″ | 11.181″ |
+| illuminated, points | 0.0035 | 0.0035 | 0.0035 | 0.0047 |
+| χ, k in [2 %, 98 %) | 0.039″ | 0.000″ | 0.053″ | 3.900″ |
+
+**Every value is inside its ruled target; no target is amended.** The
+one number above the study's stand-in is the exact interval's apparent
+place, 0.129″ against 0.055″: the service precesses and nutates with
+the atlas's own IAU 1976/1980 models, where the stand-in used IAU 2000A
+- the Sun's released contract measured 0.14″ for the same cause - and
+it stays within the ruled 0.2″. The side of the Sun agrees with
+Horizons' /T and /L on all 10 771 rows; Venus's parallax reaches
+32.15″; every phase word occurs. Espenak's nine rows hold under the
+ruled assertions (`VenusNamedEventsTest`): the four conjunctions 8–44
+minutes into the listed hour; the five greatest elongations at the
+printed tenth and side, 29–83 minutes from the listed hour, where the
+elongation is within 0.040″ of its maximum. The mutation rivals
+(`VenusMutationTest`) - a geocentric place, the civil instant read as
+TT, no deflection near the Sun, no aberration, the geometric phase
+angle, a J2000 χ, a side by ecliptic longitude, the cloud-top radius -
+each fail their target.
+
+**The first Venus table** is `docs/studies/venus/table-measurements.md`
+(`make venus-table-study`): the five observers, the date-line one
+included, at Espenak's nine events, the four representative
+appearances, a chosen day and both ends of the interval; Oslo every 14
+days through the 2026–27 apparition and hourly through the 2012
+transit - in the Moon table's columns and rounding, the phase words as
+ruled, in English until #502 carries them in the language files.
+
+**Packaged.** `NOTICE-planets.md` joins the licensing inventory (12
+resources), the archive (`licenses/NOTICE-planets.md`), `LICENSING.md`
+and the About dialog's notices in both languages; the packaged
+acceptance prints *planets pack OK*, checking Venus at Oslo against a
+Horizons row the image restates (held to the committed row by
+`PackagedVenusSampleTest`), the 2026 greatest eastern elongation near
+half lit in the evening sky, and the 2012 transit in front of the Sun.
+No dialog, Controller section, selection or chart mark exists yet.

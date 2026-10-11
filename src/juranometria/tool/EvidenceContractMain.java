@@ -135,6 +135,16 @@ public final class EvidenceContractMain {
         // committed fixtures, rounded as printed.
         REPORT_MAINS.put("juranometria.tool.JovianAccuracyReportMain",
                 "docs/studies/jovian-system/service-accuracy.md");
+        // The Venus service against Horizons and Espenak (#501): the worst
+        // differences beside the targets ruled on #500, the side on every
+        // row, the named events - deterministic over the bundled packs and
+        // the committed fixtures, rounded as printed.
+        REPORT_MAINS.put("juranometria.tool.VenusAccuracyReportMain",
+                "docs/studies/venus/service-accuracy.md");
+        // The first Venus table (#501): representative rows from the
+        // bundled packs in the Moon table's columns and rounding.
+        REPORT_MAINS.put("juranometria.tool.VenusTableStudyMain",
+                "docs/studies/venus/table-measurements.md");
         // Jupiter and the moons on the page (#482): the report is
         // deterministic; its mockups are held through IMAGE_MAINS.
         REPORT_MAINS.put("juranometria.tool.JovianCartographyStudyMain",
