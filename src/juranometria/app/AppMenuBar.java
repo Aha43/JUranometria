@@ -910,6 +910,35 @@ public final class AppMenuBar {
         return item;
     }
 
+    /**
+     * Adds View > Solar System > Venus... between Sun... and Moon... (#502):
+     * the Venus table's dialog, kept beside the Controller's Venus group
+     * as the Sun's and the Moon's are. Does nothing on a bar without the
+     * Solar System submenu.
+     */
+    public static void addVenusTable(javax.swing.JMenuBar bar,
+                                     juranometria.ui.language.InterfaceText said,
+                                     Runnable openVenusTable) {
+        JMenu solar = solarSystemMenu(bar);
+        if (solar == null || openVenusTable == null) {
+            return;
+        }
+        JMenuItem venus = new JMenuItem(said.say("menu.venus.label"));
+        venus.setName("venusTableItem");
+        juranometria.ui.language.MnemonicText.in(said).apply(venus, "menu.venus.mnemonic");
+        venus.getAccessibleContext().setAccessibleName(said.say("menu.venus.a11y"));
+        juranometria.ui.Explain.control(venus, said.say("menu.venus.hover"),
+                said.say("menu.venus.explain"));
+        venus.addActionListener(event -> openVenusTable.run());
+        int at = solar.getMenuComponentCount();
+        for (int i = 0; i < solar.getMenuComponentCount(); i++) {
+            if (MOON_ITEM.equals(solar.getMenuComponent(i).getName())) {
+                at = i;
+            }
+        }
+        solar.insert(venus, at);
+    }
+
     public static void addJupiterTable(javax.swing.JMenuBar bar,
                                        juranometria.ui.language.InterfaceText said,
                                        Runnable openJupiterTable) {

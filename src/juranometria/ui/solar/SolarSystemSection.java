@@ -18,7 +18,11 @@ import juranometria.ui.language.InterfaceText;
  * default. Since #474 a third group, Jupiter, follows the Moon,
  * introduced collapsed, holding one {@link JovianTableControls} over
  * Jupiter's shared session - and no Show on chart box, because nothing
- * Jovian is drawn.
+ * Jovian is drawn. Since #502 a Venus group stands between the Sun and
+ * the Moon - the ruled order outward from the Sun, showing only the
+ * bodies the atlas has - introduced collapsed, holding one
+ * {@link SolarTableControls} over Venus's shared session, with neither
+ * Show on chart nor Centre on chart, because no Venus is drawn.
  *
  * <p>Building the section computes nothing: each set of controls
  * reads the observer for its note and seeds, and shows whatever its
@@ -33,6 +37,8 @@ public final class SolarSystemSection {
 
     private final SolarTableControls sun;
     private final SolarTableControls moon;
+    /** Venus's controls, or null for a host built without Venus. */
+    private final SolarTableControls venus;
     /** Jupiter's controls, or null for a host built without Jupiter. */
     private final JovianTableControls jupiter;
 
@@ -72,13 +78,31 @@ public final class SolarSystemSection {
                               BodyOnChart sunOnChart, BodyOnChart moonOnChart,
                               JovianTableSession jupiterSession, BodyOnChart jupiterOnChart,
                               CentreOnChart centre, InterfaceText said) {
+        this(sunSession, null, moonSession, sunOnChart, moonOnChart, jupiterSession,
+                jupiterOnChart, centre, said);
+    }
+
+    /**
+     * With Venus (#502): its group between the Sun's and the Moon's,
+     * over Venus's shared session, with no chart switch and no Centre on
+     * chart; a null session leaves it out.
+     */
+    public SolarSystemSection(SolarTableSession sunSession, SolarTableSession venusSession,
+                              SolarTableSession moonSession,
+                              BodyOnChart sunOnChart, BodyOnChart moonOnChart,
+                              JovianTableSession jupiterSession, BodyOnChart jupiterOnChart,
+                              CentreOnChart centre, InterfaceText said) {
         if (sunSession.table().body() != juranometria.solar.SolarSystemService.Body.SUN
                 || moonSession.table().body()
-                        != juranometria.solar.SolarSystemService.Body.MOON) {
-            throw new IllegalArgumentException("the Sun's session, then the Moon's");
+                        != juranometria.solar.SolarSystemService.Body.MOON
+                || (venusSession != null && venusSession.table().body()
+                        != juranometria.solar.SolarSystemService.Body.VENUS)) {
+            throw new IllegalArgumentException("the Sun's session, Venus's, then the Moon's");
         }
         sun = new SolarTableControls(sunSession, said, sunOnChart, false, centre,
                 centre == null ? null : sunOnChart);
+        venus = venusSession == null ? null
+                : new SolarTableControls(venusSession, said, null, false, null, null);
         moon = new SolarTableControls(moonSession, said, moonOnChart, false, centre,
                 centre == null ? null : moonOnChart);
         jupiter = jupiterSession == null ? null
@@ -101,12 +125,21 @@ public final class SolarSystemSection {
         return moon;
     }
 
+    /** Venus's controls, or null for a host built without Venus. */
+    public SolarTableControls venus() {
+        return venus;
+    }
+
     /** The two groups, remembered apart, as the section's content. */
     public JComponent inController(CompanionStore store, InterfaceText said) {
         JPanel groups = new JPanel();
         groups.setLayout(new BoxLayout(groups, BoxLayout.Y_AXIS));
         groups.add(CompanionSection.remembered(ID + ".sun",
                 said.say("solarsystem.sun"), sun.inController(), said, store, false));
+        if (venus != null) {
+            groups.add(CompanionSection.remembered(ID + ".venus",
+                    said.say("solarsystem.venus"), venus.inController(), said, store, true));
+        }
         groups.add(CompanionSection.remembered(ID + ".moon",
                 said.say("solarsystem.moon"), moon.inController(), said, store, true));
         if (jupiter != null) {
@@ -120,6 +153,9 @@ public final class SolarSystemSection {
     /** Lets both sets of controls go of their sessions. */
     public void release() {
         sun.release();
+        if (venus != null) {
+            venus.release();
+        }
         moon.release();
         if (jupiter != null) {
             jupiter.release();

@@ -112,9 +112,13 @@ public final class SolarSystemService {
     private static final int MOON = 301;
     private static final int EARTH = 399;
 
-    /** The bodies the service answers for. */
+    /**
+     * The bodies the service answers for. Venus (#502) is answered by
+     * {@link VenusService} over the planets pack, loaded the first time
+     * Venus is asked for; the Sun's and the Moon's answers never read it.
+     */
     public enum Body {
-        SUN, MOON
+        SUN, MOON, VENUS
     }
 
     /** Altitude and azimuth in degrees; azimuth from north through east. */
@@ -158,7 +162,8 @@ public final class SolarSystemService {
     }
 
     /** One body's quantities at one instant, for one observer. */
-    public sealed interface Observation permits SunObservation, MoonObservation {
+    public sealed interface Observation permits SunObservation, MoonObservation,
+            VenusService.VenusObservation {
         Instant instant();
 
         TimeScales.Confidence timeConfidence();
@@ -242,6 +247,8 @@ public final class SolarSystemService {
 
     private final SolarSystemPack pack;
     private final TimeScales timeScales;
+    /** Venus's service, built over this pack the first time Venus is asked for. */
+    private VenusService venus;
 
     public SolarSystemService(SolarSystemPack pack) {
         if (pack == null) {
@@ -269,6 +276,7 @@ public final class SolarSystemService {
         return switch (body) {
             case SUN -> sun(observer);
             case MOON -> moon(observer);
+            case VENUS -> venus().observe(observer);
         };
     }
 
@@ -283,6 +291,19 @@ public final class SolarSystemService {
                     observe(body, observer.at(sample.instant()))));
         }
         return Collections.unmodifiableList(rows);
+    }
+
+    /**
+     * Venus's service over this service's pack and the bundled planets
+     * pack, read once, when Venus is first asked for (#502) - a missing
+     * or corrupt planets pack refuses Venus there and touches nothing
+     * the Sun or the Moon answer.
+     */
+    private synchronized VenusService venus() {
+        if (venus == null) {
+            venus = new VenusService(pack, PlanetsPack.load());
+        }
+        return venus;
     }
 
     private static void requireInsideTheInterval(Instant instant, String body) {

@@ -417,6 +417,13 @@ public final class JUranometriaMain {
         juranometria.ui.solar.SolarTableSession moonTable =
                 new juranometria.ui.solar.SolarTableSession(observerNow,
                         solarSystem, juranometria.ui.solar.SolarTable.moon());
+        // Venus (#502): one session shared by its dialog and the
+        // Controller's Venus group, over the same observer and the same
+        // lazy service, which reads the planets pack the first time a
+        // host computes Venus - never at startup, never on opening.
+        juranometria.ui.solar.SolarTableSession venusTable =
+                new juranometria.ui.solar.SolarTableSession(observerNow,
+                        solarSystem, juranometria.ui.solar.SolarTable.venus());
         // Jupiter and the four Galilean moons (#474): one session shared
         // by the Controller's Jupiter group and the Jupiter dialog, over
         // the same observer; the 53 MB Jovian pack is read once, when a
@@ -478,13 +485,13 @@ public final class JUranometriaMain {
                 juranometria.ui.solar.JovianChartSession.switchOf(jovianOnChart,
                         jovianChartStore);
         // Solar System in the Controller, third (ruled on #457): the
-        // Sun, Moon and Jupiter groups over those sessions and the
+        // Sun, Venus (#502), Moon and Jupiter groups over those sessions and the
         // module's own switches, introduced collapsed, computing nothing
         // on its own; the Sun and the Moon with Centre on chart.
         juranometria.ui.solar.SolarSystemSection solarSection =
-                new juranometria.ui.solar.SolarSystemSection(sunTable, moonTable,
-                        sunLayer, moonLayer, jupiterTable, jupiterLayer, centreOnChart,
-                        companionWords);
+                new juranometria.ui.solar.SolarSystemSection(sunTable, venusTable,
+                        moonTable, sunLayer, moonLayer, jupiterTable, jupiterLayer,
+                        centreOnChart, companionWords);
         companion.addSection(juranometria.ui.solar.SolarSystemSection.ID,
                 companionWords.say("solarsystem.title"),
                 solarSection.inController(companionStore, companionWords), true);
@@ -598,6 +605,15 @@ public final class JUranometriaMain {
                 // View, Chart Toolbar (#450): the bar, shown or hidden,
                 // from the item or its keystroke.
                 () -> showToolbar(frame, toolbar, chart, !toolbar.isVisible())));
+        // View > Solar System > Venus... (#502), between Sun... and Moon...:
+        // the dialog host of the same Venus session the Controller holds,
+        // with no Centre on chart - no Venus is drawn yet.
+        AppMenuBar.addVenusTable(frame.getJMenuBar(),
+                juranometria.ui.language.InterfaceText.forLanguage(
+                        language.interfaceLanguage()),
+                () -> juranometria.ui.solar.SolarTableDialog.open(frame, venusTable,
+                        juranometria.ui.language.InterfaceText.forLanguage(
+                                language.interfaceLanguage())));
         // View > Solar System > Jupiter... (#474), after Moon...: the
         // dialog host of the same Jupiter session the Controller holds.
         AppMenuBar.addJupiterTable(frame.getJMenuBar(),
