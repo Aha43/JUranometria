@@ -1,0 +1,283 @@
+# JPL Horizons response, kept whole (#500)
+# request-url: https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27299%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27coord%40399%27&COORD_TYPE=%27GEODETIC%27&QUANTITIES=%271%2C2%2C4%2C9%2C10%2C13%2C19%2C20%2C23%2C24%2C43%27&EXTRA_PREC=%27YES%27&ANG_FORMAT=%27DEG%27&APPARENT=%27AIRLESS%27&CSV_FORMAT=%27YES%27&TIME_DIGITS=%27SECONDS%27&SITE_COORD=%2710.75%2C59.91%2C0.0%27&START_TIME=%272026-06-01%2021%3A00%27&STOP_TIME=%272027-01-31%2021%3A00%27&STEP_SIZE=%2714%20d%27
+# requested-utc: 2026-10-11T01:52:50Z
+# body-sha256: bbfced1417fec38cd99eae6156b3e2c09c80d39d3c50e8f5e60b793c351f70d2
+# body-bytes: 18890
+# complete: True
+API VERSION: 1.2
+API SOURCE: NASA/JPL Horizons API
+
+*******************************************************************************
+ Revised: April 12, 2021                Venus                           299 / 2
+ 
+ PHYSICAL DATA (updated 2020-Oct-19):
+  Vol. Mean Radius (km) =  6051.84+-0.01 Density (g/cm^3)      =  5.204
+  Mass x10^23 (kg)      =    48.685      Volume (x10^10 km^3)  = 92.843
+  Sidereal rot. period  =   243.018484 d Sid. Rot. Rate (rad/s)= -0.00000029924
+  Mean solar day        =   116.7490 d   Equ. gravity  m/s^2   =  8.870
+  Mom. of Inertia       =     0.33       Core radius (km)      = ~3200
+  Geometric Albedo      =     0.65       Potential Love # k2   = ~0.25
+  GM (km^3/s^2)         = 324858.592     Equatorial Radius, Re = 6051.893 km
+  GM 1-sigma (km^3/s^2) =    +-0.006     Mass ratio (Sun/Venus)= 408523.72
+  Atmos. pressure (bar) =  90            Max. angular diam.    =   60.2"
+  Mean Temperature (K)  = 735            Visual mag. V(1,0)    =   -4.40
+  Obliquity to orbit    = 177.3 deg      Hill's sphere rad.,Rp =  167.1
+  Sidereal orb. per., y =   0.61519726   Orbit speed, km/s     =   35.021
+  Sidereal orb. per., d = 224.70079922   Escape speed, km/s    =   10.361
+                                 Perihelion  Aphelion    Mean
+  Solar Constant (W/m^2)         2759         2614       2650
+  Maximum Planetary IR (W/m^2)    153         153         153
+  Minimum Planetary IR (W/m^2)    153         153         153
+*******************************************************************************
+
+
+*******************************************************************************
+Ephemeris / API_USER Sat Oct 10 18:52:51 2026 Pasadena, USA      / Horizons    
+*******************************************************************************
+Target body name: Venus (299)                     {source: DE441}
+Center body name: Earth (399)                     {source: DE441}
+Center-site name: (user defined site below)
+*******************************************************************************
+Start time      : A.D. 2026-Jun-01 21:00:00.0000 UT      
+Stop  time      : A.D. 2027-Jan-31 21:00:00.0000 UT      
+Step-size       : 20160 minutes
+*******************************************************************************
+Target pole/equ : IAU_VENUS                       {East-longitude positive}
+Target radii    : 6051.8, 6051.8, 6051.8 km       {Equator_a, b, pole_c}       
+Center geodetic : 10.75, 59.91, 0.0               {E-lon(deg),Lat(deg),Alt(km)}
+Center cylindric: 10.75, 3205.78431, 5495.4568    {E-lon(deg),Dxy(km),Dz(km)}
+Center pole/equ : ITRF93                          {East-longitude positive}
+Center radii    : 6378.137, 6378.137, 6356.752 km {Equator_a, b, pole_c}       
+Target primary  : Sun
+Vis. interferer : MOON (R_eq= 1737.400) km        {source: DE441}
+Rel. light bend : Sun                             {source: DE441}
+Rel. lght bnd GM: 1.3271E+11 km^3/s^2                                          
+Atmos refraction: NO (AIRLESS)
+RA format       : DEG
+Time format     : CAL 
+Calendar mode   : Mixed Julian/Gregorian
+EOP file        : eop.261009.p270105                                           
+EOP coverage    : DATA-BASED 1962-JAN-20 TO 2026-OCT-09. PREDICTS-> 2027-JAN-04
+Units conversion: 1 au= 149597870.700 km, c= 299792.458 km/s, 1 day= 86400.0 s 
+Table cut-offs 1: Elevation (-90.0deg=NO ),Airmass (>38.000=NO), Daylight (NO )
+Table cut-offs 2: Solar elongation (  0.0,180.0=NO ),Local Hour Angle( 0.0=NO )
+Table cut-offs 3: RA/DEC angular rate (     0.0=NO )                           
+Table format    : Comma Separated Values (spreadsheet)
+*****************************************************************************************************************************************************************************************************************************************************************************************
+ Date__(UT)__HR:MN:SS, , , R.A.___(ICRF), DEC____(ICRF),  R.A.__(a-app), DEC___(a-app), Azimuth_(a-app), Elevation_(a-app),    APmag,  S-brt,      Illu%,  Ang-diam,                r,       rdot,             delta,     deldot,     S-O-T,/r,     S-T-O,       phi,  PAB-LON,  PAB-LAT,
+*****************************************************************************************************************************************************************************************************************************************************************************************
+$$SOE
+ 2026-Jun-01 21:00:00,C, , 107.674423283,  24.393816251,  108.073595317,  24.351167535,   297.489911202,      12.436420196,   -3.960,  1.152,   79.26622,  13.34602,   0.719020236662,  0.1146461,  1.25043945203261,-11.2297466,   35.0985,/T,   54.1787,   54.1741, 133.1537,   2.9812,
+ 2026-Jun-15 21:00:00,C,m, 125.221243213,  21.585357009,  125.605617272,  21.502386857,   292.996593082,      11.648977259,   -4.003,  1.218,   74.64477,  14.45711,   0.720252029827,  0.1859893,  1.15433743424550,-12.1093759,   38.0974,/T,   60.4733,   60.4689, 152.7019,   3.0579,
+ 2026-Jun-29 21:00:00,C, , 141.563457534,  16.984917461,  141.929245403,  16.871124791,   288.557808558,       8.811420885,   -4.064,  1.283,   69.55591,  15.86934,   0.721949740270,  0.2284388,  1.05161166647901,-12.8243245,   40.8190,/T,   66.9801,   66.9759, 172.0509,   2.6661,
+ 2026-Jul-13 21:00:00,C, , 156.572656985,  11.112219469,  156.922822657,  10.978021489,   284.606187323,       4.265354742,   -4.146,  1.343,   63.97741,  17.67722,   0.723851639246,  0.2359348,  0.94406145172516,-13.3044178,   43.1370,/T,   73.7709,   73.7668, 191.1263,   1.7913,
+ 2026-Jul-27 21:00:00,C,m, 170.353903555,   4.499296459,  170.695082694,   4.354324397,   281.360507730,      -1.509994658,   -4.253,  1.398,   57.85263,  20.02811,   0.725669094549,  0.2079167,  0.83324796134789,-13.6026937,   44.8945,/T,   80.9681,   80.9641, 209.8527,   0.4522,
+ 2026-Aug-10 21:00:00,N, , 183.016931550,  -2.338923283,  183.356902253,  -2.486505961,   278.961057682,      -8.019774900,   -4.385,  1.444,   51.02584,  23.14091,   0.727130640798,  0.1490841,  0.72116361218631,-13.6222438,   45.8271,/T,   88.8283,   88.8244, 228.1174,  -1.3156,
+ 2026-Aug-24 21:00:00,A,m, 194.526099573,  -8.923356491,  194.871786130,  -9.067068942,   277.618670614,     -14.855965424,   -4.538,  1.475,   43.25005,  27.36417,   0.728021044818,  0.0684394,  0.60986264958961,-13.3917049,   45.5274,/T,   97.7626,   97.7586, 245.7585,  -3.5002,
+ 2026-Sep-07 21:00:00, , , 204.384382776, -14.740582843,  204.740413155, -14.876355809,   277.997118701,     -21.812071874,   -4.695,  1.482,   34.09519,  33.22272,   0.728210619006, -0.0221155,  0.50231838445996,-12.6735260,   43.2451,/T,  108.5520,  108.5478, 262.4480,  -6.1956,
+ 2026-Sep-21 21:00:00, ,m, 211.339221724, -19.175832475,  211.705823417, -19.303484385,   281.654738708,     -28.977139787,   -4.801,  1.431,   23.12356,  41.37114,   0.727672304676, -0.1093777,  0.40338225718293,-11.1959524,   37.6753,/T,  122.5201,  122.5156, 277.5936,  -9.8573,
+ 2026-Oct-05 21:00:00, , , 213.057423880, -21.177566233,  213.428335445, -21.302785679,   292.027624313,     -36.484908891,   -4.680,  1.202,   10.71434,  51.74883,   0.726485340658, -0.1805452,  0.32248817285285, -8.0763732,   26.7019,/T,  141.7916,  141.7867, 290.1916, -16.5445,
+ 2026-Oct-19 21:00:00, ,m, 208.156216327, -19.172258356,  208.520153024, -19.303494903,   313.590716649,     -42.558749805,   -4.215, -0.210,    1.40137,  60.29320,   0.724825109437, -0.2249291,  0.27678717969911, -2.4926900,    9.8477,/T,  166.4068,  166.4029, 300.5449, -46.3730,
+ 2026-Nov-02 21:00:00, , , 201.502124997, -13.780403970,  201.856011506, -13.918729274,   341.368217743,     -42.874781309,   -4.302,  0.664,    3.57426,  58.76334,   0.722939103258, -0.2356479,  0.28399311698351,  4.3496802,   15.6996,/L,  158.1992,  158.2045, 125.0736, -16.4684,
+ 2026-Nov-16 21:00:00, , , 200.568321046,  -9.761996221,  200.919100956,  -9.901645448,     0.999941539,     -39.988243096,   -4.836,  1.304,   15.12694,  49.04948,   0.721110820322, -0.2107693,  0.34023569735282,  9.1555198,   31.5069,/L,  134.2188,  134.2237, 135.5228,  -1.9371,
+ 2026-Nov-30 21:00:00, , , 206.104449160,  -9.267410063,  206.458096732,  -9.402067037,    11.509152136,     -39.037615660,   -4.873,  1.436,   27.66202,  39.20617,   0.719618313969, -0.1535869,  0.42565711311939, 11.6145927,   40.7540,/L,  116.5316,  116.5360, 149.2620,   2.1640,
+ 2026-Dec-14 21:00:00, , , 215.950324246, -11.314463473,  216.311714847, -11.436531044,    16.852288441,     -40.572069730,   -4.752,  1.455,   38.25551,  31.79989,   0.718691934703, -0.0725270,  0.52479371753073, 12.6704063,   45.2073,/L,  103.5810,  103.5851, 165.4911,   3.9262,
+ 2026-Dec-28 21:00:00, , , 228.512198637, -14.517685103,  228.885916311, -14.618261376,    19.120414887,     -43.523855067,   -4.599,  1.435,   46.98530,  26.50367,   0.718476348545,  0.0199080,  0.62966311510410, 13.0780999,   46.8225,/L,   93.4527,   93.4567, 183.1965,   4.5878,
+ 2027-Jan-11 21:00:00, , , 243.034806207, -17.781975912,  243.423054656, -17.851549667,    18.910603313,     -46.830531457,   -4.451,  1.401,   54.30844,  22.67522,   0.719005288039,  0.1091807,  0.73597455550873, 13.0701920,   46.7446,/L,   85.0528,   85.0568, 201.7585,   4.5183,
+ 2027-Jan-25 21:00:00, ,m, 259.045569843, -20.244693848,  259.446010072, -20.274890451,    16.382751896,     -49.560467396,   -4.320,  1.361,   60.61224,  19.83406,   0.720195327243,  0.1812858,  0.84140020937888, 12.8872820,   45.6283,/L,   77.7420,   77.7461, 220.7900,   3.9058,
+$$EOE
+*****************************************************************************************************************************************************************************************************************************************************************************************
+Column meaning:
+ 
+TIME
+
+  Times PRIOR to 1962 are UT1, a mean-solar time closely related to the
+prior but now-deprecated GMT. Times AFTER 1962 are in UTC, the current
+civil or "wall-clock" time-scale. UTC is kept within 0.9 seconds of UT1
+using integer leap-seconds for 1972 and later years.
+
+  Conversion from the internal Barycentric Dynamical Time (TDB) of solar
+system dynamics to the non-uniform civil UT time-scale requested for output
+has not been determined for UTC times after the next July or January 1st.
+Therefore, the last known leap-second is used as a constant over future
+intervals.
+
+  Time tags refer to the UT time-scale conversion from TDB on Earth
+regardless of observer location within the solar system, although clock
+rates may differ due to the local gravity field and no analog to "UT"
+may be defined for that location.
+
+  Any 'b' symbol in the 1st-column denotes a B.C. date. First-column blank
+(" ") denotes an A.D. date.
+ 
+CALENDAR SYSTEM
+
+  Mixed calendar mode was active such that calendar dates after AD 1582-Oct-15
+(if any) are in the modern Gregorian system. Dates prior to 1582-Oct-5 (if any)
+are in the Julian calendar system, which is automatically extended for dates
+prior to its adoption on 45-Jan-1 BC.  The Julian calendar is useful for
+matching historical dates. The Gregorian calendar more accurately corresponds
+to the Earth's orbital motion and seasons. A "Gregorian-only" calendar mode is
+available if such physical events are the primary interest.
+
+  NOTE: "n.a." in output means quantity "not available" at the print-time.
+ 
+SOLAR PRESENCE (OBSERVING SITE)
+  Time tag is followed by a blank, then a solar-presence symbol:
+
+       '*'  Daylight (refracted solar upper-limb on or above apparent horizon)
+       'C'  Civil twilight/dawn
+       'N'  Nautical twilight/dawn
+       'A'  Astronomical twilight/dawn
+       ' '  Night OR geocentric ephemeris
+
+LUNAR PRESENCE (OBSERVING SITE)
+  The solar-presence symbol is immediately followed by a lunar-presence symbol:
+
+       'm'  Refracted upper-limb of Moon on or above apparent horizon
+       ' '  Refracted upper-limb of Moon below apparent horizon OR geocentric
+            ephemeris
+ 
+ 'R.A.___(ICRF), DEC____(ICRF),' =
+  Astrometric right ascension and declination of the target center with
+respect to the observing site (coordinate origin) in the reference frame of
+the planetary ephemeris (ICRF). Compensated for down-leg light-time delay
+aberration.
+
+  Units: RA  in decimal degrees,  ddd.fffff{ffff}
+         DEC in decimal degrees,  sdd.fffff{ffff}
+ 
+ 'R.A.__(a-app), DEC___(a-app),' =
+  Airless apparent right ascension and declination of the target center
+with respect to an instantaneous reference frame defined by the Earth equator
+of-date (z-axis) and meridian containing the Earth equinox of-date (x-axis,
+EOP-corrected IAU76/80). Compensated for down-leg light-time delay,
+gravitational deflection of light, stellar aberration, precession & nutation.
+Note: equinox (RA origin) is offset -53 mas from the of-date frame defined by
+the IAU06/00a P & N system.
+
+  Units: RA  in decimal degrees, ddd.fffff{ffff}
+         DEC in decimal degrees  sdd.fffff{ffff}
+
+ 
+ 'Azimuth_(a-app), Elevation_(a-app),' =
+  Airless apparent azimuth and elevation of target center. Compensated
+for light-time, the gravitational deflection of light, stellar aberration,
+precession and nutation. Azimuth is measured clockwise from north:
+
+  North(0) -> East(90) -> South(180) -> West(270) -> North (360)
+
+Elevation angle is with respect to a plane perpendicular to the reference
+surface local zenith direction. TOPOCENTRIC ONLY.  Units: DEGREES
+ 
+ 'APmag,  S-brt,' =
+  The targets' approximate apparent visual magnitude and surface brightness.
+For planets and natural satellites, output is restricted to solar phase angles
+covered by observational data. Outside the observed phase angle range, "n.a."
+may be output to avoid extrapolation beyond the limit of model validity.
+
+   For Earth-based observers, the estimated dimming due to atmospheric
+absorption (extinction) is available as a separate, requestable quantity.
+
+   Surface brightness is the average airless visual magnitude of a
+square-arcsecond of the illuminated portion of the apparent disk. It is
+computed only if the target radius is known.
+
+   Units: MAGNITUDES & MAGNITUDES PER SQUARE ARCSECOND
+ 
+ 'Illu%,' =
+   Fraction of the target objects' assumed circular disk illuminated by Sun
+(phase), as seen by the observer.  Units: PERCENT
+ 
+ 'Ang-diam,' =
+   The equatorial angular width of the target body full disk, if it were fully
+illuminated and visible to the observer. If the target body diameter is unknown
+"n.a." is output.
+
+   Units: ARCSECONDS
+ 
+ 'r,       rdot,' =
+   The Sun's apparent range ("r", light-time aberrated) and range-rate ("rdot")
+relative to the target center, as seen by the observer. A positive "rdot" means
+the target center was moving away from the Sun, negative means moving toward
+the Sun.  Units: AU and KM/S
+ 
+ 'delta,     deldot,' =
+   Apparent range ("delta", light-time aberrated) and range-rate ("delta-dot")
+of the target center relative to the observer. A positive "deldot" means the
+target center is moving away from the observer, negative indicates movement
+toward the observer.  Units: AU and KM/S
+ 
+ 'S-O-T,/r,' =
+   Sun-Observer-Target apparent SOLAR ELONGATION ANGLE seen from the observers'
+location at print-time.
+
+   The '/r' column provides a code indicating the targets' apparent position
+relative to the Sun in the observers' sky, as described below:
+
+   Case A: For an observing location on the surface of a rotating body, that
+body rotational sense is considered:
+
+    /T indicates target TRAILS Sun   (evening sky: rises and sets AFTER Sun)
+    /L indicates target LEADS Sun    (morning sky: rises and sets BEFORE Sun)
+
+   Case B: For an observing point that does not have a rotational model (such
+as a spacecraft), the "leading" and "trailing" condition is defined by the
+observers' heliocentric ORBITAL motion:
+
+    * If continuing in the observers' current direction of heliocentric
+       motion would encounter the targets' apparent longitude first, followed
+       by the Sun's, the target LEADS the Sun as seen by the observer.
+
+    * If the Sun's apparent longitude would be encountered first, followed
+       by the targets', the target TRAILS the Sun.
+
+   Two other codes can be output:
+    /* indicates observer is Sun-centered    (undefined)
+    /? Target is aligned with Sun center     (no lead or trail)
+
+   The S-O-T solar elongation angle is numerically the minimum separation
+angle of the Sun and target in the sky in any direction. It does NOT indicate
+the amount of separation in the leading or trailing directions, which would
+be defined along the equator of a spherical coordinate system.
+
+   Units: DEGREES
+ 
+ 'S-T-O,' =
+   The Sun-Target-Observer angle; the interior vertex angle at target center
+formed by a vector from the target to the apparent center of the Sun (at
+reflection time on the target) and the apparent vector from target to the
+observer at print-time. Slightly different from true PHASE ANGLE (requestable
+separately) at the few arcsecond level in that it includes stellar aberration
+on the down-leg from target to observer.  Units: DEGREES
+ 
+ 'phi,  PAB-LON,  PAB-LAT,' =
+   "phi" is the true PHASE ANGLE at the observers' location at print time.
+"PAB-LON" and "PAB-LAT" are the J2000 ecliptic longitude and latitude of the
+phase angle bisector direction; the outward directed angle bisecting the arc
+created by the apparent vector from Sun to target center and the astrometric
+vector from observer to target center. For an otherwise uniform ellipsoid, the
+time when its long-axis is perpendicular to the PAB direction approximately
+corresponds to lightcurve maximum (or maximum brightness) of the body. PAB is
+discussed in Harris et al., Icarus 57, 251-258 (1984).
+
+   Units: DEGREES, DEGREES, DEGREES
+
+Computations by ...
+
+    Solar System Dynamics Group, Horizons On-Line Ephemeris System
+    4800 Oak Grove Drive, Jet Propulsion Laboratory
+    Pasadena, CA  91109   USA
+
+    General site: https://ssd.jpl.nasa.gov/
+    Mailing list: https://ssd.jpl.nasa.gov/email_list.html
+    System news : https://ssd.jpl.nasa.gov/horizons/news.html
+    User Guide  : https://ssd.jpl.nasa.gov/horizons/manual.html
+    Connect     : browser        https://ssd.jpl.nasa.gov/horizons/app.html#/x
+                  API            https://ssd-api.jpl.nasa.gov/doc/horizons.html
+                  command-line   telnet ssd.jpl.nasa.gov 6775
+                  e-mail/batch   https://ssd.jpl.nasa.gov/ftp/ssd/horizons_batch.txt
+                  scripts        https://ssd.jpl.nasa.gov/ftp/ssd/SCRIPTS
+    Inquiries   : Jon.D.Giorgini@jpl.nasa.gov
+
+*****************************************************************************************************************************************************************************************************************************************************************************************

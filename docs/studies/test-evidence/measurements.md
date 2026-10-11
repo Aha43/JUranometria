@@ -118,10 +118,11 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | src/juranometria/tool/SwingChromeSheetMain.java | look-and-feel | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/ToggleShortcutStudyMain.java | look-and-feel | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/ToolbarSheetMain.java | look-and-feel, preferences | UNPROTECTED: look-and-feel |
+| src/juranometria/tool/VenusContractStudyMain.java | look-and-feel, default-font | protected-locally |
 | src/juranometria/tool/WorkingSelectionMockupMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/app/PackagedAcceptanceMain.java | look-and-feel, locale, preferences | protected-locally |
 
-**29 evidence executables** touch process-wide state; 22 carry an unpaired touch.
+**30 evidence executables** touch process-wide state; 22 carry an unpaired touch.
 
 ## Display-dependent tests, their premises and their routes
 
@@ -219,11 +220,11 @@ Whether a particular read happens on the event thread is control flow, which tex
 
 | class | the contract | files |
 |---|---|---|
-| deterministic-report | regenerates byte-for-byte on the same tree | 103 |
-| byte-exact-fixture | committed data with provenance; never regenerated casually | 101 |
+| deterministic-report | regenerates byte-for-byte on the same tree | 110 |
+| byte-exact-fixture | committed data with provenance; never regenerated casually | 111 |
 | captured-evidence | an operating-system screenshot, digest-pinned; a re-capture is a provenance event | 13 |
 | renderer-drawn | byte-reproducible per machine; production ink, no widgets | 515 |
-| widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 150 |
+| widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 163 |
 | session-photograph | a packed window on a display; drifts between desktop sessions | 3 |
 
 The byte-exact fixtures:
@@ -324,6 +325,16 @@ The byte-exact fixtures:
 - docs/studies/solar-system/seasons-2026.txt
 - docs/studies/solar-system/spk-reference.txt
 - docs/studies/solar-system/sun-invariance.txt
+- docs/studies/venus/horizons/apparition-2026-oslo-10.txt
+- docs/studies/venus/horizons/apparition-2026-oslo-299.txt
+- docs/studies/venus/horizons/appearances-oslo-10.txt
+- docs/studies/venus/horizons/appearances-oslo-299.txt
+- docs/studies/venus/horizons/dense-2026-inferior-conjunction-oslo-10.txt
+- docs/studies/venus/horizons/dense-2026-inferior-conjunction-oslo-299.txt
+- docs/studies/venus/horizons/matrix-7d-oslo.txt
+- docs/studies/venus/horizons/named-oslo-10.txt
+- docs/studies/venus/horizons/named-oslo-299.txt
+- docs/studies/venus/venus-events.txt
 - docs/studies/wider-field/released-pages.txt
 - docs/studies/wider-field/released-text.txt
 - scripts/ecliptic-vectors.c
@@ -490,6 +501,19 @@ The widget-rendered artifacts (a new one arrives by a reviewed addition to the s
 - docs/studies/solar-system-controls/controls-solar-nb-NO-7-sun-open-moon-closed.png
 - docs/studies/solar-system-controls/controls-solar-nb-NO-8-sun-closed-moon-open.png
 - docs/studies/solar-system-controls/controls-solar-nb-NO-9-controller-collapsed-900.png
+- docs/studies/venus/controls-venus-5-phase-geometry.png
+- docs/studies/venus/controls-venus-6-appearances.png
+- docs/studies/venus/controls-venus-7-apparition.png
+- docs/studies/venus/controls-venus-en-1-venus-card.png
+- docs/studies/venus/controls-venus-en-2-range-dark.png
+- docs/studies/venus/controls-venus-en-2-range.png
+- docs/studies/venus/controls-venus-en-3-refused.png
+- docs/studies/venus/controls-venus-en-4-controller-group.png
+- docs/studies/venus/controls-venus-nb-NO-1-venus-card.png
+- docs/studies/venus/controls-venus-nb-NO-2-range-dark.png
+- docs/studies/venus/controls-venus-nb-NO-2-range.png
+- docs/studies/venus/controls-venus-nb-NO-3-refused.png
+- docs/studies/venus/controls-venus-nb-NO-4-controller-group.png
 - docs/studies/working-selection/selection-accumulate.png
 - docs/studies/working-selection/selection-set-dark.png
 - docs/studies/working-selection/selection-set-enlarged.png

@@ -139,6 +139,12 @@ public final class EvidenceContractMain {
         // deterministic; its mockups are held through IMAGE_MAINS.
         REPORT_MAINS.put("juranometria.tool.JovianCartographyStudyMain",
                 "docs/studies/jovian-cartography/measurements.md");
+        // The Venus table and cartography handoff, proposed (#500):
+        // deterministic over the committed Horizons fixtures and the
+        // production projection; its mock-ups are held through
+        // IMAGE_MAINS, their sizes in the platform record below.
+        REPORT_MAINS.put("juranometria.tool.VenusContractStudyMain",
+                "docs/studies/venus/measurements.md");
         // The Sun on production pages (#415): the report is
         // deterministic; its pages are held through IMAGE_MAINS.
         REPORT_MAINS.put("juranometria.tool.SunOnTheChartStudyMain",
@@ -332,6 +338,8 @@ public final class EvidenceContractMain {
                 "docs/studies/jupiter-on-the-chart/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.JovianCartographyStudyMain",
                 "docs/studies/jovian-cartography/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.VenusContractStudyMain",
+                "docs/studies/venus/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.ToggleShortcutStudyMain",
                 "docs/studies/toggle-shortcuts/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.ControlExplanationStudyMain",
@@ -479,6 +487,10 @@ public final class EvidenceContractMain {
             // production pages composed by the component with the Jovian
             // module attached.
             "juranometria.tool.JupiterOnTheChartStudyMain",
+            // The Venus table mock-ups and diagrams (issue #500): the
+            // proposed table in study-only arrangements; widget-rendered
+            // inspection, the controls- prefix.
+            "juranometria.tool.VenusContractStudyMain",
             // The working-selection surface mock-ups (issue #258):
             // widget-rendered inspection, the selection- prefix.
             "juranometria.tool.WorkingSelectionMockupMain",
