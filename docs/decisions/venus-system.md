@@ -644,3 +644,10 @@ one refuses Venus alone.
   languages (`venustable-*`, a registered photographer), and the menu
   and Controller sheets retaken with Venus in them.
 
+
+## Handed over (#503)
+
+Part I of the road to 5.2.0 closed on 2026-10-11 at main `838edb27`.
+The handover to cartography - what is settled, what was measured and
+why, every stopped or incomplete run, what moved, and what Part II
+must decide - is `venus-handover.md`. This record stays the contract.
