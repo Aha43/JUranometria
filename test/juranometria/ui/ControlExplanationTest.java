@@ -171,8 +171,19 @@ class ControlExplanationTest {
             for (Control control
                     : ControlExplanationStudyMain.audit().controls()) {
                 String hovered = control.hovered();
-                if (hovered == null
-                        || hovered.length() <= Explain.WRAP_OVER) {
+                if (hovered == null) {
+                    continue;
+                }
+                // A menu item's tooltip is drawn by the platform, which
+                // wraps it and shows markup as source (#508): there the
+                // rule is the opposite - the words alone.
+                if (control.kind().contains("Menu")) {
+                    assertTrue(!hovered.contains("<") && !hovered.contains("&lt;"),
+                            control.surface() + " " + control.seen()
+                                    + ": a menu item's tooltip is plain text: " + hovered);
+                    continue;
+                }
+                if (hovered.length() <= Explain.WRAP_OVER) {
                     continue;
                 }
                 assertTrue(hovered.startsWith("<html>")
