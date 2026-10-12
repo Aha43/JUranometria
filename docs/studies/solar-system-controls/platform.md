@@ -26,8 +26,8 @@ System as stated, and whether that fits a 900 px companion.
 
 | language | Sun dialog | Moon dialog | Sun group, card | Sun group, table | Moon group, card | Moon group, table | both, card | Controller, Solar System collapsed | Controller, Sun open | Controller, both open |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| `en` | 425 | 425 | 409 | 318 | 460 | 318 | 899 | 959 | 1398 | 1828 |
-| `nb-NO` | 425 | 425 | 409 | 318 | 460 | 318 | 899 | 959 | 1398 | 1828 |
+| `en` | 425 | 425 | 409 | 318 | 460 | 318 | 899 | 980 | 1419 | 1849 |
+| `nb-NO` | 425 | 425 | 409 | 318 | 460 | 318 | 899 | 980 | 1419 | 1849 |
 
 ## A table's height by its rows
 

@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**570 promoted artifacts.**
+**568 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -382,8 +382,6 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/label-placement/sagittarius-120-candidate.png` | `cb4d9661a353dcc4d277925840456d7209686ea592ba1d70713bed00b588db80` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/label-placement/sagittarius-120-today.png` | `63590ac511146e5223de2c853315c8e96ab1216fd9cbc99c40d27cf6ec440fe5` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/meridian-ticks/bodies-moon-120.png` | `09833652d42d9c72850b449acf6dca57ac7c4b398b0785c5060587dd84f82b53` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/meridian-ticks/bodies-north-120.png` | `bbf096c2d69446f9c75d94c18b7a72098bf2eb57ac7e32d53edc876d7f5af8d7` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/meridian-ticks/bodies-south-120.png` | `4d857ec285f0acbecaa5378f5ae16860de2792e329307493c47eb9c0c479fb3c` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/meridian-ticks/bodies-sun-120.png` | `ff63340b106b683e8843426b2a0d6338d10284e1eb0f6dee0ed7e6944a791896` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/meridian-ticks/bodies-venus-120.png` | `8b2bc96cc6bb40abc4f36b1b6e252b0a2ac57240dd84ace5c0c365d5c72d1a40` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/meridian-ticks/density-10-10.png` | `099145083ed18fad8bb73bad779491323e3df19942a239ca41989bb234deba44` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |

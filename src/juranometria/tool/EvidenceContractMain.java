@@ -355,6 +355,11 @@ public final class EvidenceContractMain {
         // loses every moon label is held on each platform by the
         // study itself and by JovianLabelInvariantTest.
         // #486: the production pages' name placements, the same reason.
+        // Sprint 48 (#515). The graduation's strokes and figures: whether a
+        // stroke shows through the page's own text and where a figure found
+        // room depend on this desktop's fonts; which ticks lie on a page does not.
+        PLATFORM_REPORTS.put("juranometria.tool.MeridianTicksStudyMain",
+                "docs/studies/meridian-ticks/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.JupiterOnTheChartStudyMain",
                 "docs/studies/jupiter-on-the-chart/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.JovianCartographyStudyMain",

@@ -73,13 +73,19 @@ the module attached through the host — for the stated observer (Oslo,
 densities side by side on the 60° south page; and the Sun, the Moon and
 Venus on pages centred on each of them with the ticks on and off.
 
-Read from the pixels: every tick on a page is a stroke inked where the
-sky puts it, perpendicular to the line to within the pixel; every figure
-of the proposal finds a clean box on these pages but one — the Norwegian
-60° page letters four of five, the fifth's stroke lying under the page's
-own text, which is the layering ruled for reference ink; the bodies'
-placements and every pixel inside their discs are identical with the
-ticks on and off.
+Read from the pixels. The portable report states what is the same on
+every machine: which ticks lie on each page (the sky's and the
+projection's), and that the bodies' placements and every pixel inside
+their discs are identical with the ticks on and off. This machine's
+record beside it (`platform.md`, held to reproducing here as Jupiter's
+is) states what depends on the fonts in front of the rasteriser: every
+tick on a page is a stroke inked where the sky puts it, perpendicular to
+the line to within the pixel, and every figure of the proposal finds a
+clean box on these pages but one — the Norwegian 60° page letters four
+of five, the fifth's stroke lying under the page's own text, which is
+the layering ruled for reference ink. (CI's Linux desktop, with wider
+fonts, put the 60° north page's 20° tick under the title block; the ink
+test skips a tick the page's own reserved ink covers, for that reason.)
 
 ## For the ruling
 

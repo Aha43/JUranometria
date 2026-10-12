@@ -23,10 +23,10 @@ checkbox, label, button or field is drawn narrower than it asks.
 
 | language | appearance | Deep sky | Stars | Constellations | Chart | groups, all open | tabs | Place and Time | both, groups open | narrowest, groups | narrowest, tabs |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| `en` | light | 423 | 91 | 91 | 112 | 912 | 569 | 293 | 1205 | 338 | 338 |
-| `en` | dark | 423 | 91 | 91 | 112 | 912 | 569 | 293 | 1205 | 338 | 338 |
-| `nb-NO` | light | 437 | 91 | 91 | 112 | 926 | 583 | 293 | 1219 | 336 | 336 |
-| `nb-NO` | dark | 437 | 91 | 91 | 112 | 926 | 583 | 293 | 1219 | 336 | 336 |
+| `en` | light | 423 | 91 | 91 | 112 | 912 | 569 | 314 | 1226 | 338 | 338 |
+| `en` | dark | 423 | 91 | 91 | 112 | 912 | 569 | 314 | 1226 | 338 | 338 |
+| `nb-NO` | light | 437 | 91 | 91 | 112 | 926 | 583 | 314 | 1240 | 336 | 336 |
+| `nb-NO` | dark | 437 | 91 | 91 | 112 | 926 | 583 | 314 | 1240 | 336 | 336 |
 
 ## Both sections, open, on four screens
 
@@ -34,5 +34,5 @@ Usable height is the screen less a menu bar and a title bar (53 px).
 
 | language | both open | 800 | 900 | 1080 | 1440 |
 |---|---:|---|---|---|---|
-| `en` | 1205 px | scrolls | scrolls | scrolls | fits |
-| `nb-NO` | 1219 px | scrolls | scrolls | scrolls | fits |
+| `en` | 1226 px | scrolls | scrolls | scrolls | fits |
+| `nb-NO` | 1240 px | scrolls | scrolls | scrolls | fits |
