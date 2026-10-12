@@ -7,6 +7,13 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**A selected Solar System body is an occurrence (#513).** The chart's
+selection can now name a drawn body together with the instant and the
+observer it was computed for, and the Inspector says so in both
+languages; the page's inventory lists the bodies it drew. No released
+body is selectable yet - the Sun, the Moon and Jupiter keep their ruled
+behaviour - this is the seam Venus selects through.
+
 **The Controller has two tabs (#507).** JUranometria Controller now
 opens on a Chart tab holding Chart controls, Place and Time and Chart
 Options as before, and a Solar System tab holding the Sun, Venus, Moon

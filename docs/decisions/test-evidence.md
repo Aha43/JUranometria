@@ -377,8 +377,8 @@ aborts — a run count, not a claim of eliminated intermittence.
 Text cannot decide whether a read runs on the event thread — that
 is control flow, and #220 proved the cost of guessing, three times
 (the journey's mark derivation, its page offset, and finally its
-own premise capture). The measurements count the traffic: **457
-reads of live chart state** against **975 explicit hand-offs**
+own premise capture). The measurements count the traffic: **458
+reads of live chart state** against **986 explicit hand-offs**
 suite-wide (requoted for the #261 reader-surface tests, which read
 scenes and marks under the same one-hand-off discipline; for #275's
 closing journey, which reads the page's own objects and takes its
@@ -450,7 +450,10 @@ draft on the event thread; and for #508's menu help test, which builds the
 bar and its later items on the event thread; and for #507's Controller tab
 tests, which build the strip's second tab, choose a tab and dispose the
 window on the event thread, because a tab chosen and a window let go are
-what a reader does there). The discipline
+what a reader does there; and for #513's occurrence journey, which builds
+the chart and its module host, paints, clicks and reads the Inspector on
+the event thread, and reads the current scene once per page to place
+its click). The discipline
 that closed #220 — derive, read and act
 in **one** `invokeAndWait`, with the deterministic queued-change
 race tests holding it — is the named pattern; its mutations already

@@ -157,6 +157,16 @@ public final class SelectInteraction extends MouseAdapter {
         // chrome, and the hit test is defined on the paper.
         double x = point.x;
         double y = point.y - chart.pageOffsetY();
+        // A selectable body (#513) is what a reader pointing at it
+        // means: its occurrence - the body at the instant and place it
+        // was drawn for - replaces or toggles the working selection by
+        // its identity, as an object does.
+        java.util.Optional<ReferenceInk.BodyPlacement> pointed =
+                chart.selectableBodyAt(x, y);
+        if (pointed.isPresent()) {
+            occurrence(pointed.get(), scene, x, y, additive);
+            return;
+        }
         // A Solar System body's opaque disc hides what it covers, for
         // the pointer as for the eye (#414 ruling C4, C6): a click on
         // it is the empty sky at that place, and no catalogue object
@@ -200,6 +210,40 @@ public final class SelectInteraction extends MouseAdapter {
                 working.clear();
             }
             selection.selectEmptySky(hit.selection().position());
+        } finally {
+            writing = false;
+        }
+    }
+
+    /**
+     * A selectable body pointed at: the working selection replaces or
+     * toggles its identity, and the answering model is given the
+     * occurrence - the body's identity with the moment and the J2000
+     * place the page drew it for.
+     */
+    private void occurrence(ReferenceInk.BodyPlacement body, ChartScene scene,
+                            double x, double y, boolean additive) {
+        endTransaction();
+        String identity = body.identity();
+        juranometria.chart.SkyPosition at = ChartHitTest.skyAt(scene,
+                body.centre().x(), body.centre().y());
+        if (at == null) {
+            return;
+        }
+        Selection.Occurrence occurrence = new Selection.Occurrence(identity,
+                body.moment().instant(), body.moment().latitudeDegrees(),
+                body.moment().eastLongitudeDegrees(), at);
+        writing = true;
+        try {
+            boolean removed = additive && working.isMember(identity);
+            if (additive) {
+                working.toggle(identity);
+            } else {
+                working.replaceWith(List.of(identity), identity);
+            }
+            if (!removed) {
+                selection.selectOccurrence(occurrence);
+            }
         } finally {
             writing = false;
         }

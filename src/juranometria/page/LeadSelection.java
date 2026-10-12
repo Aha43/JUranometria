@@ -63,18 +63,21 @@ public final class LeadSelection {
         // answered, which is how a star the catalogue does not name
         // is remembered, since no inventory lists it. Derived
         // presentation data, never membership.
-        java.util.Map<String, Selection.Object> known =
-                new java.util.HashMap<>();
+        java.util.Map<String, Selection> known = new java.util.HashMap<>();
         Runnable releaseAnswers = selection.onChange(change -> {
             if (change.selection() instanceof Selection.Object object) {
                 known.put(object.catalogueId(), object);
+            } else if (change.selection() instanceof Selection.Occurrence body) {
+                // A body's occurrence (#513), remembered the same way:
+                // the instant it was selected for stays with it.
+                known.put(body.identity(), body);
             }
         });
         Runnable releaseLeads = working.onChange(change -> {
             PageContents contents = page.get();
             for (String member : change.members()) {
-                selectable(contents, member)
-                        .ifPresent(object -> known.put(member, object));
+                resolve(contents, member)
+                        .ifPresent(answer -> known.put(member, answer));
             }
             String lead = change.lead();
             if (lead == null) {
@@ -89,10 +92,16 @@ public final class LeadSelection {
                 // with the click's candidates still offered.
                 return;
             }
-            Selection.Object object = selectable(contents, lead)
+            if (selection.selection() instanceof Selection.Occurrence current
+                    && current.identity().equals(lead)) {
+                return;
+            }
+            Selection answer = resolve(contents, lead)
                     .orElseGet(() -> known.get(lead));
-            if (object != null) {
+            if (answer instanceof Selection.Object object) {
                 selection.select(object);
+            } else if (answer instanceof Selection.Occurrence body) {
+                selection.selectOccurrence(body);
             } else {
                 selection.clear();
             }
@@ -103,16 +112,37 @@ public final class LeadSelection {
         };
     }
 
-    /** The lead, as the chart's own idea of a selected object. */
+    /** The lead, as the chart's own idea of a selected object; empty for a body. */
     public static Optional<Selection.Object> selectable(PageContents page,
                                                         String identity) {
+        return resolve(page, identity)
+                .filter(answer -> answer instanceof Selection.Object)
+                .map(answer -> (Selection.Object) answer);
+    }
+
+    /**
+     * The lead, as the answering model's idea of it: an object for a
+     * catalogue entry, an occurrence for a drawn body that may be
+     * selected (#513), nothing for a body that may not.
+     */
+    public static Optional<Selection> resolve(PageContents page, String identity) {
         if (page == null || identity == null) {
             return Optional.empty();
         }
-        return page.find(identity).map(entry -> new Selection.Object(
-                entry instanceof PageEntry.DeepSky
-                        ? Selection.Object.Kind.DEEP_SKY
-                        : Selection.Object.Kind.STAR,
-                entry.identity(), entry.position()));
+        return page.find(identity).flatMap(entry -> {
+            if (entry instanceof PageEntry.Body body) {
+                if (!body.selectable()) {
+                    return Optional.empty();
+                }
+                return Optional.of(new Selection.Occurrence(body.identity(),
+                        body.moment().instant(), body.moment().latitudeDegrees(),
+                        body.moment().eastLongitudeDegrees(), body.position()));
+            }
+            return Optional.of(new Selection.Object(
+                    entry instanceof PageEntry.DeepSky
+                            ? Selection.Object.Kind.DEEP_SKY
+                            : Selection.Object.Kind.STAR,
+                    entry.identity(), entry.position()));
+        });
     }
 }

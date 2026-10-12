@@ -36,6 +36,31 @@ class SelectionModelTest {
                 ((Selection.Object) seen.get(0).selection()).catalogueId());
     }
 
+    /** A drawn body's occurrence (#513): one whole answer, no candidates. */
+    @Test
+    void anOccurrenceIsOneAnswerWithNoCandidates() {
+        SelectionModel model = new SelectionModel();
+        model.select(star("TYC 1-2-3", 10.0, 20.0));
+        Selection.Occurrence moon = new Selection.Occurrence("moon",
+                java.time.Instant.parse("2026-03-20T21:33:00Z"), 59.913, 10.752,
+                new SkyPosition(40.0, 15.0));
+        List<SelectionModel.Change> seen = new ArrayList<>();
+        model.onChange(seen::add);
+        model.selectOccurrence(moon);
+        SelectionModel.Change change = seen.get(seen.size() - 1);
+        assertEquals(moon, change.selection());
+        assertEquals(List.of(), change.candidates(), "a body is never one of several");
+        assertEquals(-1, change.currentIndex());
+        assertEquals(moon, model.selection());
+        assertTrue(moon.sameAs(new Selection.Occurrence("moon", moon.instant(), 59.913,
+                10.752, new SkyPosition(41.0, 15.0))), "the same body, instant and place");
+        assertTrue(!moon.sameAs(new Selection.Occurrence("moon",
+                moon.instant().plusSeconds(1), 59.913, 10.752, moon.position())),
+                "another instant is another occurrence");
+        model.clear();
+        assertEquals(Selection.NOTHING, model.selection());
+    }
+
     @Test
     void twoIndependentObserversSeeTheSameTransition() {
         // The seam the sprint's journey depends on, and the whole of

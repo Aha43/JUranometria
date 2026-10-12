@@ -553,6 +553,11 @@ said.say("inspector.tab.page.explain"));
         clearSelection.addActionListener(event -> working.clear());
         this.unsubscribeWorking =
                 working.onChange(change -> rebuildWorkingSet());
+        // A selection answered before the page was wired is described
+        // against the page now: an occurrence's heading is the page's
+        // name for the body (#513).
+        show(new SelectionModel.Change(selection.selection(),
+                selection.candidates(), selection.currentIndex()));
     }
 
     /**
@@ -880,6 +885,8 @@ said.say("inspector.tab.page.explain"));
             fact(FRAME);
             fact("");
             fact(said.say("inspector.emptysky.fact"), true);
+        } else if (current instanceof Selection.Occurrence body) {
+            describeOccurrence(body);
         } else {
             Selection.Object object = (Selection.Object) current;
             if (change.isAmbiguous()) {
@@ -903,6 +910,40 @@ said.say("inspector.tab.page.explain"));
         revalidate();
         repaint();
     }
+
+    /**
+     * A drawn body at the moment it was drawn for (#513): its name as
+     * the page says it, the instant and the observer it was computed
+     * for, its J2000 place - and, when the page no longer draws it,
+     * that the facts are for the instant stated. Its numbers are the
+     * table's, not repeated here.
+     */
+    private void describeOccurrence(Selection.Occurrence body) {
+        juranometria.page.PageContents page = pageContents == null ? null
+                : pageContents.get();
+        java.util.Optional<juranometria.page.PageEntry.Body> drawn = page == null
+                ? java.util.Optional.empty()
+                : page.bodies().stream()
+                        .filter(entry -> entry.identity().equals(body.identity()))
+                        .findFirst();
+        setSelectedHeading(drawn.map(juranometria.page.PageEntry.Body::name)
+                .orElse(body.identity()));
+        fact(said.say("inspector.occurrence.instant", OCCURRENCE_INSTANT.format(
+                body.instant().atOffset(java.time.ZoneOffset.UTC))));
+        fact(said.say("inspector.occurrence.observer",
+                String.format(Locale.ROOT, "%.3f", body.latitudeDegrees()),
+                String.format(Locale.ROOT, "%.3f", body.eastLongitudeDegrees())));
+        fact(coordinates(body.position()));
+        fact(FRAME);
+        if (page != null && drawn.isEmpty()) {
+            fact("");
+            fact(said.say("inspector.occurrence.absent"), true);
+        }
+    }
+
+    /** The instant an occurrence is for, to the second, as Place and Time writes it. */
+    private static final java.time.format.DateTimeFormatter OCCURRENCE_INSTANT =
+            java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.ROOT);
 
     private void describeStar(Star star, SelectionModel.Change change) {
         StarIdentity identity = star.identity();

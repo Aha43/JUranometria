@@ -62,6 +62,33 @@ public record PageContents(List<PageEntry> entries) {
     }
 
     /** The entry with this identity, if it is on the page. */
+    /** The Solar System bodies the page drew (#513), in painting order. */
+    public List<PageEntry.Body> bodies() {
+        List<PageEntry.Body> found = new ArrayList<>();
+        for (PageEntry entry : entries) {
+            if (entry instanceof PageEntry.Body body) {
+                found.add(body);
+            }
+        }
+        return List.copyOf(found);
+    }
+
+    /**
+     * These contents with the drawn bodies replaced (#513): the
+     * catalogue's entries are the scene's and change with it; the
+     * bodies are the paint's and change with every moment.
+     */
+    public PageContents withBodies(List<PageEntry.Body> bodies) {
+        List<PageEntry> next = new ArrayList<>();
+        for (PageEntry entry : entries) {
+            if (!(entry instanceof PageEntry.Body)) {
+                next.add(entry);
+            }
+        }
+        next.addAll(bodies);
+        return new PageContents(next);
+    }
+
     public Optional<PageEntry> find(String identity) {
         for (PageEntry entry : entries) {
             if (entry.identity().equals(identity)) {

@@ -190,7 +190,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 
 ## Input routes across the whole suite
 
-- files dispatching real pointer events: 20
+- files dispatching real pointer events: 21
 - files dispatching real keyboard events: 2
 - files using doClick somewhere: 39
 - files using postActionEvent somewhere: 4
@@ -214,8 +214,8 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 
 Whether a particular read happens on the event thread is control flow, which text cannot decide; issue #220 proved the cost of guessing, three times. What can be counted is the traffic:
 
-- reads of live chart state (currentScene, pageOffsetY, navigation.state): **457** across the suite
-- explicit event-thread hand-offs (invokeAndWait): **975**
+- reads of live chart state (currentScene, pageOffsetY, navigation.state): **458** across the suite
+- explicit event-thread hand-offs (invokeAndWait): **986**
 
 ## Generated evidence, classified
 

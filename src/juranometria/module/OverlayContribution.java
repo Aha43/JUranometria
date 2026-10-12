@@ -266,10 +266,20 @@ public sealed interface OverlayContribution {
      */
     record Body(String identity, String accessibleName, SkyPosition at,
                 double angularDiameterArcseconds, Lit lit,
-                boolean belowHorizon, double distanceKm, InkRole role)
+                boolean belowHorizon, double distanceKm, InkRole role,
+                Moment moment, boolean selectable)
             implements OverlayContribution {
+        /** A body with no stated moment, not selectable - a study's, or the released form. */
+        public Body(String identity, String accessibleName, SkyPosition at,
+                    double angularDiameterArcseconds, Lit lit,
+                    boolean belowHorizon, double distanceKm, InkRole role) {
+            this(identity, accessibleName, at, angularDiameterArcseconds, lit,
+                    belowHorizon, distanceKm, role, null, false);
+        }
+
         public Body {
             requireIdentified(identity, accessibleName, role);
+            requireMomentIfSelectable(identity, moment, selectable);
             if (at == null) {
                 throw new IllegalArgumentException(
                         "a body is somewhere: " + identity);
@@ -319,10 +329,23 @@ public sealed interface OverlayContribution {
                       double equatorialDiameterArcseconds,
                       double polarDiameterArcseconds, double poleAngleDegrees,
                       double minimumMarkPx, boolean belowHorizon,
-                      double distanceKm, InkRole role)
+                      double distanceKm, InkRole role,
+                      Moment moment, boolean selectable)
             implements OverlayContribution {
+        /** With no stated moment, not selectable. */
+        public OblateBody(String identity, String accessibleName, SkyPosition at,
+                          double equatorialDiameterArcseconds,
+                          double polarDiameterArcseconds, double poleAngleDegrees,
+                          double minimumMarkPx, boolean belowHorizon,
+                          double distanceKm, InkRole role) {
+            this(identity, accessibleName, at, equatorialDiameterArcseconds,
+                    polarDiameterArcseconds, poleAngleDegrees, minimumMarkPx,
+                    belowHorizon, distanceKm, role, null, false);
+        }
+
         public OblateBody {
             requireIdentified(identity, accessibleName, role);
+            requireMomentIfSelectable(identity, moment, selectable);
             if (at == null) {
                 throw new IllegalArgumentException("a body is somewhere: " + identity);
             }
@@ -375,7 +398,7 @@ public sealed interface OverlayContribution {
     record Satellite(String identity, String accessibleName, SkyPosition at,
                      String primary, Relation relation, boolean shadowed,
                      int precedence, double markPx, boolean belowHorizon,
-                     InkRole role)
+                     InkRole role, Moment moment, boolean selectable)
             implements OverlayContribution {
 
         /** Where a satellite stands against its primary's disc. */
@@ -383,8 +406,18 @@ public sealed interface OverlayContribution {
             CLEAR, IN_FRONT, BEHIND
         }
 
+        /** With no stated moment, not selectable. */
+        public Satellite(String identity, String accessibleName, SkyPosition at,
+                         String primary, Relation relation, boolean shadowed,
+                         int precedence, double markPx, boolean belowHorizon,
+                         InkRole role) {
+            this(identity, accessibleName, at, primary, relation, shadowed, precedence,
+                    markPx, belowHorizon, role, null, false);
+        }
+
         public Satellite {
             requireIdentified(identity, accessibleName, role);
+            requireMomentIfSelectable(identity, moment, selectable);
             if (at == null || primary == null || relation == null) {
                 throw new IllegalArgumentException("a satellite is somewhere, of"
                         + " something, in some relation to it: " + identity);
@@ -397,6 +430,33 @@ public sealed interface OverlayContribution {
                 throw new IllegalArgumentException("a body is drawn in the body role: "
                         + identity);
             }
+        }
+    }
+
+    /**
+     * The instant and the observer's place a moving body was computed
+     * for (Sprint 48, issue #513): what a selected body is an
+     * occurrence <em>of</em>. The module that computed it states it;
+     * the chart core keeps no clock of its own. A body offered with
+     * none is drawn as before and is not selectable.
+     */
+    record Moment(java.time.Instant instant, double latitudeDegrees,
+                  double eastLongitudeDegrees) {
+        public Moment {
+            if (instant == null) {
+                throw new IllegalArgumentException("a moment is an instant");
+            }
+            if (Double.isNaN(latitudeDegrees) || latitudeDegrees < -90.0
+                    || latitudeDegrees > 90.0 || !Double.isFinite(eastLongitudeDegrees)) {
+                throw new IllegalArgumentException(
+                        "a moment's observer is a place on the Earth");
+            }
+        }
+
+        /** The moment an observer stands at. */
+        public static Moment of(juranometria.sky.Observer observer) {
+            return new Moment(observer.instant(), observer.latitudeDegrees(),
+                    observer.eastLongitudeDegrees());
         }
     }
 
@@ -452,6 +512,16 @@ public sealed interface OverlayContribution {
                         "a region is bounded by at least three"
                                 + " positions: " + identity);
             }
+        }
+    }
+
+    /** A selectable body says what it is an occurrence of. */
+    private static void requireMomentIfSelectable(String identity, Moment moment,
+                                                  boolean selectable) {
+        if (selectable && moment == null) {
+            throw new IllegalArgumentException(
+                    "a selectable body states the moment it was computed for: "
+                            + identity);
         }
     }
 

@@ -61,6 +61,42 @@ public sealed interface Selection {
         }
     }
 
+    /**
+     * A drawn Solar System body, as computed for an instant and an
+     * observer (Sprint 48, issue #513): the identity the page draws it
+     * under - {@code sun}, {@code moon}, {@code venus}, Jupiter's - with
+     * the instant and the observer's place its drawn position belongs
+     * to, because a moving body's place is nothing without them. Still
+     * identity and position only: its facts are the service's, read
+     * when shown. The chart core owns no clock; the instant is the one
+     * Place and Time gave the module that drew it.
+     */
+    record Occurrence(String identity, java.time.Instant instant,
+                      double latitudeDegrees, double eastLongitudeDegrees,
+                      SkyPosition position) implements Selection {
+        public Occurrence {
+            if (identity == null || identity.isBlank() || instant == null
+                    || position == null) {
+                throw new IllegalArgumentException(
+                        "an occurrence names a body, its instant and its"
+                                + " position");
+            }
+            if (Double.isNaN(latitudeDegrees) || latitudeDegrees < -90.0
+                    || latitudeDegrees > 90.0 || !Double.isFinite(eastLongitudeDegrees)) {
+                throw new IllegalArgumentException(
+                        "an occurrence's observer is a place on the Earth");
+            }
+        }
+
+        /** Whether this is the same body at the same instant and place. */
+        public boolean sameAs(Occurrence other) {
+            return other != null && identity.equals(other.identity)
+                    && instant.equals(other.instant)
+                    && latitudeDegrees == other.latitudeDegrees
+                    && eastLongitudeDegrees == other.eastLongitudeDegrees;
+        }
+    }
+
     /** The selection every session starts with. */
     Selection NOTHING = new None();
 }

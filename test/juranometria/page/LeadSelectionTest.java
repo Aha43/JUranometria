@@ -10,6 +10,7 @@ import juranometria.chart.ChartScene;
 import juranometria.chart.ChartViewState;
 import juranometria.chart.Selection;
 import juranometria.chart.SelectionModel;
+import juranometria.chart.SkyPosition;
 import juranometria.chart.WorkingSelection;
 import juranometria.render.ChartOptions;
 
@@ -61,6 +62,36 @@ class LeadSelectionTest {
         assertEquals(1, selection.candidates().size(),
                 "and the selection is not quietly turned into a list of"
                         + " everything selected");
+    }
+
+    /** A member that is a drawn body leads as its occurrence (#513); an unselectable one leads nothing. */
+    @Test
+    void aBodyMemberLeadsAsItsOccurrenceWhenThePageMayAnswerIt() {
+        WorkingSelection working = new WorkingSelection();
+        SelectionModel selection = new SelectionModel();
+        java.time.Instant when = java.time.Instant.parse("2026-03-26T10:32:00Z");
+        juranometria.module.OverlayContribution.Moment moment =
+                new juranometria.module.OverlayContribution.Moment(when, 59.913, 10.752);
+        PageContents[] page = {pageContents().withBodies(List.of(
+                new PageEntry.Body("moon", "Moon", new SkyPosition(40.0, 15.0), moment, true, 0.1),
+                new PageEntry.Body("sun", "Sun", new SkyPosition(1.0, 1.0), moment, false, 3.0)))};
+        LeadSelection.connect(working, selection, () -> page[0]);
+        working.add("moon");
+        Selection.Occurrence led = assertInstanceOf(Selection.Occurrence.class,
+                selection.selection(), "a selectable body leads as its occurrence");
+        assertEquals(when, led.instant());
+        assertEquals(new SkyPosition(40.0, 15.0), led.position());
+        working.add("sun");
+        assertInstanceOf(Selection.None.class, selection.selection(),
+                "a body the page draws but may not answer leads nothing: "
+                        + selection.selection());
+        assertTrue(LeadSelection.selectable(page[0], "moon").isEmpty(),
+                "a body is never a catalogue object");
+        // The page no longer draws the Moon: the bridge remembers the
+        // occurrence it answered, as it remembers an object.
+        page[0] = pageContents();
+        working.lead("moon");
+        assertEquals(led, selection.selection(), "remembered with the instant it held");
     }
 
     @Test

@@ -64,6 +64,36 @@ public sealed interface PageEntry {
     }
 
     /**
+     * A Solar System body the page drew (Sprint 48, issue #513): its
+     * identity on the page, its name as the page said it, where it
+     * was drawn, the moment it was computed for, and whether a reader
+     * may select it as an occurrence. Always drawn - a body the page
+     * did not draw is not an entry - and always named.
+     */
+    record Body(String identity, String name, SkyPosition position,
+                juranometria.module.OverlayContribution.Moment moment,
+                boolean selectable, double separationDegrees)
+            implements PageEntry {
+        public Body {
+            if (identity == null || identity.isBlank() || name == null
+                    || position == null) {
+                throw new IllegalArgumentException(
+                        "a drawn body has an identity, a name and a place");
+            }
+        }
+
+        @Override
+        public PageVisibility visibility() {
+            return PageVisibility.DRAWN;
+        }
+
+        @Override
+        public boolean named() {
+            return true;
+        }
+    }
+
+    /**
      * A star.
      *
      * <p>Most are anonymous: a page holds hundreds of stars with

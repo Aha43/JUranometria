@@ -460,6 +460,7 @@ public final class PackagedAcceptanceMain {
         zoomLockJourney();
         companionJourney();
         controllerTabsJourney();
+        occurrenceJourney();
         chartOptionsJourney();
         chartControlsJourney();
         cleanChartJourney();
@@ -947,6 +948,184 @@ public final class PackagedAcceptanceMain {
                 + " groups with no outer group; building and choosing compute nothing;"
                 + " Venus computed, the field changed on Chart, Venus intact on return;"
                 + " the tab chosen remembered, a fresh profile opening Chart)");
+    }
+
+    /**
+     * The shared occurrence context inside the packaged image (#513):
+     * a module offering the Moon's disc with its moment and marked
+     * selectable, over the production chart; a real click on the disc
+     * selects an occurrence - identity, instant, observer, J2000 place
+     * - and makes it the working selection's member and lead; the
+     * module drawing the same body for another instant re-resolves the
+     * selection to that instant; the module withdrawing it leaves the
+     * selection with the instant it was selected for; a body offered
+     * without the mark still consumes the click as empty sky (C6); the
+     * view report's selection line names the occurrence. Headless, as
+     * this acceptance runs.
+     */
+    private static void occurrenceJourney() throws Exception {
+        juranometria.solar.SolarSystemService solar =
+                juranometria.solar.SolarSystemService.load();
+        juranometria.sky.Observer[] observer = {new juranometria.sky.Observer(59.913, 10.752,
+                MOON_FIRST_QUARTER)};
+        boolean[] selectable = {true};
+        boolean[] offering = {true};
+        juranometria.ui.ChartComponent[] chart = new juranometria.ui.ChartComponent[1];
+        juranometria.chart.SelectionModel selection = new juranometria.chart.SelectionModel();
+        juranometria.ui.ChartModuleHost[] host = new juranometria.ui.ChartModuleHost[1];
+        juranometria.chart.WorkingSelection[] working = new juranometria.chart.WorkingSelection[1];
+        juranometria.module.ChartModule module = new juranometria.module.ChartModule() {
+            private Runnable withdraw;
+
+            @Override
+            public String name() {
+                return "study occurrence";
+            }
+
+            @Override
+            public void attach(juranometria.module.ChartServices services) {
+                withdraw = services.contribute("study.occurrence", () -> {
+                    if (!offering[0]) {
+                        return java.util.List.of();
+                    }
+                    juranometria.solar.SolarSystemService.MoonObservation moon =
+                            (juranometria.solar.SolarSystemService.MoonObservation)
+                                    solar.observe(juranometria.solar.SolarSystemService.Body.MOON,
+                                            observer[0]);
+                    return java.util.List.of(new juranometria.module.OverlayContribution.Body(
+                            juranometria.solarchart.SolarSystemModule.MOON, "Moon",
+                            moon.astrometricJ2000(), moon.angularDiameterArcseconds(),
+                            new juranometria.module.OverlayContribution.Lit(
+                                    moon.illuminatedFraction(), moon.brightLimbAngleDegrees(),
+                                    moon.phaseAngleDegrees()),
+                            false, moon.distanceKm(), juranometria.module.InkRole.BODY,
+                            juranometria.module.OverlayContribution.Moment.of(observer[0]),
+                            selectable[0]));
+                });
+            }
+
+            @Override
+            public void detach() {
+                if (withdraw != null) {
+                    withdraw.run();
+                }
+            }
+        };
+        juranometria.solar.SolarSystemService.MoonObservation first =
+                (juranometria.solar.SolarSystemService.MoonObservation)
+                        solar.observe(juranometria.solar.SolarSystemService.Body.MOON, observer[0]);
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            chart[0] = new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
+            chart[0].setSize(900, 700);
+            chart[0].setViewState(new juranometria.chart.ChartViewState(
+                    first.astrometricJ2000(), 1.0, 8.0, null, null));
+            host[0] = new juranometria.ui.ChartModuleHost(chart[0], selection, request -> { });
+            working[0] = host[0].workingSelection();
+            juranometria.ui.SelectInteraction.install(chart[0], selection, working[0],
+                    new juranometria.chart.SelectionMode());
+            host[0].attach(module);
+        });
+        try {
+            paintHeadless(chart[0]);
+            juranometria.ui.ReferenceInk.BodyPlacement drawn = chart[0].renderedBodies().get(0);
+            require(drawn.selectable() && drawn.moment() != null
+                            && drawn.moment().instant().equals(MOON_FIRST_QUARTER),
+                    "the drawn Moon carries its moment and is selectable: " + drawn);
+            require(host[0].inventory().bodies().size() == 1
+                            && host[0].inventory().find(
+                                    juranometria.solarchart.SolarSystemModule.MOON).isPresent(),
+                    "the page's inventory lists the drawn body");
+            clickOn(chart[0], drawn.centre());
+            require(selection.selection() instanceof juranometria.chart.Selection.Occurrence,
+                    "a click on a selectable body selects an occurrence: "
+                            + selection.selection());
+            juranometria.chart.Selection.Occurrence chosen =
+                    (juranometria.chart.Selection.Occurrence) selection.selection();
+            require(chosen.identity().equals(juranometria.solarchart.SolarSystemModule.MOON)
+                            && chosen.instant().equals(MOON_FIRST_QUARTER)
+                            && chosen.latitudeDegrees() == 59.913
+                            && chosen.position().separationDegrees(first.astrometricJ2000()) < 0.01
+                            && selection.candidates().isEmpty(),
+                    "the occurrence names the body, the instant, the observer and the place,"
+                            + " with no candidates: " + chosen);
+            require(working[0].members().equals(java.util.List.of(
+                            juranometria.solarchart.SolarSystemModule.MOON))
+                            && juranometria.solarchart.SolarSystemModule.MOON.equals(working[0].lead()),
+                    "and the working selection holds and leads with its identity");
+            String report = ViewReport.selection(selection.selection());
+            require(report.startsWith("occurrence " + juranometria.solarchart.SolarSystemModule.MOON
+                            + " at " + MOON_FIRST_QUARTER),
+                    "the view report names the occurrence: " + report);
+
+            // Another instant, twenty minutes on - the Moon still on the 1°
+            // page, drawn elsewhere: the selection follows it to that instant.
+            observer[0] = observer[0].at(MOON_FIRST_QUARTER.plus(java.time.Duration.ofMinutes(20)));
+            javax.swing.SwingUtilities.invokeAndWait(() -> host[0].redraw());
+            paintHeadless(chart[0]);
+            juranometria.chart.Selection.Occurrence later =
+                    (juranometria.chart.Selection.Occurrence) selection.selection();
+            require(later.instant().equals(observer[0].instant())
+                            && !later.position().equals(chosen.position()),
+                    "drawn for another instant, the selection re-resolves to it: " + later);
+
+            // Withdrawn: the selection keeps the instant it last held.
+            offering[0] = false;
+            javax.swing.SwingUtilities.invokeAndWait(() -> host[0].redraw());
+            paintHeadless(chart[0]);
+            require(selection.selection().equals(later)
+                            && host[0].inventory().bodies().isEmpty(),
+                    "no longer drawn, the selection keeps its instant: " + selection.selection());
+
+            // Not selectable: the disc consumes the click as empty sky (C6).
+            offering[0] = true;
+            selectable[0] = false;
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                working[0].clear();
+                selection.clear();
+                host[0].redraw();
+            });
+            paintHeadless(chart[0]);
+            drawn = chart[0].renderedBodies().get(0);
+            clickOn(chart[0], drawn.centre());
+            require(selection.selection() instanceof juranometria.chart.Selection.EmptySky
+                            && working[0].members().isEmpty(),
+                    "a body not marked selectable still consumes the click as empty sky: "
+                            + selection.selection());
+        } finally {
+            javax.swing.SwingUtilities.invokeAndWait(host[0]::detachAll);
+        }
+        System.out.println("occurrence OK (a selectable body's click is an occurrence with"
+                + " its instant, observer and place, member and lead; it follows the page to"
+                + " another instant and keeps its instant when withdrawn; an unselectable"
+                + " body still consumes the click; the report names it)");
+    }
+
+    private static void paintHeadless(juranometria.ui.ChartComponent chart) throws Exception {
+        java.awt.image.BufferedImage image = new java.awt.image.BufferedImage(
+                chart.getWidth(), chart.getHeight(), java.awt.image.BufferedImage.TYPE_INT_RGB);
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            java.awt.Graphics2D g = image.createGraphics();
+            try {
+                chart.paint(g);
+            } finally {
+                g.dispose();
+            }
+        });
+        javax.swing.SwingUtilities.invokeAndWait(() -> { });
+    }
+
+    private static void clickOn(juranometria.ui.ChartComponent chart,
+                                juranometria.project.PixelPoint centre) throws Exception {
+        int cx = (int) Math.round(centre.x()) + chart.pageOffsetX();
+        int cy = (int) Math.round(centre.y()) + chart.pageOffsetY();
+        for (int id : new int[] {java.awt.event.MouseEvent.MOUSE_PRESSED,
+                java.awt.event.MouseEvent.MOUSE_RELEASED,
+                java.awt.event.MouseEvent.MOUSE_CLICKED}) {
+            javax.swing.SwingUtilities.invokeAndWait(() -> chart.dispatchEvent(
+                    new java.awt.event.MouseEvent(chart, id, System.nanoTime() / 1_000_000,
+                            0, cx, cy, 1, false, java.awt.event.MouseEvent.BUTTON1)));
+        }
+        javax.swing.SwingUtilities.invokeAndWait(() -> { });
     }
 
     private static void chartOptionsJourney() throws Exception {
