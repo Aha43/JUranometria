@@ -85,6 +85,7 @@ help:
 	@echo "  import-planets       Build the planets pack (one DE440 kernel per planet) from de440s.bsp and pck00011.tpc, proved against the sources (issue #501)"
 	@echo "  jovian-accuracy-report  The Jovian service against Horizons, the report the tests hold (issue #473)"
 	@echo "  jovian-cartography-study  Measure Jupiter and the moons on the atlas's pages, with mockups (issue #482)"
+	@echo "  venus-cartography-study  Measure Venus on the atlas's pages and the fields below 1°, with mockups (issue #512)"
 	@echo "  sun-on-the-chart-study  The Sun on production pages through the module (issue #415)"
 	@echo "  jupiter-on-the-chart-study  Jupiter and its moons on production pages (issue #486)"
 	@echo "  moon-on-the-chart-study The Moon on production pages, and the lunation as a row of phases (issue #416)"
@@ -625,7 +626,7 @@ black-sky-study: classes
 		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BlackSkyStudyMain \
 		> docs/studies/black-sky/measurements.md
 
-.PHONY: spk-boundary-fixture import-jovian-system import-planets venus-accuracy-report venus-table-study jovian-accuracy-report jovian-cartography-study evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study venus-pack-study sun-on-the-chart-study moon-on-the-chart-study jupiter-on-the-chart-study printable-chart-study
+.PHONY: spk-boundary-fixture import-jovian-system import-planets venus-accuracy-report venus-table-study jovian-accuracy-report jovian-cartography-study venus-cartography-study evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study venus-pack-study sun-on-the-chart-study moon-on-the-chart-study jupiter-on-the-chart-study printable-chart-study
 # The heap is stated rather than inherited from whatever a machine's
 # ergonomics chose for it: the CI runner's default quarter-of-RAM is
 # not the same number as a developer's.
@@ -811,6 +812,16 @@ jovian-cartography-study: classes
 		juranometria.tool.JovianCartographyStudyMain \
 		> docs/studies/jovian-cartography/measurements.md
 	@echo "written to docs/studies/jovian-cartography/measurements.md"
+
+# Venus on the atlas's pages (issue #512): size on every page, the
+# phase's readability, the conjunctions, the frame, the fields below 1°
+# (#481) and mockups over production pages under both candidate rules.
+venus-cartography-study: classes
+	mkdir -p docs/studies/venus-cartography
+	$(JAVA) -Xmx3g -Djava.awt.headless=true -cp "$(CLASSES_DIR):$(LIB_DIR)/*" \
+		juranometria.tool.VenusCartographyStudyMain \
+		> docs/studies/venus-cartography/measurements.md
+	@echo "written to docs/studies/venus-cartography/measurements.md"
 
 solar-system-controls-study: classes
 	mkdir -p docs/studies/solar-system-controls

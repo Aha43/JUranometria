@@ -1858,9 +1858,11 @@ public final class ReferenceInk {
      * disc towards the limb, with the half-ellipse of semi-axis
      * r·|cos i| across it added beyond the centre when gibbous
      * (cos i &gt; 0) and taken away from it when crescent. Its area
-     * is k = (1 + cos i) / 2 of the disc's.
+     * is k = (1 + cos i) / 2 of the disc's. Public so a cartography
+     * study can draw a candidate body with the page's own geometry
+     * rather than a copy of it (#512).
      */
-    static java.awt.geom.Area litRegion(PixelPoint centre, double radius,
+    public static java.awt.geom.Area litRegion(PixelPoint centre, double radius,
             PageBasis basis, OverlayContribution.Lit lit) {
         double cosI = Math.cos(Math.toRadians(lit.phaseAngleDegrees()));
         double r = radius;

@@ -155,6 +155,11 @@ public final class EvidenceContractMain {
         // IMAGE_MAINS, their sizes in the platform record below.
         REPORT_MAINS.put("juranometria.tool.VenusContractStudyMain",
                 "docs/studies/venus/measurements.md");
+        // Venus on the page (#512): deterministic over the bundled packs,
+        // the committed named instants and the production projection; its
+        // mock-ups are held through IMAGE_MAINS.
+        REPORT_MAINS.put("juranometria.tool.VenusCartographyStudyMain",
+                "docs/studies/venus-cartography/measurements.md");
         // The Sun on production pages (#415): the report is
         // deterministic; its pages are held through IMAGE_MAINS.
         REPORT_MAINS.put("juranometria.tool.SunOnTheChartStudyMain",
@@ -501,6 +506,8 @@ public final class EvidenceContractMain {
             // proposed table in study-only arrangements; widget-rendered
             // inspection, the controls- prefix.
             "juranometria.tool.VenusContractStudyMain",
+            // #512: Venus on the page, both candidate rules over production pages.
+            "juranometria.tool.VenusCartographyStudyMain",
             // The working-selection surface mock-ups (issue #258):
             // widget-rendered inspection, the selection- prefix.
             "juranometria.tool.WorkingSelectionMockupMain",
