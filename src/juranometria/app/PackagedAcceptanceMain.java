@@ -959,9 +959,11 @@ public final class PackagedAcceptanceMain {
      * module drawing the same body for another instant re-resolves the
      * selection to that instant; the module withdrawing it leaves the
      * selection with the instant it was selected for; a body offered
-     * without the mark still consumes the click as empty sky (C6); the
-     * view report's selection line names the occurrence. Headless, as
-     * this acceptance runs.
+     * without the mark still consumes the click as empty sky (C6). The
+     * view report's line for an occurrence is held by its own test; the
+     * packaged acceptance must not reach the view report, which the
+     * rendering closure keeps outside. Headless, as this acceptance
+     * runs.
      */
     private static void occurrenceJourney() throws Exception {
         juranometria.solar.SolarSystemService solar =
@@ -1052,10 +1054,6 @@ public final class PackagedAcceptanceMain {
                             juranometria.solarchart.SolarSystemModule.MOON))
                             && juranometria.solarchart.SolarSystemModule.MOON.equals(working[0].lead()),
                     "and the working selection holds and leads with its identity");
-            String report = ViewReport.selection(selection.selection());
-            require(report.startsWith("occurrence " + juranometria.solarchart.SolarSystemModule.MOON
-                            + " at " + MOON_FIRST_QUARTER),
-                    "the view report names the occurrence: " + report);
 
             // Another instant, twenty minutes on - the Moon still on the 1°
             // page, drawn elsewhere: the selection follows it to that instant.
@@ -1097,7 +1095,7 @@ public final class PackagedAcceptanceMain {
         System.out.println("occurrence OK (a selectable body's click is an occurrence with"
                 + " its instant, observer and place, member and lead; it follows the page to"
                 + " another instant and keeps its instant when withdrawn; an unselectable"
-                + " body still consumes the click; the report names it)");
+                + " body still consumes the click)");
     }
 
     private static void paintHeadless(juranometria.ui.ChartComponent chart) throws Exception {
