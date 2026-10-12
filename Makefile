@@ -89,6 +89,7 @@ help:
 	@echo "  sun-on-the-chart-study  The Sun on production pages through the module (issue #415)"
 	@echo "  jupiter-on-the-chart-study  Jupiter and its moons on production pages (issue #486)"
 	@echo "  moon-on-the-chart-study The Moon on production pages, and the lunation as a row of phases (issue #416)"
+	@echo "  venus-on-the-chart-study Venus on production pages, and the 2026-27 apparition as a row of phases (issue #514)"
 	@echo "  pan-study         Measure the Sprint 8 grab-to-pan geometry and costs"
 	@echo "  chart-options-study  Render the Sprint 12 chart-options candidates"
 	@echo "  star-identity-study  Measure and render the Sprint 13 star-identity candidates"
@@ -626,7 +627,7 @@ black-sky-study: classes
 		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BlackSkyStudyMain \
 		> docs/studies/black-sky/measurements.md
 
-.PHONY: spk-boundary-fixture import-jovian-system import-planets venus-accuracy-report venus-table-study jovian-accuracy-report jovian-cartography-study venus-cartography-study evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study venus-pack-study sun-on-the-chart-study moon-on-the-chart-study jupiter-on-the-chart-study printable-chart-study
+.PHONY: spk-boundary-fixture import-jovian-system import-planets venus-accuracy-report venus-table-study jovian-accuracy-report jovian-cartography-study venus-cartography-study evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study venus-pack-study sun-on-the-chart-study moon-on-the-chart-study venus-on-the-chart-study jupiter-on-the-chart-study printable-chart-study
 # The heap is stated rather than inherited from whatever a machine's
 # ergonomics chose for it: the CI runner's default quarter-of-RAM is
 # not the same number as a developer's.
@@ -854,6 +855,15 @@ moon-on-the-chart-study: classes
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.MoonOnTheChartStudyMain \
 		> docs/studies/moon-on-the-chart/measurements.md
 	@echo "written to docs/studies/moon-on-the-chart/measurements.md"
+
+# Venus on the chart (issue #514): production pages at the cited
+# instants under the rulings on #512, and the apparition as a row of
+# phases measured against the table.
+venus-on-the-chart-study: classes
+	mkdir -p docs/studies/venus-on-the-chart
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.VenusOnTheChartStudyMain \
+		> docs/studies/venus-on-the-chart/measurements.md
+	@echo "written to docs/studies/venus-on-the-chart/measurements.md"
 
 ecliptic-study: classes
 	mkdir -p docs/studies/ecliptic

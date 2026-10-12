@@ -7,6 +7,16 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Venus on the chart (#514).** View ▸ Solar System ▸ Venus on the chart,
+and the Controller's and the dialog's Show on chart and Centre on chart
+for Venus, draw Venus where it stands for the place and instant set in
+Place and Time: its solid-body disc phased exactly as the Venus table
+states, or - while the true disc is smaller - a 6-pixel cartographic
+symbol phased the same way and spoken as a symbol. A transit shows as
+Venus's dark disc inside the Sun's ring and the page says so; Venus can
+be selected as an occurrence. Hidden until asked, remembered like the
+Sun's and the Moon's switches, in both languages.
+
 **The Sun, the Moon and Jupiter can be selected (#513).** A click on
 the Sun's or the Moon's disc, or on Jupiter's disc or symbol, now
 selects that body as an occurrence - the body at the instant and the

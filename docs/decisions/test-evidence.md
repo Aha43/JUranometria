@@ -76,8 +76,8 @@ The gate test pins all of it: zero unprotected, and the
 non-preference locals list is exactly `SwingSession.java`.
 
 The standing counts, quoted from the scanner so the gate can hold
-this document to them: **74 files** touch process-wide state —
-**35** use the shared guard, **38** restore locally,
+this document to them: **75 files** touch process-wide state —
+**35** use the shared guard, **39** restore locally,
 **0 flagged unprotected** — and **56 files** depend on a display,
 of which **19** state a focus premise and **33** a reachability
 premise through the shared route helper. (#246 added two
@@ -377,8 +377,8 @@ aborts — a run count, not a claim of eliminated intermittence.
 Text cannot decide whether a read runs on the event thread — that
 is control flow, and #220 proved the cost of guessing, three times
 (the journey's mark derivation, its page offset, and finally its
-own premise capture). The measurements count the traffic: **458
-reads of live chart state** against **986 explicit hand-offs**
+own premise capture). The measurements count the traffic: **460
+reads of live chart state** against **999 explicit hand-offs**
 suite-wide (requoted for the #261 reader-surface tests, which read
 scenes and marks under the same one-hand-off discipline; for #275's
 closing journey, which reads the page's own objects and takes its
@@ -453,7 +453,10 @@ window on the event thread, because a tab chosen and a window let go are
 what a reader does there; and for #513's occurrence journey, which builds
 the chart and its module host, paints, clicks and reads the Inspector on
 the event thread, and reads the current scene once per page to place
-its click). The discipline
+its click; and for #514's Venus chart journey and ink test, which build
+the component, paint and click on the event thread and read the scene
+to find the drawn disc, the journey restoring its own preference node).
+The discipline
 that closed #220 — derive, read and act
 in **one** `invokeAndWait`, with the deterministic queued-change
 race tests holding it — is the named pattern; its mutations already

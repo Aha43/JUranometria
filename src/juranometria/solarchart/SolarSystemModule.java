@@ -41,6 +41,21 @@ public final class SolarSystemModule implements ChartModule {
     public static final String ID = "solar-system";
     public static final String SUN = "sun";
     public static final String MOON = "moon";
+    /**
+     * Venus's identity on the page (#514): the service's own name for the
+     * body, lower-cased - derived, so the language ledger gains no row
+     * for a word that is a key and not a word (as #501's pack keys).
+     */
+    public static final String VENUS = Body.VENUS.name().toLowerCase(java.util.Locale.ROOT);
+    /**
+     * Rule M (ruling 1 on #512): Venus is drawn as the larger of its true
+     * solid-body disc and a mark of this size, phased either way; a
+     * cartographic symbol, never a claim about apparent size.
+     */
+    public static final double VENUS_MINIMUM_MARK_PX = 6.0;
+    /** The page's state keys for Venus meeting the Sun's disc (ruling 3 on #512). */
+    public static final String VENUS_IN_FRONT = "venus.inFront";
+    public static final String VENUS_BEHIND = "venus.behind";
 
     private final Supplier<Observer> observer;
     private final Supplier<SolarSystemService> service;
@@ -128,6 +143,37 @@ public final class SolarSystemModule implements ChartModule {
         return moonShowing;
     }
 
+    private boolean venusShowing;
+    private final java.util.List<java.util.function.Consumer<Boolean>> venusListeners =
+            new java.util.ArrayList<>();
+
+    public boolean venusShowing() {
+        return venusShowing;
+    }
+
+    /** Venus on the chart (#514): its own switch, independent of the Sun's and the Moon's. */
+    public void venusShowing(boolean showing) {
+        boolean changed = this.venusShowing != showing;
+        this.venusShowing = showing;
+        if (services != null) {
+            services.redraw();
+        }
+        if (changed) {
+            for (java.util.function.Consumer<Boolean> listener
+                    : java.util.List.copyOf(venusListeners)) {
+                listener.accept(showing);
+            }
+        }
+    }
+
+    public void onVenusChange(java.util.function.Consumer<Boolean> listener) {
+        if (listener == null) {
+            throw new IllegalArgumentException("a listener is required");
+        }
+        venusListeners.add(listener);
+        listener.accept(venusShowing);
+    }
+
     /** Shows or hides the Moon; the chart redraws, and every listener hears a change. */
     public void moonShowing(boolean showing) {
         boolean changed = this.moonShowing != showing;
@@ -190,7 +236,7 @@ public final class SolarSystemModule implements ChartModule {
      */
     public List<OverlayContribution> contributedGeometry() {
         contributions++;
-        if (!sunShowing && !moonShowing) {
+        if (!sunShowing && !moonShowing && !venusShowing) {
             return List.of();
         }
         Observer now = observer.get();
@@ -206,6 +252,34 @@ public final class SolarSystemModule implements ChartModule {
                     horizon && sun.horizontal().altitudeDegrees() < 0.0,
                     sun.distanceKm(), InkRole.BODY,
                     OverlayContribution.Moment.of(now), true));
+        }
+        if (venusShowing) {
+            // Venus (#514, the rulings on #512): the solid body's disc,
+            // phased exactly as the Venus table states it - k, χ of date
+            // and i - over the 6 px minimum mark, selectable as an
+            // occurrence (#513), its geometric state spoken when its disc
+            // meets the Sun's. Outside its years the table says why; the
+            // chart draws nothing it has no numbers for.
+            try {
+                juranometria.solar.VenusService.VenusObservation venus =
+                        (juranometria.solar.VenusService.VenusObservation)
+                                service.get().observe(Body.VENUS, now);
+                String state = switch (venus.phase()) {
+                    case IN_FRONT_OF_SUN -> VENUS_IN_FRONT;
+                    case BEHIND_SUN -> VENUS_BEHIND;
+                    default -> null;
+                };
+                offered.add(new OverlayContribution.Body(VENUS, "Venus",
+                        venus.astrometricJ2000(), venus.solidBodyDiameterArcseconds(),
+                        new OverlayContribution.Lit(venus.illuminatedFraction(),
+                                venus.brightLimbAngleDegrees(), venus.phaseAngleDegrees()),
+                        horizon && venus.horizontal().altitudeDegrees() < 0.0,
+                        venus.distanceKm(), InkRole.BODY,
+                        OverlayContribution.Moment.of(now), true, VENUS_MINIMUM_MARK_PX,
+                        state));
+            } catch (IllegalArgumentException outsideTheYears) {
+                // Nothing for this instant.
+            }
         }
         if (moonShowing) {
             MoonObservation moon = (MoonObservation) service.get().observe(Body.MOON, now);

@@ -187,3 +187,56 @@ written, recorded as given:
 Nothing in the proposal was amended; the study's report and mock-ups
 stand as measured. #513 (the shared occurrence identity and selection
 context) and #514 (Venus on the chart) build on these rulings.
+
+## Venus on the chart, as built (#514)
+
+- **The seam.** `OverlayContribution.Body` gains a minimum mark (0 for
+  the Sun and the Moon, 6 px for Venus - `SolarSystemModule
+  .VENUS_MINIMUM_MARK_PX`, ruling 1) and a state key (ruling 3).
+  `SolarSystemModule` offers Venus as a third switch beside the Sun's
+  and the Moon's: the solid body's disc, `Lit(k, χ, i)` exactly as the
+  Venus table states them, its moment, selectable (#513, ruling 2),
+  and `venus.inFront` / `venus.behind` when its disc meets the Sun's;
+  outside Venus's years it offers nothing, as Jupiter's module does.
+- **Rule M on the page.** `ReferenceInk.bodyOn` places a round body's
+  mark as the larger of its true disc and its minimum; while the mark
+  stands in, the body is a *symbol* - painted by the reference layer
+  beneath the stars (`paintSymbols`, with Jupiter's), phased by the
+  page's own lit region exactly as the true disc would be, not opaque
+  (a click through it reaches a star unless Venus is pointed at),
+  spoken with `page.body.venus.symbol`; once the true disc reaches the
+  mark it is the body itself, opaque, the Moon's phased disc. The
+  symbol's ink is an obstacle for the page's words, as Jupiter's is.
+- **No conjunction rule.** The transit is Venus's dark disc inside the
+  Sun's ring by painting order (the nearer last); a Venus inside the
+  ring and farther is covered by the Sun's ground-filled disc; the
+  spoken description appends *in front of the Sun* / *behind the Sun*
+  (`page.body.state.venus.*`, both languages).
+- **The switch.** `View ▸ Solar System ▸ Venus on the chart`, directly
+  after *Sun on the chart* (the ruled order), remembered as the Sun's
+  and the Moon's are (`VenusChartStore`, preference `venusOnChartShown`;
+  `VenusChartSession`), hidden by default; the Controller's Venus group
+  and the Venus dialog gain *Show on chart* and *Centre on chart* over
+  the same layer and the shared action (`CentreOnChart.Body.VENUS`).
+- **Selection.** Venus is a selectable occurrence through the #513
+  seam: a click on the disc, or on the symbol, selects Venus at the
+  instant and observer drawn, nothing behind an opaque disc offered.
+- **Paper.** The same layer through `SheetInk.bodies`, so a sheet
+  carries Venus as the screen showed it.
+- **Proof.** `SolarSystemModuleTest` (k, χ, i, the mark, the moment,
+  the state, nothing outside the years); `VenusInkTest` (the symbol at
+  8°, phased and pointable, the true disc at 1°, the transit over the
+  Sun's ring and the spoken state); `VenusOnTheChartJourneyTest` (the
+  real component: drawn where the service puts it, spoken as a symbol
+  at 8° and as Venus at 1°, a click selecting its occurrence, the
+  switch remembered and restored with its item in both languages, the
+  submenu's order); the Controller journey's Venus group with both
+  controls; the packaged image's `venusOnTheChartJourney`.
+- **Evidence.** `docs/studies/venus-on-the-chart/` - Venus's production
+  pages at the cited instants (the 2026 elongation at 8° in Norwegian,
+  at 3° on both palettes and at 1°; the 2012 transit over the Sun's
+  ring; the 2026 inferior and superior conjunctions) and the 2026-27
+  apparition as a row of phases measured against the table; the menu
+  sheets retaken with the new item; provenance re-recorded.
+- **Not done, by ruling.** No field below 1° (#481 stays open); no
+  atmospheric detail; the Galilean moons' selection unchanged.

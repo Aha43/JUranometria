@@ -91,6 +91,9 @@ Bar packed 843 × 264 px; widest popup 232 px.
 | item spoken name \| Sun on the chart |
 | item spoken description \| Shows or hides the Sun on the chart, drawn at its true size where it stands for the place and instant set in Place and Time; below a drawn horizon it is dimmed and says so. |
 | item access letter (language) \| U |
+| item label \| Venus on the chart |
+| item spoken name \| Venus on the chart |
+| item spoken description \| Shows or hides Venus on the chart where it stands for the place and instant set in Place and Time, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
 | item label \| Moon on the chart |
 | item spoken name \| Moon on the chart |
 | item spoken description \| Shows or hides the Moon on the chart, drawn at its true size where it stands for the place and instant set in Place and Time, lit on the side the Moon table states; below a drawn horizon it is dimmed and says so. |
@@ -192,6 +195,9 @@ Bar packed 843 × 264 px; widest popup 232 px.
 | item spoken name \| Sun on the chart |
 | item spoken description \| Shows or hides the Sun on the chart, drawn at its true size where it stands for the place and instant set in Place and Time; below a drawn horizon it is dimmed and says so. |
 | item access letter (language) \| U |
+| item label [checked] \| Venus on the chart |
+| item spoken name \| Venus on the chart |
+| item spoken description \| Shows or hides Venus on the chart where it stands for the place and instant set in Place and Time, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
 | item label [checked] \| Moon on the chart |
 | item spoken name \| Moon on the chart |
 | item spoken description \| Shows or hides the Moon on the chart, drawn at its true size where it stands for the place and instant set in Place and Time, lit on the side the Moon table states; below a drawn horizon it is dimmed and says so. |
@@ -293,6 +299,9 @@ Bar packed 843 × 264 px; widest popup 232 px.
 | item spoken name \| Sun on the chart |
 | item spoken description \| Shows or hides the Sun on the chart, drawn at its true size where it stands for the place and instant set in Place and Time; below a drawn horizon it is dimmed and says so. |
 | item access letter (language) \| U |
+| item label \| Venus on the chart |
+| item spoken name \| Venus on the chart |
+| item spoken description \| Shows or hides Venus on the chart where it stands for the place and instant set in Place and Time, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
 | item label \| Moon on the chart |
 | item spoken name \| Moon on the chart |
 | item spoken description \| Shows or hides the Moon on the chart, drawn at its true size where it stands for the place and instant set in Place and Time, lit on the side the Moon table states; below a drawn horizon it is dimmed and says so. |
@@ -394,6 +403,9 @@ Bar packed 843 × 264 px; widest popup 232 px.
 | item spoken name \| Sun on the chart |
 | item spoken description \| Shows or hides the Sun on the chart, drawn at its true size where it stands for the place and instant set in Place and Time; below a drawn horizon it is dimmed and says so. |
 | item access letter (language) \| U |
+| item label \| Venus on the chart |
+| item spoken name \| Venus on the chart |
+| item spoken description \| Shows or hides Venus on the chart where it stands for the place and instant set in Place and Time, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
 | item label \| Moon on the chart |
 | item spoken name \| Moon on the chart |
 | item spoken description \| Shows or hides the Moon on the chart, drawn at its true size where it stands for the place and instant set in Place and Time, lit on the side the Moon table states; below a drawn horizon it is dimmed and says so. |
@@ -497,6 +509,9 @@ Bar packed 844 × 264 px; widest popup 214 px.
 | item spoken name \| Solen på kartet |
 | item spoken description \| Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid; under en tegnet horisont dempes den og sier fra. |
 | item access letter (language) \| T |
+| item label \| Venus på kartet |
+| item spoken name \| Venus på kartet |
+| item spoken description \| Viser eller skjuler Venus på kartet der den står for stedet og tidspunktet satt i Sted og tid, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om den. |
 | item label \| Månen på kartet |
 | item spoken name \| Månen på kartet |
 | item spoken description \| Viser eller skjuler Månen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid, opplyst på den siden Månetabellen oppgir; under en tegnet horisont dempes den og sier fra. |
@@ -598,6 +613,9 @@ Bar packed 844 × 264 px; widest popup 214 px.
 | item spoken name \| Solen på kartet |
 | item spoken description \| Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid; under en tegnet horisont dempes den og sier fra. |
 | item access letter (language) \| T |
+| item label [checked] \| Venus på kartet |
+| item spoken name \| Venus på kartet |
+| item spoken description \| Viser eller skjuler Venus på kartet der den står for stedet og tidspunktet satt i Sted og tid, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om den. |
 | item label [checked] \| Månen på kartet |
 | item spoken name \| Månen på kartet |
 | item spoken description \| Viser eller skjuler Månen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid, opplyst på den siden Månetabellen oppgir; under en tegnet horisont dempes den og sier fra. |
@@ -699,6 +717,9 @@ Bar packed 844 × 264 px; widest popup 214 px.
 | item spoken name \| Solen på kartet |
 | item spoken description \| Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid; under en tegnet horisont dempes den og sier fra. |
 | item access letter (language) \| T |
+| item label \| Venus på kartet |
+| item spoken name \| Venus på kartet |
+| item spoken description \| Viser eller skjuler Venus på kartet der den står for stedet og tidspunktet satt i Sted og tid, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om den. |
 | item label \| Månen på kartet |
 | item spoken name \| Månen på kartet |
 | item spoken description \| Viser eller skjuler Månen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid, opplyst på den siden Månetabellen oppgir; under en tegnet horisont dempes den og sier fra. |
@@ -800,6 +821,9 @@ Bar packed 844 × 264 px; widest popup 214 px.
 | item spoken name \| Solen på kartet |
 | item spoken description \| Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid; under en tegnet horisont dempes den og sier fra. |
 | item access letter (language) \| T |
+| item label \| Venus på kartet |
+| item spoken name \| Venus på kartet |
+| item spoken description \| Viser eller skjuler Venus på kartet der den står for stedet og tidspunktet satt i Sted og tid, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om den. |
 | item label \| Månen på kartet |
 | item spoken name \| Månen på kartet |
 | item spoken description \| Viser eller skjuler Månen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid, opplyst på den siden Månetabellen oppgir; under en tegnet horisont dempes den og sier fra. |
