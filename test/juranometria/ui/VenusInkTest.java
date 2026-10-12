@@ -232,6 +232,46 @@ class VenusInkTest {
         }
     }
 
+    /**
+     * The owner's second #514 checkpoint finding: the packaged copy stopped
+     * repainting on the transit page beyond 4° - the symbol-over-a-disc
+     * test asked every contribution on the page for its distance, and the
+     * ecliptic (a great circle, drawn on every production page) has none.
+     * The reference layer must paint with a great circle beside the two
+     * bodies, and the symbol still lands over the Sun's disc.
+     */
+    @Test
+    void aGreatCircleOnTheTransitPageIsNoObstacleAndThrowsNothing() throws Exception {
+        Instant transit = event("2012-inferior-conjunction");
+        VenusObservation v = venus(transit);
+        for (double field : new double[] {4.0, 6.0, 12.0, 120.0}) {
+            ChartScene scene = page(v.astrometricJ2000(), field);
+            // The circle is offered first, as the ecliptic is in the
+            // application: it is met before the Sun's disc answers.
+            OverlayRegistry registry = new OverlayRegistry();
+            registry.offer("equator", () -> List.of(new OverlayContribution.GreatCircle(
+                    "equator", "Equator", new SkyPosition(0.0, 90.0),
+                    OverlayContribution.Reference.LINE, InkRole.REFERENCE_LINE)));
+            SolarSystemModule module = new SolarSystemModule(
+                    () -> new Observer(OSLO_LAT, OSLO_LON, transit), () -> SERVICE, () -> false);
+            module.venusShowing(true);
+            module.sunShowing(true);
+            registry.offer(SolarSystemModule.ID, module::contributedGeometry);
+            List<ReferenceInk.BodyPlacement> drawn = placed(scene, registry, ENGLISH);
+            assertEquals(2, drawn.size(), field + "°: the Sun and Venus, the circle no body");
+            ReferenceInk.BodyPlacement venus = drawn.get(1);
+            assertTrue(venus.symbol(), field + "°: the mark stands in");
+            BufferedImage image = painted(scene, registry, ChartPalette.WHITE_PAPER, ENGLISH);
+            if (field <= 12.0) {
+                int groundRed = ChartPalette.WHITE_PAPER.ground().getRed();
+                int centreRed = new Color(image.getRGB((int) Math.round(venus.centre().x()),
+                        (int) Math.round(venus.centre().y()))).getRed();
+                assertTrue(centreRed < groundRed - 40, field + "°: the mark is still painted"
+                        + " over the Sun's disc with a circle on the page: " + centreRed);
+            }
+        }
+    }
+
     /** The lit share of the pixels inside a disc on white paper, and their count. */
     private static double[] litShare(BufferedImage image, double cx, double cy, double r) {
         double lit = 0;

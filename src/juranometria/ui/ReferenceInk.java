@@ -2047,16 +2047,21 @@ public final class ReferenceInk {
         Rectangle2D own = mark.disc().getBounds2D();
         for (OverlayRegistry.Owned owned : contributions) {
             OverlayContribution other = owned.geometry();
-            if (other == body || distanceOf(other) <= body.distanceKm()) {
-                continue;
-            }
+            // Only a body has a disc or a distance; a great circle, a
+            // boundary or a ruled line on the same page is no obstacle.
             Shape disc = null;
             if (other instanceof OverlayContribution.OblateBody oblate) {
+                if (oblate.distanceKm() <= body.distanceKm()) {
+                    continue;
+                }
                 OblateMark theirs = oblateOn(page, oblate);
                 if (theirs != null && theirs.onPage() && !theirs.symbol()) {
                     disc = theirs.outline();
                 }
             } else if (other instanceof OverlayContribution.Body round) {
+                if (round == body || round.distanceKm() <= body.distanceKm()) {
+                    continue;
+                }
                 BodyMark theirs = bodyOn(page, projection, mapping, paper, sky,
                         region.bounded(), round);
                 if (theirs != null && !theirs.symbol()) {

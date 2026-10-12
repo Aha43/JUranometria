@@ -213,6 +213,12 @@ context) and #514 (Venus on the chart) build on these rulings.
   where the disc would cover it (`ReferenceInk.symbolOverADisc`); its
   name takes the first clean box beside the mark, clear of the Sun's
   ink, or is refused where none is, as the Moon's at a new Moon (C4).
+  Only the page's bodies are asked whether they stand in front: a
+  great circle, a boundary or a ruled line beside them is no obstacle
+  and has no distance (the second checkpoint finding - the ecliptic,
+  on every production page, stopped the transit page painting beyond
+  4°; `VenusInkTest` offers a circle ahead of the module as the
+  application does).
 - **No conjunction rule.** The transit is Venus's dark disc inside the
   Sun's ring by painting order (the nearer last); a Venus inside the
   ring and farther is covered by the Sun's ground-filled disc; the
