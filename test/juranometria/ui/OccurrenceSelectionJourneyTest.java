@@ -141,8 +141,9 @@ class OccurrenceSelectionJourneyTest {
     private void click(double pageX, double pageY, boolean additive) throws Exception {
         int cx = (int) Math.round(pageX) + chart.pageOffsetX();
         int cy = (int) Math.round(pageY) + chart.pageOffsetY();
-        int modifiers = additive ? java.awt.Toolkit.getDefaultToolkit()
-                .getMenuShortcutKeyMaskEx() : 0;
+        // The interaction's own stated mask, which a headless toolkit
+        // answers where the toolkit itself refuses (CI's test job).
+        int modifiers = additive ? SelectInteraction.toggleModifierMask() : 0;
         for (int id : new int[] {MouseEvent.MOUSE_PRESSED, MouseEvent.MOUSE_RELEASED,
                 MouseEvent.MOUSE_CLICKED}) {
             SwingUtilities.invokeAndWait(() -> chart.dispatchEvent(new MouseEvent(chart, id,
