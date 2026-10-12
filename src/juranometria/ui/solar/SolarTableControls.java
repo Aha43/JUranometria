@@ -237,10 +237,8 @@ public final class SolarTableControls {
         CentreOnChart.Body which = switch (body.body()) {
             case SUN -> CentreOnChart.Body.SUN;
             case MOON -> CentreOnChart.Body.MOON;
-            // No Venus is drawn yet (#502): nothing to centre on, and no
-            // host offers the button for it.
-            case VENUS -> throw new IllegalStateException(
-                    "Venus has no chart layer to centre on");
+            // Venus (#514): its layer arrived with the production drawing.
+            case VENUS -> CentreOnChart.Body.VENUS;
         };
         return new CentreOnChart.Target() {
             @Override

@@ -167,6 +167,9 @@ public final class EvidenceContractMain {
         // The Moon on production pages (#416), the same way.
         REPORT_MAINS.put("juranometria.tool.MoonOnTheChartStudyMain",
                 "docs/studies/moon-on-the-chart/measurements.md");
+        // Venus on production pages (#514), the same way.
+        REPORT_MAINS.put("juranometria.tool.VenusOnTheChartStudyMain",
+                "docs/studies/venus-on-the-chart/measurements.md");
         // Jupiter and the moons on production pages (#486): the report
         // is deterministic, its pages held through IMAGE_MAINS, and where
         // each name went is the platform record (PLATFORM_REPORTS).
@@ -498,6 +501,9 @@ public final class EvidenceContractMain {
             // The Moon on the chart (issue #416): the same, and the
             // lunation strip cut from production pages.
             "juranometria.tool.MoonOnTheChartStudyMain",
+            // Venus on the chart (issue #514): the same, and the apparition
+            // strip cut from production pages.
+            "juranometria.tool.VenusOnTheChartStudyMain",
             // Jupiter and the Galilean moons on the chart (issue #486):
             // production pages composed by the component with the Jovian
             // module attached.

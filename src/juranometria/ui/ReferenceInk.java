@@ -1561,7 +1561,17 @@ public final class ReferenceInk {
             List<OverlayRegistry.Owned> contributions,
             juranometria.render.ChartPalette palette) {
         List<JovianSystem> systems = systemsOn(page, contributions);
-        if (systems.isEmpty()) {
+        // A round body whose minimum mark stands in for its disc (#514,
+        // rule M on #512): the mark, phased as the disc would be, beneath
+        // the stars - Venus at the fields where its true disc is smaller.
+        List<OverlayContribution.Body> rounds = new ArrayList<>();
+        for (OverlayRegistry.Owned owned : contributions) {
+            if (owned.geometry() instanceof OverlayContribution.Body body
+                    && body.minimumMarkPx() > 0.0) {
+                rounds.add(body);
+            }
+        }
+        if (systems.isEmpty() && rounds.isEmpty()) {
             return;
         }
         Graphics2D g2 = (Graphics2D) g.create();
@@ -1570,8 +1580,30 @@ public final class ReferenceInk {
                     RenderingHints.VALUE_ANTIALIAS_ON);
             ViewportMapping mapping = new ViewportMapping(page);
             Rectangle2D paper = ChartRenderer.paperOf(page.scene());
-            g2.clip(skyOf(mapping.regionFor(page.scene().viewport(), page.projection()),
-                    paper));
+            PageRegion region = mapping.regionFor(page.scene().viewport(), page.projection());
+            Shape sky = skyOf(region, paper);
+            g2.clip(sky);
+            for (OverlayContribution.Body body : rounds) {
+                BodyMark mark = bodyOn(page, page.projection(), mapping, paper, sky,
+                        region.bounded(), body);
+                if (mark == null || !mark.symbol()
+                        || symbolOverADisc(page, body, mark, contributions)) {
+                    // In front of an opaque disc the bodies layer paints,
+                    // the symbol is that layer's to paint, over the disc
+                    // (#514 checkpoint): beneath the stars it would be
+                    // covered - Venus drawn and hidden at a transit.
+                    continue;
+                }
+                double radius = mark.disc().getWidth() / 2.0;
+                if (body.lit() == null) {
+                    paintSun(g2, mark.disc(), mark.centre(), radius, palette,
+                            body.belowHorizon());
+                } else {
+                    PageBasis basis = PageBasis.at(page, body.at()).orElse(null);
+                    paintMoon(g2, mark.disc(), mark.centre(), radius, basis, body.lit(),
+                            palette, body.belowHorizon());
+                }
+            }
             for (JovianSystem system : systems) {
                 if (system.mark().symbol() && system.mark().onPage()) {
                     paintOblate(g2, system.mark(), palette, system.primary().belowHorizon());
@@ -1646,6 +1678,10 @@ public final class ReferenceInk {
         List<Shape> discs = new ArrayList<>();
         List<Shape> inks = new ArrayList<>();
         List<OblateMark> oblates = new ArrayList<>();
+        // Whether a round body's mark stands in for its disc (rule M on
+        // #512): then it is a symbol, painted beneath the stars and not
+        // opaque, as Jupiter's is.
+        List<Boolean> bodySymbols = new ArrayList<>();
         for (OverlayContribution contribution : bodies) {
             if (contribution instanceof OverlayContribution.OblateBody oblate) {
                 OblateMark mark = oblateOn(page, oblate);
@@ -1657,26 +1693,20 @@ public final class ReferenceInk {
                 discs.add(mark.outline());
                 inks.add(inkOf(mark));
                 oblates.add(mark);
+                bodySymbols.add(false);
                 continue;
             }
             OverlayContribution.Body body = (OverlayContribution.Body) contribution;
-            Optional<juranometria.project.PlanePoint> projected =
-                    projection.project(body.at());
-            if (projected.isEmpty()) {
-                continue;
-            }
-            PixelPoint centre = mapping.toPixel(projected.get());
-            double radius = radiusPx(projection, mapping, body.at(),
-                    body.angularDiameterArcseconds() / 3600.0 / 2.0);
-            Ellipse2D disc = discOn(centre, radius, paper, sky, bounded);
-            if (disc == null) {
+            BodyMark mark = bodyOn(page, projection, mapping, paper, sky, bounded, body);
+            if (mark == null) {
                 continue;
             }
             drawn.add(body);
-            centres.add(centre);
-            discs.add(disc);
-            inks.add(inkOf(disc, body.lit() != null));
+            centres.add(mark.centre());
+            discs.add(mark.disc());
+            inks.add(inkOf(mark.disc(), body.lit() != null));
             oblates.add(null);
+            bodySymbols.add(mark.symbol());
         }
         String[] names = new String[drawn.size()];
         Rectangle2D[] boxes = new Rectangle2D[drawn.size()];
@@ -1718,6 +1748,17 @@ public final class ReferenceInk {
                     continue;
                 }
                 OverlayContribution.Body body = (OverlayContribution.Body) drawn.get(i);
+                if (bodySymbols.get(i) && !symbolOverADisc(page, body,
+                        new BodyMark(centres.get(i), (Ellipse2D) discs.get(i), true),
+                        contributions)) {
+                    // Its minimum mark stands in for it: a symbol, painted
+                    // beneath the stars by the reference layer (#514, as
+                    // Jupiter's #484), never erasing one here. In front of
+                    // an opaque disc it is painted here instead, in this
+                    // pass's farthest-first order, so it lands over the
+                    // disc as the sky has it (the transit, #514 checkpoint).
+                    continue;
+                }
                 Ellipse2D disc = (Ellipse2D) discs.get(i);
                 double radius = disc.getWidth() / 2.0;
                 if (body.lit() == null) {
@@ -1789,7 +1830,9 @@ public final class ReferenceInk {
         for (int i = 0; i < drawn.size(); i++) {
             placed.add(new BodyPlacement(drawn.get(i).identity(), centres.get(i),
                     discs.get(i), names[i], boxes[i], belowHorizonOf(drawn.get(i)),
-                    oblates.get(i) != null && oblates.get(i).symbol(), null,
+                    oblates.get(i) != null ? oblates.get(i).symbol() : bodySymbols.get(i),
+                    drawn.get(i) instanceof OverlayContribution.Body round
+                            ? round.state() : null,
                     momentOf(drawn.get(i)), selectableOf(drawn.get(i))));
         }
         for (SatelliteMark m : moons) {
@@ -1957,6 +2000,81 @@ public final class ReferenceInk {
                 disc.getCenterY() - grown, 2.0 * grown, 2.0 * grown);
     }
 
+    /**
+     * A round body's mark on this page: its centre, the disc as drawn -
+     * the true disc, or the minimum mark standing in for it (rule M on
+     * #512) - and whether the mark is a symbol; null when none of it is
+     * on the page.
+     */
+    record BodyMark(PixelPoint centre, Ellipse2D disc, boolean symbol) {
+    }
+
+    private static BodyMark bodyOn(DrawnPage page, Projection projection,
+            ViewportMapping mapping, Rectangle2D paper, Shape sky, boolean bounded,
+            OverlayContribution.Body body) {
+        Optional<juranometria.project.PlanePoint> projected = projection.project(body.at());
+        if (projected.isEmpty()) {
+            return null;
+        }
+        PixelPoint centre = mapping.toPixel(projected.get());
+        double trueRadius = radiusPx(projection, mapping, body.at(),
+                body.angularDiameterArcseconds() / 3600.0 / 2.0);
+        boolean symbol = body.minimumMarkPx() > 0.0
+                && trueRadius < body.minimumMarkPx() / 2.0;
+        double radius = symbol ? body.minimumMarkPx() / 2.0 : trueRadius;
+        Ellipse2D disc = discOn(centre, radius, paper, sky, bounded);
+        return disc == null ? null : new BodyMark(centre, disc, symbol);
+    }
+
+    /**
+     * Whether a round body's symbol lies in front of an opaque disc the
+     * bodies layer paints on this page - a nearer symbol whose mark
+     * intersects the drawn disc of a farther body that is not itself a
+     * symbol (#514 checkpoint: Venus in transit at 4° to 12°). Such a
+     * symbol is painted in the bodies layer, over that disc, rather than
+     * beneath the stars where the disc would cover it.
+     */
+    static boolean symbolOverADisc(DrawnPage page, OverlayContribution.Body body,
+                                   BodyMark mark, List<OverlayRegistry.Owned> contributions) {
+        if (!mark.symbol()) {
+            return false;
+        }
+        Projection projection = page.projection();
+        ViewportMapping mapping = new ViewportMapping(page);
+        Rectangle2D paper = ChartRenderer.paperOf(page.scene());
+        PageRegion region = mapping.regionFor(page.scene().viewport(), projection);
+        Shape sky = skyOf(region, paper);
+        Rectangle2D own = mark.disc().getBounds2D();
+        for (OverlayRegistry.Owned owned : contributions) {
+            OverlayContribution other = owned.geometry();
+            // Only a body has a disc or a distance; a great circle, a
+            // boundary or a ruled line on the same page is no obstacle.
+            Shape disc = null;
+            if (other instanceof OverlayContribution.OblateBody oblate) {
+                if (oblate.distanceKm() <= body.distanceKm()) {
+                    continue;
+                }
+                OblateMark theirs = oblateOn(page, oblate);
+                if (theirs != null && theirs.onPage() && !theirs.symbol()) {
+                    disc = theirs.outline();
+                }
+            } else if (other instanceof OverlayContribution.Body round) {
+                if (round == body || round.distanceKm() <= body.distanceKm()) {
+                    continue;
+                }
+                BodyMark theirs = bodyOn(page, projection, mapping, paper, sky,
+                        region.bounded(), round);
+                if (theirs != null && !theirs.symbol()) {
+                    disc = theirs.disc();
+                }
+            }
+            if (disc != null && disc.intersects(own)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** The disc at this centre, or null when none of it is on the page. */
     private static Ellipse2D discOn(PixelPoint centre, double radius,
             Rectangle2D paper, Shape sky, boolean bounded) {
@@ -2006,12 +2124,9 @@ public final class ReferenceInk {
             if (projected.isEmpty()) {
                 continue;
             }
-            Ellipse2D disc = discOn(mapping.toPixel(projected.get()),
-                    radiusPx(projection, mapping, body.at(),
-                            body.angularDiameterArcseconds() / 3600.0 / 2.0),
-                    paper, sky, bounded);
-            if (disc != null) {
-                discs.add(inkOf(disc, body.lit() != null));
+            BodyMark mark = bodyOn(page, projection, mapping, paper, sky, bounded, body);
+            if (mark != null) {
+                discs.add(inkOf(mark.disc(), body.lit() != null));
             }
         }
         for (JovianSystem system : systemsOn(page, contributions)) {

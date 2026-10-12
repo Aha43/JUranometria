@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -31,7 +31,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * over Venus's eleven columns, in the vocabulary ruled on #500 - what it
  * shows at the named cases, what it says in each language, its range and
  * refusals, its two hosts over one session, and what it never offers:
- * no chart switch, no Centre on chart, because no Venus is drawn.
+ * built without a layer here, no chart switch and no Centre on chart
+ * (the application gives both since #514).
  */
 class VenusTableTest {
 
@@ -188,7 +189,7 @@ class VenusTableTest {
             group[0] = controller[0].inController();
         });
         assertEquals(0, session.computations(), "building the group asks the service nothing");
-        assertNull(controller[0].onChart, "no Show on chart: no Venus is drawn");
+        assertNull(controller[0].onChart, "built without a layer: no Show on chart");
         assertNull(controller[0].centreOnChart, "and no Centre on chart");
         assertNull(named(group[0], "venusCard"), "no result, no card");
 
@@ -207,12 +208,29 @@ class VenusTableTest {
         assertEquals(cell(dialog[0], 0, 8), String.valueOf(controller[0].model.getValueAt(0, 8)));
     }
 
+    /** Since #514 Venus has a chart layer: its Centre on chart target names it. */
     @Test
-    void venusHasNoChartLayerToCentreOn() {
+    void venusCentresOnItsOwnLayer() {
         SolarTableSession session = new SolarTableSession(() -> oslo(ELONGATION), service,
                 SolarTable.venus());
-        SolarTableControls controls = new SolarTableControls(session, EN, null, false);
-        assertThrows(IllegalStateException.class, () -> controls.target(null).body());
+        juranometria.ui.solar.BodyOnChart layer = new juranometria.ui.solar.BodyOnChart() {
+            @Override
+            public boolean showing() {
+                return false;
+            }
+
+            @Override
+            public void show(boolean shown) {
+            }
+
+            @Override
+            public void onChange(java.util.function.Consumer<Boolean> listener) {
+                listener.accept(false);
+            }
+        };
+        SolarTableControls controls = new SolarTableControls(session, EN, layer, false);
+        assertEquals(CentreOnChart.Body.VENUS, controls.target(layer).body());
+        assertSame(layer, controls.target(layer).layer());
     }
 
     private static List<Component> all(Component root) {

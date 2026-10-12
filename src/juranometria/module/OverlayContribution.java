@@ -267,19 +267,43 @@ public sealed interface OverlayContribution {
     record Body(String identity, String accessibleName, SkyPosition at,
                 double angularDiameterArcseconds, Lit lit,
                 boolean belowHorizon, double distanceKm, InkRole role,
-                Moment moment, boolean selectable)
+                Moment moment, boolean selectable, double minimumMarkPx,
+                String state)
             implements OverlayContribution {
         /** A body with no stated moment, not selectable - a study's, or the released form. */
         public Body(String identity, String accessibleName, SkyPosition at,
                     double angularDiameterArcseconds, Lit lit,
                     boolean belowHorizon, double distanceKm, InkRole role) {
             this(identity, accessibleName, at, angularDiameterArcseconds, lit,
-                    belowHorizon, distanceKm, role, null, false);
+                    belowHorizon, distanceKm, role, null, false, 0.0, null);
         }
 
+        /** A body drawn at true scale always (the Sun's and the Moon's rule, C1), with no state. */
+        public Body(String identity, String accessibleName, SkyPosition at,
+                    double angularDiameterArcseconds, Lit lit,
+                    boolean belowHorizon, double distanceKm, InkRole role,
+                    Moment moment, boolean selectable) {
+            this(identity, accessibleName, at, angularDiameterArcseconds, lit,
+                    belowHorizon, distanceKm, role, moment, selectable, 0.0, null);
+        }
+
+        /**
+         * @param minimumMarkPx the cartographic mark that stands in for the
+         *     disc while the true disc is smaller (rule M, ruling 1 on
+         *     #512: Venus), phased as the disc would be; 0 for a body drawn
+         *     at true scale always (C1: the Sun, the Moon)
+         * @param state what a reader who cannot see the page is told beside
+         *     the name when the body's geometric state matters (ruling 3 on
+         *     #512: Venus in front of or behind the Sun), as the page's
+         *     state key, or null
+         */
         public Body {
             requireIdentified(identity, accessibleName, role);
             requireMomentIfSelectable(identity, moment, selectable);
+            if (!(minimumMarkPx >= 0.0) || !Double.isFinite(minimumMarkPx)) {
+                throw new IllegalArgumentException(
+                        "a minimum mark is a size, or none: " + identity);
+            }
             if (at == null) {
                 throw new IllegalArgumentException(
                         "a body is somewhere: " + identity);

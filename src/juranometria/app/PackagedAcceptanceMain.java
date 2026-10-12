@@ -455,6 +455,7 @@ public final class PackagedAcceptanceMain {
         venusTableJourney();
         menuHelpJourney();
         sunOnTheChartJourney();
+        venusOnTheChartJourney();
         moonOnTheChartJourney();
         solarSystemSheetJourney();
         zoomLockJourney();
@@ -630,6 +631,7 @@ public final class PackagedAcceptanceMain {
                 AppMenuBar.addVenusTable(bar[0], said, () -> { });
                 AppMenuBar.addJupiterTable(bar[0], said, () -> { });
                 AppMenuBar.addJupiterOnChart(bar[0], said, () -> { });
+                AppMenuBar.addVenusOnChart(bar[0], said, () -> { });
             });
             java.util.Deque<javax.swing.JMenuItem> walk = new java.util.ArrayDeque<>();
             for (int m = 0; m < bar[0].getMenuCount(); m++) {
@@ -2500,6 +2502,89 @@ public final class PackagedAcceptanceMain {
      * page's own north and east, named and spoken; a click on the disc
      * is the empty sky there.
      */
+    /**
+     * Venus on the chart inside the packaged image (#514, the rulings on
+     * #512 and #513): at the elongation the packaged Venus sample
+     * restates, the production component with the Solar System module
+     * attached draws Venus at 8° as the phased 6 px symbol, spoken as
+     * one, and at the minimum field as its true disc; a click on the disc
+     * selects Venus's occurrence; the layer is the same on paper.
+     */
+    private static void venusOnTheChartJourney() throws Exception {
+        juranometria.solar.SolarSystemService solar =
+                juranometria.solar.SolarSystemService.load();
+        juranometria.sky.Observer oslo = new juranometria.sky.Observer(59.91, 10.75,
+                VENUS_SAMPLE_INSTANT);
+        juranometria.solar.VenusService.VenusObservation venus =
+                (juranometria.solar.VenusService.VenusObservation)
+                        solar.observe(juranometria.solar.SolarSystemService.Body.VENUS, oslo);
+        for (double field : new double[] {8.0,
+                juranometria.chart.ChartViewState.normalMinimumFieldDegrees()}) {
+            juranometria.ui.ChartComponent[] chart = new juranometria.ui.ChartComponent[1];
+            juranometria.chart.SelectionModel selection = new juranometria.chart.SelectionModel();
+            juranometria.ui.ChartModuleHost[] host = new juranometria.ui.ChartModuleHost[1];
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                chart[0] = new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
+                chart[0].setSize(900, 700);
+                chart[0].setViewState(new juranometria.chart.ChartViewState(
+                        venus.astrometricJ2000(), field, 8.0, null, null));
+                host[0] = new juranometria.ui.ChartModuleHost(chart[0], selection, r -> { });
+                juranometria.ui.SelectInteraction.install(chart[0], selection,
+                        host[0].workingSelection(), new juranometria.chart.SelectionMode());
+                juranometria.solarchart.SolarSystemModule module =
+                        juranometria.ui.solar.SunChartSession.begin(host[0], () -> oslo,
+                                () -> solar, () -> false);
+                module.venusShowing(true);
+            });
+            try {
+                paintHeadless(chart[0]);
+                java.util.List<juranometria.ui.ReferenceInk.BodyPlacement> drawn =
+                        chart[0].renderedBodies();
+                require(drawn.size() == 1 && juranometria.solarchart.SolarSystemModule.VENUS
+                        .equals(drawn.get(0).identity()), "the packaged chart drew Venus at "
+                        + field + "°: " + drawn);
+                juranometria.project.DrawnPage page =
+                        juranometria.project.DrawnPage.of(chart[0].currentScene());
+                juranometria.project.PixelPoint expected =
+                        new juranometria.project.ViewportMapping(page).toPixel(
+                                page.projection().project(venus.astrometricJ2000()).orElseThrow());
+                juranometria.project.PixelPoint centre = drawn.get(0).centre();
+                require(Math.hypot(centre.x() - expected.x(), centre.y() - expected.y()) < 0.01,
+                        "at the service's J2000 place at " + field + "°");
+                String said = chart[0].getAccessibleContext().getAccessibleDescription();
+                boolean symbol = field > juranometria.chart.ChartViewState
+                        .normalMinimumFieldDegrees();
+                require(drawn.get(0).symbol() == symbol,
+                        "the phased 6 px symbol at 8°, the true disc at the minimum field: "
+                                + field + "° " + drawn.get(0).symbol());
+                if (symbol) {
+                    double width = drawn.get(0).disc().getBounds2D().getWidth();
+                    require(Math.abs(width - juranometria.solarchart.SolarSystemModule
+                            .VENUS_MINIMUM_MARK_PX) < 0.05, "the 6 px mark: " + width);
+                    require(said.contains(" Venus (a cartographic symbol, not Venus's apparent"
+                            + " diameter)."), "spoken as a symbol: " + said);
+                } else {
+                    require(said.contains(" Venus.") || said.endsWith(" Venus."),
+                            "spoken as Venus: " + said);
+                    clickOn(chart[0], centre);
+                    require(selection.selection() instanceof juranometria.chart.Selection
+                            .Occurrence chosen
+                            && juranometria.solarchart.SolarSystemModule.VENUS.equals(
+                                    chosen.identity())
+                            && VENUS_SAMPLE_INSTANT.equals(chosen.instant()),
+                            "a click on Venus's disc is Venus's occurrence (#513): "
+                                    + selection.selection());
+                }
+            } finally {
+                javax.swing.SwingUtilities.invokeAndWait(host[0]::detachAll);
+            }
+        }
+        System.out.println("venus on the chart OK (the packaged component draws Venus"
+                + " where the service puts it at the 2026 greatest eastern elongation -"
+                + " the phased 6 px symbol at 8°, spoken as one; the true disc at the"
+                + " minimum field - and a click on the disc selects Venus's occurrence)");
+    }
+
     private static void moonOnTheChartJourney() throws Exception {
         juranometria.solar.SolarSystemService solar =
                 juranometria.solar.SolarSystemService.load();

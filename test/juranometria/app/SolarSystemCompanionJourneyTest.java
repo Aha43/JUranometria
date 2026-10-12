@@ -99,8 +99,8 @@ class SolarSystemCompanionJourneyTest {
                     assertNull(find(content, "moonTable"));
 
                     // Venus (#502): between the Sun and the Moon, introduced
-                    // collapsed; opened, it has computed nothing, and it offers
-                    // neither Show on chart nor Centre on chart - no Venus is drawn.
+                    // collapsed; opened, it has computed nothing; since #514 it
+                    // offers Show on chart and Centre on chart over its layer.
                     AbstractButton venusHeading = (AbstractButton) named(content,
                             "heading.solarsystem.venus");
                     java.util.List<String> headings = new java.util.ArrayList<>();
@@ -120,8 +120,10 @@ class SolarSystemCompanionJourneyTest {
                     assertNull(find(content, "venusCard"), "Venus, opened, has computed nothing");
                     assertNull(find(content, "venusTable"));
                     assertNotNull(find(content, "venusCompute"), "but its controls are there");
-                    assertNull(find(content, "venusOnChart"), "no Show on chart for Venus");
-                    assertNull(find(content, "venusCentreOnChart"), "and no Centre on chart");
+                    assertNotNull(find(content, "venusOnChart"), "Show on chart for Venus (#514)");
+                    assertFalse(((javax.swing.JCheckBox) find(content, "venusOnChart"))
+                            .isSelected(), "off by default: opening draws nothing");
+                    assertNotNull(find(content, "venusCentreOnChart"), "and Centre on chart");
 
                     // Jupiter (#474): after the Moon, introduced collapsed;
                     // opened, it has computed nothing.
@@ -242,8 +244,8 @@ class SolarSystemCompanionJourneyTest {
                     for (int i = 0; i < solar.getItemCount(); i++) {
                         order.add(solar.getItem(i) == null ? "—" : solar.getItem(i).getText());
                     }
-                    assertEquals(List.of("Sun on the chart", "Moon on the chart",
-                            "Jupiter and moons on the chart", "—",
+                    assertEquals(List.of("Sun on the chart", "Venus on the chart",
+                            "Moon on the chart", "Jupiter and moons on the chart", "—",
                             "Sun...", "Venus...", "Moon...", "Jupiter..."), order);
 
                     // The window's own focus traversal reaches the group: the
@@ -347,6 +349,7 @@ class SolarSystemCompanionJourneyTest {
                 juranometria.ui.placeandtime.PlaceStore.forNode(node),
                 juranometria.ui.ecliptic.EclipticStore.forNode(node),
                 SunChartStore.forNode(node),
+                juranometria.ui.solar.VenusChartStore.forNode(node),
                 juranometria.ui.solar.MoonChartStore.forNode(node),
                 juranometria.ui.solar.JovianChartStore.forNode(node),
                 ZoomLockStore.forNode(node),

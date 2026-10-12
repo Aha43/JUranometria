@@ -28,6 +28,9 @@ public interface MoonChartStore {
 
     void flush();
 
+    /** The preference key; Venus's (#514) is formed from it by the one rule. */
+    String KEY = "moonOnChartShown";
+
     static MoonChartStore user() {
         return forNode(Preferences.userRoot().node("juranometria"));
     }
@@ -37,7 +40,7 @@ public interface MoonChartStore {
             throw new IllegalArgumentException("a store is kept somewhere");
         }
         return new MoonChartStore() {
-            private static final String KEY = "moonOnChartShown";
+            private static final String KEY = MoonChartStore.KEY;
 
             @Override
             public Optional<Boolean> shown() {

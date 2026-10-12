@@ -210,6 +210,13 @@ public final class MenuSheetMain {
                 if (jupiterOnChart != null) {
                     jupiterOnChart.setSelected(state.checked());
                 }
+                // Venus on the chart (#514), which the application adds after
+                // the bar is built, directly after Sun on the chart.
+                JCheckBoxMenuItem venusOnChart = AppMenuBar.addVenusOnChart(bar[0],
+                        juranometria.ui.language.InterfaceText.forLanguage(language), () -> { });
+                if (venusOnChart != null) {
+                    venusOnChart.setSelected(state.checked());
+                }
 
                 JCheckBoxMenuItem inspector = AppMenuBar.inspectorItem(bar[0]);
                 if (inspector != null) {

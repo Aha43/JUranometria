@@ -22,8 +22,8 @@ import juranometria.ui.language.InterfaceText;
  * Jovian is drawn. Since #502 a Venus group stands between the Sun and
  * the Moon - the ruled order outward from the Sun, showing only the
  * bodies the atlas has - introduced collapsed, holding one
- * {@link SolarTableControls} over Venus's shared session, with neither
- * Show on chart nor Centre on chart, because no Venus is drawn.
+ * {@link SolarTableControls} over Venus's shared session - since #514
+ * with Show on chart and Centre on chart, as the Sun's and the Moon's.
  *
  * <p>Building the section computes nothing: each set of controls
  * reads the observer for its note and seeds, and shows whatever its
@@ -86,11 +86,26 @@ public final class SolarSystemSection {
     /**
      * With Venus (#502): its group between the Sun's and the Moon's,
      * over Venus's shared session, with no chart switch and no Centre on
-     * chart; a null session leaves it out.
+     * chart - the form before #514; a null session leaves it out.
      */
     public SolarSystemSection(SolarTableSession sunSession, SolarTableSession venusSession,
                               SolarTableSession moonSession,
                               BodyOnChart sunOnChart, BodyOnChart moonOnChart,
+                              JovianTableSession jupiterSession, BodyOnChart jupiterOnChart,
+                              CentreOnChart centre, InterfaceText said) {
+        this(sunSession, venusSession, moonSession, sunOnChart, null, moonOnChart,
+                jupiterSession, jupiterOnChart, centre, said);
+    }
+
+    /**
+     * With Venus drawn (#514, the rulings on #512): Venus's group carries
+     * its own Show on chart and, with the shared action, Centre on chart,
+     * as the Sun's and the Moon's do; a null switch leaves both out.
+     */
+    public SolarSystemSection(SolarTableSession sunSession, SolarTableSession venusSession,
+                              SolarTableSession moonSession,
+                              BodyOnChart sunOnChart, BodyOnChart venusOnChart,
+                              BodyOnChart moonOnChart,
                               JovianTableSession jupiterSession, BodyOnChart jupiterOnChart,
                               CentreOnChart centre, InterfaceText said) {
         if (sunSession.table().body() != juranometria.solar.SolarSystemService.Body.SUN
@@ -103,7 +118,9 @@ public final class SolarSystemSection {
         sun = new SolarTableControls(sunSession, said, sunOnChart, false, centre,
                 centre == null ? null : sunOnChart);
         venus = venusSession == null ? null
-                : new SolarTableControls(venusSession, said, null, false, null, null);
+                : new SolarTableControls(venusSession, said, venusOnChart, false,
+                        venusOnChart == null ? null : centre,
+                        venusOnChart == null || centre == null ? null : venusOnChart);
         moon = new SolarTableControls(moonSession, said, moonOnChart, false, centre,
                 centre == null ? null : moonOnChart);
         jupiter = jupiterSession == null ? null

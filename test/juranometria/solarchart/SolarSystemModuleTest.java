@@ -107,6 +107,48 @@ class SolarSystemModuleTest {
                 "the Sun is the farther, so the page paints it first");
     }
 
+    /**
+     * Venus (#514, the rulings on #512): its own switch offers Venus
+     * alone - the solid body's disc, phased exactly as the Venus table
+     * states it, over the 6 px minimum mark, selectable as an occurrence
+     * with its moment, its geometric state the page's key only when its
+     * disc meets the Sun's.
+     */
+    @Test
+    void shownVenusCarriesItsPhaseItsMarkAndItsMomentAsTheTableStatesThem() {
+        Rig rig = new Rig();
+        rig.module.venusShowing(true);
+        List<OverlayContribution> offered = rig.module.contributedGeometry();
+        assertEquals(1, offered.size(), "Venus's switch offers Venus alone");
+        OverlayContribution.Body venus = (OverlayContribution.Body) offered.get(0);
+        juranometria.solar.VenusService.VenusObservation expected =
+                (juranometria.solar.VenusService.VenusObservation)
+                        SERVICE.observe(Body.VENUS, OSLO);
+        assertEquals(SolarSystemModule.VENUS, venus.identity());
+        assertEquals(expected.astrometricJ2000(), venus.at());
+        assertEquals(expected.solidBodyDiameterArcseconds(),
+                venus.angularDiameterArcseconds(), 0.0, "the solid body, never the clouds");
+        assertEquals(expected.distanceKm(), venus.distanceKm(), 0.0);
+        assertEquals(expected.illuminatedFraction(), venus.lit().illuminatedFraction(), 0.0);
+        assertEquals(expected.brightLimbAngleDegrees(),
+                venus.lit().brightLimbAngleDegrees(), 0.0, "χ of date, the table's");
+        assertEquals(expected.phaseAngleDegrees(), venus.lit().phaseAngleDegrees(), 0.0);
+        assertEquals(SolarSystemModule.VENUS_MINIMUM_MARK_PX, venus.minimumMarkPx(), 0.0,
+                "rule M: the 6 px mark stands in for a smaller disc");
+        assertTrue(venus.selectable(), "a selectable occurrence (#513, ruling 2)");
+        assertEquals(OSLO.instant(), venus.moment().instant());
+        assertEquals(null, venus.state(), "no state: Venus is clear of the Sun's disc");
+        rig.module.sunShowing(true);
+        rig.module.moonShowing(true);
+        assertEquals(3, rig.module.contributedGeometry().size(), "three switches, three bodies");
+        // Outside Venus's years the table says why; the chart draws nothing.
+        rig.observer = OSLO.at(Instant.parse("1850-01-01T00:00:00Z"));
+        rig.module.sunShowing(false);
+        rig.module.moonShowing(false);
+        assertEquals(List.of(), rig.module.contributedGeometry(),
+                "no numbers, nothing drawn");
+    }
+
     @Test
     void belowTheHorizonIsSaidOnlyWhileTheHorizonIsDrawn() {
         Rig rig = new Rig();

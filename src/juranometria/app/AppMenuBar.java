@@ -253,6 +253,19 @@ public final class AppMenuBar {
 
     /** The name the Moon-on-the-chart switch carries, for tests to find (#416). */
     public static final String MOON_CHART_ITEM = "moonOnChartItem";
+    /**
+     * Venus on the chart's item (#514), between the Sun's and the Moon's:
+     * named by the Moon's rule - the body's identity and the item's
+     * suffix - so no new name is written down.
+     */
+    public static final String VENUS_CHART_ITEM =
+            juranometria.solarchart.SolarSystemModule.VENUS
+                    + MOON_CHART_ITEM.substring(juranometria.solarchart.SolarSystemModule.MOON.length());
+
+    public static javax.swing.JCheckBoxMenuItem venusChartItem(
+            javax.swing.JMenuBar bar) {
+        return checkBoxItem(bar, VENUS_CHART_ITEM);
+    }
 
     /** View's Moon-on-the-chart switch, or null when the bar has none. */
     public static javax.swing.JCheckBoxMenuItem moonChartItem(
@@ -903,6 +916,36 @@ public final class AppMenuBar {
         for (int i = 0; i < solar.getMenuComponentCount(); i++) {
             java.awt.Component c = solar.getMenuComponent(i);
             if (MOON_CHART_ITEM.equals(c.getName()) || SUN_CHART_ITEM.equals(c.getName())) {
+                after = i;
+            }
+        }
+        solar.insert(item, after + 1);
+        return item;
+    }
+
+    /**
+     * Adds View > Solar System > Venus on the chart directly after Sun
+     * on the chart (#514; the ruled order outward from the Sun): the one
+     * remembered switch for Venus's layer, toggled like the Sun's and the
+     * Moon's. Returns the item, which the session then keeps in step with
+     * the module, or null on a bar without the submenu.
+     */
+    public static javax.swing.JCheckBoxMenuItem addVenusOnChart(javax.swing.JMenuBar bar,
+            juranometria.ui.language.InterfaceText said, Runnable toggleVenusOnChart) {
+        JMenu solar = solarSystemMenu(bar);
+        if (solar == null || toggleVenusOnChart == null) {
+            return null;
+        }
+        javax.swing.JCheckBoxMenuItem item = new javax.swing.JCheckBoxMenuItem(
+                said.say("menu.venuschart.label"));
+        item.setName(VENUS_CHART_ITEM);
+        juranometria.ui.language.MnemonicText.in(said).apply(item, "menu.venuschart.mnemonic");
+        item.getAccessibleContext().setAccessibleName(said.say("menu.venuschart.a11y"));
+        juranometria.ui.Explain.selfExplanatory(item, said.say("menu.venuschart.explain"));
+        item.addActionListener(event -> toggleVenusOnChart.run());
+        int after = -1;
+        for (int i = 0; i < solar.getMenuComponentCount(); i++) {
+            if (SUN_CHART_ITEM.equals(solar.getMenuComponent(i).getName())) {
                 after = i;
             }
         }
