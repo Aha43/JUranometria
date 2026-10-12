@@ -158,6 +158,28 @@ both languages rather than in one.
 | Clear selection | Remove every working mark | Clear selection | Empties the whole working selection. The page and your place in it are left alone. |
 | Centre here | Centre the chart on the selected object | Centre here | Moves the page so the object shown here sits at the centre; nothing about what the chart draws changes |
 
+### A Solar System body at the page's moment
+
+| shown | hovered | spoken as | read out |
+|---|---|---|---|
+| Moon | — | Selected object | — |
+| — | Close Inspector (⌘I) | Close Inspector | Hides this pane. The chart keeps its place, its target and your selection, and widens to use the space. |
+| Selected | The facts of the object you last chose | Selected | Shows what the atlas holds on the one object you chose, rather than everything on the page |
+| On this page | Everything on the page you are looking at, drawn or not | On this page | Lists every object the atlas holds within this page, including the ones the chart is not drawing, and says why each is or is not drawn |
+| — | Several objects lie within reach of that point; choose one to inspect it | Objects at this point | A list of everything within reach of the point you clicked. Choosing one shows its facts here and does not move the chart. |
+| — | — | Details of the selected object | — |
+| Computed for 2026-06-21 21:55:00 UTC, the instant set in Place and Time | — | Computed for 2026-06-21 21:55:00 UTC, the instant set in Place and Time | — |
+| For an observer at latitude 59.913, longitude 10.752 east | — | For an observer at latitude 59.913, longitude 10.752 east | — |
+| 11h 54.9m −3° 07′ | — | 11h 54.9m −3° 07′ | — |
+| ICRS J2000 | — | ICRS J2000 | — |
+| — | — | Working set | Every object in the working selection, across pages, in the order they joined |
+| Working set · 1 | — | Working set · 1 | — |
+| ◉ | — | ◉ | — |
+| Moon | Show the facts for Moon | Moon, lead | Makes this member the lead and shows its facts here. Membership is unchanged. |
+| ✕ | Remove Moon from the working selection | Remove Moon | Takes Moon out of the working selection. The rest stay, and the page does not move. |
+| Clear selection | Remove every working mark | Clear selection | Empties the whole working selection. The page and your place in it are left alone. |
+| Centre here | Centre the chart on the selected object | Centre here | Moves the page so the object shown here sits at the centre; nothing about what the chart draws changes |
+
 ## Norsk bokmål (`nb-NO`)
 
 ### Nothing selected
@@ -265,6 +287,28 @@ both languages rather than in one.
 | NGC 7000 | Vis opplysningene om NGC 7000 | NGC 7000, utenfor siden | Gjør dette objektet til hovedobjektet og viser opplysningene her. Utvalget endres ikke. |
 | utenfor siden | — | utenfor siden | — |
 | ✕ | Fjern NGC 7000 fra arbeidsutvalget | Fjern NGC 7000 | Tar NGC 7000 ut av arbeidsutvalget. Resten blir stående, og siden flytter seg ikke. |
+| Tøm utvalget | Remove every working mark | Clear selection | Empties the whole working selection. The page and your place in it are left alone. |
+| Sentrer her | Sentrer kartet på det valgte objektet | Sentrer her | Flytter siden slik at objektet som vises her havner i midten; ingenting ved det kartet tegner endres. |
+
+### A Solar System body at the page's moment
+
+| shown | hovered | spoken as | read out |
+|---|---|---|---|
+| Månen | — | Valgt objekt | — |
+| — | Lukk inspektøren (⌘I) | Lukk inspektøren | Skjuler denne ruten. Kartet beholder stedet, målet og utvalget ditt, og utvider seg til å bruke plassen. |
+| Selected | Opplysningene om objektet du sist valgte | Valgt | Viser det atlaset vet om det ene objektet du valgte, ikke alt som er på siden. |
+| On this page | Alt på siden du ser på, tegnet eller ikke | På denne siden | Lister opp hvert objekt atlaset har innenfor denne siden, også de kartet ikke tegner, og sier hvorfor hvert enkelt tegnes eller ikke. |
+| — | Flere objekter ligger innenfor rekkevidde av punktet; velg ett for å se på det | Objekter på dette punktet | En liste over alt innenfor rekkevidde av punktet du klikket på. Å velge ett viser opplysningene her og flytter ikke kartet. |
+| — | — | Opplysninger om det valgte objektet | — |
+| Beregnet for 2026-06-21 21:55:00 UTC, tidspunktet satt i Sted og tid | — | Beregnet for 2026-06-21 21:55:00 UTC, tidspunktet satt i Sted og tid | — |
+| For en observatør på bredde 59.913, lengde 10.752 øst | — | For en observatør på bredde 59.913, lengde 10.752 øst | — |
+| 11h 54.9m −3° 07′ | — | 11h 54.9m −3° 07′ | — |
+| ICRS J2000 | — | ICRS J2000 | — |
+| — | — | Arbeidsutvalg | Hvert objekt i arbeidsutvalget, på tvers av sider, i den rekkefølgen de kom til |
+| Arbeidsutvalg · 1 | — | Arbeidsutvalg · 1 | — |
+| ◉ | — | ◉ | — |
+| Månen | Vis opplysningene om Månen | Månen, hovedobjekt | Gjør dette objektet til hovedobjektet og viser opplysningene her. Utvalget endres ikke. |
+| ✕ | Fjern Månen fra arbeidsutvalget | Fjern Månen | Tar Månen ut av arbeidsutvalget. Resten blir stående, og siden flytter seg ikke. |
 | Tøm utvalget | Remove every working mark | Clear selection | Empties the whole working selection. The page and your place in it are left alone. |
 | Sentrer her | Sentrer kartet på det valgte objektet | Sentrer her | Flytter siden slik at objektet som vises her havner i midten; ingenting ved det kartet tegner endres. |
 

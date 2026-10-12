@@ -183,7 +183,8 @@ public final class JovianModule implements ChartModule {
         offered.add(new OverlayContribution.OblateBody(JUPITER, "Jupiter",
                 jupiter.astrometricJ2000(), jupiter.equatorialDiameterArcseconds(),
                 jupiter.polarDiameterArcseconds(), jovian.poleAngleJ2000Degrees(jupiter),
-                MINIMUM_MARK_PX, below, jupiter.distanceKm(), InkRole.BODY));
+                MINIMUM_MARK_PX, below, jupiter.distanceKm(), InkRole.BODY,
+                OverlayContribution.Moment.of(now), true));
         // The four Galilean moons (#485), where they have numbers
         // (2000-2100): each at its own astrometric J2000 place - never the
         // table's of-date X/Y offsets - with its state, for the page to
@@ -203,7 +204,10 @@ public final class JovianModule implements ChartModule {
             offered.add(new OverlayContribution.Satellite(identityOf(moon.moon()),
                     nameOf(moon.moon()), moon.astrometricJ2000(), JUPITER, relation,
                     moon.shadowRelation() != JovianSystemService.ShadowRelation.SUNLIT,
-                    PRECEDENCE.indexOf(moon.moon()), MOON_MARK_PX, below, InkRole.BODY));
+                    // Ruled on #513: the moons stay unselectable until their
+                    // marks, overlap, states and click priority are ruled.
+                    PRECEDENCE.indexOf(moon.moon()), MOON_MARK_PX, below, InkRole.BODY,
+                    OverlayContribution.Moment.of(now), false));
         }
         return List.copyOf(offered);
     }

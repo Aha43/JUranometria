@@ -220,6 +220,11 @@ public final class JUranometriaMain {
         // selected; the panel re-reads it rather than going on
         // describing something that has gone.
         chart.onSceneChange(inspector::refresh);
+        // And when a paint draws other bodies, or the same for another
+        // moment (#513): what the Inspector says of a selected
+        // occurrence - on this page, or for the instant it held - is
+        // the page's to decide.
+        chart.onBodiesChange(inspector::refresh);
 
         // The first module (issue #216). The chart offers services;
         // this asks for them and gives back a table and some crosses.

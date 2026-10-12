@@ -344,6 +344,46 @@ public final class ChartComponent extends JComponent {
         return drawnBodies;
     }
 
+    /** Told after a paint whose drawn bodies differ from the last paint's (#513). */
+    private final java.util.List<Runnable> bodyListeners =
+            new java.util.ArrayList<>();
+    /** What the last paint's bodies were, for telling a change from a repaint. */
+    private java.util.List<Object> bodySignature = java.util.List.of();
+
+    /**
+     * Told whenever a paint draws a different set of bodies, or the
+     * same bodies for a different moment or at different places - the
+     * seam a selected occurrence re-resolves through (#513).
+     */
+    public void onBodiesChange(Runnable listener) {
+        if (listener != null) {
+            bodyListeners.add(listener);
+        }
+    }
+
+    /**
+     * The selectable body a reader points at, if any (#513): on its
+     * drawn ink or within the hit tolerance of its centre, the nearest
+     * first. A body offered without a moment, or not selectable, is
+     * never answered here - see {@link #bodyAt} for what its opaque ink
+     * does to a click.
+     */
+    public java.util.Optional<ReferenceInk.BodyPlacement> selectableBodyAt(
+            double x, double y) {
+        ReferenceInk.BodyPlacement nearest = null;
+        double best = Double.MAX_VALUE;
+        for (ReferenceInk.BodyPlacement body : drawnBodies) {
+            if (body.pointedAt(x, y, juranometria.render.ChartHitTest.TOLERANCE_PX)) {
+                double d = Math.hypot(body.centre().x() - x, body.centre().y() - y);
+                if (d < best) {
+                    best = d;
+                    nearest = body;
+                }
+            }
+        }
+        return java.util.Optional.ofNullable(nearest);
+    }
+
     /**
      * The opaque body under a page point, if any (#414 ruling C4 and
      * C6): what it covers is covered, for the pointer as for the eye.
@@ -607,6 +647,22 @@ public final class ChartComponent extends JComponent {
                                                 .membersOf(emphasized)));
                     },
                     null, emphasized);
+            // A paint that drew other bodies, or the same for another
+            // moment or place, is told to whoever resolves a selected
+            // occurrence against the page (#513); an unchanged repaint
+            // is not.
+            java.util.List<Object> signature = new java.util.ArrayList<>();
+            for (ReferenceInk.BodyPlacement body : drawnBodies) {
+                signature.add(java.util.List.of(body.identity(),
+                        java.util.Objects.requireNonNullElse(body.moment(), ""),
+                        body.selectable(), body.centre()));
+            }
+            if (!signature.equals(bodySignature)) {
+                bodySignature = signature;
+                for (Runnable listener : java.util.List.copyOf(bodyListeners)) {
+                    listener.run();
+                }
+            }
             // What a reader who cannot see the page is told follows
             // what the page actually rendered (#359): the base
             // description, and then every cardinal direction this

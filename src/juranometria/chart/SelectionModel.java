@@ -132,6 +132,18 @@ public final class SelectionModel {
     }
 
     /**
+     * A drawn Solar System body at the instant and place it was drawn
+     * for (#513): one answer, no candidates - a body is never one of
+     * several things at a point, because its ink is its own.
+     */
+    public void selectOccurrence(Selection.Occurrence occurrence) {
+        if (occurrence == null) {
+            throw new IllegalArgumentException("use clear() when nothing was hit");
+        }
+        set(occurrence, List.of(), -1);
+    }
+
+    /**
      * Several candidates in the reviewed order, the first current.
      * The reader is being offered a choice; the atlas has not made
      * one for them.

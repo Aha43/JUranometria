@@ -137,7 +137,7 @@ class SunOnTheChartJourneyTest {
     }
 
     @Test
-    void aClickOnTheDiscIsTheEmptySkyThereAndHidesWhatIsBehindIt() throws Exception {
+    void aClickOnTheDiscIsTheSunsOccurrenceAndHidesWhatIsBehindIt() throws Exception {
         build(OSLO, false);
         SwingUtilities.invokeAndWait(() -> module.sunShowing(true));
         paint();
@@ -148,12 +148,17 @@ class SunOnTheChartJourneyTest {
         ChartHitTest bare = new ChartHitTest(new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH));
         ChartHitTest.Hit under = bare.at(chart.currentScene(), chart.chartOptions(), cx, cy);
         click(cx, cy + chart.pageOffsetY());
-        assertInstanceOf(Selection.EmptySky.class, selection.selection(),
-                "the disc consumed the click: " + selection.selection()
-                        + " (the bare page would have said " + under + ")");
+        // Ruled on #513: the Sun is a selectable occurrence - the click
+        // is the Sun at the instant and place it was drawn for, and
+        // still nothing behind the disc is offered.
+        Selection.Occurrence said = assertInstanceOf(Selection.Occurrence.class,
+                selection.selection(), "the disc answered with the Sun's occurrence: "
+                        + selection.selection() + " (the bare page would have said "
+                        + under + ")");
+        assertEquals(SolarSystemModule.SUN, said.identity());
+        assertEquals(OSLO.instant(), said.instant());
         assertEquals(List.of(), selection.candidates(), "nothing behind it is offered");
-        SkyPosition said = ((Selection.EmptySky) selection.selection()).position();
-        assertTrue(said.separationDegrees(sun(OSLO).astrometricJ2000()) < 0.05,
+        assertTrue(said.position().separationDegrees(sun(OSLO).astrometricJ2000()) < 0.05,
                 "the place the reader pointed at is the Sun's");
         // Beside the disc, the page answers as before.
         SwingUtilities.invokeAndWait(selection::clear);

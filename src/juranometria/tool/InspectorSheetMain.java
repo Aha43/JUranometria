@@ -147,7 +147,7 @@ public final class InspectorSheetMain {
                     .append("`)\n\n");
             int sheet = 1;
             for (String state : List.of("none", "emptysky", "star",
-                    "deepsky", "ambiguous", "workingset")) {
+                    "deepsky", "ambiguous", "workingset", "occurrence")) {
                 said.append("### ").append(title(state)).append("\n\n")
                         .append("| shown | hovered | spoken as | read out |\n")
                         .append("|---|---|---|---|\n")
@@ -159,7 +159,7 @@ public final class InspectorSheetMain {
         }
         Files.writeString(out.resolve("inspector-strings.md"),
                 said.toString(), StandardCharsets.UTF_8);
-        System.out.println("inspector sheets: 12 images and "
+        System.out.println("inspector sheets: 14 images and "
                 + out.resolve("inspector-strings.md"));
     }
 
@@ -170,6 +170,7 @@ public final class InspectorSheetMain {
             case "star" -> "A named star";
             case "deepsky" -> "A deep-sky object";
             case "ambiguous" -> "Several objects at one point";
+            case "occurrence" -> "A Solar System body at the page's moment";
             default -> "The working set";
         };
     }
@@ -192,7 +193,8 @@ public final class InspectorSheetMain {
                         () -> ChartOptions.DEFAULTS, chosen -> { },
                         InterfaceText.forLanguage(language));
                 owner[0].setContentPane(panel[0]);
-                arrange(state, scene, selection, working, panel[0]);
+                arrange(state, scene, selection, working, panel[0],
+                        InterfaceText.forLanguage(language));
                 owner[0].pack();
             });
             SwingUtilities.invokeAndWait(() -> { });
@@ -240,7 +242,7 @@ public final class InspectorSheetMain {
     private static void arrange(String state, ChartScene scene,
                                 SelectionModel selection,
                                 juranometria.chart.WorkingSelection working,
-                                InspectorPanel panel) {
+                                InspectorPanel panel, InterfaceText said) {
         switch (state) {
             case "emptysky" -> selection.selectEmptySky(
                     new SkyPosition(84.0, -1.5));
@@ -277,6 +279,40 @@ public final class InspectorSheetMain {
                 panel.showWorkingSet(working, () -> page);
                 working.lead(page.entries().isEmpty() ? "NGC 7000"
                         : page.entries().get(0).identity());
+            }
+            // The Moon as an occurrence (#513): at the June 2026 first
+            // quarter the Moon events fixture cites, over Oslo, with the
+            // page's inventory holding the drawn body so the heading is
+            // the page's name for it.
+            case "occurrence" -> {
+                java.time.Instant when;
+                try {
+                    when = MoonEventsFixture.read().get("first-quarter-june").instant();
+                } catch (IOException unreadable) {
+                    throw new IllegalStateException(unreadable);
+                }
+                juranometria.sky.Observer oslo =
+                        new juranometria.sky.Observer(59.913, 10.752, when);
+                juranometria.solar.SolarSystemService.MoonObservation moon =
+                        (juranometria.solar.SolarSystemService.MoonObservation)
+                                juranometria.solar.SolarSystemService.load().observe(
+                                        juranometria.solar.SolarSystemService.Body.MOON, oslo);
+                juranometria.module.OverlayContribution.Moment moment =
+                        juranometria.module.OverlayContribution.Moment.of(oslo);
+                juranometria.page.PageContents page =
+                        juranometria.page.PageInventory.of(scene, ChartOptions.DEFAULTS)
+                                .withBodies(List.of(new juranometria.page.PageEntry.Body(
+                                        juranometria.solarchart.SolarSystemModule.MOON,
+                                        juranometria.ui.language.PageText.in(said)
+                                                .bodyName(juranometria.solarchart
+                                                        .SolarSystemModule.MOON),
+                                        moon.astrometricJ2000(), moment, true, 0.0)));
+                working.add(juranometria.solarchart.SolarSystemModule.MOON);
+                panel.showWorkingSet(working, () -> page);
+                selection.selectOccurrence(new Selection.Occurrence(
+                        juranometria.solarchart.SolarSystemModule.MOON, when,
+                        oslo.latitudeDegrees(), oslo.eastLongitudeDegrees(),
+                        moon.astrometricJ2000()));
             }
             default -> { }
         }

@@ -265,16 +265,33 @@ public final class ViewReport {
                 new Switch("magnitude-key", o.magnitudeKey()));
     }
 
-    private static String selection(Selection selection) {
+    /** The selection line's value; package-visible for its own test (#513). */
+    static String selection(Selection selection) {
         if (selection instanceof Selection.Object object) {
             return token(object.kind().name()) + " "
                     + object.catalogueId();
         }
         if (selection instanceof Selection.EmptySky sky) {
-            return "empty sky at RA " + exact(sky.position().raDegrees())
-                    + "; Dec " + exact(sky.position().decDegrees());
+            return "empty sky at " + place(sky.position().raDegrees(),
+                    sky.position().decDegrees());
+        }
+        if (selection instanceof Selection.Occurrence body) {
+            return "occurrence " + body.identity() + " at " + body.instant()
+                    + " for latitude " + exact(body.latitudeDegrees())
+                    + "; longitude " + exact(body.eastLongitudeDegrees())
+                    + "; " + place(body.position().raDegrees(),
+                            body.position().decDegrees());
         }
         return "none";
+    }
+
+    /**
+     * A place as the report writes one: both coordinates, exactly, in
+     * degrees - as two numbers, so this text-only feature names no
+     * chart type and stays outside the rendering closure.
+     */
+    private static String place(double raDegrees, double decDegrees) {
+        return "RA " + exact(raDegrees) + "; Dec " + exact(decDegrees);
     }
 
     /** A double exactly as Java round-trips it, independent of locale. */

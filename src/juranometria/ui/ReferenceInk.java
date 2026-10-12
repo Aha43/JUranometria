@@ -1273,7 +1273,16 @@ public final class ReferenceInk {
     public record BodyPlacement(String identity, PixelPoint centre,
                                 Shape disc, String name, Rectangle2D box,
                                 boolean belowHorizon, boolean symbol,
-                                String state) {
+                                String state, OverlayContribution.Moment moment,
+                                boolean selectable) {
+        /** As before #513: no stated moment, not selectable. */
+        public BodyPlacement(String identity, PixelPoint centre, Shape disc,
+                             String name, Rectangle2D box, boolean belowHorizon,
+                             boolean symbol, String state) {
+            this(identity, centre, disc, name, box, belowHorizon, symbol, state,
+                    null, false);
+        }
+
         /**
          * Whether a page point lies on this body's opaque ink. A
          * cartographic symbol (#484) is no opaque ink: it hides nothing,
@@ -1281,6 +1290,17 @@ public final class ReferenceInk {
          */
         public boolean covers(double x, double y) {
             return !symbol && disc.contains(x, y);
+        }
+
+        /**
+         * Whether a reader pointing here points at this body as an
+         * occurrence (#513): a selectable body, on its drawn ink or
+         * within the chart's hit tolerance of its centre - a symbol as
+         * much as a disc, because a reader can point at what they see.
+         */
+        public boolean pointedAt(double x, double y, double tolerance) {
+            return selectable && (disc.contains(x, y)
+                    || Math.hypot(centre.x() - x, centre.y() - y) <= tolerance);
         }
     }
 
@@ -1769,16 +1789,29 @@ public final class ReferenceInk {
         for (int i = 0; i < drawn.size(); i++) {
             placed.add(new BodyPlacement(drawn.get(i).identity(), centres.get(i),
                     discs.get(i), names[i], boxes[i], belowHorizonOf(drawn.get(i)),
-                    oblates.get(i) != null && oblates.get(i).symbol(), null));
+                    oblates.get(i) != null && oblates.get(i).symbol(), null,
+                    momentOf(drawn.get(i)), selectableOf(drawn.get(i))));
         }
         for (SatelliteMark m : moons) {
             OverlayContribution.Satellite s = m.satellite();
             String state = s.relation() == OverlayContribution.Satellite.Relation.IN_FRONT
                     ? "jovian.inFront" : s.shadowed() ? "jovian.shadowed" : null;
             placed.add(new BodyPlacement(s.identity(), m.centre(), m.mark(),
-                    moonNames.get(m), moonBoxes.get(m), s.belowHorizon(), true, state));
+                    moonNames.get(m), moonBoxes.get(m), s.belowHorizon(), true, state,
+                    s.moment(), s.selectable()));
         }
         return List.copyOf(placed);
+    }
+
+    /** The moment a body was computed for, or null when it states none. */
+    private static OverlayContribution.Moment momentOf(OverlayContribution body) {
+        return body instanceof OverlayContribution.OblateBody oblate ? oblate.moment()
+                : ((OverlayContribution.Body) body).moment();
+    }
+
+    private static boolean selectableOf(OverlayContribution body) {
+        return body instanceof OverlayContribution.OblateBody oblate ? oblate.selectable()
+                : ((OverlayContribution.Body) body).selectable();
     }
 
     private static double distanceOf(OverlayContribution body) {

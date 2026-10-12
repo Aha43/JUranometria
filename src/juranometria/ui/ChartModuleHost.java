@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 
 import juranometria.chart.ChartScene;
 import juranometria.chart.ChartViewState;
+import juranometria.chart.Selection;
 import juranometria.chart.SelectionModel;
 import juranometria.chart.SkyPosition;
 import juranometria.module.ChartModule;
@@ -63,6 +64,11 @@ public final class ChartModuleHost implements ChartServices {
         this.navigation = navigation;
         rebuild();
         chart.onSceneChange(this::rebuild);
+        // The bodies a paint drew join the inventory after that paint
+        // (#513): they are the paint's, not the scene's, and a page
+        // that draws them for another moment is another page for a
+        // selected occurrence, which re-resolves here.
+        chart.onBodiesChange(this::bodiesChanged);
         // And when the reader changes what the chart draws: the
         // scene is the same sky, but what can be seen of it is not,
         // and an inventory that reported visibility from a stale
@@ -105,6 +111,54 @@ public final class ChartModuleHost implements ChartServices {
             listener.accept(inventory);
         }
         chart.repaint();
+    }
+
+    /**
+     * A paint drew other bodies, or the same for another moment: the
+     * inventory carries them as the page draws them, and a selected
+     * occurrence of a body the page still draws follows the page -
+     * the same identity, the moment and place now drawn - while one
+     * the page no longer draws keeps the moment it was selected for
+     * and says so (#513; the behaviour for the owner's ruling).
+     */
+    private void bodiesChanged() {
+        ChartScene scene = chart.currentScene();
+        List<juranometria.page.PageEntry.Body> bodies = new ArrayList<>();
+        juranometria.project.DrawnPage page = scene == null ? null
+                : juranometria.project.DrawnPage.of(scene);
+        for (juranometria.ui.ReferenceInk.BodyPlacement drawn : chart.renderedBodies()) {
+            if (drawn.moment() == null || page == null) {
+                continue;
+            }
+            juranometria.chart.SkyPosition at = juranometria.render.ChartHitTest.skyAt(
+                    page, drawn.centre().x(), drawn.centre().y());
+            if (at == null) {
+                continue;
+            }
+            // Named as the page names it, whether or not the page found
+            // room for the name beside the disc.
+            bodies.add(new juranometria.page.PageEntry.Body(drawn.identity(),
+                    chart.words().bodyName(drawn.identity()), at,
+                    drawn.moment(), drawn.selectable(),
+                    at.separationDegrees(scene.viewport().centre())));
+        }
+        inventory = inventory.withBodies(bodies);
+        for (Consumer<PageContents> listener : List.copyOf(pageListeners)) {
+            listener.accept(inventory);
+        }
+        if (selection.selection() instanceof Selection.Occurrence current) {
+            for (juranometria.page.PageEntry.Body body : bodies) {
+                if (body.selectable() && body.identity().equals(current.identity())) {
+                    Selection.Occurrence now = new Selection.Occurrence(body.identity(),
+                            body.moment().instant(), body.moment().latitudeDegrees(),
+                            body.moment().eastLongitudeDegrees(), body.position());
+                    if (!now.sameAs(current) || !now.position().equals(current.position())) {
+                        selection.selectOccurrence(now);
+                    }
+                    return;
+                }
+            }
+        }
     }
 
     // ---- the services --------------------------------------------

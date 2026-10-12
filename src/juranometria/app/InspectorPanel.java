@@ -553,6 +553,11 @@ said.say("inspector.tab.page.explain"));
         clearSelection.addActionListener(event -> working.clear());
         this.unsubscribeWorking =
                 working.onChange(change -> rebuildWorkingSet());
+        // A selection answered before the page was wired is described
+        // against the page now: an occurrence's heading is the page's
+        // name for the body (#513).
+        show(new SelectionModel.Change(selection.selection(),
+                selection.candidates(), selection.currentIndex()));
     }
 
     /**
@@ -588,8 +593,14 @@ said.say("inspector.tab.page.explain"));
                 // not.
                 boolean offPage = page == null
                         || page.find(member).isEmpty();
-                workingSet.add(memberRow(member, leads, offPage));
-                workingSetTexts.add((leads ? "◉ " : "") + member
+                // A body member is shown by the page's name for it (#513);
+                // a catalogue member by its designation, as always.
+                String shown = page == null ? member : page.find(member)
+                        .filter(entry -> entry instanceof juranometria.page.PageEntry.Body)
+                        .map(entry -> ((juranometria.page.PageEntry.Body) entry).name())
+                        .orElse(member);
+                workingSet.add(memberRow(member, shown, leads, offPage));
+                workingSetTexts.add((leads ? "◉ " : "") + shown
                         + (offPage ? " — off this page" : ""));
             }
             clearSelection.setAlignmentX(0.0f);
@@ -603,14 +614,14 @@ said.say("inspector.tab.page.explain"));
     }
 
     /** One member's row: lead mark, name, off-page word, remove. */
-    private JComponent memberRow(String member, boolean leads,
+    private JComponent memberRow(String member, String shown, boolean leads,
                                  boolean offPage) {
         JPanel row = new JPanel();
         row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
         row.setAlignmentX(0.0f);
         JLabel leadMark = new JLabel(leads ? "◉ " : "   ");
         row.add(leadMark);
-        JButton name = new JButton(member);
+        JButton name = new JButton(shown);
         name.putClientProperty("JButton.buttonType", "toolBarButton");
         name.setHorizontalAlignment(javax.swing.SwingConstants.LEADING);
         if (leads) {
@@ -625,12 +636,12 @@ said.say("inspector.tab.page.explain"));
                                  : "inspector.member.a11y.lead")
                       : (offPage ? "inspector.member.a11y.offpage"
                                  : "inspector.member.a11y"),
-                member));
+                shown));
         juranometria.ui.Explain.control(name,
                 // "Show M 31's facts" put an English possessive on a
                 // catalogue designation. A designation takes no
                 // inflection in any language the atlas speaks.
-                said.say("inspector.member.hover", member),
+                said.say("inspector.member.hover", shown),
                 said.say("inspector.member.explain"));
         name.addActionListener(event -> working.lead(member));
         row.add(name);
@@ -652,10 +663,10 @@ said.say("inspector.tab.page.explain"));
         JButton remove = new JButton("\u2715");
         remove.putClientProperty("JButton.buttonType", "toolBarButton");
         remove.getAccessibleContext().setAccessibleName(
-                said.say("inspector.member.remove", member));
+                said.say("inspector.member.remove", shown));
         juranometria.ui.Explain.control(remove,
-                said.say("inspector.member.remove.hover", member),
-                said.say("inspector.member.remove.explain", member));
+                said.say("inspector.member.remove.hover", shown),
+                said.say("inspector.member.remove.explain", shown));
         remove.addActionListener(event -> working.remove(member));
         row.add(remove);
         row.setMaximumSize(new Dimension(Integer.MAX_VALUE,
@@ -880,6 +891,8 @@ said.say("inspector.tab.page.explain"));
             fact(FRAME);
             fact("");
             fact(said.say("inspector.emptysky.fact"), true);
+        } else if (current instanceof Selection.Occurrence body) {
+            describeOccurrence(body);
         } else {
             Selection.Object object = (Selection.Object) current;
             if (change.isAmbiguous()) {
@@ -903,6 +916,42 @@ said.say("inspector.tab.page.explain"));
         revalidate();
         repaint();
     }
+
+    /**
+     * A drawn body at the moment it was drawn for (#513): its name as
+     * the page says it, the instant and the observer it was computed
+     * for, its J2000 place - and, when the page no longer draws it,
+     * that the facts are for the instant stated. Its numbers are the
+     * table's, not repeated here.
+     */
+    private void describeOccurrence(Selection.Occurrence body) {
+        juranometria.page.PageContents page = pageContents == null ? null
+                : pageContents.get();
+        java.util.Optional<juranometria.page.PageEntry.Body> drawn = page == null
+                ? java.util.Optional.empty()
+                : page.bodies().stream()
+                        .filter(entry -> entry.identity().equals(body.identity()))
+                        .findFirst();
+        setSelectedHeading(drawn.map(juranometria.page.PageEntry.Body::name)
+                .orElse(body.identity()));
+        // Sentences, so they break across lines like the explanatory
+        // facts do, rather than being cut as a designation would be.
+        fact(said.say("inspector.occurrence.instant", OCCURRENCE_INSTANT.format(
+                body.instant().atOffset(java.time.ZoneOffset.UTC))), true);
+        fact(said.say("inspector.occurrence.observer",
+                String.format(Locale.ROOT, "%.3f", body.latitudeDegrees()),
+                String.format(Locale.ROOT, "%.3f", body.eastLongitudeDegrees())), true);
+        fact(coordinates(body.position()));
+        fact(FRAME);
+        if (page != null && drawn.isEmpty()) {
+            fact("");
+            fact(said.say("inspector.occurrence.absent"), true);
+        }
+    }
+
+    /** The instant an occurrence is for, to the second, as Place and Time writes it. */
+    private static final java.time.format.DateTimeFormatter OCCURRENCE_INSTANT =
+            java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.ROOT);
 
     private void describeStar(Star star, SelectionModel.Change change) {
         StarIdentity identity = star.identity();
