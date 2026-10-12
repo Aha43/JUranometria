@@ -15,6 +15,10 @@ behind that argument.
 - [Which way the light falls](which-way-the-light-falls.md) — what the Moon's
   phase is, which way it faces on a chart and in your sky, and what a chart
   drawn at true scale can and cannot show of it.
+- [Jupiter's little sky](jupiters-little-sky.md) — what the atlas draws of
+  Jupiter and its four large moons, how the marks are to be read, and what it
+  does not claim. Also in Norwegian: [Jupiters lille
+  himmel](jupiters-lille-himmel.md).
 
 ## How JUranometria works
 

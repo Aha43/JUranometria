@@ -19,6 +19,10 @@ PAGES = [
      "where-the-sun-is.html", "Exploring the sky"),
     (ROOT / "docs/articles/which-way-the-light-falls.md",
      "which-way-the-light-falls.html", "Exploring the sky"),
+    (ROOT / "docs/articles/jupiters-little-sky.md",
+     "jupiters-little-sky.html", "Exploring the sky"),
+    (ROOT / "docs/articles/jupiters-lille-himmel.md",
+     "jupiters-lille-himmel.html", "Utforsk himmelen", "nb-NO"),
     (ROOT / "docs/how/language.md", "language.html", "How JUranometria works"),
     (ROOT / "docs/how/projections.md", "projections.html", "How JUranometria works"),
 ]
@@ -28,6 +32,8 @@ SPECIAL_LINKS = {
     "../articles/from-celestial-sphere-to-page.md": "celestial-sphere-to-page.html",
     "where-the-sun-is.md": "where-the-sun-is.html",
     "which-way-the-light-falls.md": "which-way-the-light-falls.html",
+    "jupiters-little-sky.md": "jupiters-little-sky.html",
+    "jupiters-lille-himmel.md": "jupiters-lille-himmel.html",
     "../how/language.md": "language.html",
     "../how/projections.md": "projections.html",
     "language.md": "language.html",
@@ -129,9 +135,9 @@ def render_markdown(source: Path) -> tuple[str, str]:
     flush_paragraph(); close_list(); flush_quote()
     return title, "\n".join(out)
 
-def page(title: str, series: str, body: str, filename: str) -> str:
+def page(title: str, series: str, body: str, filename: str, lang: str = "en") -> str:
     return f'''<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="{lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{html.escape(title)} — JUranometria</title><link rel="stylesheet" href="articles.css"></head>
 <body><nav><a href="../index.html">Gallery</a><a href="index.html">Articles</a><a href="https://github.com/Aha43/JUranometria">Repository</a></nav>
 <main><p class="series">{html.escape(series)}</p>{body}</main>
@@ -158,9 +164,11 @@ def main() -> None:
     out=Path(sys.argv[1]); articles=out/"articles"; articles.mkdir(parents=True,exist_ok=True)
     shutil.copy2(ROOT/"docs/articles/articles.css",articles/"articles.css")
     shutil.copytree(ROOT/"docs/articles/images",articles/"images",dirs_exist_ok=True)
-    for source,name,series in PAGES:
+    for entry in PAGES:
+        source,name,series=entry[:3]
+        lang=entry[3] if len(entry)>3 else "en"
         title,body=render_markdown(source)
-        (articles/name).write_text(page(title,series,body,name),encoding="utf-8")
+        (articles/name).write_text(page(title,series,body,name,lang),encoding="utf-8")
     gallery=out/"index.html"
     if gallery.exists():
         text=gallery.read_text(encoding="utf-8")
