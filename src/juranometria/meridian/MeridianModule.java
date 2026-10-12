@@ -62,6 +62,8 @@ public final class MeridianModule implements ChartModule {
     private boolean meridianShowing = true;
     private boolean horizonShowing = true;
     private boolean zenithShowing = true;
+    private boolean ticksShowing = false;
+    private Ticks ticks = Ticks.PROPOSED;
 
     private final List<Runnable> listeners = new ArrayList<>();
 
@@ -201,6 +203,87 @@ public final class MeridianModule implements ChartModule {
     }
 
     /**
+     * The meridian's graduation: a tick every {@code stepDegrees} of
+     * altitude above the mathematical horizon, on both halves, with
+     * the figure written beside every {@code labelEveryDegrees}
+     * (issue #515). Ninety is the zenith and is never a tick; zero is
+     * the horizon and is never one either.
+     *
+     * <p>{@link #PROPOSED} is the study's proposal, held here as the
+     * one declared value the chart, the study and the record all
+     * read; the owner's ruling on the steps and the density replaces
+     * it in one place.
+     */
+    public record Ticks(double stepDegrees, double labelEveryDegrees) {
+
+        /** Every ten degrees, each one lettered: the proposal. */
+        public static final Ticks PROPOSED = new Ticks(10.0, 10.0);
+
+        public Ticks {
+            if (!(stepDegrees > 0.0 && stepDegrees < 90.0)
+                    || Math.abs(90.0 / stepDegrees
+                            - Math.rint(90.0 / stepDegrees)) > 1e-9) {
+                throw new IllegalArgumentException(
+                        "the step divides the quarter turn: "
+                                + stepDegrees);
+            }
+            if (!(labelEveryDegrees >= stepDegrees)
+                    || Math.abs(labelEveryDegrees / stepDegrees
+                            - Math.rint(labelEveryDegrees / stepDegrees))
+                            > 1e-9) {
+                throw new IllegalArgumentException(
+                        "a figure stands at a tick: " + labelEveryDegrees
+                                + " is no multiple of " + stepDegrees);
+            }
+        }
+
+        /** The altitudes ticked, ascending, the zenith excluded. */
+        public List<Double> altitudes() {
+            List<Double> all = new ArrayList<>();
+            for (int k = 1; k * stepDegrees < 90.0 - 1e-9; k++) {
+                all.add(k * stepDegrees);
+            }
+            return List.copyOf(all);
+        }
+
+        /** Whether the figure is written at this altitude. */
+        public boolean labelled(double altitudeDegrees) {
+            double n = altitudeDegrees / labelEveryDegrees;
+            return Math.abs(n - Math.rint(n)) < 1e-9;
+        }
+    }
+
+    /** Whether the meridian carries its altitude ticks. */
+    public boolean ticksShowing() {
+        return ticksShowing;
+    }
+
+    /**
+     * Graduate the meridian, or stop. Drawn with the meridian: a
+     * reader who hides the line hides its ticks with it, and showing
+     * ticks on a hidden line draws nothing until the line is shown.
+     */
+    public void ticksShowing(boolean showing) {
+        this.ticksShowing = showing;
+        redraw();
+        changed();
+    }
+
+    public Ticks ticks() {
+        return ticks;
+    }
+
+    /** The graduation to draw - the study's way of comparing densities. */
+    public void ticks(Ticks ticks) {
+        if (ticks == null) {
+            throw new IllegalArgumentException("a graduation, or the proposal");
+        }
+        this.ticks = ticks;
+        redraw();
+        changed();
+    }
+
+    /**
      * How many times this module has worked out the observer's sky.
      *
      * <p>Here so that "a module showing nothing does no observer or
@@ -252,6 +335,31 @@ public final class MeridianModule implements ChartModule {
                     "meridian", "Meridian", sky.meridian().pole(),
                     OverlayContribution.Reference.LINE,
                     InkRole.REFERENCE_LINE));
+            // The graduation rides the meridian (#515): the altitude
+            // of each tick is the module's, the point is the sky's
+            // own, and the words are the page's. The geographic
+            // poles, where the meridian has no north and no south
+            // half, carry no ticks - refused by the sky and caught
+            // here, as a module that threw while the chart painted
+            // would stop the page.
+            if (ticksShowing
+                    && Math.abs(observer.latitudeDegrees()) < 90.0 - 1e-9) {
+                for (double altitude : ticks.altitudes()) {
+                    for (boolean north : new boolean[] {true, false}) {
+                        // Its own identity, unique in the module: the
+                        // line, the half and the altitude.
+                        String half = (north ? juranometria.chart.Cardinal.NORTH
+                                : juranometria.chart.Cardinal.SOUTH).name()
+                                .toLowerCase(java.util.Locale.ROOT);
+                        offered.add(new OverlayContribution.Tick(
+                                ID + "/" + half + "/" + altitude, ID,
+                                sky.onMeridian(altitude, north),
+                                sky.meridian().pole(), altitude,
+                                ticks.labelled(altitude),
+                                InkRole.REFERENCE_LINE));
+                    }
+                }
+            }
         }
         if (horizonShowing) {
             // "Mathematical horizon", because the gate says the name

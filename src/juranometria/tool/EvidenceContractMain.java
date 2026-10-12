@@ -170,6 +170,9 @@ public final class EvidenceContractMain {
         // Venus on production pages (#514), the same way.
         REPORT_MAINS.put("juranometria.tool.VenusOnTheChartStudyMain",
                 "docs/studies/venus-on-the-chart/measurements.md");
+        // The meridian's graduation on production pages (#515), the same way.
+        REPORT_MAINS.put("juranometria.tool.MeridianTicksStudyMain",
+                "docs/studies/meridian-ticks/measurements.md");
         // Jupiter and the moons on production pages (#486): the report
         // is deterministic, its pages held through IMAGE_MAINS, and where
         // each name went is the platform record (PLATFORM_REPORTS).
@@ -504,6 +507,9 @@ public final class EvidenceContractMain {
             // Venus on the chart (issue #514): the same, and the apparition
             // strip cut from production pages.
             "juranometria.tool.VenusOnTheChartStudyMain",
+            // The meridian's graduation (issue #515): production pages
+            // composed by the component with the module attached.
+            "juranometria.tool.MeridianTicksStudyMain",
             // Jupiter and the Galilean moons on the chart (issue #486):
             // production pages composed by the component with the Jovian
             // module attached.

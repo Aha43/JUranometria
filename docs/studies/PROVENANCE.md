@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**551 promoted artifacts.**
+**570 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -231,17 +231,17 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/interface-language/chartoptions-nb-NO-2.png` | `e069856774fc1f55f046c5bf1aa7c981b6b47ecf4405aa92b2aa62f182a2ef5c` | 2026-10-03 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/chartoptions-nb-NO-3.png` | `7bcaf6c3c622cb9dab0a6d60ff3c0bb8446f61c2a8e7085d8c11573293314065` | 2026-10-03 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/chartoptions-nb-NO-4.png` | `a7fdabfe988a832363ceac8a402ae39ca3861f52704618195586b9cfaf8491c6` | 2026-10-03 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/companion-en-1-open.png` | `4cb9742799cea0b4c5270ead0b07601280b0fce6b105e4b0008752dea88558c0` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/companion-en-2-dark.png` | `52b1b66fd61692153659ededccaa8bf34b7b6c2ca74e6676380513583d0de6d6` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/companion-en-1-open.png` | `d2bafbd520d6f662c649640f07fd4da476b26bb00a33fc8bbff0462603ae016e` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/companion-en-2-dark.png` | `749c5b28d4b72d0843b4176344be3cc9adaf77445e1816a96b94f24faae5539e` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/companion-en-3-collapsed.png` | `ced5a5180a7151de04c4153bd28547a1a424424d037789a71e75deb0963e16d1` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/companion-en-4-refused.png` | `e6492e69c29a618cb07261d0d40427139cf2c48ca3930dd6bbb071754e81e410` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/companion-en-4-refused.png` | `c7dedd1dbbb169a806395820e4ce617abf3a0bf9f5816ff5afeaebcbc6cced0b` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/companion-en-5-deep-sky-open.png` | `017d61d64086fbffe155b887e5fb1612b08358c1c12725bd03589dd8a08088d2` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/companion-en-6-solar-system-open.png` | `ebb08e669a932f653c25ec2100d0ff2712e603f7957a863ac541f2dbca556608` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/companion-en-7-jupiter-open.png` | `7744666b2fc425aa3108fe12de12a410a21191f735bca83199e9e13c05430941` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/companion-nb-NO-1-open.png` | `f096f6ab88087f278e811caf277f4f9b052a473077ce1a2826b057fb87fe66da` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/companion-nb-NO-2-dark.png` | `eeba68cfab6b05e6f736b7c7e0a95c9bc58acf4a2f1164c5b6cf8381fd567f7c` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/companion-nb-NO-1-open.png` | `37bb9c53c919e3ea18c3e818efbf3dc4d11ae35a94cd5a0a723b838e33de7bcb` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/companion-nb-NO-2-dark.png` | `e4c6756071f5d3dfbf35794303a55fb5a3678fe2bcd15783bf8a6fbeaad2d24b` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/companion-nb-NO-3-collapsed.png` | `565b55b636aeb42336a3c74386bdf8912e13d43c20b189dfc440308d053008ff` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/companion-nb-NO-4-refused.png` | `b56f086aba835039c5db807cc0acec7015b0341b06420d1765210b6da883a0ea` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/companion-nb-NO-4-refused.png` | `aa52847337d710e3f7067846a1b38b6794924dc4a1e9627dd35b166ae6ad7e99` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/companion-nb-NO-5-deep-sky-open.png` | `47fe1799e7b09553db89e5a70ee19619a2a500b84172dfe80f93704c72561300` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/companion-nb-NO-6-solar-system-open.png` | `672dbc622733cc832f53e235a9a5814c453d958d8d1a3cd5d7329fc05025cd69` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/companion-nb-NO-7-jupiter-open.png` | `eaee1bf03d4005dcec6b3b7d8e176a07de0edefbeaafded297bb64c7c2efa583` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
@@ -291,18 +291,18 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/interface-language/page-en-nbsky.png` | `189b264163081de1397541042ff3c47e61d55d66985f948377c9c66f4aa1c950` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/page-nb-latin.png` | `d27e3bbbea60cb7f62fff61c333a59186fa727e65266a9f7d9c3b09199383b41` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/page-nb-nbsky.png` | `d2e9fb54db7cebe44fc0febdc8ed3b9dd0d2584932aff8f26bcce807569a8234` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/placeandtime-en-1-default.png` | `21fb4f24ff94e11322dd7dae661d1b2008e5c1a8fd275f284f28916a509d93ae` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/placeandtime-en-2-oslo.png` | `9eed06d20297e370cc0432648b3498f5fd30b564f5b8bc697a31940a0806cc7c` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/placeandtime-en-3-santiago.png` | `508911cc1068bf83f0c2fc0c8b884382a07a7ff8ea13f66ebb6a15cd83262fa4` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/placeandtime-en-4-lines-off.png` | `83d64aa02c399908118d9de17fea6b8b473831701f326c3ea905578a7ee39b21` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/placeandtime-en-5-lines-on.png` | `5f6ccae22298061acbff07efaae72b284f118aec519d2b0adb2d8432ed638252` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/placeandtime-en-6-dark.png` | `19b0f49a66ca66629d8488b09d4dd1ca53df949bb841f478a612a592232b0f64` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/placeandtime-nb-NO-10-lines-off.png` | `c3a59276440749836fa94bc303cdd771e77d3cf56bbdc60ec6d7204cd675b019` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/placeandtime-nb-NO-11-lines-on.png` | `7429fcc8851793d12516dca777e4f87a6f6e0632d2a90438c66a6fd663b414c9` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/placeandtime-nb-NO-12-dark.png` | `83460d7c6618c53365fffd55fa9ee746db7dd6653851548a0ed759af981ff550` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/placeandtime-nb-NO-7-default.png` | `94974309b2ae442b1ab6fe49bb78365cbc90ef4da76eb499755fe99bc285e5c4` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/placeandtime-nb-NO-8-oslo.png` | `0addfb1f71d67f6c6040b317b50527dfe19040847239f064f8e6276fe8855d90` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/placeandtime-nb-NO-9-santiago.png` | `7d6d567c8dd5c8111ed8449aa24084f7074cbc5903f6b8eea11fa53c728afd48` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/placeandtime-en-1-default.png` | `90e53e121795e5b026118ba447c405b1f076b25dd03fe6ead5db339a1d1725eb` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/placeandtime-en-2-oslo.png` | `a026996b5997e50dc91a0c6340e724af8d15e1ac6ae687349b465c1005c89bd5` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/placeandtime-en-3-santiago.png` | `10f35cf084afdcd3679d0b7153abae071facc71b7b4c1b42325e537891640c99` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/placeandtime-en-4-lines-off.png` | `cbe05340a7b09d165b2689bcabf0750e4821a1ac2406c5b58422c9447cc9fb8f` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/placeandtime-en-5-lines-on.png` | `544c73aa09e7a0af75aaf8d2d6425f0a9a1ce6845bb02cf015670aea19ae646f` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/placeandtime-en-6-dark.png` | `4617196a992c4bf26baeba27f15f4d98e42c0d5a5b7fe7566b1f6a8f43fb9d5a` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/placeandtime-nb-NO-10-lines-off.png` | `26369ae74919cede6612b2e0be3d09d2a316a4b42e3e9d0bc0565055fc5e5532` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/placeandtime-nb-NO-11-lines-on.png` | `7b077889074aa4e9ee31f874147c9e983580f49234412ab25892e291a8bc09f9` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/placeandtime-nb-NO-12-dark.png` | `de2830574007166de485143aa75fc77cd460da341e00a75ca93672982b6c0138` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/placeandtime-nb-NO-7-default.png` | `9777b2b692281fe07c171eb896390d7165361c974f5900c21c7c349e2442e59c` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/placeandtime-nb-NO-8-oslo.png` | `2a0d6f45fd1ce08225c7ddf9670fae3e65b7464663c19d48fad8c3260268815c` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/placeandtime-nb-NO-9-santiago.png` | `cf7b9ac2f73a42342c446f68078fd8f9fcc28561697516371a54f17944f7cdf8` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/settings-en.png` | `98d250329502a5b2243399049bce296178c76c59290c4f8f1a12463de79fc75f` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/settings-nb-NO.png` | `697f8eea0a3ec238cf6ff7cfb16362bf26f33d488697a7a0685e667136bbb44f` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/suntable-en-1-instant.png` | `043bb838596cc65a4d7d74fe082f1179311b37711ff8ab1ec365f9fe0d4374d8` | 2026-09-29 | Mac OS X aarch64, Java 21.0.12.1 | various |
@@ -381,6 +381,25 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/label-placement/orion-90-today.png` | `23589defba2b50018f3e4d7ae0656d5d004632970fbdcaa9b0eda666b49de4f4` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/label-placement/sagittarius-120-candidate.png` | `cb4d9661a353dcc4d277925840456d7209686ea592ba1d70713bed00b588db80` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/label-placement/sagittarius-120-today.png` | `63590ac511146e5223de2c853315c8e96ab1216fd9cbc99c40d27cf6ec440fe5` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meridian-ticks/bodies-moon-120.png` | `09833652d42d9c72850b449acf6dca57ac7c4b398b0785c5060587dd84f82b53` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meridian-ticks/bodies-north-120.png` | `bbf096c2d69446f9c75d94c18b7a72098bf2eb57ac7e32d53edc876d7f5af8d7` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meridian-ticks/bodies-south-120.png` | `4d857ec285f0acbecaa5378f5ae16860de2792e329307493c47eb9c0c479fb3c` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meridian-ticks/bodies-sun-120.png` | `ff63340b106b683e8843426b2a0d6338d10284e1eb0f6dee0ed7e6944a791896` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meridian-ticks/bodies-venus-120.png` | `8b2bc96cc6bb40abc4f36b1b6e252b0a2ac57240dd84ace5c0c365d5c72d1a40` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meridian-ticks/density-10-10.png` | `099145083ed18fad8bb73bad779491323e3df19942a239ca41989bb234deba44` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meridian-ticks/density-10-30.png` | `992194d82e2f667bde1b7d63439a0dd72fd05266afe54d5e6adc93dc6a836597` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meridian-ticks/density-5-10.png` | `15b504fb7374c685e10c608ff99694e2b914cf7c0ae5b99e4987b41fc31f5854` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meridian-ticks/north-120.png` | `c6526f81a2dffef722918ffd35a73e02bc3d3c7cf47a1f07021b8c040a858cde` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meridian-ticks/north-24.png` | `ec08b63b63ebeda2ef313ffb8d0730aa099c379905d0c79c15921d98817155c7` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meridian-ticks/north-60.png` | `ef6acfa57b84c84ad407a4ffd7cb7f5848ef6b3ed01b54cef0d6bd1f57c5d359` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meridian-ticks/north-8.png` | `75b28b9254841f734fc6cbc2e8f961b1cf2decba7209970475c75f7a4161f539` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meridian-ticks/south-120.png` | `4d857ec285f0acbecaa5378f5ae16860de2792e329307493c47eb9c0c479fb3c` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meridian-ticks/south-24.png` | `365f600e933f5e57b9edef6e5dcb45c7267b370be9f52314a9b84621cb9dd83d` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meridian-ticks/south-60-dark.png` | `9c75033c9e84dea5ac8bdba465c12e5146dfddaf67da5865c4cd040e8d90f72a` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meridian-ticks/south-60-nb.png` | `495e212beec94b8cdee265862a4f2d0ff56b329ac64b35727553a2b233b9fc72` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meridian-ticks/south-60.png` | `099145083ed18fad8bb73bad779491323e3df19942a239ca41989bb234deba44` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meridian-ticks/south-8.png` | `3a938bfa3f4bd7dd6bf8ac612ef8b8f088dd1b671a4991a6a6386e44b11e98c1` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meridian-ticks/zenith-60.png` | `27a5d02a3146d5767548ca8978810ed4f3338343c38789122a683f32942e4c92` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/moon-on-the-chart/apogee-farthest-3.png` | `fcf2cc23b0ff4751d62f28b778d7db3d98c8d6a590ecbdd35e0b1cd52b476988` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/moon-on-the-chart/july-last-quarter-horizon-36.png` | `92d38a68fc353bef2f2f8f186438028f3dbf8729ba71c6453c81a8f36c0da2f1` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/moon-on-the-chart/june-first-quarter-3-dark.png` | `225c52e6cd09b21a35550c28c86b7d03b2ce0481c01a1e598b3a45078a6edd33` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |

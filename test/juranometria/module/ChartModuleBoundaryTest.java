@@ -119,21 +119,21 @@ class ChartModuleBoundaryTest {
         // ruled minimum mark - still typed geometry, and the page, not
         // the module, decides when the minimum is a symbol. #485 added
         // the satellite: a Galilean moon's place and state, for the page
-        // to decide moon by moon - typed geometry still.
-        assertEquals(java.util.List.of("GreatCircle", "Point", "Path",
-                        "Region", "DirectionMark", "Body", "OblateBody", "Satellite"),
+        // to decide moon by moon - typed geometry still. #515 added the
+        // tick: a graduation of a reference line, its altitude a number
+        // and its words the page's - typed geometry, no appearance.
+        java.util.List<String> vocabulary = java.util.List.of("GreatCircle",
+                "Point", "Path", "Region", "DirectionMark", "Tick", "Body",
+                "OblateBody", "Satellite");
+        assertEquals(vocabulary,
                 java.util.Arrays.stream(OverlayContribution.class
                                 .getPermittedSubclasses())
                         .map(Class::getSimpleName).sorted(
-                                java.util.Comparator.comparingInt(
-                                        java.util.List.of("GreatCircle",
-                                                "Point", "Path", "Region",
-                                                "DirectionMark", "Body",
-                                                "OblateBody", "Satellite")::indexOf))
+                                java.util.Comparator.comparingInt(vocabulary::indexOf))
                         .toList(),
-                "a great circle, a point, a path, a region, a"
-                        + "direction mark, a body, an oblate body and a satellite - the geometry a module may"
-                        + " contribute, and nothing else");
+                "a great circle, a point, a path, a region, a direction mark, a"
+                        + " tick, a body, an oblate body and a satellite - the geometry"
+                        + " a module may contribute, and nothing else");
     }
 
     @Test

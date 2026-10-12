@@ -196,4 +196,12 @@ public interface PageWords {
      * {@code jovian.shadowed}; a clear moon has none.
      */
     String bodyState(String state);
+
+    /**
+     * The figure written beside a graduation of a reference line
+     * (Sprint 48, issue #515): the altitude above the mathematical
+     * horizon, in degrees, as the page writes a number - a tick
+     * carries no words of its own.
+     */
+    String altitudeTick(double altitudeDegrees);
 }

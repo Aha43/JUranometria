@@ -3295,6 +3295,68 @@ public final class PackagedAcceptanceMain {
                 "and the zenith is inked where the model puts it, at "
                         + Math.round(at[0]) + "," + Math.round(at[1]));
 
+        // The meridian's graduation (#515): ticks ride the meridian -
+        // more ink with them, the line alone without, nothing at all
+        // when the line is hidden whatever the tick switch says - and
+        // each tick this page holds is inked where the sky puts it.
+        // On a page that holds ticks: the released page's meridian
+        // runs from the zenith down past M31 with no tick inside it,
+        // so the chart is turned, for this check only, to the 40°
+        // south tick at 60° - five ticks on the paper - and turned
+        // back after.
+        juranometria.sky.LocalSky sky =
+                new juranometria.sky.LocalSky(module.observer());
+        module.showing(false, false, false);
+        chart.setViewState(new ChartViewState(sky.onMeridian(40.0, false), 60.0,
+                ChartViewState.defaultMagnitudeFor(60.0)));
+        java.awt.image.BufferedImage tickPage = paint(chart);
+        module.showing(true, false, false);
+        module.ticksShowing(false);
+        int lineAlone = differingPixels(tickPage, paint(chart));
+        module.ticksShowing(true);
+        java.awt.image.BufferedImage graduated = paint(chart);
+        int withTicks = differingPixels(tickPage, graduated);
+        require(withTicks > lineAlone, "the graduation adds ink to the"
+                + " meridian: " + withTicks + " against " + lineAlone);
+        int ticksOnPage = 0;
+        for (double altitude : module.ticks().altitudes()) {
+            for (boolean north : new boolean[] {true, false}) {
+                double[] tick = host.projection()
+                        .toPage(sky.onMeridian(altitude, north)).orElse(null);
+                if (tick == null || tick[0] < 12 || tick[1] < 12
+                        || tick[0] > 888 || tick[1] > 688) {
+                    continue;
+                }
+                ticksOnPage++;
+                require(inkNear(graduated, tickPage, (int) Math.round(tick[0]),
+                                (int) Math.round(tick[1]), 4),
+                        "the " + altitude + "° tick is inked where the sky"
+                                + " puts it, at " + Math.round(tick[0]) + ","
+                                + Math.round(tick[1]));
+            }
+        }
+        require(ticksOnPage > 0, "this page holds at least one tick");
+        module.showing(false, false, false);
+        require(differingPixels(tickPage, paint(chart)) == 0,
+                "no meridian, no ticks: the switch alone draws nothing");
+        module.showing(true, false, false);
+        module.ticksShowing(false);
+        require(differingPixels(tickPage, paint(chart)) == lineAlone,
+                "and off again is the line alone");
+        require(chart.overlays().collect().stream().noneMatch(owned ->
+                        owned.geometry() instanceof
+                                juranometria.module.OverlayContribution.Tick),
+                "nothing is offered for a hidden graduation");
+        System.out.println("meridian ticks OK (every "
+                + Math.round(module.ticks().stepDegrees())
+                + "° of altitude on both halves, " + ticksOnPage + " on this page,"
+                + " inked where the sky puts them; ride the meridian, off with it;"
+                + " furniture, nothing selects them)");
+        chart.setViewState(ChartViewState.DEFAULT);
+        module.showing(true, true, true);
+        require(differingPixels(without, paint(chart)) == ink,
+                "turned back, the released page is as it was");
+
         // Setting a place or an instant redraws and does not move the
         // page; only a reader asking does that.
         juranometria.chart.ChartViewState where = chart.viewState();

@@ -7,6 +7,15 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Altitude ticks on the meridian (#515).** Place and Time's fourth
+switch, Altitude ticks, graduates the meridian every 10° of altitude
+above the mathematical horizon on both halves, with the figure beside
+each tick where the page has room; drawn with the meridian in its own
+ink, in the dialog and the companion over one module, off at every
+session start like the other lines, exported as drawn, named in the
+view report as `altitude-ticks`. Nothing selects a tick, and no word of
+the sky's moves for one. In both languages.
+
 **Venus on the chart (#514).** View ▸ Solar System ▸ Venus on the chart,
 and the Controller's and the dialog's Show on chart and Centre on chart
 for Venus, draw Venus where it stands for the place and instant set in

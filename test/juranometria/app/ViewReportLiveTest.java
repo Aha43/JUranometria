@@ -159,7 +159,7 @@ class ViewReportLiveTest {
                     "limiting-magnitude: 7.0",
                     "emphasis: meridian+horizon",
                     "modules: place-and-time, ecliptic",
-                    "observer-lines: meridian on, horizon on, zenith off",
+                    "observer-lines: meridian on, horizon on, zenith off, altitude-ticks off",
                     "observer: latitude +59.913000; longitude-east"
                             + " +10.752000",
                     "instant-utc: 2026-03-20T21:33:00Z",

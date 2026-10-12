@@ -138,6 +138,56 @@ public record LocalSky(Observer observer) {
         };
     }
 
+    /**
+     * The point on the meridian at this altitude above the
+     * mathematical horizon, towards north or towards south (#515).
+     *
+     * <p>Built from the meridian's own pole and the zenith, so it
+     * lies on {@link #meridian()} exactly - the circle the chart
+     * draws, through the celestial pole <em>of date</em> - and
+     * {@link #altitudeDegrees} of it is the altitude asked for, which
+     * is what a test holds it to. The north half is the one towards
+     * the north celestial pole. Ninety degrees is the zenith from
+     * either side; zero is where the meridian meets the horizon,
+     * which stands beside the cardinal point by the 8.8′ the pole of
+     * date is from J2000's ({@code docs/decisions/place-and-time.md},
+     * "What a polar page shows") and not on it.
+     *
+     * <p>Refused outside 0 to 90 degrees: the meridian's half below
+     * the horizon has no reader; and refused at the geographic poles,
+     * where the meridian has no north half and no south half, as the
+     * cardinals are refused there.
+     */
+    public SkyPosition onMeridian(double altitudeDegrees, boolean towardsNorth) {
+        if (!(altitudeDegrees >= 0.0 && altitudeDegrees <= 90.0)) {
+            throw new IllegalArgumentException(
+                    "a point on the meridian above the horizon has an"
+                            + " altitude from 0 to 90 degrees: "
+                            + altitudeDegrees);
+        }
+        if (Math.abs(observer.latitudeDegrees()) >= 90.0 - 1e-9) {
+            throw new IllegalArgumentException(
+                    "at the geographic pole the meridian has no north"
+                            + " half and no south half");
+        }
+        double[] z = unitOf(zenith());
+        double[] m = unitOf(meridian().pole());
+        // Perpendicular to both the zenith and the meridian's pole:
+        // along the meridian, on the horizon. Of its two senses, north
+        // is the one with the celestial pole on its side.
+        double[] along = normalised(new double[] {
+                m[1] * z[2] - m[2] * z[1],
+                m[2] * z[0] - m[0] * z[2],
+                m[0] * z[1] - m[1] * z[0]});
+        double sense = (along[2] >= 0.0) == towardsNorth ? 1.0 : -1.0;
+        double up = Math.sin(Math.toRadians(altitudeDegrees));
+        double out = Math.cos(Math.toRadians(altitudeDegrees)) * sense;
+        return positionOf(normalised(new double[] {
+                out * along[0] + up * z[0],
+                out * along[1] + up * z[1],
+                out * along[2] + up * z[2]}));
+    }
+
     private static double[] unitOf(SkyPosition position) {
         double ra = Math.toRadians(position.raDegrees());
         double dec = Math.toRadians(position.decDegrees());
