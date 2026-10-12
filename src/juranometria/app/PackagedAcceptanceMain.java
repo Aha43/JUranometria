@@ -3323,8 +3323,13 @@ public final class PackagedAcceptanceMain {
             for (boolean north : new boolean[] {true, false}) {
                 double[] tick = host.projection()
                         .toPage(sky.onMeridian(altitude, north)).orElse(null);
+                // Off the paper is silence; and the title block's band
+                // along the bottom is the page's own furniture, drawn
+                // over the reference layer by rule, with a height that
+                // depends on the desktop's fonts - CI's Linux laid it over
+                // the 20° tick at y=646 - so a tick there is not asked for.
                 if (tick == null || tick[0] < 12 || tick[1] < 12
-                        || tick[0] > 888 || tick[1] > 688) {
+                        || tick[0] > 888 || tick[1] > 600) {
                     continue;
                 }
                 ticksOnPage++;
