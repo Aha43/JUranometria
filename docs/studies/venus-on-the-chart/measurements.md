@@ -36,6 +36,18 @@ The table: 48.7 % lit, near half lit, χ 294.6° (WNW (295°)). About 6.1 px at 
 
 In front of the Sun: the nearer body painted last, Venus's dark disc inside the Sun's ring, and the page says so beside the name. Drawn: Sun at (444.9, 486.3), disc 472.6 px, name placed; Venus at (450.0, 350.0), disc 14.5 px, state venus.inFront, name refused; Spoken: Venus, in front of the Sun.
 
+### The 2012 transit at 6°
+
+![](transit-2012-6.png)
+
+The true disc is under 6 px here, so the phased mark stands in - painted in the bodies layer over the Sun's ring, because a symbol in front of an opaque disc is that layer's to paint (the #514 checkpoint); its name takes the first clean box beside the mark, clear of the Sun's ink, or is refused where none is (C4). Drawn: Sun at (449.1, 372.7), disc 78.7 px, name placed; Venus at (450.0, 350.0), symbol 6.0 px, state venus.inFront, name placed; Spoken: Venus's apparent diameter).
+
+### The 2012 transit at 8°, in Norwegian
+
+![](transit-2012-8.png)
+
+The mark over the ring, and the name beside it where a box is clean. Drawn: Solen at (449.4, 367.0), disc 59.0 px, name placed; Venus at (450.0, 350.0), symbol 6.0 px, state venus.inFront, name placed; Spoken: Venus' tilsynelatende diameter).
+
 ### The 2026 inferior conjunction, 2026-10-24T03:00:00Z
 
 ![](inferior-conjunction-2026-1.png)

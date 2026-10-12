@@ -119,6 +119,16 @@ public final class VenusOnTheChartStudyMain {
                 ENGLISH, ChartPalette.WHITE_PAPER, atTransit, service, true,
                 "In front of the Sun: the nearer body painted last, Venus's dark disc"
                         + " inside the Sun's ring, and the page says so beside the name.");
+        page("transit-2012-6", "The 2012 transit at 6°", centredOn(inFront, 6.0), ENGLISH,
+                ChartPalette.WHITE_PAPER, atTransit, service, true,
+                "The true disc is under 6 px here, so the phased mark stands in - painted in"
+                        + " the bodies layer over the Sun's ring, because a symbol in front of"
+                        + " an opaque disc is that layer's to paint (the #514 checkpoint); its"
+                        + " name takes the first clean box beside the mark, clear of the Sun's"
+                        + " ink, or is refused where none is (C4).");
+        page("transit-2012-8", "The 2012 transit at 8°, in Norwegian", centredOn(inFront, 8.0),
+                NORSK, ChartPalette.BLACK_SKY, atTransit, service, true,
+                "The mark over the ring, and the name beside it where a box is clean.");
         Instant inferior = events.get("2026-inferior-conjunction");
         Observer atInferior = new Observer(OSLO_LAT, OSLO_LON, inferior);
         VenusObservation thin = venus(service, atInferior);

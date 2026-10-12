@@ -1586,7 +1586,12 @@ public final class ReferenceInk {
             for (OverlayContribution.Body body : rounds) {
                 BodyMark mark = bodyOn(page, page.projection(), mapping, paper, sky,
                         region.bounded(), body);
-                if (mark == null || !mark.symbol()) {
+                if (mark == null || !mark.symbol()
+                        || symbolOverADisc(page, body, mark, contributions)) {
+                    // In front of an opaque disc the bodies layer paints,
+                    // the symbol is that layer's to paint, over the disc
+                    // (#514 checkpoint): beneath the stars it would be
+                    // covered - Venus drawn and hidden at a transit.
                     continue;
                 }
                 double radius = mark.disc().getWidth() / 2.0;
@@ -1743,10 +1748,15 @@ public final class ReferenceInk {
                     continue;
                 }
                 OverlayContribution.Body body = (OverlayContribution.Body) drawn.get(i);
-                if (bodySymbols.get(i)) {
+                if (bodySymbols.get(i) && !symbolOverADisc(page, body,
+                        new BodyMark(centres.get(i), (Ellipse2D) discs.get(i), true),
+                        contributions)) {
                     // Its minimum mark stands in for it: a symbol, painted
                     // beneath the stars by the reference layer (#514, as
-                    // Jupiter's #484), never erasing one here.
+                    // Jupiter's #484), never erasing one here. In front of
+                    // an opaque disc it is painted here instead, in this
+                    // pass's farthest-first order, so it lands over the
+                    // disc as the sky has it (the transit, #514 checkpoint).
                     continue;
                 }
                 Ellipse2D disc = (Ellipse2D) discs.get(i);
@@ -2014,6 +2024,50 @@ public final class ReferenceInk {
         double radius = symbol ? body.minimumMarkPx() / 2.0 : trueRadius;
         Ellipse2D disc = discOn(centre, radius, paper, sky, bounded);
         return disc == null ? null : new BodyMark(centre, disc, symbol);
+    }
+
+    /**
+     * Whether a round body's symbol lies in front of an opaque disc the
+     * bodies layer paints on this page - a nearer symbol whose mark
+     * intersects the drawn disc of a farther body that is not itself a
+     * symbol (#514 checkpoint: Venus in transit at 4° to 12°). Such a
+     * symbol is painted in the bodies layer, over that disc, rather than
+     * beneath the stars where the disc would cover it.
+     */
+    static boolean symbolOverADisc(DrawnPage page, OverlayContribution.Body body,
+                                   BodyMark mark, List<OverlayRegistry.Owned> contributions) {
+        if (!mark.symbol()) {
+            return false;
+        }
+        Projection projection = page.projection();
+        ViewportMapping mapping = new ViewportMapping(page);
+        Rectangle2D paper = ChartRenderer.paperOf(page.scene());
+        PageRegion region = mapping.regionFor(page.scene().viewport(), projection);
+        Shape sky = skyOf(region, paper);
+        Rectangle2D own = mark.disc().getBounds2D();
+        for (OverlayRegistry.Owned owned : contributions) {
+            OverlayContribution other = owned.geometry();
+            if (other == body || distanceOf(other) <= body.distanceKm()) {
+                continue;
+            }
+            Shape disc = null;
+            if (other instanceof OverlayContribution.OblateBody oblate) {
+                OblateMark theirs = oblateOn(page, oblate);
+                if (theirs != null && theirs.onPage() && !theirs.symbol()) {
+                    disc = theirs.outline();
+                }
+            } else if (other instanceof OverlayContribution.Body round) {
+                BodyMark theirs = bodyOn(page, projection, mapping, paper, sky,
+                        region.bounded(), round);
+                if (theirs != null && !theirs.symbol()) {
+                    disc = theirs.disc();
+                }
+            }
+            if (disc != null && disc.intersects(own)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** The disc at this centre, or null when none of it is on the page. */

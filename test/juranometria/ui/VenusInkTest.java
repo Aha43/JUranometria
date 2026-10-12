@@ -189,6 +189,49 @@ class VenusInkTest {
         assertTrue(said.contains("Venus, in front of the Sun."), said);
     }
 
+    /**
+     * The owner's #514 checkpoint finding: at 4° to 12° Venus in transit
+     * was drawn as a symbol beneath the stars and covered by the Sun's
+     * disc, its name alone appearing from 8°. A symbol in front of an
+     * opaque disc is now painted over that disc, in the bodies layer.
+     */
+    @Test
+    void inTransitAtWiderFieldsTheSymbolIsPaintedOverTheSunsDisc() throws Exception {
+        Instant transit = event("2012-inferior-conjunction");
+        VenusObservation v = venus(transit);
+        for (double field : new double[] {6.0, 8.0}) {
+            ChartScene scene = page(v.astrometricJ2000(), field);
+            List<ReferenceInk.BodyPlacement> drawn = placed(scene, offering(transit, true), ENGLISH);
+            assertEquals(2, drawn.size(), field + "°: the Sun and Venus");
+            ReferenceInk.BodyPlacement sun = drawn.get(0);
+            ReferenceInk.BodyPlacement venus = drawn.get(1);
+            assertTrue(venus.symbol(), field + "°: the mark stands in");
+            assertTrue(sun.disc().getBounds2D().contains(venus.disc().getBounds2D()),
+                    field + "°: inside the Sun's disc");
+            assertEquals(SolarSystemModule.VENUS_IN_FRONT, venus.state());
+            assertFalse(venus.covers(venus.centre().x(), venus.centre().y()),
+                    "a symbol is no opaque ink");
+            assertTrue(venus.pointedAt(venus.centre().x(), venus.centre().y(), 4.0),
+                    "but is pointed at as Venus");
+            BufferedImage image = painted(scene, offering(transit, true),
+                    ChartPalette.WHITE_PAPER, ENGLISH);
+            // Visible over the Sun's ground-filled disc: the mark's pixels
+            // are its own tones, not the Sun's ground.
+            double[] share = litShare(image, venus.centre().x(), venus.centre().y(),
+                    venus.disc().getBounds2D().getWidth() / 2.0);
+            int groundRed = ChartPalette.WHITE_PAPER.ground().getRed();
+            int centreRed = new Color(image.getRGB((int) Math.round(venus.centre().x()),
+                    (int) Math.round(venus.centre().y()))).getRed();
+            assertTrue(centreRed < groundRed - 40, field + "°: the mark's centre is inked"
+                    + " over the Sun's disc, not the Sun's ground: " + centreRed);
+            assertTrue(share[0] < 0.2, field + "°: a dark mark at the transit: " + share[0]);
+            if (field == 8.0) {
+                assertTrue(venus.box() != null, "at 8° the name finds a clean box beside the"
+                        + " visible mark");
+            }
+        }
+    }
+
     /** The lit share of the pixels inside a disc on white paper, and their count. */
     private static double[] litShare(BufferedImage image, double cx, double cy, double r) {
         double lit = 0;

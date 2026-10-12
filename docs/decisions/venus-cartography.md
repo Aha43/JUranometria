@@ -207,6 +207,12 @@ context) and #514 (Venus on the chart) build on these rulings.
   spoken with `page.body.venus.symbol`; once the true disc reaches the
   mark it is the body itself, opaque, the Moon's phased disc. The
   symbol's ink is an obstacle for the page's words, as Jupiter's is.
+  **A symbol in front of an opaque disc** - Venus in transit at 4° to
+  12° (the owner's checkpoint finding) - is painted in the bodies
+  layer over that disc, in painting order, not beneath the stars
+  where the disc would cover it (`ReferenceInk.symbolOverADisc`); its
+  name takes the first clean box beside the mark, clear of the Sun's
+  ink, or is refused where none is, as the Moon's at a new Moon (C4).
 - **No conjunction rule.** The transit is Venus's dark disc inside the
   Sun's ring by painting order (the nearer last); a Venus inside the
   ring and farther is covered by the Sun's ground-filled disc; the

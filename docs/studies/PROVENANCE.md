@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**549 promoted artifacts.**
+**551 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -571,5 +571,7 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/venus-on-the-chart/inferior-conjunction-2026-1.png` | `8b422836c0474ebfea62069faeacb5425ca541b43d9e3bbb1680ea2c837101a0` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/venus-on-the-chart/superior-conjunction-2026-3.png` | `240c5d3fc567fb2eeccecb930cef8f5c63fcb6ddf779aba6900d82388aff1af3` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/venus-on-the-chart/transit-2012-1.png` | `1d4bb94f1b967e8d4e2e9c646deb761e98023c601f23a15c869e047587459089` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/venus-on-the-chart/transit-2012-6.png` | `14500790ca34cbdbab70d21c8b7ea81c36517d4f13ff6f6ff6c17c98e46bef49` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/venus-on-the-chart/transit-2012-8.png` | `34a497e54391101e7f1e078e7059550374466aedc06537b1abbc23476412791a` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/working-selection/decided-members.png` | `2db34e7aa922b3f75c0cd4c8903c2620b24a7f83d92608ee6ae1a9775c32c527` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/working-selection/today-two-leads.png` | `306cf50272170cbcbbb50e8385789143b59b5fb43ee98081f248eb08be7f80f0` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |

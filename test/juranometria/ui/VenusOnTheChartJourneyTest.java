@@ -187,6 +187,37 @@ class VenusOnTheChartJourneyTest {
         assertFalse(said.contains("symbol"), said);
     }
 
+    /** The transit through the component at 6°: Venus's symbol over the Sun, the Sun opaque beneath. */
+    @Test
+    void inTransitTheSymbolIsDrawnOverTheSunAndIsPointedAtAsVenus() throws Exception {
+        Instant transit = null;
+        for (String line : Files.readAllLines(Path.of("docs/studies/venus/venus-events.txt"),
+                StandardCharsets.UTF_8)) {
+            if (line.startsWith("2012-inferior-conjunction\t")) {
+                String iso = line.split("\t")[1];
+                transit = Instant.parse(iso.length() == 17 ? iso.substring(0, 16) + ":00Z" : iso);
+            }
+        }
+        Observer oslo = new Observer(59.913, 10.752, transit);
+        build(oslo, 6.0);
+        SwingUtilities.invokeAndWait(() -> {
+            module.sunShowing(true);
+            module.venusShowing(true);
+        });
+        paint();
+        List<ReferenceInk.BodyPlacement> drawn = chart.renderedBodies();
+        assertEquals(2, drawn.size(), "the Sun, then Venus in front");
+        assertEquals(SolarSystemModule.SUN, drawn.get(0).identity());
+        ReferenceInk.BodyPlacement venus = drawn.get(1);
+        assertTrue(venus.symbol());
+        assertEquals(SolarSystemModule.SUN, chart.bodyAt(venus.centre().x(), venus.centre().y())
+                .orElseThrow().identity(), "the opaque disc under the pointer is the Sun's");
+        assertEquals(SolarSystemModule.VENUS, chart.selectableBodyAt(venus.centre().x(),
+                venus.centre().y()).orElseThrow().identity(), "and Venus is what is pointed at");
+        String said = chart.getAccessibleContext().getAccessibleDescription();
+        assertTrue(said.contains("Venus, in front of the Sun"), said);
+    }
+
     @Test
     void aClickOnVenusSelectsItsOccurrence() throws Exception {
         Observer oslo = new Observer(59.913, 10.752, elongation());
