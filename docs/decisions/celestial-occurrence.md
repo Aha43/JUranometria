@@ -89,26 +89,54 @@ never following - would let the page draw the Moon in one place while
 the Inspector described it in another. The proposal is for the owner's
 ruling before Venus selects through the seam.
 
-## Which bodies select, for the ruling
+## Which bodies select
 
-In this issue **no released body is selectable**: the Sun, the Moon,
-Jupiter and the Galilean moons state their moment and keep their
-ruled behaviour (C6; Jupiter unchanged), so no released page, click or
-evidence moves. The seam is proved with a module that offers the
-Moon's disc with its moment and the selectable mark, in the journeys
-and the packaged acceptance (*occurrence OK*). Venus opts in with its
-layer in #514. Whether the Sun, the Moon and Jupiter should become
-selectable occurrences too is a product question this record asks and
-does not decide.
+As first built, no released body was selectable; the seam was proved
+with a module offering the Moon's disc with its moment and the
+selectable mark. The owner ruled otherwise (below): the three released
+primary bodies opt in through this issue.
+
+## The ruling
+
+The owner's rulings (2026-10-12), recorded as given:
+
+1. **Re-resolution: the built behaviour is accepted.** A selected
+   occurrence follows the page's current moment while that body
+   remains drawn. If the body disappears, the last resolved occurrence
+   is retained and the Inspector clearly says it is no longer present
+   at the page's current moment. This keeps the chart and the
+   Inspector coherent without silently discarding the selection.
+2. **Selectable bodies: the Sun, the Moon, Jupiter and Venus are
+   selectable occurrences.** Venus opts in with #514; the three
+   released primary bodies opt in now, through #513. A shared
+   occurrence model should not begin with Venus as an arbitrary
+   exception, and this prepares the later bookmark model where
+   Solar System selections carry their observing context. **The four
+   Galilean moons stay unselectable** in this change: their small
+   marks, overlap, state vocabulary and click priority deserve an
+   explicit later ruling.
+
+As ruled, then: a click on the Sun's or the Moon's disc, or on
+Jupiter's disc or its cartographic symbol, selects that body's
+occurrence - its identity at the instant and place drawn - and still
+offers nothing hidden behind an opaque disc (C4 and C6 keep their
+force for what a disc covers; what they ruled out, a Sun or Moon
+*inspector selection*, is what this ruling now grants, as an
+occurrence). A moon's mark lets the click through as before. The
+Inspector's absent fact reads *No longer present at the page's
+current moment; these facts are for the instant stated.*
 
 ## Evidence this change moves, and what must not
 
-No chart, table-result, export or interface-language evidence moves:
-no released body selects, the Inspector's photographed states are
-unchanged (an occurrence state is photographed when Venus is real,
-#514), and the modules' contributions draw as before. The language
-files gain three Inspector keys in each language. Held by
-`SelectionModelTest`, `PageContentsTest`, `LeadSelectionTest`,
+The Inspector gains a photographed occurrence state (`inspector-*-7-
+occurrence`, the Moon at a cited instant) in both languages, so the
+new words are in the language evidence; no chart, table-result or
+export bytes move - the modules draw exactly as before, only what a
+click answers has changed. The language files gain three Inspector
+keys in each language. Held by `SelectionModelTest`,
+`PageContentsTest`, `LeadSelectionTest`,
 `OccurrenceSelectionJourneyTest` (the real component: a click, the
 working selection, the Inspector in both languages, re-resolution, the
-withdrawn body, the unselectable body) and the packaged journey.
+withdrawn body, the unselectable body), the Sun, Moon and Jupiter
+chart journeys (the ruled click), and the packaged journeys
+(*occurrence OK*, and the three bodies' own).

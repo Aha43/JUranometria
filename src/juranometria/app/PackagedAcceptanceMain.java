@@ -2583,13 +2583,15 @@ public final class PackagedAcceptanceMain {
                             java.awt.event.MouseEvent.BUTTON1)));
         }
         javax.swing.SwingUtilities.invokeAndWait(() -> { });
-        require(selection.selection() instanceof juranometria.chart.Selection.EmptySky,
-                "a click on the Moon's disc is the empty sky there: "
-                        + selection.selection());
+        require(selection.selection() instanceof juranometria.chart.Selection.Occurrence pointed
+                        && juranometria.solarchart.SolarSystemModule.MOON.equals(pointed.identity())
+                        && selection.candidates().isEmpty(),
+                "a click on the Moon's disc is the Moon's occurrence, nothing behind it"
+                        + " offered (#513): " + selection.selection());
         System.out.println("moon on the chart OK (the packaged component draws"
                 + " the first-quarter Moon at true scale where the service puts it,"
                 + " lit towards the table's bright limb, names it, speaks it, and a"
-                + " click on the disc selects nothing behind it)");
+                + " click on the disc selects the Moon's occurrence and nothing behind it)");
     }
 
     /**
@@ -2918,9 +2920,11 @@ public final class PackagedAcceptanceMain {
                                     java.awt.event.MouseEvent.BUTTON1)));
                 }
                 javax.swing.SwingUtilities.invokeAndWait(() -> { });
-                require(selection.selection() instanceof juranometria.chart.Selection.EmptySky,
-                        "a click on Jupiter's disc is the empty sky there: "
-                                + selection.selection());
+                require(selection.selection() instanceof juranometria.chart.Selection.Occurrence j
+                                && juranometria.jovianchart.JovianModule.JUPITER.equals(j.identity())
+                                && selection.candidates().isEmpty(),
+                        "a click on Jupiter's disc is Jupiter's occurrence, nothing behind it"
+                                + " offered (#513): " + selection.selection());
             }
         }
         // Centre on chart from Jupiter's Controller group: the module's own
@@ -3068,12 +3072,15 @@ public final class PackagedAcceptanceMain {
                             java.awt.event.MouseEvent.BUTTON1)));
         }
         javax.swing.SwingUtilities.invokeAndWait(() -> { });
-        require(selection.selection() instanceof juranometria.chart.Selection.EmptySky,
-                "a click on the Sun's disc is the empty sky there: "
-                        + selection.selection());
+        require(selection.selection() instanceof juranometria.chart.Selection.Occurrence pointed
+                        && juranometria.solarchart.SolarSystemModule.SUN.equals(pointed.identity())
+                        && selection.candidates().isEmpty(),
+                "a click on the Sun's disc is the Sun's occurrence, nothing behind it"
+                        + " offered (#513): " + selection.selection());
         System.out.println("sun on the chart OK (the packaged component draws"
                 + " the Sun at true scale where the service puts it, names it,"
-                + " speaks it, and a click on the disc selects nothing behind it)");
+                + " speaks it, and a click on the disc selects the Sun's occurrence and"
+                + " nothing behind it)");
     }
 
 

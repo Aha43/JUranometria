@@ -131,6 +131,10 @@ class JupiterOnTheChartJourneyTest {
                 chart.getAccessibleContext().getAccessibleDescription());
         assertTrue(chart.bodyAt(placed.centre().x(), placed.centre().y()).isEmpty(),
                 "a click through the symbol is not consumed: it hides nothing");
+        // Ruled on #513: Jupiter is a selectable occurrence, its symbol as
+        // much as its disc - a reader points at what they see.
+        assertTrue(chart.selectableBodyAt(placed.centre().x(), placed.centre().y())
+                .isPresent(), "but the symbol is pointed at as Jupiter");
     }
 
     @Test
@@ -144,6 +148,9 @@ class JupiterOnTheChartJourneyTest {
                 chart.getAccessibleContext().getAccessibleDescription());
         assertTrue(chart.bodyAt(placed.centre().x(), placed.centre().y()).isPresent(),
                 "the opaque disc consumes a click, so no hidden star is offered");
+        assertEquals(JovianModule.JUPITER, chart.selectableBodyAt(placed.centre().x(),
+                placed.centre().y()).orElseThrow().identity(),
+                "and the disc is pointed at as Jupiter's occurrence (#513)");
     }
 
     @Test

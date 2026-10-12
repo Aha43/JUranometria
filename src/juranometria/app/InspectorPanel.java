@@ -593,8 +593,14 @@ said.say("inspector.tab.page.explain"));
                 // not.
                 boolean offPage = page == null
                         || page.find(member).isEmpty();
-                workingSet.add(memberRow(member, leads, offPage));
-                workingSetTexts.add((leads ? "◉ " : "") + member
+                // A body member is shown by the page's name for it (#513);
+                // a catalogue member by its designation, as always.
+                String shown = page == null ? member : page.find(member)
+                        .filter(entry -> entry instanceof juranometria.page.PageEntry.Body)
+                        .map(entry -> ((juranometria.page.PageEntry.Body) entry).name())
+                        .orElse(member);
+                workingSet.add(memberRow(member, shown, leads, offPage));
+                workingSetTexts.add((leads ? "◉ " : "") + shown
                         + (offPage ? " — off this page" : ""));
             }
             clearSelection.setAlignmentX(0.0f);
@@ -608,14 +614,14 @@ said.say("inspector.tab.page.explain"));
     }
 
     /** One member's row: lead mark, name, off-page word, remove. */
-    private JComponent memberRow(String member, boolean leads,
+    private JComponent memberRow(String member, String shown, boolean leads,
                                  boolean offPage) {
         JPanel row = new JPanel();
         row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
         row.setAlignmentX(0.0f);
         JLabel leadMark = new JLabel(leads ? "◉ " : "   ");
         row.add(leadMark);
-        JButton name = new JButton(member);
+        JButton name = new JButton(shown);
         name.putClientProperty("JButton.buttonType", "toolBarButton");
         name.setHorizontalAlignment(javax.swing.SwingConstants.LEADING);
         if (leads) {
@@ -630,12 +636,12 @@ said.say("inspector.tab.page.explain"));
                                  : "inspector.member.a11y.lead")
                       : (offPage ? "inspector.member.a11y.offpage"
                                  : "inspector.member.a11y"),
-                member));
+                shown));
         juranometria.ui.Explain.control(name,
                 // "Show M 31's facts" put an English possessive on a
                 // catalogue designation. A designation takes no
                 // inflection in any language the atlas speaks.
-                said.say("inspector.member.hover", member),
+                said.say("inspector.member.hover", shown),
                 said.say("inspector.member.explain"));
         name.addActionListener(event -> working.lead(member));
         row.add(name);
@@ -657,10 +663,10 @@ said.say("inspector.tab.page.explain"));
         JButton remove = new JButton("\u2715");
         remove.putClientProperty("JButton.buttonType", "toolBarButton");
         remove.getAccessibleContext().setAccessibleName(
-                said.say("inspector.member.remove", member));
+                said.say("inspector.member.remove", shown));
         juranometria.ui.Explain.control(remove,
-                said.say("inspector.member.remove.hover", member),
-                said.say("inspector.member.remove.explain", member));
+                said.say("inspector.member.remove.hover", shown),
+                said.say("inspector.member.remove.explain", shown));
         remove.addActionListener(event -> working.remove(member));
         row.add(remove);
         row.setMaximumSize(new Dimension(Integer.MAX_VALUE,
@@ -928,11 +934,13 @@ said.say("inspector.tab.page.explain"));
                         .findFirst();
         setSelectedHeading(drawn.map(juranometria.page.PageEntry.Body::name)
                 .orElse(body.identity()));
+        // Sentences, so they break across lines like the explanatory
+        // facts do, rather than being cut as a designation would be.
         fact(said.say("inspector.occurrence.instant", OCCURRENCE_INSTANT.format(
-                body.instant().atOffset(java.time.ZoneOffset.UTC))));
+                body.instant().atOffset(java.time.ZoneOffset.UTC))), true);
         fact(said.say("inspector.occurrence.observer",
                 String.format(Locale.ROOT, "%.3f", body.latitudeDegrees()),
-                String.format(Locale.ROOT, "%.3f", body.eastLongitudeDegrees())));
+                String.format(Locale.ROOT, "%.3f", body.eastLongitudeDegrees())), true);
         fact(coordinates(body.position()));
         fact(FRAME);
         if (page != null && drawn.isEmpty()) {

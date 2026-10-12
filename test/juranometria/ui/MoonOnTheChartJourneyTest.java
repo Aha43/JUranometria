@@ -155,8 +155,12 @@ class MoonOnTheChartJourneyTest {
         }
         assertNotNull(hidden, "a June 2026 Moon covers a catalogue star on a 3° page");
         click(hidden[0], hidden[1] + chart.pageOffsetY());
-        assertInstanceOf(Selection.EmptySky.class, selection.selection(),
-                "the disc consumed the click: " + selection.selection());
+        // Ruled on #513: the Moon is a selectable occurrence; the hidden
+        // star is still not offered.
+        Selection.Occurrence moon = assertInstanceOf(Selection.Occurrence.class,
+                selection.selection(), "the disc answered with the Moon's occurrence: "
+                        + selection.selection());
+        assertEquals(SolarSystemModule.MOON, moon.identity());
         assertEquals(List.of(), selection.candidates(), "the hidden star is not offered");
     }
 

@@ -205,7 +205,7 @@ public final class SolarSystemModule implements ChartModule {
                     sun.astrometricJ2000(), sun.angularDiameterArcseconds(), null,
                     horizon && sun.horizontal().altitudeDegrees() < 0.0,
                     sun.distanceKm(), InkRole.BODY,
-                    OverlayContribution.Moment.of(now), false));
+                    OverlayContribution.Moment.of(now), true));
         }
         if (moonShowing) {
             MoonObservation moon = (MoonObservation) service.get().observe(Body.MOON, now);
@@ -215,7 +215,7 @@ public final class SolarSystemModule implements ChartModule {
                             moon.brightLimbAngleDegrees(), moon.phaseAngleDegrees()),
                     horizon && moon.horizontal().altitudeDegrees() < 0.0,
                     moon.distanceKm(), InkRole.BODY,
-                    OverlayContribution.Moment.of(now), false));
+                    OverlayContribution.Moment.of(now), true));
         }
         return List.copyOf(offered);
     }

@@ -226,7 +226,7 @@ class OccurrenceSelectionJourneyTest {
         assertEquals(List.of(), host.inventory().bodies());
         flush();
         said = String.join(" | ", panel[0].lines());
-        assertTrue(said.contains("Not drawn on the current page"), said);
+        assertTrue(said.contains("No longer present at the page's current moment"), said);
         assertTrue(said.contains("Computed for 2026-03-26 10:52:00 UTC"), said);
 
         // Offered again at that instant: an additive click toggles it out
