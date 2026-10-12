@@ -98,6 +98,8 @@ public final class ReferenceInk {
     /** The zenith ring and its tick, in pixels. */
     private static final double RING = 5.0;
     private static final double TICK = 4.0;
+    /** Half the stroke of a graduation across a reference line (#515). */
+    private static final double GRADUATION = 3.0;
 
     /** Half the diagonal of a landmark's diamond, in pixels. */
     private static final double DIAMOND =
@@ -348,10 +350,127 @@ public final class ReferenceInk {
                                 - metrics.getDescent()));
                 g2.setClip(underSky);
             }
+            // The graduations (#515), after every name and letter this
+            // layer writes: the stroke under the sky clip like a mark,
+            // the figure under the paper clip like a name, and each
+            // figure placed against what is already written - so a
+            // crowded page drops the figure, never the stroke, and
+            // never moves a word.
+            for (OverlayRegistry.Owned owned : reference) {
+                if (owned.geometry()
+                        instanceof OverlayContribution.Tick tick) {
+                    drawTick(g2, projection, mapping, paper, sky, bounded,
+                            tick, words, taken, reserved, discs, palette,
+                            emphasized);
+                }
+            }
             return laid.directions();
         } finally {
             g2.dispose();
         }
+    }
+
+    /**
+     * A graduation on a reference line (#515): a short stroke across
+     * the great circle at the tick's position, in the line's own
+     * accent, and - when the module asks - the page's figure for its
+     * altitude beside it.
+     *
+     * <p>Across, never along: the circle's tangent at the position is
+     * its pole crossed with the position, and a small step along that
+     * tangent, projected, gives the line's direction on this page in
+     * this projection; the stroke is perpendicular to it. Off the page
+     * is silence, as for every mark.
+     */
+    private static void drawTick(Graphics2D g, Projection projection,
+                                 ViewportMapping mapping, Rectangle2D paper,
+                                 java.awt.Shape sky, boolean bounded,
+                                 OverlayContribution.Tick tick,
+                                 juranometria.project.PageWords words,
+                                 List<Rectangle2D> taken,
+                                 List<java.awt.Shape> reserved,
+                                 List<Shape> discs,
+                                 juranometria.render.ChartPalette palette,
+                                 java.util.function.Predicate<
+                                         juranometria.render.ChartStructure>
+                                         emphasized) {
+        PixelPoint at = projection.project(tick.at())
+                .map(mapping::toPixel).orElse(null);
+        if (at == null || !sky.contains(at.x(), at.y())) {
+            return;
+        }
+        PixelPoint ahead = alongTheCircle(projection, mapping, tick, 0.1);
+        if (ahead == null) {
+            ahead = alongTheCircle(projection, mapping, tick, -0.1);
+        }
+        if (ahead == null) {
+            return;
+        }
+        double dx = ahead.x() - at.x();
+        double dy = ahead.y() - at.y();
+        double length = Math.hypot(dx, dy);
+        if (length == 0.0) {
+            return;
+        }
+        double nx = -dy / length;
+        double ny = dx / length;
+        juranometria.render.StructureStyle.Style style =
+                juranometria.render.ChartStructure
+                        .ofIdentity(tick.lineIdentity())
+                        .map(s -> juranometria.render.StructureStyle
+                                .resolve(palette, s, emphasized.test(s),
+                                        palette.figureInk(), SOLID))
+                        .orElseGet(() ->
+                                new juranometria.render.StructureStyle
+                                        .Style(palette.figureInk(), SOLID));
+        g.setColor(style.color());
+        g.setStroke(style.stroke());
+        g.draw(new Line2D.Double(at.x() - nx * GRADUATION,
+                at.y() - ny * GRADUATION,
+                at.x() + nx * GRADUATION, at.y() + ny * GRADUATION));
+        if (!tick.labelled()) {
+            return;
+        }
+        String figure = words.altitudeTick(tick.altitudeDegrees());
+        if (!bounded) {
+            write(g, paper, sky, at, figure, taken, reserved, discs, palette);
+            return;
+        }
+        Shape marksClip = g.getClip();
+        g.setClip(paper);
+        try {
+            write(g, paper, sky, at, figure, taken, reserved, discs, palette);
+        } finally {
+            g.setClip(marksClip);
+        }
+    }
+
+    /**
+     * The pixel a small step along the tick's circle lands on, or null
+     * when the projection refuses it.
+     */
+    private static PixelPoint alongTheCircle(Projection projection,
+                                             ViewportMapping mapping,
+                                             OverlayContribution.Tick tick,
+                                             double stepDegrees) {
+        double[] p = juranometria.sky.SkyFrame.toVector(tick.alongPole());
+        double[] a = juranometria.sky.SkyFrame.toVector(tick.at());
+        double[] t = new double[] {
+                p[1] * a[2] - p[2] * a[1],
+                p[2] * a[0] - p[0] * a[2],
+                p[0] * a[1] - p[1] * a[0]};
+        double norm = Math.sqrt(t[0] * t[0] + t[1] * t[1] + t[2] * t[2]);
+        if (norm == 0.0) {
+            return null;
+        }
+        double c = Math.cos(Math.toRadians(stepDegrees));
+        double s = Math.sin(Math.toRadians(stepDegrees));
+        double[] ahead = new double[] {
+                a[0] * c + t[0] / norm * s,
+                a[1] * c + t[1] / norm * s,
+                a[2] * c + t[2] / norm * s};
+        return projection.project(juranometria.sky.SkyFrame.toPosition(ahead))
+                .map(mapping::toPixel).orElse(null);
     }
 
     /**

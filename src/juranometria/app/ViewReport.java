@@ -72,7 +72,8 @@ public final class ViewReport {
      * three switches - present only while the module is attached.
      */
     public record PlaceAndTime(Observer observer, boolean meridian,
-                               boolean horizon, boolean zenith) {
+                               boolean horizon, boolean zenith,
+                               boolean ticks) {
     }
 
     private ViewReport() {
@@ -111,7 +112,8 @@ public final class ViewReport {
             place = new PlaceAndTime(placeAndTime.observer(),
                     placeAndTime.meridianShowing(),
                     placeAndTime.horizonShowing(),
-                    placeAndTime.zenithShowing());
+                    placeAndTime.zenithShowing(),
+                    placeAndTime.ticksShowing());
         }
         Boolean eclipticShowing = null;
         if (ecliptic != null && ecliptic.attached()) {
@@ -188,7 +190,8 @@ public final class ViewReport {
             PlaceAndTime place = s.placeAndTime();
             lines.add("observer-lines: meridian " + onOff(place.meridian())
                     + ", horizon " + onOff(place.horizon()) + ", zenith "
-                    + onOff(place.zenith()));
+                    + onOff(place.zenith()) + ", altitude-ticks "
+                    + onOff(place.ticks()));
             lines.add(String.format(Locale.ROOT,
                     "observer: latitude %+.6f; longitude-east %+.6f",
                     place.observer().latitudeDegrees(),

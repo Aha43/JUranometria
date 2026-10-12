@@ -83,6 +83,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Place and Time | JCheckBox | Meridian | Draw the great circle through both celestial poles and your zenith (<prefix> then R) | Draws the line that runs from due north, through the point overhead, to due south. It l... | hovered |
 | Place and Time | JCheckBox | Mathematical horizon | Draw where the sky meets a perfectly flat, transparent Earth (<prefix> then H) | Draws the circle where the sky would meet a flat and transparent Earth; your own horizo... | hovered |
 | Place and Time | JCheckBox | Zenith | Mark the point overhead | Marks the point directly above you. It is drawn with the observer's lines and has no sh... | hovered |
+| Place and Time | JCheckBox | Altitude ticks | Graduate the meridian every 10° of altitude above the horizon | Marks the meridian every 10° of altitude from the horizon to the zenith, with the figur... | hovered |
 | Place and Time | JButton | Now | Reads the clock once and freezes the chart at that instant | Freezes the reference lines at the present moment. The clock is read once; nothing move... | hovered |
 | Place and Time | JButton | Centre on zenith | Move the chart to the point overhead | Moves the page to the point directly above you. This is the only control in this window... | hovered |
 | Controls | JToggleButton | ▾ Place and Time | Show or hide this section | A hidden section keeps everything it is set to; whether it is hidden is remembered. | hovered |
@@ -153,7 +154,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 
 ## The audit
 
-**136 operable controls** across 16 surfaces: **88** hovered, **12** dynamic, **36** left to their own visible words, **0 undecided**.
+**137 operable controls** across 16 surfaces: **89** hovered, **12** dynamic, **36** left to their own visible words, **0 undecided**.
 
 **0** say the same words twice - a tooltip read back as a description. The seam refuses it, so this is zero or a finding.
 

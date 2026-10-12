@@ -179,8 +179,8 @@ class PlaceAndTimeDialogTest {
         assertEquals(3, all(rig.content, JTextField.class).size(),
                 "latitude, longitude, instant - and no fourth field");
         List<Component> switches = all(rig.content, JCheckBox.class);
-        assertEquals(3, switches.size(),
-                "meridian, mathematical horizon, zenith");
+        assertEquals(4, switches.size(),
+                "meridian, mathematical horizon, zenith, altitude ticks (#515)");
         assertEquals(2, all(rig.content, JButton.class).size(),
                 "two deliberate actions, and no others: no Apply, no"
                         + " Cancel, no OK");

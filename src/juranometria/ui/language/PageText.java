@@ -84,6 +84,16 @@ public final class PageText implements PageWords {
     }
 
     @Override
+    public String altitudeTick(double altitudeDegrees) {
+        // Whole degrees as an integer, anything else to one decimal:
+        // a ruled step of 7.5 would write 7.5, not 7 or 8.
+        String figure = Math.abs(altitudeDegrees - Math.rint(altitudeDegrees)) < 1e-9
+                ? Long.toString(Math.round(altitudeDegrees))
+                : String.format(java.util.Locale.ROOT, "%.1f", altitudeDegrees);
+        return said.say(STEM + "altitude.tick", figure);
+    }
+
+    @Override
     public String chartInstructions() {
         return said.say(STEM + "chart.explain");
     }

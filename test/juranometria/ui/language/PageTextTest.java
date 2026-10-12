@@ -241,6 +241,11 @@ class PageTextTest {
             public String bodyState(String state) {
                 return EN.bodyState(state);
             }
+
+            @Override
+            public String altitudeTick(double altitudeDegrees) {
+                return EN.altitudeTick(altitudeDegrees);
+            }
         };
 
         assertEquals("spherical Mercator",

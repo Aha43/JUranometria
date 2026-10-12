@@ -46,7 +46,7 @@ class ViewReportTest {
                         ChartStructure.HORIZON,
                         ChartStructure.EQUATORIAL_GRID),
                 List.of("place-and-time", "ecliptic"),
-                new ViewReport.PlaceAndTime(OSLO, true, true, false),
+                new ViewReport.PlaceAndTime(OSLO, true, true, false, false),
                 Boolean.FALSE,
                 new Selection.Object(Selection.Object.Kind.STAR,
                         "star:hip-102098",
@@ -83,7 +83,7 @@ class ViewReportTest {
                 page-overrides: none
                 emphasis: meridian+equatorial-grid+horizon
                 modules: place-and-time, ecliptic
-                observer-lines: meridian on, horizon on, zenith off
+                observer-lines: meridian on, horizon on, zenith off, altitude-ticks off
                 observer: latitude +59.913000; longitude-east +10.752000
                 instant-utc: 2026-03-20T21:33:00Z
                 ecliptic: off
@@ -231,7 +231,7 @@ class ViewReportTest {
         ViewReport.PlaceAndTime p = b.placeAndTime();
         return copy(b, b.view(), b.chosen(), b.drawn(), b.emphasis(),
                 new ViewReport.PlaceAndTime(observer, p.meridian(),
-                        p.horizon(), p.zenith()));
+                        p.horizon(), p.zenith(), p.ticks()));
     }
 
     private static ViewReport.Snapshot copy(ViewReport.Snapshot b,

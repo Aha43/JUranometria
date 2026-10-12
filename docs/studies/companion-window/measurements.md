@@ -22,10 +22,11 @@ nothing - is one machine's answer, in `platform.md` beside this.
 | JCheckBox | Meridian | Show Meridian |
 | JCheckBox | Mathematical horizon | Show Mathematical horizon |
 | JCheckBox | Zenith | Show Zenith |
+| JCheckBox | Altitude ticks | Show Altitude ticks |
 | JButton | Now | Now |
 | JButton | Centre on zenith | Centre on zenith |
 
-**8 operable controls.** A companion that hosts this content offers
+**9 operable controls.** A companion that hosts this content offers
 exactly these; it adds only its own shell.
 
 ## The content in `nb-NO`
@@ -38,10 +39,11 @@ exactly these; it adds only its own shell.
 | JCheckBox | Meridian | Vis meridianen |
 | JCheckBox | Matematisk horisont | Vis matematisk horisont |
 | JCheckBox | Senit | Vis senit |
+| JCheckBox | Høydemerker | Vis høydemerker |
 | JButton | Nå | Nå |
 | JButton | Sentrer på senit | Sentrer på senit |
 
-**8 operable controls.** A companion that hosts this content offers
+**9 operable controls.** A companion that hosts this content offers
 exactly these; it adds only its own shell.
 
 ## Placement at four screen sizes

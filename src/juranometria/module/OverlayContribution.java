@@ -244,6 +244,61 @@ public sealed interface OverlayContribution {
 
     /** An open run of sky positions. */
     /**
+     * A graduation on a reference line: a short stroke across the
+     * great circle given by {@code alongPole}, at {@code at}, marking
+     * {@code altitudeDegrees} above the mathematical horizon (issue
+     * #515).
+     *
+     * <p>Furniture, not an object: nothing selects a tick, and it
+     * carries <strong>no words</strong>, as the cardinal marks carry
+     * none - the drawn figure is the page's language ({@code
+     * PageWords.altitudeTick}), and a module that shipped "30°" would
+     * be choosing how a page writes a number. {@code lineIdentity} is
+     * the line the tick belongs to, so the chart inks it with that
+     * line's accent; {@code identity} is the tick's own, unique in its
+     * module as every contribution's is; {@code labelled} says whether the page is asked to
+     * write the figure beside this one, which is the module's density
+     * choice and not the chart's.
+     *
+     * <p>The chart finds the stroke's direction from the circle's
+     * pole and the tick's position - across the line, never along it -
+     * and draws nothing where the position is off the page.
+     */
+    record Tick(String identity, String lineIdentity, SkyPosition at,
+                SkyPosition alongPole, double altitudeDegrees,
+                boolean labelled, InkRole role)
+            implements OverlayContribution {
+
+        public Tick {
+            if (identity == null || identity.isBlank()) {
+                throw new IllegalArgumentException(
+                        "a tick carries an identity of its own, unique"
+                                + " among its module's contributions");
+            }
+            if (lineIdentity == null || lineIdentity.isBlank()) {
+                throw new IllegalArgumentException(
+                        "a tick belongs to a named line: " + identity);
+            }
+            if (at == null || alongPole == null) {
+                throw new IllegalArgumentException(
+                        "a tick is somewhere on a circle given by its"
+                                + " pole: " + identity);
+            }
+            if (role == null) {
+                throw new IllegalArgumentException(
+                        "a tick says what role its ink is in: "
+                                + identity);
+            }
+            if (!(altitudeDegrees > 0.0 && altitudeDegrees < 90.0)) {
+                throw new IllegalArgumentException(
+                        "a tick graduates the line between the horizon"
+                                + " and the zenith, neither included: "
+                                + altitudeDegrees);
+            }
+        }
+    }
+
+    /**
      * A Solar System body drawn at its true angular size (Sprint 37,
      * issue #415, under the #414 ruling): the centre, the disc's
      * apparent diameter, whether it is below the observer's drawn

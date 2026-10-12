@@ -170,12 +170,29 @@ public final class PlaceAndTimePanel extends JPanel {
                 said.say("placeandtime.zenith.hover"),
                 said.say("placeandtime.zenith.explain"),
                 said, letters, "showZenith");
+        // The meridian's graduation (#515): drawn with the meridian,
+        // as the zenith is drawn with the lines, and like it with no
+        // shortcut of its own.
+        // The step is the module's declared value, stated once in the
+        // words: a ruling that changes it changes no sentence. The
+        // degree sign is the sentence's; the number is not a page word.
+        double stepDegrees = module.ticks().stepDegrees();
+        String step = stepDegrees == Math.rint(stepDegrees)
+                ? Long.toString(Math.round(stepDegrees))
+                : String.format(java.util.Locale.ROOT, "%.1f", stepDegrees);
+        JCheckBox ticks = show("placeandtime.ticks",
+                module.ticksShowing(),
+                said.say("placeandtime.ticks.hover", step),
+                said.say("placeandtime.ticks.explain", step),
+                said, letters, "showAltitudeticks");
         Runnable showing = () -> module.showing(meridian.isSelected(),
                 horizon.isSelected(), zenith.isSelected());
         for (JCheckBox box : new JCheckBox[] {meridian, horizon, zenith}) {
             box.addActionListener(event -> showing.run());
             panel.add(box);
         }
+        ticks.addActionListener(event -> module.ticksShowing(ticks.isSelected()));
+        panel.add(ticks);
 
         // The content shows what the module holds, whoever changed it
         // (#434): the chart keyboard toggles a line while this is
@@ -190,6 +207,7 @@ public final class PlaceAndTimePanel extends JPanel {
             meridian.setSelected(module.meridianShowing());
             horizon.setSelected(module.horizonShowing());
             zenith.setSelected(module.zenithShowing());
+            ticks.setSelected(module.ticksShowing());
         });
         // Released when the window holding it is disposed - the only
         // way the dialog closes - so reopening adds no listener.
