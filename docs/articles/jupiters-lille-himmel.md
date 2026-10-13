@@ -142,11 +142,11 @@ målestokken ligger de to aksene under én piksel fra hverandre.
 ![Et 1-graders kart sentrert på Jupiter 11. desember 2026 kl. 22:45
 UTC: en liten skive merket Jupiter med tre prikker på, merket Europa,
 Callisto og Io, og én prikk oppe til høyre merket
-Ganymede.](images/jupiter-triple-transit-1.png)
+Ganymedes.](images/jupiter-triple-transit-1.png)
 
 *Den tredoble passasjen ved 1°: Jupiters sanne skive med Io, Europa og
 Callisto foran, hver en prikk med ring i papirets farge, og Ganymedes
-fri av den mot øst (den engelske siden).*
+fri av den oppe til høyre, vest og nord for Jupiter (den engelske siden).*
 
 **Hver måne er et 3 px merke, og merket sier tilstanden.** En månes egen
 skive er mindre enn en piksel, så hver måne er et symbol, og ordforrådet
@@ -165,7 +165,7 @@ ved siden av skiven - på den norske siden, der månen leses opp som
 "Io, i Jupiters skygge".*
 
 ![Et 1-graders kart 2. desember 2026 kl. 07:00 UTC: Jupiters skive med
-bare tre måner tegnet - Europa, Callisto og Ganymede - og intet merke
+bare tre måner tegnet - Europa, Callisto og Ganymedes - og intet merke
 for Io.](images/jupiter-io-behind-1.png)
 
 *Tre timer senere, 2026-12-02 07:00 UTC, er Io bak Jupiter og tegnes rett
@@ -179,7 +179,7 @@ aldri resten med seg. Navn legges rundt merkene på kartets vanlige vis,
 og et navn uten ren plass sløyfes for seg, skyves aldri over noe annet.
 
 ![Et 3-graders kart på svart himmel 6. mars 2026 kl. 06:00 UTC: Jupiter
-som et lite fylt symbol med to prikker til høyre merket Ganymede og
+som et lite fylt symbol med to prikker til høyre merket Ganymedes og
 Callisto, og ingen merker for Io og Europa.](images/jupiter-spread-3-dark.png)
 
 *De samme fire månene ved 3° på svart himmel, 2026-03-06 06:00 UTC:
@@ -189,10 +189,10 @@ og Europa gjør det ikke, og kartet later ikke som noe annet.*
 
 ![Et 8-graders kart på svart himmel 11. desember 2026 kl. 22:45 UTC:
 Jupiter som et lite symbol merket Jupiter, med én prikk ved siden av
-merket Ganymede.](images/jupiter-triple-8.png)
+merket Ganymedes.](images/jupiter-triple-8.png)
 
 *Den tredoble passasjen ved 8°: i denne målestokken kan de tre
-passerende månene ikke vises, og bare Ganymedes, langt mot øst, vises.*
+passerende månene ikke vises, og bare Ganymedes, langt mot vest, vises.*
 
 De samme to reglene gjelder under en tegnet horisont, der Jupiter
 dempes og sier det, og på papir, der et eksportert ark tegner Jupiter
@@ -209,13 +209,13 @@ tegnet blekt, og navngitt som under den.*
 
 ![Et 1-graders kart 11. desember 2026 kl. 22:30 UTC: Jupiters skive med
 Europa og Callisto på, og Io som en fylt prikk like utenfor den
-vestlige randen; Ganymede oppe til høyre.](images/jupiter-sequence-2230.png)
+østlige randen; Ganymedes oppe til høyre.](images/jupiter-sequence-2230.png)
 
 *22:30 UTC: Io, en fylt prikk, har ennå ikke rørt randen; Europa og
 Callisto er allerede foran.*
 
 ![Samme kart på svart himmel kl. 23:00 UTC: Io og Europa på skiven,
-Callisto en fylt prikk like utenfor østsiden.](images/jupiter-sequence-2300.png)
+Callisto en fylt prikk like utenfor vestsiden.](images/jupiter-sequence-2300.png)
 
 *23:00 UTC: Callisto har forlatt skiven og er en vanlig prikk igjen; Io
 og Europa er fortsatt foran.*
@@ -228,7 +228,7 @@ svarer for det.
 
 ## Hva atlaset ikke påstår
 
-- **Ingen overflate.** Ingen skybelter, ingen store røde flekk og ingen
+- **Ingen overflate.** Ingen skybelter, ingen stor rød flekk og ingen
   rotasjon; skiven er en figur, ikke et bilde.
 - **Ingen skygger på Jupiter.** En månes skygge som faller på skiven,
   regnes ikke ut og tegnes derfor ikke, selv om tabellen sier når en

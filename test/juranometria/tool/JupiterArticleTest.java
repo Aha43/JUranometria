@@ -132,6 +132,86 @@ class JupiterArticleTest {
         }
     }
 
+    /**
+     * The named evening's sides, read from Horizons' signed offsets in
+     * the contract study (X positive east): every clause of either
+     * article that names a moon and a side names the side the sign
+     * gives, so the prose cannot disagree with the table (the owner's
+     * reading of 2affc1c4 found Ganymede "to the east").
+     */
+    @Test
+    void everyMoonsSideInTheProseIsTheSignOfItsHorizonsOffset() throws IOException {
+        java.util.Map<String, Boolean> eastOf = new java.util.LinkedHashMap<>();
+        for (String line : read(Path.of("docs/studies/jovian-system/measurements.md")).split("\n")) {
+            if (!line.startsWith("| 2026-Dec-11 ")) {
+                continue;
+            }
+            String[] cells = line.split("\\|");
+            if (cells.length < 5 || !cells[2].trim().matches("io|europa|ganymede|callisto")) {
+                continue;
+            }
+            String moon = cells[2].trim();
+            boolean east = cells[3].trim().startsWith("+");
+            Boolean before = eastOf.put(moon, east);
+            assertTrue(before == null || before == east,
+                    moon + " keeps one side through the named evening");
+        }
+        assertTrue(eastOf.size() == 4, "all four moons read from the named evening: " + eastOf);
+        java.util.Map<String, String> norwegian = java.util.Map.of("io", "Io", "europa", "Europa",
+                "ganymede", "Ganymedes", "callisto", "Callisto");
+        java.util.Map<String, String> english = java.util.Map.of("io", "Io", "europa", "Europa",
+                "ganymede", "Ganymede", "callisto", "Callisto");
+        sidesAgree(read(ENGLISH), english, eastOf,
+                "\\b(east|eastern)\\b", "\\b(west|western)\\b", "English");
+        sidesAgree(read(NORWEGIAN), norwegian, eastOf,
+                "\\b(øst|østlige|østsiden)\\b", "\\b(vest|vestlige|vestsiden)\\b", "Norwegian");
+    }
+
+    /**
+     * A side word belongs to the moon last named before it in its
+     * clause - "Io east ... Ganymede west" names two moons and two
+     * sides, each the right one.
+     */
+    private static void sidesAgree(String article, java.util.Map<String, String> names,
+                                   java.util.Map<String, Boolean> eastOf,
+                                   String eastWords, String westWords, String language) {
+        StringBuilder alternatives = new StringBuilder();
+        for (String name : names.values()) {
+            alternatives.append("\\b").append(name).append("\\b|");
+        }
+        java.util.regex.Pattern token = java.util.regex.Pattern.compile(
+                alternatives + eastWords + "|" + westWords);
+        java.util.regex.Pattern east = java.util.regex.Pattern.compile(eastWords);
+        int sidesChecked = 0;
+        for (String clause : article.replace("\n", " ").split("[.;:]")) {
+            String current = null;
+            java.util.regex.Matcher m = token.matcher(clause);
+            while (m.find()) {
+                String word = m.group();
+                String moon = null;
+                for (var name : names.entrySet()) {
+                    if (name.getValue().equals(word)) {
+                        moon = name.getKey();
+                    }
+                }
+                if (moon != null) {
+                    current = moon;
+                    continue;
+                }
+                if (current == null) {
+                    continue;
+                }
+                boolean saysEast = east.matcher(word).matches();
+                sidesChecked++;
+                assertTrue(saysEast == eastOf.get(current), language + ": '" + clause.trim()
+                        + "' - " + names.get(current) + " is "
+                        + (eastOf.get(current) ? "east" : "west")
+                        + " of Jupiter on the named evening, not '" + word + "'");
+            }
+        }
+        assertTrue(sidesChecked >= 4, language + ": the sides are stated: " + sidesChecked);
+    }
+
     @Test
     void bothLanguagesAreListedWhereAReaderFindsThem() throws IOException {
         String index = read(Path.of("docs/articles/README.md"));

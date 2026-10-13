@@ -149,7 +149,7 @@ Ganymede.](images/jupiter-triple-transit-1.png)
 
 *The triple transit at 1°: Jupiter's true disc with Io, Europa and
 Callisto in front of it, each a dot ringed in the paper's colour, and
-Ganymede clear of it to the east.*
+Ganymede clear of it to the upper right, west and north of Jupiter.*
 
 **Each moon is a 3 px mark, and the mark says its state.** A moon's
 own disc is smaller than a pixel, so every moon is a symbol, and the
@@ -198,7 +198,7 @@ Jupiter as a small symbol labelled Jupiter, with one dot beside it
 labelled Ganymede.](images/jupiter-triple-8.png)
 
 *The triple transit at 8°: at this scale the three transiting moons
-cannot be shown, and only Ganymede, far to the east, is.*
+cannot be shown, and only Ganymede, far to the west, is.*
 
 The same two rules hold below a drawn horizon, where Jupiter is
 dimmed and says so, and on paper, where an exported sheet draws
@@ -216,13 +216,13 @@ drawn pale, and named as below it.*
 
 ![A 1-degree chart on 11 December 2026 at 22:30 UTC: Jupiter's disc
 with Europa and Callisto on it and Io a filled dot just clear of the
-western limb; Ganymede to the upper right.](images/jupiter-sequence-2230.png)
+eastern limb; Ganymede to the upper right.](images/jupiter-sequence-2230.png)
 
 *22:30 UTC: Io, a filled dot, has not yet touched the limb; Europa and
 Callisto are already in front.*
 
 ![The same chart on the black sky at 23:00 UTC: Io and Europa on the
-disc, Callisto a filled dot just clear of its eastern side.](images/jupiter-sequence-2300.png)
+disc, Callisto a filled dot just clear of its western side.](images/jupiter-sequence-2300.png)
 
 *23:00 UTC: Callisto has left the disc and is a plain dot again; Io and
 Europa remain in front.*
