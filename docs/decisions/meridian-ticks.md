@@ -95,6 +95,30 @@ test skips a tick the page's own reserved ink covers, for that reason.)
 3. The behaviour above — session-only like the other lines, no
    shortcut, nothing selectable — unless the owner rules otherwise.
 
+## The ruling
+
+The owner's ruling (2026-10-13, on #515 at 4ec9bfb1), accepting the
+proposal as built, recorded as given:
+
+1. **Ticks every 10°.**
+2. **A degree figure at every tick where placement has room.**
+
+> Five-degree ticks would add visual texture faster than useful
+> precision, especially at wide fields. Ten degrees makes the meridian
+> a practical altitude scale, and labelling every tick preserves the
+> simple "read the nearest mark" behaviour. Keep negative values
+> absent, as previously ruled. The remaining behaviour also looks
+> right: optional and off at startup, shared between the dialog and
+> Controller, dependent on the Meridian switch, raised with meridian
+> emphasis, and reported as `altitude-ticks on/off`.
+
+So `MeridianModule.Ticks.PROPOSED` - 10°, every tick lettered - is the
+ruled value, nothing below the horizon is ever a tick, and the
+behaviour above stands. The packaged verdict on the candidate from
+`ac278af3`'s successor `4ec9bfb1`: the zoom problem of an earlier head
+solved, the ticks as described. Merged as PR #521, pinned to
+`4ec9bfb1`, landing `3444c26b`.
+
 ## Rejected
 
 - **A tick at 0° and at 90°.** The horizon crossing is the horizon's,
