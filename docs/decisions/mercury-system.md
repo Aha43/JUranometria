@@ -13,7 +13,10 @@ cartography handoff (`measurements.md`), `make mercury-pack-study` for
 the excerpt (`pack-measurements.md`),
 `scripts/mercury-authority-comparison.py` for the error matrix
 (`authority-comparison.md`); the numbers quoted here are those
-reports'.
+reports'. The contract study and its images are registered evidence
+that CI reproduces; the pack report and the authority comparison read
+the pinned raw downloads the runner does not hold, so they are
+reproduced locally and held as committed, as Venus's are.
 
 > Mercury must eventually answer where it is in the chart's J2000
 > frame and in the observer's sky; how far away and how large it

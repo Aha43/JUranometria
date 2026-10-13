@@ -175,9 +175,10 @@ public final class EvidenceContractMain {
         // The meridian's graduation on production pages (#515), the same way.
         REPORT_MAINS.put("juranometria.tool.MeridianTicksStudyMain",
                 "docs/studies/meridian-ticks/measurements.md");
-        // The Mercury pack study (#528): the kernel the builder would add, measured.
-        REPORT_MAINS.put("juranometria.tool.MercuryPackStudyMain",
-                "docs/studies/mercury/pack-measurements.md");
+        // The Mercury pack study (#528) is not registered, as the Venus one is
+        // not: both read the gitignored de440s.bsp and pck00011.tpc, which the CI
+        // runner does not hold; `make mercury-pack-study` reproduces the report
+        // locally against the pinned downloads, and it is held as committed.
         // Jupiter and the moons on production pages (#486): the report
         // is deterministic, its pages held through IMAGE_MAINS, and where
         // each name went is the platform record (PLATFORM_REPORTS).
