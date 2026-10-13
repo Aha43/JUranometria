@@ -1,0 +1,290 @@
+# JPL Horizons response, kept whole (#528)
+# request-url: https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27199%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27coord%40399%27&COORD_TYPE=%27GEODETIC%27&QUANTITIES=%271%2C2%2C4%2C9%2C10%2C13%2C19%2C20%2C23%2C24%2C43%27&EXTRA_PREC=%27YES%27&ANG_FORMAT=%27DEG%27&APPARENT=%27AIRLESS%27&CSV_FORMAT=%27YES%27&TIME_DIGITS=%27SECONDS%27&SITE_COORD=%2710.75%2C59.91%2C0.0%27&TLIST=%271900-01-01%2000%3A00%3A00%27%20%271962-01-01%2000%3A00%3A00%27%20%271972-01-01%2000%3A00%3A00%27%20%272000-01-01%2012%3A00%3A00%27%20%272017-01-01%2000%3A00%3A00%27%20%272027-06-28%2000%3A00%3A00%27%20%272100-12-31%2023%3A59%3A59%27%20%272012-02-07%2009%3A00%3A00%27%20%272012-03-21%2019%3A00%3A00%27%20%272012-05-27%2011%3A00%3A00%27%20%272012-07-28%2020%3A00%3A00%27%20%272012-09-10%2013%3A00%3A00%27%20%272012-11-17%2016%3A00%3A00%27%20%272026-01-21%2016%3A00%3A00%27%20%272026-03-07%2011%3A00%3A00%27%20%272026-05-14%2014%3A00%3A00%27%20%272026-07-13%2001%3A00%3A00%27%20%272026-08-27%2017%3A00%3A00%27%20%272026-11-04%2014%3A00%3A00%27%20%272100-02-08%2004%3A00%3A00%27%20%272100-04-18%2017%3A00%3A00%27%20%272100-06-10%2005%3A00%3A00%27%20%272100-08-01%2006%3A00%3A00%27%20%272100-10-09%2007%3A00%3A00%27%20%272100-11-28%2007%3A00%3A00%27&TLIST_TYPE=%27CAL%27
+# requested-utc: 2026-10-13T20:36:04Z
+# body-sha256: a81472d17ca29c5fb3bddf13d6108c3990ba4559b1578ee005b07be8d02da1bc
+# body-bytes: 20989
+# complete: True
+API VERSION: 1.2
+API SOURCE: NASA/JPL Horizons API
+
+*******************************************************************************
+ Revised: April 12, 2021             Mercury                            199 / 1
+
+ PHYSICAL DATA (updated 2024-Mar-04):
+  Vol. Mean Radius (km) =  2439.4+-0.1    Density (g cm^-3)     = 5.427
+  Mass x10^23 (kg)      =     3.302       Volume (x10^10 km^3)  = 6.085  
+  Sidereal rot. period  =    58.6463 d    Sid. rot. rate (rad/s)= 0.00000124001
+  Mean solar day        =   175.9421 d    Core radius (km)      = ~1600 
+  Geometric Albedo      =     0.106       Surface emissivity    = 0.77+-0.06
+  GM (km^3/s^2)         = 22031.86855     Equatorial radius, Re = 2440.53 km
+  GM 1-sigma (km^3/s^2) =                 Mass ratio (Sun/plnt) = 6023682
+  Mom. of Inertia       =     0.33        Equ. gravity  m/s^2   = 3.701     
+  Atmos. pressure (bar) = < 5x10^-15      Max. angular diam.    = 11.0"   
+  Mean Temperature (K)  = 440             Visual mag. V(1,0)    = -0.42 
+  Obliquity to orbit[1] =  2.11' +/- 0.1' Hill's sphere rad. Rp = 94.4 
+  Sidereal orb. per.    =  0.2408467 y    Mean Orbit vel.  km/s = 47.362 
+  Sidereal orb. per.    = 87.969257  d    Escape vel. km/s      =  4.435
+                                 Perihelion  Aphelion    Mean
+  Solar Constant (W/m^2)         14462       6278        9126
+  Maximum Planetary IR (W/m^2)   12700       5500        8000
+  Minimum Planetary IR (W/m^2)   6           6           6
+*******************************************************************************
+
+
+*******************************************************************************
+Ephemeris / API_USER Tue Oct 13 13:36:05 2026 Pasadena, USA      / Horizons    
+*******************************************************************************
+Target body name: Mercury (199)                   {source: DE441}
+Center body name: Earth (399)                     {source: DE441}
+Center-site name: (user defined site below)
+*******************************************************************************
+Start time      : A.D. 1900-Jan-01 00:00:00.0000 UT      
+Stop  time      : A.D. 2100-Dec-31 23:59:59.0000 UT      
+Step-size       : 0 steps
+*******************************************************************************
+Target pole/equ : IAU_MERCURY                     {West-longitude positive}
+Target radii    : 2440.53, 2440.53, 2438.26 km    {Equator_a, b, pole_c}       
+Center geodetic : 10.75, 59.91, 0.0               {E-lon(deg),Lat(deg),Alt(km)}
+Center cylindric: 10.75, 3205.78431, 5495.4568    {E-lon(deg),Dxy(km),Dz(km)}
+Center pole/equ : ITRF93                          {East-longitude positive}
+Center radii    : 6378.137, 6378.137, 6356.752 km {Equator_a, b, pole_c}       
+Target primary  : Sun
+Vis. interferer : MOON (R_eq= 1737.400) km        {source: DE441}
+Rel. light bend : Sun                             {source: DE441}
+Rel. lght bnd GM: 1.3271E+11 km^3/s^2                                          
+Atmos refraction: NO (AIRLESS)
+RA format       : DEG
+Time format     : CAL 
+Calendar mode   : Mixed Julian/Gregorian
+EOP file        : eop.261012.p270108                                           
+EOP coverage    : DATA-BASED 1962-JAN-20 TO 2026-OCT-12. PREDICTS-> 2027-JAN-07
+Units conversion: 1 au= 149597870.700 km, c= 299792.458 km/s, 1 day= 86400.0 s 
+Table cut-offs 1: Elevation (-90.0deg=NO ),Airmass (>38.000=NO), Daylight (NO )
+Table cut-offs 2: Solar elongation (  0.0,180.0=NO ),Local Hour Angle( 0.0=NO )
+Table cut-offs 3: RA/DEC angular rate (     0.0=NO )                           
+Table format    : Comma Separated Values (spreadsheet)
+*********************************************************************************************************************************************************************************************************************************************************************************************
+ Date__(UT)__HR:MN:SC.fff, , , R.A.___(ICRF), DEC____(ICRF),  R.A.__(a-app), DEC___(a-app), Azimuth_(a-app), Elevation_(a-app),    APmag,  S-brt,      Illu%,  Ang-diam,                r,       rdot,             delta,     deldot,     S-O-T,/r,     S-T-O,       phi,  PAB-LON,  PAB-LAT,
+*********************************************************************************************************************************************************************************************************************************************************************************************
+$$SOE
+ 1900-Jan-01 00:00:00.000, , , 259.636582490, -21.982313510,  258.135193074, -21.874339113,    45.846382356,     -45.515088249,   -0.360,  2.942,   76.76367,  5.892653,   0.420706128253,  8.2103444,  1.14209698707394, 29.5656102,   21.1836,/L,   57.6321,   57.6375, 231.5904,   2.3773,
+ 1962-Jan-01 00:00:00.000, , , 291.717230644, -24.117939039,  291.132205231, -24.194573778,   359.661205407,     -54.284252386,   -0.926,  2.243,   96.25062,  4.948930,   0.421287856701, -8.1678417,  1.35988613741181,-18.8471155,    9.3713,/T,   22.3354,   22.3298, 300.6576,  -4.6414,
+ 1972-Jan-01 00:00:00.000, ,m, 256.634075800, -20.880867014,  256.215942238, -20.845525251,    47.076433552,     -44.027560080,   -0.247,  3.109,   62.28232,  6.706332,   0.390143981316,  9.7600921,  1.00352644715560, 35.5029387,   22.6192,/L,   75.7746,   75.7800, 219.6467,   4.4958,
+ 2000-Jan-01 12:00:00.000,*,m, 272.084904732, -24.422073561,  272.074371598, -24.420600487,   197.413769013,       4.218920680,   -0.734,  2.362,   97.48665,  4.754604,   0.466468841938,  0.6185366,  1.41546622098131,  8.0644460,    8.5372,/L,   18.2381,   18.2438, 262.8325,  -2.0335,
+ 2012-Feb-07 09:00:00.000,*, , 320.916994077, -17.459594006,  321.084412334, -17.406994054,   143.333601495,       6.655857423,   -1.533,  1.618,   99.81443,  4.818391,   0.412731993486, -8.7410301,  1.39672801709061, -8.5665408,    2.0645,/T,    4.9379,    4.9379, 317.8069,  -4.5350,
+ 2012-Mar-21 19:00:00.000,N, , 359.995612885,   3.569669197,    0.151103057,   3.637225862,   293.947148154,      -9.142270479,    5.817,  5.096,    0.53754,  11.04509,   0.389654148879,  9.7747110,  0.60931861728364, -9.5777699,    3.2781,/L,  171.5909,  171.5909,  30.2667,  88.9403,
+ 2012-May-27 11:00:00.000,*,m,  64.411719151,  21.869513532,   64.594337184,  21.897998679,   174.821208935,      51.910056046,   -2.460,  0.812,   99.97878,  5.092377,   0.308467319045, -1.9251404,  1.32157949228594, -1.8032267,    0.5085,/L,    1.6691,    1.6693,  66.3368,   1.3389,
+ 2012-Jul-28 20:00:00.000,C,m, 127.064911396,  13.968045992,  127.238553693,  13.925036020,   311.974219388,      -6.151979421,    5.414,  5.493,    1.05825,  11.37815,   0.429115054082, -7.5425604,  0.59148291020365,  7.5816063,    4.9620,/L,  168.1909,  168.1909, 125.9898, -89.0612,
+ 2012-Sep-10 13:00:00.000,*,m, 169.656936993,   6.230240838,  169.819577171,   6.161062177,   211.094810946,      32.769546871,   -1.818,  1.364,   99.84921,  4.888999,   0.371291817171, 10.0588147,  1.37655614372594,  9.8998932,    1.6398,/T,    4.4508,    4.4509, 168.0621,   3.8627,
+ 2012-Nov-17 16:00:00.000,N,m, 233.282393415, -18.743546053,  233.465140887, -18.784635796,   247.284326151,      -8.683245344,    6.780,  1.777,    0.01286,  9.936282,   0.311306988676, -3.7413788,  0.67731382412111,  3.7972955,    0.4097,/T,  178.7004,  178.7007, 150.7692,  87.3593,
+ 2017-Jan-01 00:00:00.000, , , 273.245737982, -20.363926275,  273.490472377, -20.356066126,    26.018184788,     -48.397532694,    3.162,  4.585,    4.88975,  9.824633,   0.319936490574,  6.3924117,  0.68501094936501, 13.3667957,    8.0696,/L,  154.4441,  154.4494, 195.6060,  22.1292,
+ 2026-Jan-21 16:00:00.000,N,m, 303.982651091, -21.878831337,  304.361056332, -21.800204743,   240.017184639,      -8.198253136,   -1.400,  1.719,   99.83565,  4.748358,   0.435216973021, -6.9751094,  1.41732813191664, -6.7304773,    2.0533,/T,    4.6469,    4.6469, 301.2686,  -4.3758,
+ 2026-Mar-07 11:00:00.000,*, , 346.182246773,  -1.972434003,  346.515334577,  -1.832906453,   173.670615531,      28.102553756,    5.531,  5.084,    0.73138,  10.74172,   0.369184892834, 10.0569983,  0.62652745773356, -9.9682430,    3.6349,/L,  170.1881,  170.1881, 350.5362,  88.7240,
+ 2026-May-14 14:00:00.000,*,m,  50.977836819,  18.762346557,   51.349975535,  18.855160330,   234.514497293,      39.324685602,   -2.504,  0.767,   99.99824,  5.087776,   0.312147595455, -4.1111992,  1.32277476489098, -3.5841236,    0.1483,/L,    0.4797,    0.4805,  53.3659,   0.3799,
+ 2026-Jul-13 01:00:00.000,C,m, 111.254923771,  17.106729557,  111.633955320,  17.055136543,    24.302288760,     -10.396434025,    5.562,  5.562,    0.92414,  11.74163,   0.448033167324, -5.4726942,  0.57317280310426,  5.6299623,    4.8386,/L,  168.9671,  168.9670, 140.2510, -89.2238,
+ 2026-Aug-27 17:00:00.000,*, , 156.609792051,  11.639559929,  156.960878597,  11.505212748,   271.303108589,      12.571687074,   -1.919,  1.285,   99.80986,  4.940737,   0.353695369125,  9.7795733,  1.36214109850200,  9.7377794,    1.7479,/T,    4.9982,    4.9983, 154.0661,   4.2434,
+ 2026-Nov-04 14:00:00.000,*, , 219.272223957, -15.746346520,  219.639143439, -15.862033333,   223.099328355,       6.019672189,    6.832,  1.660,    0.01090,  9.983999,   0.317756440075, -5.8896015,  0.67407675200137,  5.3781727,    0.3825,/L,  178.8041,  178.8035, 309.8420, -83.6447,
+ 2027-Jun-28 00:00:00.000,N,m,  88.717315575,  18.837124921,   89.119349945,  18.841673232,    16.796114153,      -9.968032073,    4.421,  5.572,    2.70180,  11.66831,   0.453622163717, -4.6126569,  0.57677417863209, 12.1522869,    8.3226,/L,  161.0739,  161.0786,   7.0936, -33.5755,
+ 2100-Feb-08 04:00:00.000, , , 319.381763209, -11.979593309,  320.735296625, -11.555314900,    76.896070334,     -20.754169334,    5.294,  4.924,    0.85402,  10.29730,   0.336511890845,  8.7446293,  0.65356733006154, -8.5890506,    3.6000,/L,  169.3951,  169.3951, 336.3063,  88.2130,
+ 2100-Apr-18 17:00:00.000,*,m,  25.616173430,   9.948858328,   26.941151307,  10.448841888,   271.593162858,      11.174598146,   -2.300,  0.956,   99.97297,  5.055000,   0.327786213751, -7.7548771,  1.33135153407088, -6.8216484,    0.6148,/T,    1.8840,    1.8842,  27.3318,  -1.5651,
+ 2100-Jun-10 05:00:00.000,*,m,  77.356818543,  19.927107534,   78.838248181,  20.044241329,    75.928316188,      15.075574755,    6.307,  5.246,    0.31994,  12.23677,   0.466699393593, -0.1049354,  0.54998023201993,  0.5181496,    2.9770,/T,  173.5149,  173.5148, 150.8507, -89.1536,
+ 2100-Aug-01 06:00:00.000,*,m, 130.615293214,  19.945789368,  132.052118459,  19.578744911,    87.201993275,      21.156403116,   -2.109,  1.130,   99.79308,  5.018790,   0.327637189199,  7.7331825,  1.34095705480155,  7.1510750,    1.6810,/T,    5.2145,    5.2144, 127.7579,   4.2772,
+ 2100-Oct-09 07:00:00.000,*, , 192.751513624,  -7.619875600,  194.056951641,  -8.164512485,   119.944445245,       7.060003605,    6.119,  4.440,    0.26178,  10.17785,   0.339209560861, -8.9743821,  0.66123784464768,  7.6507006,    1.9877,/L,  174.1345,  174.1344, 211.3740, -89.0104,
+ 2100-Nov-28 07:00:00.000,C,m, 242.596675943, -21.691788609,  244.086167285, -21.945081365,   125.346350802,      -5.642936649,   -1.391,  1.679,   99.98590,  4.640159,   0.463698555038,  2.2375865,  1.45037735170964,  1.6538963,    0.6397,/L,    1.3606,    1.3608, 244.6588,  -1.3092,
+ 2100-Dec-31 23:59:59.000, , , 299.302802600, -22.557645679,  300.795070048, -22.278591134,   345.638832519,     -51.769570459,   -0.719,  2.608,   77.26280,  5.939848,   0.362863155380,-10.0041338,  1.13302245609520,-37.8300136,   18.0191,/T,   56.9634,   56.9578, 325.3011,  -4.2696,
+$$EOE
+*********************************************************************************************************************************************************************************************************************************************************************************************
+Column meaning:
+ 
+TIME
+
+  Times PRIOR to 1962 are UT1, a mean-solar time closely related to the
+prior but now-deprecated GMT. Times AFTER 1962 are in UTC, the current
+civil or "wall-clock" time-scale. UTC is kept within 0.9 seconds of UT1
+using integer leap-seconds for 1972 and later years.
+
+  Conversion from the internal Barycentric Dynamical Time (TDB) of solar
+system dynamics to the non-uniform civil UT time-scale requested for output
+has not been determined for UTC times after the next July or January 1st.
+Therefore, the last known leap-second is used as a constant over future
+intervals.
+
+  Time tags refer to the UT time-scale conversion from TDB on Earth
+regardless of observer location within the solar system, although clock
+rates may differ due to the local gravity field and no analog to "UT"
+may be defined for that location.
+
+  Any 'b' symbol in the 1st-column denotes a B.C. date. First-column blank
+(" ") denotes an A.D. date.
+ 
+CALENDAR SYSTEM
+
+  Mixed calendar mode was active such that calendar dates after AD 1582-Oct-15
+(if any) are in the modern Gregorian system. Dates prior to 1582-Oct-5 (if any)
+are in the Julian calendar system, which is automatically extended for dates
+prior to its adoption on 45-Jan-1 BC.  The Julian calendar is useful for
+matching historical dates. The Gregorian calendar more accurately corresponds
+to the Earth's orbital motion and seasons. A "Gregorian-only" calendar mode is
+available if such physical events are the primary interest.
+
+  NOTE: "n.a." in output means quantity "not available" at the print-time.
+ 
+SOLAR PRESENCE (OBSERVING SITE)
+  Time tag is followed by a blank, then a solar-presence symbol:
+
+       '*'  Daylight (refracted solar upper-limb on or above apparent horizon)
+       'C'  Civil twilight/dawn
+       'N'  Nautical twilight/dawn
+       'A'  Astronomical twilight/dawn
+       ' '  Night OR geocentric ephemeris
+
+LUNAR PRESENCE (OBSERVING SITE)
+  The solar-presence symbol is immediately followed by a lunar-presence symbol:
+
+       'm'  Refracted upper-limb of Moon on or above apparent horizon
+       ' '  Refracted upper-limb of Moon below apparent horizon OR geocentric
+            ephemeris
+ 
+ 'R.A.___(ICRF), DEC____(ICRF),' =
+  Astrometric right ascension and declination of the target center with
+respect to the observing site (coordinate origin) in the reference frame of
+the planetary ephemeris (ICRF). Compensated for down-leg light-time delay
+aberration.
+
+  Units: RA  in decimal degrees,  ddd.fffff{ffff}
+         DEC in decimal degrees,  sdd.fffff{ffff}
+ 
+ 'R.A.__(a-app), DEC___(a-app),' =
+  Airless apparent right ascension and declination of the target center
+with respect to an instantaneous reference frame defined by the Earth equator
+of-date (z-axis) and meridian containing the Earth equinox of-date (x-axis,
+EOP-corrected IAU76/80). Compensated for down-leg light-time delay,
+gravitational deflection of light, stellar aberration, precession & nutation.
+Note: equinox (RA origin) is offset -53 mas from the of-date frame defined by
+the IAU06/00a P & N system.
+
+  Units: RA  in decimal degrees, ddd.fffff{ffff}
+         DEC in decimal degrees  sdd.fffff{ffff}
+
+ 
+ 'Azimuth_(a-app), Elevation_(a-app),' =
+  Airless apparent azimuth and elevation of target center. Compensated
+for light-time, the gravitational deflection of light, stellar aberration,
+precession and nutation. Azimuth is measured clockwise from north:
+
+  North(0) -> East(90) -> South(180) -> West(270) -> North (360)
+
+Elevation angle is with respect to a plane perpendicular to the reference
+surface local zenith direction. TOPOCENTRIC ONLY.  Units: DEGREES
+ 
+ 'APmag,  S-brt,' =
+  The targets' approximate apparent visual magnitude and surface brightness.
+For planets and natural satellites, output is restricted to solar phase angles
+covered by observational data. Outside the observed phase angle range, "n.a."
+may be output to avoid extrapolation beyond the limit of model validity.
+
+   For Earth-based observers, the estimated dimming due to atmospheric
+absorption (extinction) is available as a separate, requestable quantity.
+
+   Surface brightness is the average airless visual magnitude of a
+square-arcsecond of the illuminated portion of the apparent disk. It is
+computed only if the target radius is known.
+
+   Units: MAGNITUDES & MAGNITUDES PER SQUARE ARCSECOND
+ 
+ 'Illu%,' =
+   Fraction of the target objects' assumed circular disk illuminated by Sun
+(phase), as seen by the observer.  Units: PERCENT
+ 
+ 'Ang-diam,' =
+   The equatorial angular width of the target body full disk, if it were fully
+illuminated and visible to the observer. If the target body diameter is unknown
+"n.a." is output.
+
+   Units: ARCSECONDS
+ 
+ 'r,       rdot,' =
+   The Sun's apparent range ("r", light-time aberrated) and range-rate ("rdot")
+relative to the target center, as seen by the observer. A positive "rdot" means
+the target center was moving away from the Sun, negative means moving toward
+the Sun.  Units: AU and KM/S
+ 
+ 'delta,     deldot,' =
+   Apparent range ("delta", light-time aberrated) and range-rate ("delta-dot")
+of the target center relative to the observer. A positive "deldot" means the
+target center is moving away from the observer, negative indicates movement
+toward the observer.  Units: AU and KM/S
+ 
+ 'S-O-T,/r,' =
+   Sun-Observer-Target apparent SOLAR ELONGATION ANGLE seen from the observers'
+location at print-time.
+
+   The '/r' column provides a code indicating the targets' apparent position
+relative to the Sun in the observers' sky, as described below:
+
+   Case A: For an observing location on the surface of a rotating body, that
+body rotational sense is considered:
+
+    /T indicates target TRAILS Sun   (evening sky: rises and sets AFTER Sun)
+    /L indicates target LEADS Sun    (morning sky: rises and sets BEFORE Sun)
+
+   Case B: For an observing point that does not have a rotational model (such
+as a spacecraft), the "leading" and "trailing" condition is defined by the
+observers' heliocentric ORBITAL motion:
+
+    * If continuing in the observers' current direction of heliocentric
+       motion would encounter the targets' apparent longitude first, followed
+       by the Sun's, the target LEADS the Sun as seen by the observer.
+
+    * If the Sun's apparent longitude would be encountered first, followed
+       by the targets', the target TRAILS the Sun.
+
+   Two other codes can be output:
+    /* indicates observer is Sun-centered    (undefined)
+    /? Target is aligned with Sun center     (no lead or trail)
+
+   The S-O-T solar elongation angle is numerically the minimum separation
+angle of the Sun and target in the sky in any direction. It does NOT indicate
+the amount of separation in the leading or trailing directions, which would
+be defined along the equator of a spherical coordinate system.
+
+   Units: DEGREES
+ 
+ 'S-T-O,' =
+   The Sun-Target-Observer angle; the interior vertex angle at target center
+formed by a vector from the target to the apparent center of the Sun (at
+reflection time on the target) and the apparent vector from target to the
+observer at print-time. Slightly different from true PHASE ANGLE (requestable
+separately) at the few arcsecond level in that it includes stellar aberration
+on the down-leg from target to observer.  Units: DEGREES
+ 
+ 'phi,  PAB-LON,  PAB-LAT,' =
+   "phi" is the true PHASE ANGLE at the observers' location at print time.
+"PAB-LON" and "PAB-LAT" are the J2000 ecliptic longitude and latitude of the
+phase angle bisector direction; the outward directed angle bisecting the arc
+created by the apparent vector from Sun to target center and the astrometric
+vector from observer to target center. For an otherwise uniform ellipsoid, the
+time when its long-axis is perpendicular to the PAB direction approximately
+corresponds to lightcurve maximum (or maximum brightness) of the body. PAB is
+discussed in Harris et al., Icarus 57, 251-258 (1984).
+
+   Units: DEGREES, DEGREES, DEGREES
+
+Computations by ...
+
+    Solar System Dynamics Group, Horizons On-Line Ephemeris System
+    4800 Oak Grove Drive, Jet Propulsion Laboratory
+    Pasadena, CA  91109   USA
+
+    General site: https://ssd.jpl.nasa.gov/
+    Mailing list: https://ssd.jpl.nasa.gov/email_list.html
+    System news : https://ssd.jpl.nasa.gov/horizons/news.html
+    User Guide  : https://ssd.jpl.nasa.gov/horizons/manual.html
+    Connect     : browser        https://ssd.jpl.nasa.gov/horizons/app.html#/x
+                  API            https://ssd-api.jpl.nasa.gov/doc/horizons.html
+                  command-line   telnet ssd.jpl.nasa.gov 6775
+                  e-mail/batch   https://ssd.jpl.nasa.gov/ftp/ssd/horizons_batch.txt
+                  scripts        https://ssd.jpl.nasa.gov/ftp/ssd/SCRIPTS
+    Inquiries   : Jon.D.Giorgini@jpl.nasa.gov
+
+*********************************************************************************************************************************************************************************************************************************************************************************************

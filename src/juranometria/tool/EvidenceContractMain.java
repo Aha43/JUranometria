@@ -155,6 +155,8 @@ public final class EvidenceContractMain {
         // IMAGE_MAINS, their sizes in the platform record below.
         REPORT_MAINS.put("juranometria.tool.VenusContractStudyMain",
                 "docs/studies/venus/measurements.md");
+        REPORT_MAINS.put("juranometria.tool.MercuryContractStudyMain",
+                "docs/studies/mercury/measurements.md");
         // Venus on the page (#512): deterministic over the bundled packs,
         // the committed named instants and the production projection; its
         // mock-ups are held through IMAGE_MAINS.
@@ -173,6 +175,9 @@ public final class EvidenceContractMain {
         // The meridian's graduation on production pages (#515), the same way.
         REPORT_MAINS.put("juranometria.tool.MeridianTicksStudyMain",
                 "docs/studies/meridian-ticks/measurements.md");
+        // The Mercury pack study (#528): the kernel the builder would add, measured.
+        REPORT_MAINS.put("juranometria.tool.MercuryPackStudyMain",
+                "docs/studies/mercury/pack-measurements.md");
         // Jupiter and the moons on production pages (#486): the report
         // is deterministic, its pages held through IMAGE_MAINS, and where
         // each name went is the platform record (PLATFORM_REPORTS).
@@ -366,6 +371,8 @@ public final class EvidenceContractMain {
                 "docs/studies/jovian-cartography/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.VenusContractStudyMain",
                 "docs/studies/venus/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.MercuryContractStudyMain",
+                "docs/studies/mercury/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.ToggleShortcutStudyMain",
                 "docs/studies/toggle-shortcuts/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.ControlExplanationStudyMain",
@@ -512,6 +519,9 @@ public final class EvidenceContractMain {
             // Venus on the chart (issue #514): the same, and the apparition
             // strip cut from production pages.
             "juranometria.tool.VenusOnTheChartStudyMain",
+            // The Mercury table mock-ups and diagrams (issue #528): the proposed table
+            // in study-only arrangements, widget-rendered, in both languages.
+            "juranometria.tool.MercuryContractStudyMain",
             // The meridian's graduation (issue #515): production pages
             // composed by the component with the module attached.
             "juranometria.tool.MeridianTicksStudyMain",

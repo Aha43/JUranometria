@@ -208,7 +208,7 @@ public final class PlanetsPackMain {
     }
 
     /** Every pick of a planet's excerpt against the source at 1.7-day spacing. */
-    private static String prove(SpkKernel excerpt, SpkKernel source, Planet p) {
+    static String prove(SpkKernel excerpt, SpkKernel source, Planet p) {
         int states = 0;
         double worst = 0.0;
         for (double jd = START_JD; jd <= END_JD; jd += 1.7) {
@@ -231,7 +231,7 @@ public final class PlanetsPackMain {
     }
 
     /** A planet about its barycentre, where the planet has no moon: zero, proved. */
-    private static String zero(SpkKernel source, int center, int target) {
+    static String zero(SpkKernel source, int center, int target) {
         int states = 0;
         for (double jd = START_JD; jd <= END_JD; jd += 1.7) {
             SpkKernel.State s = source.state(center, target, (jd - 2451545.0) * 86400.0);
@@ -245,7 +245,7 @@ public final class PlanetsPackMain {
                 + " zero: the planet is its barycentre", states);
     }
 
-    private static String comment(Planet p, String sourceComments) {
+    static String comment(Planet p, String sourceComments) {
         StringBuilder text = new StringBuilder();
         text.append(p.kernelName).append(":\n")
                 .append("JUranometria planets pack, version ").append(PACK_VERSION)

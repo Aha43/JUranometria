@@ -78,6 +78,8 @@ help:
 	@echo "  jovian-pack-study    Cut and measure the Jovian excerpt of jup365.bsp against its source (issue #472)"
 	@echo "  venus-system-study   Propose the Venus table and the cartography handoff from the kept Horizons fixtures, with mockups and diagrams (issue #500)"
 	@echo "  venus-pack-study venus-system-study     Cut and measure the Venus excerpt of de440s.bsp in both layouts, with the released packs held (issue #500)"
+	@echo "  mercury-pack-study   Cut and measure the Mercury kernel the planets-pack builder would add, with the released packs held (issue #528)"
+	@echo "  mercury-system-study Propose the Mercury table and the cartography handoff from the kept Horizons fixtures, with mockups and diagrams (issue #528)"
 	@echo "  spk-boundary-fixture  Cut the JUP365 segment-split test fixture from jup365.bsp and prove it against its source (issue #473)"
 	@echo "  import-jovian-system  Build the Jovian System pack from jup365.bsp and pck00011.tpc, proved against the sources (issue #473)"
 	@echo "  venus-table-study    Write the first Venus table from the bundled packs (issue #501)"
@@ -628,7 +630,7 @@ black-sky-study: classes
 		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BlackSkyStudyMain \
 		> docs/studies/black-sky/measurements.md
 
-.PHONY: spk-boundary-fixture import-jovian-system import-planets venus-accuracy-report venus-table-study jovian-accuracy-report jovian-cartography-study venus-cartography-study evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study venus-pack-study sun-on-the-chart-study moon-on-the-chart-study venus-on-the-chart-study jupiter-on-the-chart-study printable-chart-study meridian-ticks-study
+.PHONY: spk-boundary-fixture import-jovian-system import-planets venus-accuracy-report venus-table-study jovian-accuracy-report jovian-cartography-study venus-cartography-study evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study venus-pack-study sun-on-the-chart-study moon-on-the-chart-study venus-on-the-chart-study jupiter-on-the-chart-study printable-chart-study meridian-ticks-study mercury-pack-study mercury-system-study
 # The heap is stated rather than inherited from whatever a machine's
 # ergonomics chose for it: the CI runner's default quarter-of-RAM is
 # not the same number as a developer's.
@@ -798,6 +800,19 @@ venus-system-study: classes
 venus-pack-study: classes
 	$(JAVA) -Djava.awt.headless=true -cp "$(CLASSES_DIR):$(LIB_DIR)/*" \
 		juranometria.tool.VenusPackStudyMain
+
+mercury-pack-study: classes
+	mkdir -p docs/studies/mercury
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.MercuryPackStudyMain \
+		> docs/studies/mercury/pack-measurements.md
+	@echo "written to docs/studies/mercury/pack-measurements.md"
+
+mercury-system-study: classes
+	mkdir -p docs/studies/mercury
+	$(JAVA) -Djava.awt.headless=true -cp "$(CLASSES_DIR):$(LIB_DIR)/*" \
+		juranometria.tool.MercuryContractStudyMain \
+		> docs/studies/mercury/measurements.md
+	@echo "written to docs/studies/mercury/measurements.md"
 
 # The JUP365 segment-split fixture (#473): cuts twenty days each side of
 # the 1997 split from imports/raw/jovian-system/jup365.bsp, proves every

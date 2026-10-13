@@ -107,6 +107,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | src/juranometria/tool/InspectorSheetMain.java | look-and-feel, preferences | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/JovianContractStudyMain.java | look-and-feel, default-font | protected-locally |
 | src/juranometria/tool/MenuSheetMain.java | look-and-feel, preferences | UNPROTECTED: look-and-feel |
+| src/juranometria/tool/MercuryContractStudyMain.java | look-and-feel, default-font | protected-locally |
 | src/juranometria/tool/MoonTableSheetMain.java | look-and-feel | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/OnThisPageMockupMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/tool/OnThisPageSheetMain.java | look-and-feel | UNPROTECTED: look-and-feel |
@@ -124,7 +125,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | src/juranometria/tool/WorkingSelectionMockupMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/app/PackagedAcceptanceMain.java | look-and-feel, locale, preferences | protected-locally |
 
-**31 evidence executables** touch process-wide state; 23 carry an unpaired touch.
+**32 evidence executables** touch process-wide state; 23 carry an unpaired touch.
 
 ## Display-dependent tests, their premises and their routes
 
@@ -222,11 +223,11 @@ Whether a particular read happens on the event thread is control flow, which tex
 
 | class | the contract | files |
 |---|---|---|
-| deterministic-report | regenerates byte-for-byte on the same tree | 117 |
-| byte-exact-fixture | committed data with provenance; never regenerated casually | 131 |
+| deterministic-report | regenerates byte-for-byte on the same tree | 124 |
+| byte-exact-fixture | committed data with provenance; never regenerated casually | 187 |
 | captured-evidence | an operating-system screenshot, digest-pinned; a re-capture is a provenance event | 13 |
 | renderer-drawn | byte-reproducible per machine; production ink, no widgets | 568 |
-| widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 163 |
+| widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 176 |
 | session-photograph | a packed window on a display; drifts between desktop sessions | 3 |
 
 The byte-exact fixtures:
@@ -293,6 +294,62 @@ The byte-exact fixtures:
 - docs/studies/label-placement/census-before.tsv
 - docs/studies/label-placement/text-before.tsv
 - docs/studies/language-ledger/manual-review.tsv
+- docs/studies/mercury/horizons/apparition-2026-oslo-10.txt
+- docs/studies/mercury/horizons/apparition-2026-oslo-199.txt
+- docs/studies/mercury/horizons/appearances-alert-10.txt
+- docs/studies/mercury/horizons/appearances-alert-199.txt
+- docs/studies/mercury/horizons/appearances-cape-town-10.txt
+- docs/studies/mercury/horizons/appearances-cape-town-199.txt
+- docs/studies/mercury/horizons/appearances-chatham-10.txt
+- docs/studies/mercury/horizons/appearances-chatham-199.txt
+- docs/studies/mercury/horizons/appearances-geocentric-10.txt
+- docs/studies/mercury/horizons/appearances-geocentric-199.txt
+- docs/studies/mercury/horizons/appearances-oslo-10.txt
+- docs/studies/mercury/horizons/appearances-oslo-199.txt
+- docs/studies/mercury/horizons/appearances-quito-10.txt
+- docs/studies/mercury/horizons/appearances-quito-199.txt
+- docs/studies/mercury/horizons/dense-2026-greatest-elongation-west-1-oslo-10.txt
+- docs/studies/mercury/horizons/dense-2026-greatest-elongation-west-1-oslo-199.txt
+- docs/studies/mercury/horizons/dense-2026-inferior-conjunction-1-oslo-10.txt
+- docs/studies/mercury/horizons/dense-2026-inferior-conjunction-1-oslo-199.txt
+- docs/studies/mercury/horizons/elongations-alert-10.txt
+- docs/studies/mercury/horizons/elongations-alert-199.txt
+- docs/studies/mercury/horizons/elongations-cape-town-10.txt
+- docs/studies/mercury/horizons/elongations-cape-town-199.txt
+- docs/studies/mercury/horizons/elongations-chatham-10.txt
+- docs/studies/mercury/horizons/elongations-chatham-199.txt
+- docs/studies/mercury/horizons/elongations-geocentric-10.txt
+- docs/studies/mercury/horizons/elongations-geocentric-199.txt
+- docs/studies/mercury/horizons/elongations-oslo-10.txt
+- docs/studies/mercury/horizons/elongations-oslo-199.txt
+- docs/studies/mercury/horizons/elongations-quito-10.txt
+- docs/studies/mercury/horizons/elongations-quito-199.txt
+- docs/studies/mercury/horizons/matrix-7d-oslo.txt
+- docs/studies/mercury/horizons/named-alert-10.txt
+- docs/studies/mercury/horizons/named-alert-199.txt
+- docs/studies/mercury/horizons/named-cape-town-10.txt
+- docs/studies/mercury/horizons/named-cape-town-199.txt
+- docs/studies/mercury/horizons/named-chatham-10.txt
+- docs/studies/mercury/horizons/named-chatham-199.txt
+- docs/studies/mercury/horizons/named-geocentric-10.txt
+- docs/studies/mercury/horizons/named-geocentric-199.txt
+- docs/studies/mercury/horizons/named-oslo-10.txt
+- docs/studies/mercury/horizons/named-oslo-199.txt
+- docs/studies/mercury/horizons/named-quito-10.txt
+- docs/studies/mercury/horizons/named-quito-199.txt
+- docs/studies/mercury/horizons/transits-alert-10.txt
+- docs/studies/mercury/horizons/transits-alert-199.txt
+- docs/studies/mercury/horizons/transits-cape-town-10.txt
+- docs/studies/mercury/horizons/transits-cape-town-199.txt
+- docs/studies/mercury/horizons/transits-chatham-10.txt
+- docs/studies/mercury/horizons/transits-chatham-199.txt
+- docs/studies/mercury/horizons/transits-geocentric-10.txt
+- docs/studies/mercury/horizons/transits-geocentric-199.txt
+- docs/studies/mercury/horizons/transits-oslo-10.txt
+- docs/studies/mercury/horizons/transits-oslo-199.txt
+- docs/studies/mercury/horizons/transits-quito-10.txt
+- docs/studies/mercury/horizons/transits-quito-199.txt
+- docs/studies/mercury/mercury-events.txt
 - docs/studies/place-and-time/reference-vectors.txt
 - docs/studies/sky-language/iau-constellations.tsv
 - docs/studies/solar-system/horizons-moon/NAMED-CASES.txt
@@ -485,6 +542,19 @@ The widget-rendered artifacts (a new one arrives by a reviewed addition to the s
 - docs/studies/jovian-system/controls-jovian-nb-NO-4-range-flat.png
 - docs/studies/jovian-system/controls-jovian-nb-NO-5-refused.png
 - docs/studies/jovian-system/controls-jovian-nb-NO-6-controller-group.png
+- docs/studies/mercury/controls-mercury-5-phase-geometry.png
+- docs/studies/mercury/controls-mercury-6-appearances.png
+- docs/studies/mercury/controls-mercury-7-apparition.png
+- docs/studies/mercury/controls-mercury-en-1-mercury-card.png
+- docs/studies/mercury/controls-mercury-en-2-range-dark.png
+- docs/studies/mercury/controls-mercury-en-2-range.png
+- docs/studies/mercury/controls-mercury-en-3-refused.png
+- docs/studies/mercury/controls-mercury-en-4-controller-group.png
+- docs/studies/mercury/controls-mercury-nb-NO-1-mercury-card.png
+- docs/studies/mercury/controls-mercury-nb-NO-2-range-dark.png
+- docs/studies/mercury/controls-mercury-nb-NO-2-range.png
+- docs/studies/mercury/controls-mercury-nb-NO-3-refused.png
+- docs/studies/mercury/controls-mercury-nb-NO-4-controller-group.png
 - docs/studies/on-this-page/sidebar-dense-enlarged.png
 - docs/studies/on-this-page/sidebar-dense.png
 - docs/studies/on-this-page/sidebar-empty.png
