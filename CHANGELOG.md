@@ -7,6 +7,17 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**The article "Jupiter's little sky" (#516).** A reader article, in
+English and Norwegian, on what the atlas draws of Jupiter and the four
+Galilean moons as released in 5.1: where the numbers come from and how
+they are held to JPL Horizons, the named evening of 11 December 2026,
+how the marks are read - a filled dot clear of Jupiter, a dot ringed
+in the page's ground in front of it, a hollow ring in its shadow,
+nothing behind it, the 6-pixel symbol against the true disc - and
+what the atlas does not claim. Every figure is a released evidence
+page copied byte for byte and every cited number is held to the report
+it quotes. Listed in the articles index and published with the gallery.
+
 **Altitude ticks on the meridian (#515).** Place and Time's fourth
 switch, Altitude ticks, graduates the meridian every 10° of altitude
 above the mathematical horizon on both halves, with the figure beside
