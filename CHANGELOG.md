@@ -7,6 +7,8 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [5.2.0] - 2026-10-13
+
 **The article "Jupiter's little sky" (#516).** A reader article, in
 English and Norwegian, on what the atlas draws of Jupiter and the four
 Galilean moons as released in 5.1: where the numbers come from and how

@@ -51,7 +51,9 @@ class GalleryReleaseTest {
             List.of("1.11.0", "1.12.0", "2.0.0", "2.1.0", "3.0.0",
                     // 4.0.0 and 5.0.0 were not added when they were
                     // replaced; 5.1.0 adds both (#495).
-                    "4.0.0", "5.0.0");
+                    "4.0.0", "5.0.0",
+                    // 5.2.0 adds the one it replaces.
+                    "5.1.0");
 
     /** The chart-sheet study: SVG metadata, PDF producer, PNG text. */
     private static final Path SHEETS =

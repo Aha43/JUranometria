@@ -31,7 +31,7 @@ with it paragraph by paragraph.
 |---|---|
 | window title | About JUranometria |
 | window, spoken | Application identity, version, and licensing information |
-| heading | JUranometria 5.1.0 |
+| heading | JUranometria 5.2.0 |
 | description | A quiet, interactive atlas for learning the geography of the sky. |
 | summary, spoken name | Licensing summary |
 | summary, explanation | The short form of the atlas's licensing. The bundled data and icon notices are behind the button below. |
@@ -71,7 +71,7 @@ with it paragraph by paragraph.
 | window title | About JUranometria |
 | window, spoken | Application identity, version, and licensing information |
 | shown | *(the application mark: decorative, no text, no spoken name)* |
-| shown | JUranometria 5.1.0 |
+| shown | JUranometria 5.2.0 |
 | shown | A quiet, interactive atlas for learning the geography of the sky. |
 | shown | *(read-only document, 1355 characters — printed in full below or listed by path)* |
 | shown | Full notices and licences... |
@@ -104,7 +104,7 @@ with it paragraph by paragraph.
 | window title | About JUranometria |
 | window, spoken | Application identity, version, and licensing information |
 | shown | *(the application mark: decorative, no text, no spoken name)* |
-| shown | JUranometria 5.1.0 |
+| shown | JUranometria 5.2.0 |
 | shown | A quiet, interactive atlas for learning the geography of the sky. |
 | shown | *(read-only document, 1355 characters — printed in full below or listed by path)* |
 | shown | Full notices and licences... |
@@ -171,7 +171,7 @@ Toolbar icons from the Tabler icon set: MIT license.
 |---|---|
 | window title | Om JUranometria |
 | window, spoken | Programmets navn, versjon og lisensopplysninger |
-| heading | JUranometria 5.1.0 |
+| heading | JUranometria 5.2.0 |
 | description | Et rolig, interaktivt atlas for å lære himmelens geografi. |
 | summary, spoken name | Lisenssammendrag |
 | summary, explanation | Et sammendrag av lisensene for atlaset. Lisensmerknadene for data og ikoner ligger bak knappen nedenfor. |
@@ -211,7 +211,7 @@ Toolbar icons from the Tabler icon set: MIT license.
 | window title | Om JUranometria |
 | window, spoken | Programmets navn, versjon og lisensopplysninger |
 | shown | *(the application mark: decorative, no text, no spoken name)* |
-| shown | JUranometria 5.1.0 |
+| shown | JUranometria 5.2.0 |
 | shown | Et rolig, interaktivt atlas for å lære himmelens geografi. |
 | shown | *(read-only document, 1340 characters — printed in full below or listed by path)* |
 | shown | Merknader og lisenser... |
@@ -244,7 +244,7 @@ Toolbar icons from the Tabler icon set: MIT license.
 | window title | Om JUranometria |
 | window, spoken | Programmets navn, versjon og lisensopplysninger |
 | shown | *(the application mark: decorative, no text, no spoken name)* |
-| shown | JUranometria 5.1.0 |
+| shown | JUranometria 5.2.0 |
 | shown | Et rolig, interaktivt atlas for å lære himmelens geografi. |
 | shown | *(read-only document, 1340 characters — printed in full below or listed by path)* |
 | shown | Merknader og lisenser... |
