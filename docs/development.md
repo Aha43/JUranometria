@@ -263,7 +263,10 @@ asked:
   123 pixels in each dark image and 124 in each light one — the count
   is the two glyphs' difference, the cell is the invariant. At 5.1.0
   (0→1) the second cell alone moved, 127 pixels in each image,
-  columns 222–231 of rows 33–47.
+  columns 222–231 of rows 33–47. At 5.2.0 (1→2) the same second cell
+  alone moved again, 108 pixels in each image, columns 222–231 of rows
+  33–46; every sheet PNG stayed pixel-identical and each PDF differed
+  by one byte.
 - **The articles.** Their footer names the release, and
   `scripts/build-articles.py` reads it from `VERSION` when the site is
   built rather than carrying a number - so there is nothing to
