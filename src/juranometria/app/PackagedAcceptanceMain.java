@@ -641,6 +641,8 @@ public final class PackagedAcceptanceMain {
                         () -> { }, () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
                         () -> { }, () -> { }, said);
                 AppMenuBar.addVenusTable(bar[0], said, () -> { });
+                // Mercury... (#530), added the same way, between Sun... and Venus...
+                AppMenuBar.addMercuryTable(bar[0], said, () -> { });
                 AppMenuBar.addJupiterTable(bar[0], said, () -> { });
                 AppMenuBar.addJupiterOnChart(bar[0], said, () -> { });
                 AppMenuBar.addVenusOnChart(bar[0], said, () -> { });
