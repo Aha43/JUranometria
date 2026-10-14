@@ -441,15 +441,28 @@ eight proposals, recorded as given:
    accepted: conjunction within ±1 hour; elongation value and side to
    0.1°, instant within ±2 hours; greatest transit within ±5 minutes and
    minimum separation within 0.2″; geocentric Mercury in front of the
-   Sun at every listed greatest transit.
+   Sun at every listed greatest transit. *Amended on #529 (2026-10-14)
+   for one named definition-boundary case:* the atlas's ruled PCK and
+   Horizons radii and its exact limb-overlap definition stand. At the
+   geocentric greatest transit of 1937-05-11 Mercury's centre is
+   0.017″ outside the atlas's limb sum, so the atlas correctly says
+   *near inferior conjunction*, not *in front of the Sun*; the transit
+   catalogue reaches overlap because it uses a larger solar radius,
+   and that difference is stated explicitly - the Sun is not enlarged
+   and no tolerance is added merely to reproduce the catalogue's
+   category. *In front of the Sun* is required at the other 27 of the
+   28 greatest-transit rows; the 1937 row is held by name to its
+   measured signed margin and state; any second exception stops the
+   build and returns for a ruling.
 7. **Targets**: the complete proposed table, without widening.
 8. **Cartography handoff**: the readability measure and Mercury as the
    concrete #481 case; closer zoom kept for Part II; no production
    Mercury ink now.
 
-Nothing in the proposal was amended. #529 (the pack addition and
-`MercuryService`), #530 (the table) and #531 (the handoff to
-cartography) build on these rulings.
+Nothing in the proposal was amended when ruled; ruling 6 carries the
+one amendment above, made on #529 when the service measured the 1937
+case. #529 (the pack addition and `MercuryService`), #530 (the table)
+and #531 (the handoff to cartography) build on these rulings.
 
 ## #529, as built
 
@@ -524,21 +537,26 @@ maximum; the two occultations are named instants only. The 28
 greatest transits fall −0.5 to +0.7 minutes from the catalogue's
 minute with the minimum separation agreeing to 0.1″ on every row.
 
-**The grazing transit of 1937-05-11, returned to the owner.** Ruling 6
-asserts geocentric Mercury *in front of the Sun* at every listed
-greatest transit; the service reads it at 27 of the 28. At the 1937
-greatest transit the centres are 955.546″ apart and the limb sum - the
-released Sun's 695 700 km and Mercury's 2440.53 km - is 955.529″: the
-centre is outside it by 0.017″, so the ruled word (centre within the
-Sun's radius plus Mercury's) is *near inferior conjunction* there. The
-catalogue, with its larger solar radius, lists first and fourth
-contacts (08:53, 09:06) and no second or third: a grazing contact
-decided by the solar radius, not by the ephemeris (the separation
-agrees with the published 955.5″). The test holds the 27 as ruled and
-the 28th to what it measures, outside the limb sum by less than 0.05″;
-the study had already noted the Oslo row reading *near inferior
-conjunction* for the same geometry. The owner's ruling on the word at
-this one instant is awaited; nothing else in ruling 6 is affected.
+**The grazing transit of 1937-05-11, ruled.** Ruling 6 asserted
+geocentric Mercury *in front of the Sun* at every listed greatest
+transit; the service reads it at 27 of the 28. At the 1937 greatest
+transit the centres are 955.546″ apart and the limb sum - the released
+Sun's 695 700 km and Mercury's 2440.53 km - is 955.529″: the centre is
+outside it by a signed margin of +0.017″, so the ruled word (centre
+within the Sun's radius plus Mercury's) is *near inferior conjunction*
+there. The catalogue lists first and fourth contacts (08:53, 09:06)
+and no second or third because it uses a larger solar radius: a
+grazing contact decided by the solar radius, not by the ephemeris (the
+separation agrees with the published 955.5″). The owner amended ruling
+6 for this one named definition-boundary case (above): the atlas's
+radii and its exact overlap definition stand, the Sun is not enlarged
+and no tolerance is added to reproduce the catalogue's category; the
+other 27 rows are required *in front*; the 1937 row is held by name to
+its measured signed margin and state; a second exception stops the
+build. `MercuryNamedEventsTest` holds exactly that: the margin at the
+greatest transit, printed per row in `service-accuracy.md`, is +0.017″
+at 1937 within ±0.005″ and negative at every other row. The study had already noted the Oslo
+row reading *near inferior conjunction* for the same geometry.
 
 **The mutation rivals** (`MercuryMutationTest`) - a geocentric place
 (a dozen arcseconds out near inferior conjunction), the civil instant

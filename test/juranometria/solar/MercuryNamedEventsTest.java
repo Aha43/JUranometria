@@ -28,8 +28,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * separation of the centres - falls within ±5 minutes of the listed
  * one with the minimum separation within 0.2″ of the published; and
  * geocentric Mercury reads <i>in front of the Sun</i> at the listed
- * instant - at 27 of the 28. The grazing transit of 1937-05-11 is
- * held to what it measures (below).
+ * instant at 27 of the 28 - ruling 6 as amended on #529 for one named
+ * definition-boundary case: the grazing transit of 1937-05-11 is held
+ * by name to its measured signed margin and state (below), and a
+ * second exception stops the build.
  */
 class MercuryNamedEventsTest {
 
@@ -102,35 +104,57 @@ class MercuryNamedEventsTest {
         }
     }
 
+    /**
+     * The one named exception ruling 6 admits (amended on #529): the
+     * grazing transit of 1937-05-11. Any other row outside the overlap
+     * is a second exception, and stops the build for a ruling.
+     */
+    private static final String THE_NAMED_EXCEPTION = "1937-transit";
+
     @Test
-    void geocentricMercuryIsInFrontOfTheSunAtEveryListedGreatestTransitButTheGrazingOne() {
+    void geocentricMercuryIsInFrontOfTheSunAtTheOther27GreatestTransits() {
+        int inFront = 0;
         for (Transit t : transits) {
-            if (t.name().equals("1937-transit")) {
+            if (t.name().equals(THE_NAMED_EXCEPTION)) {
                 continue;
             }
-            assertTrue(t.inFrontAtListed(), t.name() + " reads in front of the Sun");
+            assertTrue(t.inFrontAtListed() && t.signedMarginArcseconds() < 0.0,
+                    t.name() + " reads in front of the Sun, inside the limb sum: a second"
+                            + " exception stops the build and returns for a ruling - margin "
+                            + t.signedMarginArcseconds() + "″");
+            inFront++;
         }
+        assertEquals(27, inFront);
     }
 
     @Test
-    void theGrazing1937TransitIsHeldToWhatItMeasures() {
-        // Returned to the owner at the #529 checkpoint. The catalogue lists
-        // first and fourth contacts (08:53, 09:06) and no second or third:
-        // the discs touch. By the atlas's own radii - the released Sun's
-        // 695 700 km and Mercury's 2440.53 km - the centres at the listed
-        // greatest transit are 0.017″ farther apart than the limb sum, so
-        // the ruled word *in front of the Sun* (centre within the Sun's
-        // radius plus its own) is not reached, by less than a twentieth
-        // of an arcsecond; the catalogue's larger solar radius reaches it.
-        Transit t = transits.stream().filter(x -> x.name().equals("1937-transit"))
+    void theGrazing1937TransitIsHeldByNameToItsMeasuredSignedMarginAndState() {
+        // Ruling 6 as amended on #529 (docs/decisions/mercury-system.md,
+        // "The ruling", 6): the atlas's PCK and Horizons radii and its exact
+        // limb-overlap definition stand. At the geocentric greatest transit
+        // of 1937-05-11 the centre is 0.017″ outside the atlas's limb sum -
+        // the released Sun's 695 700 km and Mercury's 2440.53 km - so the
+        // atlas correctly says *near inferior conjunction*, not *in front of
+        // the Sun*. The catalogue lists first and fourth contacts (08:53,
+        // 09:06) and no second or third because it uses a larger solar
+        // radius; the Sun is not enlarged and no tolerance is added here to
+        // reproduce the catalogue's category. The margin is held to the
+        // measured +0.017″ within ±0.005″ (service-accuracy.md prints it).
+        Transit t = transits.stream().filter(x -> x.name().equals(THE_NAMED_EXCEPTION))
                 .findFirst().orElseThrow();
-        assertFalse(t.inFrontAtListed());
+        assertFalse(t.inFrontAtListed(), "the ruled word is not reached at the atlas's radii");
+        assertEquals(0.017, t.signedMarginArcseconds(), 0.005,
+                "the centre is outside the limb sum by the measured signed margin: "
+                        + t.signedMarginArcseconds() + "″");
         MercuryService service = MercuryService.load();
-        MercuryService.MercuryObservation o = service.observeGeocentric(t.listed());
-        double outsideBy = o.elongationDegrees() * 3600.0
-                - (o.sunAngularRadiusArcseconds() + o.solidBodyDiameterArcseconds() / 2.0);
-        assertTrue(outsideBy > 0.0 && outsideBy < 0.05,
-                "the centres are outside the limb sum by " + outsideBy + "″: a grazing contact");
-        assertEquals(MercuryService.Phase.NEAR_INFERIOR_CONJUNCTION, o.phase());
+        assertEquals(MercuryService.Phase.NEAR_INFERIOR_CONJUNCTION,
+                service.observeGeocentric(t.listed()).phase(),
+                "the state the ruled definition gives at the listed instant");
+        MercuryService.MercuryObservation o = service.observeGeocentric(t.ours());
+        assertEquals(MercuryService.Phase.NEAR_INFERIOR_CONJUNCTION, o.phase(),
+                "and at the greatest transit itself");
+        assertEquals(t.signedMarginArcseconds(), o.elongationDegrees() * 3600.0
+                - (o.sunAngularRadiusArcseconds() + o.solidBodyDiameterArcseconds() / 2.0), 1e-6,
+                "the margin is the service's own geometry at the greatest transit");
     }
 }

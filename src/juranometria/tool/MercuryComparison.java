@@ -130,13 +130,17 @@ public final class MercuryComparison {
     /**
      * One NASA/GSFC transit row against the service: the instant of
      * least geocentric apparent separation of the centres within six
-     * hours of the listed greatest transit, that separation, and
-     * whether geocentric Mercury reads in front of the Sun at the
-     * listed instant.
+     * hours of the listed greatest transit, that separation, whether
+     * geocentric Mercury reads in front of the Sun at the listed
+     * instant, and the signed margin at the greatest transit - the
+     * centres' least separation less the limb sum there (the Sun's
+     * apparent radius plus Mercury's), negative inside the overlap,
+     * positive outside it.
      */
     public record Transit(String name, String row, Instant listed, Instant ours,
                           double publishedMinimumSeparationArcseconds,
-                          double ourMinimumSeparationArcseconds, boolean inFrontAtListed) {
+                          double ourMinimumSeparationArcseconds, boolean inFrontAtListed,
+                          double signedMarginArcseconds) {
 
         public long minutesFromListed() {
             return Duration.between(listed, ours).toMinutes();
@@ -366,7 +370,9 @@ public final class MercuryComparison {
         MercuryObservation atListed = service.geocentricAtEt(etListed);
         result.transits.add(new Transit(f[0], f[2], listed, ours, published,
                 at.elongationDegrees() * ARCSEC,
-                atListed.phase() == MercuryService.Phase.IN_FRONT_OF_SUN));
+                atListed.phase() == MercuryService.Phase.IN_FRONT_OF_SUN,
+                at.elongationDegrees() * ARCSEC - (at.sunAngularRadiusArcseconds()
+                        + at.solidBodyDiameterArcseconds() / 2.0)));
     }
 
     /** The geocentric apparent separation's minimum, by golden section, to a second. */
@@ -551,17 +557,25 @@ public final class MercuryComparison {
                 + "Greatest transit: the instant of least geocentric apparent separation of the"
                 + " centres, within six hours of the listed one; beside it the minimum separation"
                 + " against the published one, and whether geocentric Mercury reads in front of the"
-                + " Sun at the listed instant. Ruled assertions (#528, ruling 6): the instant within"
-                + " ±5 minutes, the separation within 0.2″, in front of the Sun at every listed"
-                + " greatest transit.\n\n");
+                + " Sun at the listed instant, with the signed margin at the greatest transit: the"
+                + " centres' least separation less the limb sum there (the Sun's 695 700 km and"
+                + " Mercury's 2440.53 km as apparent radii), negative inside the overlap. Ruled assertions (#528, ruling 6, as amended"
+                + " on #529): the instant within ±5 minutes, the separation within 0.2″, in front of"
+                + " the Sun at every listed greatest transit but one named definition-boundary case"
+                + " - 1937-05-11, where the centre is outside the atlas's limb sum by 0.017″ and the"
+                + " catalogue reaches overlap only by its larger solar radius; that row is held by"
+                + " name to its measured signed margin and state, the Sun not enlarged and no"
+                + " tolerance added, and a second exception stops the build.\n\n");
         out.append("| transit | published greatest | DE440 (UT) | from the listed minute | min. separation"
-                + " | published | in front at the listed instant |\n|---|---|---|---|---|---|---|\n");
+                + " | published | in front at the listed instant | margin at greatest transit |\n"
+                + "|---|---|---|---|---|---|---|---|\n");
         for (Transit t : r.transits) {
-            out.append(String.format(Locale.ROOT, "| %s | %s | %s | %+.1f min | %.1f″ | %.1f″ | %s |%n",
+            out.append(String.format(Locale.ROOT, "| %s | %s | %s | %+.1f min | %.1f″ | %.1f″ | %s | %+.3f″ |%n",
                     t.name(), t.listed().toString().substring(0, 16).replace('T', ' '),
                     t.ours().toString().substring(0, 19).replace('T', ' '),
                     t.secondsFromListed() / 60.0, t.ourMinimumSeparationArcseconds(),
-                    t.publishedMinimumSeparationArcseconds(), t.inFrontAtListed() ? "yes" : "no"));
+                    t.publishedMinimumSeparationArcseconds(), t.inFrontAtListed() ? "yes" : "no",
+                    t.signedMarginArcseconds()));
         }
         return out.toString();
     }

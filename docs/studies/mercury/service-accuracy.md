@@ -113,35 +113,35 @@ Conjunction: the geocentric apparent ecliptic longitudes of date equal; greatest
 
 ## The transits (NASA/GSFC, Espenak) against DE440, through the service
 
-Greatest transit: the instant of least geocentric apparent separation of the centres, within six hours of the listed one; beside it the minimum separation against the published one, and whether geocentric Mercury reads in front of the Sun at the listed instant. Ruled assertions (#528, ruling 6): the instant within ±5 minutes, the separation within 0.2″, in front of the Sun at every listed greatest transit.
+Greatest transit: the instant of least geocentric apparent separation of the centres, within six hours of the listed one; beside it the minimum separation against the published one, and whether geocentric Mercury reads in front of the Sun at the listed instant, with the signed margin at the greatest transit: the centres' least separation less the limb sum there (the Sun's 695 700 km and Mercury's 2440.53 km as apparent radii), negative inside the overlap. Ruled assertions (#528, ruling 6, as amended on #529): the instant within ±5 minutes, the separation within 0.2″, in front of the Sun at every listed greatest transit but one named definition-boundary case - 1937-05-11, where the centre is outside the atlas's limb sum by 0.017″ and the catalogue reaches overlap only by its larger solar radius; that row is held by name to its measured signed margin and state, the Sun not enlarged and no tolerance added, and a second exception stops the build.
 
-| transit | published greatest | DE440 (UT) | from the listed minute | min. separation | published | in front at the listed instant |
-|---|---|---|---|---|---|---|
-| 1907-transit | 1907-11-14 12:07 | 1907-11-14 12:06:43 | -0.3 min | 758.6″ | 758.6″ | yes |
-| 1914-transit | 1914-11-07 12:03 | 1914-11-07 12:03:05 | +0.1 min | 630.7″ | 630.7″ | yes |
-| 1924-transit | 1924-05-08 01:41 | 1924-05-08 01:40:57 | -0.0 min | 84.6″ | 84.6″ | yes |
-| 1927-transit | 1927-11-10 05:46 | 1927-11-10 05:45:32 | -0.5 min | 128.7″ | 128.7″ | yes |
-| 1937-transit | 1937-05-11 08:59 | 1937-05-11 08:59:16 | +0.3 min | 955.5″ | 955.5″ | no |
-| 1940-transit | 1940-11-11 23:21 | 1940-11-11 23:21:06 | +0.1 min | 368.5″ | 368.5″ | yes |
-| 1953-transit | 1953-11-14 16:54 | 1953-11-14 16:53:46 | -0.2 min | 861.8″ | 861.8″ | yes |
-| 1957-transit | 1957-05-06 01:14 | 1957-05-06 01:14:13 | +0.2 min | 907.3″ | 907.3″ | yes |
-| 1960-transit | 1960-11-07 16:53 | 1960-11-07 16:52:53 | -0.1 min | 527.9″ | 527.9″ | yes |
-| 1970-transit | 1970-05-09 08:16 | 1970-05-09 08:16:09 | +0.2 min | 114.1″ | 114.1″ | yes |
-| 1973-transit | 1973-11-10 10:32 | 1973-11-10 10:32:13 | +0.2 min | 26.4″ | 26.4″ | yes |
-| 1986-transit | 1986-11-13 04:07 | 1986-11-13 04:07:01 | +0.0 min | 470.5″ | 470.5″ | yes |
-| 1993-transit | 1993-11-06 03:57 | 1993-11-06 03:56:31 | -0.5 min | 926.7″ | 926.7″ | yes |
-| 1999-transit | 1999-11-15 21:41 | 1999-11-15 21:40:53 | -0.1 min | 963.0″ | 963.0″ | yes |
-| 2003-transit | 2003-05-07 07:52 | 2003-05-07 07:52:24 | +0.4 min | 708.3″ | 708.3″ | yes |
-| 2006-transit | 2006-11-08 21:41 | 2006-11-08 21:41:04 | +0.1 min | 422.9″ | 422.9″ | yes |
-| 2016-transit | 2016-05-09 14:57 | 2016-05-09 14:57:25 | +0.4 min | 318.5″ | 318.5″ | yes |
-| 2019-transit | 2019-11-11 15:20 | 2019-11-11 15:19:48 | -0.2 min | 75.9″ | 75.9″ | yes |
-| 2032-transit | 2032-11-13 08:54 | 2032-11-13 08:54:02 | +0.0 min | 572.1″ | 572.1″ | yes |
-| 2039-transit | 2039-11-07 08:46 | 2039-11-07 08:46:39 | +0.7 min | 822.3″ | 822.3″ | yes |
-| 2049-transit | 2049-05-07 14:24 | 2049-05-07 14:24:11 | +0.2 min | 511.8″ | 511.8″ | yes |
-| 2052-transit | 2052-11-09 02:29 | 2052-11-09 02:29:52 | +0.9 min | 318.7″ | 318.7″ | yes |
-| 2062-transit | 2062-05-10 21:36 | 2062-05-10 21:36:54 | +0.9 min | 520.5″ | 520.5″ | yes |
-| 2065-transit | 2065-11-11 20:06 | 2065-11-11 20:06:14 | +0.2 min | 180.7″ | 180.7″ | yes |
-| 2078-transit | 2078-11-14 13:41 | 2078-11-14 13:41:01 | +0.0 min | 674.3″ | 674.3″ | yes |
-| 2085-transit | 2085-11-07 13:34 | 2085-11-07 13:34:32 | +0.5 min | 718.5″ | 718.5″ | yes |
-| 2095-transit | 2095-05-08 21:05 | 2095-05-08 21:05:28 | +0.5 min | 309.8″ | 309.8″ | yes |
-| 2098-transit | 2098-11-10 07:16 | 2098-11-10 07:16:32 | +0.5 min | 214.7″ | 214.7″ | yes |
+| transit | published greatest | DE440 (UT) | from the listed minute | min. separation | published | in front at the listed instant | margin at greatest transit |
+|---|---|---|---|---|---|---|---|
+| 1907-transit | 1907-11-14 12:07 | 1907-11-14 12:06:43 | -0.3 min | 758.6″ | 758.6″ | yes | -216.070″ |
+| 1914-transit | 1914-11-07 12:03 | 1914-11-07 12:03:05 | +0.1 min | 630.7″ | 630.7″ | yes | -342.428″ |
+| 1924-transit | 1924-05-08 01:41 | 1924-05-08 01:40:57 | -0.0 min | 84.6″ | 84.6″ | yes | -871.563″ |
+| 1927-transit | 1927-11-10 05:46 | 1927-11-10 05:45:32 | -0.5 min | 128.7″ | 128.7″ | yes | -845.029″ |
+| 1937-transit | 1937-05-11 08:59 | 1937-05-11 08:59:16 | +0.3 min | 955.5″ | 955.5″ | no | +0.017″ |
+| 1940-transit | 1940-11-11 23:21 | 1940-11-11 23:21:06 | +0.1 min | 368.5″ | 368.5″ | yes | -605.825″ |
+| 1953-transit | 1953-11-14 16:54 | 1953-11-14 16:53:46 | -0.2 min | 861.8″ | 861.8″ | yes | -113.007″ |
+| 1957-transit | 1957-05-06 01:14 | 1957-05-06 01:14:13 | +0.2 min | 907.3″ | 907.3″ | yes | -49.390″ |
+| 1960-transit | 1960-11-07 16:53 | 1960-11-07 16:52:53 | -0.1 min | 527.9″ | 527.9″ | yes | -445.349″ |
+| 1970-transit | 1970-05-09 08:16 | 1970-05-09 08:16:09 | +0.2 min | 114.1″ | 114.1″ | yes | -842.016″ |
+| 1973-transit | 1973-11-10 10:32 | 1973-11-10 10:32:13 | +0.2 min | 26.4″ | 26.4″ | yes | -947.397″ |
+| 1986-transit | 1986-11-13 04:07 | 1986-11-13 04:07:01 | +0.0 min | 470.5″ | 470.5″ | yes | -503.761″ |
+| 1993-transit | 1993-11-06 03:57 | 1993-11-06 03:56:31 | -0.5 min | 926.7″ | 926.7″ | yes | -46.008″ |
+| 1999-transit | 1999-11-15 21:41 | 1999-11-15 21:40:53 | -0.1 min | 963.0″ | 963.0″ | yes | -11.816″ |
+| 2003-transit | 2003-05-07 07:52 | 2003-05-07 07:52:24 | +0.4 min | 708.3″ | 708.3″ | yes | -248.362″ |
+| 2006-transit | 2006-11-08 21:41 | 2006-11-08 21:41:04 | +0.1 min | 422.9″ | 422.9″ | yes | -550.387″ |
+| 2016-transit | 2016-05-09 14:57 | 2016-05-09 14:57:25 | +0.4 min | 318.5″ | 318.5″ | yes | -637.488″ |
+| 2019-transit | 2019-11-11 15:20 | 2019-11-11 15:19:48 | -0.2 min | 75.9″ | 75.9″ | yes | -897.932″ |
+| 2032-transit | 2032-11-13 08:54 | 2032-11-13 08:54:02 | +0.0 min | 572.1″ | 572.1″ | yes | -402.290″ |
+| 2039-transit | 2039-11-07 08:46 | 2039-11-07 08:46:39 | +0.7 min | 822.3″ | 822.3″ | yes | -150.528″ |
+| 2049-transit | 2049-05-07 14:24 | 2049-05-07 14:24:11 | +0.2 min | 511.8″ | 511.8″ | yes | -444.824″ |
+| 2052-transit | 2052-11-09 02:29 | 2052-11-09 02:29:52 | +0.9 min | 318.7″ | 318.7″ | yes | -654.686″ |
+| 2062-transit | 2062-05-10 21:36 | 2062-05-10 21:36:54 | +0.9 min | 520.5″ | 520.5″ | yes | -435.469″ |
+| 2065-transit | 2065-11-11 20:06 | 2065-11-11 20:06:14 | +0.2 min | 180.7″ | 180.7″ | yes | -793.172″ |
+| 2078-transit | 2078-11-14 13:41 | 2078-11-14 13:41:01 | +0.0 min | 674.3″ | 674.3″ | yes | -300.126″ |
+| 2085-transit | 2085-11-07 13:34 | 2085-11-07 13:34:32 | +0.5 min | 718.5″ | 718.5″ | yes | -254.299″ |
+| 2095-transit | 2095-05-08 21:05 | 2095-05-08 21:05:28 | +0.5 min | 309.8″ | 309.8″ | yes | -646.819″ |
+| 2098-transit | 2098-11-10 07:16 | 2098-11-10 07:16:32 | +0.5 min | 214.7″ | 214.7″ | yes | -758.717″ |
