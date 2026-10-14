@@ -1,8 +1,10 @@
 # Knowing where Mercury is and how it is lit
 
 **Sprint 49, issue #528.** The numerical contract for Mercury, proposed
-from measurement before any production data or code exists. No
-production Mercury service, table, selection or rendering exists. It
+from measurement before any production data or code exists. **Ruled
+by the owner (2026-10-14)** - see [The ruling](#the-ruling) at the end,
+which accepts the eight proposals as written. No production Mercury
+service, table, selection or rendering exists. It
 inherits the Sun's, the Moon's, Jupiter's and Venus's contracts
 (`sun-computation.md`, `moon-computation.md`, `jovian-system.md`,
 `venus-system.md`) wherever it does not say otherwise, and says so
@@ -413,3 +415,38 @@ drawn on any page (`measurements.md`, *The cartography handoff*):
 8. **Cartography handoff**: the readability criterion, Mercury as the
    measured #481 case, the identity/time contract; no production
    Mercury ink before Part II.
+
+## The ruling
+
+The owner's rulings (2026-10-14, on #528 at 8abe1295), accepting all
+eight proposals, recorded as given:
+
+1. **Authority**: DE440 from the already pinned source; PCK constants;
+   Horizons for comparison; Espenak's almanacs and NASA/GSFC transit
+   catalogue for named timing. DE442 remains comparison-only.
+2. **Pack**: layout C, planets-pack version 2, one 1900–2100 Mercury
+   kernel beside Venus's, with every released file byte-identical.
+3. **Meanings**: the proposed topocentric quantities, apparent-place
+   corrections, right-ascension side, Moon-family phase geometry, and χ
+   of date.
+4. **Radius**: the 2440.53 km equatorial radius used by the PCK and
+   Horizons. The triaxial figure stated once; the mean radius not
+   substituted.
+5. **Vocabulary**: the shared phase bands and both languages, with
+   *Merkur* in Norwegian.
+6. **Fixtures**: the complete 3.89 MB committed set kept - the 0.39 MB
+   overage approved; retaining all observer transit lists is worth more
+   than trimming 0.14 MB while still exceeding the original estimate -
+   and the geocentric matrix outside Git. The proposed assertions
+   accepted: conjunction within ±1 hour; elongation value and side to
+   0.1°, instant within ±2 hours; greatest transit within ±5 minutes and
+   minimum separation within 0.2″; geocentric Mercury in front of the
+   Sun at every listed greatest transit.
+7. **Targets**: the complete proposed table, without widening.
+8. **Cartography handoff**: the readability measure and Mercury as the
+   concrete #481 case; closer zoom kept for Part II; no production
+   Mercury ink now.
+
+Nothing in the proposal was amended. #529 (the pack addition and
+`MercuryService`), #530 (the table) and #531 (the handoff to
+cartography) build on these rulings.
