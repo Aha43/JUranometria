@@ -4491,10 +4491,12 @@ public final class PackagedAcceptanceMain {
 
         // 7. Hiding one active structure clears only it.
         meridian.showing(false, true, false);
-        require(chart.emphasizedSet().equals(java.util.EnumSet
-                        .complementOf(java.util.EnumSet.of(
-                                juranometria.render.ChartStructure
-                                        .MERIDIAN))),
+        // The six line structures were raised; the label class (#526) is
+        // not offered on this page, which draws no body.
+        java.util.EnumSet<juranometria.render.ChartStructure> remaining =
+                java.util.EnumSet.copyOf(juranometria.render.ChartStructure.lineStructures());
+        remaining.remove(juranometria.render.ChartStructure.MERIDIAN);
+        require(chart.emphasizedSet().equals(remaining),
                 "hiding the meridian settles only the meridian");
         meridian.showing(true, true, false);
 
