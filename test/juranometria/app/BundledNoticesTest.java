@@ -171,6 +171,13 @@ class BundledNoticesTest {
                 "the Solar System and Jovian packs beside it are untouched");
         assertTrue(notice.contains("solid body") && notice.contains("never draws"),
                 "the radius is the solid body's, the cloud deck stated, not drawn");
+        assertTrue(notice.contains("juranometria-de440-mercury-1900-2100.bsp")
+                        && notice.contains("pack version 2")
+                        && notice.contains("Venus's file was not rewritten"),
+                "Mercury's file is named with the version it joined in (#529)");
+        assertTrue(notice.contains("2440.53 km") && notice.contains("2438.26 km")
+                        && notice.contains("never substitutes"),
+                "Mercury's triaxial figure is stated once, the equatorial radius used");
         String provenance = resourceText("/resources/planets/PROVENANCE.md");
         for (String required : new String[] {"naif.jpl.nasa.gov", "SHA-256", "SpkExcerpt",
                 "Validation", "identical to the source", "identically zero", "untouched",
@@ -183,6 +190,7 @@ class BundledNoticesTest {
     void everyPlanetsResourceShipsOnTheClasspath() {
         for (String resource : new String[] {
                 "manifest.properties", "juranometria-de440-venus-1900-2100.bsp",
+                "juranometria-de440-mercury-1900-2100.bsp",
                 "NOTICE-planets.md", "PROVENANCE.md"}) {
             assertNotNull(BundledNoticesTest.class.getResource("/resources/planets/" + resource),
                     resource + " must ship as a resource");

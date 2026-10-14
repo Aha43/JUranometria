@@ -441,12 +441,157 @@ eight proposals, recorded as given:
    accepted: conjunction within ±1 hour; elongation value and side to
    0.1°, instant within ±2 hours; greatest transit within ±5 minutes and
    minimum separation within 0.2″; geocentric Mercury in front of the
-   Sun at every listed greatest transit.
+   Sun at every listed greatest transit. *Amended on #529 (2026-10-14)
+   for one named definition-boundary case:* the atlas's ruled PCK and
+   Horizons radii and its exact limb-overlap definition stand. At the
+   geocentric greatest transit of 1937-05-11 Mercury's centre is
+   0.017″ outside the atlas's limb sum, so the atlas correctly says
+   *near inferior conjunction*, not *in front of the Sun*; the transit
+   catalogue reaches overlap because it uses a larger solar radius,
+   and that difference is stated explicitly - the Sun is not enlarged
+   and no tolerance is added merely to reproduce the catalogue's
+   category. *In front of the Sun* is required at the other 27 of the
+   28 greatest-transit rows; the 1937 row is held by name to its
+   measured signed margin and state; any second exception stops the
+   build and returns for a ruling.
 7. **Targets**: the complete proposed table, without widening.
 8. **Cartography handoff**: the readability measure and Mercury as the
    concrete #481 case; closer zoom kept for Part II; no production
    Mercury ink now.
 
-Nothing in the proposal was amended. #529 (the pack addition and
-`MercuryService`), #530 (the table) and #531 (the handoff to
-cartography) build on these rulings.
+Nothing in the proposal was amended when ruled; ruling 6 carries the
+one amendment above, made on #529 when the service measured the 1937
+case. #529 (the pack addition and `MercuryService`), #530 (the table)
+and #531 (the handoff to cartography) build on these rulings.
+
+## #529, as built
+
+**The pack, as ruled (layout C, version 2).** `src/resources/planets/`
+now carries `juranometria-de440-mercury-1900-2100.bsp` beside Venus's
+file: 3 299 328 bytes, sha256 `78736932…` - byte for byte the file the
+#528 study cut (`pack-measurements.md`) - with segments 0 → 1 and
+1 → 199 from the released pack's pinned `de440s.bsp`, every state on a
+1.7-day grid identical to the source, 1 → 199 identically zero.
+Venus's file is untouched: 1 242 112 bytes, sha256 `8b0760b4…`, the
+5.2.0 file (`PlanetsPackTest`). The builder (`PlanetsPackMain`) now
+gives each planet the pack version it joined in - Venus 1, Mercury 2 -
+and writes that version into the planet's own file's internal name and
+comment, so raising the pack's version never rewrites a released
+planet's file; the manifest says `pack.version=2`,
+`pack.planets=venus,mercury`, `ephemeris.mercury.*`,
+`ephemeris.<planet>.added.in.version`, `pck.BODY199_RADII =
+2440.53,2440.53,2438.26` verbatim; the notice names Mercury's file,
+its version and the triaxial figure once, with the equatorial radius
+the atlas uses; the provenance proves both planets about their
+barycentres and the released Solar System and Jovian kernels
+untouched. The audit date is the inventory's, 2026-10-13.
+
+**The service.** `MercuryService` is `VenusService`'s form over
+Mercury's bodies 1 and 199 and the pack's equatorial radius: the ruled
+meanings (ruling 3) - astrometric J2000; apparent of date deflected
+by the Sun (the one-body formula Jupiter's and Venus's services apply,
+held equal to both by `MercuryServiceTest`) and aberrated; airless
+horizontal; distance; the apparent diameter from 2440.53 km; the
+Moon's S-T-O and k; elongation and the side of the Sun by apparent
+right ascension of date; the phase word with the geometric states
+first, the bands Venus's name for name over a grid (ruling 5); χ of
+date with its conditioning. As with Venus on #501, the service stands
+alone in this issue: `SolarSystemService.Body` gains no entry and no
+sealed permit changes, so no switch in the interface is touched -
+Venus joined the dispatch with its table on #502, and Mercury joins
+with its own on #530. The Sun, the Moon, Jupiter and Venus answer as
+before: their services are unchanged, their packs byte-identical, and
+Venus's answers held equal before and after Mercury's service is
+loaded (`MercuryServiceTest`, `PlanetsPackTest`).
+
+**Measured, against Horizons, every committed fixture** (11 207 rows;
+`docs/studies/mercury/service-accuracy.md`,
+`make mercury-accuracy-report`, held by `MercuryReferenceVectorTest`):
+
+| quantity | 1900–1961 | 1962–1971 | 1972 → 2027-06-28 | after |
+|---|---|---|---|---|
+| astrometric | 0.106″ | 0.025″ | **0.000″** | 11.858″ |
+| apparent, elongation > 1° | 0.177″ | 0.083″ | **0.129″** | 11.938″ |
+| horizontal | 1.024″ | 1.992″ | 11.476″ | 10.886″ (not asserted) |
+| distance | 56.2 km | 15.0 km | **0.2 km** | 6 495.0 km |
+| diameter | 0.0000″ | 0.0000″ | 0.0000″ | 0.0004″ |
+| elongation, > 1° | 0.241″ | 0.187″ | 0.180″ | 11.930″ |
+| phase angle (S-T-O), > 1° | 0.419″ | 0.198″ | 0.181″ | 38.326″ |
+| illuminated, points | 0.0048 | 0.0048 | 0.0048 | 0.0119 |
+| χ, k in [2 %, 98 %) | 0.057″ | 0.011″ | 0.051″ | 5.334″ |
+
+**Every value is inside its ruled target (ruling 7); no target is
+amended.** The exact interval's apparent place is 0.129″ against the
+stand-in's 0.054″ for the cause Venus's record names - the atlas's IAU
+1976/1980 precession and nutation against the stand-in's IAU 2000A -
+and stays within the ruled 0.2″; the exact astrometric place rounds to
+0.000″ at three decimals and is not zero (the engine compares two
+implementations). The side of the Sun agrees with Horizons' /T and /L
+on all 11 207 rows; Mercury's parallax reaches 15.88″; every phase
+word occurs. Espenak's rows hold under the ruled assertions
+(`MercuryNamedEventsTest`): the eighteen conjunctions −16 to +37
+minutes from the listed hour, on both sides of it; the eighteen
+greatest elongations at the printed tenth and side, −26 to +34 minutes
+from the listed hour, where the elongation is within 0.126″ of its
+maximum; the two occultations are named instants only. The 28
+greatest transits fall −0.5 to +0.7 minutes from the catalogue's
+minute with the minimum separation agreeing to 0.1″ on every row.
+
+**The grazing transit of 1937-05-11, ruled.** Ruling 6 asserted
+geocentric Mercury *in front of the Sun* at every listed greatest
+transit; the service reads it at 27 of the 28. At the 1937 greatest
+transit the centres are 955.546″ apart and the limb sum - the released
+Sun's 695 700 km and Mercury's 2440.53 km - is 955.529″: the centre is
+outside it by a signed margin of +0.017″, so the ruled word (centre
+within the Sun's radius plus Mercury's) is *near inferior conjunction*
+there. The catalogue lists first and fourth contacts (08:53, 09:06)
+and no second or third because it uses a larger solar radius: a
+grazing contact decided by the solar radius, not by the ephemeris (the
+separation agrees with the published 955.5″). The owner amended ruling
+6 for this one named definition-boundary case (above): the atlas's
+radii and its exact overlap definition stand, the Sun is not enlarged
+and no tolerance is added to reproduce the catalogue's category; the
+other 27 rows are required *in front*; the 1937 row is held by name to
+its measured signed margin and state; a second exception stops the
+build. `MercuryNamedEventsTest` holds exactly that: the margin at the
+greatest transit, printed per row in `service-accuracy.md`, is +0.017″
+at 1937 within ±0.005″ and negative at every other row. The study had already noted the Oslo
+row reading *near inferior conjunction* for the same geometry.
+
+**The mutation rivals** (`MercuryMutationTest`) - a geocentric place
+(a dozen arcseconds out near inferior conjunction), the civil instant
+read as TT (several arcseconds at superior conjunction), no aberration
+(about 20″), the geometric phase angle (12″ at Mercury's 49 km/s), a
+J2000 χ (a century of precession), a side by ecliptic longitude (west
+by right ascension fifteen hours before the longitude conjunction),
+the mean radius (0.05 % past the 0.001″ target) - each fail their
+target. One is measured, not claimed: the Sun's deflection. Mercury's
+committed rows never come within 1.6° of the Sun's centre outside a
+transit, where the one-body deflection is a few hundredths of an
+arcsecond, so the rival without it survives the ruled 0.2″ target on
+every committed row - unlike Venus's at 0.7°. The step is ruled and
+applied; the test holds that it is applied and brings the place
+closer to Horizons' own (0.065″ with it, 0.089″ without, at the 2012
+superior conjunction).
+
+**The first Mercury table** is `docs/studies/mercury/table-measurements.md`
+(`make mercury-table-study`): the five observers, the date-line one
+included, at Espenak's 38 almanac rows and the 28 greatest transits,
+the four representative appearances, a chosen day and both ends of the
+interval; Oslo every 3 days through the 2026 evening and morning
+apparitions and hourly through the 2019 transit - in the Moon table's
+columns and rounding, the phase words as ruled, in English until #530
+carries them in the language files. From Cape Town the 1937 row reads
+*in front of the Sun* and from Oslo *near inferior conjunction*: the
+table states what each observer sees.
+
+**Packaged.** The licensing inventory is unchanged at 12 resources -
+Mercury's file joins the pack under the notice it already has - and
+the archive, `LICENSING.md` and the About dialog's notices are
+unchanged; the notice's text now names Mercury. The packaged
+acceptance's *planets pack OK* line checks Mercury at Oslo against a
+Horizons row the image restates (held to the committed row by
+`PackagedMercurySampleTest`), the 2026 greatest eastern elongation
+near half lit in the evening sky, and the 2019 transit in front of the
+Sun, beside Venus's checks. No dialog, Controller section, selection
+or chart mark exists.

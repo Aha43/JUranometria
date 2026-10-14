@@ -42,6 +42,17 @@ public final class PackagedAcceptanceMain {
     static final double VENUS_SAMPLE_RA = 186.752756659;
     static final double VENUS_SAMPLE_DEC = -4.447125032;
 
+    /**
+     * The packaged Mercury journey's sample (#529), restated once from
+     * docs/studies/mercury/horizons/elongations-oslo-199.txt - Oslo at
+     * the 2026 greatest eastern elongation - and held equal to that row
+     * by {@code PackagedMercurySampleTest}.
+     */
+    static final java.time.Instant MERCURY_SAMPLE_INSTANT =
+            java.time.Instant.parse("2026-02-19T18:00:00Z");
+    static final double MERCURY_SAMPLE_RA = 349.258401325;
+    static final double MERCURY_SAMPLE_DEC = -3.334449558;
+
     /** M31's catalogue identity: the opening page's own galaxy. */
     private static final String ANDROMEDA_ID = "NGC 224";
 
@@ -5225,17 +5236,45 @@ public final class PackagedAcceptanceMain {
                         java.time.Instant.parse("2012-06-06T01:00:00Z"))).phase()
                         == juranometria.solar.VenusService.Phase.IN_FRONT_OF_SUN,
                 "the 2012 transit reads in front of the Sun");
+        // Mercury (issue #529), the same way from its own file of the pack:
+        // Oslo at the 2026 greatest eastern elongation agrees with Horizons'
+        // astrometric row (docs/studies/mercury/horizons/elongations-oslo-199.txt,
+        // 2026-Feb-19 18:00, R.A. 349.258401325, DEC -3.334449558) to the
+        // exact-era target, near half lit in the evening sky; and the 2019
+        // transit reads in front of the Sun from Oslo.
+        juranometria.solar.MercuryService mercuryService =
+                juranometria.solar.MercuryService.load();
+        juranometria.solar.MercuryService.MercuryObservation mercurySample =
+                mercuryService.observe(new juranometria.sky.Observer(59.91, 10.75,
+                        MERCURY_SAMPLE_INSTANT));
+        double mercuryOff = mercurySample.astrometricJ2000().separationDegrees(
+                new juranometria.chart.SkyPosition(MERCURY_SAMPLE_RA, MERCURY_SAMPLE_DEC))
+                * 3600.0;
+        require(mercuryOff < 0.05, "the packaged Mercury agrees with Horizons for Oslo,"
+                + " 2026-02-19 18:00 UTC, within 0.05 arcsecond: " + mercuryOff);
+        require(mercurySample.phase() == juranometria.solar.MercuryService.Phase.NEAR_HALF_LIT
+                        && mercurySample.side()
+                                == juranometria.solar.SolarSystemService.Side.EAST_OF_SUN,
+                "at its greatest eastern elongation Mercury is near half lit in the evening"
+                        + " sky: " + mercurySample.phase() + ", " + mercurySample.side());
+        require(mercuryService.observe(new juranometria.sky.Observer(59.91, 10.75,
+                        java.time.Instant.parse("2019-11-11T15:20:00Z"))).phase()
+                        == juranometria.solar.MercuryService.Phase.IN_FRONT_OF_SUN,
+                "the 2019 transit reads in front of the Sun");
         require(PackagedAcceptanceMain.class.getResourceAsStream(
                         "/resources/planets/NOTICE-planets.md") != null
                         && PackagedAcceptanceMain.class.getResourceAsStream(
                                 "/resources/planets/PROVENANCE.md") != null,
                 "the planets pack's notice and provenance travel with it");
-        System.out.println("planets pack OK (DE440 Venus excerpt v"
+        System.out.println("planets pack OK (DE440 Venus and Mercury excerpts v"
                 + juranometria.solar.PlanetsPack.load().manifest().get("pack.version")
                 + ", Venus at Oslo within "
                 + String.format(java.util.Locale.ROOT, "%.4f", venusOff)
                 + " arcsecond of Horizons; near half lit in the evening sky on 2026-08-15;"
-                + " the 2012 transit in front of the Sun)");
+                + " the 2012 transit in front of the Sun; Mercury at Oslo within "
+                + String.format(java.util.Locale.ROOT, "%.4f", mercuryOff)
+                + " arcsecond of Horizons; near half lit in the evening sky on 2026-02-19;"
+                + " the 2019 transit in front of the Sun)");
         System.out.println("jovian system pack OK (JUP365 excerpts v"
                 + jovian.pack().manifest().get("pack.version") + ", Jupiter at Oslo within "
                 + String.format(java.util.Locale.ROOT, "%.4f", jupiterOff)

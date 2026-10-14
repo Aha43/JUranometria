@@ -41,10 +41,13 @@ public final class MercuryPackStudyMain {
     private static final Path PLANETS = Path.of("src/resources/planets");
     private static final Path OUT = Path.of("build/mercury-pack-study");
 
-    /** Mercury as the builder's next entry would state it. */
-    static final PlanetsPackMain.Planet MERCURY = new PlanetsPackMain.Planet(
-            "mercury", "Mercury", "juranometria-de440-mercury-1900-2100.bsp",
-            List.of(new SpkExcerpt.Pick(0, 1), new SpkExcerpt.Pick(1, 199)), "BODY199_RADII");
+    /**
+     * Mercury as the builder's next entry would state it - since #529,
+     * the builder's own entry: the study measured the file the builder
+     * then added, byte for byte.
+     */
+    static final PlanetsPackMain.Planet MERCURY = PlanetsPackMain.PLANETS.stream()
+            .filter(p -> p.key().equals("mercury")).findFirst().orElseThrow();
 
     private MercuryPackStudyMain() {
     }
@@ -83,18 +86,16 @@ public final class MercuryPackStudyMain {
                 .append(PlanetsPackMain.zero(full, 1, 199)).append('\n');
 
         r.append("\n## The kernel the builder would add (planets pack version "
-                + (PlanetsPackMain.PACK_VERSION + 1) + ")\n\n");
+                + MERCURY.version() + ")\n\n");
         byte[] kernel = SpkExcerpt.of(source, MERCURY.picks(), startEt, endEt,
-                "JURANOMETRIA DE440 MERCURY 1900-2100 V" + (PlanetsPackMain.PACK_VERSION + 1),
-                PlanetsPackMain.comment(MERCURY, full.comments())
-                        .replace("version " + PlanetsPackMain.PACK_VERSION + ":",
-                                "version " + (PlanetsPackMain.PACK_VERSION + 1) + ":"));
+                "JURANOMETRIA DE440 MERCURY 1900-2100 V" + MERCURY.version(),
+                PlanetsPackMain.comment(MERCURY, full.comments()));
         Files.write(OUT.resolve(MERCURY.kernelName()), kernel);
         r.append(String.format(Locale.ROOT, "- `%s`: %,d bytes (%,d gzip -9), sha256 `%s`, written to `%s`%n",
                 MERCURY.kernelName(), kernel.length, gzipSize(kernel), sha256(kernel), OUT));
         r.append("- ").append(PlanetsPackMain.prove(SpkKernel.read(kernel), full, MERCURY)).append('\n');
         r.append("- the builder's own comment, interval, margins and grid; the internal name and the"
-                + " comment's version line say V" + (PlanetsPackMain.PACK_VERSION + 1) + ".\n");
+                + " comment's version line say V" + MERCURY.version() + ".\n");
 
         r.append("\n## The radii, read from the pinned PCK as the builder reads them\n\n");
         String pck = Files.readString(PCK, StandardCharsets.US_ASCII);

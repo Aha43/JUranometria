@@ -84,6 +84,8 @@ help:
 	@echo "  import-jovian-system  Build the Jovian System pack from jup365.bsp and pck00011.tpc, proved against the sources (issue #473)"
 	@echo "  venus-table-study    Write the first Venus table from the bundled packs (issue #501)"
 	@echo "  venus-accuracy-report  The Venus service against Horizons and Espenak, the report the tests hold (issue #501)"
+	@echo "  mercury-table-study  Write the first Mercury table from the bundled packs (issue #529)"
+	@echo "  mercury-accuracy-report  The Mercury service against Horizons and Espenak, the report the tests hold (issue #529)"
 	@echo "  import-planets       Build the planets pack (one DE440 kernel per planet) from de440s.bsp and pck00011.tpc, proved against the sources (issue #501)"
 	@echo "  jovian-accuracy-report  The Jovian service against Horizons, the report the tests hold (issue #473)"
 	@echo "  jovian-cartography-study  Measure Jupiter and the moons on the atlas's pages, with mockups (issue #482)"
@@ -319,6 +321,19 @@ venus-accuracy-report: classes
 	$(JAVA) -cp "$(CLASSES_DIR)" juranometria.tool.VenusAccuracyReportMain \
 		> docs/studies/venus/service-accuracy.md
 	@echo "written to docs/studies/venus/service-accuracy.md"
+
+# The Mercury service against Horizons and Espenak (#529): the same, for Mercury.
+mercury-accuracy-report: classes
+	$(JAVA) -cp "$(CLASSES_DIR)" juranometria.tool.MercuryAccuracyReportMain \
+		> docs/studies/mercury/service-accuracy.md
+	@echo "written to docs/studies/mercury/service-accuracy.md"
+
+# The first Mercury table (issue #529): the service's answers in the Moon
+# table's columns and rounding, for the owner to read before any surface.
+mercury-table-study: classes
+	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.MercuryTableStudyMain \
+		> docs/studies/mercury/table-measurements.md
+	@echo "written to docs/studies/mercury/table-measurements.md"
 
 import-star-identities: classes
 	$(JAVA) -cp "$(CLASSES_DIR)" juranometria.tool.StarIdentityPackMain
@@ -630,7 +645,7 @@ black-sky-study: classes
 		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BlackSkyStudyMain \
 		> docs/studies/black-sky/measurements.md
 
-.PHONY: spk-boundary-fixture import-jovian-system import-planets venus-accuracy-report venus-table-study jovian-accuracy-report jovian-cartography-study venus-cartography-study evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study venus-pack-study sun-on-the-chart-study moon-on-the-chart-study venus-on-the-chart-study jupiter-on-the-chart-study printable-chart-study meridian-ticks-study mercury-pack-study mercury-system-study
+.PHONY: spk-boundary-fixture import-jovian-system import-planets venus-accuracy-report venus-table-study mercury-accuracy-report mercury-table-study jovian-accuracy-report jovian-cartography-study venus-cartography-study evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study venus-pack-study sun-on-the-chart-study moon-on-the-chart-study venus-on-the-chart-study jupiter-on-the-chart-study printable-chart-study meridian-ticks-study mercury-pack-study mercury-system-study
 # The heap is stated rather than inherited from whatever a machine's
 # ergonomics chose for it: the CI runner's default quarter-of-RAM is
 # not the same number as a developer's.

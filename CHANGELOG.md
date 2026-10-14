@@ -7,6 +7,15 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Mercury, computed (#529).** The planets pack is version 2: Mercury's
+DE440 excerpt joins Venus's in a file of its own, Venus's file byte for
+byte as 5.2.0 shipped it, and the notice names both. `MercuryService`
+answers where Mercury is and how it is lit for an observer at an
+instant or over a range, under the contract ruled on #528, measured
+against every committed Horizons row and Espenak's named events inside
+the ruled targets; the first generated Mercury table is a study page.
+Nothing in the interface or on the chart shows Mercury yet.
+
 ## [5.2.0] - 2026-10-13
 
 **The article "Jupiter's little sky" (#516).** A reader article, in

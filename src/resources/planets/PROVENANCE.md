@@ -8,7 +8,7 @@ scripts/download-jovian-sources.sh
 make import-planets
 ```
 
-Pack `planets` version 1, audited 2026-10-11.
+Pack `planets` version 2, audited 2026-10-13.
 
 ## Sources
 
@@ -26,16 +26,24 @@ Tool: `juranometria.tool.PlanetsPackMain` (this repository), using `juranometria
 - 0 -> 2: -3159518400.0 to 3191227200.0
 - 2 -> 299: -4734072000.0 to 4735368000.0
 
+`juranometria-de440-mercury-1900-2100.bsp` (Mercury), coverage of the written segments (seconds past J2000, TDB):
+
+- 0 -> 1: -3158827200.0 to 3190536000.0
+- 1 -> 199: -4734072000.0 to 4735368000.0
+
 ## Output
 
 | file | bytes | SHA-256 |
 |---|---|---|
 | `juranometria-de440-venus-1900-2100.bsp` | 1242112 | `8b0760b4a5fceee224a8f52c0ed81c9f250cf1f4fba57351462ec73267f85b12` |
+| `juranometria-de440-mercury-1900-2100.bsp` | 3299328 | `78736932fbd2cd36f360a5b5003ff107ed62322803871c06bdf029d763360a7d` |
 
 ## Validation
 
 - juranometria-de440-venus-1900-2100.bsp: 86370 states over the coverage at 1.7-day spacing, every segment: position and velocity identical to the source, worst difference 0.0.
+- juranometria-de440-mercury-1900-2100.bsp: 86370 states over the coverage at 1.7-day spacing, every segment: position and velocity identical to the source, worst difference 0.0.
 - Venus about its barycentre (2 -> 299): 43185 states, position and velocity identically zero: the planet is its barycentre.
+- Mercury about its barycentre (1 -> 199): 43185 states, position and velocity identically zero: the planet is its barycentre.
 - The released Solar System kernel is untouched: sha256 `63fbf570516667e95c0350af885924d98eee74c43e9be8bfd8616032d37b5580`, verified before writing.
 - The released Jovian kernel `juranometria-jup365-galilean-2000-2100.bsp` is untouched: sha256 `6ad781a43da97e6cfc57dea66be9a2329ca68316db2220dee6c3670346899ef6`, verified before writing.
 - The released Jovian kernel `juranometria-jup365-jupiter-1900-2100.bsp` is untouched: sha256 `efddb718ecdef7364cd1cd2cfe95219a90a363ee5f2ba0f0e8ce3b09cd6cae92`, verified before writing.
@@ -46,6 +54,7 @@ Tool: `juranometria.tool.PlanetsPackMain` (this repository), using `juranometria
 | keyword | value, verbatim |
 |---|---|
 | `BODY299_RADII` | `6051.8,6051.8,6051.8` |
+| `BODY199_RADII` | `2440.53,2440.53,2438.26` |
 | `BODY10_RADII` | `695700.,695700.,695700.` |
 
 ## Applicable rules

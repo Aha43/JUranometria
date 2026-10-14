@@ -87,7 +87,7 @@ with it paragraph by paragraph.
 |---|---|
 | window title | About JUranometria |
 | window, spoken | Application identity, version, and licensing information |
-| shown | *(read-only document, 35577 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 36204 characters — printed in full below or listed by path)* |
 | shown | Close |
 
 
@@ -120,7 +120,7 @@ with it paragraph by paragraph.
 |---|---|
 | window title | About JUranometria |
 | window, spoken | Application identity, version, and licensing information |
-| shown | *(read-only document, 35577 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 36204 characters — printed in full below or listed by path)* |
 | shown | Close |
 
 
@@ -227,7 +227,7 @@ Toolbar icons from the Tabler icon set: MIT license.
 |---|---|
 | window title | Om JUranometria |
 | window, spoken | Programmets navn, versjon og lisensopplysninger |
-| shown | *(read-only document, 35595 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 36222 characters — printed in full below or listed by path)* |
 | shown | Lukk |
 
 
@@ -260,7 +260,7 @@ Toolbar icons from the Tabler icon set: MIT license.
 |---|---|
 | window title | Om JUranometria |
 | window, spoken | Programmets navn, versjon og lisensopplysninger |
-| shown | *(read-only document, 35595 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 36222 characters — printed in full below or listed by path)* |
 | shown | Lukk |
 
 
@@ -317,9 +317,9 @@ Not reproduced here: they are upstream text, and a copy in a study is a copy tha
 | `bsd3` | `/resources/geo/constellations/LICENSE-BSD-3-Clause.txt` | 1480 |
 | `solarsystem` | `/resources/solar-system/NOTICE-solar-system.md` | 2353 |
 | `joviansystem` | `/resources/jovian-system/NOTICE-jovian-system.md` | 3759 |
-| `planets` | `/resources/planets/NOTICE-planets.md` | 3049 |
+| `planets` | `/resources/planets/NOTICE-planets.md` | 3676 |
 | `tabler` | `/resources/icons/LICENSE` | 1072 |
-| **seven** | | **34349** |
+| **seven** | | **34976** |
 
 ## The application mark
 

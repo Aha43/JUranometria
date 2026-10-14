@@ -31,6 +31,14 @@ unchanged. It is a **modified kernel** under NAIF's rules and is
 named, annotated and attributed as such; it is not an original JPL
 file and JPL did not produce it.
 
+`juranometria-de440-mercury-1900-2100.bsp` was produced the same
+way from the same kernel, in pack version 2: it keeps the Mercury
+barycentre relative to the solar-system barycentre, and Mercury
+relative to its barycentre, identically zero because Mercury has
+no moon, over the same years with every coefficient unchanged. It
+too is a modified kernel, named, annotated and attributed as such.
+Venus's file was not rewritten when Mercury's was added.
+
 NAIF's rules, quoted: "Redistribution of SPICE kernels distributed
 by NAIF is permitted as long as they have not been modified." "If
 a kernel distributed by NAIF has been modified in any way, any
@@ -53,8 +61,11 @@ The manifest carries, copied verbatim from NAIF's `pck00011.tpc`
 Elements, 2015 report, as NAIF states it), each planet's radii and
 the Sun's. Venus's radius, 6051.8 km, is its solid body; the
 visible cloud deck lies higher, and the atlas states, never draws,
-that difference. The PCK file itself is not redistributed; its
-digest is recorded.
+that difference. Mercury's radii are its triaxial figure,
+2440.53 km, 2440.53 km and 2438.26 km; the atlas uses the
+equatorial 2440.53 km, as JPL Horizons does, and never substitutes
+the mean. The PCK file itself is not redistributed; its digest is
+recorded.
 
 ## Provenance
 
