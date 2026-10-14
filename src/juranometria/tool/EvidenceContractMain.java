@@ -145,6 +145,13 @@ public final class EvidenceContractMain {
         // bundled packs in the Moon table's columns and rounding.
         REPORT_MAINS.put("juranometria.tool.VenusTableStudyMain",
                 "docs/studies/venus/table-measurements.md");
+        // The Mercury service against Horizons and Espenak (#529) and the
+        // first Mercury table, the same way: the bundled packs and the
+        // committed fixtures only, never the gitignored raw sources.
+        REPORT_MAINS.put("juranometria.tool.MercuryAccuracyReportMain",
+                "docs/studies/mercury/service-accuracy.md");
+        REPORT_MAINS.put("juranometria.tool.MercuryTableStudyMain",
+                "docs/studies/mercury/table-measurements.md");
         // Jupiter and the moons on the page (#482): the report is
         // deterministic; its mockups are held through IMAGE_MAINS.
         REPORT_MAINS.put("juranometria.tool.JovianCartographyStudyMain",

@@ -30,6 +30,9 @@ import juranometria.solar.spk.SpkKernel;
  * is the first: segments 0 → 2 (the Venus barycentre) and 2 → 299
  * (Venus about it, identically zero; proved) from the released pack's
  * own pinned source, over 1900–2100 with the released 31-day margin.
+ * Mercury is the second (Sprint 49, issue #529, as ruled on #528):
+ * segments 0 → 1 and 1 → 199, the same way, in a file of its own that
+ * carries the version it was added in; Venus's file keeps its own.
  * A planet whose centre is not in de440s (Mars and the outer planets)
  * will carry that relationship in its own file from its own authority,
  * ruled in its own study; a barycentre is never drawn as the planet.
@@ -49,8 +52,8 @@ import juranometria.solar.spk.SpkKernel;
 public final class PlanetsPackMain {
 
     static final String PACK_NAME = "planets";
-    static final int PACK_VERSION = 1;
-    static final String AUDIT_DATE = "2026-10-11";
+    static final int PACK_VERSION = 2;
+    static final String AUDIT_DATE = "2026-10-13";
 
     static final String NOTICE_NAME = "NOTICE-planets.md";
     static final String PROVENANCE_NAME = "PROVENANCE.md";
@@ -67,16 +70,24 @@ public final class PlanetsPackMain {
             "juranometria-jup365-galilean-2000-2100.bsp",
             "6ad781a43da97e6cfc57dea66be9a2329ca68316db2220dee6c3670346899ef6");
 
-    /** A planet of the pack: its file, its segments, its centre's radius keyword. */
+    /**
+     * A planet of the pack: its file, its segments, its centre's radius
+     * keyword, and the pack version it was added in - the version its
+     * file's internal name and comment state, which never moves after
+     * the file is released.
+     */
     record Planet(String key, String label, String kernelName, List<SpkExcerpt.Pick> picks,
-                  String radiusKeyword) {
+                  String radiusKeyword, int version) {
     }
 
     /** The planets, in the order they were added; a release appends. */
     static final List<Planet> PLANETS = List.of(
             new Planet("venus", "Venus", "juranometria-de440-venus-1900-2100.bsp",
                     List.of(new SpkExcerpt.Pick(0, 2), new SpkExcerpt.Pick(2, 299)),
-                    "BODY299_RADII"));
+                    "BODY299_RADII", 1),
+            new Planet("mercury", "Mercury", "juranometria-de440-mercury-1900-2100.bsp",
+                    List.of(new SpkExcerpt.Pick(0, 1), new SpkExcerpt.Pick(1, 199)),
+                    "BODY199_RADII", 2));
 
     /** The released interval and margin (SolarSystemPackMain), and its civil days. */
     static final double START_JD = SolarSystemPackMain.COVERAGE_START_JD;
@@ -131,12 +142,19 @@ public final class PlanetsPackMain {
         for (Planet p : PLANETS) {
             byte[] kernel = SpkExcerpt.of(source, p.picks, startEt, endEt,
                     "JURANOMETRIA DE440 " + p.label.toUpperCase(Locale.ROOT)
-                            + " 1900-2100 V" + PACK_VERSION,
+                            + " 1900-2100 V" + p.version,
                     comment(p, full.comments()));
             validations.put(p.key, prove(SpkKernel.read(kernel), full, p));
             kernels.put(p.key, kernel);
         }
-        String venusZero = zero(full, 2, 299);
+        Map<String, String> zeros = new LinkedHashMap<>();
+        for (Planet p : PLANETS) {
+            for (SpkExcerpt.Pick pick : p.picks) {
+                if (pick.center() != 0) {
+                    zeros.put(p.key, zero(full, pick.center(), pick.target()));
+                }
+            }
+        }
 
         // A released planet's file never moves: if the pack is already
         // here, each planet's file must come out as it went in.
@@ -159,7 +177,7 @@ public final class PlanetsPackMain {
         write(outDir.resolve(PROVENANCE_NAME), provenance(
                 PinnedInputs.sha256Hex(source),
                 PinnedInputs.sha256Hex(pck.getBytes(StandardCharsets.US_ASCII)),
-                checksums, kernels, validations, venusZero, constants)
+                checksums, kernels, validations, zeros, constants)
                 .getBytes(StandardCharsets.UTF_8), checksums);
         Files.writeString(outDir.resolve("manifest.properties"),
                 manifest(checksums, constants, kernels), StandardCharsets.UTF_8);
@@ -177,7 +195,9 @@ public final class PlanetsPackMain {
                     + " bytes, sha256 " + checksums.get(p.kernelName));
             System.out.println("  " + validations.get(p.key));
         }
-        System.out.println("  2 -> 299: " + venusZero);
+        for (Planet p : PLANETS) {
+            System.out.println("  " + aboutItsBarycentre(p) + ": " + zeros.get(p.key));
+        }
         System.out.println("  released Solar System and Jovian kernels untouched");
         System.out.println("  reloaded and verified: " + loaded.manifest().get("pack.name")
                 + " v" + loaded.manifest().get("pack.version") + ", planets "
@@ -245,10 +265,20 @@ public final class PlanetsPackMain {
                 + " zero: the planet is its barycentre", states);
     }
 
+    /** The planet-about-its-barycentre pick, as "2 -> 299". */
+    static String aboutItsBarycentre(Planet p) {
+        for (SpkExcerpt.Pick pick : p.picks) {
+            if (pick.center() != 0) {
+                return pick.center() + " -> " + pick.target();
+            }
+        }
+        throw new IllegalArgumentException(p.key + " has no barycentre pick");
+    }
+
     static String comment(Planet p, String sourceComments) {
         StringBuilder text = new StringBuilder();
         text.append(p.kernelName).append(":\n")
-                .append("JUranometria planets pack, version ").append(PACK_VERSION)
+                .append("JUranometria planets pack, version ").append(p.version)
                 .append(": ").append(p.label).append(", a subset of the JPL planetary\n")
                 .append("ephemeris DE440, MODIFIED by JUranometria\n")
                 .append("(https://github.com/Aha43/JUranometria).\n")
@@ -319,6 +349,14 @@ public final class PlanetsPackMain {
             named, annotated and attributed as such; it is not an original JPL
             file and JPL did not produce it.
 
+            `juranometria-de440-mercury-1900-2100.bsp` was produced the same
+            way from the same kernel, in pack version 2: it keeps the Mercury
+            barycentre relative to the solar-system barycentre, and Mercury
+            relative to its barycentre, identically zero because Mercury has
+            no moon, over the same years with every coefficient unchanged. It
+            too is a modified kernel, named, annotated and attributed as such.
+            Venus's file was not rewritten when Mercury's was added.
+
             NAIF's rules, quoted: "Redistribution of SPICE kernels distributed
             by NAIF is permitted as long as they have not been modified." "If
             a kernel distributed by NAIF has been modified in any way, any
@@ -341,8 +379,11 @@ public final class PlanetsPackMain {
             Elements, 2015 report, as NAIF states it), each planet's radii and
             the Sun's. Venus's radius, 6051.8 km, is its solid body; the
             visible cloud deck lies higher, and the atlas states, never draws,
-            that difference. The PCK file itself is not redistributed; its
-            digest is recorded.
+            that difference. Mercury's radii are its triaxial figure,
+            2440.53 km, 2440.53 km and 2438.26 km; the atlas uses the
+            equatorial 2440.53 km, as JPL Horizons does, and never substitutes
+            the mean. The PCK file itself is not redistributed; its digest is
+            recorded.
 
             ## Provenance
 
@@ -356,7 +397,7 @@ public final class PlanetsPackMain {
     private static String provenance(String sourceSha, String pckSha,
                                      Map<String, String> checksums,
                                      Map<String, byte[]> kernels,
-                                     Map<String, String> validations, String venusZero,
+                                     Map<String, String> validations, Map<String, String> zeros,
                                      Map<String, String> constants) throws IOException {
         StringBuilder md = new StringBuilder();
         md.append("# Planets pack provenance\n\n")
@@ -401,8 +442,12 @@ public final class PlanetsPackMain {
         for (Planet p : PLANETS) {
             md.append("- ").append(validations.get(p.key)).append(".\n");
         }
-        md.append("- Venus about its barycentre (2 -> 299): ").append(venusZero).append(".\n")
-                .append("- The released Solar System kernel is untouched: sha256 `")
+        for (Planet p : PLANETS) {
+            md.append("- ").append(p.label).append(" about its barycentre (")
+                    .append(aboutItsBarycentre(p)).append("): ").append(zeros.get(p.key))
+                    .append(".\n");
+        }
+        md.append("- The released Solar System kernel is untouched: sha256 `")
                 .append(RELEASED_SOLAR_KERNEL_SHA256).append("`, verified before writing.\n");
         for (Map.Entry<String, String> k : new TreeMap<>(RELEASED_JOVIAN_KERNELS).entrySet()) {
             md.append("- The released Jovian kernel `").append(k.getKey())
@@ -452,6 +497,7 @@ public final class PlanetsPackMain {
             m.put(prefix + "coverage.end.jd", String.format(Locale.ROOT, "%.1f", END_JD));
             m.put(prefix + "first.day", FIRST_DAY);
             m.put(prefix + "last.day", LAST_DAY);
+            m.put(prefix + "added.in.version", Integer.toString(p.version));
         }
         m.put("pack.planets", planets.toString());
         m.put("source.de440s.url", DE440S_URL);
