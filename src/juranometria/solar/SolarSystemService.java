@@ -114,11 +114,12 @@ public final class SolarSystemService {
 
     /**
      * The bodies the service answers for. Venus (#502) is answered by
-     * {@link VenusService} over the planets pack, loaded the first time
-     * Venus is asked for; the Sun's and the Moon's answers never read it.
+     * {@link VenusService} and Mercury (#530) by {@link MercuryService},
+     * each over the planets pack, loaded the first time that planet is
+     * asked for; the Sun's and the Moon's answers never read it.
      */
     public enum Body {
-        SUN, MOON, VENUS
+        SUN, MOON, VENUS, MERCURY
     }
 
     /** Altitude and azimuth in degrees; azimuth from north through east. */
@@ -163,7 +164,7 @@ public final class SolarSystemService {
 
     /** One body's quantities at one instant, for one observer. */
     public sealed interface Observation permits SunObservation, MoonObservation,
-            VenusService.VenusObservation {
+            VenusService.VenusObservation, MercuryService.MercuryObservation {
         Instant instant();
 
         TimeScales.Confidence timeConfidence();
@@ -249,6 +250,8 @@ public final class SolarSystemService {
     private final TimeScales timeScales;
     /** Venus's service, built over this pack the first time Venus is asked for. */
     private VenusService venus;
+    /** Mercury's service, the same way (#530). */
+    private MercuryService mercury;
 
     public SolarSystemService(SolarSystemPack pack) {
         if (pack == null) {
@@ -277,6 +280,7 @@ public final class SolarSystemService {
             case SUN -> sun(observer);
             case MOON -> moon(observer);
             case VENUS -> venus().observe(observer);
+            case MERCURY -> mercury().observe(observer);
         };
     }
 
@@ -304,6 +308,19 @@ public final class SolarSystemService {
             venus = new VenusService(pack, PlanetsPack.load());
         }
         return venus;
+    }
+
+    /**
+     * Mercury's service over this service's pack and the bundled planets
+     * pack, read once, when Mercury is first asked for (#530) - as
+     * Venus's; a missing or corrupt planets pack refuses Mercury there
+     * and touches nothing the Sun or the Moon answer.
+     */
+    private synchronized MercuryService mercury() {
+        if (mercury == null) {
+            mercury = new MercuryService(pack, PlanetsPack.load());
+        }
+        return mercury;
     }
 
     private static void requireInsideTheInterval(Instant instant, String body) {

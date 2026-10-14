@@ -66,10 +66,10 @@ class JovianBoundaryTest {
                 () -> new JovianSystemService(SolarSystemPack.load(), null));
         SolarSystemService solar = SolarSystemService.load();
         assertEquals(java.util.List.of(SolarSystemService.Body.SUN, SolarSystemService.Body.MOON,
-                        SolarSystemService.Body.VENUS),
+                        SolarSystemService.Body.VENUS, SolarSystemService.Body.MERCURY),
                 java.util.List.of(SolarSystemService.Body.values()),
-                "the Sun and the Moon, as released, and Venus (#502) over the planets pack;"
-                        + " Jupiter is the Jovian service's");
+                "the Sun and the Moon, as released, Venus (#502) and Mercury (#530) over the"
+                        + " planets pack; Jupiter is the Jovian service's");
         assertTrue(((SolarSystemService.SunObservation) solar.observe(
                 SolarSystemService.Body.SUN, OSLO_1950)).distanceKm() > 0.0);
     }

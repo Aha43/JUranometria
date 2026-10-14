@@ -63,6 +63,8 @@ public final class InterfacePhotographers {
                 new Photographer("moontable-strings.md", SheetCapture.Kind.PACKED));
         GENERATORS.put("VenusTableSheetMain",
                 new Photographer("venustable-strings.md", SheetCapture.Kind.PACKED));
+        GENERATORS.put("MercuryTableSheetMain",
+                new Photographer("mercurytable-strings.md", SheetCapture.Kind.PACKED));
         // Components inside a packed study frame.
         GENERATORS.put("ChartKeyboardSheetMain",
                 new Photographer("chartkeyboard-strings.md",

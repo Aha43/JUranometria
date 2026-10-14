@@ -982,6 +982,36 @@ public final class AppMenuBar {
         solar.insert(venus, at);
     }
 
+    /**
+     * Adds View > Solar System > Mercury... between Sun... and Venus...
+     * (#530): the Mercury table's dialog, kept beside the Controller's
+     * Mercury group as the others are - the order outward from the Sun.
+     * Does nothing on a bar without the Solar System submenu.
+     */
+    public static void addMercuryTable(javax.swing.JMenuBar bar,
+                                       juranometria.ui.language.InterfaceText said,
+                                       Runnable openMercuryTable) {
+        JMenu solar = solarSystemMenu(bar);
+        if (solar == null || openMercuryTable == null) {
+            return;
+        }
+        JMenuItem mercury = new JMenuItem(said.say("menu.mercury.label"));
+        mercury.setName("mercuryTableItem");
+        juranometria.ui.language.MnemonicText.in(said).apply(mercury, "menu.mercury.mnemonic");
+        mercury.getAccessibleContext().setAccessibleName(said.say("menu.mercury.a11y"));
+        juranometria.ui.Explain.control(mercury, said.say("menu.mercury.hover"),
+                said.say("menu.mercury.explain"));
+        mercury.addActionListener(event -> openMercuryTable.run());
+        int at = solar.getMenuComponentCount();
+        for (int i = solar.getMenuComponentCount() - 1; i >= 0; i--) {
+            String name = solar.getMenuComponent(i).getName();
+            if ("venusTableItem".equals(name) || MOON_ITEM.equals(name)) {
+                at = i;
+            }
+        }
+        solar.insert(mercury, at);
+    }
+
     public static void addJupiterTable(javax.swing.JMenuBar bar,
                                        juranometria.ui.language.InterfaceText said,
                                        Runnable openJupiterTable) {

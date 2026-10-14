@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * <p>A menu item's tooltip is drawn by the platform: under the macOS
  * screen menu bar the system shows it as plain text, so the HTML that
  * wraps a long Swing tooltip appeared there as source - on Sun...,
- * Venus..., Moon..., Jupiter... and Help ▸ Copy View Report, in English,
+ * Mercury..., Venus..., Moon..., Jupiter... and Help ▸ Copy View Report, in English,
  * and on Jupiter... and Copy View Report in Norwegian, where the other
  * three happen to fall under the wrapping length. Every menu item of the
  * bar as the application builds it - the items it adds afterwards
@@ -36,12 +36,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class MenuHelpPlainTextTest {
 
-    /** The five items whose help was shown as source, by key stem. */
+    /** The six items whose help was shown as source, by key stem. */
     private static final List<String> HELPED = List.of(
-            "menu.sun", "menu.venus", "menu.moon", "menu.jupiter", "menu.viewReport");
+            "menu.sun", "menu.mercury", "menu.venus", "menu.moon", "menu.jupiter",
+            "menu.viewReport");
 
     @Test
-    void theFiveItemsCarryTheirWordsExactlyInBothLanguages() throws Exception {
+    void theSixItemsCarryTheirWordsExactlyInBothLanguages() throws Exception {
         for (String language : List.of("en", "nb-NO")) {
             InterfaceText said = InterfaceText.forLanguage(language);
             JMenuBar bar = bar(said);
@@ -97,6 +98,7 @@ class MenuHelpPlainTextTest {
                     () -> { }, () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
                     () -> { }, () -> { }, () -> { }, () -> { }, () -> { }, () -> { }, said);
             AppMenuBar.addVenusTable(bar[0], said, () -> { });
+            AppMenuBar.addMercuryTable(bar[0], said, () -> { });
             AppMenuBar.addJupiterTable(bar[0], said, () -> { });
             AppMenuBar.addJupiterOnChart(bar[0], said, () -> { });
             AppMenuBar.addVenusOnChart(bar[0], said, () -> { });

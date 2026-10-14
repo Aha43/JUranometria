@@ -139,6 +139,7 @@ class CentreOnChartTest {
             case SolarSystemService.SunObservation s -> s.astrometricJ2000();
             case SolarSystemService.MoonObservation m -> m.astrometricJ2000();
             case juranometria.solar.VenusService.VenusObservation v -> v.astrometricJ2000();
+            case juranometria.solar.MercuryService.MercuryObservation mc -> mc.astrometricJ2000();
         };
     }
 

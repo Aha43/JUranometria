@@ -65,6 +65,14 @@ public interface SolarTable {
         return Venus.INSTANCE;
     }
 
+    /**
+     * Mercury's table (issue #530, the contract ruled on #528): Venus's
+     * eleven columns, the shared phase bands, Mercury's own words.
+     */
+    static SolarTable mercury() {
+        return Mercury.INSTANCE;
+    }
+
     /** The Sun's columns. */
     enum Sun implements SolarTable {
         INSTANCE;
@@ -305,6 +313,109 @@ public interface SolarTable {
         public String cell(Observation observation, int column, SolarTableWords w) {
             juranometria.solar.VenusService.VenusObservation o =
                     (juranometria.solar.VenusService.VenusObservation) observation;
+            return switch (column) {
+                case 1 -> w.n(SunTableFormat.hms(o.astrometricJ2000()));
+                case 2 -> SunTableFormat.dms(o.astrometricJ2000());
+                case 3 -> SunTableFormat.altitude(
+                        w.n(SunTableFormat.degrees(o.horizontal().altitudeDegrees())),
+                        o.horizontal().altitudeDegrees(), w.say("below"));
+                case 4 -> w.n(SunTableFormat.degrees(o.horizontal().azimuthDegrees()));
+                case 5 -> w.say("distance.pattern",
+                        w.n(SunTableFormat.astronomicalUnits(o.distanceAu())),
+                        w.n(SunTableFormat.millionKilometres(o.distanceKm())));
+                case 6 -> w.n(SunTableFormat.minutesSeconds(o.solidBodyDiameterArcseconds()));
+                case 7 -> w.n(MoonTableFormat.percent(o.illuminatedFraction()));
+                case 8 -> phaseWord(o.phase(), w);
+                case 9 -> elongation(o, w);
+                case 10 -> litSide(o, w);
+                default -> throw new IndexOutOfBoundsException(column);
+            };
+        }
+    }
+
+    /** Mercury's columns (#530): the same family, the meanings and words ruled on #528. */
+    enum Mercury implements SolarTable {
+        INSTANCE;
+
+        private static final List<String> COLUMNS = List.of("instant", "ra",
+                "dec", "altitude", "azimuth", "distance", "diameter",
+                "illuminated", "phase", "elongation", "litside");
+        private static final int[] WIDTHS = {140, 125, 115, 200, 150, 190, 175,
+                85, 190, 140, 300};
+
+        /** The key of each phase's word, in the enum's order (#528, ruling 5). */
+        static final List<String> PHASE_KEYS = List.of("phase.inFrontOfSun",
+                "phase.behindSun", "phase.nearInferiorConjunction", "phase.crescent",
+                "phase.nearHalfLit", "phase.gibbous", "phase.nearFull");
+
+        @Override
+        public Body body() {
+            return Body.MERCURY;
+        }
+
+        /** Wide enough for every column, so the phase and lit side are seen. */
+        @Override
+        public int preferredWidth() {
+            int total = 0;
+            for (int w : WIDTHS) {
+                total += w;
+            }
+            return total + 20;
+        }
+
+        @Override
+        public String stem() {
+            return "mercurytable";
+        }
+
+        @Override
+        public String prefix() {
+            return "mercury";
+        }
+
+        @Override
+        public List<String> columns() {
+            return COLUMNS;
+        }
+
+        @Override
+        public int[] widths() {
+            return WIDTHS.clone();
+        }
+
+        /** The phase's word in the language. */
+        public static String phaseWord(juranometria.solar.MercuryService.Phase phase,
+                                       SolarTableWords w) {
+            return w.say(PHASE_KEYS.get(phase.ordinal()));
+        }
+
+        /**
+         * The lit side: the angle and its compass word, or why not - near
+         * inferior conjunction (less than half lit) or near full.
+         */
+        public static String litSide(juranometria.solar.MercuryService.MercuryObservation o,
+                                     SolarTableWords w) {
+            if (o.brightLimbConditioning()
+                    != juranometria.solar.MercuryService.LimbConditioning.WELL_DEFINED) {
+                return w.say(o.illuminatedFraction() < 0.5
+                        ? "litside.undefined.inferior" : "litside.undefined.full");
+            }
+            return w.say("litside.pattern",
+                    MoonTableFormat.positionAngle(o.brightLimbAngleDegrees()),
+                    w.say("compass." + o.brightLimbCompassPoint().name()));
+        }
+
+        /** The elongation with the side's letter in the language. */
+        public static String elongation(juranometria.solar.MercuryService.MercuryObservation o,
+                                        SolarTableWords w) {
+            return w.n(MoonTableFormat.elongation(o.elongationDegrees(),
+                    w.say(o.side() == Side.EAST_OF_SUN ? "side.east" : "side.west")));
+        }
+
+        @Override
+        public String cell(Observation observation, int column, SolarTableWords w) {
+            juranometria.solar.MercuryService.MercuryObservation o =
+                    (juranometria.solar.MercuryService.MercuryObservation) observation;
             return switch (column) {
                 case 1 -> w.n(SunTableFormat.hms(o.astrometricJ2000()));
                 case 2 -> SunTableFormat.dms(o.astrometricJ2000());

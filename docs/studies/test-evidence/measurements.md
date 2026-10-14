@@ -108,6 +108,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | src/juranometria/tool/JovianContractStudyMain.java | look-and-feel, default-font | protected-locally |
 | src/juranometria/tool/MenuSheetMain.java | look-and-feel, preferences | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/MercuryContractStudyMain.java | look-and-feel, default-font | protected-locally |
+| src/juranometria/tool/MercuryTableSheetMain.java | look-and-feel | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/MoonTableSheetMain.java | look-and-feel | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/OnThisPageMockupMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/tool/OnThisPageSheetMain.java | look-and-feel | UNPROTECTED: look-and-feel |
@@ -125,7 +126,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | src/juranometria/tool/WorkingSelectionMockupMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/app/PackagedAcceptanceMain.java | look-and-feel, locale, preferences | protected-locally |
 
-**32 evidence executables** touch process-wide state; 23 carry an unpaired touch.
+**33 evidence executables** touch process-wide state; 24 carry an unpaired touch.
 
 ## Display-dependent tests, their premises and their routes
 
@@ -217,7 +218,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 Whether a particular read happens on the event thread is control flow, which text cannot decide; issue #220 proved the cost of guessing, three times. What can be counted is the traffic:
 
 - reads of live chart state (currentScene, pageOffsetY, navigation.state): **460** across the suite
-- explicit event-thread hand-offs (invokeAndWait): **1000**
+- explicit event-thread hand-offs (invokeAndWait): **1004**
 
 ## Generated evidence, classified
 

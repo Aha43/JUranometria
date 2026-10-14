@@ -97,7 +97,7 @@ public final class CompanionSheetMain {
      * #507: Chart with Chart controls, Place and Time and Chart Options
      * (its subject groups as first introduced - Deep sky collapsed, the
      * rest open); Solar System, chosen by "solar-system-open", Sun open
-     * with its instant applied, Venus, Moon and Jupiter collapsed.
+     * with its instant applied, Mercury, Venus, Moon and Jupiter collapsed.
      * "collapsed" collapses Place and Time.
      */
     private static final List<State> STATES = List.of(
@@ -256,7 +256,13 @@ public final class CompanionSheetMain {
                                 new juranometria.ui.solar.SolarTableSession(
                                         () -> observer, solar,
                                         juranometria.ui.solar.SolarTable.sun()),
-                                // Venus's group (#502), between the Sun's
+                                // Mercury's group (#530), between the Sun's
+                                // and Venus's, as the application holds it:
+                                // introduced collapsed, computing nothing.
+                                new juranometria.ui.solar.SolarTableSession(
+                                        () -> observer, solar,
+                                        juranometria.ui.solar.SolarTable.mercury()),
+                                // Venus's group (#502), between Mercury's
                                 // and the Moon's, as the application holds
                                 // it: introduced collapsed, computing nothing.
                                 new juranometria.ui.solar.SolarTableSession(
@@ -265,7 +271,9 @@ public final class CompanionSheetMain {
                                 new juranometria.ui.solar.SolarTableSession(
                                         () -> observer, solar,
                                         juranometria.ui.solar.SolarTable.moon()),
-                                new StillSwitch(), new StillSwitch(),
+                                // The Sun's switch, Venus's absent as before,
+                                // the Moon's: the photograph is of the groups.
+                                new StillSwitch(), null, new StillSwitch(),
                                 // Jupiter's group (#474) with the Jovian
                                 // module's switch (#484, #486), as the
                                 // application's Controller holds it;

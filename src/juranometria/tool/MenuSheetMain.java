@@ -199,6 +199,9 @@ public final class MenuSheetMain {
                 // meets, with its letter, hover and spoken name.
                 AppMenuBar.addVenusTable(bar[0], juranometria.ui.language.InterfaceText.forLanguage(language),
                         () -> { });
+                // Mercury... (#530), added the same way, between Sun... and Venus...
+                AppMenuBar.addMercuryTable(bar[0],
+                        juranometria.ui.language.InterfaceText.forLanguage(language), () -> { });
                 // Jupiter's two items (#474, #484), which the application also
                 // adds after the bar is built: Jupiter... after Moon..., and
                 // Jupiter and moons on the chart after Moon on the chart -

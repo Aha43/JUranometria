@@ -140,7 +140,8 @@ public final class MercuryService {
                                    double sunAngularRadiusArcseconds,
                                    Phase phase,
                                    double brightLimbAngleDegrees,
-                                   LimbConditioning brightLimbConditioning) {
+                                   LimbConditioning brightLimbConditioning)
+            implements SolarSystemService.Observation {
 
         /** Distance in astronomical units (IAU 2012). */
         public double distanceAu() {
