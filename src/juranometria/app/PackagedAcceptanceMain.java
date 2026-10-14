@@ -464,6 +464,7 @@ public final class PackagedAcceptanceMain {
         sunTableJourney();
         moonTableJourney();
         venusTableJourney();
+        mercuryTableJourney();
         menuHelpJourney();
         sunOnTheChartJourney();
         venusOnTheChartJourney();
@@ -640,6 +641,8 @@ public final class PackagedAcceptanceMain {
                         () -> { }, () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
                         () -> { }, () -> { }, said);
                 AppMenuBar.addVenusTable(bar[0], said, () -> { });
+                // Mercury... (#530), added the same way, between Sun... and Venus...
+                AppMenuBar.addMercuryTable(bar[0], said, () -> { });
                 AppMenuBar.addJupiterTable(bar[0], said, () -> { });
                 AppMenuBar.addJupiterOnChart(bar[0], said, () -> { });
                 AppMenuBar.addVenusOnChart(bar[0], said, () -> { });
@@ -668,7 +671,7 @@ public final class PackagedAcceptanceMain {
                     }
                 }
             }
-            for (String stem : java.util.List.of("menu.sun", "menu.venus", "menu.moon",
+            for (String stem : java.util.List.of("menu.sun", "menu.mercury", "menu.venus", "menu.moon",
                     "menu.jupiter", "menu.viewReport")) {
                 require(said.say(stem + ".hover").equals(hovers.get(said.say(stem + ".label"))),
                         stem + " in " + language + " says its words exactly: "
@@ -816,6 +819,148 @@ public final class PackagedAcceptanceMain {
                 + " 2012 transit in front of the Sun, the Norwegian surface, and the"
                 + " Controller's Venus group between the Sun and the Moon, all inside the"
                 + " image)");
+    }
+
+    /** The packaged Mercury table (#530): Venus's journey, over Mercury's named instants. */
+    private static void mercuryTableJourney() throws Exception {
+        juranometria.solar.SolarSystemService solar =
+                juranometria.solar.SolarSystemService.load();
+        juranometria.sky.Observer[] observer = {new juranometria.sky.Observer(
+                59.91, 10.75, java.time.Instant.parse("2026-02-19T18:00:00Z"))};
+        juranometria.ui.solar.SolarTableDialog.Content[] table =
+                new juranometria.ui.solar.SolarTableDialog.Content[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> table[0] =
+                juranometria.ui.solar.SolarTableDialog.content(() -> observer[0], solar,
+                        juranometria.ui.language.InterfaceText.forLanguage("en"),
+                        juranometria.ui.solar.SolarTable.mercury()));
+        String litSide = String.valueOf(table[0].model.getValueAt(0, 10));
+        require(table[0].model.getRowCount() == 1
+                        && table[0].model.getColumnCount() == 11
+                        && "near half lit".equals(table[0].model.getValueAt(0, 8))
+                        && String.valueOf(table[0].model.getValueAt(0, 9)).endsWith("\u00b0 E")
+                        && litSide.endsWith("(west-southwest)")
+                        && String.valueOf(table[0].model.getValueAt(0, 5)).contains(" AU ("),
+                "the packaged Mercury table shows the 2026 greatest eastern elongation near"
+                        + " half lit, east of the Sun, its lit side to the west-southwest: "
+                        + table[0].model.getValueAt(0, 8) + ", "
+                        + table[0].model.getValueAt(0, 9) + ", " + litSide);
+        observer[0] = new juranometria.sky.Observer(59.91, 10.75,
+                java.time.Instant.parse("2026-03-03T11:00:00Z"));
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            table[0].rangeView.setSelected(true);
+            table[0].start.setText("2026-03-03 11:00:00");
+            table[0].end.setText("2026-03-10 17:30");
+            table[0].update();
+        });
+        StringBuilder sides = new StringBuilder();
+        for (int r = 0; r < table[0].model.getRowCount(); r++) {
+            String e = String.valueOf(table[0].model.getValueAt(r, 9));
+            sides.append(e.substring(e.length() - 1));
+        }
+        require(table[0].model.getRowCount() == 9
+                        && String.valueOf(table[0].model.getValueAt(8, 0)).endsWith("\u2020")
+                        && sides.toString().matches("E+W+")
+                        && "near inferior conjunction".equals(table[0].model.getValueAt(4, 8)),
+                "the range through the 2026 inferior conjunction: nine rows, the appended end"
+                        + " marked, the side changing once from E to W: " + sides + ", "
+                        + table[0].status());
+        observer[0] = new juranometria.sky.Observer(59.91, 10.75,
+                java.time.Instant.parse("2019-11-11T15:20:00Z"));
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            table[0].instantView.setSelected(true);
+            table[0].update();
+        });
+        require("in front of the Sun".equals(table[0].model.getValueAt(0, 8))
+                        && "not well-defined (near inferior conjunction)"
+                                .equals(table[0].model.getValueAt(0, 10)),
+                "the 2019 transit reads in front of the Sun, its lit side not well-defined: "
+                        + table[0].model.getValueAt(0, 8) + ", "
+                        + table[0].model.getValueAt(0, 10));
+        juranometria.ui.solar.SolarTableDialog.Content[] norsk =
+                new juranometria.ui.solar.SolarTableDialog.Content[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> norsk[0] =
+                juranometria.ui.solar.SolarTableDialog.content(() -> observer[0], solar,
+                        juranometria.ui.language.InterfaceText.forLanguage("nb-NO"),
+                        juranometria.ui.solar.SolarTable.mercury()));
+        require("Fase".equals(norsk[0].model.getColumnName(8))
+                        && "foran Solen".equals(norsk[0].model.getValueAt(0, 8))
+                        && String.valueOf(norsk[0].model.getValueAt(0, 9)).endsWith("\u00b0 \u00d8")
+                        && "1 rader.".equals(norsk[0].status()),
+                "and speaks Norwegian: " + norsk[0].model.getValueAt(0, 8) + ", "
+                        + norsk[0].model.getValueAt(0, 9));
+
+        // The Controller's Mercury group, between the Sun's and Venus's.
+        java.util.prefs.Preferences scratch = java.util.prefs.Preferences.userRoot()
+                .node("juranometria-packaged-mercury-" + System.nanoTime());
+        try {
+            juranometria.ui.language.InterfaceText en =
+                    juranometria.ui.language.InterfaceText.forLanguage("en");
+            juranometria.ui.solar.SolarTableSession sun = new juranometria.ui.solar
+                    .SolarTableSession(() -> observer[0], solar,
+                    juranometria.ui.solar.SolarTable.sun());
+            juranometria.ui.solar.SolarTableSession mercury = new juranometria.ui.solar
+                    .SolarTableSession(() -> observer[0], solar,
+                    juranometria.ui.solar.SolarTable.mercury());
+            juranometria.ui.solar.SolarTableSession venus = new juranometria.ui.solar
+                    .SolarTableSession(() -> observer[0], solar,
+                    juranometria.ui.solar.SolarTable.venus());
+            juranometria.ui.solar.SolarTableSession moon = new juranometria.ui.solar
+                    .SolarTableSession(() -> observer[0], solar,
+                    juranometria.ui.solar.SolarTable.moon());
+            juranometria.ui.solar.BodyOnChart still = new juranometria.ui.solar.BodyOnChart() {
+                @Override
+                public boolean showing() {
+                    return false;
+                }
+
+                @Override
+                public void show(boolean wanted) {
+                }
+
+                @Override
+                public void onChange(java.util.function.Consumer<Boolean> listener) {
+                    listener.accept(false);
+                }
+            };
+            javax.swing.JComponent[] groups = new javax.swing.JComponent[1];
+            juranometria.ui.solar.SolarSystemSection[] section =
+                    new juranometria.ui.solar.SolarSystemSection[1];
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                section[0] = new juranometria.ui.solar.SolarSystemSection(sun, mercury, venus,
+                        moon, still, null, still, null, null, null, en);
+                groups[0] = section[0].inController(
+                        juranometria.ui.companion.CompanionStore.forNode(scratch), en);
+            });
+            java.util.List<String> order = new java.util.ArrayList<>();
+            java.util.Deque<java.awt.Component> walk = new java.util.ArrayDeque<>();
+            walk.add(groups[0]);
+            while (!walk.isEmpty()) {
+                java.awt.Component c = walk.poll();
+                if (c.getName() != null && c.getName().startsWith("heading.solarsystem.")) {
+                    order.add(c.getName());
+                }
+                if (c instanceof java.awt.Container container) {
+                    walk.addAll(java.util.List.of(container.getComponents()));
+                }
+            }
+            require(order.equals(java.util.List.of("heading.solarsystem.sun",
+                            "heading.solarsystem.mercury", "heading.solarsystem.venus",
+                            "heading.solarsystem.moon")),
+                    "the Controller orders the groups outward from the Sun: " + order);
+            require(mercury.computations() == 0 && section[0].mercury().onChart == null
+                            && section[0].mercury().centreOnChart == null,
+                    "Mercury's group computes nothing when built and offers no chart switch"
+                            + " and no Centre on chart");
+            javax.swing.SwingUtilities.invokeAndWait(section[0]::release);
+        } finally {
+            scratch.removeNode();
+        }
+        System.out.println("mercury table OK (the 2026 greatest eastern elongation near half"
+                + " lit in the evening sky, a nine-row range through the 2026 inferior"
+                + " conjunction with the side changing from E to W and its appended end, the"
+                + " 2019 transit in front of the Sun, the Norwegian surface, and the"
+                + " Controller's Mercury group between the Sun and Venus with no chart switch,"
+                + " all inside the image)");
     }
 
     /**

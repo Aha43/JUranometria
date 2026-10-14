@@ -595,3 +595,55 @@ Horizons row the image restates (held to the committed row by
 near half lit in the evening sky, and the 2019 transit in front of the
 Sun, beside Venus's checks. No dialog, Controller section, selection
 or chart mark exists.
+
+## #530, the table, as built
+
+Mercury joins the Sun's, the Moon's and Venus's table family, as ruled:
+one more `SolarTable` (`SolarTable.mercury()`, stem `mercurytable`,
+prefix `mercury`) over the same shell, session, refusals and range cap.
+The service seam is the one Venus took on #502: Mercury is added to the
+Solar System service - `Body.MERCURY`, answered by `MercuryService`
+over the planets pack, which `SolarSystemService` builds the first time
+Mercury is asked for, so the Sun's and the Moon's answers never read
+the planets pack and a missing one refuses Mercury alone, as it refuses
+Venus. `MercuryObservation` joins the sealed `Observation` family, and
+every switch over it names Mercury; the one Centre on chart switch
+refuses Mercury by name, since nothing of Mercury is drawn.
+
+- **Columns**: Venus's eleven - instant; right ascension and declination
+  (J2000); altitude; azimuth; distance in AU and million km; the solid
+  body's apparent diameter, its explanation naming the equatorial
+  2440.53 km, the triaxial figure once, and the mean never substituted
+  (ruling 4); illuminated; phase, in the ruled words with the geometric
+  states first, its explanation saying the bands are Venus's (ruling
+  5); elongation with E or W by right ascension, announcing no
+  conjunction (ruling 3); lit side, χ of date with the nearest of
+  sixteen points, *not well-defined (near inferior conjunction)* below
+  2 % and *(near full)* from 98 %.
+- **Hosts**: View > Solar System > Mercury... between Sun... and
+  Venus...; the Controller's Mercury group between the Sun's and
+  Venus's, introduced collapsed - the order outward from the Sun (#527).
+  One shared session, each host's draft its own; building, opening,
+  expanding, choosing the Solar System tab or restoring a window
+  computes nothing; Update from Place and Time and Compute apply. No
+  Show on chart and no Centre on chart: no Mercury is drawn, and the
+  menu's "on the chart" items are unchanged.
+- **Words**: `mercurytable.*`, `menu.mercury.*` and
+  `solarsystem.mercury` in both languages - *Merkur*, *Solen*, *Ø*/*V*,
+  *Elongasjon fra Solen* as the released tables say them; the phase
+  words are Venus's, word for word, held equal by `MercuryTableTest`.
+  The access letter is R in both languages (`MenuMnemonicTest`). The
+  time note states the measured after-2027 cost: below 15″ through
+  2100 (the ruled after-interval target, the service measured at
+  11.9″).
+- **Evidence**: `MercuryTableTest` (the named cases in both languages
+  - the 2026 greatest eastern elongation, the 2019 transit, the 2026
+  superior conjunction - the range through the 2026 inferior
+  conjunction with the side changing once and its refusals, the
+  date-line observer, two hosts over one session, no chart layer); the
+  Controller journey, the menu order and the menu help in both
+  languages; the packaged journey *mercury table OK*; the Mercury table
+  photographed in both languages (`mercurytable-*`, a registered
+  photographer, Venus's twin), and the menu and Controller sheets
+  retaken with Mercury in them. The Sun's, the Moon's, Venus's and
+  Jupiter's tables are unchanged: their tests and sheets stand.

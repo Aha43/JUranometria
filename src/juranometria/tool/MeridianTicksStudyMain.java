@@ -261,6 +261,8 @@ public final class MeridianTicksStudyMain {
                 case SolarSystemService.SunObservation s -> s.astrometricJ2000();
                 case SolarSystemService.MoonObservation m -> m.astrometricJ2000();
                 case juranometria.solar.VenusService.VenusObservation v -> v.astrometricJ2000();
+                // Mercury (#530) is in the family but not drawn: not in the loop above.
+                case juranometria.solar.MercuryService.MercuryObservation mc -> mc.astrometricJ2000();
             };
             String name = body.name().toLowerCase(Locale.ROOT);
             ChartComponent[] chart = new ChartComponent[1];

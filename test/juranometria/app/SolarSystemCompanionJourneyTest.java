@@ -109,9 +109,26 @@ class SolarSystemCompanionJourneyTest {
                             headings.add(c.getName());
                         }
                     }
-                    assertEquals(List.of("heading.solarsystem.sun", "heading.solarsystem.venus",
-                            "heading.solarsystem.moon", "heading.solarsystem.jupiter"), headings,
+                    assertEquals(List.of("heading.solarsystem.sun", "heading.solarsystem.mercury",
+                            "heading.solarsystem.venus", "heading.solarsystem.moon",
+                            "heading.solarsystem.jupiter"), headings,
                             "outward from the Sun, the bodies the atlas has");
+                    // Mercury (#530): between the Sun and Venus, introduced
+                    // collapsed; opened, it has computed nothing; no Show on
+                    // chart and no Centre on chart, since nothing of Mercury
+                    // is drawn.
+                    AbstractButton mercuryHeading = (AbstractButton) named(content,
+                            "heading.solarsystem.mercury");
+                    assertFalse(mercuryHeading.isSelected(), "Mercury introduced collapsed");
+                    reveal(mercuryHeading);
+                    ReaderInput.click(mercuryHeading);
+                    drain();
+                    assertTrue(mercuryHeading.isSelected(), "Mercury opened");
+                    assertNull(find(content, "mercuryCard"), "Mercury, opened, has computed nothing");
+                    assertNull(find(content, "mercuryTable"));
+                    assertNotNull(find(content, "mercuryCompute"), "but its controls are there");
+                    assertNull(find(content, "mercuryOnChart"), "no Show on chart: nothing drawn");
+                    assertNull(find(content, "mercuryCentreOnChart"), "and no Centre on chart");
                     assertFalse(venusHeading.isSelected(), "Venus introduced collapsed");
                     reveal(venusHeading);
                     ReaderInput.click(venusHeading);
@@ -246,7 +263,8 @@ class SolarSystemCompanionJourneyTest {
                     }
                     assertEquals(List.of("Sun on the chart", "Venus on the chart",
                             "Moon on the chart", "Jupiter and moons on the chart", "—",
-                            "Sun...", "Venus...", "Moon...", "Jupiter..."), order);
+                            "Sun...", "Mercury...", "Venus...", "Moon...", "Jupiter..."), order,
+                            "the tables outward from the Sun; no Mercury on the chart (#530)");
 
                     // The window's own focus traversal reaches the group: the
                     // chosen view (its sibling is reached by the arrow keys,

@@ -7,6 +7,16 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Mercury in the Solar System tables (#530).** View > Solar System >
+Mercury... and the Controller's Mercury group, between the Sun and
+Venus, show where Mercury is for an instant or over a range in the
+Sun's, the Moon's and Venus's table family: position, altitude and
+azimuth, distance, the solid body's apparent diameter, the illuminated
+fraction, the phase in the words Venus uses, the elongation with its
+side of the Sun, and the lit side - in English and Norwegian. Opening,
+expanding or restoring computes nothing. Nothing of Mercury is drawn on
+the chart yet.
+
 **Mercury, computed (#529).** The planets pack is version 2: Mercury's
 DE440 excerpt joins Venus's in a file of its own, Venus's file byte for
 byte as 5.2.0 shipped it, and the notice names both. `MercuryService`
