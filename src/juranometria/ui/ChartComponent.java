@@ -48,8 +48,9 @@ public final class ChartComponent extends JComponent {
     /** The lead identity, wearing the cross vocabulary's treatment. */
     private String highlighted;
     /**
-     * The reader's transient emphasis (issue #361): at most one
-     * semantic structure raised in ink. Presentation context beside
+     * The reader's transient emphasis (issue #361): the semantic
+     * structures raised in ink - since #526 the Solar System labels as
+     * one class among them. Presentation context beside
      * the options, never inside them and never persisted - it
      * survives panning and zooming and dies with the session. It is
      * cleared the moment its structure stops being available, so no
@@ -539,6 +540,15 @@ public final class ChartComponent extends JComponent {
                             && policy.boundariesDrawn();
             case CONSTELLATION_FIGURES ->
                     drawn.constellationFigures() && policy.figuresDrawn();
+            // The label class (#526) is choosable while some module
+            // contributes a body or a satellite - the bodies layer's own
+            // classification, so a later planet joins by contributing.
+            case SOLAR_SYSTEM_LABELS -> overlays.collect().stream().anyMatch(owned ->
+                    owned.geometry() instanceof juranometria.module.OverlayContribution.Body
+                            || owned.geometry()
+                                    instanceof juranometria.module.OverlayContribution.OblateBody
+                            || owned.geometry()
+                                    instanceof juranometria.module.OverlayContribution.Satellite);
             default -> overlays.collect().stream().anyMatch(owned ->
                     juranometria.render.ChartStructure
                             .ofIdentity(owned.geometry().identity())
@@ -644,7 +654,9 @@ public final class ChartComponent extends JComponent {
                                 ReferenceInk.referenceBoxes(page, offered,
                                         words, reserved,
                                         juranometria.render.ChartStructure
-                                                .membersOf(emphasized)));
+                                                .membersOf(emphasized)),
+                                juranometria.render.ChartStructure
+                                        .membersOf(emphasized));
                     },
                     null, emphasized);
             // A paint that drew other bodies, or the same for another

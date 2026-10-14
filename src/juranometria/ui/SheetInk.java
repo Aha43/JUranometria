@@ -69,6 +69,17 @@ public final class SheetInk {
      * same layer the screen paints, on white paper's ground.
      */
     public static ChartRenderer.ReferenceLayer bodies(ChartComponent chart) {
+        return bodies(chart, null);
+    }
+
+    /**
+     * The same, with the reader's explicitly exported emphasis (#526):
+     * the Solar System labels in the deep red on paper exactly when the
+     * class is among the exported set, so screen and sheet agree.
+     * {@code null} is the canonical layer by the same path.
+     */
+    public static ChartRenderer.ReferenceLayer bodies(ChartComponent chart,
+            java.util.Set<juranometria.render.ChartStructure> emphasized) {
         if (chart == null) {
             throw new IllegalArgumentException("a chart is required");
         }
@@ -77,9 +88,11 @@ public final class SheetInk {
                     juranometria.project.DrawnPage.of(scene);
             java.util.List<juranometria.module.OverlayRegistry.Owned> offered =
                     chart.overlays().collect();
+            java.util.function.Predicate<juranometria.render.ChartStructure> raised =
+                    juranometria.render.ChartStructure.membersOf(emphasized);
             ReferenceInk.paintBodies(g, page, offered, ChartPalette.WHITE_PAPER,
                     chart.words(), reserved, ReferenceInk.referenceBoxes(page,
-                            offered, chart.words(), reserved, structure -> false));
+                            offered, chart.words(), reserved, raised), raised);
         };
     }
 

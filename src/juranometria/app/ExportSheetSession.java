@@ -190,8 +190,9 @@ public final class ExportSheetSession {
                 SheetInk.reference(chart, emphasized),
                 // The Sun and the Moon the screen carries (#418,
                 // correcting #415, which drew them on the screen and
-                // left them off the paper).
-                SheetInk.bodies(chart),
+                // left them off the paper) - their labels in the deep red
+                // when the exported set raises the class (#526).
+                SheetInk.bodies(chart, emphasized),
                 request.workingSelection()
                         ? SheetInk.working(chart, working.members(),
                                 working.lead(), options.options())

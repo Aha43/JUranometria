@@ -109,7 +109,10 @@ class CombinedEmphasisTest {
                         page.name() + " on " + ground.storedAs()
                                 + ": no target and the empty set are"
                                 + " the same canonical page");
-                for (ChartStructure target : ChartStructure.values()) {
+                // The six line structures: the #361 migration proof. The
+                // label class (#526) has no released one-target route to
+                // agree with and is held by its own contract.
+                for (ChartStructure target : ChartStructure.lineStructures()) {
                     BufferedImage one = viaOneTarget(scene, options,
                             modules, target);
                     BufferedImage set = viaSet(scene, options, modules,
@@ -125,8 +128,8 @@ class CombinedEmphasisTest {
                 }
             }
         }
-        assertEquals(java.util.EnumSet.allOf(ChartStructure.class), inked,
-                "every structure must actually change the page somewhere,"
+        assertEquals(java.util.EnumSet.copyOf(ChartStructure.lineStructures()), inked,
+                "every line structure must actually change the page somewhere,"
                         + " or its agreement proves nothing");
     }
 

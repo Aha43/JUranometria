@@ -206,3 +206,55 @@ JVM and must agree to the byte: every singleton page with the
 module structures contributing, and every singleton export in SVG,
 PDF and PNG. The two routes are shaped independently, and each
 contract was proved able to fail by breaking one route at a time.
+
+## The Solar System labels as one class (#526)
+
+A reader may raise the labels of every drawn Solar System body as one
+class - the Sun's, the Moon's, every drawn planet's, the Galilean
+moons' when their names are drawn - with one choice, **Solar System
+labels** / **Solsystemetiketter**, the seventh row of the Emphasis
+menu, after the six line structures.
+
+- **The seam.** `ChartStructure.SOLAR_SYSTEM_LABELS` joins the enum and
+  the raised set; the six line structures are listed apart as
+  `ChartStructure.lineStructures()`, which the frozen-palette study and
+  the line contracts walk, so their matrix, tables and promoted pages
+  are unchanged. The bodies layer (`ReferenceInk.paintBodies`) takes
+  the raised set and asks `StructureStyle.labelInk` for its names'
+  ink; the classification is the layer's own - a contributed body,
+  oblate body or satellite - so a later planet and its drawn
+  satellites join by contributing, and no list is kept in a menu.
+- **The ink, and nothing else.** While the class is raised every name
+  the bodies layer writes is in the atlas's existing deep red - the
+  meridian's frozen accent, `#a42e2e` on white paper and `#e8907e` on
+  the black sky, measured on both grounds by the #361 study - colour
+  only, a label having no stroke to gain. Marks, discs, phase geometry,
+  state marks and every other ink keep their colours and rules; a name
+  the placement refuses is not forced; a name below the drawn horizon
+  is quieted towards the ground exactly as the text ink is; the
+  placement order and the placements themselves are the canonical
+  page's, held by contract: every changed pixel lies inside a placed
+  name's box.
+- **Availability and settling.** The class is choosable while some
+  module contributes a body or a satellite to the page, and leaves the
+  set the moment none does - the same rule the line structures follow.
+  Off by default; transient, never persisted, exactly as the six are:
+  the ruling's "persisted exactly like the existing emphasis choices"
+  is read as that same lifecycle, since none of them is persisted.
+- **One authority.** The raised set on the chart component is read by
+  the toolbar's Emphasis menu, the view report (`emphasis:
+  solar-system-labels`) and, through #525, the Controller's checkboxes;
+  the atlas has no View-menu emphasis items, so the menu the ruling
+  names is the toolbar's.
+- **The export.** A checked export carries the token
+  `solar-system-labels` in the enum-ordered join and writes the names
+  in the same deep red on paper, so screen and sheet agree.
+- **Evidence.** `SolarSystemLabelsEmphasisTest` (the wide page with the
+  Sun, the Moon and Venus under the horizon on both grounds and in
+  Norwegian; the quieted below-horizon name; Jupiter's and its moons'
+  names at 1°; the refused name at the 2012 transit; availability,
+  independence and the menu's words; the export's token and ink), the
+  packaged journey *solar system labels OK*, and
+  `docs/studies/solar-system-labels/` (`make solar-system-labels-study`):
+  production pages canonical and raised side by side, the changed
+  pixels counted inside the names' boxes in its platform record.

@@ -96,7 +96,7 @@ public final class EmphasisStudyMain {
                             ChartStructure.ECLIPTIC),
                     java.util.Set.of(ChartStructure.MERIDIAN,
                             ChartStructure.HORIZON),
-                    java.util.EnumSet.allOf(ChartStructure.class));
+                    java.util.EnumSet.copyOf(ChartStructure.lineStructures()));
 
     /** A combination drawn for visual evidence, on one page and ground. */
     private record Reviewed(Page page, ChartPalette ground,
@@ -145,7 +145,7 @@ public final class EmphasisStudyMain {
                 BufferedImage canonical = painted(scene, options,
                         java.util.Set.<ChartStructure>of());
                 write(canonical, page.name() + "-" + g + "-canonical");
-                for (ChartStructure structure : ChartStructure.values()) {
+                for (ChartStructure structure : ChartStructure.lineStructures()) {
                     BufferedImage emphasized =
                             painted(scene, options, structure);
                     String stem = page.name() + "-" + g + "-"
@@ -229,7 +229,7 @@ public final class EmphasisStudyMain {
     private static String comboStem(
             java.util.Set<ChartStructure> combination) {
         StringBuilder stem = new StringBuilder();
-        for (ChartStructure structure : ChartStructure.values()) {
+        for (ChartStructure structure : ChartStructure.lineStructures()) {
             if (combination.contains(structure)) {
                 if (stem.length() > 0) {
                     stem.append('+');
@@ -249,7 +249,7 @@ public final class EmphasisStudyMain {
         Vision worst = Vision.PROTANOPIA;
         double least = Double.MAX_VALUE;
         List<ChartStructure> active = new java.util.ArrayList<>();
-        for (ChartStructure structure : ChartStructure.values()) {
+        for (ChartStructure structure : ChartStructure.lineStructures()) {
             if (combination.contains(structure)) {
                 active.add(structure);
             }
@@ -402,7 +402,7 @@ public final class EmphasisStudyMain {
                     + " ink | vs canonical | protan | deutan | tritan |"
                     + " limiting |");
             said.println("|---|---|---|---|---|---|---|---|---|");
-            for (ChartStructure structure : ChartStructure.values()) {
+            for (ChartStructure structure : ChartStructure.lineStructures()) {
                 Color accent = accent(ground, structure);
                 Color ink = canonicalInk(ground, structure);
                 StringBuilder row = new StringBuilder();
@@ -426,7 +426,7 @@ public final class EmphasisStudyMain {
             said.println();
             said.println("Monochrome separation (luminance-only"
                     + " distance accent to canonical ink):");
-            for (ChartStructure structure : ChartStructure.values()) {
+            for (ChartStructure structure : ChartStructure.lineStructures()) {
                 Color accent = accent(ground, structure);
                 Color ink = canonicalInk(ground, structure);
                 said.println(String.format(Locale.ROOT,
@@ -454,11 +454,11 @@ public final class EmphasisStudyMain {
         said.println();
         said.println("Accent pairs (distance raw, then under the"
                 + " pair's own limiting simulation):");
-        ChartStructure[] all = ChartStructure.values();
-        for (int i = 0; i < all.length; i++) {
-            for (int j = i + 1; j < all.length; j++) {
-                Color one = accent(ground, all[i]);
-                Color other = accent(ground, all[j]);
+        List<ChartStructure> all = ChartStructure.lineStructures();
+        for (int i = 0; i < all.size(); i++) {
+            for (int j = i + 1; j < all.size(); j++) {
+                Color one = accent(ground, all.get(i));
+                Color other = accent(ground, all.get(j));
                 Vision worst = Vision.PROTANOPIA;
                 double least = Double.MAX_VALUE;
                 for (Vision vision : List.of(Vision.PROTANOPIA,
@@ -472,7 +472,7 @@ public final class EmphasisStudyMain {
                 }
                 said.println(String.format(Locale.ROOT,
                         "- %s / %s: %.1f, %.1f under %s",
-                        all[i], all[j], distance(one, other), least,
+                        all.get(i), all.get(j), distance(one, other), least,
                         worst));
             }
         }
@@ -510,7 +510,7 @@ public final class EmphasisStudyMain {
                 ChartStructure firstOf = null;
                 ChartStructure secondOf = null;
                 List<ChartStructure> active = new java.util.ArrayList<>();
-                for (ChartStructure structure : ChartStructure.values()) {
+                for (ChartStructure structure : ChartStructure.lineStructures()) {
                     if (combination.contains(structure)) {
                         active.add(structure);
                     }
