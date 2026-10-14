@@ -1,0 +1,182 @@
+# JPL Horizons response, kept whole (#528)
+# request-url: https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%2710%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27500%40399%27&COORD_TYPE=%27GEODETIC%27&QUANTITIES=%271%2C2%2C4%2C20%27&EXTRA_PREC=%27YES%27&ANG_FORMAT=%27DEG%27&APPARENT=%27AIRLESS%27&CSV_FORMAT=%27YES%27&TIME_DIGITS=%27SECONDS%27&TLIST=%272012-03-05%2009%3A00%3A00%27%20%272012-04-18%2017%3A00%3A00%27%20%272012-07-01%2002%3A00%3A00%27%20%272012-08-16%2012%3A00%3A00%27%20%272012-10-26%2022%3A00%3A00%27%20%272012-12-04%2023%3A00%3A00%27%20%272012-12-12%2000%3A44%3A00%27%20%272026-02-18%2023%3A03%3A00%27%20%272026-02-19%2018%3A00%3A00%27%20%272026-04-03%2023%3A00%3A00%27%20%272026-06-15%2020%3A00%3A00%27%20%272026-08-02%2008%3A00%3A00%27%20%272026-10-12%2010%3A00%3A00%27%20%272026-11-20%2023%3A00%3A00%27%20%272100-01-23%2016%3A00%3A00%27%20%272100-03-05%2023%3A00%3A00%27%20%272100-05-16%2016%3A00%3A00%27%20%272100-07-04%2006%3A00%3A00%27%20%272100-09-13%2016%3A00%3A00%27%20%272100-10-24%2020%3A00%3A00%27&TLIST_TYPE=%27CAL%27
+# requested-utc: 2026-10-13T20:36:49Z
+# body-sha256: c6f3b2e8dfe425ec215cf46bdad63c021f5feb66217a542ae6a291ff071e1030
+# body-bytes: 11748
+# complete: True
+API VERSION: 1.2
+API SOURCE: NASA/JPL Horizons API
+
+*******************************************************************************
+ Revised: July 31, 2013                  Sun                                 10
+
+ PHYSICAL PROPERTIES (updated 2024-Oct-30):
+  GM, km^3/s^2          = 132712440041.93938  Mass, 10^24 kg        = ~1988410
+  Vol. mean radius, km  = 695700              Volume, 10^12 km^3    = 1412000
+  Solar radius (IAU2015)= 695700 km           Mean density, g/cm^3  = 1.408
+  Radius (photosphere)  = 696500 km           Angular diam at 1 AU  = 1919.3"
+  Photosphere temp., K  = 6600 (bottom)       Photosphere temp., K  = 4400(top)
+  Photospheric depth    = ~500 km             Chromospheric depth   = ~2500 km
+  Flatness, f           = 0.00005             Adopted sid. rot. per.= 25.38 d
+  Surface gravity       =  274.0 m/s^2        Escape speed, km/s    =  617.7
+  Pole (RA,DEC), deg.   = (286.13, 63.87)     Obliquity to ecliptic = 7.25 deg.
+  Solar constant (1 AU) = 1367.6 W/m^2        Luminosity, 10^24 J/s = 382.8
+  Mass-energy conv rate = 4.260 x 10^9 kg/s   Effective temp, K     = 5772
+  Sunspot cycle         = 11.4 yr             Cycle 24 sunspot min. = 2008 A.D.
+
+  Motion relative to nearby stars = apex : R.A.= 271 deg.; DEC.= +30 deg.
+                                    speed: 19.4 km/s (0.0112 au/day)
+  Motion relative to 2.73K BB/CBR = apex : l= 264.7 +- 0.8; b= 48.2 +- 0.5 deg.
+                                    speed: 369 +-11 km/s
+*******************************************************************************
+
+
+*******************************************************************************
+Ephemeris / API_USER Tue Oct 13 13:36:50 2026 Pasadena, USA      / Horizons    
+*******************************************************************************
+Target body name: Sun (10)                        {source: DE441}
+Center body name: Earth (399)                     {source: DE441}
+Center-site name: GEOCENTRIC
+*******************************************************************************
+Start time      : A.D. 2012-Mar-05 09:00:00.0000 UT      
+Stop  time      : A.D. 2100-Oct-24 20:00:00.0000 UT      
+Step-size       : 0 steps
+*******************************************************************************
+Target pole/equ : IAU_SUN                         {East-longitude positive}
+Target radii    : 695700.0, 695700.0, 695700.0 km {Equator_a, b, pole_c}       
+Center geodetic : 0.0, 0.0, -6378.137             {E-lon(deg),Lat(deg),Alt(km)}
+Center cylindric: 0.0, 0.0, 0.0                   {E-lon(deg),Dxy(km),Dz(km)}
+Center pole/equ : ITRF93                          {East-longitude positive}
+Center radii    : 6378.137, 6378.137, 6356.752 km {Equator_a, b, pole_c}       
+Target primary  : Sun
+Vis. interferer : MOON (R_eq= 1737.400) km        {source: DE441}
+Rel. light bend : Sun                             {source: DE441}
+Rel. lght bnd GM: 1.3271E+11 km^3/s^2                                          
+Atmos refraction: NO (AIRLESS)
+RA format       : DEG
+Time format     : CAL 
+Calendar mode   : Mixed Julian/Gregorian
+EOP file        : eop.261012.p270108                                           
+EOP coverage    : DATA-BASED 1962-JAN-20 TO 2026-OCT-12. PREDICTS-> 2027-JAN-07
+Units conversion: 1 au= 149597870.700 km, c= 299792.458 km/s, 1 day= 86400.0 s 
+Table cut-offs 1: Elevation (-90.0deg=NO ),Airmass (>38.000=NO), Daylight (NO )
+Table cut-offs 2: Solar elongation (  0.0,180.0=NO ),Local Hour Angle( 0.0=NO )
+Table cut-offs 3: RA/DEC angular rate (     0.0=NO )                           
+Table format    : Comma Separated Values (spreadsheet)
+**************************************************************************************************************************************************************
+ Date__(UT)__HR:MN:SC.fff, , , R.A.___(ICRF), DEC____(ICRF),  R.A.__(a-app), DEC___(a-app), Azimuth_(a-app), Elevation_(a-app),             delta,     deldot,
+**************************************************************************************************************************************************************
+$$SOE
+ 2012-Mar-05 09:00:00.000, , , 346.211347924,  -5.899430087,  346.368016457,  -5.833781986,            n.a.,              n.a.,  0.99192956433325,  0.4323485,
+ 2012-Apr-18 17:00:00.000, , ,  26.847280530,  11.077470493,   27.009630441,  11.137577441,            n.a.,              n.a.,  1.00434029271165,  0.4840810,
+ 2012-Jul-01 02:00:00.000, , , 100.313143600,  23.098910304,  100.501006610,  23.085146674,            n.a.,              n.a.,  1.01664815002811,  0.0231303,
+ 2012-Aug-16 12:00:00.000, , , 146.160225139,  13.572232138,  146.330116475,  13.513490829,            n.a.,              n.a.,  1.01254053436445, -0.3235059,
+ 2012-Oct-26 22:00:00.000, , , 211.478197373, -12.754920471,  211.649196401, -12.814354994,            n.a.,              n.a.,  0.99380306182018, -0.4718826,
+ 2012-Dec-04 23:00:00.000, , , 251.604766678, -22.360706792,  251.796548652, -22.381549241,            n.a.,              n.a.,  0.98544012168299, -0.2369927,
+ 2012-Dec-12 00:44:00.000, , , 259.356148649, -23.076783450,  259.550133000, -23.088209366,            n.a.,              n.a.,  0.98458009056321, -0.1878819,
+ 2026-Feb-18 23:03:00.000, , , 332.032311516, -11.491419271,  332.377702607, -11.365204219,            n.a.,              n.a.,  0.98850294263679,  0.3589633,
+ 2026-Feb-19 18:00:00.000, , , 332.792555000, -11.210624119,  333.137264980, -11.083501628,            n.a.,              n.a.,  0.98866728762706,  0.3618184,
+ 2026-Apr-03 23:00:00.000, , ,  12.728172609,   5.455125701,   13.063702520,   5.596575963,            n.a.,              n.a.,  0.99993753980434,  0.5000648,
+ 2026-Jun-15 20:00:00.000, , ,  83.862105241,  23.315978866,   84.260247590,  23.333138601,            n.a.,              n.a.,  1.01578363949032,  0.1564221,
+ 2026-Aug-02 08:00:00.000, , , 132.136715377,  17.820122542,  132.509820003,  17.722925326,            n.a.,              n.a.,  1.01480139027992, -0.2145336,
+ 2026-Oct-12 10:00:00.000, , , 197.278729841,  -7.336431413,  197.624100614,  -7.478000963,            n.a.,              n.a.,  0.99810673596295, -0.4972353,
+ 2026-Nov-20 23:00:00.000, , , 236.018214499, -19.770559736,  236.403487528, -19.854727325,            n.a.,              n.a.,  0.98801037630111, -0.3585922,
+ 2100-Jan-23 16:00:00.000, , , 304.569177209, -19.636068870,  306.008069579, -19.317318783,            n.a.,              n.a.,  0.98419504104674,  0.1568972,
+ 2100-Mar-05 23:00:00.000, , , 345.295663925,  -6.277695259,  346.589872704,  -5.739130568,            n.a.,              n.a.,  0.99168095480965,  0.4432722,
+ 2100-May-16 16:00:00.000, , ,  52.148090364,  18.886046546,   53.583072378,  19.224128497,            n.a.,              n.a.,  1.01085321799432,  0.3616837,
+ 2100-Jul-04 06:00:00.000, , , 101.977925350,  22.969878889,  103.492457459,  22.849084239,            n.a.,              n.a.,  1.01668513312563,  0.0249343,
+ 2100-Sep-13 16:00:00.000, , , 170.419037573,   4.125975927,  171.712186280,   3.574091094,            n.a.,              n.a.,  1.00641056492892, -0.4651712,
+ 2100-Oct-24 20:00:00.000, , , 207.995925763, -11.495028132,  209.339501255, -11.987085740,            n.a.,              n.a.,  0.99487875231926, -0.4640429,
+$$EOE
+**************************************************************************************************************************************************************
+Column meaning:
+ 
+TIME
+
+  Times PRIOR to 1962 are UT1, a mean-solar time closely related to the
+prior but now-deprecated GMT. Times AFTER 1962 are in UTC, the current
+civil or "wall-clock" time-scale. UTC is kept within 0.9 seconds of UT1
+using integer leap-seconds for 1972 and later years.
+
+  Conversion from the internal Barycentric Dynamical Time (TDB) of solar
+system dynamics to the non-uniform civil UT time-scale requested for output
+has not been determined for UTC times after the next July or January 1st.
+Therefore, the last known leap-second is used as a constant over future
+intervals.
+
+  Time tags refer to the UT time-scale conversion from TDB on Earth
+regardless of observer location within the solar system, although clock
+rates may differ due to the local gravity field and no analog to "UT"
+may be defined for that location.
+
+  Any 'b' symbol in the 1st-column denotes a B.C. date. First-column blank
+(" ") denotes an A.D. date.
+ 
+CALENDAR SYSTEM
+
+  Mixed calendar mode was active such that calendar dates after AD 1582-Oct-15
+(if any) are in the modern Gregorian system. Dates prior to 1582-Oct-5 (if any)
+are in the Julian calendar system, which is automatically extended for dates
+prior to its adoption on 45-Jan-1 BC.  The Julian calendar is useful for
+matching historical dates. The Gregorian calendar more accurately corresponds
+to the Earth's orbital motion and seasons. A "Gregorian-only" calendar mode is
+available if such physical events are the primary interest.
+
+  NOTE: "n.a." in output means quantity "not available" at the print-time.
+ 
+ 'R.A.___(ICRF), DEC____(ICRF),' =
+  Astrometric right ascension and declination of the target center with
+respect to the observing site (coordinate origin) in the reference frame of
+the planetary ephemeris (ICRF). Compensated for down-leg light-time delay
+aberration.
+
+  Units: RA  in decimal degrees,  ddd.fffff{ffff}
+         DEC in decimal degrees,  sdd.fffff{ffff}
+ 
+ 'R.A.__(a-app), DEC___(a-app),' =
+  Airless apparent right ascension and declination of the target center
+with respect to an instantaneous reference frame defined by the Earth equator
+of-date (z-axis) and meridian containing the Earth equinox of-date (x-axis,
+EOP-corrected IAU76/80). Compensated for down-leg light-time delay,
+gravitational deflection of light, stellar aberration, precession & nutation.
+Note: equinox (RA origin) is offset -53 mas from the of-date frame defined by
+the IAU06/00a P & N system.
+
+  Units: RA  in decimal degrees, ddd.fffff{ffff}
+         DEC in decimal degrees  sdd.fffff{ffff}
+
+ 
+ 'Azimuth_(a-app), Elevation_(a-app),' =
+  Airless apparent azimuth and elevation of target center. Compensated
+for light-time, the gravitational deflection of light, stellar aberration,
+precession and nutation. Azimuth is measured clockwise from north:
+
+  North(0) -> East(90) -> South(180) -> West(270) -> North (360)
+
+Elevation angle is with respect to a plane perpendicular to the reference
+surface local zenith direction. TOPOCENTRIC ONLY.  Units: DEGREES
+ 
+ 'delta,     deldot,' =
+   Apparent range ("delta", light-time aberrated) and range-rate ("delta-dot")
+of the target center relative to the observer. A positive "deldot" means the
+target center is moving away from the observer, negative indicates movement
+toward the observer.  Units: AU and KM/S
+
+Computations by ...
+
+    Solar System Dynamics Group, Horizons On-Line Ephemeris System
+    4800 Oak Grove Drive, Jet Propulsion Laboratory
+    Pasadena, CA  91109   USA
+
+    General site: https://ssd.jpl.nasa.gov/
+    Mailing list: https://ssd.jpl.nasa.gov/email_list.html
+    System news : https://ssd.jpl.nasa.gov/horizons/news.html
+    User Guide  : https://ssd.jpl.nasa.gov/horizons/manual.html
+    Connect     : browser        https://ssd.jpl.nasa.gov/horizons/app.html#/x
+                  API            https://ssd-api.jpl.nasa.gov/doc/horizons.html
+                  command-line   telnet ssd.jpl.nasa.gov 6775
+                  e-mail/batch   https://ssd.jpl.nasa.gov/ftp/ssd/horizons_batch.txt
+                  scripts        https://ssd.jpl.nasa.gov/ftp/ssd/SCRIPTS
+    Inquiries   : Jon.D.Giorgini@jpl.nasa.gov
+
+**************************************************************************************************************************************************************

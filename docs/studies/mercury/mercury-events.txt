@@ -1,0 +1,90 @@
+# Mercury named cases (#528): conjunctions, greatest elongations and lunar occultations, quoted rows
+#
+# Source: Fred Espenak, Sky Event Almanacs, GMT editions
+#   "Sky Event Almanacs Courtesy of Fred Espenak, www.AstroPixels.com"
+#   https://astropixels.com/almanac/almanac01/almanac2012gmt.html  sha256 251a85e49504212df9391af58daec07b72f4fee86c77fe22b443e44c1018b307  36080 B
+#   https://astropixels.com/almanac/almanac21/almanac2026gmt.html  sha256 4236c51d23297c270a42a3cb7a17c82881c1e5020de06b890594a1f40d80ce17  37476 B
+#   https://astropixels.com/almanac/almanac81/almanac2100gmt.html  sha256 1178bd6d049593e5a3f40a94e6dbdf4210637587b09a25c3972b4d79b81aecd6  37241 B
+#   retrieved 2026-10-11T01:22Z (the #500 copies, re-read 2026-10-13); times are UTC to the hour as published, occultations to the minute.
+# Used for named-case timing only; JPL Horizons remains the numerical
+# comparison authority. Not a runtime or build input. The lunar
+# occultations are Moon-Mercury instants, kept for a cross-check of both
+# bodies' apparent places; they anchor no dense window.
+#
+# name	instant (UTC, to the hour)	published row
+2012-superior-conjunction-1	2012-02-07T09:00Z	Feb 07 09 Mercury at Superior Conjunction
+2012-greatest-elongation-east-1	2012-03-05T09:00Z	Mar 05 09 Mercury at Greatest Elong: 18.2°E
+2012-inferior-conjunction-1	2012-03-21T19:00Z	Mar 21 19 Mercury at Inferior Conjunction
+2012-greatest-elongation-west-1	2012-04-18T17:00Z	Apr 18 17 Mercury at Greatest Elong: 27.5°W
+2012-superior-conjunction-2	2012-05-27T11:00Z	May 27 11 Mercury at Superior Conjunction
+2012-greatest-elongation-east-2	2012-07-01T02:00Z	Jul 01 02 Mercury at Greatest Elong: 25.7°E
+2012-inferior-conjunction-2	2012-07-28T20:00Z	Jul 28 20 Mercury at Inferior Conjunction
+2012-greatest-elongation-west-2	2012-08-16T12:00Z	Aug 16 12 Mercury at Greatest Elong: 18.7°W
+2012-superior-conjunction-3	2012-09-10T13:00Z	Sep 10 13 Mercury at Superior Conjunction
+2012-greatest-elongation-east-3	2012-10-26T22:00Z	Oct 26 22 Mercury at Greatest Elong: 24.1°E
+2012-inferior-conjunction-3	2012-11-17T16:00Z	Nov 17 16 Mercury at Inferior Conjunction
+2012-greatest-elongation-west-3	2012-12-04T23:00Z	Dec 04 23 Mercury at Greatest Elong: 20.6°W
+2012-lunar-occultation-1	2012-12-12T00:44Z	Dec 12 00:44 Mercury 1.1°N of Moon: Occn.
+2026-superior-conjunction-1	2026-01-21T16:00Z	Jan 21 16 Mercury at Superior Conjunction
+2026-lunar-occultation-1	2026-02-18T23:03Z	Feb 18 23:03 Mercury 0.1°N of Moon: Occn.
+2026-greatest-elongation-east-1	2026-02-19T18:00Z	Feb 19 18 Mercury at Greatest Elong: 18.1°E
+2026-inferior-conjunction-1	2026-03-07T11:00Z	Mar 07 11 Mercury at Inferior Conjunction
+2026-greatest-elongation-west-1	2026-04-03T23:00Z	Apr 03 23 Mercury at Greatest Elong: 27.8°W
+2026-superior-conjunction-2	2026-05-14T14:00Z	May 14 14 Mercury at Superior Conjunction
+2026-greatest-elongation-east-2	2026-06-15T20:00Z	Jun 15 20 Mercury at Greatest Elong: 24.5°E
+2026-inferior-conjunction-2	2026-07-13T01:00Z	Jul 13 01 Mercury at Inferior Conjunction
+2026-greatest-elongation-west-2	2026-08-02T08:00Z	Aug 02 08 Mercury at Greatest Elong: 19.5°W
+2026-superior-conjunction-3	2026-08-27T17:00Z	Aug 27 17 Mercury at Superior Conjunction
+2026-greatest-elongation-east-3	2026-10-12T10:00Z	Oct 12 10 Mercury at Greatest Elong: 25.2°E
+2026-inferior-conjunction-3	2026-11-04T14:00Z	Nov 04 14 Mercury at Inferior Conjunction
+2026-greatest-elongation-west-3	2026-11-20T23:00Z	Nov 20 23 Mercury at Greatest Elong: 19.6°W
+2100-greatest-elongation-east-1	2100-01-23T16:00Z	Jan 23 16 Mercury at Greatest Elong: 18.6°E
+2100-inferior-conjunction-1	2100-02-08T04:00Z	Feb 08 04 Mercury at Inferior Conjunction
+2100-greatest-elongation-west-1	2100-03-05T23:00Z	Mar 05 23 Mercury at Greatest Elong: 27.2°W
+2100-superior-conjunction-1	2100-04-18T17:00Z	Apr 18 17 Mercury at Superior Conjunction
+2100-greatest-elongation-east-2	2100-05-16T16:00Z	May 16 16 Mercury at Greatest Elong: 21.9°E
+2100-inferior-conjunction-2	2100-06-10T05:00Z	Jun 10 05 Mercury at Inferior Conjunction
+2100-greatest-elongation-west-2	2100-07-04T06:00Z	Jul 04 06 Mercury at Greatest Elong: 21.7°W
+2100-superior-conjunction-2	2100-08-01T06:00Z	Aug 01 06 Mercury at Superior Conjunction
+2100-greatest-elongation-east-3	2100-09-13T16:00Z	Sep 13 16 Mercury at Greatest Elong: 26.8°E
+2100-inferior-conjunction-3	2100-10-09T07:00Z	Oct 09 07 Mercury at Inferior Conjunction
+2100-greatest-elongation-west-3	2100-10-24T20:00Z	Oct 24 20 Mercury at Greatest Elong: 18.3°W
+2100-superior-conjunction-3	2100-11-28T07:00Z	Nov 28 07 Mercury at Superior Conjunction
+#
+# Transits of Mercury, 1900-2100: Fred Espenak, "Seven Century Catalog of Mercury Transits: 1601 CE to 2300 CE",
+#   NASA/GSFC, https://eclipse.gsfc.nasa.gov/transit/catalog/MercuryCatalog.html
+#   sha256 e29ff3e1ada11eaee343032f0c5b927ccf9a9b2cacad8e006a2bd6b4fc71ba40  26830 B, retrieved 2026-10-13T20:30:23Z
+#   "Permission is freely granted to reproduce this data when accompanied by an acknowledgment:
+#    Transit Predictions by Fred Espenak, NASA/GSFC" - so acknowledged here; kept outside Git whole, not bundled.
+#   Columns as published: contacts I, II, greatest transit, III, IV (geocentric UT, h:m), minimum separation of
+#   the centres (arcseconds), the Sun's RA (h) and Dec (deg), GST at 00:00 UT (h), transit series. The instant
+#   quoted is greatest transit; a dash is a contact that does not occur (grazing).
+# name	instant (UTC, to the minute)	published row
+1907-transit	1907-11-14T12:07Z	1907 Nov 14 10:24 10:26 12:07 13:47 13:50 758.6 15.236 -18.01 3.496 2
+1914-transit	1914-11-07T12:03Z	1914 Nov 07 09:57 09:59 12:03 14:07 14:09 630.7 14.785 -16.12 3.056 8
+1924-transit	1924-05-08T01:41Z	1924 May 08 21:44 21:47 01:41 05:35 05:38 84.6 2.981 16.97 15.041 7
+1927-transit	1927-11-10T05:46Z	1927 Nov 10 03:02 03:04 05:46 08:27 08:29 128.7 14.958 -16.87 3.226 6
+1937-transit	1937-05-11T08:59Z	1937 May 11 08:53 - 08:59 - 09:06 955.5 3.187 17.81 15.248 5
+1940-transit	1940-11-11T23:21Z	1940 Nov 11 20:49 20:51 23:21 01:52 01:53 368.5 15.132 -17.59 3.396 4
+1953-transit	1953-11-14T16:54Z	1953 Nov 14 15:37 15:41 16:54 18:07 18:11 861.8 15.308 -18.28 3.566 2
+1957-transit	1957-05-06T01:14Z	1957 May 06 23:59 00:09 01:14 02:20 02:30 907.3 2.852 16.41 14.909 9
+1960-transit	1960-11-07T16:53Z	1960 Nov 07 14:34 14:36 16:53 19:10 19:12 527.9 14.855 -16.42 3.126 8
+1970-transit	1970-05-09T08:16Z	1970 May 09 04:19 04:22 08:16 12:10 12:13 114.1 3.056 17.28 15.115 7
+1973-transit	1973-11-10T10:32Z	1973 Nov 10 07:47 07:49 10:32 13:16 13:17 26.4 15.028 -17.17 3.296 6
+1986-transit	1986-11-13T04:07Z	1986 Nov 13 01:43 01:45 04:07 06:29 06:31 470.5 15.203 -17.87 3.466 4
+1993-transit	1993-11-06T03:57Z	1993 Nov 06 03:06 03:12 03:57 04:41 04:47 926.7 14.753 -15.97 3.025 10
+1999-transit	1999-11-15T21:41Z	1999 Nov 15 21:15 21:30 21:41 21:52 22:07 963.0 15.379 -18.54 3.635 2
+2003-transit	2003-05-07T07:52Z	2003 May 07 05:13 05:17 07:52 10:27 10:32 708.3 2.926 16.73 14.983 9
+2006-transit	2006-11-08T21:41Z	2006 Nov 08 19:12 19:14 21:41 00:08 00:10 422.9 14.925 -16.73 3.196 8
+2016-transit	2016-05-09T14:57Z	2016 May 09 11:12 11:15 14:57 18:39 18:42 318.5 3.130 17.58 15.190 7
+2019-transit	2019-11-11T15:20Z	2019 Nov 11 12:35 12:37 15:20 18:02 18:04 75.9 15.098 -17.45 3.366 6
+2032-transit	2032-11-13T08:54Z	2032 Nov 13 06:41 06:43 08:54 11:05 11:07 572.1 15.274 -18.14 3.535 4
+2039-transit	2039-11-07T08:46Z	2039 Nov 07 07:17 07:21 08:46 10:12 10:15 822.3 14.822 -16.27 3.095 10
+2049-transit	2049-05-07T14:24Z	2049 May 07 11:03 11:07 14:24 17:41 17:44 511.8 3.000 17.04 15.058 9
+2052-transit	2052-11-09T02:29Z	2052 Nov 09 23:53 23:55 02:29 05:04 05:06 318.7 14.996 -17.02 3.265 8
+2062-transit	2062-05-10T21:36Z	2062 May 10 18:16 18:20 21:36 00:53 00:57 520.5 3.206 17.88 15.265 7
+2065-transit	2065-11-11T20:06Z	2065 Nov 11 17:24 17:26 20:06 22:46 22:48 180.7 15.170 -17.73 3.435 6
+2078-transit	2078-11-14T13:41Z	2078 Nov 14 11:42 11:44 13:41 15:37 15:39 674.3 15.345 -18.41 3.605 4
+2085-transit	2085-11-07T13:34Z	2085 Nov 07 11:42 11:45 13:34 15:24 15:26 718.5 14.893 -16.58 3.165 10
+2095-transit	2095-05-08T21:05Z	2095 May 08 17:20 17:24 21:05 00:47 00:50 309.8 3.075 17.35 15.133 9
+2098-transit	2098-11-10T07:16Z	2098 Nov 10 04:35 04:37 07:16 09:56 09:57 214.7 15.066 -17.31 3.335 8
