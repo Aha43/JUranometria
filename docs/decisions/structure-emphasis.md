@@ -238,14 +238,16 @@ menu, after the six line structures.
 - **Availability and settling.** The class is choosable while some
   module contributes a body or a satellite to the page, and leaves the
   set the moment none does - the same rule the line structures follow.
-  Off by default; transient, never persisted, exactly as the six are:
-  the ruling's "persisted exactly like the existing emphasis choices"
-  is read as that same lifecycle, since none of them is persisted.
+  Off by default; transient, never persisted, exactly as the six are.
+  The owner ruled (2026-10-14): all seven Emphasis choices stay
+  transient and off at every application start; the established
+  lifecycle does not change in this issue.
 - **One authority.** The raised set on the chart component is read by
-  the toolbar's Emphasis menu, the view report (`emphasis:
-  solar-system-labels`) and, through #525, the Controller's checkboxes;
-  the atlas has no View-menu emphasis items, so the menu the ruling
-  names is the toolbar's.
+  the toolbar's Emphasis popup, the view report (`emphasis:
+  solar-system-labels`) and, through #525, the Controller's checkboxes.
+  "Menu" in #525 and #526 means that popup - the owner ruled
+  (2026-10-14) that there is no View-menu Emphasis submenu, and both
+  issues' wording was corrected to say so.
 - **The export.** A checked export carries the token
   `solar-system-labels` in the enum-ordered join and writes the names
   in the same deep red on paper, so screen and sheet agree.
