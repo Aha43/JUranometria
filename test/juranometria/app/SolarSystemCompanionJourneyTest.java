@@ -55,15 +55,18 @@ class SolarSystemCompanionJourneyTest {
                     drain();
                     // Since #507 the Solar System is the Controller's second
                     // tab, its groups standing on it with no outer group;
-                    // Chart Options is the Chart tab's third section.
+                    // Chart Options is the Chart tab's fourth section, after
+                    // Chart controls, Emphasis (#525) and Place and Time.
                     juranometria.ui.companion.CompanionTabs tabs = companion.tabs();
                     assertEquals(List.of(juranometria.ui.companion.CompanionTabs.CHART, "solarsystem"),
                             tabs.ids());
                     assertEquals(juranometria.ui.companion.CompanionTabs.CHART, tabs.chosen(),
                             "a fresh profile opens Chart");
                     List<CompanionSection> sections = companion.sections();
-                    assertEquals("section.chartoptions", sections.get(2).getName(),
-                            "Chart Options is the Chart tab's third section");
+                    assertEquals("section.emphasis", sections.get(1).getName(),
+                            "Emphasis is the Chart tab's second section (#525)");
+                    assertEquals("section.chartoptions", sections.get(3).getName(),
+                            "Chart Options is the Chart tab's fourth section");
                     JComponent content = tabs.content("solarsystem");
                     assertFalse(content.isShowing(), "not shown until its tab is chosen");
                     assertNull(find(companion.getContentPane(), "section.solarsystem"),
