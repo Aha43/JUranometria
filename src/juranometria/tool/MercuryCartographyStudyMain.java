@@ -700,6 +700,7 @@ public final class MercuryCartographyStudyMain {
             }
             MercuryObservation g = mercury.observeGeocentric(n.when());
             double sep = g.elongationDegrees() * 3600.0;
+            // The dot as it was drawn before #541: a sixth of the radius.
             double dot = g.sunAngularRadiusArcseconds() / 6.0;
             double markArcsecAt1 = MARK_PX / JovianCartographyStudyMain.pxPerArcsec(1.0, PAGE_W, PAGE_H) / 2.0;
             if (sep + markArcsecAt1 <= dot) {
@@ -711,18 +712,16 @@ public final class MercuryCartographyStudyMain {
                         .append(" (partly)");
             }
         }
-        p(String.format(Locale.ROOT, "**The Sun's centre dot meets central transits.** The"
-                + " production Sun is a ground-filled disc with its ring and a centre dot of a"
-                + " sixth of its radius - about 40 px on the 1° page, 160 px on the 0.25° page."
-                + " Of the 28 transits, at greatest transit (geocentric), Mercury's 1° mark stands"
-                + " wholly on that dot in %d and partly in %d (%s). There the dark mark is drawn"
-                + " in the dark side's tone on the dot's full ink - 30 %% of the way from the"
-                + " darker ink to the lighter - so it reads as a faint grey point"
-                + " (`transit-2019-1.png`). Below 1° the dot grows with the disc: at 0.25° the"
-                + " Sun's ring is off the page and the page is a black disc 320 px across with"
-                + " Mercury's grey disc on it and no name for either (`transit-2019-0.25.png`)."
-                + " Venus's 2012 transit stood outside the dot, which is why #514 did not meet"
-                + " this.", inside, partly, which));
+        p(String.format(Locale.ROOT, "**The Sun's centre dot met central transits; it is now"
+                + " capped.** The production Sun drew a centre dot of a sixth of its radius -"
+                + " about 40 px on the 1° page, 160 px on the 0.25° page. Of the 28 transits, at"
+                + " greatest transit (geocentric), Mercury's 1° mark stood wholly on that dot in"
+                + " %d and partly in %d (%s), its dark tone a faint grey on the dot's ink, and"
+                + " below 1° the dot filled the page. That finding is #539's, ruled on (ruling"
+                + " 2) and answered by #541: the dot is now capped at %.0f px, so these pages"
+                + " show the mark on the Sun's ground beside a small dot. Venus's 2012 transit"
+                + " stood outside the dot either way.", inside, partly, which,
+                ReferenceInk.SUN_DOT_MAX_RADIUS_PX));
         p("");
         p("A transit paints Mercury's dark mark (at 1°) or dark disc (at 0.25°) over the Sun's"
                 + " ground-filled ring - nearer, so later, the #514 rule for a symbol in front of"
