@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**586 promoted artifacts.**
+**621 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -393,6 +393,41 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/label-placement/orion-90-today.png` | `23589defba2b50018f3e4d7ae0656d5d004632970fbdcaa9b0eda666b49de4f4` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/label-placement/sagittarius-120-candidate.png` | `cb4d9661a353dcc4d277925840456d7209686ea592ba1d70713bed00b588db80` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/label-placement/sagittarius-120-today.png` | `63590ac511146e5223de2c853315c8e96ab1216fd9cbc99c40d27cf6ec440fe5` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/appearance-crescent-evening-1.png` | `867981e2a36efffcca503719bd0b8d2b764454729f2efe974406625c22add811` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/appearance-crescent-morning-1.png` | `fafcb2f554016d3801aee6266991458fc3e645d77c057445cbdc63ea7722f9ac` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/appearance-gibbous-evening-1.png` | `6934c08e7687d68c33e9d71dd77a008f67b2dcdd7f50e8680fc4e59a10ea7416` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/appearance-gibbous-morning-1.png` | `fd266f882c7215139b1b38bf0e8f905f037765c3c26f2ea8c639b86c09841019` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/below-horizon-mark-3.png` | `37b6bb82cea30c6f7ba60ac6c2afe6b23ab9b9c8585b113c45f1aac944779d97` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/closer-fields.png` | `f11f1343ba0211e1bcd64ae3863244e2e58a71f4675b64862010177db467ee5c` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/crowded-sagittarius-3.png` | `ba1a7bf06e70f407172e49edefc5a27adcd1dbfa4a8d674e71af2d11d1b544bc` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/elongation-mark-1.png` | `91fc9431486dc09593421cc1ac974ef35d6c559efc9d740b644c7a897604c78f` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/elongation-mark-3.png` | `bd315e6e8471ac6e3b51eaaa7c722efea82e35d9efb4ba9651cc714f2ec06d73` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/elongation-mark-8.png` | `c0cce9630fdcc7d33ec08d5a00fe4186c3c0750624caf0e6890f5c1a75042c1f` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/elongation-true-1.png` | `1314036b5dcbb0f4a4216347f70c581ec5d1aa6ef1eb8cd7b7ac2b3ab749e095` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/elongation-true-3.png` | `aace3f5489e06855cf3189b3ced54549973c4673f42c1d0bf0f0faf02a0cfd50` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/elongation-true-8.png` | `75d02b19a3b5a4fbd816fcf654111c430a9ccc1006bcfd23b672537c554df1d8` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/grazing-1937-0.25.png` | `1db22efaf1dea7594ebccd85ac1ff71d06c454cff094bcedbd0b30c2b2447288` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/grazing-1937-1.png` | `6092b193984eaabdec8f80534131da316b6cdbde500da5dbb02f38b36f4137c2` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/inferior-2026-1.png` | `962d320432d43fac577c17638bed217ea2ba2f014e6a92b793ef294d1bdc0fd1` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/mercury-crescent-0.25.png` | `71703a3b9b93316d3e478fff65315ea8a61b643e8b8bf648d8a2b57e7349c103` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/mercury-crescent-0.5.png` | `115653be96b1db70339b239a28ad374aad95fe28e5c0fab9b92f66a81160fb9c` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/mercury-crescent-1.png` | `c64c1edb70d876f1d3eadb0f140ddcd9cf8bb873b71d5148cea0114b0a050f85` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/mercury-elongation-0.25.png` | `5b2de0cb20b4916d6122f170a94b90236b10069ad237440477bf458e18da45b4` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/mercury-elongation-0.5.png` | `68a383c685d1c8a01d10a9f06f14647bdd93a681d5ec5b5038f9636ed4111b7c` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/mercury-elongation-1.png` | `91fc9431486dc09593421cc1ac974ef35d6c559efc9d740b644c7a897604c78f` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/mercury-gibbous-0.25.png` | `cac5c22d239cf698a8cd2606e5bce468442a7ec4592e2c85e5d878c56c9e4833` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/mercury-gibbous-0.5.png` | `4971f6ed320d790db3819f3e087b17742152113323a53680b71cec25c4ae9c7e` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/mercury-gibbous-1.png` | `6934c08e7687d68c33e9d71dd77a008f67b2dcdd7f50e8680fc4e59a10ea7416` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/printable-a4-1.png` | `61bb228840069919e51769b0ad2b890af5c237ced3269ceaf6b88b7186545726` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/superior-2026-1.png` | `da686364c9e1b89dd5bd431380beb9b16de277cfe058cc0131efa9f2c0b26539` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/transit-2019-0.25.png` | `8ef906430a132b991f00a716965255a1718097303810d53636d444c2130b95e8` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/transit-2019-1.png` | `9bebc155f856d74343ba15ca2d30e96e8f0506effa66d4aacf65445a85255d20` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/venus-crescent-0.25.png` | `1ce56c7e3946a62439ede3ee80b5926f790bcca48cf12ea9d6ad4c391013200b` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/venus-crescent-0.5.png` | `4c3fb99e3efb659309b8a3f01f0f655e72d7bfd4e032b2c7d916ab39687b8484` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/venus-crescent-1.png` | `1aaaae5982ad5166b4779710ae3325a150b1320bea24ff747024d794642db6e5` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/venus-elongation-0.25.png` | `814adacb240edbbf0c7429b3584e4625c516a07122ea28d51bbd94264ff77292` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/venus-elongation-0.5.png` | `fb9798ec106653efbd270656500c5b4142cb0af46c898d3e35e83d9b614fd61c` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-cartography/venus-elongation-1.png` | `cd340d6c83f668de3d904c542b798c94d791e4a1824887a8ca4b973c585dbb28` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/meridian-ticks/bodies-moon-120.png` | `09833652d42d9c72850b449acf6dca57ac7c4b398b0785c5060587dd84f82b53` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/meridian-ticks/bodies-sun-120.png` | `ff63340b106b683e8843426b2a0d6338d10284e1eb0f6dee0ed7e6944a791896` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/meridian-ticks/bodies-venus-120.png` | `8b2bc96cc6bb40abc4f36b1b6e252b0a2ac57240dd84ace5c0c365d5c72d1a40` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
