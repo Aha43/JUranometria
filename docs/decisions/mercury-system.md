@@ -647,3 +647,10 @@ refuses Mercury by name, since nothing of Mercury is drawn.
   photographer, Venus's twin), and the menu and Controller sheets
   retaken with Mercury in them. The Sun's, the Moon's, Venus's and
   Jupiter's tables are unchanged: their tests and sheets stand.
+
+## Handed over (#531)
+
+Part I of the road to 5.3.0 closed on 2026-10-15 at main `0ae4afa0`.
+The handover to cartography - what is settled, what was measured and
+why, every stopped or incomplete run, what moved, and what Part II
+must decide - is `mercury-handover.md`. This record stays the contract.
