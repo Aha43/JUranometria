@@ -34,6 +34,14 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Chart controls | JToggleButton | Accumulate | When on, choosing objects adds them to the working selection and choosing them again re... | Off, each object you choose replaces the working selection; on, it is added to it, and ... | hovered |
 | Chart controls | JButton | Emphasis | Let one or more chart structures rise from the page | Temporarily strengthens chosen structures so they are easy to follow — the meridian, th... | hovered |
 | Chart controls | SearchField | (a field) | Find an object or coordinates, e.g. M 31, NGC 224, TYC 2801-2090-1, or 0:42:44 +41:16:09 | Type a Messier or NGC number, a star's catalogue identity, or a right ascension and dec... | hovered |
+| Emphasis | JCheckBox | Meridian | &mdash; | Raises it on the chart - Meridian - until it is unchecked, Normal is chosen, or it can ... | self-explanatory |
+| Emphasis | JCheckBox | Ecliptic | &mdash; | Raises it on the chart - Ecliptic - until it is unchecked, Normal is chosen, or it can ... | self-explanatory |
+| Emphasis | JCheckBox | Equatorial grid | &mdash; | Raises it on the chart - Equatorial grid - until it is unchecked, Normal is chosen, or ... | self-explanatory |
+| Emphasis | JCheckBox | Mathematical horizon | &mdash; | Raises it on the chart - Mathematical horizon - until it is unchecked, Normal is chosen... | self-explanatory |
+| Emphasis | JCheckBox | Constellation boundaries | &mdash; | Raises it on the chart - Constellation boundaries - until it is unchecked, Normal is ch... | self-explanatory |
+| Emphasis | JCheckBox | Constellation figures | &mdash; | Raises it on the chart - Constellation figures - until it is unchecked, Normal is chose... | self-explanatory |
+| Emphasis | JCheckBox | Solar System labels | &mdash; | Raises it on the chart - Solar System labels - until it is unchecked, Normal is chosen,... | self-explanatory |
+| Emphasis | JButton | Normal | &mdash; | Settles every raised structure at once, so the chart returns to its ordinary design. | self-explanatory |
 | Menu bar | JMenu | File | &mdash; | Exporting the chart and changing application settings | self-explanatory |
 | Menu bar | JMenuItem | Export Chart Sheet... | &mdash; | Exports this chart as an SVG, PDF or PNG sheet | self-explanatory |
 | Menu bar | JMenuItem | Settings... | &mdash; | Opens the window for appearance and for the languages used by the application and chart | self-explanatory |
@@ -154,7 +162,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 
 ## The audit
 
-**137 operable controls** across 16 surfaces: **89** hovered, **12** dynamic, **36** left to their own visible words, **0 undecided**.
+**145 operable controls** across 17 surfaces: **89** hovered, **12** dynamic, **44** left to their own visible words, **0 undecided**.
 
 **0** say the same words twice - a tooltip read back as a description. The seam refuses it, so this is zero or a finding.
 

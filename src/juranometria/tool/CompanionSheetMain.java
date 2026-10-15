@@ -53,7 +53,8 @@ public final class CompanionSheetMain {
     /** One arrangement, and what it shows. */
     private record State(String name, boolean dark, boolean collapsed,
                          String refused, boolean deepSkyOpen,
-                         boolean solarSystemOpen, boolean jupiterOpen) {
+                         boolean solarSystemOpen, boolean jupiterOpen,
+                         boolean emphasisOpen) {
     }
 
     /** A chart switch that stands still: the section's photograph is not the chart's. */
@@ -94,22 +95,26 @@ public final class CompanionSheetMain {
 
     /**
      * Both tabs in every state, as the application holds them since
-     * #507: Chart with Chart controls, Place and Time and Chart Options
+     * #507: Chart with Chart controls, Emphasis (#525, introduced
+     * collapsed; opened in "emphasis-open"), Place and Time and Chart Options
      * (its subject groups as first introduced - Deep sky collapsed, the
      * rest open); Solar System, chosen by "solar-system-open", Sun open
      * with its instant applied, Mercury, Venus, Moon and Jupiter collapsed.
      * "collapsed" collapses Place and Time.
      */
     private static final List<State> STATES = List.of(
-            new State("open", false, false, null, false, false, false),
-            new State("dark", true, false, null, false, false, false),
-            new State("collapsed", false, true, null, false, false, false),
-            new State("refused", false, false, "91", false, false, false),
-            new State("deep-sky-open", false, true, null, true, false, false),
-            new State("solar-system-open", false, true, null, false, true, false),
+            new State("open", false, false, null, false, false, false, false),
+            new State("dark", true, false, null, false, false, false, false),
+            new State("collapsed", false, true, null, false, false, false, false),
+            new State("refused", false, false, "91", false, false, false, false),
+            new State("deep-sky-open", false, true, null, true, false, false, false),
+            new State("solar-system-open", false, true, null, false, true, false, false),
             // #486: Jupiter's group open, the Sun's collapsed, nothing
             // computed - the Jovian module's Show on chart box in place.
-            new State("jupiter-open", false, true, null, false, true, true));
+            new State("jupiter-open", false, true, null, false, true, true, false),
+            // #525: the Emphasis group open on the Chart tab, the grid raised
+            // through it - the one authority the toolbar's popup reads too.
+            new State("emphasis-open", false, true, null, false, false, false, true));
 
     private CompanionSheetMain() {
     }
@@ -138,10 +143,12 @@ public final class CompanionSheetMain {
                 application classes and their classpath resources.
 
                 The production companion window on its two tabs (#507):
-                Chart, holding its three production sections - the
+                Chart, holding its four production sections - the
                 chart's controls, the same class the toolbar hosts; the
-                same `PlaceAndTimePanel` the Place and Time dialog
-                holds; and Chart Options - and Solar System, holding the
+                Emphasis group (#525), one box per choice of the
+                toolbar's Emphasis popup over the same chart; the same
+                `PlaceAndTimePanel` the Place and Time dialog holds; and
+                Chart Options - and Solar System, holding the
                 same controls the Sun, Venus, Moon and Jupiter dialogs
                 host as groups of their own, in a real window at the
                 size the companion's own policy states. Place and Time is `PlaceAndTimeSheetMain`'s Oslo
@@ -231,6 +238,15 @@ public final class CompanionSheetMain {
                 window[0].addSection("chartcontrols",
                         words.say("chartcontrols.title"),
                         chrome.companionControls(chart).inCompanion());
+                // Emphasis (#525), as the application holds it: after Chart
+                // controls, introduced collapsed, over the same chart.
+                juranometria.ui.EmphasisControls emphasis =
+                        new juranometria.ui.EmphasisControls(chart, words);
+                window[0].addSection("emphasis", words.say("emphasis.title"),
+                        emphasis.inController(), true);
+                if (state.emphasisOpen()) {
+                    emphasis.choose(juranometria.render.ChartStructure.EQUATORIAL_GRID);
+                }
                 panel[0] = new PlaceAndTimePanel(module, store,
                         () -> PlaceAndTimeSheetMain.WHEN, words);
                 window[0].addSection("placeandtime",
@@ -302,10 +318,13 @@ public final class CompanionSheetMain {
                                 () -> false, words).inCompanion(companionStore,
                                 words));
                 if (state.collapsed()) {
+                    window[0].sections().get(2).heading().doClick();
+                }
+                if (state.emphasisOpen()) {
                     window[0].sections().get(1).heading().doClick();
                 }
                 if (state.deepSkyOpen()) {
-                    deepSkyHeading(window[0].sections().get(2)).doClick();
+                    deepSkyHeading(window[0].sections().get(3)).doClick();
                 }
                 if (state.refused() != null) {
                     JTextField latitude = (JTextField) named(panel[0],

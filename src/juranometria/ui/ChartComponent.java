@@ -62,6 +62,9 @@ public final class ChartComponent extends JComponent {
                     juranometria.render.ChartStructure.class);
     private final java.util.List<Runnable> emphasisListeners =
             new java.util.ArrayList<>();
+    /** Told whenever what may be emphasized could have changed (#525). */
+    private final java.util.List<Runnable> availabilityListeners =
+            new java.util.ArrayList<>();
     private final java.util.List<Runnable> sceneListeners =
             new java.util.ArrayList<>();
 
@@ -567,6 +570,22 @@ public final class ChartComponent extends JComponent {
                 structure -> !emphasisAvailable(structure));
         if (changed) {
             emphasisChanged();
+        }
+        // Wherever availability can change, a host showing it is told
+        // (#525): the Controller's boxes follow the chart, not a copy.
+        for (Runnable listener : java.util.List.copyOf(availabilityListeners)) {
+            listener.run();
+        }
+    }
+
+    /**
+     * Told whenever what may be emphasized could have changed - an
+     * options change, a scene change, a module contributing or
+     * withdrawing (#525). Never during painting.
+     */
+    public void onEmphasisAvailabilityChange(Runnable listener) {
+        if (listener != null) {
+            availabilityListeners.add(listener);
         }
     }
 
