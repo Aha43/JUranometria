@@ -239,10 +239,8 @@ public final class SolarTableControls {
             case MOON -> CentreOnChart.Body.MOON;
             // Venus (#514): its layer arrived with the production drawing.
             case VENUS -> CentreOnChart.Body.VENUS;
-            // No Mercury is drawn (#530): nothing to centre on, and no
-            // host offers the button for it.
-            case MERCURY -> throw new IllegalStateException(
-                    "Mercury has no chart layer to centre on");
+            // Mercury (#542): its layer arrived with the production drawing.
+            case MERCURY -> CentreOnChart.Body.MERCURY;
         };
         return new CentreOnChart.Target() {
             @Override

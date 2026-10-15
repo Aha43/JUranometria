@@ -262,6 +262,15 @@ public final class AppMenuBar {
             juranometria.solarchart.SolarSystemModule.VENUS
                     + MOON_CHART_ITEM.substring(juranometria.solarchart.SolarSystemModule.MOON.length());
 
+    /** Mercury on the chart's item (#542), between the Sun's and Venus's, named by the same rule. */
+    public static final String MERCURY_CHART_ITEM =
+            juranometria.solarchart.SolarSystemModule.MERCURY
+                    + MOON_CHART_ITEM.substring(juranometria.solarchart.SolarSystemModule.MOON.length());
+
+    public static javax.swing.JCheckBoxMenuItem mercuryChartItem(javax.swing.JMenuBar bar) {
+        return checkBoxItem(bar, MERCURY_CHART_ITEM);
+    }
+
     public static javax.swing.JCheckBoxMenuItem venusChartItem(
             javax.swing.JMenuBar bar) {
         return checkBoxItem(bar, VENUS_CHART_ITEM);
@@ -943,6 +952,38 @@ public final class AppMenuBar {
         item.getAccessibleContext().setAccessibleName(said.say("menu.venuschart.a11y"));
         juranometria.ui.Explain.selfExplanatory(item, said.say("menu.venuschart.explain"));
         item.addActionListener(event -> toggleVenusOnChart.run());
+        // After Sun on the chart, and after Mercury on the chart when the bar
+        // has it (#542): the order outward from the Sun, whichever is added first.
+        int after = -1;
+        for (int i = 0; i < solar.getMenuComponentCount(); i++) {
+            String name = solar.getMenuComponent(i).getName();
+            if (SUN_CHART_ITEM.equals(name) || MERCURY_CHART_ITEM.equals(name)) {
+                after = i;
+            }
+        }
+        solar.insert(item, after + 1);
+        return item;
+    }
+
+    /**
+     * Adds View > Solar System > Mercury on the chart between Sun on the
+     * chart and Venus on the chart (#542, ruling 3 on #539): the one
+     * remembered switch for Mercury's layer. Returns the item, or null on a
+     * bar without the submenu.
+     */
+    public static javax.swing.JCheckBoxMenuItem addMercuryOnChart(javax.swing.JMenuBar bar,
+            juranometria.ui.language.InterfaceText said, Runnable toggleMercuryOnChart) {
+        JMenu solar = solarSystemMenu(bar);
+        if (solar == null || toggleMercuryOnChart == null) {
+            return null;
+        }
+        javax.swing.JCheckBoxMenuItem item = new javax.swing.JCheckBoxMenuItem(
+                said.say("menu.mercurychart.label"));
+        item.setName(MERCURY_CHART_ITEM);
+        juranometria.ui.language.MnemonicText.in(said).apply(item, "menu.mercurychart.mnemonic");
+        item.getAccessibleContext().setAccessibleName(said.say("menu.mercurychart.a11y"));
+        juranometria.ui.Explain.selfExplanatory(item, said.say("menu.mercurychart.explain"));
+        item.addActionListener(event -> toggleMercuryOnChart.run());
         int after = -1;
         for (int i = 0; i < solar.getMenuComponentCount(); i++) {
             if (SUN_CHART_ITEM.equals(solar.getMenuComponent(i).getName())) {

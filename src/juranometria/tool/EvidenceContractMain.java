@@ -179,6 +179,9 @@ public final class EvidenceContractMain {
         // Venus on production pages (#514), the same way.
         REPORT_MAINS.put("juranometria.tool.VenusOnTheChartStudyMain",
                 "docs/studies/venus-on-the-chart/measurements.md");
+        // Mercury on production pages (#542), the same way.
+        REPORT_MAINS.put("juranometria.tool.MercuryOnTheChartStudyMain",
+                "docs/studies/mercury-on-the-chart/measurements.md");
         // The meridian's graduation on production pages (#515), the same way.
         REPORT_MAINS.put("juranometria.tool.MeridianTicksStudyMain",
                 "docs/studies/meridian-ticks/measurements.md");
@@ -540,6 +543,9 @@ public final class EvidenceContractMain {
             // Venus on the chart (issue #514): the same, and the apparition
             // strip cut from production pages.
             "juranometria.tool.VenusOnTheChartStudyMain",
+            // Mercury on the chart (issue #542): the same, and the 2026
+            // apparitions as a row of phases.
+            "juranometria.tool.MercuryOnTheChartStudyMain",
             // The Mercury table mock-ups and diagrams (issue #528): the proposed table
             // in study-only arrangements, widget-rendered, in both languages.
             "juranometria.tool.MercuryContractStudyMain",

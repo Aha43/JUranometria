@@ -7,6 +7,15 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Mercury on the chart (#542).** View > Solar System gains *Mercury on the
+chart*, between the Sun and Venus. Mercury is drawn as Venus is: a
+small phased symbol showing which side is lit, beneath the stars, and
+drawn over the Sun's disc during a transit. The page says whether
+Mercury is in front of or behind the Sun. The Controller's Mercury
+group gains Show on chart, and the Mercury table's Centre on chart
+centres Mercury. Off until chosen, and remembered like Venus. In both
+languages.
+
 **The Sun's centre dot is a small symbol (#541).** On close pages the
 dot at the Sun's centre is now drawn at about 3 pixels instead of a
 sixth of the Sun's radius, so a planet crossing near the Sun's centre

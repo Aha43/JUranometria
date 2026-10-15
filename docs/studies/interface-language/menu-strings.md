@@ -40,7 +40,7 @@ open menu would cover the thing it explains.
 
 ![](menu-en-1-menus.png)
 
-Bar packed 843 × 264 px; widest popup 232 px.
+Bar packed 843 × 287 px; widest popup 232 px.
 
 | channel | words |
 |---|---|
@@ -91,6 +91,9 @@ Bar packed 843 × 264 px; widest popup 232 px.
 | item spoken name \| Sun on the chart |
 | item spoken description \| Shows or hides the Sun on the chart, drawn at its true size where it stands for the place and instant set in Place and Time; below a drawn horizon it is dimmed and says so. |
 | item access letter (language) \| U |
+| item label \| Mercury on the chart |
+| item spoken name \| Mercury on the chart |
+| item spoken description \| Shows or hides Mercury on the chart where it stands for the place and instant set in Place and Time, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
 | item label \| Venus on the chart |
 | item spoken name \| Venus on the chart |
 | item spoken description \| Shows or hides Venus on the chart where it stands for the place and instant set in Place and Time, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
@@ -148,7 +151,7 @@ Bar packed 843 × 264 px; widest popup 232 px.
 
 ![](menu-en-2-checked.png)
 
-Bar packed 843 × 264 px; widest popup 232 px.
+Bar packed 843 × 287 px; widest popup 232 px.
 
 | channel | words |
 |---|---|
@@ -199,6 +202,9 @@ Bar packed 843 × 264 px; widest popup 232 px.
 | item spoken name \| Sun on the chart |
 | item spoken description \| Shows or hides the Sun on the chart, drawn at its true size where it stands for the place and instant set in Place and Time; below a drawn horizon it is dimmed and says so. |
 | item access letter (language) \| U |
+| item label [checked] \| Mercury on the chart |
+| item spoken name \| Mercury on the chart |
+| item spoken description \| Shows or hides Mercury on the chart where it stands for the place and instant set in Place and Time, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
 | item label [checked] \| Venus on the chart |
 | item spoken name \| Venus on the chart |
 | item spoken description \| Shows or hides Venus on the chart where it stands for the place and instant set in Place and Time, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
@@ -256,7 +262,7 @@ Bar packed 843 × 264 px; widest popup 232 px.
 
 ![](menu-en-3-widest.png)
 
-Bar packed 843 × 264 px; widest popup 232 px.
+Bar packed 843 × 287 px; widest popup 232 px.
 
 | channel | words |
 |---|---|
@@ -307,6 +313,9 @@ Bar packed 843 × 264 px; widest popup 232 px.
 | item spoken name \| Sun on the chart |
 | item spoken description \| Shows or hides the Sun on the chart, drawn at its true size where it stands for the place and instant set in Place and Time; below a drawn horizon it is dimmed and says so. |
 | item access letter (language) \| U |
+| item label \| Mercury on the chart |
+| item spoken name \| Mercury on the chart |
+| item spoken description \| Shows or hides Mercury on the chart where it stands for the place and instant set in Place and Time, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
 | item label \| Venus on the chart |
 | item spoken name \| Venus on the chart |
 | item spoken description \| Shows or hides Venus on the chart where it stands for the place and instant set in Place and Time, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
@@ -364,7 +373,7 @@ Bar packed 843 × 264 px; widest popup 232 px.
 
 ![](menu-en-4-narrowest.png)
 
-Bar packed 843 × 264 px; widest popup 232 px.
+Bar packed 843 × 287 px; widest popup 232 px.
 
 | channel | words |
 |---|---|
@@ -415,6 +424,9 @@ Bar packed 843 × 264 px; widest popup 232 px.
 | item spoken name \| Sun on the chart |
 | item spoken description \| Shows or hides the Sun on the chart, drawn at its true size where it stands for the place and instant set in Place and Time; below a drawn horizon it is dimmed and says so. |
 | item access letter (language) \| U |
+| item label \| Mercury on the chart |
+| item spoken name \| Mercury on the chart |
+| item spoken description \| Shows or hides Mercury on the chart where it stands for the place and instant set in Place and Time, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
 | item label \| Venus on the chart |
 | item spoken name \| Venus on the chart |
 | item spoken description \| Shows or hides Venus on the chart where it stands for the place and instant set in Place and Time, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
@@ -474,7 +486,7 @@ Bar packed 843 × 264 px; widest popup 232 px.
 
 ![](menu-nb-NO-5-menus.png)
 
-Bar packed 844 × 264 px; widest popup 214 px.
+Bar packed 844 × 287 px; widest popup 214 px.
 
 | channel | words |
 |---|---|
@@ -525,6 +537,9 @@ Bar packed 844 × 264 px; widest popup 214 px.
 | item spoken name \| Solen på kartet |
 | item spoken description \| Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid; under en tegnet horisont dempes den og sier fra. |
 | item access letter (language) \| T |
+| item label \| Merkur på kartet |
+| item spoken name \| Merkur på kartet |
+| item spoken description \| Viser eller skjuler Merkur på kartet der den står for stedet og tidspunktet satt i Sted og tid, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om det. |
 | item label \| Venus på kartet |
 | item spoken name \| Venus på kartet |
 | item spoken description \| Viser eller skjuler Venus på kartet der den står for stedet og tidspunktet satt i Sted og tid, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om den. |
@@ -582,7 +597,7 @@ Bar packed 844 × 264 px; widest popup 214 px.
 
 ![](menu-nb-NO-6-checked.png)
 
-Bar packed 844 × 264 px; widest popup 214 px.
+Bar packed 844 × 287 px; widest popup 214 px.
 
 | channel | words |
 |---|---|
@@ -633,6 +648,9 @@ Bar packed 844 × 264 px; widest popup 214 px.
 | item spoken name \| Solen på kartet |
 | item spoken description \| Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid; under en tegnet horisont dempes den og sier fra. |
 | item access letter (language) \| T |
+| item label [checked] \| Merkur på kartet |
+| item spoken name \| Merkur på kartet |
+| item spoken description \| Viser eller skjuler Merkur på kartet der den står for stedet og tidspunktet satt i Sted og tid, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om det. |
 | item label [checked] \| Venus på kartet |
 | item spoken name \| Venus på kartet |
 | item spoken description \| Viser eller skjuler Venus på kartet der den står for stedet og tidspunktet satt i Sted og tid, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om den. |
@@ -690,7 +708,7 @@ Bar packed 844 × 264 px; widest popup 214 px.
 
 ![](menu-nb-NO-7-widest.png)
 
-Bar packed 844 × 264 px; widest popup 214 px.
+Bar packed 844 × 287 px; widest popup 214 px.
 
 | channel | words |
 |---|---|
@@ -741,6 +759,9 @@ Bar packed 844 × 264 px; widest popup 214 px.
 | item spoken name \| Solen på kartet |
 | item spoken description \| Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid; under en tegnet horisont dempes den og sier fra. |
 | item access letter (language) \| T |
+| item label \| Merkur på kartet |
+| item spoken name \| Merkur på kartet |
+| item spoken description \| Viser eller skjuler Merkur på kartet der den står for stedet og tidspunktet satt i Sted og tid, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om det. |
 | item label \| Venus på kartet |
 | item spoken name \| Venus på kartet |
 | item spoken description \| Viser eller skjuler Venus på kartet der den står for stedet og tidspunktet satt i Sted og tid, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om den. |
@@ -798,7 +819,7 @@ Bar packed 844 × 264 px; widest popup 214 px.
 
 ![](menu-nb-NO-8-narrowest.png)
 
-Bar packed 844 × 264 px; widest popup 214 px.
+Bar packed 844 × 287 px; widest popup 214 px.
 
 | channel | words |
 |---|---|
@@ -849,6 +870,9 @@ Bar packed 844 × 264 px; widest popup 214 px.
 | item spoken name \| Solen på kartet |
 | item spoken description \| Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid; under en tegnet horisont dempes den og sier fra. |
 | item access letter (language) \| T |
+| item label \| Merkur på kartet |
+| item spoken name \| Merkur på kartet |
+| item spoken description \| Viser eller skjuler Merkur på kartet der den står for stedet og tidspunktet satt i Sted og tid, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om det. |
 | item label \| Venus på kartet |
 | item spoken name \| Venus på kartet |
 | item spoken description \| Viser eller skjuler Venus på kartet der den står for stedet og tidspunktet satt i Sted og tid, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om den. |

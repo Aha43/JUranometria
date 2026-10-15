@@ -41,6 +41,7 @@ record StartupStores(AppearanceStore appearance,
                      PlaceStore place,
                      EclipticStore ecliptic,
                      juranometria.ui.solar.SunChartStore sunChart,
+                     juranometria.ui.solar.MercuryChartStore mercuryChart,
                      juranometria.ui.solar.VenusChartStore venusChart,
                      juranometria.ui.solar.MoonChartStore moonChart,
                      juranometria.ui.solar.JovianChartStore jovianChart,
@@ -56,6 +57,7 @@ record StartupStores(AppearanceStore appearance,
         require(place, "place and time");
         require(ecliptic, "ecliptic");
         require(sunChart, "sun on the chart");
+        require(mercuryChart, "mercury on the chart");
         require(venusChart, "venus on the chart");
         require(moonChart, "moon on the chart");
         require(jovianChart, "jupiter and moons on the chart");
@@ -76,6 +78,7 @@ record StartupStores(AppearanceStore appearance,
                 ChartOptionsStore.user(), SkyLanguageStore.user(),
                 PlaceStore.user(), EclipticStore.user(),
                 juranometria.ui.solar.SunChartStore.user(),
+                juranometria.ui.solar.MercuryChartStore.user(),
                 juranometria.ui.solar.VenusChartStore.user(),
                 juranometria.ui.solar.MoonChartStore.user(),
                 juranometria.ui.solar.JovianChartStore.user(),

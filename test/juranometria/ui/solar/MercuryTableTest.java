@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -238,9 +239,9 @@ class MercuryTableTest {
         assertEquals(MoonTableFormat.elongation(o.elongationDegrees(), "E"), cell(c, 0, 9));
     }
 
-    /** No Mercury is drawn (#530): its Centre on chart target is refused by name. */
+    /** Since #542 Mercury has a chart layer: its Centre on chart target names it. */
     @Test
-    void mercuryHasNoLayerToCentreOn() {
+    void mercuryCentresOnItsOwnLayer() {
         SolarTableSession session = new SolarTableSession(() -> oslo(ELONGATION), service,
                 SolarTable.mercury());
         juranometria.ui.solar.BodyOnChart layer = new juranometria.ui.solar.BodyOnChart() {
@@ -258,13 +259,10 @@ class MercuryTableTest {
                 listener.accept(false);
             }
         };
-        // Built as every host builds it: without a Show on chart switch.
-        SolarTableControls controls = new SolarTableControls(session, EN, null, false);
-        assertNull(controls.onChart);
-        IllegalStateException refused = assertThrows(IllegalStateException.class,
-                () -> controls.target(layer));
-        assertTrue(refused.getMessage().contains("Mercury has no chart layer"),
-                refused.getMessage());
+        SolarTableControls controls = new SolarTableControls(session, EN, layer, false);
+        assertEquals(CentreOnChart.Body.MERCURY, controls.target(layer).body(),
+                "since #542 Mercury centres on its own layer");
+        assertSame(layer, controls.target(layer).layer());
     }
 
     private static List<Component> all(Component root) {

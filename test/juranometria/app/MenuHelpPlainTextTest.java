@@ -102,6 +102,7 @@ class MenuHelpPlainTextTest {
             AppMenuBar.addJupiterTable(bar[0], said, () -> { });
             AppMenuBar.addJupiterOnChart(bar[0], said, () -> { });
             AppMenuBar.addVenusOnChart(bar[0], said, () -> { });
+            AppMenuBar.addMercuryOnChart(bar[0], said, () -> { });
         });
         return bar[0];
     }
