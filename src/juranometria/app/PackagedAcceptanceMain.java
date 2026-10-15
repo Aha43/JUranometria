@@ -459,6 +459,7 @@ public final class PackagedAcceptanceMain {
         emphasisJourney();
         combinedEmphasisJourney();
         solarSystemLabelsJourney();
+        emphasisControlsJourney();
         horizonPanJourney();
         javax.swing.SwingUtilities.invokeAndWait(() ->
                 cardinalLandmarkJourney());
@@ -4171,6 +4172,96 @@ public final class PackagedAcceptanceMain {
                 + figureInk + ", ecliptic " + eclipticInk
                 + " px raised on real pages; Normal settles"
                 + " byte-exactly; nothing persisted)");
+    }
+
+    /**
+     * The Controller's Emphasis group (#525), inside the image: on the
+     * combinations journey's page, one visit raises the ecliptic and the
+     * meridian and lowers the grid; the toolbar's popup, built from the
+     * same chart, agrees; a section collapsed and reopened changes no
+     * setting; the boxes speak both languages with no access letter.
+     */
+    private static void emphasisControlsJourney() throws Exception {
+        juranometria.ui.ChartComponent[] chart = new juranometria.ui.ChartComponent[1];
+        juranometria.ui.ChartModuleHost[] host = new juranometria.ui.ChartModuleHost[1];
+        juranometria.ui.EmphasisControls[] group = new juranometria.ui.EmphasisControls[1];
+        juranometria.ui.companion.CompanionTabs[] tabs =
+                new juranometria.ui.companion.CompanionTabs[1];
+        Preferences scratch = Preferences.userRoot()
+                .node("juranometria-packaged-emphasis-controls-" + System.nanoTime());
+        juranometria.ui.language.InterfaceText en =
+                juranometria.ui.language.InterfaceText.forLanguage("en");
+        try {
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                chart[0] = new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
+                chart[0].setSize(900, 700);
+                chart[0].setViewState(new ChartViewState(new SkyPosition(83.0, 0.0), 42.0, 6.0));
+                host[0] = new juranometria.ui.ChartModuleHost(chart[0],
+                        new juranometria.chart.SelectionModel(), r -> { });
+                juranometria.meridian.MeridianModule meridian = host[0].attach(
+                        new juranometria.meridian.MeridianModule(new juranometria.sky.Observer(
+                                80.0, -58.7, java.time.Instant.parse("2026-03-20T21:33:00Z"))));
+                meridian.showing(true, true, false);
+                host[0].attach(new juranometria.ecliptic.EclipticModule()).showing(true);
+                chart[0].toggleEmphasis(juranometria.render.ChartStructure.EQUATORIAL_GRID);
+                group[0] = new juranometria.ui.EmphasisControls(chart[0], en);
+                tabs[0] = new juranometria.ui.companion.CompanionTabs(en,
+                        juranometria.ui.companion.CompanionStore.forNode(scratch));
+                tabs[0].addSection("emphasis", en.say("emphasis.title"),
+                        group[0].inController(), true);
+            });
+            java.util.Set<juranometria.render.ChartStructure> before = chart[0].emphasizedSet();
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                tabs[0].sections().get(0).heading().doClick();
+                tabs[0].sections().get(0).heading().doClick();
+            });
+            require(chart[0].emphasizedSet().equals(before),
+                    "opening and collapsing the group changes no setting");
+            require(group[0].box(juranometria.render.ChartStructure.EQUATORIAL_GRID).isSelected(),
+                    "the group shows the grid the chart already raised");
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                group[0].choose(juranometria.render.ChartStructure.ECLIPTIC);
+                group[0].choose(juranometria.render.ChartStructure.MERIDIAN);
+                group[0].choose(juranometria.render.ChartStructure.EQUATORIAL_GRID);
+            });
+            require(chart[0].emphasizedSet().equals(java.util.Set.of(
+                            juranometria.render.ChartStructure.MERIDIAN,
+                            juranometria.render.ChartStructure.ECLIPTIC)),
+                    "one visit: ecliptic and meridian up, grid down: " + chart[0].emphasizedSet());
+            javax.swing.JPopupMenu popup = juranometria.ui.ChartActions.emphasisMenu(chart[0], en);
+            int checked = 0;
+            for (java.awt.Component item : popup.getComponents()) {
+                if (item instanceof javax.swing.JCheckBoxMenuItem box && box.isSelected()) {
+                    checked++;
+                }
+            }
+            require(checked == 2, "the toolbar's popup agrees: " + checked + " checked");
+            javax.swing.SwingUtilities.invokeAndWait(() -> chart[0].toggleEmphasis(
+                    juranometria.render.ChartStructure.HORIZON));
+            require(group[0].box(juranometria.render.ChartStructure.HORIZON).isSelected(),
+                    "a change from the popup's side shows in the group at once");
+            juranometria.ui.language.InterfaceText nb =
+                    juranometria.ui.language.InterfaceText.forLanguage("nb-NO");
+            juranometria.ui.EmphasisControls[] norsk = new juranometria.ui.EmphasisControls[1];
+            javax.swing.SwingUtilities.invokeAndWait(() ->
+                    norsk[0] = new juranometria.ui.EmphasisControls(chart[0], nb));
+            for (juranometria.render.ChartStructure s : juranometria.render.ChartStructure.values()) {
+                javax.swing.JCheckBox box = norsk[0].box(s);
+                require(nb.say("emphasis." + s.token()).equals(box.getText())
+                                && box.getMnemonic() == 0
+                                && box.getAccessibleContext().getAccessibleDescription() != null,
+                        "the Norwegian box for " + s.token() + ": " + box.getText());
+            }
+            javax.swing.SwingUtilities.invokeAndWait(group[0]::settle);
+            require(chart[0].emphasizedSet().isEmpty(), "Normal settles the whole set");
+            System.out.println("emphasis controls OK (one visit raises the ecliptic and the"
+                    + " meridian and lowers the grid; the toolbar's popup agrees both ways;"
+                    + " opening and collapsing change nothing; seven boxes in English and"
+                    + " Norwegian, no access letters; Normal settles; nothing persisted)");
+        } finally {
+            javax.swing.SwingUtilities.invokeAndWait(host[0]::detachAll);
+            scratch.removeNode();
+        }
     }
 
     /**

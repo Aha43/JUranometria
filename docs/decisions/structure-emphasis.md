@@ -260,3 +260,46 @@ menu, after the six line structures.
   `docs/studies/solar-system-labels/` (`make solar-system-labels-study`):
   production pages canonical and raised side by side, the changed
   pixels counted inside the names' boxes in its platform record.
+
+## The Controller's Emphasis group (#525)
+
+A persistent **Emphasis** group on the Controller's **Chart** tab,
+after Chart controls and introduced collapsed: one immediate checkbox
+for every choice the toolbar's Emphasis popup offers - the six line
+structures and the Solar System labels, in the popup's order - and
+**Normal**. A reader raises the ecliptic and the meridian and lowers
+the grid in one visit, where the popup closes after every choice. The
+popup and its toolbar button stay for quick single changes and
+keyboard access.
+
+- **No second model.** `EmphasisControls` reads and writes the chart
+  component's raised set, the one authority (#361, #526): a box asks
+  the chart to toggle its structure, then shows the chart's answer;
+  every box is checked when its structure is raised and available when
+  it is raised or choosable now. The chart tells the group whenever
+  the set changes (`onEmphasisChange`) and whenever availability may
+  have changed (`onEmphasisAvailabilityChange`, fired where the chart
+  already re-checks availability - an options change, a scene change,
+  a module contributing or withdrawing), so a structure that stops
+  being drawn leaves and its box follows. The popup is built fresh
+  from the same chart each time it opens, so the hosts cannot
+  disagree.
+- **Nothing changes by looking.** Building, showing, opening,
+  collapsing or switching to the group changes no chart setting. The
+  section's collapse is remembered like every Controller section's;
+  the emphasis itself stays transient, off at every application start,
+  as ruled on #526.
+- **Words.** The boxes carry the popup's words (`emphasis.*`), each
+  described by `emphasis.check.explain` with its own name, Normal by
+  `emphasis.normal.explain`, the section titled `emphasis.title` -
+  *Emphasis* / *Fremheving*. No access letters, as every Controller
+  group (ruling 10 on #457); every box is reached by keyboard.
+- **Evidence.** `EmphasisControlsTest` (building changes nothing; the
+  ecliptic and meridian up and the grid down in one visit; the popup
+  and the group agree both ways; a structure the detail policy stops
+  drawing leaves with its box; both languages, no access letters);
+  `CompanionStartupJourneyTest` (four Chart sections, Emphasis
+  introduced collapsed); the packaged journey *emphasis controls OK*;
+  the companion photographed with the group (`companion-*-8-emphasis-open`
+  added, the others retaken); the control-explanation audit gains the
+  group's eight controls.

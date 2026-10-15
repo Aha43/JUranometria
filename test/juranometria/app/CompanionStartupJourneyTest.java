@@ -83,14 +83,18 @@ class CompanionStartupJourneyTest {
                         assertEquals(List.of("Chart", "Solar System"),
                                 List.of(companion.tabs().getTitleAt(0),
                                         companion.tabs().getTitleAt(1)));
-                        assertEquals(3, companion.sections().size(),
-                                "on Chart: Chart controls, Place and Time, then"
-                                        + " Chart Options");
+                        assertEquals(4, companion.sections().size(),
+                                "on Chart: Chart controls, Emphasis (#525), Place and"
+                                        + " Time, then Chart Options");
                         assertEquals("Chart controls, expanded",
                                 companion.sections().get(0).heading()
                                         .getAccessibleContext().getAccessibleName());
+                        assertEquals("Emphasis, collapsed",
+                                companion.sections().get(1).heading()
+                                        .getAccessibleContext().getAccessibleName(),
+                                "Emphasis is introduced collapsed");
                         assertEquals("Chart Options, expanded",
-                                companion.sections().get(2).heading()
+                                companion.sections().get(3).heading()
                                         .getAccessibleContext().getAccessibleName());
                         assertFalse(((javax.swing.AbstractButton) named(
                                 companion.getContentPane(),

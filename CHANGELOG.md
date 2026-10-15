@@ -7,6 +7,14 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Emphasis in the Controller (#525).** The Controller's Chart tab gains
+an Emphasis group: one checkbox for every choice of the toolbar's
+Emphasis popup, and Normal, so several structures can be raised or
+lowered in one visit. It reads and writes the same chart state as the
+popup, which stays for quick single changes; opening or collapsing the
+group changes nothing, and emphasis remains off at every start. In
+both languages.
+
 **Solar System labels as one emphasis class (#526).** The Emphasis menu
 gains one choice, Solar System labels, which writes the label of every
 drawn Solar System body - the Sun, the Moon, the planets drawn,

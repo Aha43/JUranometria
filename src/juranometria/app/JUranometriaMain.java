@@ -348,6 +348,12 @@ public final class JUranometriaMain {
         companion.addSection("chartcontrols",
                 companionWords.say("chartcontrols.title"),
                 chartControls.inCompanion());
+        // Emphasis (#525): one immediate box per choice of the toolbar's
+        // Emphasis popup, over the chart's one raised set; collapsed
+        // until a reader opens it, and nothing it shows is persisted.
+        companion.addSection("emphasis", companionWords.say("emphasis.title"),
+                new juranometria.ui.EmphasisControls(chart, companionWords).inController(),
+                true);
         companion.addSection("placeandtime",
                 companionWords.say("placeandtime.title"),
                 new juranometria.ui.placeandtime.PlaceAndTimePanel(meridian,

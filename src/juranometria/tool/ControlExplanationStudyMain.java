@@ -348,6 +348,12 @@ public final class ControlExplanationStudyMain {
                 Atlas.assembler(),
                 juranometria.ui.language.PageText.in(english)));
         surfaces.put("Chart controls", chartControls.inCompanion());
+        // The Controller's Emphasis group (#525): one box per choice of
+        // the toolbar's popup, over a chart of its own here.
+        surfaces.put("Emphasis", new juranometria.ui.EmphasisControls(
+                new juranometria.ui.ChartComponent(Atlas.assembler(),
+                        juranometria.ui.language.PageText.in(english)),
+                english).inController());
         surfaces.put("Menu bar", AppMenuBar.create(navigation, () -> { },
                 () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
                 () -> { }, () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
