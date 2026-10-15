@@ -191,3 +191,43 @@ deterministic report, a platform record, the pages held by the image
 contract). `MercuryCartographyTest` is new. No production code, chart,
 table-result or export bytes move; no language key; no Mercury layer; no
 change to the field ladder; no download.
+
+## The ruling
+
+The owner's rulings (2026-10-15), approving all seven recommendations,
+recorded as given:
+
+1. **Size: rule M**, as for Venus. Printed marks retain their size in
+   page units.
+2. **Conjunctions:** no Mercury-specific exception; the table's state is
+   represented. The Sun's centre dot is capped at approximately a 3 px
+   radius - the sole change to existing released ink.
+3. **Interaction:** Venus's labels, selection and Centre on chart
+   inherited. *Mercury on the chart* between Sun and Venus, C in English
+   and K in Norwegian; Show on chart and Centre on chart in the
+   Controller's Mercury group.
+4. **#481 is in 5.3.0.** Visible phase on screen is an acceptance
+   requirement; merely drawing Mercury does not satisfy it.
+5. **Closer fields 0.5° and 0.25°.** Each step offered when Mercury or
+   Venus lies within the page that step would display. Panning preserves
+   the field; Home keeps its current behaviour. Titles show sufficient
+   precision, export remains available, and closer fields are never
+   persisted. Exposure is blocked until all four foundations are
+   complete: field formatting, finer grid steps, catalogue queries at the
+   actual closer field, and the Sun-dot cap.
+6. **Inheritance:** Mercury and Venus only for now; Jupiter, Mars and
+   Saturn each require their own study; the Sun and the Moon excluded.
+7. **Production split:** the six PRs in the stated order, each
+   independently reviewable, with #481 placed explicitly in the sequence:
+
+   | step | issue | |
+   |---|---|---|
+   | 1 | #541 | Cap the Sun's centre dot |
+   | 2 | #542 | Draw Mercury on the chart |
+   | 3 | #543 | Closer-field foundations, no UI (part of #481) |
+   | 4 | #544 | Offer the closer fields (closes #481) |
+   | 5 | #545 | The Venus article |
+   | 6 | #546 | Prepare and publish 5.3.0 |
+
+This approves the design and sequence; each merge and the release remain
+separate checkpoints.
