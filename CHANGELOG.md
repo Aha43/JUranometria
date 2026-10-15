@@ -7,6 +7,12 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**The Sun's centre dot is a small symbol (#541).** On close pages the
+dot at the Sun's centre is now drawn at about 3 pixels instead of a
+sixth of the Sun's radius, so a planet crossing near the Sun's centre
+stays visible. The ring, its true size and everything else about the
+Sun are unchanged.
+
 **Mercury handed to cartography (#531).** Part I of the road to 5.3.0
 closes with `docs/decisions/mercury-handover.md`: the settled numerical
 contract, the measured accuracy and named cases, the two emphasis

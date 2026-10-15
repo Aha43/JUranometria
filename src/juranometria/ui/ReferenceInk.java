@@ -2010,6 +2010,14 @@ public final class ReferenceInk {
                 ? oblate.belowHorizon() : ((OverlayContribution.Body) body).belowHorizon();
     }
 
+    /**
+     * The largest the Sun's centre dot is drawn, in page pixels (#541, ruling 2
+     * on #539): the dot is a symbol, not a feature of the disc. At a sixth of
+     * the radius it grew to about 40 px at 1° and held Mercury's mark in five
+     * of the century's transits, and below 1° it would fill the page.
+     */
+    public static final double SUN_DOT_MAX_RADIUS_PX = 3.0;
+
     /** The Sun: the ground, then the ring and its centre dot in star ink. */
     private static void paintSun(Graphics2D g2, Ellipse2D disc, PixelPoint centre,
             double radius, juranometria.render.ChartPalette palette,
@@ -2023,7 +2031,7 @@ public final class ReferenceInk {
         g2.setColor(ink);
         g2.setStroke(new BasicStroke((float) ringWidth(radius)));
         g2.draw(disc);
-        double dot = Math.max(1.5, radius / 6.0);
+        double dot = Math.max(1.5, Math.min(radius / 6.0, SUN_DOT_MAX_RADIUS_PX));
         g2.fill(new Ellipse2D.Double(centre.x() - dot, centre.y() - dot,
                 2.0 * dot, 2.0 * dot));
     }

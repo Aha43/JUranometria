@@ -123,6 +123,42 @@ class BodyInkTest {
         assertTrue(limb.getRed() < 128, "the ring on the limb, antialiased but dark: " + limb);
     }
 
+    /**
+     * The centre dot is a symbol capped near 3 px (#541, ruling 2 on #539): on
+     * the 1° page, where a sixth of the Sun's radius is about 40 px, the disc
+     * is the ground a few pixels from the centre, so a body in transit near
+     * the centre is not drawn on a dot of the Sun's ink.
+     */
+    @Test
+    void theSunsCentreDotIsASymbolCappedNearThreePixels() {
+        SkyPosition at = new SkyPosition(2.0, 1.0);
+        ChartScene close = Atlas.assembler().assemble(
+                new ChartViewState(at, 1.0, 8.0, null, null), 900, 700);
+        OverlayRegistry registry = offering(sun(at, false));
+        BufferedImage image = new BufferedImage(900, 700, BufferedImage.TYPE_INT_RGB);
+        java.awt.Graphics2D g = image.createGraphics();
+        try {
+            RENDERER.render(g, close, ChartOptions.DEFAULTS, ChartRenderer.ReferenceLayer.NONE,
+                    (layerG, scene, reserved) -> ReferenceInk.paintBodies(layerG,
+                            DrawnPage.of(scene), registry.collect(), ChartPalette.WHITE_PAPER,
+                            ENGLISH, reserved, List.of()),
+                    null, java.util.Set.of());
+        } finally {
+            g.dispose();
+        }
+        ReferenceInk.BodyPlacement sun = placed(close, registry, ENGLISH).get(0);
+        int cx = (int) Math.round(sun.centre().x());
+        int cy = (int) Math.round(sun.centre().y());
+        double r = sun.disc().getBounds2D().getWidth() / 2.0;
+        assertTrue(r / 6.0 > 30.0, "the premise: a sixth of the Sun's radius at 1°: " + r / 6.0);
+        assertEquals(Color.BLACK.getRGB(), image.getRGB(cx, cy), "the centre dot is drawn");
+        int clear = (int) Math.ceil(ReferenceInk.SUN_DOT_MAX_RADIUS_PX) + 2;
+        for (int[] d : new int[][] {{clear, 0}, {-clear, 0}, {0, clear}, {0, -clear}}) {
+            assertEquals(Color.WHITE.getRGB(), image.getRGB(cx + d[0], cy + d[1]),
+                    "the dot ends within its cap, the disc the ground beyond it");
+        }
+    }
+
     @Test
     void belowTheHorizonItIsDimmedAndSaysSoInTheLanguage() {
         SkyPosition at = new SkyPosition(2.0, 1.0);
