@@ -7,6 +7,15 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Closer fields prepared, not yet offered (#543).** The chart can now
+stand at 0.5° and 0.25°, below the 1° floor, though no control reaches
+them yet: the zoom stops at 1° as before. At those fields the title,
+the spoken description, the toolbar, the export and its file name say
+0.5 and 0.25 exactly; the grid takes finer steps (15 seconds of time,
+2 arcminutes); the catalogue is asked for the closer page itself; and
+zooming out walks back to the ladder. Nothing on the ordinary fields
+changes.
+
 **Mercury on the chart (#542).** View > Solar System gains *Mercury on the
 chart*, between the Sun and Venus. Mercury is drawn as Venus is: a
 small phased symbol showing which side is lit, beneath the stars, and

@@ -136,25 +136,25 @@ Real pages at 1°, 0.5° and 0.25°, centred on the body, through the production
 | page | body | instant (UTC) | phase | field | drawn px | symbol | lit px | dark px | readable | stars on the page | grid steps (RA, Dec) and spacing | the page says |
 |---|---|---|---|---:|---:|---|---:|---:|---|---:|---|---|
 | `mercury-elongation-1` | Mercury | 2026-02-19 18:00 | near half lit | 1° | 6.00 | yes | 2.98 | 3.02 | no | 1 | 1m, 15′ - 225 and 225 px apart | Field 1.0 degrees wide, gnomonic projection |
-| `mercury-elongation-0.5` | Mercury | 2026-02-19 18:00 | near half lit | 0.5° | 6.00 | yes | 2.98 | 3.02 | no | 0 | 1m, 15′ - 449 and 450 px apart | Field 0.5 degrees wide, gnomonic projection |
-| `mercury-elongation-0.25` | Mercury | 2026-02-19 18:00 | near half lit | 0.25° | 7.18 | no | 3.57 | 3.61 | yes | 0 | 1m, 15′ - 898 and 900 px apart | Field 0.3 degrees wide, gnomonic projection |
+| `mercury-elongation-0.5` | Mercury | 2026-02-19 18:00 | near half lit | 0.5° | 6.00 | yes | 2.98 | 3.02 | no | 0 | 15s, 5′ - 112 and 150 px apart | Field 0.5 degrees wide, gnomonic projection |
+| `mercury-elongation-0.25` | Mercury | 2026-02-19 18:00 | near half lit | 0.25° | 7.18 | no | 3.57 | 3.61 | yes | 0 | 15s, 2′ - 225 and 120 px apart | Field 0.25 degrees wide, gnomonic projection |
 | `mercury-crescent-1` | Mercury | 2026-02-23 00:00 | crescent | 1° | 6.00 | yes | 2.07 | 3.93 | no | 1 | 1m, 15′ - 225 and 225 px apart | Field 1.0 degrees wide, gnomonic projection |
-| `mercury-crescent-0.5` | Mercury | 2026-02-23 00:00 | crescent | 0.5° | 6.00 | yes | 2.07 | 3.93 | no | 1 | 1m, 15′ - 450 and 450 px apart | Field 0.5 degrees wide, gnomonic projection |
-| `mercury-crescent-0.25` | Mercury | 2026-02-23 00:00 | crescent | 0.25° | 7.94 | no | 2.74 | 5.20 | yes | 0 | 1m, 15′ - 900 and 900 px apart | Field 0.3 degrees wide, gnomonic projection |
+| `mercury-crescent-0.5` | Mercury | 2026-02-23 00:00 | crescent | 0.5° | 6.00 | yes | 2.07 | 3.93 | no | 1 | 15s, 5′ - 112 and 150 px apart | Field 0.5 degrees wide, gnomonic projection |
+| `mercury-crescent-0.25` | Mercury | 2026-02-23 00:00 | crescent | 0.25° | 7.94 | no | 2.74 | 5.20 | yes | 0 | 15s, 2′ - 225 and 120 px apart | Field 0.25 degrees wide, gnomonic projection |
 | `mercury-gibbous-1` | Mercury | 2026-02-16 00:00 | gibbous | 1° | 6.00 | yes | 3.96 | 2.04 | no | 1 | 1m, 15′ - 224 and 225 px apart | Field 1.0 degrees wide, gnomonic projection |
-| `mercury-gibbous-0.5` | Mercury | 2026-02-16 00:00 | gibbous | 0.5° | 6.00 | yes | 3.96 | 2.04 | no | 1 | 1m, 15′ - 448 and 450 px apart | Field 0.5 degrees wide, gnomonic projection |
-| `mercury-gibbous-0.25` | Mercury | 2026-02-16 00:00 | gibbous | 0.25° | 6.46 | no | 4.26 | 2.20 | yes | 1 | 1m, 15′ - 895 and 900 px apart | Field 0.3 degrees wide, gnomonic projection |
+| `mercury-gibbous-0.5` | Mercury | 2026-02-16 00:00 | gibbous | 0.5° | 6.00 | yes | 3.96 | 2.04 | no | 1 | 15s, 5′ - 112 and 150 px apart | Field 0.5 degrees wide, gnomonic projection |
+| `mercury-gibbous-0.25` | Mercury | 2026-02-16 00:00 | gibbous | 0.25° | 6.46 | no | 4.26 | 2.20 | yes | 1 | 15s, 2′ - 224 and 120 px apart | Field 0.25 degrees wide, gnomonic projection |
 | `venus-elongation-1` | Venus | 2026-08-15 06:00 | near half lit | 1° | 6.08 | no | 2.96 | 3.12 | yes | 2 | 1m, 15′ - 224 and 225 px apart | Field 1.0 degrees wide, gnomonic projection |
-| `venus-elongation-0.5` | Venus | 2026-08-15 06:00 | near half lit | 0.5° | 12.16 | no | 5.92 | 6.24 | yes | 2 | 1m, 15′ - 449 and 450 px apart | Field 0.5 degrees wide, gnomonic projection |
-| `venus-elongation-0.25` | Venus | 2026-08-15 06:00 | near half lit | 0.25° | 24.32 | no | 11.85 | 12.47 | yes | 0 | 1m, 15′ - 897 and 900 px apart | Field 0.3 degrees wide, gnomonic projection |
+| `venus-elongation-0.5` | Venus | 2026-08-15 06:00 | near half lit | 0.5° | 12.16 | no | 5.92 | 6.24 | yes | 2 | 15s, 5′ - 112 and 150 px apart | Field 0.5 degrees wide, gnomonic projection |
+| `venus-elongation-0.25` | Venus | 2026-08-15 06:00 | near half lit | 0.25° | 24.32 | no | 11.85 | 12.47 | yes | 0 | 15s, 2′ - 224 and 120 px apart | Field 0.25 degrees wide, gnomonic projection |
 | `venus-crescent-1` | Venus | 2026-10-06 00:00 | crescent | 1° | 12.96 | no | 1.37 | 11.59 | yes | 0 | 1m, 15′ - 210 and 225 px apart | Field 1.0 degrees wide, gnomonic projection |
-| `venus-crescent-0.5` | Venus | 2026-10-06 00:00 | crescent | 0.5° | 25.92 | no | 2.75 | 23.17 | yes | 0 | 1m, 15′ - 420 and 450 px apart | Field 0.5 degrees wide, gnomonic projection |
-| `venus-crescent-0.25` | Venus | 2026-10-06 00:00 | crescent | 0.25° | 51.84 | no | 5.50 | 46.35 | yes | 0 | 1m, 15′ - 839 and 900 px apart | Field 0.3 degrees wide, gnomonic projection |
+| `venus-crescent-0.5` | Venus | 2026-10-06 00:00 | crescent | 0.5° | 25.92 | no | 2.75 | 23.17 | yes | 0 | 30s, 5′ - 210 and 150 px apart | Field 0.5 degrees wide, gnomonic projection |
+| `venus-crescent-0.25` | Venus | 2026-10-06 00:00 | crescent | 0.25° | 51.84 | no | 5.50 | 46.35 | yes | 0 | 15s, 2′ - 210 and 120 px apart | Field 0.25 degrees wide, gnomonic projection |
 
 `closer-fields.png` cuts a 240 px window around the body from each of these pages, at the page's own pixels - no magnification: what each field shows. The findings on the pages themselves, beyond the body:
 
-- **The page's own words round the field.** The title block and the spoken description print one decimal: the 0.25° page says *Field 0.3°*. A closer field needs the field printed to its own precision.
-- **The grid's finest steps were built for the ladder.** Its smallest steps are 1m of right ascension and 15′ of declination; at 0.25° one step spans the whole page, so at most one line each way is drawn, often none - the reader loses the grid's scale exactly where scale matters most. A closer field needs finer steps (15s, 2′) before it is offered.
+- **The page's own words rounded the field.** As measured for #539, the title block and the spoken description printed one decimal: the 0.25° page said *Field 0.3°*. A closer field needs the field printed to its own precision. *Met by #543:* these pages now say 0.25 (the table's last column).
+- **The grid's finest steps were built for the ladder.** As measured for #539, its smallest steps were 1m of right ascension and 15′ of declination; at 0.25° one step spanned the whole page, so at most one line each way was drawn, often none - the reader lost the grid's scale exactly where scale matters most. A closer field needs finer steps (15s, 2′) before it is offered. *Met by #543:* the table's grid column shows the steps these pages now take.
 - **The page may hold no star at all.** A 0.25° field near the ecliptic often contains no catalogue star at V 8.0; the body then stands alone, which is honest but leaves the reader nothing to orient by except the body and the title.
-- **The catalogue query is the 1° page's.** The study reuses it, which is exact (the narrower page is inside it); production would query its own field.
+- **The catalogue query is the 1° page's.** The study reuses it, which is exact (the narrower page is inside it); production would query its own field. *Met by #543:* production does, proven in `docs/studies/closer-fields`.
 

@@ -227,4 +227,33 @@ class SceneAssemblerTest {
         assertEquals(1, catalogue.starQueries);
         assertTrue(catalogue.lastRegion.contains(cornerStar.position()));
     }
+
+    @Test
+    void aCloserFieldIsQueriedAtItsOwnFieldNotTheFloors() {
+        // #543, part of #481: the #539 study drew its closer pages from
+        // the 1-degree scene's stars; production asks the catalogue for
+        // the closer page itself - its own corners plus the object
+        // margin, centred on its own centre.
+        SkyPosition near = new SkyPosition(10.684708, 41.5);
+        for (double field : ChartViewState.closerFieldSteps()) {
+            CountingCatalogue catalogue = new CountingCatalogue();
+            SceneAssembler assembler = new SceneAssembler(
+                    catalogue, M31, 10.0, TEST_MARGIN);
+            ChartViewState state = new ChartViewState(near, field, 8.0);
+            ChartScene scene = assembler.assemble(state, 900, 700);
+            assertEquals(field, scene.viewport().fieldWidthDegrees());
+            assertEquals(near, catalogue.lastRegion.centre());
+            double own = assembler.queryRadiusDegrees(
+                    new GnomonicProjection(near), field, 900, 700);
+            assertEquals(own, catalogue.lastRegion.radiusDegrees(), 1e-12,
+                    field + ": the page's own radius");
+            double floor = assembler.queryRadiusDegrees(
+                    new GnomonicProjection(near), 1.0, 900, 700);
+            assertTrue(own < floor, field + ": closer than the floor's query, "
+                    + own + " against " + floor);
+            assertEquals(field / 2.0 * Math.hypot(1.0, 700.0 / 900.0)
+                            + TEST_MARGIN, own, 1e-4,
+                    "the corner of a page this small is the flat corner");
+        }
+    }
 }

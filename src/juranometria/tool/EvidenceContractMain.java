@@ -203,6 +203,11 @@ public final class EvidenceContractMain {
         // Mercury offered by the study; the label placements in its platform record.
         REPORT_MAINS.put("juranometria.tool.MercuryCartographyStudyMain",
                 "docs/studies/mercury-cartography/measurements.md");
+        // The closer fields' foundations (#543): production pages at 1°,
+        // 0.5° and 0.25° set by state; name and grid-figure placements in
+        // its platform record.
+        REPORT_MAINS.put("juranometria.tool.CloserFieldsStudyMain",
+                "docs/studies/closer-fields/measurements.md");
         REPORT_MAINS.put("juranometria.tool.PrintableChartStudyMain",
                 "docs/studies/printable-chart/measurements.md");
         // Not prose but an oracle: the released pages' own pixels
@@ -391,6 +396,8 @@ public final class EvidenceContractMain {
                 "docs/studies/solar-system-labels/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.MercuryCartographyStudyMain",
                 "docs/studies/mercury-cartography/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.CloserFieldsStudyMain",
+                "docs/studies/closer-fields/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.JovianCartographyStudyMain",
                 "docs/studies/jovian-cartography/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.VenusContractStudyMain",
@@ -561,6 +568,9 @@ public final class EvidenceContractMain {
             "juranometria.tool.SolarSystemLabelsStudyMain",
             // Mercury on the page and the 0.5° and 0.25° candidates (issue #539).
             "juranometria.tool.MercuryCartographyStudyMain",
+            // The closer fields' foundations (issue #543): production pages
+            // at 1°, 0.5° and 0.25°, and an exported A4 sheet at 0.25°.
+            "juranometria.tool.CloserFieldsStudyMain",
             // The Venus table mock-ups and diagrams (issue #500): the
             // proposed table in study-only arrangements; widget-rendered
             // inspection, the controls- prefix.

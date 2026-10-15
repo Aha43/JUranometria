@@ -60,6 +60,21 @@ public final class EquatorialGrid {
             0.25, 0.5, 1.0, 2.0, 5.0, 10.0, 15.0};
 
     /**
+     * The closer fields' finer steps (#543, part of #481), tried before
+     * the ladder's own and only below the ladder's floor: 15s and 30s
+     * of time, 2', 5' and 10' of arc. At a closer field the ladder's
+     * finest steps (1m, 15') are a whole page apart - at 0.25 degrees
+     * one step spans the page (docs/decisions/mercury-cartography.md,
+     * "The closer pages themselves") - and the same spacing rule then
+     * picks 15s and 2' at 0.25 degrees. A ladder page never sees these,
+     * so no released grid moves.
+     */
+    private static final double[] CLOSER_RA_STEPS_DEGREES = {
+            0.0625, 0.125};
+    private static final double[] CLOSER_DEC_STEPS_DEGREES = {
+            1.0 / 30.0, 1.0 / 12.0, 1.0 / 6.0};
+
+    /**
      * The adaptive interval rule: the smallest pleasant step whose
      * on-page spacing at the page centre is at least this many pixels
      * - bounded below here and above by the next step's refusal, so
@@ -119,21 +134,34 @@ public final class EquatorialGrid {
                 / viewport.fieldWidthDegrees();
         double cosDec = Math.max(1e-6, Math.cos(Math.toRadians(
                 viewport.centre().decDegrees())));
+        boolean closer = viewport.fieldWidthDegrees()
+                < juranometria.chart.ChartViewState.normalMinimumFieldDegrees();
         double raStep = RA_STEPS_DEGREES[RA_STEPS_DEGREES.length - 1];
-        for (double candidate : RA_STEPS_DEGREES) {
+        for (double candidate : closer
+                ? concat(CLOSER_RA_STEPS_DEGREES, RA_STEPS_DEGREES)
+                : RA_STEPS_DEGREES) {
             if (candidate * cosDec * pxPerDegree >= MINIMUM_SPACING_PX) {
                 raStep = candidate;
                 break;
             }
         }
         double decStep = DEC_STEPS_DEGREES[DEC_STEPS_DEGREES.length - 1];
-        for (double candidate : DEC_STEPS_DEGREES) {
+        for (double candidate : closer
+                ? concat(CLOSER_DEC_STEPS_DEGREES, DEC_STEPS_DEGREES)
+                : DEC_STEPS_DEGREES) {
             if (candidate * pxPerDegree >= MINIMUM_SPACING_PX) {
                 decStep = candidate;
                 break;
             }
         }
         return new GridSpec(raStep, decStep);
+    }
+
+    private static double[] concat(double[] finer, double[] ladder) {
+        double[] all = new double[finer.length + ladder.length];
+        System.arraycopy(finer, 0, all, 0, finer.length);
+        System.arraycopy(ladder, 0, all, finer.length, ladder.length);
+        return all;
     }
 
     /**
@@ -179,7 +207,7 @@ public final class EquatorialGrid {
                     projection, mapping, viewport, samples, worstError);
             meridians.addAll(pieces);
             if (!pieces.isEmpty()) {
-                Label label = edgeLabel(pieces, raLabel(ra), viewport, true);
+                Label label = edgeLabel(pieces, raLabel(ra, spec.raStepDegrees()), viewport, true);
                 if (label != null) {
                     if (!fitsPaper(label, metrics, viewport)
                             || intersectsFurniture(label, metrics, furniture)) {
@@ -196,7 +224,8 @@ public final class EquatorialGrid {
                     // Held for the second pass. Placing it now would
                     // let it choose a spot no parallel has claimed
                     // yet, because the Dec loop below has not run.
-                    missed.add(new Missed(pieces, raLabel(ra), ra, true));
+                    missed.add(new Missed(pieces,
+                            raLabel(ra, spec.raStepDegrees()), ra, true));
                 }
             }
         }
@@ -277,12 +306,37 @@ public final class EquatorialGrid {
         return minutes == 0 ? hours + "h" : hours + "h " + minutes + "m";
     }
 
+    /**
+     * RA grid notation at a step: the ladder's notation for a step of a
+     * minute of time or more, and seconds as well for the closer fields'
+     * finer steps (#543), whose meridians fall between minutes -
+     * {@code 5h 30m 15s}; a meridian on a whole minute or hour keeps
+     * the shorter form.
+     */
+    public static String raLabel(double raDegrees, double stepDegrees) {
+        if (stepDegrees >= 0.25) {
+            return raLabel(raDegrees);
+        }
+        int totalSeconds = (int) Math.round(normalizeRa(raDegrees) * 240.0);
+        int hours = (totalSeconds / 3600) % 24;
+        int minutes = (totalSeconds / 60) % 60;
+        int seconds = totalSeconds % 60;
+        if (seconds != 0) {
+            return hours + "h " + minutes + "m " + seconds + "s";
+        }
+        return minutes == 0 ? hours + "h" : hours + "h " + minutes + "m";
+    }
+
     /** Dec grid notation: signed degrees, arcminutes only when needed. */
     public static String decLabel(double decDegrees, double stepDegrees) {
         String sign = decDegrees < 0 ? "−" : "+";
-        double magnitude = Math.abs(decDegrees);
-        int whole = (int) magnitude;
-        int arcmin = (int) Math.round((magnitude - whole) * 60.0);
+        // Rounded to the arcminute first, then split: a closer field's
+        // 2' parallels are not exact binary fractions, and splitting
+        // first could print 59.999... as 0 degrees 60'. The ladder's
+        // steps are exact quarters, which either order prints alike.
+        int totalArcmin = (int) Math.round(Math.abs(decDegrees) * 60.0);
+        int whole = totalArcmin / 60;
+        int arcmin = totalArcmin % 60;
         if (stepDegrees >= 1.0 || arcmin == 0) {
             return sign + whole + "°";
         }

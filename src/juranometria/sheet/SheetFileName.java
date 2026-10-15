@@ -29,9 +29,11 @@ public final class SheetFileName {
         String subject = state.targetLabel() != null
                 ? state.targetLabel() : scene.title();
         String slug = slug(subject);
-        return String.format(Locale.ROOT, "juranometria-%s%.0fdeg.%s",
+        return String.format(Locale.ROOT, "juranometria-%s%sdeg.%s",
                 slug.isEmpty() ? "" : slug + "-",
-                state.fieldWidthDegrees(), format.extension());
+                juranometria.chart.FieldWidthText.whole(
+                        state.fieldWidthDegrees()),
+                format.extension());
     }
 
     /**

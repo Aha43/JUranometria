@@ -404,7 +404,7 @@ public final class ChartControls {
         // handed over already written. A language places them; none
         // re-formats them, so a decimal point cannot become a comma
         // in a magnitude (#350).
-        String field = String.format(Locale.ROOT, "%.0f",
+        String field = juranometria.chart.FieldWidthText.whole(
                 state.fieldWidthDegrees());
         String limit = String.format(Locale.ROOT, "%.1f",
                 state.limitingMagnitude());

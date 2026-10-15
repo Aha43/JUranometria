@@ -162,4 +162,46 @@ class AtlasToolbarTest {
         assertTrue(button(toolbar, "Zoom in").isEnabled());
         assertTrue(button(toolbar, "Fewer stars").isEnabled());
     }
+
+    @Test
+    void aCloserFieldReadsToItsOwnPrecisionAndZoomsOutBackToTheLadder() {
+        // #543, part of #481: no surface offers a closer field yet, but a
+        // state at one reads as itself - never "Field 0°" - with zoom in
+        // unavailable and zoom out walking back to the floor. The
+        // keyboard's and the menu's zoom are the same controller calls.
+        ChartViewController controller = new ChartViewController();
+        AtlasToolbar toolbar = toolbar(controller);
+        juranometria.chart.SkyPosition pleiades =
+                new juranometria.chart.SkyPosition(56.75, 24.12);
+
+        controller.recenter(pleiades, 0.25);
+        assertEquals("Field 0.25° · Stars to V 8.0", readout(toolbar).getText());
+        assertFalse(button(toolbar, "Zoom in").isEnabled(),
+                "zoom in is not the closer step");
+        assertTrue(button(toolbar, "Zoom out").isEnabled());
+        assertEquals(ChartViewController.PointerZoomOutcome.AT_BOUND,
+                controller.zoomAt(new juranometria.project.PlanePoint(0.001, 0.0),
+                        true, 900, 700),
+                "nor is the wheel's");
+
+        controller.zoomOut();
+        assertEquals("Field 0.5° · Stars to V 8.0", readout(toolbar).getText());
+        assertEquals(ChartViewController.PointerZoomOutcome.ACCEPTED,
+                controller.zoomAt(new juranometria.project.PlanePoint(0.001, 0.0),
+                        false, 900, 700),
+                "the wheel zooms out of a closer field about the pointer");
+        assertEquals("Field 1° · Stars to V 8.0", readout(toolbar).getText());
+        assertEquals(1.0, controller.state().fieldWidthDegrees());
+    }
+
+    @Test
+    void aCloserFieldIsNeverPersisted() {
+        // Ruling 5: a closer field is never saved. Nothing saves the view
+        // at all - every controller, and so every start, opens at the
+        // released default page.
+        ChartViewController controller = new ChartViewController();
+        controller.recenter(new juranometria.chart.SkyPosition(56.75, 24.12), 0.25);
+        assertEquals(juranometria.chart.ChartViewState.DEFAULT,
+                new ChartViewController().state());
+    }
 }

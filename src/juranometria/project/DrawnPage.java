@@ -152,7 +152,7 @@ public record DrawnPage(ChartScene scene, Projection projection) {
                         scene.viewport().centre().raDegrees()),
                 String.format(Locale.ROOT, "%+.4f",
                         scene.viewport().centre().decDegrees()),
-                String.format(Locale.ROOT, "%.1f",
+                juranometria.chart.FieldWidthText.title(
                         scene.viewport().fieldWidthDegrees()),
                 words.projection(projectionName()),
                 String.format(Locale.ROOT, "%.1f",

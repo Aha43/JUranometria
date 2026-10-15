@@ -53,10 +53,21 @@ class MercuryCartographyTest {
     }
 
     @Test
-    void theLadderStillRefusesEveryCandidateField() {
+    void theLadderStillOffersNoCandidateField() {
+        // #543 made the two ruled candidates (ruling 5) states a view may
+        // hold; the ladder still offers none of them, and a candidate the
+        // rulings did not approve is still refused outright.
         for (double field : MercuryCartographyStudyMain.CLOSER_FIELDS) {
-            assertThrows(IllegalArgumentException.class, () -> new ChartViewState(
-                    new SkyPosition(0.0, 0.0), field, 8.0), field + "° is not offered");
+            assertFalse(ChartViewState.fieldWidthSteps().contains(field),
+                    field + "° is not a ladder rung");
+            if (ChartViewState.closerFieldSteps().contains(field)) {
+                ChartViewState floor = new ChartViewState(new SkyPosition(0.0, 0.0), 1.0, 8.0);
+                assertEquals(1.0, floor.zoomIn().fieldWidthDegrees(),
+                        field + "°: the zoom stops at the floor");
+            } else {
+                assertThrows(IllegalArgumentException.class, () -> new ChartViewState(
+                        new SkyPosition(0.0, 0.0), field, 8.0), field + "° was not ruled");
+            }
         }
         assertEquals(1.0, ChartViewState.normalMinimumFieldDegrees(), "the floor is unchanged");
     }

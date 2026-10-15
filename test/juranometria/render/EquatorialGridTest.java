@@ -583,4 +583,59 @@ class EquatorialGridTest {
                         java.util.List.of(), java.util.List.of(),
                         "grid", 6.0, null));
     }
+
+    @Test
+    void theCloserFieldsTakeFinerStepsAndTheLadderNeverDoes() {
+        // #543: the ladder's finest steps (1m, 15') are a page apart at a
+        // closer field. The same spacing rule picks 15s and 2' at 0.25
+        // degrees and 15s and 5' at 0.5 on the equator.
+        var quarter = EquatorialGrid.spec(page(83.8, 0.0, 0.25));
+        assertEquals(0.0625, quarter.raStepDegrees(), 1e-12, "15s of time");
+        assertEquals(1.0 / 30.0, quarter.decStepDegrees(), 1e-12, "2'");
+        var half = EquatorialGrid.spec(page(83.8, 0.0, 0.5));
+        assertEquals(0.0625, half.raStepDegrees(), 1e-12);
+        assertEquals(1.0 / 12.0, half.decStepDegrees(), 1e-12, "5'");
+
+        // A 1-degree page wide enough that 15s would clear the spacing
+        // still takes the ladder's 1m and 15': finer steps are for
+        // closer fields only, so no released grid moves.
+        var wide = EquatorialGrid.spec(new ChartViewport(
+                new SkyPosition(83.8, 0.0), 1.0, 3000, 2000));
+        assertEquals(0.25, wide.raStepDegrees(), 1e-12);
+        assertEquals(0.25, wide.decStepDegrees(), 1e-12);
+    }
+
+    @Test
+    void aCloserGridDrawsSeveralLinesEachWayAndLabelsThemToTheirStep() {
+        for (double field : new double[] {0.5, 0.25}) {
+            var grid = EquatorialGrid.gridFor(pageOf(page(83.8, 22.0, field)),
+                    null);
+            assertTrue(grid.meridians().size() >= 3,
+                    field + ": meridians " + grid.meridians().size());
+            assertTrue(grid.parallels().size() >= 3,
+                    field + ": parallels " + grid.parallels().size());
+            assertTrue(grid.labels().stream().anyMatch(
+                            label -> label.text().endsWith("s")),
+                    field + ": an RA label in seconds " + grid.labels());
+            assertTrue(grid.labels().stream().anyMatch(
+                            label -> label.text().endsWith("′")),
+                    field + ": a Dec label in arcminutes " + grid.labels());
+        }
+    }
+
+    @Test
+    void closerNotationCarriesSecondsAndNeverSixtyMinutes() {
+        assertEquals("5h 35m 15s", EquatorialGrid.raLabel(83.8125, 0.0625));
+        assertEquals("5h 35m", EquatorialGrid.raLabel(83.75, 0.0625),
+                "a whole minute keeps the short form");
+        assertEquals("6h", EquatorialGrid.raLabel(90.0, 0.125));
+        assertEquals("5h 40m", EquatorialGrid.raLabel(85.0, 0.25),
+                "the ladder's step keeps the ladder's notation");
+        // 2' parallels are not exact binary fractions.
+        double nearlyTwentyTwo = 21.0 + 30 * (1.0 / 30.0);
+        assertEquals("+22°", EquatorialGrid.decLabel(nearlyTwentyTwo,
+                1.0 / 30.0));
+        assertEquals("+21° 58′", EquatorialGrid.decLabel(
+                21.0 + 29 * (1.0 / 30.0), 1.0 / 30.0));
+    }
 }

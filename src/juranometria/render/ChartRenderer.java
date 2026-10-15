@@ -2465,7 +2465,7 @@ public final class ChartRenderer {
                         formatRa(scene.viewport().centre().raDegrees()),
                         formatDec(scene.viewport().centre().decDegrees())),
                 words.titleFacts(
-                        String.format(Locale.ROOT, "%.1f",
+                        juranometria.chart.FieldWidthText.title(
                                 scene.viewport().fieldWidthDegrees()),
                         String.format(Locale.ROOT, "%.1f",
                                 scene.limitingMagnitude()),

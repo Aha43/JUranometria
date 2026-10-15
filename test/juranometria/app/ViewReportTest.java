@@ -247,4 +247,23 @@ class ViewReportTest {
                 b.workingSet(), b.workingLead(), b.osName(),
                 b.osVersion(), b.osArch(), b.javaVersion());
     }
+
+    @Test
+    void aCloserFieldIsReportedExactly() {
+        // #543: the report prints the field exactly, so a closer field
+        // reads 0.25 - never rounded to a rung.
+        ViewReport.Snapshot r = rich();
+        ViewReport.Snapshot closer = new ViewReport.Snapshot(r.version(),
+                new ChartViewState(new SkyPosition(56.75, 24.12), 0.25, 8.0),
+                r.chartWidthPx(), r.chartHeightPx(), r.pageWidthPx(),
+                r.pageHeightPx(), r.pageOffsetXPx(), r.pageOffsetYPx(),
+                r.displayScale(), r.chosen(), r.drawn(),
+                r.interfaceLanguage(), r.skyLanguageChosen(),
+                r.skyLanguageOnChart(), r.emphasis(), r.modules(),
+                r.placeAndTime(), r.eclipticShowing(), r.selection(),
+                r.workingSet(), r.workingLead(), r.osName(), r.osVersion(),
+                r.osArch(), r.javaVersion());
+        assertTrue(ViewReport.format(closer).contains("field-degrees: 0.25\n"),
+                ViewReport.format(closer));
+    }
 }

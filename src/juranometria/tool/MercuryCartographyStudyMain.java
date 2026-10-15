@@ -995,8 +995,13 @@ public final class MercuryCartographyStudyMain {
                 juranometria.render.EquatorialGrid.GridSpec grid =
                         juranometria.render.EquatorialGrid.spec(scene.viewport());
                 double pxPerDeg = PAGE_W / field;
-                String lines = String.format(Locale.ROOT, "%.0fm, %.0f′ - %.0f and %.0f px apart",
-                        grid.raStepDegrees() * 4.0, grid.decStepDegrees() * 60.0,
+                // Seconds of time below a minute, since #543 gave the closer
+                // fields finer steps.
+                String raStep = grid.raStepDegrees() < 0.25
+                        ? String.format(Locale.ROOT, "%.0fs", grid.raStepDegrees() * 240.0)
+                        : String.format(Locale.ROOT, "%.0fm", grid.raStepDegrees() * 4.0);
+                String lines = String.format(Locale.ROOT, "%s, %.0f′ - %.0f and %.0f px apart",
+                        raStep, grid.decStepDegrees() * 60.0,
                         grid.raStepDegrees() * Math.cos(Math.toRadians(centre.decDegrees())) * pxPerDeg,
                         grid.decStepDegrees() * pxPerDeg);
                 String says = drawnPage.describe(w);
@@ -1042,20 +1047,23 @@ public final class MercuryCartographyStudyMain {
                 + " at the page's own pixels - no magnification: what each field shows. The"
                 + " findings on the pages themselves, beyond the body:");
         p("");
-        p("- **The page's own words round the field.** The title block and the spoken"
-                + " description print one decimal: the 0.25° page says *Field 0.3°*. A closer"
-                + " field needs the field printed to its own precision.");
-        p("- **The grid's finest steps were built for the ladder.** Its smallest steps are 1m"
-                + " of right ascension and 15′ of declination; at 0.25° one step spans the whole"
-                + " page, so at most one line each way is drawn, often none - the reader loses"
-                + " the grid's scale exactly where scale matters most. A closer field needs finer"
-                + " steps (15s, 2′) before it is offered.");
+        p("- **The page's own words rounded the field.** As measured for #539, the title"
+                + " block and the spoken description printed one decimal: the 0.25° page said"
+                + " *Field 0.3°*. A closer field needs the field printed to its own precision."
+                + " *Met by #543:* these pages now say 0.25 (the table's last column).");
+        p("- **The grid's finest steps were built for the ladder.** As measured for #539, its"
+                + " smallest steps were 1m of right ascension and 15′ of declination; at 0.25°"
+                + " one step spanned the whole page, so at most one line each way was drawn,"
+                + " often none - the reader lost the grid's scale exactly where scale matters"
+                + " most. A closer field needs finer steps (15s, 2′) before it is offered."
+                + " *Met by #543:* the table's grid column shows the steps these pages now take.");
         p("- **The page may hold no star at all.** A 0.25° field near the ecliptic often"
                 + " contains no catalogue star at V 8.0; the body then stands alone, which is"
                 + " honest but leaves the reader nothing to orient by except the body and the"
                 + " title.");
         p("- **The catalogue query is the 1° page's.** The study reuses it, which is exact"
-                + " (the narrower page is inside it); production would query its own field.");
+                + " (the narrower page is inside it); production would query its own field."
+                + " *Met by #543:* production does, proven in `docs/studies/closer-fields`.");
         p("");
     }
 
