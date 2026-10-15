@@ -97,6 +97,25 @@ public final class StructureStyle {
             case CONSTELLATION_FIGURES -> dark
                     ? new Color(204, 116, 71)    // rust
                     : new Color(148, 79, 48);
+            // The Solar System labels (#526): the atlas's existing deep
+            // red - the meridian's frozen accent pair, measured on both
+            // grounds by the #361 study - on text rather than a line.
+            case SOLAR_SYSTEM_LABELS -> dark
+                    ? new Color(232, 144, 126)
+                    : new Color(164, 46, 46);
         };
+    }
+
+    /**
+     * The ink a Solar System body's label is written in (#526): the
+     * deep-red accent while the label class is raised, else exactly
+     * the canonical text ink. Colour only - a label has no stroke to
+     * gain - and a below-horizon label is quieted afterwards by its
+     * painter exactly as the canonical ink would be.
+     */
+    public static Color labelInk(ChartPalette palette, boolean selected,
+                                 Color canonicalInk) {
+        return selected ? accent(palette, ChartStructure.SOLAR_SYSTEM_LABELS)
+                : canonicalInk;
     }
 }

@@ -26,7 +26,28 @@ public enum ChartStructure {
     EQUATORIAL_GRID,
     HORIZON,
     CONSTELLATION_BOUNDARIES,
-    CONSTELLATION_FIGURES;
+    CONSTELLATION_FIGURES,
+    /**
+     * The labels of every drawn Solar System body as one class
+     * (#526): the Sun's, the Moon's, every drawn planet's and the
+     * Galilean moons' names, in the atlas's existing deep red. Labels
+     * only - marks, discs, phase geometry and state marks keep their
+     * ink - and no label is forced that placement refuses. Later
+     * planets and their drawn satellites join through the bodies
+     * layer's own classification, not through a list kept here.
+     */
+    SOLAR_SYSTEM_LABELS;
+
+    /**
+     * The six line structures of #361, in this order: what the frozen
+     * palette study measures and the line painters ask about. The
+     * label class is not among them - it is text, wearing a line
+     * structure's accent by the #526 ruling.
+     */
+    public static java.util.List<ChartStructure> lineStructures() {
+        return java.util.List.of(MERIDIAN, ECLIPTIC, EQUATORIAL_GRID, HORIZON,
+                CONSTELLATION_BOUNDARIES, CONSTELLATION_FIGURES);
+    }
 
     /**
      * This structure as a stable lowercase token - the form metadata

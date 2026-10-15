@@ -1768,6 +1768,30 @@ public final class ReferenceInk {
             juranometria.render.ChartPalette palette,
             juranometria.project.PageWords words, List<Shape> reserved,
             List<Rectangle2D> referenceBoxes) {
+        return paintBodies(g, page, contributions, palette, words, reserved,
+                referenceBoxes, structure -> false);
+    }
+
+    /**
+     * The same, with the reader's raised structures (#526): while
+     * {@link juranometria.render.ChartStructure#SOLAR_SYSTEM_LABELS}
+     * is raised every name this layer writes - the bodies' and the
+     * moons' - is written in the deep-red accent instead of the text
+     * ink, quieted below the horizon as the text ink is. Ink only: the
+     * discs, marks, boxes, order, refusals and placements are those of
+     * the canonical page, so the placements returned are identical
+     * whether or not the class is raised.
+     */
+    public static List<BodyPlacement> paintBodies(Graphics2D g,
+            DrawnPage page, List<OverlayRegistry.Owned> contributions,
+            juranometria.render.ChartPalette palette,
+            juranometria.project.PageWords words, List<Shape> reserved,
+            List<Rectangle2D> referenceBoxes,
+            java.util.function.Predicate<juranometria.render.ChartStructure> emphasized) {
+        Color nameInk = juranometria.render.StructureStyle.labelInk(palette,
+                emphasized != null && emphasized.test(
+                        juranometria.render.ChartStructure.SOLAR_SYSTEM_LABELS),
+                palette.textInk());
         List<OverlayContribution> bodies = new ArrayList<>();
         for (OverlayRegistry.Owned owned : contributions) {
             if (owned.geometry() instanceof OverlayContribution.Body
@@ -1913,8 +1937,8 @@ public final class ReferenceInk {
                     taken.add(box);
                     boxes[i] = box;
                     g2.setColor(below
-                            ? ChartRenderer.quiet(palette.textInk(), palette.ground())
-                            : palette.textInk());
+                            ? ChartRenderer.quiet(nameInk, palette.ground())
+                            : nameInk);
                     g2.drawString(name, (float) box.getMinX(),
                             (float) (box.getMaxY() - metrics.getDescent()));
                 }
@@ -1936,8 +1960,8 @@ public final class ReferenceInk {
                     taken.add(box);
                     moonBoxes.put(m, box);
                     g2.setColor(m.satellite().belowHorizon()
-                            ? ChartRenderer.quiet(palette.textInk(), palette.ground())
-                            : palette.textInk());
+                            ? ChartRenderer.quiet(nameInk, palette.ground())
+                            : nameInk);
                     g2.drawString(name, (float) box.getMinX(),
                             (float) (box.getMaxY() - metrics.getDescent()));
                 }

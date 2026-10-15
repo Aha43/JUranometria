@@ -107,7 +107,7 @@ class StructureEmphasisTest {
                 new float[] {6.0f, 3.0f, 1.0f, 3.0f}, 0.0f);
         for (ChartPalette palette : ChartPalette.values()) {
             java.util.Set<Color> accents = new java.util.HashSet<>();
-            for (ChartStructure structure : ChartStructure.values()) {
+            for (ChartStructure structure : ChartStructure.lineStructures()) {
                 StructureStyle.Style style = StructureStyle.resolve(
                         palette, structure, true,
                         palette.figureInk(), dashDot);
@@ -125,9 +125,18 @@ class StructureEmphasisTest {
                 assertEquals(dashDot.getEndCap(),
                         style.stroke().getEndCap());
             }
-            assertEquals(ChartStructure.values().length, accents.size(),
-                    "six structures, six distinguishable accents on "
+            assertEquals(ChartStructure.lineStructures().size(), accents.size(),
+                    "six line structures, six distinguishable accents on "
                             + palette);
+            // The label class (#526) is text wearing the meridian's deep
+            // red by ruling - the one accent shared, on purpose.
+            assertEquals(StructureStyle.resolve(palette, ChartStructure.MERIDIAN, true,
+                            palette.figureInk(), dashDot).color(),
+                    StructureStyle.labelInk(palette, true, palette.textInk()),
+                    "the Solar System labels wear the existing deep red on " + palette);
+            assertEquals(palette.textInk(),
+                    StructureStyle.labelInk(palette, false, palette.textInk()),
+                    "and exactly the text ink while not raised");
         }
     }
 

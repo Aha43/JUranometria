@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**578 promoted artifacts.**
+**584 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -545,6 +545,12 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/solar-cartography/moon-first-quarter-8.png` | `167b12c2f8216bd00d94fafc3e356b8e4237f77635832f85a3d8bc7baa4bd5b3` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/solar-cartography/moon-over-stars-3.png` | `efce7c1d867b07686aa91ce1e2912d285b6aacbd15b3b90b6a5cc14afefaae93` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/solar-cartography/off-page-hint-24.png` | `5bbdfe142d2a8a21d95fab5803a18ba0fa5b6c59aa266489ffa6aabc24c90b48` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/solar-system-labels/close-1-black.png` | `23e5d2c09e0d4bd7bfc6d2940d390e02b5c64a9cf1a7359fc8e10f288a1e60c4` | 2026-10-14 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/solar-system-labels/close-1-paper.png` | `f6c965bb5cebb4407b03f9bb046a26b555a7ca1153e1f8a3eba2e5418ac045b5` | 2026-10-14 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/solar-system-labels/transit-2-paper.png` | `c1412aa6812e64d9b24ac9464af765b10cb55b61b7613d6370e31a6853538ab9` | 2026-10-14 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/solar-system-labels/wide-120-black.png` | `fee0ebf5acf0e3ebdb6d3527b6e8b191de843596dfb3e0c2d1775a9f2dab176e` | 2026-10-14 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/solar-system-labels/wide-120-paper-nb.png` | `8bf7a64f80e722185b7da278f730c21dce9ae58d24c0f37b0cded1c44008074a` | 2026-10-14 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/solar-system-labels/wide-120-paper.png` | `c11c3d37329e1837d22bd72919f0361f8d7aed77e747d9f9a690cd5dfa5998e1` | 2026-10-14 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/solar-system/moon-contract/figures/bright-limb-angle.png` | `ad56a9a40b4d3bcfa61e96f0282f684a4d37bcd5e261c807890ab43bd214e3b0` | 2026-09-29 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/solar-system/moon-contract/figures/bright-limb-angle.svg` | `10260987ae252fdc1458feeb71f3b1f804610d97e2bef26679ac5f9cddaf8765` | 2026-09-29 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/solar-system/moon-contract/figures/phase-geometry.png` | `ece2bacb68599d85dcae0c5b738c19250432514098c488fd2b9b04b740beed91` | 2026-09-29 | Mac OS X aarch64, Java 21.0.12.1 | various |

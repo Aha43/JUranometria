@@ -191,6 +191,11 @@ public final class EvidenceContractMain {
         // each name went is the platform record (PLATFORM_REPORTS).
         REPORT_MAINS.put("juranometria.tool.JupiterOnTheChartStudyMain",
                 "docs/studies/jupiter-on-the-chart/measurements.md");
+        // The Solar System labels as one emphasis class (#526): production
+        // pages canonical and raised; the portable half here, the
+        // font-dependent counts in its platform record.
+        REPORT_MAINS.put("juranometria.tool.SolarSystemLabelsStudyMain",
+                "docs/studies/solar-system-labels/measurements.md");
         REPORT_MAINS.put("juranometria.tool.PrintableChartStudyMain",
                 "docs/studies/printable-chart/measurements.md");
         // Not prose but an oracle: the released pages' own pixels
@@ -375,6 +380,8 @@ public final class EvidenceContractMain {
                 "docs/studies/meridian-ticks/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.JupiterOnTheChartStudyMain",
                 "docs/studies/jupiter-on-the-chart/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.SolarSystemLabelsStudyMain",
+                "docs/studies/solar-system-labels/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.JovianCartographyStudyMain",
                 "docs/studies/jovian-cartography/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.VenusContractStudyMain",
@@ -537,6 +544,9 @@ public final class EvidenceContractMain {
             // production pages composed by the component with the Jovian
             // module attached.
             "juranometria.tool.JupiterOnTheChartStudyMain",
+            // The Solar System labels as one emphasis class (issue #526):
+            // production pages canonical and raised, side by side.
+            "juranometria.tool.SolarSystemLabelsStudyMain",
             // The Venus table mock-ups and diagrams (issue #500): the
             // proposed table in study-only arrangements; widget-rendered
             // inspection, the controls- prefix.

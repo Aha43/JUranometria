@@ -7,6 +7,15 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Solar System labels as one emphasis class (#526).** The Emphasis menu
+gains one choice, Solar System labels, which writes the label of every
+drawn Solar System body - the Sun, the Moon, the planets drawn,
+Jupiter's moons - in the atlas's existing deep red. Labels only: marks,
+discs, phases and every other ink keep their rules; a refused name
+stays refused; a name below the horizon stays quieted. Transient like
+the other choices, independent of them, carried onto an exported sheet
+under its own token. In both languages.
+
 **Mercury in the Solar System tables (#530).** View > Solar System >
 Mercury... and the Controller's Mercury group, between the Sun and
 Venus, show where Mercury is for an instant or over a range in the

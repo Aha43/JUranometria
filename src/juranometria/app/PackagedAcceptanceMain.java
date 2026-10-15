@@ -458,6 +458,7 @@ public final class PackagedAcceptanceMain {
         meridianJourney();
         emphasisJourney();
         combinedEmphasisJourney();
+        solarSystemLabelsJourney();
         horizonPanJourney();
         javax.swing.SwingUtilities.invokeAndWait(() ->
                 cardinalLandmarkJourney());
@@ -4173,6 +4174,135 @@ public final class PackagedAcceptanceMain {
     }
 
     /**
+     * The Solar System labels as one emphasis class (#526): on a wide
+     * page with the Sun, the Moon and Venus drawn under the horizon's
+     * module, raising the class changes ink only inside the names'
+     * boxes - the placements are the canonical page's, a refused name
+     * stays refused, the discs keep their ink - and settles with
+     * Normal; the class is offered only while a body is drawn; the
+     * menu names it in both languages.
+     */
+    private static void solarSystemLabelsJourney() throws Exception {
+        juranometria.solar.SolarSystemService solar =
+                juranometria.solar.SolarSystemService.load();
+        juranometria.sky.Observer oslo = new juranometria.sky.Observer(59.91, 10.75,
+                java.time.Instant.parse("2026-03-20T21:33:00Z"));
+        juranometria.chart.SkyPosition sun = ((juranometria.solar.SolarSystemService
+                .SunObservation) solar.observe(juranometria.solar.SolarSystemService.Body.SUN,
+                oslo)).astrometricJ2000();
+        juranometria.ui.ChartComponent[] chart = new juranometria.ui.ChartComponent[1];
+        juranometria.ui.ChartModuleHost[] host = new juranometria.ui.ChartModuleHost[1];
+        juranometria.solarchart.SolarSystemModule[] module =
+                new juranometria.solarchart.SolarSystemModule[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            chart[0] = new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
+            chart[0].setSize(900, 700);
+            chart[0].setViewState(new ChartViewState(sun, 120.0, 8.0, null, null));
+            host[0] = new juranometria.ui.ChartModuleHost(chart[0],
+                    new juranometria.chart.SelectionModel(), r -> { });
+        });
+        try {
+            require(!chart[0].emphasisAvailable(juranometria.render.ChartStructure
+                    .SOLAR_SYSTEM_LABELS), "no body drawn: the class is not offered");
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                juranometria.meridian.MeridianModule meridian = host[0].attach(
+                        new juranometria.meridian.MeridianModule(oslo));
+                meridian.showing(true, true, false);
+                module[0] = juranometria.ui.solar.SunChartSession.begin(host[0], () -> oslo,
+                        () -> solar, meridian::horizonShowing);
+                module[0].sunShowing(true);
+                module[0].moonShowing(true);
+                module[0].venusShowing(true);
+            });
+            javax.swing.SwingUtilities.invokeAndWait(() -> { });
+            require(chart[0].emphasisAvailable(juranometria.render.ChartStructure
+                    .SOLAR_SYSTEM_LABELS), "bodies drawn: the class can be raised");
+            java.awt.image.BufferedImage canonical = paint(chart[0]);
+            java.util.List<juranometria.ui.ReferenceInk.BodyPlacement> before =
+                    chart[0].renderedBodies();
+            int placed = 0;
+            boolean below = false;
+            for (juranometria.ui.ReferenceInk.BodyPlacement b : before) {
+                placed += b.box() == null ? 0 : 1;
+                below |= b.belowHorizon() && b.box() != null;
+            }
+            require(before.size() == 3 && placed >= 2 && below,
+                    "the Sun, the Moon and Venus drawn, names placed, one below the horizon: "
+                            + before);
+            chart[0].toggleEmphasis(juranometria.render.ChartStructure.SOLAR_SYSTEM_LABELS);
+            java.awt.image.BufferedImage raised = paint(chart[0]);
+            java.util.List<juranometria.ui.ReferenceInk.BodyPlacement> after =
+                    chart[0].renderedBodies();
+            require(after.size() == before.size(), "the same bodies");
+            for (int i = 0; i < before.size(); i++) {
+                require(before.get(i).identity().equals(after.get(i).identity())
+                                && java.util.Objects.equals(before.get(i).box(), after.get(i).box())
+                                && before.get(i).name().equals(after.get(i).name())
+                                && before.get(i).centre().equals(after.get(i).centre()),
+                        "placements are the canonical page's: " + after.get(i));
+            }
+            int inside = 0;
+            int outside = 0;
+            for (int y = 0; y < canonical.getHeight(); y++) {
+                for (int x = 0; x < canonical.getWidth(); x++) {
+                    if (canonical.getRGB(x, y) == raised.getRGB(x, y)) {
+                        continue;
+                    }
+                    boolean inBox = false;
+                    for (juranometria.ui.ReferenceInk.BodyPlacement b : before) {
+                        if (b.box() != null && new java.awt.geom.Rectangle2D.Double(
+                                b.box().getX() - 1, b.box().getY() - 1, b.box().getWidth() + 2,
+                                b.box().getHeight() + 2).contains(x + 0.5, y + 0.5)) {
+                            inBox = true;
+                            break;
+                        }
+                    }
+                    if (inBox) {
+                        inside++;
+                    } else {
+                        outside++;
+                    }
+                }
+            }
+            require(inside > 20 && outside == 0, "the names rise in the deep red and nothing"
+                    + " else moves: " + inside + " px inside the names' boxes, " + outside
+                    + " outside");
+            // Independent of the lines: the meridian joins, the grid does not.
+            chart[0].toggleEmphasis(juranometria.render.ChartStructure.MERIDIAN);
+            require(chart[0].emphasizedSet().equals(java.util.Set.of(
+                            juranometria.render.ChartStructure.MERIDIAN,
+                            juranometria.render.ChartStructure.SOLAR_SYSTEM_LABELS)),
+                    "labels and meridian raised, the grid not: " + chart[0].emphasizedSet());
+            for (String[] language : new String[][] {{"en", "Solar System labels"},
+                    {"nb-NO", "Solsystemetiketter"}}) {
+                javax.swing.JPopupMenu menu = juranometria.ui.ChartActions.emphasisMenu(chart[0],
+                        juranometria.ui.language.InterfaceText.forLanguage(language[0]));
+                javax.swing.JCheckBoxMenuItem last = (javax.swing.JCheckBoxMenuItem)
+                        menu.getComponent(menu.getComponentCount() - 1);
+                require(language[1].equals(last.getText()) && last.isSelected(),
+                        "the menu names the class in " + language[0] + ": " + last.getText());
+            }
+            chart[0].clearEmphasis();
+            require(differingPixels(canonical, paint(chart[0])) == 0,
+                    "Normal settles the page byte-exactly");
+            javax.swing.SwingUtilities.invokeAndWait(() -> module[0].sunShowing(false));
+            javax.swing.SwingUtilities.invokeAndWait(() -> module[0].moonShowing(false));
+            javax.swing.SwingUtilities.invokeAndWait(() -> module[0].venusShowing(false));
+            javax.swing.SwingUtilities.invokeAndWait(() -> { });
+            require(!chart[0].emphasisAvailable(juranometria.render.ChartStructure
+                    .SOLAR_SYSTEM_LABELS), "every body hidden: the class is no longer offered");
+            System.out.println("solar system labels OK (one choice raises the Sun's, the Moon's"
+                    + " and Venus's names in the deep red on a 120\u00b0 page under the"
+                    + " horizon, " + inside + " px inside the names' boxes and none outside,"
+                    + " placements unchanged, a below-horizon name quieted; independent of"
+                    + " the meridian and the grid; named in both languages; Normal settles"
+                    + " byte-exactly; offered only while a body is drawn)");
+        } finally {
+            javax.swing.SwingUtilities.invokeAndWait(host[0]::detachAll);
+        }
+    }
+
+    /**
      * The combinations journey (the multiple-emphasis follow-up to
      * #361), walking the owner's scripted list mechanically: grid
      * alone, horizon with meridian, grid with figures, then all six
@@ -4212,10 +4342,13 @@ public final class PackagedAcceptanceMain {
                 host.attach(new juranometria.ecliptic.EclipticModule());
         ecliptic.showing(true);
         for (juranometria.render.ChartStructure structure
-                : juranometria.render.ChartStructure.values()) {
+                : juranometria.render.ChartStructure.lineStructures()) {
             require(chart.emphasisAvailable(structure),
                     "the journey page must offer " + structure.token());
         }
+        require(!chart.emphasisAvailable(juranometria.render.ChartStructure
+                        .SOLAR_SYSTEM_LABELS),
+                "and no body is drawn here, so the label class (#526) is not offered");
         java.awt.image.BufferedImage canonical = paint(chart);
 
         // 1. Grid alone; horizon + meridian; grid + figures.
@@ -4358,10 +4491,12 @@ public final class PackagedAcceptanceMain {
 
         // 7. Hiding one active structure clears only it.
         meridian.showing(false, true, false);
-        require(chart.emphasizedSet().equals(java.util.EnumSet
-                        .complementOf(java.util.EnumSet.of(
-                                juranometria.render.ChartStructure
-                                        .MERIDIAN))),
+        // The six line structures were raised; the label class (#526) is
+        // not offered on this page, which draws no body.
+        java.util.EnumSet<juranometria.render.ChartStructure> remaining =
+                java.util.EnumSet.copyOf(juranometria.render.ChartStructure.lineStructures());
+        remaining.remove(juranometria.render.ChartStructure.MERIDIAN);
+        require(chart.emphasizedSet().equals(remaining),
                 "hiding the meridian settles only the meridian");
         meridian.showing(true, true, false);
 
