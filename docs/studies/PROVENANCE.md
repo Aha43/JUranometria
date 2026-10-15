@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**621 promoted artifacts.**
+**630 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -267,14 +267,14 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/interface-language/inspector-nb-NO-5-ambiguous.png` | `3b50f3d5d399d685b6dc0c86c2c1e43309673963c08666debbe25ed4792a078e` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/inspector-nb-NO-6-workingset.png` | `af38b8fc6a4d6bd42f29915bd9ac8046f99808ff77953a02fd55d57fdcc189f7` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/inspector-nb-NO-7-occurrence.png` | `54abb95a786bcac00c8256a130bece9d7ceea11de6d50f60f0e5d2f595c27d7a` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/menu-en-1-menus.png` | `aba0a81df4dc0ba609be55fac30718fe54fe49f3c3fa25a186836178880c49e4` | 2026-10-14 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/menu-en-2-checked.png` | `59ed02b7de5b6eac75f59488c754950e0d12564793c4e8e64f0c83195623e672` | 2026-10-14 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/menu-en-3-widest.png` | `b14647cd87cb4ac947e9a5d4092fdf1cc006284f7cdf62f6b0fd83e5079fa817` | 2026-10-14 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/menu-en-4-narrowest.png` | `2d806c95164dd0645d7b3077a02ca0f50f629708cfc03549e74c20959b1567bc` | 2026-10-14 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/menu-nb-NO-5-menus.png` | `443980776d7ef9025c0a69d5be5ec5a194df8498a0c7247484a29245cbc544cb` | 2026-10-14 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/menu-nb-NO-6-checked.png` | `185a3e8adb2cae5b759ebaea790fa2c0c3767ca003c91601534c202b04b083c9` | 2026-10-14 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/menu-nb-NO-7-widest.png` | `11d80d4de132792655dfc0eaa51bbc98fc0cc73d5778ef4f36332863c2469f79` | 2026-10-14 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/menu-nb-NO-8-narrowest.png` | `99debfbdef105af60aa1aed05aeb8dbe7c8809f4680e404eb6204890d19dca01` | 2026-10-14 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/menu-en-1-menus.png` | `8ce3f1eb69272b69691537985c893771f04db4977540ffb9e4ab132aa06ecc23` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/menu-en-2-checked.png` | `745fdeda065eb31794740bcf6d96a95e2787af61bed0d0eacd2aa73a1fff1d9c` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/menu-en-3-widest.png` | `671207c6ea2198ee9d6404302b94ba4d6b9629b31b9479af6f026dc1b4dfc044` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/menu-en-4-narrowest.png` | `bdb736d760508be2faf2143f8fab6cae4407002b217b7fead094bc1e766ca189` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/menu-nb-NO-5-menus.png` | `7868c9623f317f0dc10c105d6516f69b22b6fb4d56a068f77f9b342afc521044` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/menu-nb-NO-6-checked.png` | `9a3c7eca9bec4f59f83a7fc3fc2c7f075e7ac6658785a9e7779abf82f38dcf61` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/menu-nb-NO-7-widest.png` | `68782507cbb82afd658a134d4ec1bf964bf0b317167f45e326a2e73d9b8d4f05` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/menu-nb-NO-8-narrowest.png` | `a3b4611cf8921808a1b1f038fa2678c7eaf88bc67b651df4aaacbe4cd124443e` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/mercurytable-en-1-instant.png` | `8e60aea50ac45ead7d0944eb4514ad0024e4ad3ec144f8b0f852fbe33f19d2f3` | 2026-10-14 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/mercurytable-en-2-range.png` | `a160f8b5bf236a97eb266a453655774d40249d6cd66e703856cae049b27b4f2f` | 2026-10-14 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/mercurytable-en-3-refused.png` | `de9544094c232e49d10570ddb0cd8a833321e9b81a40bdf81a9a49bbd20ffa69` | 2026-10-14 | Mac OS X aarch64, Java 21.0.12.1 | various |
@@ -428,6 +428,15 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/mercury-cartography/venus-elongation-0.25.png` | `814adacb240edbbf0c7429b3584e4625c516a07122ea28d51bbd94264ff77292` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/mercury-cartography/venus-elongation-0.5.png` | `fb9798ec106653efbd270656500c5b4142cb0af46c898d3e35e83d9b614fd61c` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/mercury-cartography/venus-elongation-1.png` | `cd340d6c83f668de3d904c542b798c94d791e4a1824887a8ca4b973c585dbb28` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-on-the-chart/apparition-2026.png` | `78ba1ca03dcc9a404e88eb0cf4425a3807491b2bbfebfbb9baaadc8fa8a13d81` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-on-the-chart/behind-the-sun-2026-1.png` | `fed271d932b1e3d42b9666e9bbe0cffe4f68d015c6f22d7ff59053a54fff0a0e` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-on-the-chart/elongation-1.png` | `85e39b3cf60ceafec36f9afaed0880a3ef2e129c4a34e523d61f6b94f3219719` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-on-the-chart/elongation-3-dark.png` | `e0dbda093f2a600ee8effe29470f815a3532d531f6ef1a20d5019093ec431727` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-on-the-chart/elongation-3.png` | `2402fd748c34a1cc0a20f68f6c9a70b462dcd24a66b2846d85620bd9f8b346b6` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-on-the-chart/elongation-8-nb.png` | `a42c50ceaa0788373c878278c9025f40a52e12930812a196f625e15a07ddad18` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-on-the-chart/inferior-conjunction-2026-1.png` | `f6ff6e9c997bb99666009b59ceeb805ea1f6900ff0478320030fb0ff527b21d5` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-on-the-chart/transit-2019-1.png` | `adc67e1a283b494a15e1f1964adba0f1e77b60873c68ac35d99e184a68379784` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mercury-on-the-chart/transit-2019-6-nb.png` | `74dc2452e3875030bd2d5c059dc744bc4e5f2ff802d67986a4368e46d21ac3cf` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/meridian-ticks/bodies-moon-120.png` | `09833652d42d9c72850b449acf6dca57ac7c4b398b0785c5060587dd84f82b53` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/meridian-ticks/bodies-sun-120.png` | `ff63340b106b683e8843426b2a0d6338d10284e1eb0f6dee0ed7e6944a791896` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/meridian-ticks/bodies-venus-120.png` | `8b2bc96cc6bb40abc4f36b1b6e252b0a2ac57240dd84ace5c0c365d5c72d1a40` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |

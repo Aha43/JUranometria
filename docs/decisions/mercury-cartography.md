@@ -231,3 +231,41 @@ recorded as given:
 
 This approves the design and sequence; each merge and the release remain
 separate checkpoints.
+
+## #542, as built
+
+Step 2 of the sequence, under rulings 1-3 and 6. The evidence is
+`docs/studies/mercury-on-the-chart/` (`make mercury-on-the-chart-study`),
+drawn by the production `ChartComponent` with the Solar System module
+attached.
+
+- **Rule M on the page.** Mercury joins the Solar System module beside
+  Venus: the larger of the true solid-body disc and the 6 px mark,
+  phased by the page's own lit region. On the ordinary ladder the true
+  disc is always under the mark, so Mercury is always a cartographic
+  symbol beneath the stars, spoken as one. No sliver is invented near
+  conjunction: the mark is as dark as the geometry gives. The study's
+  row of 2026 phases holds the drawn half and the lit side's facing
+  against the Mercury table wherever the table states χ (its closing
+  line states the count).
+- **Conjunctions by painting order.** In front of the Sun the mark is
+  painted in the bodies layer over the Sun's disc (#514's rule), beside
+  the capped centre dot (#541); behind the Sun it lies beneath the
+  stars and is covered. The geometric state is spoken in both cases
+  (*in front of the Sun*, *behind the Sun*). The name refused inside
+  the Sun's ink is C4's, as for Venus. There is no Mercury exception
+  (ruling 2).
+- **Interaction inherited from Venus.** *Mercury on the chart* sits in
+  View > Solar System between the Sun and Venus, mnemonic C in English and K
+  in Norwegian. The Controller's Mercury group gains Show on chart, and
+  the Mercury table's Centre on chart now centres Mercury's own layer.
+  Mercury on the chart is remembered as Venus on the chart is
+  (`MercuryChartStore`, off at first start). Labels, selection and the
+  Solar System labels emphasis class reach Mercury unchanged.
+- **Phase on screen is not yet visible.** On the ordinary ladder the
+  mark is too small for its phase to be read; ruling 4's acceptance
+  requirement belongs to #543-#544 and is not claimed here.
+- **Evidence moved.** The new study, its provenance rows, the menu
+  sheets (the new item), the companion and test-evidence pins, and the
+  packaged journey *mercury on the chart OK*. No existing chart page
+  moves: Mercury is off unless chosen.
