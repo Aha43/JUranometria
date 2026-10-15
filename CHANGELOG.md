@@ -7,6 +7,14 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Mercury handed to cartography (#531).** Part I of the road to 5.3.0
+closes with `docs/decisions/mercury-handover.md`: the settled numerical
+contract, the measured accuracy and named cases, the two emphasis
+decisions, every stopped run, the routes and evidence movement, and
+the questions Part II must decide - Mercury's size on the page, the
+phased minimum mark, #481, conjunction painting, selection and Centre
+on chart.
+
 **Emphasis in the Controller (#525).** The Controller's Chart tab gains
 an Emphasis group: one checkbox for every choice of the toolbar's
 Emphasis popup, and Normal, so several structures can be raised or
