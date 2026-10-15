@@ -56,6 +56,13 @@ public final class SolarSystemModule implements ChartModule {
     /** The page's state keys for Venus meeting the Sun's disc (ruling 3 on #512). */
     public static final String VENUS_IN_FRONT = "venus.inFront";
     public static final String VENUS_BEHIND = "venus.behind";
+    /** Mercury's identity on the page (#542), derived as Venus's is. */
+    public static final String MERCURY = Body.MERCURY.name().toLowerCase(java.util.Locale.ROOT);
+    /** Rule M for Mercury (ruling 1 on #539): Venus's mark, the same size. */
+    public static final double MERCURY_MINIMUM_MARK_PX = VENUS_MINIMUM_MARK_PX;
+    /** The page's state keys for Mercury meeting the Sun's disc (ruling 2 on #539). */
+    public static final String MERCURY_IN_FRONT = MERCURY + VENUS_IN_FRONT.substring(VENUS.length());
+    public static final String MERCURY_BEHIND = MERCURY + VENUS_BEHIND.substring(VENUS.length());
 
     private final Supplier<Observer> observer;
     private final Supplier<SolarSystemService> service;
@@ -146,6 +153,36 @@ public final class SolarSystemModule implements ChartModule {
     private boolean venusShowing;
     private final java.util.List<java.util.function.Consumer<Boolean>> venusListeners =
             new java.util.ArrayList<>();
+    private boolean mercuryShowing;
+    private final java.util.List<java.util.function.Consumer<Boolean>> mercuryListeners =
+            new java.util.ArrayList<>();
+
+    public boolean mercuryShowing() {
+        return mercuryShowing;
+    }
+
+    /** Mercury on the chart (#542): its own switch, independent of every other body's. */
+    public void mercuryShowing(boolean showing) {
+        boolean changed = this.mercuryShowing != showing;
+        this.mercuryShowing = showing;
+        if (services != null) {
+            services.redraw();
+        }
+        if (changed) {
+            for (java.util.function.Consumer<Boolean> listener
+                    : java.util.List.copyOf(mercuryListeners)) {
+                listener.accept(showing);
+            }
+        }
+    }
+
+    public void onMercuryChange(java.util.function.Consumer<Boolean> listener) {
+        if (listener == null) {
+            throw new IllegalArgumentException("a listener is required");
+        }
+        mercuryListeners.add(listener);
+        listener.accept(mercuryShowing);
+    }
 
     public boolean venusShowing() {
         return venusShowing;
@@ -236,7 +273,7 @@ public final class SolarSystemModule implements ChartModule {
      */
     public List<OverlayContribution> contributedGeometry() {
         contributions++;
-        if (!sunShowing && !moonShowing && !venusShowing) {
+        if (!sunShowing && !moonShowing && !venusShowing && !mercuryShowing) {
             return List.of();
         }
         Observer now = observer.get();
@@ -252,6 +289,33 @@ public final class SolarSystemModule implements ChartModule {
                     horizon && sun.horizontal().altitudeDegrees() < 0.0,
                     sun.distanceKm(), InkRole.BODY,
                     OverlayContribution.Moment.of(now), true));
+        }
+        if (mercuryShowing) {
+            // Mercury (#542, the rulings on #539): Venus's form exactly - the
+            // solid body's disc from the equatorial radius, phased as the
+            // Mercury table states it, over the same 6 px mark (rule M),
+            // selectable as an occurrence, its state spoken when its disc
+            // meets the Sun's. Outside its years the chart draws nothing.
+            try {
+                juranometria.solar.MercuryService.MercuryObservation mercury =
+                        (juranometria.solar.MercuryService.MercuryObservation)
+                                service.get().observe(Body.MERCURY, now);
+                String state = switch (mercury.phase()) {
+                    case IN_FRONT_OF_SUN -> MERCURY_IN_FRONT;
+                    case BEHIND_SUN -> MERCURY_BEHIND;
+                    default -> null;
+                };
+                offered.add(new OverlayContribution.Body(MERCURY, "Mercury",
+                        mercury.astrometricJ2000(), mercury.solidBodyDiameterArcseconds(),
+                        new OverlayContribution.Lit(mercury.illuminatedFraction(),
+                                mercury.brightLimbAngleDegrees(), mercury.phaseAngleDegrees()),
+                        horizon && mercury.horizontal().altitudeDegrees() < 0.0,
+                        mercury.distanceKm(), InkRole.BODY,
+                        OverlayContribution.Moment.of(now), true, MERCURY_MINIMUM_MARK_PX,
+                        state));
+            } catch (IllegalArgumentException outsideTheYears) {
+                // Nothing for this instant.
+            }
         }
         if (venusShowing) {
             // Venus (#514, the rulings on #512): the solid body's disc,

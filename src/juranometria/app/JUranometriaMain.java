@@ -413,6 +413,7 @@ public final class JUranometriaMain {
         // The Moon (#416) on the same module, with a switch of its own.
         juranometria.ui.solar.MoonChartStore moonChartStore = stores.moonChart();
         juranometria.ui.solar.VenusChartStore venusChartStore = stores.venusChart();
+        juranometria.ui.solar.MercuryChartStore mercuryChartStore = stores.mercuryChart();
         juranometria.solarchart.SolarSystemModule sunOnChart =
                 juranometria.ui.solar.SunChartSession.begin(modules,
                         () -> meridian.attached() ? meridian.observer() : null,
@@ -503,6 +504,10 @@ public final class JUranometriaMain {
         // a third switch, remembered like the Sun's and the Moon's.
         juranometria.ui.solar.BodyOnChart venusLayer =
                 juranometria.ui.solar.VenusChartSession.switchOf(sunOnChart, venusChartStore);
+        // Mercury on the chart (#542, the rulings on #539): a fourth switch on
+        // the same module, remembered like the others.
+        juranometria.ui.solar.BodyOnChart mercuryLayer =
+                juranometria.ui.solar.MercuryChartSession.switchOf(sunOnChart, mercuryChartStore);
         juranometria.ui.solar.BodyOnChart jupiterLayer =
                 juranometria.ui.solar.JovianChartSession.switchOf(jovianOnChart,
                         jovianChartStore);
@@ -515,8 +520,8 @@ public final class JUranometriaMain {
         // Centre on chart, Mercury with neither switch nor button.
         juranometria.ui.solar.SolarSystemSection solarSection =
                 new juranometria.ui.solar.SolarSystemSection(sunTable, mercuryTable,
-                        venusTable, moonTable, sunLayer, venusLayer, moonLayer, jupiterTable,
-                        jupiterLayer, centreOnChart, companionWords);
+                        venusTable, moonTable, sunLayer, mercuryLayer, venusLayer, moonLayer,
+                        jupiterTable, jupiterLayer, centreOnChart, companionWords);
         companion.addTab(juranometria.ui.solar.SolarSystemSection.ID,
                 companionWords.say("companion.tab.solarsystem"),
                 solarSection.inController(companionStore, companionWords));
@@ -648,7 +653,16 @@ public final class JUranometriaMain {
                         language.interfaceLanguage()),
                 () -> juranometria.ui.solar.SolarTableDialog.open(frame, mercuryTable,
                         juranometria.ui.language.InterfaceText.forLanguage(
-                                language.interfaceLanguage())));
+                                language.interfaceLanguage()), centreOnChart, mercuryLayer));
+        // View > Solar System > Mercury on the chart (#542), between Sun on the
+        // chart and Venus on the chart: the switch, remembered.
+        javax.swing.JCheckBoxMenuItem mercuryOnChartItem = AppMenuBar.addMercuryOnChart(
+                frame.getJMenuBar(),
+                juranometria.ui.language.InterfaceText.forLanguage(
+                        language.interfaceLanguage()),
+                juranometria.ui.solar.MercuryChartSession.toggle(sunOnChart, mercuryChartStore));
+        juranometria.ui.solar.MercuryChartSession.restore(sunOnChart, mercuryChartStore,
+                mercuryOnChartItem);
         // View > Solar System > Venus on the chart (#514), after Sun on the
         // chart: the switch, remembered, its item following the module.
         javax.swing.JCheckBoxMenuItem venusOnChartItem = AppMenuBar.addVenusOnChart(

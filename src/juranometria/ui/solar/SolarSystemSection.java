@@ -114,19 +114,34 @@ public final class SolarSystemSection {
                               BodyOnChart moonOnChart,
                               JovianTableSession jupiterSession, BodyOnChart jupiterOnChart,
                               CentreOnChart centre, InterfaceText said) {
-        this(sunSession, null, venusSession, moonSession, sunOnChart, venusOnChart, moonOnChart,
-                jupiterSession, jupiterOnChart, centre, said);
+        this(sunSession, null, venusSession, moonSession, sunOnChart, null, venusOnChart,
+                moonOnChart, jupiterSession, jupiterOnChart, centre, said);
     }
 
     /**
-     * With Mercury (#530): its group between the Sun's and Venus's, over
-     * Mercury's shared session, with no chart switch and no Centre on
-     * chart - nothing of Mercury is drawn; a null session leaves it out.
+     * With Mercury (#530): its group between the Sun's and Venus's, with no
+     * chart switch and no Centre on chart - the form before #542.
      */
     public SolarSystemSection(SolarTableSession sunSession, SolarTableSession mercurySession,
                               SolarTableSession venusSession, SolarTableSession moonSession,
                               BodyOnChart sunOnChart, BodyOnChart venusOnChart,
                               BodyOnChart moonOnChart,
+                              JovianTableSession jupiterSession, BodyOnChart jupiterOnChart,
+                              CentreOnChart centre, InterfaceText said) {
+        this(sunSession, mercurySession, venusSession, moonSession, sunOnChart, null,
+                venusOnChart, moonOnChart, jupiterSession, jupiterOnChart, centre, said);
+    }
+
+    /**
+     * With Mercury drawn (#542, the rulings on #539): its group between the
+     * Sun's and Venus's, carrying its own Show on chart and, with the
+     * shared action, Centre on chart, as Venus's does; a null switch leaves
+     * both out; a null session leaves the group out.
+     */
+    public SolarSystemSection(SolarTableSession sunSession, SolarTableSession mercurySession,
+                              SolarTableSession venusSession, SolarTableSession moonSession,
+                              BodyOnChart sunOnChart, BodyOnChart mercuryOnChart,
+                              BodyOnChart venusOnChart, BodyOnChart moonOnChart,
                               JovianTableSession jupiterSession, BodyOnChart jupiterOnChart,
                               CentreOnChart centre, InterfaceText said) {
         if (mercurySession != null && mercurySession.table().body()
@@ -143,7 +158,9 @@ public final class SolarSystemSection {
         sun = new SolarTableControls(sunSession, said, sunOnChart, false, centre,
                 centre == null ? null : sunOnChart);
         mercury = mercurySession == null ? null
-                : new SolarTableControls(mercurySession, said, null, false);
+                : new SolarTableControls(mercurySession, said, mercuryOnChart, false,
+                        mercuryOnChart == null ? null : centre,
+                        mercuryOnChart == null || centre == null ? null : mercuryOnChart);
         venus = venusSession == null ? null
                 : new SolarTableControls(venusSession, said, venusOnChart, false,
                         venusOnChart == null ? null : centre,

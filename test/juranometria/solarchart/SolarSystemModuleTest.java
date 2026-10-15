@@ -149,6 +149,59 @@ class SolarSystemModuleTest {
                 "no numbers, nothing drawn");
     }
 
+    /**
+     * Mercury (#542, the rulings on #539): its own switch offers Mercury
+     * alone, in Venus's form exactly - the solid body's disc phased as the
+     * Mercury table states it, over the same 6 px mark, selectable as an
+     * occurrence, its state the page's key only when its disc meets the
+     * Sun's.
+     */
+    @Test
+    void shownMercuryCarriesItsPhaseItsMarkAndItsMomentAsTheTableStatesThem() {
+        Rig rig = new Rig();
+        java.util.List<Boolean> heard = new java.util.ArrayList<>();
+        rig.module.onMercuryChange(heard::add);
+        rig.module.mercuryShowing(true);
+        assertEquals(List.of(false, true), heard, "the switch tells its listeners");
+        List<OverlayContribution> offered = rig.module.contributedGeometry();
+        assertEquals(1, offered.size(), "Mercury's switch offers Mercury alone");
+        OverlayContribution.Body mercury = (OverlayContribution.Body) offered.get(0);
+        juranometria.solar.MercuryService.MercuryObservation expected =
+                (juranometria.solar.MercuryService.MercuryObservation)
+                        SERVICE.observe(Body.MERCURY, OSLO);
+        assertEquals(SolarSystemModule.MERCURY, mercury.identity());
+        assertEquals("mercury", mercury.identity());
+        assertEquals(expected.astrometricJ2000(), mercury.at());
+        assertEquals(expected.solidBodyDiameterArcseconds(),
+                mercury.angularDiameterArcseconds(), 0.0, "the equatorial radius's disc");
+        assertEquals(expected.distanceKm(), mercury.distanceKm(), 0.0);
+        assertEquals(expected.illuminatedFraction(), mercury.lit().illuminatedFraction(), 0.0);
+        assertEquals(expected.brightLimbAngleDegrees(),
+                mercury.lit().brightLimbAngleDegrees(), 0.0, "χ of date, the table's");
+        assertEquals(SolarSystemModule.VENUS_MINIMUM_MARK_PX, mercury.minimumMarkPx(), 0.0,
+                "rule M, Venus's mark (ruling 1 on #539)");
+        assertTrue(mercury.selectable(), "a selectable occurrence (#513)");
+        assertEquals(OSLO.instant(), mercury.moment().instant());
+        assertEquals("mercury.inFront", SolarSystemModule.MERCURY_IN_FRONT);
+        assertEquals("mercury.behind", SolarSystemModule.MERCURY_BEHIND);
+        rig.module.venusShowing(true);
+        rig.module.sunShowing(true);
+        rig.module.moonShowing(true);
+        assertEquals(4, rig.module.contributedGeometry().size(), "four switches, four bodies");
+        rig.module.mercuryShowing(false);
+        assertEquals(3, rig.module.contributedGeometry().size(), "and Mercury's alone goes");
+        // In front of the Sun at the 2019 transit (NASA/GSFC, mercury-events.txt).
+        rig.module.sunShowing(false);
+        rig.module.venusShowing(false);
+        rig.module.moonShowing(false);
+        rig.module.mercuryShowing(true);
+        rig.observer = OSLO.at(Instant.parse("2019-11-11T15:20:00Z"));
+        assertEquals(SolarSystemModule.MERCURY_IN_FRONT,
+                ((OverlayContribution.Body) rig.module.contributedGeometry().get(0)).state());
+        rig.observer = OSLO.at(Instant.parse("1850-01-01T00:00:00Z"));
+        assertEquals(List.of(), rig.module.contributedGeometry(), "no numbers, nothing drawn");
+    }
+
     @Test
     void belowTheHorizonIsSaidOnlyWhileTheHorizonIsDrawn() {
         Rig rig = new Rig();
