@@ -95,6 +95,7 @@ help:
 	@echo "  moon-on-the-chart-study The Moon on production pages, and the lunation as a row of phases (issue #416)"
 	@echo "  venus-on-the-chart-study Venus on production pages, and the 2026-27 apparition as a row of phases (issue #514)"
 	@echo "  solar-system-labels-study The Solar System labels raised as one emphasis class on production pages (issue #526)"
+	@echo "  mercury-cartography-study Mercury on the page under rules T and M, and the 0.5 and 0.25 degree candidates (issue #539)"
 	@echo "  meridian-ticks-study   The meridian's graduation on production pages, three densities, the bodies invariant (issue #515)"
 	@echo "  pan-study         Measure the Sprint 8 grab-to-pan geometry and costs"
 	@echo "  chart-options-study  Render the Sprint 12 chart-options candidates"
@@ -646,7 +647,7 @@ black-sky-study: classes
 		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BlackSkyStudyMain \
 		> docs/studies/black-sky/measurements.md
 
-.PHONY: spk-boundary-fixture import-jovian-system import-planets venus-accuracy-report venus-table-study mercury-accuracy-report mercury-table-study jovian-accuracy-report jovian-cartography-study venus-cartography-study evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study venus-pack-study sun-on-the-chart-study moon-on-the-chart-study venus-on-the-chart-study mercury-on-the-chart-study jupiter-on-the-chart-study solar-system-labels-study printable-chart-study meridian-ticks-study mercury-pack-study mercury-system-study
+.PHONY: spk-boundary-fixture import-jovian-system import-planets venus-accuracy-report venus-table-study mercury-accuracy-report mercury-table-study jovian-accuracy-report jovian-cartography-study venus-cartography-study evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study venus-pack-study sun-on-the-chart-study moon-on-the-chart-study venus-on-the-chart-study mercury-on-the-chart-study jupiter-on-the-chart-study mercury-cartography-study solar-system-labels-study printable-chart-study meridian-ticks-study mercury-pack-study mercury-system-study
 # The heap is stated rather than inherited from whatever a machine's
 # ergonomics chose for it: the CI runner's default quarter-of-RAM is
 # not the same number as a developer's.
@@ -881,6 +882,15 @@ solar-system-labels-study: classes
 		juranometria.tool.SolarSystemLabelsStudyMain \
 		> docs/studies/solar-system-labels/measurements.md
 	@echo "written to docs/studies/solar-system-labels/measurements.md"
+
+# Mercury on the page and the closer fields of #481 (issue #539): production
+# renderer and bodies layer, Mercury offered by the study under rules T and M.
+mercury-cartography-study: classes
+	mkdir -p docs/studies/mercury-cartography
+	$(JAVA) -Xmx2g -Djava.awt.headless=true -cp "$(CLASSES_DIR):$(LIB_DIR)/*" \
+		juranometria.tool.MercuryCartographyStudyMain \
+		> docs/studies/mercury-cartography/measurements.md
+	@echo "written to docs/studies/mercury-cartography/measurements.md"
 
 jupiter-on-the-chart-study: classes
 	mkdir -p docs/studies/jupiter-on-the-chart

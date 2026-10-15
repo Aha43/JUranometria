@@ -199,6 +199,10 @@ public final class EvidenceContractMain {
         // font-dependent counts in its platform record.
         REPORT_MAINS.put("juranometria.tool.SolarSystemLabelsStudyMain",
                 "docs/studies/solar-system-labels/measurements.md");
+        // Mercury on the page and the closer fields (#539): production pages,
+        // Mercury offered by the study; the label placements in its platform record.
+        REPORT_MAINS.put("juranometria.tool.MercuryCartographyStudyMain",
+                "docs/studies/mercury-cartography/measurements.md");
         REPORT_MAINS.put("juranometria.tool.PrintableChartStudyMain",
                 "docs/studies/printable-chart/measurements.md");
         // Not prose but an oracle: the released pages' own pixels
@@ -385,6 +389,8 @@ public final class EvidenceContractMain {
                 "docs/studies/jupiter-on-the-chart/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.SolarSystemLabelsStudyMain",
                 "docs/studies/solar-system-labels/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.MercuryCartographyStudyMain",
+                "docs/studies/mercury-cartography/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.JovianCartographyStudyMain",
                 "docs/studies/jovian-cartography/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.VenusContractStudyMain",
@@ -553,6 +559,8 @@ public final class EvidenceContractMain {
             // The Solar System labels as one emphasis class (issue #526):
             // production pages canonical and raised, side by side.
             "juranometria.tool.SolarSystemLabelsStudyMain",
+            // Mercury on the page and the 0.5° and 0.25° candidates (issue #539).
+            "juranometria.tool.MercuryCartographyStudyMain",
             // The Venus table mock-ups and diagrams (issue #500): the
             // proposed table in study-only arrangements; widget-rendered
             // inspection, the controls- prefix.
