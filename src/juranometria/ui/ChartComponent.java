@@ -87,7 +87,7 @@ public final class ChartComponent extends JComponent {
         }
         this.words = words;
         this.renderer = new ChartRenderer(StarSizePolicy.DEFAULT, words);
-        // A closer page with no Mercury or Venus on it says why zoom in
+        // A closer page with no Mercury, Venus or Jupiter on it says why zoom in
         // offers nothing more (#544); every other page carries no note.
         this.renderer.setTitleNote(this::closerFieldNote);
         this.assembler = assembler;
@@ -476,7 +476,8 @@ public final class ChartComponent extends JComponent {
 
     /**
      * The bodies whose presence on a page offers a closer field (#544,
-     * ruled on #539, rulings 5 and 6): Mercury and Venus, named by the
+     * ruled on #539, rulings 5 and 6, Jupiter added by the owner at the
+     * #544 checkpoint): Mercury, Venus and Jupiter, named by the
      * application, which knows the module's identities; none until it
      * does, which is a chart that never offers one.
      */
@@ -519,9 +520,18 @@ public final class ChartComponent extends JComponent {
         juranometria.project.ViewportMapping mapping =
                 new juranometria.project.ViewportMapping(drawn);
         for (juranometria.module.OverlayRegistry.Owned owned : overlays.collect()) {
+            // Mercury and Venus are round bodies, Jupiter an oblate one.
+            juranometria.chart.SkyPosition at = null;
             if (owned.geometry() instanceof juranometria.module.OverlayContribution.Body body
                     && closerFieldBodies.contains(body.identity())) {
-                var plane = drawn.projection().project(body.at());
+                at = body.at();
+            } else if (owned.geometry()
+                    instanceof juranometria.module.OverlayContribution.OblateBody oblate
+                    && closerFieldBodies.contains(oblate.identity())) {
+                at = oblate.at();
+            }
+            if (at != null) {
+                var plane = drawn.projection().project(at);
                 if (plane.isEmpty()) {
                     continue;
                 }

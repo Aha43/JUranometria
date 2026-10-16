@@ -1,6 +1,6 @@
 # The closer fields: foundations and the offer
 
-Sprint 50, issues #543 and #544 (#481). The four foundations ruling 5 on #539 requires before any surface offers 0.5° or 0.25° (#543), proven on production pages: the production `ChartComponent` over the bundled catalogue, set to a state at the field; then the offer itself (#544, section 5): zoom in at the floor is the closer step where Mercury or Venus, as drawn, lies on the page that step would display, through the same controller and component the application wires. The instants are the cited rows in `docs/studies/mercury/mercury-events.txt` and `docs/studies/venus/venus-events.txt`; positions are the services' for Oslo at sea level. Where names and grid figures found room is in `platform.md`. Regenerate with `make closer-fields-study`.
+Sprint 50, issues #543 and #544 (#481). The four foundations ruling 5 on #539 requires before any surface offers 0.5° or 0.25° (#543), proven on production pages: the production `ChartComponent` over the bundled catalogue, set to a state at the field; then the offer itself (#544, section 5): zoom in at the floor is the closer step where Mercury, Venus or Jupiter, as drawn, lies on the page that step would display, through the same controller and component the application wires. The instants are the cited rows in `docs/studies/mercury/mercury-events.txt` and `docs/studies/venus/venus-events.txt`; positions are the services' for Oslo at sea level. Where names and grid figures found room is in `platform.md`. Regenerate with `make closer-fields-study`.
 
 ## 1. The field's words on every surface
 
@@ -38,7 +38,7 @@ The #539 study drew its closer pages from the 1° page's stars. Production asks 
 | the Pleiades | 0.5° | 149 | 6 |
 | the Pleiades | 0.25° | 142 | 2 |
 
-## 4. Mercury and Venus at the closer fields
+## 4. Mercury, Venus and Jupiter at the closer fields
 
 ### 4.1 Mercury at its 2026 greatest eastern elongation, 2026-02-19T18:00:00Z, Oslo
 
@@ -88,19 +88,35 @@ Centred on the body; rule M's mark is 6 px, and the true disc takes over where i
 
 ![](transit-2019-0.25.png)
 
+### 4.4 Jupiter at the 11 December 2026 triple transit, 2026-12-11T22:45:00Z, Oslo
+
+Jupiter joined the closer fields at the owner's #544 checkpoint (Saturn waits for its own cartography study). Its oblate disc at true scale, the Galilean moons by the Jovian layer's own rules (a moon in Jupiter's shadow a hollow ring). The shadows the moons cast on Jupiter's disc are not drawn; they remain a future motivation for closer zoom, not part of #544.
+
+| field | stars queried | stars on the page | drawn |
+|---:|---:|---:|---|
+| 1° | 80 | 0 | Jupiter disc 10.1 px; Ganymede symbol 3.0 px; Europa symbol 3.0 px; Io symbol 3.0 px; Callisto symbol 3.0 px |
+| 0.5° | 71 | 0 | Jupiter disc 20.1 px; Ganymede symbol 3.0 px; Europa symbol 3.0 px; Io symbol 3.0 px; Callisto symbol 3.0 px |
+| 0.25° | 68 | 0 | Jupiter disc 40.1 px; Ganymede symbol 3.0 px; Europa symbol 3.0 px; Io symbol 3.0 px; Callisto symbol 3.0 px |
+
+![](jupiter-triple-1.png)
+
+![](jupiter-triple-0.5.png)
+
+![](jupiter-triple-0.25.png)
+
 ## 5. The closer step offered, and the way back
 
-Mercury at its 2026 greatest eastern elongation, wired as the application wires the chart (#544): the controller asks the component whether Mercury or Venus, as the Solar System module contributes them, lies on the page a closer step would display. The toolbar, the View menu, the shortcuts and the wheel all make these controller calls; what the zoom-in control explains is the toolbar's own sentence. A pan of a degree then takes Mercury off the 0.25° page.
+Mercury at its 2026 greatest eastern elongation, wired as the application wires the chart (#544): the controller asks the component whether Mercury, Venus or Jupiter, as the Solar System module contributes them, lies on the page a closer step would display. The toolbar, the View menu, the shortcuts and the wheel all make these controller calls; what the zoom-in control explains is the toolbar's own sentence. A pan of a degree then takes Mercury off the 0.25° page.
 
 | step | field | toolbar | zoom in | zoom in explains | title note |
 |---|---:|---|---|---|---|
-| Mercury hidden | 1° | Field 1° · Stars to V 8.0 | unavailable | Unavailable: a closer field is offered only when Mercury or Venus, shown on the chart, is on the page the step would show | - |
-| Mercury shown | 1° | Field 1° · Stars to V 8.0 | to 0.5° | The next step in is a closer field, offered because Mercury or Venus is on the page it would show | - |
-| zoom in | 0.5° | Field 0.5° · Stars to V 8.0 | to 0.25° | The next step in is a closer field, offered because Mercury or Venus is on the page it would show | - |
+| Mercury hidden | 1° | Field 1° · Stars to V 8.0 | unavailable | Unavailable: a closer field is offered only when Mercury, Venus or Jupiter, shown on the chart, is on the page the step would show | - |
+| Mercury shown | 1° | Field 1° · Stars to V 8.0 | to 0.5° | The next step in is a closer field, offered because Mercury, Venus or Jupiter is on the page it would show | - |
+| zoom in | 0.5° | Field 0.5° · Stars to V 8.0 | to 0.25° | The next step in is a closer field, offered because Mercury, Venus or Jupiter is on the page it would show | - |
 | zoom in | 0.25° | Field 0.25° · Stars to V 8.0 | unavailable | Unavailable: this is the narrowest field the atlas draws | - |
-| pan a degree east | 0.25° | Field 0.25° · Stars to V 8.0 | unavailable | Unavailable: this is the narrowest field the atlas draws | No Mercury or Venus on this page: no closer step from here |
-| zoom out | 0.5° | Field 0.5° · Stars to V 8.0 | unavailable | Unavailable: a closer field is offered only when Mercury or Venus, shown on the chart, is on the page the step would show | No Mercury or Venus on this page: no closer step from here |
-| zoom out | 1° | Field 1° · Stars to V 8.0 | unavailable | Unavailable: a closer field is offered only when Mercury or Venus, shown on the chart, is on the page the step would show | - |
+| pan a degree east | 0.25° | Field 0.25° · Stars to V 8.0 | unavailable | Unavailable: this is the narrowest field the atlas draws | No Mercury, Venus or Jupiter on this page: no closer step from here |
+| zoom out | 0.5° | Field 0.5° · Stars to V 8.0 | unavailable | Unavailable: a closer field is offered only when Mercury, Venus or Jupiter, shown on the chart, is on the page the step would show | No Mercury, Venus or Jupiter on this page: no closer step from here |
+| zoom out | 1° | Field 1° · Stars to V 8.0 | unavailable | Unavailable: a closer field is offered only when Mercury, Venus or Jupiter, shown on the chart, is on the page the step would show | - |
 | zoom out | 2° | Field 2° · Stars to V 8.0 | to 1° | Shows a narrower field, with fainter stars on it | - |
 
 The page Mercury has left, at 0.25° - the field kept, the title block saying why there is no closer step:
@@ -108,6 +124,18 @@ The page Mercury has left, at 0.25° - the field kept, the title block saying wh
 ![](mercury-left-0.25.png)
 
 Nothing persists the view: a new controller - every start - opens at the released default, 8° on M31 (held), so a closer field is never saved.
+
+### 5.1 The same steps for Jupiter, at the triple transit
+
+| step | field | toolbar | zoom in | zoom in explains | title note |
+|---|---:|---|---|---|---|
+| Jupiter hidden | 1° | Field 1° · Stars to V 8.0 | unavailable | Unavailable: a closer field is offered only when Mercury, Venus or Jupiter, shown on the chart, is on the page the step would show | - |
+| Jupiter shown | 1° | Field 1° · Stars to V 8.0 | to 0.5° | The next step in is a closer field, offered because Mercury, Venus or Jupiter is on the page it would show | - |
+| zoom in | 0.5° | Field 0.5° · Stars to V 8.0 | to 0.25° | The next step in is a closer field, offered because Mercury, Venus or Jupiter is on the page it would show | - |
+| zoom in | 0.25° | Field 0.25° · Stars to V 8.0 | unavailable | Unavailable: this is the narrowest field the atlas draws | - |
+| pan a degree east | 0.25° | Field 0.25° · Stars to V 8.0 | unavailable | Unavailable: this is the narrowest field the atlas draws | No Mercury, Venus or Jupiter on this page: no closer step from here |
+| zoom out | 0.5° | Field 0.5° · Stars to V 8.0 | unavailable | Unavailable: a closer field is offered only when Mercury, Venus or Jupiter, shown on the chart, is on the page the step would show | No Mercury, Venus or Jupiter on this page: no closer step from here |
+| zoom out | 1° | Field 1° · Stars to V 8.0 | unavailable | Unavailable: a closer field is offered only when Mercury, Venus or Jupiter, shown on the chart, is on the page the step would show | - |
 
 ## 6. The exported sheet at 0.25°
 
@@ -118,4 +146,10 @@ Mercury's 2026 greatest eastern elongation at 0.25°, recorded by `ChartSheet` w
 and would be offered as `juranometria-23h-17-0m-3-20-0.25deg.png`.
 
 ![](sheet-mercury-0.25-a4.png)
+
+### 6.1 Jupiter's sheet at 0.25°, the triple transit
+
+> 9h 56.7m, +13° 26′. Centre RA 149.1636, Dec +13.4293 (ICRS/J2000). Closer field 0.25 degrees wide, gnomonic. Stars to V 8.0. A4 landscape, 297.0 x 210.0 mm, 12.7 mm margins, chart 271.6 x 184.6 mm. Ground: white-paper.
+
+![](sheet-jupiter-0.25-a4.png)
 

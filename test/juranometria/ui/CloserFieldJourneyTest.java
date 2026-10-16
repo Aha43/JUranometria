@@ -237,4 +237,122 @@ class CloserFieldJourneyTest {
         flush();
         assertFalse(controller.canZoomIn(), "the Sun fills the ordinary pages already");
     }
+
+    // ---- Jupiter (#544, added by the owner at the checkpoint) ----------------
+
+    /** The 11 December 2026 triple transit, the named Sprint 44 fixture (TripleTransitTest). */
+    private static final Instant TRIPLE = Instant.parse("2026-12-11T22:45:00Z");
+
+    private juranometria.jovianchart.JovianModule jovian;
+
+    private void buildJovian(SkyPosition centre, double field) throws Exception {
+        Observer at = new Observer(OSLO_LAT, OSLO_LON, TRIPLE);
+        juranometria.solar.JovianSystemService service =
+                juranometria.solar.JovianSystemService.load();
+        SwingUtilities.invokeAndWait(() -> {
+            chart = new ChartComponent(Atlas.assembler(), ENGLISH);
+            chart.setSize(900, 700);
+            controller = new ChartViewController();
+            controller.onChange(chart::setViewState);
+            chart.setCloserFieldBodies(Set.of(SolarSystemModule.MERCURY, SolarSystemModule.VENUS,
+                    juranometria.jovianchart.JovianModule.JUPITER));
+            controller.offerCloserFields(chart::offersCloserField);
+            chart.onPageContentsChange(controller::closerOfferChanged);
+            controller.onAvailabilityChange(availability::incrementAndGet);
+            controller.recenter(centre, field);
+            ChartModuleHost host = new ChartModuleHost(chart, new SelectionModel(),
+                    request -> { });
+            MeridianModule meridian = host.attach(new MeridianModule(at));
+            meridian.showing(false, false, false);
+            jovian = host.attach(new juranometria.jovianchart.JovianModule(
+                    () -> meridian.attached() ? meridian.observer() : null,
+                    () -> service, meridian::horizonShowing));
+            jovian.showing(false);
+        });
+        flush();
+    }
+
+    private static SkyPosition jupiter() {
+        return juranometria.solar.JovianSystemService.load()
+                .observeJupiter(new Observer(OSLO_LAT, OSLO_LON, TRIPLE)).astrometricJ2000();
+    }
+
+    @Test
+    void jupiterAtTheTripleTransitOffersTheCloserFields() throws Exception {
+        SkyPosition place = jupiter();
+        buildJovian(place, 1.0);
+        assertFalse(controller.canZoomIn(), "Jupiter hidden: 1° is the floor");
+        int before = availability.get();
+        SwingUtilities.invokeAndWait(() -> jovian.showing(true));
+        flush();
+        assertTrue(availability.get() > before, "switching Jupiter on tells the controls");
+        assertTrue(controller.canZoomIn(), "Jupiter on the page 0.5° would show");
+
+        SwingUtilities.invokeAndWait(controller::zoomIn);
+        flush();
+        SwingUtilities.invokeAndWait(controller::zoomIn);
+        flush();
+        assertEquals(0.25, controller.state().fieldWidthDegrees());
+        paint();
+        assertTrue(chart.renderedBodies().stream().anyMatch(b ->
+                        juranometria.jovianchart.JovianModule.JUPITER.equals(b.identity())),
+                "Jupiter is drawn on the closer page: " + chart.renderedBodies());
+        assertTrue(chart.getAccessibleContext().getAccessibleDescription()
+                        .contains("Closer field 0.25 degrees wide"),
+                chart.getAccessibleContext().getAccessibleDescription());
+        assertNull(chart.closerFieldNote(chart.currentScene()));
+
+        // The sheet says what the screen says, Jupiter's ink and all.
+        juranometria.sheet.SheetRecording sheet = juranometria.sheet.ChartSheet.record(
+                Atlas.assembler()::assemble, controller.state(),
+                juranometria.render.ChartOptions.DEFAULTS,
+                SheetInk.reference(chart, Set.of()), SheetInk.bodies(chart, Set.of()),
+                juranometria.render.ChartRenderer.ReferenceLayer.NONE,
+                juranometria.sheet.PaperSize.A4, ENGLISH, Set.of());
+        assertTrue(sheet.metadata().description().contains("Closer field 0.25 degrees wide"),
+                sheet.metadata().description());
+
+        // Jupiter leaves: the field is kept and the title says why.
+        SwingUtilities.invokeAndWait(() -> controller.recenter(new SkyPosition(
+                place.raDegrees() + 1.0 / Math.cos(Math.toRadians(place.decDegrees())),
+                place.decDegrees())));
+        flush();
+        assertEquals(0.25, controller.state().fieldWidthDegrees(), "panning keeps the field");
+        assertFalse(controller.canZoomIn());
+        String note = chart.closerFieldNote(chart.currentScene());
+        assertEquals(ENGLISH.closerFieldWithoutBody(), note);
+        assertTrue(note.contains("Mercury, Venus or Jupiter"), note);
+        SwingUtilities.invokeAndWait(controller::zoomOut);
+        SwingUtilities.invokeAndWait(controller::zoomOut);
+        assertEquals(1.0, controller.state().fieldWidthDegrees(), "back to the ladder");
+    }
+
+    @Test
+    void theWheelAsksAboutJupiterAtThePointer() throws Exception {
+        SkyPosition place = jupiter();
+        SkyPosition centre = new SkyPosition(place.raDegrees()
+                + 0.4 / Math.cos(Math.toRadians(place.decDegrees())), place.decDegrees());
+        buildJovian(centre, 1.0);
+        SwingUtilities.invokeAndWait(() -> jovian.showing(true));
+        flush();
+        assertFalse(controller.canZoomIn(), "the button's page is about the centre");
+        PlanePoint onJupiter = new juranometria.project.GnomonicProjection(centre)
+                .project(place).orElseThrow();
+        assertEquals(ChartViewController.PointerZoomOutcome.AT_BOUND,
+                controller.zoomAt(new PlanePoint(-onJupiter.xiEast(), 0.0), true, 900, 700));
+        assertEquals(ChartViewController.PointerZoomOutcome.ACCEPTED,
+                controller.zoomAt(onJupiter, true, 900, 700));
+        assertEquals(0.5, controller.state().fieldWidthDegrees());
+    }
+
+    @Test
+    void theMoonNeverOffersACloserField() throws Exception {
+        Observer at = oslo();
+        SkyPosition moon = ((SolarSystemService.MoonObservation) SERVICE.observe(Body.MOON, at))
+                .astrometricJ2000();
+        build(at, moon, 1.0);
+        SwingUtilities.invokeAndWait(() -> module.moonShowing(true));
+        flush();
+        assertFalse(controller.canZoomIn(), "the Moon fills the ordinary pages already");
+    }
 }

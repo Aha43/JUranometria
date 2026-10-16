@@ -340,13 +340,12 @@ section 5 of `docs/studies/closer-fields/` and the packaged journey
 *closer fields OK*.
 
 - **The offer.** Zoom in at the floor, and from 0.5°, is the closer step
-  where Mercury or Venus, as the Solar System module contributes them
+  where Mercury, Venus or Jupiter, as their modules contribute them
   (switched on), lies on the page that step would display: about the
   page centre for the toolbar, the View menu and the shortcuts, about
   the pointer for the wheel, whose page is solved first and then asked.
   The controller asks the chart (`offersCloserField`); the application
-  names the two bodies. The Sun and the Moon never offer one, and no
-  later planet does until its own study (ruling 6).
+  names the three bodies. The Sun and the Moon never offer one.
 - **Availability follows the page.** A body switched on or off, or
   moved by Place and Time, changes the offer without moving the view;
   the chart announces it, and the toolbar, the Controller and the menu
@@ -354,9 +353,9 @@ section 5 of `docs/studies/closer-fields/` and the packaged journey
 - **Lifecycle.** Panning keeps the field; a selection does nothing to
   it; Home goes to the opening page; zoom out walks back through the
   closer fields to the ladder; Centre on chart still lands at 1°. When
-  Mercury or Venus leaves a closer page the field is kept, zoom in is
-  unavailable, and the title block's last line says why: *No Mercury or
-  Venus on this page: no closer step from here*.
+  the body leaves a closer page the field is kept, zoom in is
+  unavailable, and the title block's last line says why: *No Mercury,
+  Venus or Jupiter on this page: no closer step from here*.
 - **Words.** The page, the spoken description and an exported sheet
   call it a *closer field* (*nærfelt*) with the field to its own
   precision; the view report adds `field-kind: closer` at a closer
@@ -376,6 +375,29 @@ section 5 of `docs/studies/closer-fields/` and the packaged journey
   the menu sheet's strings (zoom in at the floor now says why no closer
   field is offered); provenance and the test-evidence study. No ladder
   page, sheet or sentence moves.
+- **Jupiter, added at the owner's checkpoint (amending ruling 6).** The
+  owner and the planner, reviewing candidate `602aaef4`, added Jupiter
+  to the eligible bodies; Saturn waits for its own cartography study.
+  Every eligibility message, tooltip, spoken line and title note names
+  Mercury, Venus and Jupiter in both languages. The toolbar, the
+  Controller, the menu and the wheel, pan-off, the view report, the
+  export, the spoken page and the packaged journey are proven for
+  Jupiter at the 11 December 2026 triple transit (22:45 UTC, the named
+  Sprint 44 fixture), and the closer-fields study draws it (sections
+  4.4, 5.1 and 6.1).
+- **Product finding (the owner, at the checkpoint).** On a laptop screen
+  the closer fields give limited benefit; on an external chart monitor -
+  a common JUranometria arrangement of two displays - they are clearly
+  worthwhile. Behaviour does not depend on the monitor's size.
+- **A future motivation, not built here.** The shadows the Galilean
+  moons cast on Jupiter's disc would profit from the closer fields; they
+  are not drawn, and #544 does not draw them. (A moon that is itself in
+  Jupiter's shadow is already drawn as a hollow ring.)
+- **Earlier qualifications kept.** Candidate `b05b9c19` (its checkpoint,
+  where the Place and Time defect #551 was found) and `602aaef4` (the
+  fresh candidate after #551 landed, Mercury and Venus only) keep their
+  gate, CI, candidate and checkpoint records unchanged; neither was
+  merged.
 - **Not decided here.** At 0.25° during a transit the page lies inside
   the Sun's disc and nothing on it names the Sun (#543's finding); the
   rulings did not ask for it, and it is left for the owner.

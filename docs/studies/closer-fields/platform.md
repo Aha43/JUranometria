@@ -40,3 +40,9 @@ Recorded on: `Mac OS X 27.0.1/aarch64/Homebrew 21.0.12.1`
 - 0.5°: Sun refused; Mercury refused
 - 0.25°: Sun refused; Mercury refused
 
+## 4.4 Jupiter at the triple transit
+
+- 1°: Jupiter placed; Ganymede placed; Europa placed; Io placed; Callisto placed
+- 0.5°: Jupiter placed; Ganymede placed; Europa placed; Io placed; Callisto placed
+- 0.25°: Jupiter placed; Ganymede placed; Europa placed; Io placed; Callisto placed
+

@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**644 promoted artifacts.**
+**648 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -131,13 +131,17 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/chart-sheet/sheet-a4.pdf` | `d41fd4ba2123dee74ec2f407a62a85d30da96ec254a5b590c1b8ad76c321fbcc` | 2026-10-13 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/chart-sheet/sheet-a4.svg` | `602f6b06708b8d06b4776514129a8eeba5b12253784fc4ef787009c3c24de044` | 2026-10-13 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/chart-sheet/sheet-letter.svg` | `7ec8cba12dac3d3f2922183e9f7e77ecd446e405b52534bc8fbadba3124bd3f5` | 2026-10-13 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/closer-fields/jupiter-triple-0.25.png` | `ee1dde54083d95b1bf61b50c65694044678bb6abd5b53808319b2eaa824b69f5` | 2026-10-17 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/closer-fields/jupiter-triple-0.5.png` | `c3cc27e316e2316087fc57176ee4bfec931eda75240b9470c5aee86a08db6e0d` | 2026-10-17 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/closer-fields/jupiter-triple-1.png` | `3d50bd8302a39e370835f4c0b892ca888478ce909b31148ed75fb00b7b667e29` | 2026-10-17 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/closer-fields/mercury-elongation-0.25.png` | `88212c4e5402b73161158a5a2a2ae38e0ff0456ce94d90a27100c74f4fd5dccb` | 2026-10-16 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/closer-fields/mercury-elongation-0.5.png` | `d8d53e850e0f9ee1b10332f4c12f4618687253b4f56d17767315e784a8c844f0` | 2026-10-16 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/closer-fields/mercury-elongation-1.png` | `85e39b3cf60ceafec36f9afaed0880a3ef2e129c4a34e523d61f6b94f3219719` | 2026-10-16 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/closer-fields/mercury-left-0.25.png` | `98d782183d7fa2aedf04f46c038d7755e2b82d3706fa5c8396eaf83a79ea2385` | 2026-10-16 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/closer-fields/mercury-left-0.25.png` | `16938c976d896f81839982567db781f3402a1af429ffdd70d0f7de14bbb4d453` | 2026-10-17 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/closer-fields/pleiades-0.25.png` | `12134480b2d3117e7bebb3e4eaeae0d27feb3d38a73f5af228b81c9551e86f82` | 2026-10-16 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/closer-fields/pleiades-0.5.png` | `76029a47ad16211a98967b277d3a76738d2ea18c440f4d6df0fa3033aec30ea0` | 2026-10-16 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/closer-fields/pleiades-1.png` | `e5a30f7de2d38a492ed325d964d913d5173d75df254033084598a3c5bd9a8305` | 2026-10-16 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/closer-fields/sheet-jupiter-0.25-a4.png` | `46f4e3d91607a3cc9a0d6ec6ccfdf0952b286e28c312e6f89f60c174b623cce1` | 2026-10-17 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/closer-fields/sheet-mercury-0.25-a4.png` | `295cab727aa8edcbd44afe4200ca96807f4585a2f78d49f504ecf77464aef979` | 2026-10-16 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/closer-fields/transit-2019-0.25.png` | `081f111b16202e7a54d750e33e8e36a12801c1a1d5848855faedcc20e0c71eec` | 2026-10-16 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/closer-fields/transit-2019-0.5.png` | `a54e648ef5ec9c68a8d6388e30fa8ce1342aa0c3a99f5995b8e593a6a5271c8f` | 2026-10-16 | Mac OS X aarch64, Java 21.0.12.1 | various |
