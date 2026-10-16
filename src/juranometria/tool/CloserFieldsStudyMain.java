@@ -54,7 +54,7 @@ import juranometria.ui.language.PageText;
  *
  * <p>Every page is the production {@code ChartComponent} over the bundled
  * catalogue, set to a state at 1°, 0.5° or 0.25° - a state the view state
- * now holds and no control yet reaches. The report records what is the
+ * holds and, since #544, zoom in offers where Mercury or Venus stands. The report records what is the
  * same on every desktop: the field's words on every surface, the grid's
  * steps and line counts, the catalogue's answer at the page's own field,
  * each body's mark, the zoom back to the ladder and the exported sheet's
@@ -108,13 +108,15 @@ public final class CloserFieldsStudyMain {
                 "Names and grid figures on the closer-field pages, as this desktop's fonts place them",
                 "Sprint 50, issue #543.");
 
-        p("# The closer fields' foundations");
+        p("# The closer fields: foundations and the offer");
         p("");
-        p("Sprint 50, issue #543 (part of #481). The four foundations ruling 5 on #539"
-                + " requires before any surface offers 0.5° or 0.25°, proven on production pages:"
-                + " the production `ChartComponent` over the bundled catalogue, set to a state at"
-                + " the field. The view state now holds the two closer fields, but its zoom-in"
-                + " still stops at 1°; nothing a reader can press reaches them until #544. The"
+        p("Sprint 50, issues #543 and #544 (#481). The four foundations ruling 5 on #539"
+                + " requires before any surface offers 0.5° or 0.25° (#543), proven on production"
+                + " pages: the production `ChartComponent` over the bundled catalogue, set to a"
+                + " state at the field; then the offer itself (#544, section 5): zoom in at the"
+                + " floor is the closer step where Mercury or Venus, as drawn, lies on the page"
+                + " that step would display, through the same controller and component the"
+                + " application wires. The"
                 + " instants are the cited rows in `docs/studies/mercury/mercury-events.txt` and"
                 + " `docs/studies/venus/venus-events.txt`; positions are the services' for Oslo"
                 + " at sea level. Where names and grid figures found room is in `platform.md`."
@@ -139,7 +141,7 @@ public final class CloserFieldsStudyMain {
                         + " off the page and its ground is the page's - so what reads is Mercury"
                         + " and the Sun's centre dot, capped by #541; nothing on the page itself"
                         + " says the reader is looking at the Sun.");
-        zoomBack();
+        offered(elongation, service);
         sheet(elongation, service);
 
         System.out.print(PlatformEvidence.portable(REPORT.toString()));
@@ -299,42 +301,89 @@ public final class CloserFieldsStudyMain {
         }
     }
 
-    // ---- 5. zoom back to the ladder -----------------------------------------------------
+    // ---- 5. the closer step offered -----------------------------------------------------
 
-    private static void zoomBack() {
-        p("## 5. Zoom from a closer field, and what is kept");
+    private static void offered(Instant elongation, SolarSystemService service)
+            throws Exception {
+        Observer at = new Observer(OSLO_LAT, OSLO_LON, elongation);
+        SkyPosition place = ((MercuryObservation) service.observe(Body.MERCURY, at))
+                .astrometricJ2000();
+        p("## 5. The closer step offered, and the way back");
         p("");
-        p("The same controller calls the toolbar, the View menu, the shortcuts and the wheel"
-                + " make. From a state at 0.25°: zoom in is unavailable - the ladder's zoom-in"
-                + " is never the closer step - and zoom out walks back through 0.5° to the floor"
-                + " and up the ladder, the centre and the reader's limit carried.");
+        p("Mercury at its 2026 greatest eastern elongation, wired as the application wires"
+                + " the chart (#544): the controller asks the component whether Mercury or Venus,"
+                + " as the Solar System module contributes them, lies on the page a closer step"
+                + " would display. The toolbar, the View menu, the shortcuts and the wheel all"
+                + " make these controller calls; what the zoom-in control explains is the"
+                + " toolbar's own sentence. A pan of a degree then takes Mercury off the 0.25°"
+                + " page.");
         p("");
+        SolarSystemModule module = new SolarSystemModule(() -> at, () -> service, () -> false);
+        ChartComponent[] holder = new ChartComponent[1];
         ChartViewController controller = new ChartViewController();
-        controller.recenter(PLEIADES, 0.25);
-        p("| step | field | toolbar | zoom in | zoom out | wheel in at a pointer |");
+        SwingUtilities.invokeAndWait(() -> {
+            holder[0] = new ChartComponent(Atlas.assembler(), ENGLISH);
+            holder[0].setSize(W, H);
+            holder[0].setChartOptions(ChartOptions.DEFAULTS);
+            controller.onChange(holder[0]::setViewState);
+            holder[0].setCloserFieldBodies(Set.of(SolarSystemModule.MERCURY,
+                    SolarSystemModule.VENUS));
+            controller.offerCloserFields(holder[0]::offersCloserField);
+            controller.recenter(place, 1.0);
+            module.sunShowing(false);
+            module.mercuryShowing(false);
+            holder[0].overlays().offer(SolarSystemModule.ID, module::contributedGeometry);
+        });
+        ChartComponent chart = holder[0];
+        p("| step | field | toolbar | zoom in | zoom in explains | title note |");
         p("|---|---:|---|---|---|---|");
-        for (String step : List.of("start", "zoom out", "zoom out", "zoom out")) {
-            if (!"start".equals(step)) {
-                controller.zoomOut();
-            }
-            ChartViewState state = controller.state();
-            // Asked only where it is refused, so asking moves nothing.
-            String wheel = !state.canZoomIn()
-                    ? controller.zoomAt(new PlanePoint(0.001, 0.0), true, W, H).name()
-                    : "a ladder step";
-            p(String.format(Locale.ROOT, "| %s | %s° | %s | %s | %s | %s |", step,
-                    FieldWidthText.plain(state.fieldWidthDegrees()),
-                    EN.say("toolbar.readout", FieldWidthText.whole(state.fieldWidthDegrees()),
-                            String.format(Locale.ROOT, "%.1f", state.limitingMagnitude())),
-                    controller.canZoomIn() ? "available" : "unavailable",
-                    controller.canZoomOut() ? "available" : "unavailable", wheel));
+        row("Mercury hidden", controller, chart);
+        module.mercuryShowing(true);
+        row("Mercury shown", controller, chart);
+        SwingUtilities.invokeAndWait(controller::zoomIn);
+        row("zoom in", controller, chart);
+        SwingUtilities.invokeAndWait(controller::zoomIn);
+        row("zoom in", controller, chart);
+        SwingUtilities.invokeAndWait(() -> controller.recenter(new SkyPosition(
+                place.raDegrees() + 1.0 / Math.cos(Math.toRadians(place.decDegrees())),
+                place.decDegrees())));
+        row("pan a degree east", controller, chart);
+        ImageIO.write(paint(chart), "png", new File(DIR, "mercury-left-0.25.png"));
+        for (int i = 0; i < 3; i++) {
+            SwingUtilities.invokeAndWait(controller::zoomOut);
+            row("zoom out", controller, chart);
         }
+        p("");
+        p("The page Mercury has left, at 0.25° - the field kept, the title block saying why"
+                + " there is no closer step:");
+        p("");
+        p("![](mercury-left-0.25.png)");
         p("");
         p("Nothing persists the view: a new controller - every start - opens at the released"
                 + " default, " + FieldWidthText.plain(ChartViewState.DEFAULT.fieldWidthDegrees())
                 + "° on M31 (" + (new ChartViewController().state().equals(ChartViewState.DEFAULT)
                         ? "held" : "NOT HELD") + "), so a closer field is never saved.");
         p("");
+    }
+
+    private static void row(String step, ChartViewController controller, ChartComponent chart)
+            throws Exception {
+        String[] note = new String[1];
+        SwingUtilities.invokeAndWait(() -> note[0] = chart.closerFieldNote(chart.currentScene()));
+        ChartViewState state = controller.state();
+        java.util.Optional<ChartViewState> next = controller.zoomInTarget();
+        String explains = next.isPresent()
+                ? EN.say(next.get().closerField() ? "toolbar.zoomIn.closer.explain"
+                        : "toolbar.zoomIn.explain")
+                : EN.say(state.closerStep().isPresent() ? "toolbar.zoomIn.closer.unavailable"
+                        : "toolbar.zoomIn.end");
+        p(String.format(Locale.ROOT, "| %s | %s° | %s | %s | %s | %s |", step,
+                FieldWidthText.plain(state.fieldWidthDegrees()),
+                EN.say("toolbar.readout", FieldWidthText.whole(state.fieldWidthDegrees()),
+                        String.format(Locale.ROOT, "%.1f", state.limitingMagnitude())),
+                next.map(n -> "to " + FieldWidthText.plain(n.fieldWidthDegrees()) + "°")
+                        .orElse("unavailable"),
+                explains, note[0] == null ? "-" : note[0]));
     }
 
     // ---- 6. the exported sheet ----------------------------------------------------------

@@ -2459,18 +2459,40 @@ public final class ChartRenderer {
      * text, so no language can turn a magnitude limit into 6,0.
      */
     private String[] titleLines(ChartScene scene, String projectionId) {
-        return new String[] {
-                scene.title(),
-                words.titleCentre(
-                        formatRa(scene.viewport().centre().raDegrees()),
-                        formatDec(scene.viewport().centre().decDegrees())),
-                words.titleFacts(
-                        juranometria.chart.FieldWidthText.title(
-                                scene.viewport().fieldWidthDegrees()),
-                        String.format(Locale.ROOT, "%.1f",
-                                scene.limitingMagnitude()),
-                        words.projection(projectionId)),
-        };
+        double field = scene.viewport().fieldWidthDegrees();
+        String fieldText = juranometria.chart.FieldWidthText.title(field);
+        String limit = String.format(Locale.ROOT, "%.1f",
+                scene.limitingMagnitude());
+        String projection = words.projection(projectionId);
+        // A closer field is called one (#544, ruled on #539, ruling 5):
+        // its own whole pattern, not a word glued onto the ladder's.
+        String facts = field < juranometria.chart.ChartViewState
+                        .normalMinimumFieldDegrees()
+                ? words.closerTitleFacts(fieldText, limit, projection)
+                : words.titleFacts(fieldText, limit, projection);
+        String note = titleNote.apply(scene);
+        String centre = words.titleCentre(
+                formatRa(scene.viewport().centre().raDegrees()),
+                formatDec(scene.viewport().centre().decDegrees()));
+        return note == null
+                ? new String[] {scene.title(), centre, facts}
+                : new String[] {scene.title(), centre, facts, note};
+    }
+
+    /**
+     * A last line the title block carries when the screen has
+     * something to say about this page that the page itself cannot
+     * know - why a closer field offers no closer step (#544). None by
+     * default, which is every sheet and every page the atlas drew
+     * before #544.
+     */
+    private java.util.function.Function<ChartScene, String> titleNote =
+            anyScene -> null;
+
+    /** The screen's note for the title block (#544); null for none. */
+    public void setTitleNote(
+            java.util.function.Function<ChartScene, String> note) {
+        this.titleNote = note == null ? anyScene -> null : note;
     }
 
     /**

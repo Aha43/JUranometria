@@ -146,18 +146,22 @@ public record DrawnPage(ChartScene scene, Projection projection) {
             throw new IllegalArgumentException("a page says what it is"
                     + " in some language (#350)");
         }
-        return words.spokenPage(
-                scene.title(),
-                String.format(Locale.ROOT, "%.4f",
-                        scene.viewport().centre().raDegrees()),
-                String.format(Locale.ROOT, "%+.4f",
-                        scene.viewport().centre().decDegrees()),
-                juranometria.chart.FieldWidthText.title(
-                        scene.viewport().fieldWidthDegrees()),
-                words.projection(projectionName()),
-                String.format(Locale.ROOT, "%.1f",
-                        scene.limitingMagnitude()),
-                bounded());
+        String ra = String.format(Locale.ROOT, "%.4f",
+                scene.viewport().centre().raDegrees());
+        String dec = String.format(Locale.ROOT, "%+.4f",
+                scene.viewport().centre().decDegrees());
+        String field = juranometria.chart.FieldWidthText.title(
+                scene.viewport().fieldWidthDegrees());
+        String limit = String.format(Locale.ROOT, "%.1f",
+                scene.limitingMagnitude());
+        // A closer field is called one aloud too (#544).
+        if (scene.viewport().fieldWidthDegrees()
+                < juranometria.chart.ChartViewState.normalMinimumFieldDegrees()) {
+            return words.closerSpokenPage(scene.title(), ra, dec, field,
+                    words.projection(projectionName()), limit);
+        }
+        return words.spokenPage(scene.title(), ra, dec, field,
+                words.projection(projectionName()), limit, bounded());
     }
 
     /**

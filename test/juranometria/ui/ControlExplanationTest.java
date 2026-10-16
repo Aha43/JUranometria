@@ -364,13 +364,15 @@ class ControlExplanationTest {
                 navigation.zoomIn();
             }
             assertFalse(zoomIn.isEnabled(),
-                    "the narrowest field the atlas draws");
+                    "the narrowest ordinary field");
             // Asked of the resource, not pinned as a literal: the
             // sentence belongs to the language now, and a test that
             // froze the English would make the next translation a
-            // test failure instead of a translation (#350).
+            // test failure instead of a translation (#350). At the
+            // floor it says why no closer field is offered (#544); at
+            // 0.25° it says toolbar.zoomIn.end (AtlasToolbarTest).
             assertEquals(juranometria.ui.language.InterfaceText
-                            .forLanguage("en").say("toolbar.zoomIn.end"),
+                            .forLanguage("en").say("toolbar.zoomIn.closer.unavailable"),
                     zoomIn.getAccessibleContext()
                             .getAccessibleDescription(),
                     "and the control says so rather than going quiet");

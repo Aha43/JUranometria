@@ -1,6 +1,6 @@
-# The closer fields' foundations
+# The closer fields: foundations and the offer
 
-Sprint 50, issue #543 (part of #481). The four foundations ruling 5 on #539 requires before any surface offers 0.5° or 0.25°, proven on production pages: the production `ChartComponent` over the bundled catalogue, set to a state at the field. The view state now holds the two closer fields, but its zoom-in still stops at 1°; nothing a reader can press reaches them until #544. The instants are the cited rows in `docs/studies/mercury/mercury-events.txt` and `docs/studies/venus/venus-events.txt`; positions are the services' for Oslo at sea level. Where names and grid figures found room is in `platform.md`. Regenerate with `make closer-fields-study`.
+Sprint 50, issues #543 and #544 (#481). The four foundations ruling 5 on #539 requires before any surface offers 0.5° or 0.25° (#543), proven on production pages: the production `ChartComponent` over the bundled catalogue, set to a state at the field; then the offer itself (#544, section 5): zoom in at the floor is the closer step where Mercury or Venus, as drawn, lies on the page that step would display, through the same controller and component the application wires. The instants are the cited rows in `docs/studies/mercury/mercury-events.txt` and `docs/studies/venus/venus-events.txt`; positions are the services' for Oslo at sea level. Where names and grid figures found room is in `platform.md`. Regenerate with `make closer-fields-study`.
 
 ## 1. The field's words on every surface
 
@@ -9,8 +9,8 @@ The ladder's forms are unchanged - one decimal in the title block and the spoken
 | field | title block (en) | title block (nb-NO) | spoken | toolbar | export description | file name | view report |
 |---:|---|---|---|---|---|---|---|
 | 1° | Field 1.0° | Felt 1.0° | Field 1.0 degrees wide, gnomonic projection. | Field 1° · Stars to V 8.0 | Field 1 degrees wide, gnomonic. | `juranometria-3h-47-0m-24-07-1deg.png` | `field-degrees: 1.0` |
-| 0.5° | Field 0.5° | Felt 0.5° | Field 0.5 degrees wide, gnomonic projection. | Field 0.5° · Stars to V 8.0 | Field 0.5 degrees wide, gnomonic. | `juranometria-3h-47-0m-24-07-0.5deg.png` | `field-degrees: 0.5` |
-| 0.25° | Field 0.25° | Felt 0.25° | Field 0.25 degrees wide, gnomonic projection. | Field 0.25° · Stars to V 8.0 | Field 0.25 degrees wide, gnomonic. | `juranometria-3h-47-0m-24-07-0.25deg.png` | `field-degrees: 0.25` |
+| 0.5° | Field 0.5° | Felt 0.5° | 3h 47.0m, +24° 07′. Centre RA 56.7500, Dec +24.1200 (ICRS J2000). Closer field 0.5 degrees wide, gnomonic projection. Stars to V 8.0. Celestial north is up, and celestial east is left. | Field 0.5° · Stars to V 8.0 | 3h 47.0m, +24° 07′. Centre RA 56.7500, Dec +24.1200 (ICRS/J2000). Closer field 0.5 degrees wide, gnomonic. Stars to V 8.0. A4 landscape, 297.0 x 210.0 mm, 12.7 mm margins, chart 271.6 x 184.6 mm. Ground: white-paper. | `juranometria-3h-47-0m-24-07-0.5deg.png` | `field-degrees: 0.5` |
+| 0.25° | Field 0.25° | Felt 0.25° | 3h 47.0m, +24° 07′. Centre RA 56.7500, Dec +24.1200 (ICRS J2000). Closer field 0.25 degrees wide, gnomonic projection. Stars to V 8.0. Celestial north is up, and celestial east is left. | Field 0.25° · Stars to V 8.0 | 3h 47.0m, +24° 07′. Centre RA 56.7500, Dec +24.1200 (ICRS/J2000). Closer field 0.25 degrees wide, gnomonic. Stars to V 8.0. A4 landscape, 297.0 x 210.0 mm, 12.7 mm margins, chart 271.6 x 184.6 mm. Ground: white-paper. | `juranometria-3h-47-0m-24-07-0.25deg.png` | `field-degrees: 0.25` |
 
 ## 2. The grid's finer steps
 
@@ -88,16 +88,24 @@ Centred on the body; rule M's mark is 6 px, and the true disc takes over where i
 
 ![](transit-2019-0.25.png)
 
-## 5. Zoom from a closer field, and what is kept
+## 5. The closer step offered, and the way back
 
-The same controller calls the toolbar, the View menu, the shortcuts and the wheel make. From a state at 0.25°: zoom in is unavailable - the ladder's zoom-in is never the closer step - and zoom out walks back through 0.5° to the floor and up the ladder, the centre and the reader's limit carried.
+Mercury at its 2026 greatest eastern elongation, wired as the application wires the chart (#544): the controller asks the component whether Mercury or Venus, as the Solar System module contributes them, lies on the page a closer step would display. The toolbar, the View menu, the shortcuts and the wheel all make these controller calls; what the zoom-in control explains is the toolbar's own sentence. A pan of a degree then takes Mercury off the 0.25° page.
 
-| step | field | toolbar | zoom in | zoom out | wheel in at a pointer |
+| step | field | toolbar | zoom in | zoom in explains | title note |
 |---|---:|---|---|---|---|
-| start | 0.25° | Field 0.25° · Stars to V 8.0 | unavailable | available | AT_BOUND |
-| zoom out | 0.5° | Field 0.5° · Stars to V 8.0 | unavailable | available | AT_BOUND |
-| zoom out | 1° | Field 1° · Stars to V 8.0 | unavailable | available | AT_BOUND |
-| zoom out | 2° | Field 2° · Stars to V 8.0 | available | available | a ladder step |
+| Mercury hidden | 1° | Field 1° · Stars to V 8.0 | unavailable | Unavailable: a closer field is offered only when Mercury or Venus, shown on the chart, is on the page the step would show | - |
+| Mercury shown | 1° | Field 1° · Stars to V 8.0 | to 0.5° | The next step in is a closer field, offered because Mercury or Venus is on the page it would show | - |
+| zoom in | 0.5° | Field 0.5° · Stars to V 8.0 | to 0.25° | The next step in is a closer field, offered because Mercury or Venus is on the page it would show | - |
+| zoom in | 0.25° | Field 0.25° · Stars to V 8.0 | unavailable | Unavailable: this is the narrowest field the atlas draws | - |
+| pan a degree east | 0.25° | Field 0.25° · Stars to V 8.0 | unavailable | Unavailable: this is the narrowest field the atlas draws | No Mercury or Venus on this page: no closer step from here |
+| zoom out | 0.5° | Field 0.5° · Stars to V 8.0 | unavailable | Unavailable: a closer field is offered only when Mercury or Venus, shown on the chart, is on the page the step would show | No Mercury or Venus on this page: no closer step from here |
+| zoom out | 1° | Field 1° · Stars to V 8.0 | unavailable | Unavailable: a closer field is offered only when Mercury or Venus, shown on the chart, is on the page the step would show | - |
+| zoom out | 2° | Field 2° · Stars to V 8.0 | to 1° | Shows a narrower field, with fainter stars on it | - |
+
+The page Mercury has left, at 0.25° - the field kept, the title block saying why there is no closer step:
+
+![](mercury-left-0.25.png)
 
 Nothing persists the view: a new controller - every start - opens at the released default, 8° on M31 (held), so a closer field is never saved.
 
@@ -105,7 +113,7 @@ Nothing persists the view: a new controller - every start - opens at the release
 
 Mercury's 2026 greatest eastern elongation at 0.25°, recorded by `ChartSheet` with the screen's own reference and bodies layers (`SheetInk`), A4, written at 150 dpi for the record. It says of itself:
 
-> 23h 17.0m, −3° 20′. Centre RA 349.2584, Dec -3.3344 (ICRS/J2000). Field 0.25 degrees wide, gnomonic. Stars to V 8.0. A4 landscape, 297.0 x 210.0 mm, 12.7 mm margins, chart 271.6 x 184.6 mm. Ground: white-paper.
+> 23h 17.0m, −3° 20′. Centre RA 349.2584, Dec -3.3344 (ICRS/J2000). Closer field 0.25 degrees wide, gnomonic. Stars to V 8.0. A4 landscape, 297.0 x 210.0 mm, 12.7 mm margins, chart 271.6 x 184.6 mm. Ground: white-paper.
 
 and would be offered as `juranometria-23h-17-0m-3-20-0.25deg.png`.
 

@@ -266,6 +266,8 @@ public final class ChartModuleHost implements ChartServices {
     public Runnable contribute(String moduleId,
                                Supplier<List<OverlayContribution>> geometry) {
         Runnable withdraw = chart.overlays().offer(moduleId, geometry);
+        // A body a module brings may offer a closer field (#544).
+        chart.pageContentsChanged();
         chart.repaint();
         return () -> {
             withdraw.run();

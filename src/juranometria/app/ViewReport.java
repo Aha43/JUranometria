@@ -162,6 +162,10 @@ public final class ViewReport {
                 "centre-degrees: RA %.6f; Dec %+.6f",
                 view.centre().raDegrees(), view.centre().decDegrees()));
         lines.add("field-degrees: " + exact(view.fieldWidthDegrees()));
+        // The report names a closer field (#544, ruled on #539, ruling
+        // 5); on the ladder the line is absent, so no report a reader
+        // has already taken changes.
+        lines.addAll(closerFieldLine(view).stream().toList());
         lines.add("projection: " + token(view.projection().name()));
         // What the page is about, and what the reader explicitly
         // navigated to: two facts, never collapsed into one.
@@ -298,6 +302,12 @@ public final class ViewReport {
     }
 
     /** A double exactly as Java round-trips it, independent of locale. */
+    /** The closer field's line (#544), present only at a closer field. */
+    private static java.util.Optional<String> closerFieldLine(ChartViewState view) {
+        return view.closerField() ? java.util.Optional.of("field-kind: closer")
+                : java.util.Optional.empty();
+    }
+
     private static String exact(double value) {
         return Double.toString(value);
     }

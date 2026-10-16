@@ -167,6 +167,15 @@ public final class JUranometriaMain {
                                 language.interfaceLanguage()));
         ChartComponent chart = new ChartComponent(assembler, pageWords);
         controller.onChange(chart::setViewState);
+        // The closer fields (#544, ruled on #539, rulings 5 and 6): offered
+        // where Mercury or Venus, as the Solar System module draws them,
+        // lies on the page the step would display - not the Sun, not the
+        // Moon, and no later planet until its own study.
+        chart.setCloserFieldBodies(java.util.Set.of(
+                juranometria.solarchart.SolarSystemModule.MERCURY,
+                juranometria.solarchart.SolarSystemModule.VENUS));
+        controller.offerCloserFields(chart::offersCloserField);
+        chart.onPageContentsChange(controller::closerOfferChanged);
         // Choosing a language rebuilds the page in it. Reconstruction
         // rather than repaint: names are resolved into a scene when
         // it is assembled, so a page already drawn cannot be made to

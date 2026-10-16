@@ -98,39 +98,37 @@ public record SheetMetadata(String title, String description,
         }
         ChartScene scene = page.scene();
         String subject = scene.title();
+        String ra = String.format(Locale.ROOT, "%.4f",
+                scene.viewport().centre().raDegrees());
+        String dec = String.format(Locale.ROOT, "%+.4f",
+                scene.viewport().centre().decDegrees());
+        String field = juranometria.chart.FieldWidthText.whole(
+                fieldWidthDegrees);
+        // Asked, not asserted. This said "gnomonic" in every sheet the
+        // atlas had ever written, which was true of every page it could
+        // draw until #299 put three rungs on the ladder that another
+        // projection draws - and then it was a sheet claiming to be
+        // something it was not, which is worse than a sheet that says
+        // nothing (Sprint 30, issue #300).
+        String projection = words.projection(page.projectionName());
+        String limit = String.format(Locale.ROOT, "%.1f", limitingMagnitude);
+        String paperText = words.paper(paper.identity(),
+                String.format(Locale.ROOT, "%.1f", paper.wideMm()),
+                String.format(Locale.ROOT, "%.1f", paper.highMm()),
+                String.format(Locale.ROOT, "%.1f", paper.marginMm()),
+                String.format(Locale.ROOT, "%.1f", paper.chartWideMm()),
+                String.format(Locale.ROOT, "%.1f", paper.chartHighMm()));
+        String ground = words.ground(options.palette().storedAs());
+        // A closer field's sheet says what the screen says (#544).
+        String description = fieldWidthDegrees
+                < juranometria.chart.ChartViewState.normalMinimumFieldDegrees()
+                ? words.closerSheetDescription(subject, ra, dec, field,
+                        projection, limit, paperText, ground)
+                : words.sheetDescription(subject, ra, dec, field,
+                        projection, limit, paperText, ground);
         return new SheetMetadata(
                 words.sheetTitle(AppInfo.NAME, subject),
-                words.sheetDescription(
-                        subject,
-                        String.format(Locale.ROOT, "%.4f",
-                                scene.viewport().centre().raDegrees()),
-                        String.format(Locale.ROOT, "%+.4f",
-                                scene.viewport().centre().decDegrees()),
-                        juranometria.chart.FieldWidthText.whole(
-                                fieldWidthDegrees),
-                        // Asked, not asserted. This said "gnomonic"
-                        // in every sheet the atlas had ever written,
-                        // which was true of every page it could draw
-                        // until #299 put three rungs on the ladder
-                        // that another projection draws - and then it
-                        // was a sheet claiming to be something it was
-                        // not, which is worse than a sheet that says
-                        // nothing (Sprint 30, issue #300).
-                        words.projection(page.projectionName()),
-                        String.format(Locale.ROOT, "%.1f",
-                                limitingMagnitude),
-                        words.paper(paper.identity(),
-                                String.format(Locale.ROOT, "%.1f",
-                                        paper.wideMm()),
-                                String.format(Locale.ROOT, "%.1f",
-                                        paper.highMm()),
-                                String.format(Locale.ROOT, "%.1f",
-                                        paper.marginMm()),
-                                String.format(Locale.ROOT, "%.1f",
-                                        paper.chartWideMm()),
-                                String.format(Locale.ROOT, "%.1f",
-                                        paper.chartHighMm())),
-                        words.ground(options.palette().storedAs())),
+                description,
                 words.producedBy(AppInfo.NAME + " " + AppInfo.version(),
                         AppInfo.REPO_URL));
     }

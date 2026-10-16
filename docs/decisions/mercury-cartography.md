@@ -332,3 +332,51 @@ production `ChartComponent` set to a state at 1°, 0.5° and 0.25°.
   is a 7.2 px true disc and Venus three weeks before inferior
   conjunction a 49.6 px crescent (the study's section 4) - the visible
   phase ruling 4 asks for, once a reader can reach the field.
+
+## #544, as built
+
+Step 4 of the sequence, closing #481, under rulings 4-6. The evidence is
+section 5 of `docs/studies/closer-fields/` and the packaged journey
+*closer fields OK*.
+
+- **The offer.** Zoom in at the floor, and from 0.5°, is the closer step
+  where Mercury or Venus, as the Solar System module contributes them
+  (switched on), lies on the page that step would display: about the
+  page centre for the toolbar, the View menu and the shortcuts, about
+  the pointer for the wheel, whose page is solved first and then asked.
+  The controller asks the chart (`offersCloserField`); the application
+  names the two bodies. The Sun and the Moon never offer one, and no
+  later planet does until its own study (ruling 6).
+- **Availability follows the page.** A body switched on or off, or
+  moved by Place and Time, changes the offer without moving the view;
+  the chart announces it, and the toolbar, the Controller and the menu
+  ask again. Nothing is rebuilt for it.
+- **Lifecycle.** Panning keeps the field; a selection does nothing to
+  it; Home goes to the opening page; zoom out walks back through the
+  closer fields to the ladder; Centre on chart still lands at 1°. When
+  Mercury or Venus leaves a closer page the field is kept, zoom in is
+  unavailable, and the title block's last line says why: *No Mercury or
+  Venus on this page: no closer step from here*.
+- **Words.** The page, the spoken description and an exported sheet
+  call it a *closer field* (*nærfelt*) with the field to its own
+  precision; the view report adds `field-kind: closer` at a closer
+  field only, so no ladder report changes. The zoom-in control names
+  the closer step when it offers one and says why not when it does
+  not; at 0.25° it is the narrowest field the atlas draws. Both
+  languages.
+- **Zoom lock and persistence.** The lock gates the wheel as before; the
+  view is never saved, so a closer field is never restored.
+- **Ruling 4's acceptance.** At 0.25° Mercury at its greatest
+  elongation is drawn as its true disc with both its lit and its dark
+  sides on the screen - held by `CloserFieldJourneyTest` and by the
+  packaged journey, and for the owner's eye at the packaged checkpoint.
+- **Evidence moved.** The closer-fields study (its pages now say
+  *Closer field*, its section 5 the offer, a new page Mercury has left);
+  #539's closer pages and report again, through the production title;
+  the menu sheet's strings (zoom in at the floor now says why no closer
+  field is offered); provenance and the test-evidence study. No ladder
+  page, sheet or sentence moves.
+- **Not decided here.** At 0.25° during a transit the page lies inside
+  the Sun's disc and nothing on it names the Sun (#543's finding); the
+  rulings did not ask for it, and it is left for the owner.
+

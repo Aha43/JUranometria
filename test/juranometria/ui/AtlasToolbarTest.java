@@ -204,4 +204,42 @@ class AtlasToolbarTest {
         assertEquals(juranometria.chart.ChartViewState.DEFAULT,
                 new ChartViewController().state());
     }
+
+    @Test
+    void zoomInNamesTheCloserStepWhenOfferedAndSaysWhyWhenNot() {
+        // #544: at the floor zoom in is the closer step where the chart
+        // offers one, and says so; where it does not, it says why rather
+        // than claiming the atlas draws nothing narrower.
+        ChartViewController controller = new ChartViewController();
+        AtlasToolbar toolbar = toolbar(controller);
+        juranometria.chart.SkyPosition somewhere =
+                new juranometria.chart.SkyPosition(56.75, 24.12);
+        controller.recenter(somewhere, 1.0);
+        JButton zoomIn = button(toolbar, "Zoom in");
+        assertFalse(zoomIn.isEnabled());
+        assertEquals(juranometria.ui.language.InterfaceText.forLanguage("en")
+                        .say("toolbar.zoomIn.closer.unavailable"),
+                zoomIn.getAccessibleContext().getAccessibleDescription());
+
+        boolean[] offered = {false};
+        controller.offerCloserFields(candidate -> offered[0]);
+        offered[0] = true;
+        controller.closerOfferChanged();
+        assertTrue(zoomIn.isEnabled(), "the offer reaches the button without a new view");
+        assertEquals(juranometria.ui.language.InterfaceText.forLanguage("en")
+                        .say("toolbar.zoomIn.closer.explain"),
+                zoomIn.getAccessibleContext().getAccessibleDescription());
+        assertTrue(zoomIn.getToolTipText().startsWith("Zoom in to a closer field"),
+                zoomIn.getToolTipText());
+
+        controller.zoomIn();
+        assertEquals("Field 0.5° · Stars to V 8.0", readout(toolbar).getText());
+        controller.zoomIn();
+        assertEquals(0.25, controller.state().fieldWidthDegrees());
+        assertFalse(zoomIn.isEnabled());
+        assertEquals(juranometria.ui.language.InterfaceText.forLanguage("en")
+                        .say("toolbar.zoomIn.end"),
+                zoomIn.getAccessibleContext().getAccessibleDescription(),
+                "0.25° is the narrowest field the atlas draws");
+    }
 }

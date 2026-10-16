@@ -463,7 +463,7 @@ Bar packed 843 × 287 px; widest popup 232 px.
 | item access letter (language) \| J |
 | item label [unavailable] \| Zoom In |
 | item spoken name [unavailable] \| Zoom In |
-| item spoken description [unavailable] \| Unavailable: this is the narrowest field the atlas draws |
+| item spoken description [unavailable] \| Unavailable: a closer field is offered only when Mercury or Venus, shown on the chart, is on the page the step would show |
 | item accelerator (platform notation) \| ⌘= |
 | item label \| Zoom Out |
 | item spoken name \| Zoom Out |
@@ -909,7 +909,7 @@ Bar packed 844 × 287 px; widest popup 214 px.
 | item access letter (language) \| J |
 | item label [unavailable] \| Zoom inn |
 | item spoken name [unavailable] \| Zoom inn |
-| item spoken description [unavailable] \| Utilgjengelig: dette er atlasets smaleste synsfelt |
+| item spoken description [unavailable] \| Utilgjengelig: et nærfelt tilbys bare når Merkur eller Venus, vist på kartet, står på siden steget ville vise |
 | item accelerator (platform notation) \| ⌘= |
 | item label \| Zoom ut |
 | item spoken name \| Zoom ut |
