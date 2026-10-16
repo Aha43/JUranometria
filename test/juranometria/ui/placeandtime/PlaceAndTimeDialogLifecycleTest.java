@@ -308,6 +308,78 @@ class PlaceAndTimeDialogLifecycleTest {
         }
     }
 
+    /**
+     * The owner's reproduction (#551, found at the #544 checkpoint): a
+     * date with no time is refused, the field is put back and the
+     * refusal line appears; the close box disposes the dialog, the
+     * field commits its restored value as focus leaves it, and the
+     * refusal line going asked the size policy to pack the disposed
+     * dialog - which re-created its peer, so the menu found a
+     * displayable, invisible dialog and only brought it forward.
+     * Reopened from the menu, a dialog must actually show.
+     */
+    @Test
+    void theDialogReopensAfterARefusedEntryAndAClose() throws Exception {
+        Assumptions.assumeFalse(GraphicsEnvironment.isHeadless(),
+                "a dialog is a window, and a window needs a display");
+        MeridianModule module = new MeridianModule(
+                new Observer(59.913, 10.752, WHEN));
+        module.attach(new TestChartServices());
+        PlaceStore store = PlaceStore.forNode(node);
+        SwingUtilities.invokeAndWait(() -> {
+            owner = new JFrame("lifecycle");
+            owner.setSize(600, 400);
+            owner.setJMenuBar(juranometria.app.AppMenuBar.create(null,
+                    () -> { }, () -> { }, () -> { }, null,
+                    () -> PlaceAndTimeDialog.open(owner, module, store,
+                            () -> WHEN, juranometria.ui.language.InterfaceText.forLanguage("en")),
+                    juranometria.ui.language.InterfaceText.forLanguage("en")));
+            owner.setVisible(true);
+        });
+        SwingUtilities.invokeAndWait(() -> menuItem(owner,
+                "Place and Time...").doClick());
+        flush();
+        PlaceAndTimeDialog dialog = showingDialog();
+        JTextField instant = (JTextField) named(dialog.getContentPane(),
+                "instantField");
+        String before = instant.getText();
+
+        // A date with no time, typed and committed as a reader does -
+        // which leaves the field focused, as the reader's was when the
+        // dialog closed. Refused, put back, the line shown.
+        juranometria.ui.ReaderInput.typeAndEnter(instant, "2026-03-20");
+        Assumptions.assumeTrue(instant.isFocusOwner(),
+                "this desktop would not keep the keyboard focus in the"
+                        + " field, so closing cannot leave it");
+        assertEquals(before, instant.getText(), "the field is put back");
+        assertTrue(!((PlaceAndTimePanel) dialog.getContentPane())
+                        .refusalText().isEmpty(),
+                "and the refusal line says why");
+
+        // The close box, with the refused field still focused.
+        SwingUtilities.invokeAndWait(() -> dialog.dispatchEvent(
+                new java.awt.event.WindowEvent(dialog,
+                        java.awt.event.WindowEvent.WINDOW_CLOSING)));
+        flush();
+        flush();
+        assertTrue(!dialog.isShowing(), "the close box closed the window");
+        assertTrue(!dialog.isDisplayable(),
+                "and nothing brought the disposed dialog's peer back");
+
+        SwingUtilities.invokeAndWait(() -> menuItem(owner,
+                "Place and Time...").doClick());
+        flush();
+        PlaceAndTimeDialog reopened = showingDialog();
+        assertTrue(reopened.isShowing(), "the menu opens Place and Time again");
+    }
+
+    private static PlaceAndTimeDialog showingDialog() {
+        return (PlaceAndTimeDialog) java.util.Arrays.stream(Window.getWindows())
+                .filter(w -> w instanceof PlaceAndTimeDialog && w.isShowing())
+                .findFirst().orElseThrow(() -> new AssertionError(
+                        "no Place and Time dialog is showing"));
+    }
+
     /** The named item on the frame's real menu bar. */
     private static javax.swing.JMenuItem menuItem(JFrame frame,
                                                   String text) {
