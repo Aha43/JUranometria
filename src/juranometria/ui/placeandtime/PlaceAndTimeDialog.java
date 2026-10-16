@@ -154,19 +154,35 @@ public final class PlaceAndTimeDialog extends JDialog {
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
         applySizePolicy();
         // A refusal line appearing or going changes the height the
-        // policy discovers; re-applied so it is never clipped.
-        panel.onLayoutChange(this::applySizePolicy);
+        // policy discovers; re-applied so it is never clipped - but
+        // only to a live dialog. Closing disposes the window and the
+        // focused field commits as it goes; a refused field's restored
+        // value then hides the line, and packing the disposed dialog
+        // re-created its peer, leaving it displayable and invisible
+        // for the menu to "bring forward" forever after (#551).
+        panel.onLayoutChange(() -> {
+            if (isDisplayable()) {
+                applySizePolicy();
+            }
+        });
         setLocationRelativeTo(owner);
     }
 
-    /** Opens the dialog, or brings the existing one forward. */
+    /**
+     * Opens the dialog, or brings the existing one forward - only when
+     * that one is actually showing; any other is let go and a fresh one
+     * built (#551).
+     */
     public static void open(Frame owner, MeridianModule module,
                             PlaceStore store, Supplier<Instant> clock,
                             juranometria.ui.language.InterfaceText said){
-        if (current != null && current.isDisplayable()) {
+        if (current != null && current.isVisible()) {
             current.toFront();
             current.requestFocus();
             return;
+        }
+        if (current != null && current.isDisplayable()) {
+            current.dispose();
         }
         current = new PlaceAndTimeDialog(owner, module, store, clock, said);
         current.setVisible(true);

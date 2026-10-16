@@ -16,6 +16,12 @@ field, and if the planet leaves the page the chart says why it offers
 nothing closer. Zoom out returns to the usual fields, Home is
 unchanged, and a closer field is never saved. In both languages.
 
+**Place and Time opens again after a refused entry (#551).** Typing an
+instant the dialog cannot read - a date with no time - and then closing
+the dialog left it impossible to open again for the rest of the
+session: the View menu did nothing. It now opens every time. Found at
+the #544 checkpoint; the defect was in 5.2.0.
+
 **Closer fields prepared, not yet offered (#543).** The chart can now
 stand at 0.5° and 0.25°, below the 1° floor, though no control reaches
 them yet: the zoom stops at 1° as before. At those fields the title,
