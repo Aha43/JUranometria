@@ -156,7 +156,13 @@ class ChartViewStateTest {
         SkyPosition m31 = ChartViewState.DEFAULT.centre();
         assertThrows(IllegalArgumentException.class, () -> new ChartViewState(m31, 5.0, 8.0));
         assertThrows(IllegalArgumentException.class, () -> new ChartViewState(m31, 8.0, 7.5));
-        assertThrows(IllegalArgumentException.class, () -> new ChartViewState(m31, 0.5, 8.0));
+        // 0.5 and 0.25 are the closer fields (#543); nothing else
+        // below the floor is a field the atlas draws.
+        for (double between : new double[] {0.75, 0.3, 0.2, 0.1}) {
+            assertThrows(IllegalArgumentException.class,
+                    () -> new ChartViewState(m31, between, 8.0),
+                    between + " is not a field");
+        }
         assertThrows(IllegalArgumentException.class, () -> new ChartViewState(m31, 8.0, 9.0));
         assertThrows(IllegalArgumentException.class, () -> new ChartViewState(null, 8.0, 8.0));
     }
@@ -257,5 +263,58 @@ class ChartViewStateTest {
                 () -> new ChartViewState(new SkyPosition(0.0, 0.0),
                         150.0, 5.0),
                 "150 degrees is between two rungs, which is not a rung");
+    }
+
+    @Test
+    void theCloserFieldsAreStatesTheLadderNeverWalksInto() {
+        // #543, part of #481: 0.5 and 0.25 are fields a state may hold,
+        // drawn by the tangent plane, but the ladder stops at 1 degree
+        // and its floor stays the reader's normal minimum.
+        SkyPosition m31 = ChartViewState.DEFAULT.centre();
+        assertEquals(java.util.List.of(0.5, 0.25),
+                ChartViewState.closerFieldSteps());
+        assertFalse(ChartViewState.fieldWidthSteps().contains(0.5),
+                "never a ladder rung, so search and coverage never land there");
+        assertEquals(1.0, ChartViewState.normalMinimumFieldDegrees());
+
+        ChartViewState floor = new ChartViewState(m31, 1.0, 8.0);
+        assertFalse(floor.canZoomIn());
+        assertSame(floor, floor.zoomIn(), "zoom in stops at the floor");
+        assertFalse(floor.closerField());
+
+        for (double closer : ChartViewState.closerFieldSteps()) {
+            ChartViewState state = new ChartViewState(m31, closer, 8.0);
+            assertTrue(state.closerField());
+            assertEquals(ChartProjection.GNOMONIC, state.projection());
+            assertFalse(state.canZoomIn(),
+                    "the ladder's zoom-in is never the closer step");
+            assertSame(state, state.zoomIn());
+            assertTrue(state.canZoomOut());
+        }
+    }
+
+    @Test
+    void theCloserStepGoesDownFromTheFloorAndZoomOutComesBack() {
+        SkyPosition m31 = ChartViewState.DEFAULT.centre();
+        ChartViewState floor = new ChartViewState(m31, 1.0, 7.0,
+                "a subject", null);
+        assertEquals(0.5, floor.closerStep().getAsDouble());
+        ChartViewState half = floor.withFieldWidth(0.5);
+        assertEquals(0.25, half.closerStep().getAsDouble());
+        ChartViewState quarter = half.withFieldWidth(0.25);
+        assertTrue(quarter.closerStep().isEmpty(), "0.25 is the closest");
+        assertTrue(new ChartViewState(m31, 2.0, 8.0).closerStep().isEmpty(),
+                "a closer field is entered from the floor only");
+
+        ChartViewState out = quarter.zoomOut();
+        assertEquals(0.5, out.fieldWidthDegrees());
+        out = out.zoomOut();
+        assertEquals(1.0, out.fieldWidthDegrees(), "back to the floor");
+        assertEquals(2.0, out.zoomOut().fieldWidthDegrees(),
+                "and up the ladder");
+        assertEquals(m31, out.centre());
+        assertEquals(7.0, out.limitingMagnitude(),
+                "the reader's limit carries through");
+        assertEquals("a subject", out.targetLabel());
     }
 }

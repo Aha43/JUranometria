@@ -9,7 +9,9 @@ package juranometria.chart;
  * bundled data, which is a product promise: the chart may show a smaller
  * field or hide faint stars, but it may never claim deeper or wider
  * coverage than the data holds. The bounds live here and nowhere else:
- * field width 120° down to 1°, 8° the default, limiting magnitude V 8.0
+ * field width 180° down to 1° on the ladder, and the two closer fields
+ * 0.5° and 0.25° below it that only {@link #closerStep()} reaches
+ * (#481); 8° the default, limiting magnitude V 8.0
  * (default) down to V 4.0.
  *
  * Which projection draws a rung is part of the same rule and lives here
@@ -47,6 +49,17 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
     private static final double[] FIELD_WIDTH_STEPS =
             {180.0, 120.0, 90.0, 60.0,
              42.0, 36.0, 24.0, 18.0, 12.0, 8.0, 6.0, 4.0, 3.0, 2.0, 1.0};
+
+    /**
+     * The closer fields below the ladder's floor, widest first (#481,
+     * ruled on #539, ruling 5: docs/decisions/mercury-cartography.md).
+     * A state may stand at one, but the ladder never walks into one:
+     * {@link #zoomIn()} stops at the floor, and a closer field is
+     * entered only through {@link #closerStep()} - which no surface
+     * offers until #544 gives it its eligibility. Zooming out of a
+     * closer field walks back up through these to the floor.
+     */
+    private static final double[] CLOSER_FIELD_STEPS = {0.5, 0.25};
 
     /**
      * The narrowest field the reader's zoom reaches (#483): the last rung
@@ -102,7 +115,8 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
             throw new IllegalArgumentException(
                     "projection must not be null");
         }
-        if (indexOf(FIELD_WIDTH_STEPS, fieldWidthDegrees) < 0) {
+        if (indexOf(FIELD_WIDTH_STEPS, fieldWidthDegrees) < 0
+                && indexOf(CLOSER_FIELD_STEPS, fieldWidthDegrees) < 0) {
             throw new IllegalArgumentException(
                     "field width is not a supported step: " + fieldWidthDegrees);
         }
@@ -116,10 +130,10 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
         if (projection != ChartProjection.forField(fieldWidthDegrees)) {
             throw new IllegalArgumentException(String.format(
                     java.util.Locale.ROOT,
-                    "a %.0f-degree page is drawn by the %s projection and"
+                    "a %s-degree page is drawn by the %s projection and"
                             + " this one says %s: which projection draws a"
                             + " field is not a choice",
-                    fieldWidthDegrees,
+                    FieldWidthText.plain(fieldWidthDegrees),
                     ChartProjection.forField(fieldWidthDegrees).displayName(),
                     projection.displayName()));
         }
@@ -206,12 +220,46 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
         return java.util.stream.DoubleStream.of(FIELD_WIDTH_STEPS).boxed().toList();
     }
 
+    /** The closer fields, widest first (#481): never part of the ladder. */
+    public static java.util.List<Double> closerFieldSteps() {
+        return java.util.stream.DoubleStream.of(CLOSER_FIELD_STEPS).boxed().toList();
+    }
+
+    /** Whether this page stands at a closer field, below the ladder's floor. */
+    public boolean closerField() {
+        return closerIndex() >= 0;
+    }
+
+    /**
+     * The ladder's own zoom: false at the floor and at every closer
+     * field. A closer field is reached through {@link #closerStep()},
+     * not by walking the ladder.
+     */
     public boolean canZoomIn() {
-        return fieldWidthIndex() < FIELD_WIDTH_STEPS.length - 1;
+        return !closerField() && fieldWidthIndex() < FIELD_WIDTH_STEPS.length - 1;
     }
 
     public boolean canZoomOut() {
-        return fieldWidthIndex() > 0;
+        return closerField() || fieldWidthIndex() > 0;
+    }
+
+    /**
+     * The next closer field from here - the first closer rung from the
+     * floor, the next from a closer rung - or empty when this page is
+     * above the floor or at the closest. Whether a surface may offer
+     * it is not the state's to decide (#544); the state only says
+     * where the step would go.
+     */
+    public java.util.OptionalDouble closerStep() {
+        if (closerField()) {
+            int next = closerIndex() + 1;
+            return next < CLOSER_FIELD_STEPS.length
+                    ? java.util.OptionalDouble.of(CLOSER_FIELD_STEPS[next])
+                    : java.util.OptionalDouble.empty();
+        }
+        return fieldWidthDegrees == normalMinimumFieldDegrees()
+                ? java.util.OptionalDouble.of(CLOSER_FIELD_STEPS[0])
+                : java.util.OptionalDouble.empty();
     }
 
     /** True when the limit can move brighter (show fewer stars). */
@@ -240,8 +288,17 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
                 : this;
     }
 
-    /** The next wider field, or this state at the 42-degree bound. */
+    /**
+     * The next wider field, or this state at the widest bound. From a
+     * closer field it walks back up through the closer rungs to the
+     * ladder's floor.
+     */
     public ChartViewState zoomOut() {
+        if (closerField()) {
+            return withFieldWidth(closerIndex() == 0
+                    ? normalMinimumFieldDegrees()
+                    : CLOSER_FIELD_STEPS[closerIndex() - 1]);
+        }
         return canZoomOut()
                 ? withFieldWidth(FIELD_WIDTH_STEPS[fieldWidthIndex() - 1])
                 : this;
@@ -333,6 +390,10 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
 
     private int fieldWidthIndex() {
         return indexOf(FIELD_WIDTH_STEPS, fieldWidthDegrees);
+    }
+
+    private int closerIndex() {
+        return indexOf(CLOSER_FIELD_STEPS, fieldWidthDegrees);
     }
 
     private int magnitudeIndex() {

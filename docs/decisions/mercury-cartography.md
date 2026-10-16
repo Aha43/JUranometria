@@ -262,10 +262,73 @@ attached.
   Mercury on the chart is remembered as Venus on the chart is
   (`MercuryChartStore`, off at first start). Labels, selection and the
   Solar System labels emphasis class reach Mercury unchanged.
-- **Phase on screen is not yet visible.** On the ordinary ladder the
-  mark is too small for its phase to be read; ruling 4's acceptance
-  requirement belongs to #543-#544 and is not claimed here.
+- **Phase on screen: legible at 1°, not yet usable.** On the ordinary
+  ladder the mark is a phased 6 px symbol - a true phase on an enlarged
+  symbol, not Mercury's size. *Corrected after the owner's packaged
+  checkpoint on #542:* this line first said the mark was too small for
+  its phase to be read, but at 1° the owner saw "clearly a phased
+  planet", if "not super usable". Ruling 4's acceptance requirement -
+  visible phase on screen - still belongs to #543-#544 and is not
+  claimed here.
 - **Evidence moved.** The new study, its provenance rows, the menu
   sheets (the new item), the companion and test-evidence pins, and the
   packaged journey *mercury on the chart OK*. No existing chart page
   moves: Mercury is off unless chosen.
+
+## #543, as built
+
+Step 3 of the sequence, under ruling 5's four foundations, with no
+surface offering a closer field. The evidence is
+`docs/studies/closer-fields/` (`make closer-fields-study`), drawn by the
+production `ChartComponent` set to a state at 1°, 0.5° and 0.25°.
+
+- **The closer fields are states, not rungs.** `ChartViewState` holds
+  0.5° and 0.25° (`closerFieldSteps()`), drawn by the tangent plane,
+  and refuses every other width below the floor. The ladder is
+  unchanged: its zoom-in stops at 1°, `fieldWidthSteps()` and the
+  normal minimum are what they were, so search and Centre on chart
+  never land on a closer field. `closerStep()` says where the next
+  closer step would go (1° to 0.5° to 0.25°); nothing calls it until
+  #544 gives it its eligibility. Zoom out from a closer field walks
+  back through 0.5° to the floor, carrying the centre, target and
+  limit; zoom in there, and the wheel's, is refused at the bound.
+- **Foundation 1, the field's words.** One formatter (`FieldWidthText`)
+  for the title block, the spoken description, the toolbar readout,
+  the export's description and its file name. Ladder fields print
+  exactly as before; a closer field prints 0.5 and 0.25 everywhere,
+  never the 0.3 or 0 the old formats gave. The view report already
+  printed the field exactly.
+- **Foundation 2, finer grid steps.** Below the floor the spacing rule
+  is offered 15s and 30s of time and 2′, 5′ and 10′ of arc before the
+  ladder's own; a ladder page never is, so no released grid moves. RA
+  figures carry seconds where a meridian falls between minutes; Dec
+  figures round to the arcminute before splitting, so a 2′ parallel
+  never reads 60′.
+- **Foundation 3, the catalogue at the page's own field.** The scene
+  assembler already queried by the page's own corners plus the
+  catalogue's object margin; it is now proven at both closer fields.
+  Near the ecliptic a closer page often holds no catalogue star at
+  V 8.0 (the study's tables).
+- **Foundation 4, the Sun's dot.** Capped by #541; the 2019 transit at
+  0.25° shows the cap's purpose: the page lies wholly inside the Sun's
+  disc, and what reads is Mercury's true disc and the small centre dot.
+  Nothing on such a page yet says the reader is looking at the Sun -
+  noted for #544.
+- **Projection, labels, export, keyboard zoom, persistence.** Tangent
+  plane at both fields; names placed by the production layer (where
+  they found room is the platform record); an A4 sheet exported at
+  0.25° says "Field 0.25 degrees wide" and is named `...-0.25deg.png`;
+  the toolbar, menu, shortcuts and wheel are the controller's calls,
+  proven from 0.25° back to the ladder; nothing persists the view, so
+  every start opens at the released default and a closer field is
+  never saved.
+- **Evidence moved.** The new study and its provenance rows; #539's own
+  closer pages (its 13 sub-1° pictures and its report), which draw
+  through the production title and grid and now say 0.25 and take the
+  finer steps - its findings marked as met; the test-evidence study.
+  No ladder page, sheet or sentence moves anywhere: the evidence
+  contracts reproduce every one.
+- **What #544 inherits.** At 0.25° Mercury at its greatest elongation
+  is a 7.2 px true disc and Venus three weeks before inferior
+  conjunction a 49.6 px crescent (the study's section 4) - the visible
+  phase ruling 4 asks for, once a reader can reach the field.

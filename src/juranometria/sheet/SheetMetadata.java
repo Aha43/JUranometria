@@ -106,7 +106,7 @@ public record SheetMetadata(String title, String description,
                                 scene.viewport().centre().raDegrees()),
                         String.format(Locale.ROOT, "%+.4f",
                                 scene.viewport().centre().decDegrees()),
-                        String.format(Locale.ROOT, "%.0f",
+                        juranometria.chart.FieldWidthText.whole(
                                 fieldWidthDegrees),
                         // Asked, not asserted. This said "gnomonic"
                         // in every sheet the atlas had ever written,
