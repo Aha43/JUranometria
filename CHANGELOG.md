@@ -7,6 +7,8 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [5.3.0] - 2026-10-17
+
 **The phases of Venus (#545).** A new reader article, in English and
 Norwegian (*Venus' faser*): what the atlas draws of Venus, where its
 numbers come from and how closely they match JPL Horizons, the phase
