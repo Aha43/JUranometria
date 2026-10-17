@@ -77,6 +77,25 @@ public interface PageWords {
                       String projection);
 
     /**
+     * The title's facts on a closer field (#544): the page called a
+     * closer field in its own whole pattern. A language without one
+     * says what the ladder says.
+     */
+    default String closerTitleFacts(String fieldDegrees, String magnitude,
+                                    String projection) {
+        return titleFacts(fieldDegrees, magnitude, projection);
+    }
+
+    /**
+     * The title block's note on a closer field with no Mercury or
+     * Venus on it (#544): why zoom in offers no closer step. Null in a
+     * language without one.
+     */
+    default String closerFieldWithoutBody() {
+        return null;
+    }
+
+    /**
      * The separator between the facts of {@link #titleFacts}, as this
      * language writes it - where a fact line may be broken when the
      * page has less room than the line (#359 completion). It is the
@@ -120,6 +139,14 @@ public interface PageWords {
                       String fieldDegrees, String projection,
                       String magnitude, boolean bounded);
 
+    /** The whole page spoken at a closer field (#544). */
+    default String closerSpokenPage(String subject, String ra, String dec,
+                                    String fieldDegrees, String projection,
+                                    String magnitude) {
+        return spokenPage(subject, ra, dec, fieldDegrees, projection,
+                magnitude, false);
+    }
+
     // ---- what an exported file says about itself ---------------
 
     /**
@@ -136,6 +163,16 @@ public interface PageWords {
                             String fieldDegrees, String projection,
                             String magnitude, String paper,
                             String ground);
+
+    /** The exported file's description at a closer field (#544). */
+    default String closerSheetDescription(String subject, String ra,
+                                          String dec, String fieldDegrees,
+                                          String projection,
+                                          String magnitude, String paper,
+                                          String ground) {
+        return sheetDescription(subject, ra, dec, fieldDegrees, projection,
+                magnitude, paper, ground);
+    }
 
     /** Who drew the file, and out of what. */
     String producedBy(String applicationAndVersion,

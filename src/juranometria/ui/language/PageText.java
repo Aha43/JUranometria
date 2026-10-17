@@ -111,6 +111,36 @@ public final class PageText implements PageWords {
     }
 
     @Override
+    public String closerTitleFacts(String fieldDegrees, String magnitude,
+                                   String projection) {
+        return said.say(STEM + "title.facts.closer", fieldDegrees,
+                magnitude, projection);
+    }
+
+    @Override
+    public String closerFieldWithoutBody() {
+        return said.say(STEM + "title.closer.noBody");
+    }
+
+    @Override
+    public String closerSpokenPage(String subject, String ra, String dec,
+                                   String fieldDegrees, String projection,
+                                   String magnitude) {
+        return said.say(STEM + "spoken.closer", subject, ra, dec,
+                fieldDegrees, projection, magnitude);
+    }
+
+    @Override
+    public String closerSheetDescription(String subject, String ra,
+                                         String dec, String fieldDegrees,
+                                         String projection,
+                                         String magnitude, String paper,
+                                         String ground) {
+        return said.say(STEM + "sheet.description.closer", subject, ra, dec,
+                fieldDegrees, projection, magnitude, paper, ground);
+    }
+
+    @Override
     public String titleFactSeparator() {
         return said.say(STEM + "title.facts.separator");
     }

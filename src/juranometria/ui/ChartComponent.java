@@ -87,6 +87,9 @@ public final class ChartComponent extends JComponent {
         }
         this.words = words;
         this.renderer = new ChartRenderer(StarSizePolicy.DEFAULT, words);
+        // A closer page with no Mercury, Venus or Jupiter on it says why zoom in
+        // offers nothing more (#544); every other page carries no note.
+        this.renderer.setTitleNote(this::closerFieldNote);
         this.assembler = assembler;
         setOpaque(true);
         setPreferredSize(new Dimension(900, 700));
@@ -472,6 +475,109 @@ public final class ChartComponent extends JComponent {
     }
 
     /**
+     * The bodies whose presence on a page offers a closer field (#544,
+     * ruled on #539, rulings 5 and 6, Jupiter added by the owner at the
+     * #544 checkpoint): Mercury, Venus and Jupiter, named by the
+     * application, which knows the module's identities; none until it
+     * does, which is a chart that never offers one.
+     */
+    private java.util.Set<String> closerFieldBodies = java.util.Set.of();
+
+    public void setCloserFieldBodies(java.util.Set<String> identities) {
+        closerFieldBodies = java.util.Set.copyOf(identities);
+        pageContentsChanged();
+    }
+
+    /**
+     * Whether a closer page may be offered: a body named in
+     * {@link #setCloserFieldBodies}, as the modules contribute it now,
+     * lies on the page the candidate state would display at this
+     * chart's page size. The question a closer step asks of the page
+     * it would show, about its centre or about a pointer (#544).
+     */
+    public boolean offersCloserField(ChartViewState candidate) {
+        if (candidate == null || !candidate.closerField()) {
+            return false;
+        }
+        return closerBodyOn(candidate);
+    }
+
+    private boolean closerBodyOn(ChartViewState page) {
+        if (closerFieldBodies.isEmpty()) {
+            return false;
+        }
+        int width = scene != null ? scene.viewport().widthPx() : getWidth();
+        int height = scene != null ? scene.viewport().heightPx() : getHeight();
+        if (width <= 0 || height <= 0) {
+            return false;
+        }
+        juranometria.chart.ChartViewport viewport =
+                new juranometria.chart.ChartViewport(page.centre(),
+                        page.fieldWidthDegrees(), width, height);
+        juranometria.project.DrawnPage drawn = juranometria.project.DrawnPage.of(
+                new juranometria.chart.ChartScene(viewport, List.of(), List.of(),
+                        "closer-field offer", page.limitingMagnitude(), null));
+        juranometria.project.ViewportMapping mapping =
+                new juranometria.project.ViewportMapping(drawn);
+        for (juranometria.module.OverlayRegistry.Owned owned : overlays.collect()) {
+            // Mercury and Venus are round bodies, Jupiter an oblate one.
+            juranometria.chart.SkyPosition at = null;
+            if (owned.geometry() instanceof juranometria.module.OverlayContribution.Body body
+                    && closerFieldBodies.contains(body.identity())) {
+                at = body.at();
+            } else if (owned.geometry()
+                    instanceof juranometria.module.OverlayContribution.OblateBody oblate
+                    && closerFieldBodies.contains(oblate.identity())) {
+                at = oblate.at();
+            }
+            if (at != null) {
+                var plane = drawn.projection().project(at);
+                if (plane.isEmpty()) {
+                    continue;
+                }
+                juranometria.project.PixelPoint pixel = mapping.toPixel(plane.get());
+                if (pixel.x() >= 0 && pixel.x() < width
+                        && pixel.y() >= 0 && pixel.y() < height) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /** The title block's note for this page (#544), or null. */
+    public String closerFieldNote(juranometria.chart.ChartScene drawnScene) {
+        if (!viewState.closerField() || closerFieldBodies.isEmpty()
+                || drawnScene.viewport().fieldWidthDegrees()
+                        != viewState.fieldWidthDegrees()) {
+            return null;
+        }
+        return closerBodyOn(viewState) ? null : words.closerFieldWithoutBody();
+    }
+
+    private final java.util.List<Runnable> pageContentsListeners =
+            new java.util.ArrayList<>();
+
+    /**
+     * Told whenever what the page carries could have changed - a scene,
+     * a module contributing, redrawing or withdrawing - so whatever
+     * depends on which bodies stand on it, such as the closer step's
+     * offer, asks again (#544). Never during painting.
+     */
+    public void onPageContentsChange(Runnable listener) {
+        if (listener != null) {
+            pageContentsListeners.add(listener);
+        }
+    }
+
+    /** Announces that the page's contents may have changed (#544). */
+    public void pageContentsChanged() {
+        for (Runnable listener : java.util.List.copyOf(pageContentsListeners)) {
+            listener.run();
+        }
+    }
+
+    /**
      * Toggles one semantic structure's membership in the raised set
      * (multiple-emphasis ruling): choosing a structure toggles only
      * that structure, and an unavailable structure cannot enter.
@@ -576,6 +682,8 @@ public final class ChartComponent extends JComponent {
         for (Runnable listener : java.util.List.copyOf(availabilityListeners)) {
             listener.run();
         }
+        // The same moments change which bodies stand on the page.
+        pageContentsChanged();
     }
 
     /**

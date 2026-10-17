@@ -471,6 +471,7 @@ public final class PackagedAcceptanceMain {
         sunOnTheChartJourney();
         venusOnTheChartJourney();
         mercuryOnTheChartJourney();
+        closerFieldsJourney();
         moonOnTheChartJourney();
         solarSystemSheetJourney();
         zoomLockJourney();
@@ -2722,6 +2723,171 @@ public final class PackagedAcceptanceMain {
                 + " where the service puts it at the 2026 greatest eastern elongation - the"
                 + " phased 6 px symbol at 8° and at the minimum field, spoken as one - and a"
                 + " click on the mark selects Mercury's occurrence)");
+    }
+
+    /**
+     * The closer fields inside the packaged image (#544, closing #481,
+     * rulings 4-6 on #539): wired as the application wires them, zoom in
+     * at 1° is the closer step where Mercury stands on the page it would
+     * show - 0.5°, then 0.25° - and at 0.25° Mercury's true disc is
+     * drawn with both its lit and dark sides (ruling 4's acceptance); a
+     * pan that leaves Mercury keeps the field and offers no closer step;
+     * zoom out returns to the ladder.
+     */
+    private static void closerFieldsJourney() throws Exception {
+        juranometria.solar.SolarSystemService solar =
+                juranometria.solar.SolarSystemService.load();
+        juranometria.sky.Observer oslo = new juranometria.sky.Observer(59.91, 10.75,
+                MERCURY_SAMPLE_INSTANT);
+        juranometria.chart.SkyPosition place =
+                ((juranometria.solar.MercuryService.MercuryObservation) solar.observe(
+                        juranometria.solar.SolarSystemService.Body.MERCURY, oslo))
+                        .astrometricJ2000();
+        juranometria.ui.ChartComponent[] chart = new juranometria.ui.ChartComponent[1];
+        juranometria.ui.ChartViewController controller =
+                new juranometria.ui.ChartViewController();
+        juranometria.ui.ChartModuleHost[] host = new juranometria.ui.ChartModuleHost[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            chart[0] = new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
+            chart[0].setSize(900, 700);
+            controller.onChange(chart[0]::setViewState);
+            chart[0].setCloserFieldBodies(CLOSER_FIELD_BODIES);
+            controller.offerCloserFields(chart[0]::offersCloserField);
+            chart[0].onPageContentsChange(controller::closerOfferChanged);
+            controller.recenter(place, 1.0);
+            host[0] = new juranometria.ui.ChartModuleHost(chart[0],
+                    new juranometria.chart.SelectionModel(), r -> { });
+            juranometria.solarchart.SolarSystemModule module =
+                    juranometria.ui.solar.SunChartSession.begin(host[0], () -> oslo,
+                            () -> solar, () -> false);
+            module.sunShowing(false);
+            module.mercuryShowing(true);
+        });
+        try {
+            javax.swing.SwingUtilities.invokeAndWait(() -> { });
+            require(controller.canZoomIn(), "at 1° with Mercury on the page, the closer step"
+                    + " is offered");
+            javax.swing.SwingUtilities.invokeAndWait(controller::zoomIn);
+            require(controller.state().fieldWidthDegrees() == 0.5, "zoom in reaches 0.5°");
+            javax.swing.SwingUtilities.invokeAndWait(controller::zoomIn);
+            require(controller.state().fieldWidthDegrees() == 0.25, "and then 0.25°");
+            require(!controller.canZoomIn(), "0.25° is the closest");
+            java.awt.image.BufferedImage image = new java.awt.image.BufferedImage(900, 700,
+                    java.awt.image.BufferedImage.TYPE_INT_RGB);
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                java.awt.Graphics2D g = image.createGraphics();
+                try {
+                    chart[0].paint(g);
+                } finally {
+                    g.dispose();
+                }
+            });
+            juranometria.ui.ReferenceInk.BodyPlacement drawn = chart[0].renderedBodies()
+                    .stream().filter(b -> juranometria.solarchart.SolarSystemModule.MERCURY
+                            .equals(b.identity())).findFirst().orElse(null);
+            require(drawn != null && !drawn.symbol(), "at 0.25° Mercury is its true disc: "
+                    + drawn);
+            double diameter = drawn.disc().getBounds2D().getWidth();
+            double cx = drawn.centre().x() + chart[0].pageOffsetX();
+            double cy = drawn.centre().y() + chart[0].pageOffsetY();
+            double inner = diameter / 2.0 - 1.0;
+            int lit = 0;
+            int dark = 0;
+            for (int y = (int) (cy - inner); y <= (int) (cy + inner); y++) {
+                for (int x = (int) (cx - inner); x <= (int) (cx + inner); x++) {
+                    if (Math.hypot(x + 0.5 - cx, y + 0.5 - cy) > inner) {
+                        continue;
+                    }
+                    int rgb = image.getRGB(x, y);
+                    int luminance = ((rgb >> 16 & 0xff) + (rgb >> 8 & 0xff) + (rgb & 0xff)) / 3;
+                    if (luminance > 200) {
+                        lit++;
+                    } else if (luminance < 120) {
+                        dark++;
+                    }
+                }
+            }
+            require(lit >= 3 && dark >= 3, "Mercury's phase is on the screen at 0.25°: " + lit
+                    + " lit and " + dark + " dark pixels");
+            String said = chart[0].getAccessibleContext().getAccessibleDescription();
+            require(said.contains("Closer field 0.25 degrees wide"), "called a closer field: "
+                    + said);
+            javax.swing.SwingUtilities.invokeAndWait(() -> controller.recenter(
+                    new juranometria.chart.SkyPosition(place.raDegrees() + 1.0,
+                            place.decDegrees())));
+            require(controller.state().fieldWidthDegrees() == 0.25
+                    && !controller.canZoomIn(), "a pan off Mercury keeps the field and offers"
+                    + " nothing closer");
+            javax.swing.SwingUtilities.invokeAndWait(controller::zoomOut);
+            javax.swing.SwingUtilities.invokeAndWait(controller::zoomOut);
+            require(controller.state().fieldWidthDegrees() == 1.0, "zoom out returns to the"
+                    + " ladder");
+        } finally {
+            javax.swing.SwingUtilities.invokeAndWait(host[0]::detachAll);
+        }
+        closerFieldsForJupiter();
+        System.out.println("closer fields OK (zoom in at 1° offers 0.5° and then 0.25° where"
+                + " Mercury stands on the page, at the 2026 greatest eastern elongation, and"
+                + " where Jupiter stands, at the 2026-12-11 triple transit; at 0.25° Mercury's"
+                + " true disc shows its lit and dark sides and Jupiter is drawn; a pan off"
+                + " either keeps the field and offers nothing closer; zoom out returns to the"
+                + " ladder)");
+    }
+
+    /** The bodies the application names for the closer fields (#544), as JUranometriaMain does. */
+    private static final java.util.Set<String> CLOSER_FIELD_BODIES = java.util.Set.of(
+            juranometria.solarchart.SolarSystemModule.MERCURY,
+            juranometria.solarchart.SolarSystemModule.VENUS,
+            juranometria.jovianchart.JovianModule.JUPITER);
+
+    /** Jupiter's half of the closer-fields journey, at the Jovian sheet's moment. */
+    private static void closerFieldsForJupiter() throws Exception {
+        juranometria.solar.JovianSystemService jovianService =
+                juranometria.solar.JovianSystemService.load();
+        juranometria.sky.Observer oslo = new juranometria.sky.Observer(59.91, 10.75,
+                JOVIAN_SHEET_MOMENT);
+        juranometria.chart.SkyPosition place =
+                jovianService.observeJupiter(oslo).astrometricJ2000();
+        juranometria.ui.ChartComponent[] chart = new juranometria.ui.ChartComponent[1];
+        juranometria.ui.ChartViewController controller =
+                new juranometria.ui.ChartViewController();
+        juranometria.ui.ChartModuleHost[] host = new juranometria.ui.ChartModuleHost[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            chart[0] = new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
+            chart[0].setSize(900, 700);
+            controller.onChange(chart[0]::setViewState);
+            chart[0].setCloserFieldBodies(CLOSER_FIELD_BODIES);
+            controller.offerCloserFields(chart[0]::offersCloserField);
+            chart[0].onPageContentsChange(controller::closerOfferChanged);
+            controller.recenter(place, 1.0);
+            host[0] = new juranometria.ui.ChartModuleHost(chart[0],
+                    new juranometria.chart.SelectionModel(), r -> { });
+            juranometria.jovianchart.JovianModule jovian = host[0].attach(
+                    new juranometria.jovianchart.JovianModule(() -> oslo, () -> jovianService,
+                            () -> false));
+            jovian.showing(true);
+        });
+        try {
+            javax.swing.SwingUtilities.invokeAndWait(() -> { });
+            require(controller.canZoomIn(), "at 1° with Jupiter on the page, the closer step"
+                    + " is offered");
+            javax.swing.SwingUtilities.invokeAndWait(controller::zoomIn);
+            javax.swing.SwingUtilities.invokeAndWait(controller::zoomIn);
+            require(controller.state().fieldWidthDegrees() == 0.25, "Jupiter's page reaches"
+                    + " 0.25°");
+            paintHeadless(chart[0]);
+            require(chart[0].renderedBodies().stream().anyMatch(b ->
+                            juranometria.jovianchart.JovianModule.JUPITER.equals(b.identity())),
+                    "Jupiter is drawn at 0.25°: " + chart[0].renderedBodies());
+            javax.swing.SwingUtilities.invokeAndWait(() -> controller.recenter(
+                    new juranometria.chart.SkyPosition(place.raDegrees() + 1.0,
+                            place.decDegrees())));
+            require(controller.state().fieldWidthDegrees() == 0.25
+                    && !controller.canZoomIn(), "a pan off Jupiter keeps the field and offers"
+                    + " nothing closer");
+        } finally {
+            javax.swing.SwingUtilities.invokeAndWait(host[0]::detachAll);
+        }
     }
 
     /**

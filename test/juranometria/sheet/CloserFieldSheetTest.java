@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * A closer field says its own width on the page, aloud and in an
- * export (#543, part of #481): 0.5 and 0.25, never the "0.3" or "0" the
+ * export (#543, part of #481), and since #544 calls itself a closer field: 0.5 and 0.25, never the "0.3" or "0" the
  * ladder's formats would round it to, in both languages, with the
  * sheet's file name a reader can find again.
  */
@@ -38,21 +38,21 @@ class CloserFieldSheetTest {
             DrawnPage page = DrawnPage.of(scene);
 
             assertTrue(page.describe(ENGLISH).contains(
-                            "Field " + width + " degrees wide"),
+                            "Closer field " + width + " degrees wide"),
                     page.describe(ENGLISH));
             assertTrue(page.describe(NORWEGIAN).contains(
-                            "Felt " + width + " grader bredt"),
+                            "Nærfelt " + width + " grader bredt"),
                     page.describe(NORWEGIAN));
 
             SheetMetadata english = SheetMetadata.of(scene, state,
                     ChartOptions.DEFAULTS, PaperSize.A4, ENGLISH);
             assertTrue(english.description().contains(
-                            "Field " + width + " degrees wide"),
+                            "Closer field " + width + " degrees wide"),
                     english.description());
             SheetMetadata norwegian = SheetMetadata.of(scene, state,
                     ChartOptions.DEFAULTS, PaperSize.A4, NORWEGIAN);
             assertTrue(norwegian.description().contains(
-                            "Felt " + width + " grader bredt"),
+                            "Nærfelt " + width + " grader bredt"),
                     norwegian.description());
 
             String name = SheetFileName.suggest(state, scene, SheetFormat.PNG);

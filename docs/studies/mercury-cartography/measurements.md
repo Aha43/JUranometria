@@ -136,20 +136,20 @@ Real pages at 1°, 0.5° and 0.25°, centred on the body, through the production
 | page | body | instant (UTC) | phase | field | drawn px | symbol | lit px | dark px | readable | stars on the page | grid steps (RA, Dec) and spacing | the page says |
 |---|---|---|---|---:|---:|---|---:|---:|---|---:|---|---|
 | `mercury-elongation-1` | Mercury | 2026-02-19 18:00 | near half lit | 1° | 6.00 | yes | 2.98 | 3.02 | no | 1 | 1m, 15′ - 225 and 225 px apart | Field 1.0 degrees wide, gnomonic projection |
-| `mercury-elongation-0.5` | Mercury | 2026-02-19 18:00 | near half lit | 0.5° | 6.00 | yes | 2.98 | 3.02 | no | 0 | 15s, 5′ - 112 and 150 px apart | Field 0.5 degrees wide, gnomonic projection |
-| `mercury-elongation-0.25` | Mercury | 2026-02-19 18:00 | near half lit | 0.25° | 7.18 | no | 3.57 | 3.61 | yes | 0 | 15s, 2′ - 225 and 120 px apart | Field 0.25 degrees wide, gnomonic projection |
+| `mercury-elongation-0.5` | Mercury | 2026-02-19 18:00 | near half lit | 0.5° | 6.00 | yes | 2.98 | 3.02 | no | 0 | 15s, 5′ - 112 and 150 px apart | Closer field 0.5 degrees wide, gnomonic projection |
+| `mercury-elongation-0.25` | Mercury | 2026-02-19 18:00 | near half lit | 0.25° | 7.18 | no | 3.57 | 3.61 | yes | 0 | 15s, 2′ - 225 and 120 px apart | Closer field 0.25 degrees wide, gnomonic projection |
 | `mercury-crescent-1` | Mercury | 2026-02-23 00:00 | crescent | 1° | 6.00 | yes | 2.07 | 3.93 | no | 1 | 1m, 15′ - 225 and 225 px apart | Field 1.0 degrees wide, gnomonic projection |
-| `mercury-crescent-0.5` | Mercury | 2026-02-23 00:00 | crescent | 0.5° | 6.00 | yes | 2.07 | 3.93 | no | 1 | 15s, 5′ - 112 and 150 px apart | Field 0.5 degrees wide, gnomonic projection |
-| `mercury-crescent-0.25` | Mercury | 2026-02-23 00:00 | crescent | 0.25° | 7.94 | no | 2.74 | 5.20 | yes | 0 | 15s, 2′ - 225 and 120 px apart | Field 0.25 degrees wide, gnomonic projection |
+| `mercury-crescent-0.5` | Mercury | 2026-02-23 00:00 | crescent | 0.5° | 6.00 | yes | 2.07 | 3.93 | no | 1 | 15s, 5′ - 112 and 150 px apart | Closer field 0.5 degrees wide, gnomonic projection |
+| `mercury-crescent-0.25` | Mercury | 2026-02-23 00:00 | crescent | 0.25° | 7.94 | no | 2.74 | 5.20 | yes | 0 | 15s, 2′ - 225 and 120 px apart | Closer field 0.25 degrees wide, gnomonic projection |
 | `mercury-gibbous-1` | Mercury | 2026-02-16 00:00 | gibbous | 1° | 6.00 | yes | 3.96 | 2.04 | no | 1 | 1m, 15′ - 224 and 225 px apart | Field 1.0 degrees wide, gnomonic projection |
-| `mercury-gibbous-0.5` | Mercury | 2026-02-16 00:00 | gibbous | 0.5° | 6.00 | yes | 3.96 | 2.04 | no | 1 | 15s, 5′ - 112 and 150 px apart | Field 0.5 degrees wide, gnomonic projection |
-| `mercury-gibbous-0.25` | Mercury | 2026-02-16 00:00 | gibbous | 0.25° | 6.46 | no | 4.26 | 2.20 | yes | 1 | 15s, 2′ - 224 and 120 px apart | Field 0.25 degrees wide, gnomonic projection |
+| `mercury-gibbous-0.5` | Mercury | 2026-02-16 00:00 | gibbous | 0.5° | 6.00 | yes | 3.96 | 2.04 | no | 1 | 15s, 5′ - 112 and 150 px apart | Closer field 0.5 degrees wide, gnomonic projection |
+| `mercury-gibbous-0.25` | Mercury | 2026-02-16 00:00 | gibbous | 0.25° | 6.46 | no | 4.26 | 2.20 | yes | 1 | 15s, 2′ - 224 and 120 px apart | Closer field 0.25 degrees wide, gnomonic projection |
 | `venus-elongation-1` | Venus | 2026-08-15 06:00 | near half lit | 1° | 6.08 | no | 2.96 | 3.12 | yes | 2 | 1m, 15′ - 224 and 225 px apart | Field 1.0 degrees wide, gnomonic projection |
-| `venus-elongation-0.5` | Venus | 2026-08-15 06:00 | near half lit | 0.5° | 12.16 | no | 5.92 | 6.24 | yes | 2 | 15s, 5′ - 112 and 150 px apart | Field 0.5 degrees wide, gnomonic projection |
-| `venus-elongation-0.25` | Venus | 2026-08-15 06:00 | near half lit | 0.25° | 24.32 | no | 11.85 | 12.47 | yes | 0 | 15s, 2′ - 224 and 120 px apart | Field 0.25 degrees wide, gnomonic projection |
+| `venus-elongation-0.5` | Venus | 2026-08-15 06:00 | near half lit | 0.5° | 12.16 | no | 5.92 | 6.24 | yes | 2 | 15s, 5′ - 112 and 150 px apart | Closer field 0.5 degrees wide, gnomonic projection |
+| `venus-elongation-0.25` | Venus | 2026-08-15 06:00 | near half lit | 0.25° | 24.32 | no | 11.85 | 12.47 | yes | 0 | 15s, 2′ - 224 and 120 px apart | Closer field 0.25 degrees wide, gnomonic projection |
 | `venus-crescent-1` | Venus | 2026-10-06 00:00 | crescent | 1° | 12.96 | no | 1.37 | 11.59 | yes | 0 | 1m, 15′ - 210 and 225 px apart | Field 1.0 degrees wide, gnomonic projection |
-| `venus-crescent-0.5` | Venus | 2026-10-06 00:00 | crescent | 0.5° | 25.92 | no | 2.75 | 23.17 | yes | 0 | 30s, 5′ - 210 and 150 px apart | Field 0.5 degrees wide, gnomonic projection |
-| `venus-crescent-0.25` | Venus | 2026-10-06 00:00 | crescent | 0.25° | 51.84 | no | 5.50 | 46.35 | yes | 0 | 15s, 2′ - 210 and 120 px apart | Field 0.25 degrees wide, gnomonic projection |
+| `venus-crescent-0.5` | Venus | 2026-10-06 00:00 | crescent | 0.5° | 25.92 | no | 2.75 | 23.17 | yes | 0 | 30s, 5′ - 210 and 150 px apart | Closer field 0.5 degrees wide, gnomonic projection |
+| `venus-crescent-0.25` | Venus | 2026-10-06 00:00 | crescent | 0.25° | 51.84 | no | 5.50 | 46.35 | yes | 0 | 15s, 2′ - 210 and 120 px apart | Closer field 0.25 degrees wide, gnomonic projection |
 
 `closer-fields.png` cuts a 240 px window around the body from each of these pages, at the page's own pixels - no magnification: what each field shows. The findings on the pages themselves, beyond the body:
 

@@ -176,6 +176,9 @@ public final class ChartControls {
         // coverage predicate, so a zoom that would leave the bundled data
         // is disabled rather than refused after the click.
         controller.onChange(this::sync);
+        // A closer step can open or close without the view moving - a
+        // body switched on, or moved by Place and Time (#544).
+        controller.onAvailabilityChange(() -> sync(controller.state()));
     }
 
     /**
@@ -413,7 +416,7 @@ public final class ChartControls {
         say(zoomOut, "toolbar.zoomOut", Shortcuts.ZOOM_OUT,
                 controller.canZoomOut() ? state.zoomOut() : null, state);
         say(zoomIn, "toolbar.zoomIn", Shortcuts.ZOOM_IN,
-                controller.canZoomIn() ? state.zoomIn() : null, state);
+                controller.zoomInTarget().orElse(null), state);
 
         // A step the ladder will not take must say so. Zoom has said
         // it since #203; the magnitude controls went grey and went on
@@ -461,7 +464,16 @@ public final class ChartControls {
                 said.say(stem + ".hover"), id);
         String heard = said.say(stem + ".explain");
         if (next == null) {
-            heard = said.say(stem + ".end");
+            // At the floor, or a closer field short of the closest, zoom
+            // in is not at the end of anything: a closer field is offered
+            // where Mercury, Venus or Jupiter is on the page, and here is not (#544).
+            heard = said.say("toolbar.zoomIn".equals(stem)
+                    && state.closerStep().isPresent()
+                    ? "toolbar.zoomIn.closer.unavailable" : stem + ".end");
+        } else if (next.closerField() && "toolbar.zoomIn".equals(stem)) {
+            hovered = shortcuts.withKeystroke(
+                    said.say("toolbar.zoomIn.closer.hover"), id);
+            heard = said.say("toolbar.zoomIn.closer.explain");
         } else if (next.overview() != state.overview()) {
             // Whole keys, not a stem with a fragment glued on, so that
             // every one of them can be found by searching for it.

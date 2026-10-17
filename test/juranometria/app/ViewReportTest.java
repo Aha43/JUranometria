@@ -1,6 +1,7 @@
 package juranometria.app;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Instant;
@@ -265,5 +266,10 @@ class ViewReportTest {
                 r.osArch(), r.javaVersion());
         assertTrue(ViewReport.format(closer).contains("field-degrees: 0.25\n"),
                 ViewReport.format(closer));
+        // #544: the report names a closer field, and only a closer field.
+        assertTrue(ViewReport.format(closer).contains("field-kind: closer\n"),
+                ViewReport.format(closer));
+        assertFalse(ViewReport.format(r).contains("field-kind"),
+                "a ladder report is unchanged");
     }
 }

@@ -7,6 +7,17 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Closer fields for Mercury, Venus and Jupiter (#544, #481).** Zoom in
+now goes past 1° to 0.5° and 0.25° when Mercury, Venus or Jupiter,
+shown on the chart, is on the page the step would show - by the
+toolbar, the Controller, the View menu, the shortcuts or the wheel. At
+0.25° Mercury's phase is plainly visible, and Jupiter is drawn large
+enough to show its moons crossing it. The page says it is a closer field; panning keeps
+the field, and if the planet leaves the page the chart says why it
+offers nothing closer. Zoom out returns to the usual fields, Home is
+unchanged, and a closer field is never saved. Most useful on a large
+chart monitor. In both languages.
+
 **Place and Time opens again after a refused entry (#551).** Typing an
 instant the dialog cannot read - a date with no time - and then closing
 the dialog left it impossible to open again for the rest of the

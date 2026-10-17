@@ -790,15 +790,26 @@ public final class AppMenuBar {
                     boolean canOut = navigation.canZoomOut();
                     zoomIn.setEnabled(canIn);
                     zoomOut.setEnabled(canOut);
+                    // The closer step (#544) says what it is, and why it
+                    // is not offered, in the toolbar's own terms.
+                    juranometria.chart.ChartViewState now = navigation.state();
                     juranometria.ui.Explain.selfExplanatory(zoomIn,
-                            said.say(canIn ? "menu.zoomIn.explain"
-                                    : "menu.zoomIn.end"));
+                            said.say(canIn
+                                    ? (navigation.zoomInTarget()
+                                            .map(juranometria.chart.ChartViewState::closerField)
+                                            .orElse(false)
+                                            ? "menu.zoomIn.closer.explain"
+                                            : "menu.zoomIn.explain")
+                                    : now.closerStep().isPresent()
+                                            ? "menu.zoomIn.closer.unavailable"
+                                            : "menu.zoomIn.end"));
                     juranometria.ui.Explain.selfExplanatory(zoomOut,
                             said.say(canOut ? "menu.zoomOut.explain"
                                     : "menu.zoomOut.end"));
                 };
                 sayWhatTheLadderAllows.run();
                 navigation.onChange(state -> sayWhatTheLadderAllows.run());
+                navigation.onAvailabilityChange(sayWhatTheLadderAllows);
                 view.add(zoomIn);
                 view.add(zoomOut);
             }

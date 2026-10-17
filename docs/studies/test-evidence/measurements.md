@@ -217,8 +217,8 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 
 Whether a particular read happens on the event thread is control flow, which text cannot decide; issue #220 proved the cost of guessing, three times. What can be counted is the traffic:
 
-- reads of live chart state (currentScene, pageOffsetY, navigation.state): **460** across the suite
-- explicit event-thread hand-offs (invokeAndWait): **1025**
+- reads of live chart state (currentScene, pageOffsetY, navigation.state): **465** across the suite
+- explicit event-thread hand-offs (invokeAndWait): **1048**
 
 ## Generated evidence, classified
 
@@ -227,7 +227,7 @@ Whether a particular read happens on the event thread is control flow, which tex
 | deterministic-report | regenerates byte-for-byte on the same tree | 134 |
 | byte-exact-fixture | committed data with provenance; never regenerated casually | 187 |
 | captured-evidence | an operating-system screenshot, digest-pinned; a re-capture is a provenance event | 13 |
-| renderer-drawn | byte-reproducible per machine; production ink, no widgets | 643 |
+| renderer-drawn | byte-reproducible per machine; production ink, no widgets | 648 |
 | widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 176 |
 | session-photograph | a packed window on a display; drifts between desktop sessions | 3 |
 

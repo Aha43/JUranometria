@@ -24,6 +24,16 @@ public final class ChartViewController {
     private ChartViewState state = ChartViewState.DEFAULT;
     private final List<Consumer<ChartViewState>> listeners = new ArrayList<>();
 
+    /**
+     * Whether a closer field (#481) may be offered at a candidate page:
+     * the chart's answer to "does Mercury, Venus or Jupiter lie on the page this
+     * step would display" (ruled on #539, ruling 5). Nothing is offered
+     * until a chart says so, which is the atlas without the closer
+     * fields.
+     */
+    private Predicate<ChartViewState> closerOffer = candidate -> false;
+    private final List<Runnable> availabilityListeners = new ArrayList<>();
+
     /** A controller that accepts every state; for tests without coverage. */
     public ChartViewController() {
         this(anyState -> true);
@@ -47,8 +57,64 @@ public final class ChartViewController {
         listener.accept(state);
     }
 
+    /**
+     * Where zoom in would go from here: the ladder's next rung, or -
+     * at the floor or a closer field - the closer step the chart
+     * offers about the page centre (#544). Empty when neither.
+     */
+    public java.util.Optional<ChartViewState> zoomInTarget() {
+        if (state.canZoomIn()) {
+            ChartViewState next = state.zoomIn();
+            return isViewValid.test(next) ? java.util.Optional.of(next)
+                    : java.util.Optional.empty();
+        }
+        java.util.OptionalDouble closer = state.closerStep();
+        if (closer.isEmpty()) {
+            return java.util.Optional.empty();
+        }
+        ChartViewState candidate = state.withFieldWidth(closer.getAsDouble());
+        return isViewValid.test(candidate) && closerOffer.test(candidate)
+                ? java.util.Optional.of(candidate) : java.util.Optional.empty();
+    }
+
     public boolean canZoomIn() {
-        return state.canZoomIn() && isViewValid.test(state.zoomIn());
+        return zoomInTarget().isPresent();
+    }
+
+    /**
+     * Gives the controller the chart's answer to whether a closer page
+     * may be offered (#544), and tells every host showing zoom
+     * availability to ask again.
+     */
+    public void offerCloserFields(Predicate<ChartViewState> offer) {
+        if (offer == null) {
+            throw new IllegalArgumentException("an offer to consult");
+        }
+        this.closerOffer = offer;
+        closerOfferChanged();
+    }
+
+    /**
+     * What the offer depends on changed without the view changing - a
+     * body switched on or off, or moved by Place and Time - so zoom's
+     * availability may have: hosts re-read it. The view is untouched,
+     * and nothing is rebuilt.
+     */
+    public void closerOfferChanged() {
+        for (Runnable listener : List.copyOf(availabilityListeners)) {
+            listener.run();
+        }
+    }
+
+    /**
+     * Told whenever zoom's availability may have changed without a new
+     * view state (#544). A view change is announced through
+     * {@link #onChange}; hosts showing availability listen to both.
+     */
+    public void onAvailabilityChange(Runnable listener) {
+        if (listener != null) {
+            availabilityListeners.add(listener);
+        }
     }
 
     public boolean canZoomOut() {
@@ -65,8 +131,12 @@ public final class ChartViewController {
                 && isViewValid.test(state.increaseMagnitudeLimit());
     }
 
+    /**
+     * The ladder's next rung, or the offered closer step about the page
+     * centre; nothing where neither is available.
+     */
     public void zoomIn() {
-        update(state.zoomIn());
+        zoomInTarget().ifPresent(this::update);
     }
 
     public void zoomOut() {
@@ -207,10 +277,18 @@ public final class ChartViewController {
     public PointerZoomOutcome zoomAt(juranometria.project.PlanePoint pointer,
                                      boolean zoomIn, int widthPx,
                                      int heightPx) {
-        if (zoomIn ? !state.canZoomIn() : !state.canZoomOut()) {
+        // At the floor or a closer field, zoom in is the closer step
+        // (#544), offered only where a supported body lies on the page
+        // this pointer's step would display - asked of that page below,
+        // once its centre is solved.
+        boolean closer = zoomIn && !state.canZoomIn();
+        if (closer ? state.closerStep().isEmpty()
+                : zoomIn ? !state.canZoomIn() : !state.canZoomOut()) {
             return PointerZoomOutcome.AT_BOUND;
         }
-        ChartViewState centred = zoomIn ? state.zoomIn() : state.zoomOut();
+        ChartViewState centred = closer
+                ? state.withFieldWidth(state.closerStep().getAsDouble())
+                : zoomIn ? state.zoomIn() : state.zoomOut();
         if (pointer.xiEast() == 0.0 && pointer.etaNorth() == 0.0) {
             // The exact page centre: the anchor IS the centre and the
             // solve degenerates to the toolbar's centre-preserving
@@ -218,6 +296,9 @@ public final class ChartViewController {
             // round-trip's last-bit noise.
             if (!isViewValid.test(centred)) {
                 return PointerZoomOutcome.REFUSED_COVERAGE;
+            }
+            if (closer && !closerOffer.test(centred)) {
+                return PointerZoomOutcome.AT_BOUND;
             }
             update(centred);
             return PointerZoomOutcome.ACCEPTED;
@@ -237,6 +318,9 @@ public final class ChartViewController {
                         .withFieldWidth(centred.fieldWidthDegrees());
         if (!isViewValid.test(candidate)) {
             return PointerZoomOutcome.REFUSED_COVERAGE;
+        }
+        if (closer && !closerOffer.test(candidate)) {
+            return PointerZoomOutcome.AT_BOUND;
         }
         update(candidate);
         return PointerZoomOutcome.ACCEPTED;

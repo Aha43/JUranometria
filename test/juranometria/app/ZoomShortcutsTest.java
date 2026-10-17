@@ -182,4 +182,28 @@ class ZoomShortcutsTest {
         }
         throw new AssertionError("no View item named " + name);
     }
+
+    @Test
+    void theMenusZoomInNamesTheCloserStepAndItsBodies() {
+        // #544: the View menu's Zoom In says the closer step's sentence
+        // when the chart offers one, and why not when it does not -
+        // naming Mercury, Venus and Jupiter, in both languages' terms.
+        ChartViewController navigation = new ChartViewController();
+        navigation.recenter(new SkyPosition(10.684708, 41.268750), 1.0);
+        juranometria.ui.language.InterfaceText en =
+                juranometria.ui.language.InterfaceText.forLanguage("en");
+        JMenuBar bar = AppMenuBar.create(navigation, null, () -> { }, () -> { }, en);
+        JMenuItem zoomIn = itemNamed(bar.getMenu(0), "Zoom In");
+        assertFalse(zoomIn.isEnabled());
+        assertEquals(en.say("menu.zoomIn.closer.unavailable"),
+                zoomIn.getAccessibleContext().getAccessibleDescription());
+        assertTrue(en.say("menu.zoomIn.closer.unavailable").contains("Mercury, Venus or Jupiter"));
+        boolean[] offered = {true};
+        navigation.offerCloserFields(candidate -> offered[0]);
+        assertTrue(zoomIn.isEnabled(), "the offer reaches the menu without a new view");
+        assertEquals(en.say("menu.zoomIn.closer.explain"),
+                zoomIn.getAccessibleContext().getAccessibleDescription());
+        assertTrue(juranometria.ui.language.InterfaceText.forLanguage("nb-NO")
+                .say("menu.zoomIn.closer.explain").contains("Merkur, Venus eller Jupiter"));
+    }
 }

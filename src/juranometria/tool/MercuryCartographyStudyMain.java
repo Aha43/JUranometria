@@ -1005,7 +1005,10 @@ public final class MercuryCartographyStudyMain {
                         grid.raStepDegrees() * Math.cos(Math.toRadians(centre.decDegrees())) * pxPerDeg,
                         grid.decStepDegrees() * pxPerDeg);
                 String says = drawnPage.describe(w);
-                says = says.substring(says.indexOf("Field"), says.indexOf("projection") + 10);
+                // A closer page calls itself one since #544.
+                int from = says.indexOf("Closer field") >= 0 ? says.indexOf("Closer field")
+                        : says.indexOf("Field");
+                says = says.substring(from, says.indexOf("projection") + 10);
                 String name = tag + "-" + fmt(field);
                 write(image, name, (isVenus ? "Venus" : "rule M") + ", " + fmt(field) + "°"
                         + (field < 1.0 ? " (not offered)" : ""));
