@@ -206,6 +206,11 @@ public final class EvidenceContractMain {
         // The closer fields' foundations (#543): production pages at 1°,
         // 0.5° and 0.25° set by state; name and grid-figure placements in
         // its platform record.
+        // The frozen chart instant (#556): production pages with the proposed
+        // Place and Time box drawn over them; its size and displacements in
+        // the platform record.
+        REPORT_MAINS.put("juranometria.tool.ChartInstantStudyMain",
+                "docs/studies/chart-instant/measurements.md");
         REPORT_MAINS.put("juranometria.tool.CloserFieldsStudyMain",
                 "docs/studies/closer-fields/measurements.md");
         REPORT_MAINS.put("juranometria.tool.PrintableChartStudyMain",
@@ -396,6 +401,8 @@ public final class EvidenceContractMain {
                 "docs/studies/solar-system-labels/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.MercuryCartographyStudyMain",
                 "docs/studies/mercury-cartography/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.ChartInstantStudyMain",
+                "docs/studies/chart-instant/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.CloserFieldsStudyMain",
                 "docs/studies/closer-fields/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.JovianCartographyStudyMain",
@@ -571,6 +578,9 @@ public final class EvidenceContractMain {
             // The closer fields' foundations (issue #543): production pages
             // at 1°, 0.5° and 0.25°, and an exported A4 sheet at 0.25°.
             "juranometria.tool.CloserFieldsStudyMain",
+            // The frozen chart instant (issue #556): the proposed Place and Time
+            // box over production pages, and schematic panel drawings.
+            "juranometria.tool.ChartInstantStudyMain",
             // The Venus table mock-ups and diagrams (issue #500): the
             // proposed table in study-only arrangements; widget-rendered
             // inspection, the controls- prefix.
