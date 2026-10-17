@@ -19,6 +19,10 @@ behind that argument.
   Jupiter and its four large moons, how the marks are to be read, and what it
   does not claim. Also in Norwegian: [Jupiters lille
   himmel](jupiters-lille-himmel.md).
+- [The phases of Venus](the-phases-of-venus.md) — what the atlas draws of
+  Venus, why a planet needs a phase on the chart, how to read the mark, and
+  what it does not claim. Also in Norwegian: [Venus'
+  faser](venus-faser.md).
 
 ## How JUranometria works
 

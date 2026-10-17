@@ -7,6 +7,14 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**The phases of Venus (#545).** A new reader article, in English and
+Norwegian (*Venus' faser*): what the atlas draws of Venus, where its
+numbers come from and how closely they match JPL Horizons, the phase
+words of the Venus table, how to read the phased mark on the chart and
+a transit across the Sun, a whole apparition held against the table,
+and what the atlas does not claim. Every figure is a released evidence
+page and every number is quoted from the report that measured it.
+
 **Closer fields for Mercury, Venus and Jupiter (#544, #481).** Zoom in
 now goes past 1° to 0.5° and 0.25° when Mercury, Venus or Jupiter,
 shown on the chart, is on the page the step would show - by the
