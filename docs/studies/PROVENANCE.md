@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**648 promoted artifacts.**
+**665 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -115,6 +115,23 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/chart-furniture/quiet-08-without-key.png` | `14818c1ccf5b3515da9964ac992f1908258664c93edb1dcdb4b1bc6f37a5dbb5` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/chart-furniture/sagittarius-08-with-key.png` | `9b1fa2f298017b0d69012c566e7de2a4aa406aec086de648af0f35b462a10141` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/chart-furniture/sagittarius-08-without-key.png` | `df5830947284abd0473c5908ea1d74457acdb60cf354ff5b3cb2d7243c1dbb5b` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/chart-instant/checkpoint-two-screens.png` | `1bbfcaabb38035ae36c354da6002ed0beb5e508a8cf2882131c14539df7eabe6` | 2026-10-17 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/chart-instant/default-8.png` | `f32c7d18e449d89272b9a9c72634cadbb806044e59060a8d1bb3aad9281fa57f` | 2026-10-17 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/chart-instant/dense-lines-8.png` | `2a5e9d6db94140d7305f7d09aa7487123cb80699c6fd89cfec3358cd7da9919c` | 2026-10-17 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/chart-instant/globe-lines-180.png` | `843f40d5551742b9f9147ced6ecee625063484931040e7e22d3456ca49b16d9b` | 2026-10-17 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/chart-instant/letterbox-lines-120.png` | `6786013845a93bead9c338c1199691db67a9dcce6500497a1e46162ba530d0e7` | 2026-10-17 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/chart-instant/narrow-lines-8.png` | `ab4e74b7638baa7a986de2a6d7f0c43a3a378b3ebea4f854c8fef5b0e60a1431` | 2026-10-17 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/chart-instant/panel-agrees-en.png` | `ad662da04c6783175a8e8f8ccc172f390ba304884e519ba41d64a89503d3bfc5` | 2026-10-17 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/chart-instant/panel-agrees-nb.png` | `2d348efab3f1854cb97b124a2fdb8380074677defeaa0ba9189dfe98b96667e8` | 2026-10-17 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/chart-instant/panel-differs-en.png` | `c7f839d8182ded91aa4993ff9495cdec8bcde20be776143e2f81747e943df7f3` | 2026-10-17 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/chart-instant/panel-differs-nb.png` | `109e4b8c415eec96e41329cc575c9dd2e25e12e81fce59539671f8fc840025ed` | 2026-10-17 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/chart-instant/polar-lines-8.png` | `f41cc0eb2f5133e4a3a60ca7b052cb55f7e4464c704ff7d364426e5f0e2da2d2` | 2026-10-17 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/chart-instant/sheet-static.png` | `96cbdf5248583096325e1d8cde936ca2bc1199e69d3c234ae67fa338e6113b2a` | 2026-10-17 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/chart-instant/sparse-lines-8-dark.png` | `9001799a75d77bb0c712cedfca9574e18c65a47a06181f7df3d73c26472ab24d` | 2026-10-17 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/chart-instant/sparse-lines-8-nb.png` | `ca6f08f1a30fb7e0fa4e90f9c8675024bf1194646a643931fd3c5d804a105ff6` | 2026-10-17 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/chart-instant/sparse-lines-8.png` | `dd9e11446329bcf11570dc8fda4e8790e2b358690f0a0b2646383bacbf5c8a7e` | 2026-10-17 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/chart-instant/venus-3.png` | `bfff24f5a38e59b171476f8ce1172bfd2a79ef4dc2d431c921c6f5da260a2df5` | 2026-10-17 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/chart-instant/wide-lines-60.png` | `0d9207e191c2316831ff5d776a099f0a8822339a1b1fdd36fd20a64d24e1feff` | 2026-10-17 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/chart-options/m42-36-defaults.png` | `80a5309b612daeb2da37b4207f00df7098aae2e90beb83fcd5d93670df6ef85e` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | ChartOptionsStudyMain |
 | `docs/studies/chart-options/m42-36-dsos-off.png` | `07b207697cf4aa2fd8ba006c4b7937fc5f0b5cf853404a19e5918acb102abd88` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | ChartOptionsStudyMain |
 | `docs/studies/chart-options/m42-36-figures-off-names-on.png` | `fdfdad313f7b09029acc61f9e1c115e8d8c47191ca0731f5820a27da8df155e4` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | ChartOptionsStudyMain |
