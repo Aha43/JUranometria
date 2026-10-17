@@ -187,10 +187,16 @@ is recorded rather than claimed: the **integrated evidence flush** is
 gate 3 (`make evidence-contracts`) and gate 4 (`evidence-contracts-ci`)
 on this head, every study of the road regenerated on the integrated
 main; the **packaged release journey on every platform image** is the
-`app-image` workflow's images, each running the packaged acceptance
-with *mercury table OK*, *solar system labels OK*, *emphasis controls
-OK*, *mercury on the chart OK* and *closer fields OK* among its
-journeys; the **dist archive built twice and verified** is gate 6; the
+`app-image` workflow's four images (macOS arm64 and x64, Linux,
+Windows) and their cross-architecture smoke test in run 38993794049,
+which qualified #555's trial merge `38f96dbf` - whose tree is main
+`32234b73`'s, the code this document describes - each image running
+the packaged acceptance with *mercury table OK*, *solar system labels
+OK*, *emphasis controls OK*, *mercury on the chart OK* and *closer
+fields OK* among its journeys. This head changes only this document,
+so CI classifies it as documentation and skips the images and its own
+evidence job; locally, gate 5 runs the packaged acceptance on this Mac
+on this head. The **dist archive built twice and verified** is gate 6; the
 **articles reachable** is the live Pages check made on `32234b73` for
 #545 (both pages, their languages, a figure byte for byte against the
 repository). The results go on #546 and under
