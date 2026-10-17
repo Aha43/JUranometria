@@ -53,7 +53,9 @@ class GalleryReleaseTest {
                     // replaced; 5.1.0 adds both (#495).
                     "4.0.0", "5.0.0",
                     // 5.2.0 adds the one it replaces.
-                    "5.1.0");
+                    "5.1.0",
+                    // 5.3.0 adds the one it replaces.
+                    "5.2.0");
 
     /** The chart-sheet study: SVG metadata, PDF producer, PNG text. */
     private static final Path SHEETS =

@@ -266,7 +266,10 @@ asked:
   columns 222–231 of rows 33–47. At 5.2.0 (1→2) the same second cell
   alone moved again, 108 pixels in each image, columns 222–231 of rows
   33–46; every sheet PNG stayed pixel-identical and each PDF differed
-  by one byte.
+  by one byte. At 5.3.0 (2→3) the second cell moved again, 104 pixels
+  in each image, columns 222–232 of rows 33–47 - the wider glyph
+  reaching one column further; every sheet PNG stayed pixel-identical
+  and each PDF and SVG differed by one byte.
 - **The articles.** Their footer names the release, and
   `scripts/build-articles.py` reads it from `VERSION` when the site is
   built rather than carrying a number - so there is nothing to
