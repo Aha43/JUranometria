@@ -205,3 +205,50 @@ box displaces nothing there.
 No production furniture, no local civil time, named zone, device
 location, UT1 service, rise/set table, observing plan, bookmark, server
 work or new planet. #537, #557 and the rest of Sprint 51 wait.
+
+## The rulings (owner, 2026-10-17)
+
+The study was found convincing. Recorded as given, with the one
+amendment marked:
+
+1. **When shown - accepted.** The box is drawn whenever any
+   time-dependent layer or Solar System body is enabled, even when its
+   ink is off the page in view. It does not flicker through navigation,
+   and there is no hide switch.
+2. **Contents - accepted.** Observer coordinates, UTC to the second,
+   local sidereal time to the minute and one action. No civil time,
+   inferred offset or time zone.
+3. **Placement and architecture - accepted.** The chart-owned corner
+   order and typed module contribution: modules supply meaning and text;
+   the chart owns layout, ink, collisions, interaction, speech and
+   export.
+4. **Actions - accepted.** *Update to now* everywhere, and the existing
+   *Now* is renamed accordingly. It reads the clock exactly once and
+   changes only Place and Time's frozen chart instant. *Update from Place
+   and Time* stays the separate panel action.
+5. **Agreement lines - accepted, amended.** *Agreement covers both the
+   observer and the instant*, because updating from Place and Time reads
+   both. The line says *Same place and instant as the chart* only when
+   both agree; when either differs it identifies the chart's place and
+   instant and the table's place and instant. A range states its
+   observer, its range and the chart's current place and instant without
+   calling that inherently wrong. Updating the line never recomputes the
+   table.
+6. **Paper - accepted.** The static box with no false action, and the
+   sentence that the chart is frozen at that instant.
+7. **Speech, keyboard and report - accepted.** The spoken sentence, the
+   view-report entry, and **W** as the chart-keyboard command for *Update
+   to now*. Every route invokes the same single clock read.
+8. **Persistence - accepted, unchanged.** The place may return; the
+   instant never does. Start-up reads the clock once.
+9. **Two screens - accepted.** The chart-instant line and *Update to now*
+   at the top of the Controller's Solar System tab - especially valuable
+   with the Controller on the laptop and the chart on an external monitor.
+10. **Delivery - accepted.** #259 implements the complete ruled design,
+    including the two stale wording corrections of section 1. No other
+    Sprint 51 issue begins first.
+
+The mutation cases of section 5 gain one from the amendment: *an
+agreement line that compares the instant alone* - a table computed for
+another place at the chart's instant must not read as agreeing.
+
