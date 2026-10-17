@@ -222,3 +222,31 @@ family, met again on #542), the 0.25° transit page that does not name
 the Sun, Saturn's and Mars's own cartography studies, the moons'
 shadows on Jupiter's disc, and the backlog as listed on the
 repository.
+
+### 9.1 Immediate successor: Sprint 51
+
+Milestone "Sprint 51 — Make the chart state explicit", created after
+this document's first head:
+
+- [#556](https://github.com/Aha43/JUranometria/issues/556): rule the
+  frozen UTC chart instant and update relationship.
+- [#259](https://github.com/Aha43/JUranometria/issues/259): implement
+  the accepted Place and Time chart furniture.
+- [#537](https://github.com/Aha43/JUranometria/issues/537): preserve
+  emphasis through zoom and pan.
+- [#557](https://github.com/Aha43/JUranometria/issues/557): study the
+  optional dense star-identity mode.
+- [#558](https://github.com/Aha43/JUranometria/issues/558): implement
+  it.
+- [#559](https://github.com/Aha43/JUranometria/issues/559): hand the
+  detail sprint to the next planet milestone.
+
+Sprint 51 starts only after 5.3.0 closes, has no release of its own,
+and excludes local civil time, bookmarks and NGC/IC/M annotation work.
+
+### 9.2 The longer road
+
+- [#553](https://github.com/Aha43/JUranometria/issues/553): time-range
+  paths, for the first planet milestone after Mercury.
+- [#554](https://github.com/Aha43/JUranometria/issues/554): the
+  Sun–Earth–planet configuration diagram, around the 6.0 wrap-up.
