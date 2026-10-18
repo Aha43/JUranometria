@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**679 promoted artifacts.**
+**702 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -650,6 +650,29 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/solar-system/moon-contract/figures/bright-limb-angle.svg` | `10260987ae252fdc1458feeb71f3b1f804610d97e2bef26679ac5f9cddaf8765` | 2026-09-29 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/solar-system/moon-contract/figures/phase-geometry.png` | `ece2bacb68599d85dcae0c5b738c19250432514098c488fd2b9b04b740beed91` | 2026-09-29 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/solar-system/moon-contract/figures/phase-geometry.svg` | `d5d512d379502ae40e3a33f0042a1b89297a4b47a23c5f4157da9301a563e456` | 2026-09-29 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/star-identity-density/aries-8-a.png` | `e97fd38a0bfb041cd886623a3280c4f7234c8329d7158b15a5104f4a68cb1924` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/star-identity-density/aries-8-b.png` | `ccde593ba30df5b545090525c3fa81423b36bda63fc165f07647ca6e7550aa61` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/star-identity-density/aries-8-c.png` | `e97fd38a0bfb041cd886623a3280c4f7234c8329d7158b15a5104f4a68cb1924` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/star-identity-density/aries-8-released.png` | `443c7d0bfb7f4701a4aaac9e2ab2b632687eb11f6062999dbe8270f8bf79dc49` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/star-identity-density/cygnus-8-a.png` | `53b1bcec88f1e351cb18715f21d40cf72bd9385c355be31d95527bb5037ce1e6` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/star-identity-density/cygnus-8-b.png` | `973b14fd8b0d9cae68f4f9a547a0adfce4e2e0ff21b27492d6f492e1d70ba4c2` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/star-identity-density/cygnus-8-c.png` | `53b1bcec88f1e351cb18715f21d40cf72bd9385c355be31d95527bb5037ce1e6` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/star-identity-density/cygnus-8-released.png` | `bce4063d2113a5ce130b5f87706bddacb7ed59fd1d88a6472ec90c30c717e8dd` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/star-identity-density/eridanus-8-a.png` | `9facb73c61ba4bbaa35ccc1c93dbaf12f30ddf58d4f1aa59c3fa2cdd1aeece60` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/star-identity-density/eridanus-8-b.png` | `9facb73c61ba4bbaa35ccc1c93dbaf12f30ddf58d4f1aa59c3fa2cdd1aeece60` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/star-identity-density/eridanus-8-c.png` | `9facb73c61ba4bbaa35ccc1c93dbaf12f30ddf58d4f1aa59c3fa2cdd1aeece60` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/star-identity-density/eridanus-8-released.png` | `8dd8024bf61caa02ec50b3d492074d675c148ec7ee337393c52b1d35eae0d61d` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/star-identity-density/orion-24-a.png` | `254367be56d632a07d3452c27ad6619751793896a2c8288d37b2ca39200cd02b` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/star-identity-density/orion-24-b.png` | `8924766c9d6c9c960247b64f236b351dd262cd36f19263a30d2a0951be227f13` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/star-identity-density/orion-24-c.png` | `ef62cbf367e8abdfeb8b76126a5be4e9c683434f3c12c1f95f27ddb48ca9f911` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/star-identity-density/orion-24-released.png` | `fa4a7e7144d42ff07ac1fe6b93d79c32ed15cf3f1bb3ca10efdaad066712277c` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/star-identity-density/orion-60-a.png` | `823a8109a39cf0c1a3edbc5c1bf28728d1ce5df0ad49b1a38b81ac7c53550d4e` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/star-identity-density/orion-60-c.png` | `26535fccb56cf424c77083eb65a67dfe659e44ac307517fc7d027a30c5cecdd3` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/star-identity-density/orion-60-released.png` | `22f01056719befcce56a6ef235e4bf20706c669ff0fc6bd1faf64705cc3c3aae` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/star-identity-density/orion-8-a.png` | `610d893e5df6266344723dd8a437a5aa3fc7a27d766c0ebd6a6b5236b936014f` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/star-identity-density/orion-8-b.png` | `610d893e5df6266344723dd8a437a5aa3fc7a27d766c0ebd6a6b5236b936014f` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/star-identity-density/orion-8-c.png` | `610d893e5df6266344723dd8a437a5aa3fc7a27d766c0ebd6a6b5236b936014f` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/star-identity-density/orion-8-released.png` | `b80445b633c1a0a0dd511a77affd86a9c9b2c9a8132c3f0ee67a9f755c132e5a` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/star-identity/crux-18.png` | `255a943079eecd1468121e370a6314250b84fb472640b041e41cf4d6d3d850f5` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | StarIdentityStudyMain |
 | `docs/studies/star-identity/m31-08.png` | `d749cde5883dd87ec1797590f1ab5002aa8864c544efa4276f8b9ab24d8ed729` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | StarIdentityStudyMain |
 | `docs/studies/star-identity/orion-08.png` | `9ac434abe1b27243e88ca8a35d59745747fb4ff23b9861025329e38668d430c0` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | StarIdentityStudyMain |
