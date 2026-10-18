@@ -134,3 +134,31 @@ What the measurements say (`measurements.md`, `platform.md`):
 
 No production change, no NGC/IC/M density, no pinned or retained labels,
 no bookmark or annotation work; #558 implements only what is ruled here.
+
+## The rulings (owner, 2026-10-18)
+
+All six proposals of section 3 accepted as written:
+
+1. **Wording and interaction - accepted.** One Chart Options switch after
+   Flamsteed numbers, *All star identities where they fit* / *Alle
+   stjerneidentiteter der de får plass*: a density choice that lifts the
+   thresholds of whichever of Star names, Bayer letters and Flamsteed
+   numbers are on; unavailable while all three are off; remembered with
+   the Chart Options, off by default; no chart-keyboard letter.
+2. **Priority - accepted: ordering C.** The released page first, in its
+   released order, each star it labels written with its full identity;
+   then every other identity, brightest first, only into clean room -
+   never under duress. Deep-sky labels, constellation names and the
+   searched target keep their places. Composition unchanged.
+3. **No promise of everything - accepted.** Refused identities are not
+   drawn; the view report states the switch, not refusals.
+4. **Wide fields - accepted, with the proposed sub-ruling.** Offered at
+   every field; names and letters unthresholded at every field; bare
+   Flamsteed numbers join only below 12°, as in the released policy.
+5. **Accessibility, report, export - accepted.** Hover explanation and
+   accessible name in both languages; `all-star-identities on|off` in the
+   view report's options; export follows the options; the spoken page
+   description unchanged.
+6. **Searched and selected stars - accepted.** No further guarantee.
+
+#558 implements this design.
