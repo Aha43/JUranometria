@@ -7,6 +7,12 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Emphasis survives zooming and panning (#537).** Raised constellation
+figures or boundaries stay raised when you zoom or pan to a
+page that draws none of them, can still be ticked or unticked there,
+and come back in deep red when they are drawn again. Switching a layer
+off still clears its emphasis.
+
 **The chart says when it is drawn for (#259, ruled on #556).** Whenever
 the meridian, the horizon, the zenith or a Solar System body is on, the
 chart carries a small *Place and Time* box beside the title block: the

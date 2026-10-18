@@ -457,6 +457,7 @@ public final class PackagedAcceptanceMain {
         onThisPageJourney();
         meridianJourney();
         emphasisJourney();
+        emphasisThroughNavigation();
         combinedEmphasisJourney();
         solarSystemLabelsJourney();
         emphasisControlsJourney();
@@ -4335,6 +4336,68 @@ public final class PackagedAcceptanceMain {
      * meridian journey's stated observer, the meridian; a 120-degree
      * Orion page holds the figures and the ecliptic.
      */
+    /**
+     * Emphasis survives navigation (#537, amending #361): constellation
+     * figures and boundaries raised on a 42° page where the detail policy
+     * draws them, a zoom to 8° where it draws neither and a pan, both
+     * kept and still toggleable while absent, and back on the 42° page
+     * the same deep-red ink, byte for byte; switching the figures' layer
+     * off still settles theirs.
+     */
+    private static void emphasisThroughNavigation() throws Exception {
+        juranometria.ui.ChartComponent chart =
+                new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
+        chart.setSize(900, 700);
+        ChartViewState drawn = new ChartViewState(
+                new juranometria.chart.SkyPosition(83.0, 0.0), 42.0, 8.0);
+        chart.setViewState(drawn);
+        java.awt.image.BufferedImage canonical = paint(chart);
+        chart.toggleEmphasis(juranometria.render.ChartStructure.CONSTELLATION_FIGURES);
+        chart.toggleEmphasis(juranometria.render.ChartStructure.CONSTELLATION_BOUNDARIES);
+        java.util.Set<juranometria.render.ChartStructure> raised = java.util.Set.of(
+                juranometria.render.ChartStructure.CONSTELLATION_FIGURES,
+                juranometria.render.ChartStructure.CONSTELLATION_BOUNDARIES);
+        require(chart.emphasizedSet().equals(raised), "both raised where drawn");
+        java.awt.image.BufferedImage emphasized = paint(chart);
+        int ink = differingPixels(canonical, emphasized);
+        require(ink > 0, "the raised figures and boundaries change the page");
+
+        chart.setViewState(new ChartViewState(
+                new juranometria.chart.SkyPosition(83.0, 0.0), 8.0, 8.0));
+        require(chart.emphasizedSet().equals(raised),
+                "zooming past the detail policy keeps both choices: " + chart.emphasizedSet());
+        chart.toggleEmphasis(juranometria.render.ChartStructure.CONSTELLATION_BOUNDARIES);
+        chart.toggleEmphasis(juranometria.render.ChartStructure.CONSTELLATION_BOUNDARIES);
+        require(chart.emphasizedSet().equals(raised), "and both toggle while absent");
+        chart.setViewState(new ChartViewState(
+                new juranometria.chart.SkyPosition(200.0, -60.0), 8.0, 8.0));
+        require(chart.emphasizedSet().equals(raised), "a pan keeps them");
+        chart.setViewState(drawn);
+        int returned = differingPixels(emphasized, paint(chart));
+        require(returned == 0, "back on the 42° page the same deep-red ink returns: "
+                + returned + " px differ");
+
+        juranometria.render.ChartOptions on = chart.chartOptions();
+        chart.setChartOptions(new juranometria.render.ChartOptions(on.deepSkyObjects(),
+                on.deepSkyLabels(), false, on.constellationBoundaries(),
+                on.constellationNames(), on.starNames(), on.bayerLetters(),
+                on.flamsteedNumbers(), on.equatorialGrid(), on.titleBlock(),
+                on.magnitudeKey(), on.galaxies(), on.openClusters(),
+                on.globularClusters(), on.nebulae(), on.planetaryNebulae(), on.palette()));
+        require(!chart.emphasizedSet().contains(
+                        juranometria.render.ChartStructure.CONSTELLATION_FIGURES)
+                        && !chart.emphasisAvailable(
+                                juranometria.render.ChartStructure.CONSTELLATION_FIGURES),
+                "switching the figures off settles and disables their emphasis");
+        require(chart.emphasizedSet().contains(
+                        juranometria.render.ChartStructure.CONSTELLATION_BOUNDARIES),
+                "and leaves the boundaries' alone");
+        System.out.println("emphasis through navigation OK (figures and boundaries raised at"
+                + " 42°, " + ink + " px of emphasis; kept and toggleable through a zoom"
+                + " to 8° and a pan; the same ink returns byte for byte; switching the"
+                + " figures off still settles theirs)");
+    }
+
     private static void emphasisJourney() throws Exception {
         // Page one: the opening page, with the stated observer's
         // meridian laid across it.

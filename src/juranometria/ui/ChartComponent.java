@@ -963,25 +963,31 @@ public final class ChartComponent extends JComponent {
     }
 
     /**
-     * Whether this structure could take emphasis right now: its
-     * layer is switched on and drawn at this field, or some module
-     * is contributing geometry the chart maps to it.
+     * Whether this structure could take emphasis right now: the
+     * reader has its layer switched on, or some module is contributing
+     * geometry the chart maps to it.
+     *
+     * <p><strong>Navigation is not a choice (#537, amending #361).</strong>
+     * Availability follows the reader's own switches, never what the
+     * page in view happens to draw: zooming past the field where the
+     * detail policy stops drawing figures or boundaries, panning, or a
+     * globe that turns boundaries off for its own page leaves the
+     * emphasis raised and still toggleable, and its ink returns when the
+     * structure is drawn again. Switching the layer itself off, or a
+     * module stopping its geometry, is an explicit choice and still
+     * clears the emphasis at once - #361's point stands: no layer is
+     * hidden with a forgotten emphasis attached to it.
      */
     public boolean emphasisAvailable(
             juranometria.render.ChartStructure structure) {
         if (structure == null) {
             return false;
         }
-        juranometria.render.ChartOptions drawn = drawnOptions();
-        var policy = new juranometria.render.GeographyDetailPolicy(
-                viewState.fieldWidthDegrees());
+        juranometria.render.ChartOptions chosen = chartOptions;
         return switch (structure) {
-            case EQUATORIAL_GRID -> drawn.equatorialGrid();
-            case CONSTELLATION_BOUNDARIES ->
-                    drawn.constellationBoundaries()
-                            && policy.boundariesDrawn();
-            case CONSTELLATION_FIGURES ->
-                    drawn.constellationFigures() && policy.figuresDrawn();
+            case EQUATORIAL_GRID -> chosen.equatorialGrid();
+            case CONSTELLATION_BOUNDARIES -> chosen.constellationBoundaries();
+            case CONSTELLATION_FIGURES -> chosen.constellationFigures();
             // The label class (#526) is choosable while some module
             // contributes a body or a satellite - the bodies layer's own
             // classification, so a later planet joins by contributing.

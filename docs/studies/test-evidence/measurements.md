@@ -221,7 +221,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 Whether a particular read happens on the event thread is control flow, which text cannot decide; issue #220 proved the cost of guessing, three times. What can be counted is the traffic:
 
 - reads of live chart state (currentScene, pageOffsetY, navigation.state): **472** across the suite
-- explicit event-thread hand-offs (invokeAndWait): **1059**
+- explicit event-thread hand-offs (invokeAndWait): **1060**
 
 ## Generated evidence, classified
 

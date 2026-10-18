@@ -14,6 +14,7 @@ import juranometria.render.ChartStructure;
 import juranometria.sky.Observer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -96,24 +97,62 @@ class StructureEmphasisSessionTest {
     }
 
     @Test
-    void theDetailPolicySettlesWhatItStopsDrawing() {
+    void navigationKeepsWhatTheDetailPolicyStopsDrawing() {
+        // #537, amending #361: crossing the policy's field in either
+        // direction is navigation, not a choice. Figures and boundaries
+        // are drawn at 42 degrees and not on the default 8-degree page.
         ChartComponent chart = chart();
-        // Figures are drawn at 42 degrees; the default 8-degree page
-        // is below the policy's narrowest figure field.
         chart.setViewState(new ChartViewState(
                 new SkyPosition(83.0, 0.0), 42.0, 8.0));
         chart.toggleEmphasis(ChartStructure.CONSTELLATION_FIGURES);
-        assertEquals(java.util.Set.of(
-                        ChartStructure.CONSTELLATION_FIGURES),
-                chart.emphasizedSet());
+        chart.toggleEmphasis(ChartStructure.CONSTELLATION_BOUNDARIES);
+        java.util.Set<ChartStructure> raised = java.util.Set.of(
+                ChartStructure.CONSTELLATION_FIGURES,
+                ChartStructure.CONSTELLATION_BOUNDARIES);
+        assertEquals(raised, chart.emphasizedSet());
 
-        // Below the policy's narrowest figure field the page draws
-        // no figures, so the emphasis settles with them.
         chart.setViewState(new ChartViewState(
                 new SkyPosition(83.0, 0.0), 8.0, 8.0));
+        assertEquals(raised, chart.emphasizedSet(),
+                "zooming past where the policy draws them keeps the choices");
+        assertTrue(chart.emphasisAvailable(ChartStructure.CONSTELLATION_FIGURES)
+                        && chart.emphasisAvailable(ChartStructure.CONSTELLATION_BOUNDARIES),
+                "and both stay toggleable while their ink is absent");
+        chart.toggleEmphasis(ChartStructure.CONSTELLATION_BOUNDARIES);
+        assertEquals(java.util.Set.of(ChartStructure.CONSTELLATION_FIGURES),
+                chart.emphasizedSet(), "unchecked while absent");
+        chart.toggleEmphasis(ChartStructure.CONSTELLATION_BOUNDARIES);
+        assertEquals(raised, chart.emphasizedSet(), "and raised again while absent");
+
+        chart.setViewState(new ChartViewState(
+                new SkyPosition(200.0, -60.0), 8.0, 8.0));
+        assertEquals(raised, chart.emphasizedSet(), "panning keeps them");
+        chart.setViewState(new ChartViewState(
+                new SkyPosition(83.0, 0.0), 42.0, 8.0));
+        assertEquals(raised, chart.emphasizedSet(),
+                "and back where they are drawn, they are drawn emphasized");
+    }
+
+    @Test
+    void switchingTheFiguresOffStillSettlesTheirEmphasis() {
+        ChartComponent chart = chart();
+        chart.setViewState(new ChartViewState(
+                new SkyPosition(83.0, 0.0), 8.0, 8.0));
+        chart.toggleEmphasis(ChartStructure.CONSTELLATION_FIGURES);
+        assertEquals(java.util.Set.of(ChartStructure.CONSTELLATION_FIGURES),
+                chart.emphasizedSet(), "raised where none are drawn (#537)");
+        ChartOptions on = ChartOptions.DEFAULTS;
+        chart.setChartOptions(new ChartOptions(on.deepSkyObjects(),
+                on.deepSkyLabels(), false,
+                on.constellationBoundaries(), on.constellationNames(),
+                on.starNames(), on.bayerLetters(), on.flamsteedNumbers(),
+                on.equatorialGrid(), on.titleBlock(), on.magnitudeKey(),
+                on.galaxies(), on.openClusters(), on.globularClusters(),
+                on.nebulae(), on.planetaryNebulae(), on.palette()));
         assertTrue(chart.emphasizedSet().isEmpty(),
-                "a field the policy keeps figures off cannot keep"
-                        + " them emphasized");
+                "switching the layer off is a choice: the emphasis settles (#361)");
+        assertFalse(chart.emphasisAvailable(ChartStructure.CONSTELLATION_FIGURES),
+                "and cannot be raised until the layer is back");
     }
 
     @Test
