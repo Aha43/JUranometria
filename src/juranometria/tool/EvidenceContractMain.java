@@ -211,6 +211,8 @@ public final class EvidenceContractMain {
         // the platform record.
         REPORT_MAINS.put("juranometria.tool.ChartInstantStudyMain",
                 "docs/studies/chart-instant/measurements.md");
+        REPORT_MAINS.put("juranometria.tool.ChartInstantFurnitureMain",
+                "docs/studies/chart-instant-furniture/measurements.md");
         REPORT_MAINS.put("juranometria.tool.CloserFieldsStudyMain",
                 "docs/studies/closer-fields/measurements.md");
         REPORT_MAINS.put("juranometria.tool.PrintableChartStudyMain",
@@ -403,6 +405,8 @@ public final class EvidenceContractMain {
                 "docs/studies/mercury-cartography/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.ChartInstantStudyMain",
                 "docs/studies/chart-instant/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.ChartInstantFurnitureMain",
+                "docs/studies/chart-instant-furniture/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.CloserFieldsStudyMain",
                 "docs/studies/closer-fields/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.JovianCartographyStudyMain",
@@ -581,6 +585,9 @@ public final class EvidenceContractMain {
             // The frozen chart instant (issue #556): the proposed Place and Time
             // box over production pages, and schematic panel drawings.
             "juranometria.tool.ChartInstantStudyMain",
+            // Place and Time's box as built (issue #259): production pages
+            // with the chart's own box, and the exported sheet without a control.
+            "juranometria.tool.ChartInstantFurnitureMain",
             // The Venus table mock-ups and diagrams (issue #500): the
             // proposed table in study-only arrangements; widget-rendered
             // inspection, the controls- prefix.

@@ -218,6 +218,30 @@ public final class ChartKeyboardText {
                 toggle.keyLetter());
     }
 
+    // ---- what the keyboard does (#259) -----------------------------
+
+    /** What a command is called. */
+    public String commandLabel(ChartKeys.Command command) {
+        return required(STEM + command.id() + ".label");
+    }
+
+    /** A command's row, as it is shown: letter and name, no state. */
+    public String commandRow(ChartKeys.Command command) {
+        return said.say(STEM + "command.row", command.keyLetter(),
+                commandLabel(command));
+    }
+
+    /** A command's row, as it is spoken, with its keystrokes. */
+    public String commandSpoken(ChartKeys.Command command) {
+        return said.say(STEM + "command.spoken", commandLabel(command),
+                shortcuts.sequence(ChartKeys.prefixText(), command.keyLetter()));
+    }
+
+    /** What the palette says when the command has run. */
+    public String commandAnnounce(ChartKeys.Command command) {
+        return required(STEM + command.id() + ".announce");
+    }
+
     // ---- what the keyboard will not switch -------------------------
 
     /** The refused row, as it is shown. */

@@ -55,7 +55,7 @@ arrangement at its frozen instant.
 | Mathematical horizon | Draw where the sky meets a perfectly flat, transparent Earth (⌘K then H) | Show Mathematical horizon | Draws the circle where the sky would meet a flat and transparent Earth; your own horizon has hills and air in it. It lasts as long as this session. |
 | Zenith | Mark the point overhead | Show Zenith | Marks the point directly above you. It is drawn with the observer's lines and has no shortcut of its own. |
 | Altitude ticks | Graduate the meridian every 10° of altitude above the horizon | Show Altitude ticks | Marks the meridian every 10° of altitude from the horizon to the zenith, with the figure beside each tick. It is drawn with the meridian and has no shortcut of its own. |
-| Now | Reads the clock once and freezes the chart at that instant | Now | Freezes the reference lines at the present moment. The clock is read once; nothing moves afterwards. |
+| Update to now | Reads the clock once and freezes the chart at that instant | Update to now | Freezes the chart at the present moment. The clock is read once; nothing moves afterwards. |
 | Centre on zenith | Move the chart to the point overhead | Centre on zenith | Moves the page to the point directly above you. This is the only control in this window that moves the chart. |
 | ▾ Chart Options | Show or hide this section | Chart Options, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Deep sky | Show or hide this section | Deep sky, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
@@ -109,7 +109,7 @@ arrangement at its frozen instant.
 | Mathematical horizon | Draw where the sky meets a perfectly flat, transparent Earth (⌘K then H) | Show Mathematical horizon | Draws the circle where the sky would meet a flat and transparent Earth; your own horizon has hills and air in it. It lasts as long as this session. |
 | Zenith | Mark the point overhead | Show Zenith | Marks the point directly above you. It is drawn with the observer's lines and has no shortcut of its own. |
 | Altitude ticks | Graduate the meridian every 10° of altitude above the horizon | Show Altitude ticks | Marks the meridian every 10° of altitude from the horizon to the zenith, with the figure beside each tick. It is drawn with the meridian and has no shortcut of its own. |
-| Now | Reads the clock once and freezes the chart at that instant | Now | Freezes the reference lines at the present moment. The clock is read once; nothing moves afterwards. |
+| Update to now | Reads the clock once and freezes the chart at that instant | Update to now | Freezes the chart at the present moment. The clock is read once; nothing moves afterwards. |
 | Centre on zenith | Move the chart to the point overhead | Centre on zenith | Moves the page to the point directly above you. This is the only control in this window that moves the chart. |
 | ▾ Chart Options | Show or hide this section | Chart Options, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Deep sky | Show or hide this section | Deep sky, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
@@ -204,7 +204,7 @@ arrangement at its frozen instant.
 | Mathematical horizon | Draw where the sky meets a perfectly flat, transparent Earth (⌘K then H) | Show Mathematical horizon | Draws the circle where the sky would meet a flat and transparent Earth; your own horizon has hills and air in it. It lasts as long as this session. |
 | Zenith | Mark the point overhead | Show Zenith | Marks the point directly above you. It is drawn with the observer's lines and has no shortcut of its own. |
 | Altitude ticks | Graduate the meridian every 10° of altitude above the horizon | Show Altitude ticks | Marks the meridian every 10° of altitude from the horizon to the zenith, with the figure beside each tick. It is drawn with the meridian and has no shortcut of its own. |
-| Now | Reads the clock once and freezes the chart at that instant | Now | Freezes the reference lines at the present moment. The clock is read once; nothing moves afterwards. |
+| Update to now | Reads the clock once and freezes the chart at that instant | Update to now | Freezes the chart at the present moment. The clock is read once; nothing moves afterwards. |
 | Centre on zenith | Move the chart to the point overhead | Centre on zenith | Moves the page to the point directly above you. This is the only control in this window that moves the chart. |
 | Latitude must be between −90° and 90°. Kept 59.913. | — | Latitude must be between −90° and 90°. Kept 59.913. | — |
 | ▾ Chart Options | Show or hide this section | Chart Options, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
@@ -292,7 +292,11 @@ arrangement at its frozen instant.
 | — | — | Controller tabs | Two tabs: the chart's controls, and the Solar System's bodies. Choosing a tab computes nothing; the tab last chosen is remembered. |
 | Chart | — | Chart | — |
 | ▾ Solar System | — | Solar System | — |
+| Chart: 2026-03-20 21:33:00 UTC | — | Chart: 2026-03-20 21:33:00 UTC | — |
+| Update to now | Reads the clock once and freezes the chart at that instant | Update to now | Freezes the chart at the present moment. The clock is read once; nothing moves afterwards. |
 | ▾ Sun | Show or hide this section | Sun, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
+| — | — | Agreement with the chart | — |
+| Same place and instant as the chart: 59.91° N · 10.75° E, 2026-03-20 21:33:00 UTC | — | Same place and instant as the chart: 59.91° N · 10.75° E, 2026-03-20 21:33:00 UTC | — |
 | Observer at latitude 59.913, longitude 10.752 east; instant 2026-03-20 21:33:00 UTC, from Place and Time. | — | Observer at latitude 59.913, longitude 10.752 east; instant 2026-03-20 21:33:00 UTC, from Place and Time. | — |
 | This instant | One row, at the instant set in Place and Time | Show the Sun at the instant set in Place and Time | Shows a single row: the Sun at the observing instant set in Place and Time. |
 | Over a range | A row for every step from a start to an end | Show the Sun over a range of instants | Shows a row for every step from the start to the end, both included; an end that is not on the grid is added as the last row and marked. |
@@ -323,7 +327,6 @@ arrangement at its frozen instant.
 | Apparent diameter | How large the Sun's disc looks, in minutes and seconds of arc. | Apparent diameter | How large the Sun's disc looks, in minutes and seconds of arc. |
 | 32′ 06.1″ | — | Apparent diameter: 32′ 06.1″ | — |
 | Sun on the chart | — | Sun on the chart | Shows or hides the Sun on the chart, drawn at its true size where it stands for the place and instant set in Place and Time; the same choice as View's. |
-| Update from Place and Time | Read the place and instant from Place and Time again | Read the observer and instant from Place and Time again | Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
 | ▸ Mercury | Show or hide this section | Mercury, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Venus | Show or hide this section | Venus, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Moon | Show or hide this section | Moon, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
@@ -339,11 +342,15 @@ arrangement at its frozen instant.
 | — | — | Controller tabs | Two tabs: the chart's controls, and the Solar System's bodies. Choosing a tab computes nothing; the tab last chosen is remembered. |
 | Chart | — | Chart | — |
 | ▾ Solar System | — | Solar System | — |
+| Chart: 2026-03-20 21:33:00 UTC | — | Chart: 2026-03-20 21:33:00 UTC | — |
+| Update to now | Reads the clock once and freezes the chart at that instant | Update to now | Freezes the chart at the present moment. The clock is read once; nothing moves afterwards. |
 | ▸ Sun | Show or hide this section | Sun, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Mercury | Show or hide this section | Mercury, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Venus | Show or hide this section | Venus, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Moon | Show or hide this section | Moon, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▾ Jupiter | Show or hide this section | Jupiter, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
+| — | — | Agreement with the chart | — |
+| Chart: 59.91° N · 10.75° E, 2026-03-20 21:33:00 UTC | — | Chart: 59.91° N · 10.75° E, 2026-03-20 21:33:00 UTC | — |
 | Observer at latitude 59.913, longitude 10.752 east; instant 2026-03-20 21:33:00 UTC, from Place and Time. | — | Observer at latitude 59.913, longitude 10.752 east; instant 2026-03-20 21:33:00 UTC, from Place and Time. | — |
 | This instant | One row, at the instant set in Place and Time | Show Jupiter and its moons at the instant set in Place and Time | Shows Jupiter at the observing instant set in Place and Time, and below it the four moons in a fixed order. |
 | Over a range | A row for every step from a start to an end | Show the four moons over a range of instants | Shows the four moons for every step from the start to the end, both included, grouped under each instant; an end that is not on the grid is added as the last group and marked. This samples the range; it does not search for the moment a moon enters or leaves Jupiter's disc. |
@@ -356,7 +363,6 @@ arrangement at its frozen instant.
 | — | The elapsed time between rows | — | The elapsed time between rows |
 | Compute | Fill the table for the range above | Compute the range | Computes a row for every step of the range above. |
 | Jupiter and moons on the chart | — | Jupiter and moons on the chart | Shows or hides Jupiter on the chart where it stands for the place and instant set in Place and Time, at its true size or as a 6-pixel cartographic symbol, whichever is larger; the same choice as View's. Io, Europa, Ganymede and Callisto are drawn as 3-pixel symbols at their own places: a filled dot clear of Jupiter, a dot ringed in the page's ground in front of it, a hollow ring in its shadow, and nothing behind it; at wider fields only the moons whose marks can be told apart are drawn. |
-| Update from Place and Time | Read the place and instant from Place and Time again | Read the observer and instant from Place and Time again | Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
 
 ### emphasis-open
 
@@ -444,7 +450,7 @@ arrangement at its frozen instant.
 | Matematisk horisont | Tegn der himmelen møter en helt flat og gjennomsiktig jord (⌘K deretter H) | Vis matematisk horisont | Tegner sirkelen der himmelen ville ha møtt en flat og gjennomsiktig jord; din egen horisont har åser og luft i seg. Valget gjelder ut denne økten. |
 | Senit | Marker punktet rett over deg | Vis senit | Markerer punktet rett over deg. Det tegnes sammen med observatørens linjer og har ingen egen hurtigtast. |
 | Høydemerker | Gradér meridianen for hver 10° høyde over horisonten | Vis høydemerker | Merker meridianen for hver 10° høyde fra horisonten til senit, med tallet ved hvert merke. Det tegnes sammen med meridianen og har ingen egen hurtigtast. |
-| Nå | Les klokken én gang og sett kartets tidspunkt til nå | Nå | Tegner referanselinjene for tidspunktet nå. Klokken leses én gang; tiden går ikke videre etterpå. |
+| Oppdater til nå | Les klokken én gang og sett kartets tidspunkt til nå | Oppdater til nå | Tegner kartet for tidspunktet nå. Klokken leses én gang; tiden går ikke videre etterpå. |
 | Sentrer på senit | Flytt kartet til punktet rett over deg | Sentrer på senit | Flytter siden til punktet rett over deg. Dette er den eneste knappen i dette vinduet som flytter kartet. |
 | ▾ Kartvalg | Vis eller skjul denne delen | Kartvalg, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Dyphimmel | Vis eller skjul denne delen | Dyphimmel, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
@@ -498,7 +504,7 @@ arrangement at its frozen instant.
 | Matematisk horisont | Tegn der himmelen møter en helt flat og gjennomsiktig jord (⌘K deretter H) | Vis matematisk horisont | Tegner sirkelen der himmelen ville ha møtt en flat og gjennomsiktig jord; din egen horisont har åser og luft i seg. Valget gjelder ut denne økten. |
 | Senit | Marker punktet rett over deg | Vis senit | Markerer punktet rett over deg. Det tegnes sammen med observatørens linjer og har ingen egen hurtigtast. |
 | Høydemerker | Gradér meridianen for hver 10° høyde over horisonten | Vis høydemerker | Merker meridianen for hver 10° høyde fra horisonten til senit, med tallet ved hvert merke. Det tegnes sammen med meridianen og har ingen egen hurtigtast. |
-| Nå | Les klokken én gang og sett kartets tidspunkt til nå | Nå | Tegner referanselinjene for tidspunktet nå. Klokken leses én gang; tiden går ikke videre etterpå. |
+| Oppdater til nå | Les klokken én gang og sett kartets tidspunkt til nå | Oppdater til nå | Tegner kartet for tidspunktet nå. Klokken leses én gang; tiden går ikke videre etterpå. |
 | Sentrer på senit | Flytt kartet til punktet rett over deg | Sentrer på senit | Flytter siden til punktet rett over deg. Dette er den eneste knappen i dette vinduet som flytter kartet. |
 | ▾ Kartvalg | Vis eller skjul denne delen | Kartvalg, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Dyphimmel | Vis eller skjul denne delen | Dyphimmel, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
@@ -593,7 +599,7 @@ arrangement at its frozen instant.
 | Matematisk horisont | Tegn der himmelen møter en helt flat og gjennomsiktig jord (⌘K deretter H) | Vis matematisk horisont | Tegner sirkelen der himmelen ville ha møtt en flat og gjennomsiktig jord; din egen horisont har åser og luft i seg. Valget gjelder ut denne økten. |
 | Senit | Marker punktet rett over deg | Vis senit | Markerer punktet rett over deg. Det tegnes sammen med observatørens linjer og har ingen egen hurtigtast. |
 | Høydemerker | Gradér meridianen for hver 10° høyde over horisonten | Vis høydemerker | Merker meridianen for hver 10° høyde fra horisonten til senit, med tallet ved hvert merke. Det tegnes sammen med meridianen og har ingen egen hurtigtast. |
-| Nå | Les klokken én gang og sett kartets tidspunkt til nå | Nå | Tegner referanselinjene for tidspunktet nå. Klokken leses én gang; tiden går ikke videre etterpå. |
+| Oppdater til nå | Les klokken én gang og sett kartets tidspunkt til nå | Oppdater til nå | Tegner kartet for tidspunktet nå. Klokken leses én gang; tiden går ikke videre etterpå. |
 | Sentrer på senit | Flytt kartet til punktet rett over deg | Sentrer på senit | Flytter siden til punktet rett over deg. Dette er den eneste knappen i dette vinduet som flytter kartet. |
 | Breddegraden må ligge mellom −90° og 90°. Beholdt 59.913. | — | Breddegraden må ligge mellom −90° og 90°. Beholdt 59.913. | — |
 | ▾ Kartvalg | Vis eller skjul denne delen | Kartvalg, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
@@ -681,7 +687,11 @@ arrangement at its frozen instant.
 | — | — | Kontrollerens faner | To faner: kartets kontroller, og solsystemets himmellegemer. Å velge en fane beregner ingenting; fanen som sist ble valgt, huskes. |
 | Kart | — | Kart | — |
 | ▾ Solsystemet | — | Solsystemet | — |
+| Kartet: 2026-03-20 21:33:00 UTC | — | Kartet: 2026-03-20 21:33:00 UTC | — |
+| Oppdater til nå | Les klokken én gang og sett kartets tidspunkt til nå | Oppdater til nå | Tegner kartet for tidspunktet nå. Klokken leses én gang; tiden går ikke videre etterpå. |
 | ▾ Solen | Vis eller skjul denne delen | Solen, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
+| — | — | Samsvar med kartet | — |
+| Samme sted og tidspunkt som kartet: 59.91° N · 10.75° Ø, 2026-03-20 21:33:00 UTC | — | Samme sted og tidspunkt som kartet: 59.91° N · 10.75° Ø, 2026-03-20 21:33:00 UTC | — |
 | Observatør på bredde 59,913, lengde 10,752 øst; tidspunkt 2026-03-20 21:33:00 UTC, fra Sted og tid. | — | Observatør på bredde 59,913, lengde 10,752 øst; tidspunkt 2026-03-20 21:33:00 UTC, fra Sted og tid. | — |
 | Dette tidspunktet | Én rad, ved tidspunktet satt i Sted og tid | Vis Solen ved tidspunktet satt i Sted og tid | Viser én rad: Solen ved observasjonstidspunktet satt i Sted og tid. |
 | Over et tidsrom | Én rad for hvert steg fra en start til en slutt | Vis Solen over et tidsrom | Viser én rad for hvert steg fra starten til slutten, begge medregnet; en slutt som ikke ligger på rutenettet, legges til som siste rad og merkes. |
@@ -712,7 +722,6 @@ arrangement at its frozen instant.
 | Tilsynelatende diameter | Hvor stor solskiven ser ut, i bueminutter og buesekunder. | Tilsynelatende diameter | Hvor stor solskiven ser ut, i bueminutter og buesekunder. |
 | 32′ 06,1″ | — | Tilsynelatende diameter: 32′ 06,1″ | — |
 | Solen på kartet | — | Solen på kartet | Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid; samme valg som i Vis-menyen. |
-| Oppdater fra Sted og tid | Les sted og tidspunkt fra Sted og tid på nytt | Les observatør og tidspunkt fra Sted og tid på nytt | Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
 | ▸ Merkur | Vis eller skjul denne delen | Merkur, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Venus | Vis eller skjul denne delen | Venus, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Månen | Vis eller skjul denne delen | Månen, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
@@ -728,11 +737,15 @@ arrangement at its frozen instant.
 | — | — | Kontrollerens faner | To faner: kartets kontroller, og solsystemets himmellegemer. Å velge en fane beregner ingenting; fanen som sist ble valgt, huskes. |
 | Kart | — | Kart | — |
 | ▾ Solsystemet | — | Solsystemet | — |
+| Kartet: 2026-03-20 21:33:00 UTC | — | Kartet: 2026-03-20 21:33:00 UTC | — |
+| Oppdater til nå | Les klokken én gang og sett kartets tidspunkt til nå | Oppdater til nå | Tegner kartet for tidspunktet nå. Klokken leses én gang; tiden går ikke videre etterpå. |
 | ▸ Solen | Vis eller skjul denne delen | Solen, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Merkur | Vis eller skjul denne delen | Merkur, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Venus | Vis eller skjul denne delen | Venus, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Månen | Vis eller skjul denne delen | Månen, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▾ Jupiter | Vis eller skjul denne delen | Jupiter, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
+| — | — | Samsvar med kartet | — |
+| Kartet: 59.91° N · 10.75° Ø, 2026-03-20 21:33:00 UTC | — | Kartet: 59.91° N · 10.75° Ø, 2026-03-20 21:33:00 UTC | — |
 | Observatør på bredde 59,913, lengde 10,752 øst; tidspunkt 2026-03-20 21:33:00 UTC, fra Sted og tid. | — | Observatør på bredde 59,913, lengde 10,752 øst; tidspunkt 2026-03-20 21:33:00 UTC, fra Sted og tid. | — |
 | Dette tidspunktet | Én rad, ved tidspunktet satt i Sted og tid | Vis Jupiter og månene ved tidspunktet satt i Sted og tid | Viser Jupiter ved observasjonstidspunktet satt i Sted og tid, og under den de fire månene i fast rekkefølge. |
 | Over et tidsrom | Én rad for hvert steg fra en start til en slutt | Vis de fire månene over et tidsrom | Viser de fire månene for hvert steg fra starten til slutten, begge medregnet, gruppert under hvert tidspunkt; en slutt som ikke ligger på rutenettet, legges til som siste gruppe og merkes. Dette er utvalgte tidspunkter; tabellen leter ikke etter øyeblikket en måne går inn på eller ut av Jupiterskiven. |
@@ -745,7 +758,6 @@ arrangement at its frozen instant.
 | — | Tiden som går mellom radene | — | Tiden som går mellom radene |
 | Beregn | Fyll tabellen for tidsrommet over | Beregn tidsrommet | Beregner én rad for hvert steg i tidsrommet over. |
 | Jupiter og månene på kartet | — | Jupiter og månene på kartet | Viser eller skjuler Jupiter på kartet der den står for stedet og tidspunktet satt i Sted og tid, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst; samme valg som i Vis-menyen. Io, Europa, Ganymedes og Callisto tegnes som symboler på 3 piksler der de står: en fylt prikk klar av Jupiter, en prikk med en ring i sidens bunnfarge foran den, en hul ring i skyggen, og ingenting bak den; i videre felt tegnes bare de månene som kan skilles fra hverandre. |
-| Oppdater fra Sted og tid | Les sted og tidspunkt fra Sted og tid på nytt | Les observatør og tidspunkt fra Sted og tid på nytt | Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
 
 ### emphasis-open
 

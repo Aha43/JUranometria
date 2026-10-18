@@ -50,13 +50,39 @@ public final class ViewReport {
             Selection selection,
             List<String> workingSet, String workingLead,
             String osName, String osVersion, String osArch,
-            String javaVersion) {
+            String javaVersion, List<String> furniture) {
 
         public Snapshot {
             emphasis = emphasis == null ? Set.of() : Set.copyOf(emphasis);
             modules = List.copyOf(modules);
             workingSet = workingSet == null ? List.of()
                     : List.copyOf(workingSet);
+            furniture = furniture == null ? List.of() : List.copyOf(furniture);
+        }
+
+        /** A state with no module furniture drawn - every report before #259. */
+        public Snapshot(String version, ChartViewState view,
+                        int chartWidthPx, int chartHeightPx,
+                        int pageWidthPx, int pageHeightPx,
+                        int pageOffsetXPx, int pageOffsetYPx,
+                        Scale displayScale,
+                        ChartOptions chosen, ChartOptions drawn,
+                        String interfaceLanguage,
+                        String skyLanguageChosen, String skyLanguageOnChart,
+                        Set<ChartStructure> emphasis,
+                        List<String> modules,
+                        PlaceAndTime placeAndTime,
+                        Boolean eclipticShowing,
+                        Selection selection,
+                        List<String> workingSet, String workingLead,
+                        String osName, String osVersion, String osArch,
+                        String javaVersion) {
+            this(version, view, chartWidthPx, chartHeightPx, pageWidthPx,
+                    pageHeightPx, pageOffsetXPx, pageOffsetYPx, displayScale,
+                    chosen, drawn, interfaceLanguage, skyLanguageChosen,
+                    skyLanguageOnChart, emphasis, modules, placeAndTime,
+                    eclipticShowing, selection, workingSet, workingLead, osName,
+                    osVersion, osArch, javaVersion, List.of());
         }
     }
 
@@ -135,7 +161,11 @@ public final class ViewReport {
                 language.namesOnTheChart(), chart.emphasizedSet(),
                 modules, place, eclipticShowing, selection.selection(),
                 working.members(), working.lead(), machine[0],
-                machine[1], machine[2], machine[3]);
+                machine[1], machine[2], machine[3],
+                // What the last paint drew (#259), as the page allocated it.
+                chart.renderedFurniture().stream()
+                        .map(juranometria.ui.ChartComponent.DrawnFurniture::report)
+                        .toList());
     }
 
     /** The screen's own scale, or null where no screen supplies one. */
@@ -190,6 +220,10 @@ public final class ViewReport {
                 .orElse("none"));
         lines.add("modules: " + (s.modules().isEmpty() ? "none"
                 : String.join(", ", s.modules())));
+        // The modules' furniture the page draws, by identity and corner
+        // (#259, ruling 7 on #556).
+        lines.add("furniture: " + (s.furniture().isEmpty() ? "none"
+                : String.join(", ", s.furniture())));
         if (s.placeAndTime() != null) {
             PlaceAndTime place = s.placeAndTime();
             lines.add("observer-lines: meridian " + onOff(place.meridian())

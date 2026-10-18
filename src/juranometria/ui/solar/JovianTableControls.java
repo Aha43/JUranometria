@@ -96,6 +96,10 @@ public final class JovianTableControls {
     private final JPanel card = new JPanel();
     private final SolarTableSession.Subscription following;
     private JovianTableSession.Result shown;
+    /** The agreement line (#259), opening every arrangement. */
+    AgreementLine agreement;
+    /** Following Place and Time, to say the agreement again; never to recompute. */
+    private Runnable followingChart = () -> { };
     private JPanel resultHolder;
     private boolean narrow;
 
@@ -307,7 +311,9 @@ public final class JovianTableControls {
         } else {
             centreOnChart = null;
         }
+        agreement = new AgreementLine(said, update, "jupiter");
         following = session.onChange(this::show);
+        followingChart = session.onObserverChange(this::sayAgreement);
     }
 
     /** This host's draft, as a query. */
@@ -349,6 +355,38 @@ public final class JovianTableControls {
     /** Lets go of the session; twice is once. */
     public void release() {
         following.cancel();
+        followingChart.run();
+    }
+
+    /**
+     * Says again whether the table shown is for the chart's place and
+     * instant (#259, ruling 5 on #556). Reads, never computes.
+     */
+    private void sayAgreement() {
+        if (agreement == null) {
+            return;
+        }
+        JovianTableSession.Result result = shown;
+        boolean rows = result != null && result.applied()
+                && (result.outcome() == JovianTableSession.Outcome.ROWS
+                        || result.outcome() == JovianTableSession.Outcome.APPENDED
+                        || result.outcome() == JovianTableSession.Outcome.MOONS_OUTSIDE)
+                && !result.entries().isEmpty();
+        boolean range = rows && result.query().mode() == Mode.RANGE;
+        agreement.show(session.observerNow(), rows ? result.observer() : null,
+                range ? result.entries().get(0).sample().instant() : null,
+                range ? result.entries().get(result.entries().size() - 1).sample().instant()
+                        : null);
+    }
+
+    /** What the agreement line says now, a line per sentence. */
+    public String agreementText() {
+        return agreement.text();
+    }
+
+    /** The agreement line, for a host laying these controls out. */
+    public JComponent agreementLine() {
+        return agreement.panel();
     }
 
     /**
@@ -405,6 +443,7 @@ public final class JovianTableControls {
             showCard(null);
             say(" ");
             refreshResult();
+            sayAgreement();
             return;
         }
         String note = said.say("observer.note", said.n(degrees(now.latitudeDegrees())),
@@ -458,6 +497,7 @@ public final class JovianTableControls {
         }
         say(text);
         refreshResult();
+        sayAgreement();
     }
 
     /** The card for one instant, or blank. */
@@ -511,6 +551,11 @@ public final class JovianTableControls {
         JPanel top = new JPanel();
         top.setLayout(new BoxLayout(top, BoxLayout.Y_AXIS));
         top.putClientProperty(MARK, Boolean.TRUE);
+        // The agreement line opens the dialog too (#259, ruling 5 on #556).
+        JComponent line = agreement.panel();
+        line.setAlignmentX(0f);
+        top.add(line);
+        top.add(Box.createVerticalStrut(8));
         observerNote.setAlignmentX(0f);
         top.add(observerNote);
         top.add(Box.createVerticalStrut(8));
@@ -578,6 +623,12 @@ public final class JovianTableControls {
         if (shown != null) {
             show(shown);
         }
+        // The agreement line opens the group (#259, ruling 5 on #556),
+        // with Update from Place and Time in it when the table differs.
+        agreement.wrapTo(NARROW - 20);
+        sayAgreement();
+        column.add(agreement.panel());
+        column.add(Box.createVerticalStrut(6));
         observerNote.putClientProperty("FlatLaf.styleClass", "small");
         column.add(leadingWide(observerNote));
         column.add(Box.createVerticalStrut(6));
@@ -614,7 +665,6 @@ public final class JovianTableControls {
             column.add(leading(centreOnChart));
             column.add(Box.createVerticalStrut(4));
         }
-        column.add(leading(update));
         refreshResult();
         return column;
     }

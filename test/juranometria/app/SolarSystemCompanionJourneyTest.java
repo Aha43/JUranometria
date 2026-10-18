@@ -274,11 +274,12 @@ class SolarSystemCompanionJourneyTest {
                     // The window's own focus traversal reaches the group: the
                     // chosen view (its sibling is reached by the arrow keys,
                     // as in every Swing button group), the fields, Compute,
-                    // the box and Update.
+                    // the box. Update from Place and Time stands in the
+                    // agreement line since #259, offered only while the table
+                    // differs from the chart - and this one agrees.
                     assertReachable(companion, content,
                             "Show the Sun at the instant set in Place and Time",
                             "From (UTC)", "To (UTC)", "Step between rows", "Compute the range",
-                            "Read the observer and instant from Place and Time again",
                             "Sun on the chart");
 
                     // Jupiter's group the same way, by its own spoken names;

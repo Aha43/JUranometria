@@ -157,6 +157,11 @@ public final class SelectInteraction extends MouseAdapter {
         // chrome, and the hit test is defined on the paper.
         double x = point.x;
         double y = point.y - chart.pageOffsetY();
+        // A drawn furniture control (#259) is pressed, not asked about:
+        // the chart activates it, and nothing under it is selected.
+        if (chart.furnitureActionAt(x, y).isPresent()) {
+            return;
+        }
         // A selectable body (#513) is what a reader pointing at it
         // means: its occurrence - the body at the instant and place it
         // was drawn for - replaces or toggles the working selection by

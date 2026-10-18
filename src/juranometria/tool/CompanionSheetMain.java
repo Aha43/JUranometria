@@ -299,6 +299,10 @@ public final class CompanionSheetMain {
                                         () -> observer,
                                         juranometria.solar.JovianSystemService::load),
                                 new StillSwitch(), null, words);
+                // The tab opens with the chart's instant and Update to now
+                // (#259, ruling 9 on #556), as the application holds it.
+                solarSection.showChartInstant(() -> observer, listener -> () -> { },
+                        () -> { });
                 // Since #507 the Solar System is a tab after Chart, its
                 // groups standing on it directly; "solar-system-open"
                 // chooses that tab.

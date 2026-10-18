@@ -177,6 +177,91 @@ public final class SolarSystemSection {
         return jupiter;
     }
 
+    /** Where the chart's instant is read, and how the tab follows it; null for none. */
+    private java.util.function.Supplier<juranometria.sky.Observer> chartObserver;
+    private java.util.function.Function<Runnable, Runnable> chartChanges;
+    private Runnable updateToNow;
+    private Runnable followingChart = () -> { };
+    /** The tab's chart-instant line, once the tab is built with one. */
+    private javax.swing.JLabel chartInstant;
+    private javax.swing.JButton chartUpdate;
+
+    /**
+     * Opens the tab with the instant the chart is frozen at and Update to
+     * now (#259, ruling 9 on #556): a reader at the laptop with the chart
+     * on another screen knows what the chart shows without visiting the
+     * Chart tab. Stated before the tab is built.
+     *
+     * @param chart Place and Time's observer now, or null while it holds none
+     * @param follow the subscription that tells the line Place and Time changed
+     * @param update the one Update to now the atlas runs
+     */
+    public void showChartInstant(java.util.function.Supplier<juranometria.sky.Observer> chart,
+                                 java.util.function.Function<Runnable, Runnable> follow,
+                                 Runnable update) {
+        if (chart == null || follow == null || update == null) {
+            throw new IllegalArgumentException(
+                    "the chart's instant is read, followed and updated");
+        }
+        this.chartObserver = chart;
+        this.chartChanges = follow;
+        this.updateToNow = update;
+    }
+
+    /** What the tab's chart-instant line says now; empty without one. */
+    public String chartInstantText() {
+        return chartInstant == null || !chartInstant.isVisible() ? ""
+                : chartInstant.getText();
+    }
+
+    /** The tab's Update to now, or null without a chart-instant line. */
+    public javax.swing.JButton chartUpdateButton() {
+        return chartUpdate;
+    }
+
+    private JComponent chartInstantLine(InterfaceText said) {
+        chartInstant = new javax.swing.JLabel();
+        chartInstant.setName("solarSystemChartInstant");
+        chartUpdate = new javax.swing.JButton(said.say("placeandtime.now.label"));
+        chartUpdate.setName("solarSystemUpdateToNow");
+        chartUpdate.getAccessibleContext().setAccessibleName(
+                said.say("placeandtime.now.a11y"));
+        juranometria.ui.Explain.control(chartUpdate, said.say("placeandtime.now.hover"),
+                said.say("placeandtime.now.explain"));
+        chartUpdate.addActionListener(event -> updateToNow.run());
+        JPanel line = new JPanel(new java.awt.BorderLayout(0, 4));
+        line.setName("solarSystemChartInstantLine");
+        // The groups' own alignment, so the line spans the tab as they do.
+        line.setAlignmentX(java.awt.Component.CENTER_ALIGNMENT);
+        line.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                javax.swing.BorderFactory.createEmptyBorder(6, 10, 4, 10),
+                javax.swing.BorderFactory.createCompoundBorder(
+                        javax.swing.BorderFactory.createLineBorder(
+                                javax.swing.UIManager.getColor("Separator.foreground")),
+                        javax.swing.BorderFactory.createEmptyBorder(5, 7, 5, 7))));
+        line.add(chartInstant, java.awt.BorderLayout.CENTER);
+        JPanel button = new JPanel(new java.awt.BorderLayout());
+        button.setOpaque(false);
+        button.add(chartUpdate, java.awt.BorderLayout.WEST);
+        line.add(button, java.awt.BorderLayout.SOUTH);
+        line.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE,
+                line.getPreferredSize().height + 40));
+        Runnable say = () -> {
+            juranometria.sky.Observer now = chartObserver.get();
+            line.setVisible(now != null);
+            if (now != null) {
+                chartInstant.setText(said.say("solarsystem.chartinstant",
+                        SolarTableSession.shown(now.instant())));
+                chartInstant.getAccessibleContext().setAccessibleName(
+                        chartInstant.getText());
+            }
+        };
+        say.run();
+        followingChart.run();
+        followingChart = chartChanges.apply(say);
+        return line;
+    }
+
     /** The Sun's controls, for a host that checks what it shares. */
     public SolarTableControls sun() {
         return sun;
@@ -201,6 +286,9 @@ public final class SolarSystemSection {
     public JComponent inController(CompanionStore store, InterfaceText said) {
         JPanel groups = new JPanel();
         groups.setLayout(new BoxLayout(groups, BoxLayout.Y_AXIS));
+        if (chartObserver != null) {
+            groups.add(chartInstantLine(said));
+        }
         groups.add(CompanionSection.remembered(ID + ".sun",
                 said.say("solarsystem.sun"), sun.inController(), said, store, false));
         if (mercury != null) {
@@ -223,6 +311,8 @@ public final class SolarSystemSection {
 
     /** Lets both sets of controls go of their sessions. */
     public void release() {
+        followingChart.run();
+        followingChart = () -> { };
         sun.release();
         if (mercury != null) {
             mercury.release();

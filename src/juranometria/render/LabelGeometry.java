@@ -90,6 +90,14 @@ public final class LabelGeometry {
                         key));
             }
         }
+        // A module's furniture is furniture (#259): every name yields to
+        // it as to the title block, and only where it will draw.
+        for (ChartFurniture.Placed placed
+                : renderer.furnitureLayout(metrics, scene, options)) {
+            ink.add(new LabelPlacement.Obstacle(
+                    LabelPlacement.Refusal.FURNITURE,
+                    placed.furniture().key(), placed.covers()));
+        }
         return List.copyOf(ink);
     }
 

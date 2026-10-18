@@ -50,6 +50,8 @@ public final class ChartKeyboard extends JPanel {
     public static final String NAME = "chartKeyboard";
 
     private final ChartSwitches switches;
+    /** The commands this palette can run (#259), by action; empty for none. */
+    private final java.util.Map<String, Runnable> commands;
     private final juranometria.ui.language.ChartKeyboardText said;
     private final List<Line> lines = new ArrayList<>();
     private final JLabel announced = new JLabel(" ");
@@ -59,8 +61,10 @@ public final class ChartKeyboard extends JPanel {
     }
 
     private ChartKeyboard(ChartSwitches switches,
+                          java.util.Map<String, Runnable> commands,
                           juranometria.ui.language.InterfaceText words) {
         this.switches = switches;
+        this.commands = java.util.Map.copyOf(commands);
         this.said = juranometria.ui.language.ChartKeyboardText.in(words);
         setName(NAME);
         setLayout(new BorderLayout());
@@ -90,6 +94,20 @@ public final class ChartKeyboard extends JPanel {
             line.setName("chartKeyboard." + toggle.id());
             column.add(line);
             lines.add(new Line(toggle, line));
+        }
+
+        // The commands (#259): something the keyboard does, listed with
+        // its letter and no state, after the switches.
+        for (ChartKeys.Command command : ChartKeys.commands()) {
+            if (!this.commands.containsKey(command.id())) {
+                continue;
+            }
+            column.add(Box.createVerticalStrut(8));
+            JLabel line = new JLabel(said.commandRow(command));
+            line.setAlignmentX(0.0f);
+            line.setName("chartKeyboard." + command.id());
+            line.getAccessibleContext().setAccessibleName(said.commandSpoken(command));
+            column.add(line);
         }
 
         column.add(Box.createVerticalStrut(8));
@@ -125,6 +143,21 @@ public final class ChartKeyboard extends JPanel {
      */
     public static ChartKeyboard of(ChartSwitches switches,
             juranometria.ui.language.InterfaceText words) {
+        return of(switches, java.util.Map.of(), words);
+    }
+
+    /**
+     * The same, with the commands it can run (#259): each by its
+     * {@link ChartKeys.Command} action, reaching the very transition the
+     * reader's own control reaches.
+     */
+    public static ChartKeyboard of(ChartSwitches switches,
+            java.util.Map<String, Runnable> commands,
+            juranometria.ui.language.InterfaceText words) {
+        if (commands == null) {
+            throw new IllegalArgumentException(
+                    "the keyboard's commands, or none");
+        }
         if (switches == null) {
             throw new IllegalArgumentException(
                     "the keyboard needs the chart's switches");
@@ -133,7 +166,7 @@ public final class ChartKeyboard extends JPanel {
             throw new IllegalArgumentException(
                     "and it says what it says in some language (#350)");
         }
-        return new ChartKeyboard(switches, words);
+        return new ChartKeyboard(switches, commands, words);
     }
 
     /**
@@ -155,6 +188,17 @@ public final class ChartKeyboard extends JPanel {
     public static void install(JRootPane root, ChartSwitches switches,
                                juranometria.ui.language.InterfaceText words,
                                Opener opener) {
+        install(root, switches, java.util.Map.of(), words, opener);
+    }
+
+    /** The same, with the commands the palette can run (#259). */
+    public static void install(JRootPane root, ChartSwitches switches,
+                               java.util.Map<String, Runnable> commands,
+                               juranometria.ui.language.InterfaceText words,
+                               Opener opener) {
+        if (commands == null) {
+            throw new IllegalArgumentException("the keyboard's commands, or none");
+        }
         if (root == null || switches == null || words == null
                 || opener == null) {
             throw new IllegalArgumentException(
@@ -176,7 +220,7 @@ public final class ChartKeyboard extends JPanel {
                     return;
                 }
                 ChartKeyboard keyboard =
-                        ChartKeyboard.of(switches, words);
+                        ChartKeyboard.of(switches, commands, words);
                 showing[0] = keyboard;
                 opener.open(keyboard);
             }
@@ -219,7 +263,17 @@ public final class ChartKeyboard extends JPanel {
     public boolean press(char key) {
         ChartKeys.Toggle toggle = ChartKeys.forKey(key);
         if (toggle == null) {
-            return false;
+            // A command (#259): run once, through the reader's own
+            // control's transition, and said aloud.
+            ChartKeys.Command command = ChartKeys.commandForKey(key);
+            Runnable run = command == null ? null : commands.get(command.id());
+            if (run == null) {
+                return false;
+            }
+            run.run();
+            announce(said.commandAnnounce(command));
+            refresh();
+            return true;
         }
         if (!switches.available(toggle.id())) {
             announce(said.announceUnavailable(toggle, master(toggle)));
@@ -320,6 +374,19 @@ public final class ChartKeyboard extends JPanel {
                 @Override
                 public void actionPerformed(ActionEvent event) {
                     press(toggle.key());
+                }
+            });
+        }
+        for (ChartKeys.Command command : ChartKeys.commands()) {
+            if (!commands.containsKey(command.id())) {
+                continue;
+            }
+            inputs.put(KeyStroke.getKeyStroke(
+                    Character.toUpperCase(command.key()), 0), command.id());
+            getActionMap().put(command.id(), new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent event) {
+                    press(command.key());
                 }
             });
         }

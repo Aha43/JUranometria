@@ -108,7 +108,9 @@ class SunTableDialogTest {
         assertEquals(before, rig.content.model.getValueAt(0, 4),
                 "nothing moves until the table reads again");
         rig.content.update();
-        assertEquals(reads + 1, rig.reads, "one read per update");
+        // One read computes; since #259 the agreement line reads Place and
+        // Time once more, to compare against the chart - never to compute.
+        assertEquals(reads + 2, rig.reads, "one read per update, and one to compare");
         assertNotEquals(before, rig.content.model.getValueAt(0, 4),
                 "Quito's Sun stands at a different height");
         assertTrue(rig.content.observerNote.getText().contains("-0.18"));

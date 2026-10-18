@@ -81,6 +81,10 @@ public final class SolarTableControls {
     /** Centre on chart (#483), or null for a host built without the action. */
     public final JButton centreOnChart;
     private final SolarTableSession.Subscription following;
+    /** The agreement line (#259), opening every arrangement. */
+    final AgreementLine agreement;
+    /** Following Place and Time, to say the agreement again; never to recompute. */
+    private final Runnable followingChart;
     private SolarTableSession.Result shown;
     private JPanel resultHolder;
     /** Whether the host is the narrow one, whose note wraps. */
@@ -224,7 +228,39 @@ public final class SolarTableControls {
             centreOnChart = null;
         }
 
+        agreement = new AgreementLine(said, update, names);
         following = session.onChange(this::show);
+        followingChart = session.onObserverChange(this::sayAgreement);
+    }
+
+    /**
+     * Says again whether the table shown is for the chart's place and
+     * instant (#259, ruling 5 on #556). Reads, never computes.
+     */
+    private void sayAgreement() {
+        if (agreement == null) {
+            return;
+        }
+        SolarTableSession.Result result = shown;
+        boolean rows = result != null && result.applied()
+                && (result.outcome() == SolarTableSession.Outcome.ROWS
+                        || result.outcome() == SolarTableSession.Outcome.APPENDED)
+                && !result.rows().isEmpty();
+        boolean range = rows && result.query().mode() == SolarTableSession.Mode.RANGE;
+        agreement.show(session.observerNow(), rows ? result.observer() : null,
+                range ? result.rows().get(0).sample().instant() : null,
+                range ? result.rows().get(result.rows().size() - 1).sample().instant()
+                        : null);
+    }
+
+    /** What the agreement line says now, a line per sentence. */
+    public String agreementText() {
+        return agreement.text();
+    }
+
+    /** The agreement line, for a host laying these controls out. */
+    public JComponent agreementLine() {
+        return agreement.panel();
     }
 
     /**
@@ -307,6 +343,7 @@ public final class SolarTableControls {
     /** Lets go of the session; twice is once. */
     public void release() {
         following.cancel();
+        followingChart.run();
     }
 
     /** Shows a result: the rows, the outcome in words, the observer note. The draft is left alone. */
@@ -323,6 +360,7 @@ public final class SolarTableControls {
             model.show(List.of());
             say(" ");
             refreshResult();
+            sayAgreement();
             return;
         }
         String note = said.say("observer.note",
@@ -357,6 +395,7 @@ public final class SolarTableControls {
                     result.detail()));
         }
         refreshResult();
+        sayAgreement();
     }
 
     private void say(String text) {
@@ -393,6 +432,12 @@ public final class SolarTableControls {
             show(shown);
         }
 
+        // The agreement line opens the group (#259, ruling 5 on #556),
+        // with Update from Place and Time in it when the table differs.
+        agreement.wrapTo(CARD_LINES_WIDTH - 20);
+        sayAgreement();
+        column.add(agreement.panel());
+        column.add(Box.createVerticalStrut(6));
         observerNote.putClientProperty("FlatLaf.styleClass", "small");
         column.add(wrapped(observerNote));
         column.add(Box.createVerticalStrut(6));
@@ -432,7 +477,6 @@ public final class SolarTableControls {
             column.add(leading(centreOnChart));
             column.add(Box.createVerticalStrut(4));
         }
-        column.add(leading(update));
         refreshResult();
         return column;
     }

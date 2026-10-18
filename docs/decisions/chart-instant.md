@@ -252,3 +252,66 @@ The mutation cases of section 5 gain one from the amendment: *an
 agreement line that compares the instant alone* - a table computed for
 another place at the chart's instant must not read as agreeing.
 
+
+## As built (#259)
+
+The ruled design, as #259 implements it. The evidence is
+`docs/studies/chart-instant-furniture/` (`make chart-instant-furniture`):
+production pages where the box is the chart's own, and an exported A4
+sheet.
+
+- **The seam.** A module offers `juranometria.module.Furniture` -
+  identity, heading, lines, one optional action (identity, label, paper
+  line, explanation), a spoken sentence and a sheet sentence - through
+  `ChartServices.furnish`, owned and pulled like geometry, and withdrawn
+  with the module. The record carries strings and an action name only;
+  a test holds that it can carry nothing that draws. The renderer sees
+  `ChartFurniture` (key, heading, lines, control label or none) and owns
+  allocation, layout, ink and reservation; the chart owns the hit test,
+  the focus ring, the hover explanation, the accessible action, speech,
+  the report and the paper form. A page with no furniture offered is the
+  released page, byte for byte, and so is a page whose module detached.
+- **When (ruling 1).** `PlaceAndTimeFurniture` offers the box while the
+  meridian, the horizon or the zenith is on, or while any Solar System
+  body's switch is on - the Sun, Mercury, Venus, the Moon, Jupiter -
+  composed in `JUranometriaMain` so the module learns nothing of the
+  others. Ticks ride the meridian.
+- **Where (ruling 3).** The lower right, then the upper right unless the
+  magnitude key is on, then the upper left; the first corner whose box
+  fits inside the margins and meets neither the title block, the key nor
+  an earlier box. The box keeps the key's right edge and the title
+  block's foot. Grid figures and names are refused by it as by the title
+  block; a name every candidate of which was refused may stand at its
+  least bad place under it, as under the title block, and the opaque box
+  covers it.
+- **The action (rulings 4 and 7).** One `UpdateToNow` per session reads
+  the clock once per activation and replaces only Place and Time's
+  instant. It is reached by a click on the box's framed control, by Tab
+  from the chart then Enter or Space, by the chart's accessible action,
+  by the chart keyboard's W (a command, listed with its letter and no
+  state), by the Controller's Solar System tab and by Place and Time's
+  button, renamed *Update to now*. The application's `start` takes the
+  clock, so the journey counts the reads on these real routes.
+- **Agreement (ruling 5, amended).** `AgreementLine` opens every Solar
+  System group and dialog; *Update from Place and Time* moved into it and
+  is shown only while the table differs (place or instant), or while a
+  range was computed for another place. Places that differ are written
+  with more decimals until they read differently. Each table's session
+  follows Place and Time's change notice; the line re-reads, never
+  recomputes.
+- **Paper (ruling 6).** The sheet's box carries the frozen sentence in
+  the control's place; the sheet's description gains the box's sentence
+  only when the box is drawn on the sheet.
+- **Report (ruling 7).** `furniture: place-and-time <corner>`, or
+  `furniture: none`.
+- **Two screens (ruling 9).** The Solar System tab opens with *Chart:
+  <instant> UTC* and *Update to now*, following Place and Time.
+- **Persistence (ruling 8).** Unchanged: the place is stored, the
+  instant never; each start reads the clock once.
+- **Stale words (ruling 10).** View ▸ Solar System's explanation names
+  the five bodies it holds; the `JUranometriaMain` comment no longer
+  says Mercury has neither switch nor button.
+- **One guard moved, said here.** The language ledger's readability cap
+  rose from 150 to 160: #259 brought three reviewed identifiers (the
+  box's identity, its action's, the report's furniture key) to a
+  boundary that stood at 149.

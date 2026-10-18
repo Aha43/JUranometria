@@ -99,6 +99,31 @@ public interface ChartServices {
                         java.util.function.Supplier<List<OverlayContribution>>
                                 geometry);
 
+    /**
+     * Asks the chart to carry a module's furniture, and returns the
+     * handle that withdraws it (Sprint 51, issue #259, the rulings on
+     * #556).
+     *
+     * <p>Typed content only - meaning, text and an action's identity
+     * ({@link Furniture}). The chart owns everything else: which corner,
+     * the layout, the ink, the collisions, the hit test, the speech and
+     * what paper gets. When a reader activates the box's action, by any
+     * route, the chart hands its identity to {@code actions} and does
+     * nothing else; what the action does is the module's.
+     *
+     * <p>Pulled, as geometry is, so a module whose text changed asks for
+     * a {@link #redraw()} and nothing more.
+     *
+     * <p>A chart that carries no module furniture - a test's services -
+     * refuses rather than quietly dropping the box.
+     */
+    default Runnable furnish(String moduleId,
+                             java.util.function.Supplier<List<Furniture>> furniture,
+                             Consumer<String> actions) {
+        throw new UnsupportedOperationException(
+                "this chart carries no module furniture: " + moduleId);
+    }
+
     /** Sky to page and back, as a module is allowed to ask it. */
     interface Projection {
 

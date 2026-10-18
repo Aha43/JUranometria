@@ -197,7 +197,11 @@ public final class ExportSheetSession {
                         ? SheetInk.working(chart, working.members(),
                                 working.lead(), options.options())
                         : ChartRenderer.ReferenceLayer.NONE,
-                request, destination, replace, said, emphasized);
+                request, destination, replace, said, emphasized,
+                // The modules' furniture, as paper carries it (#259,
+                // ruling 6 on #556): no control, the frozen-instant
+                // sentence in its place, and a sentence for the file.
+                chart.paperFurniture());
     }
 
     /**

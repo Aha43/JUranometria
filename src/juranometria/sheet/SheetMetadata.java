@@ -67,6 +67,21 @@ public record SheetMetadata(String title, String description,
     }
 
     /**
+     * The same statement, with a sentence for each box of furniture the
+     * sheet draws (Sprint 51, issue #259, ruling 6 on #556): what a
+     * reader of the file is told the page states. None is the sheet's
+     * description as it was.
+     */
+    public SheetMetadata withFurniture(java.util.List<String> sentences) {
+        if (sentences.isEmpty()) {
+            return this;
+        }
+        return new SheetMetadata(title,
+                description + " " + String.join(" ", sentences), producedBy,
+                emphasis);
+    }
+
+    /**
      * What an exported file says about itself, in a stated language
      * (Sprint 33, issue #350).
      *

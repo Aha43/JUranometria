@@ -222,6 +222,12 @@ public final class PanInteraction extends MouseAdapter {
         if (!chart.isOnPaper(point)) {
             return java.util.Optional.empty();
         }
+        // Nor on a drawn furniture control (#259): a press there is the
+        // control's, and the pointer there is the ordinary one.
+        if (chart.furnitureActionAt(point.x, point.y - chart.pageOffsetY())
+                .isPresent()) {
+            return java.util.Optional.empty();
+        }
         var scene = chart.scene();
         if (scene == null) {
             return java.util.Optional.empty();

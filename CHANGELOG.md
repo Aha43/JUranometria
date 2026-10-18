@@ -7,6 +7,23 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**The chart says when it is drawn for (#259, ruled on #556).** Whenever
+the meridian, the horizon, the zenith or a Solar System body is on, the
+chart carries a small *Place and Time* box beside the title block: the
+place, the frozen instant in UTC to the second, and the local sidereal
+time - no civil time and no time zone. Its one control, *Update to
+now*, reads the clock once and redraws the chart for that instant;
+nothing ticks afterwards. Place and Time's *Now* is renamed *Update to
+now*, and the same action is on the chart keyboard (W), the chart's
+keyboard focus (Tab, then Enter), assistive technology, and the top of
+the Controller's Solar System tab, which now opens with the instant the
+chart is frozen at. On an exported sheet the box carries no control and
+says the chart is frozen at that instant. Every Solar System table and
+dialog opens with a line saying whether its table is for the chart's
+place and instant, and when it is not, names both and offers *Update
+from Place and Time* - saying so never recomputes the table. The view
+report gains a furniture line. In both languages.
+
 ## [5.3.0] - 2026-10-17
 
 **The phases of Venus (#545).** A new reader article, in English and

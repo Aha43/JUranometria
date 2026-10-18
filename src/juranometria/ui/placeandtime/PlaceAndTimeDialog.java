@@ -25,7 +25,7 @@ import juranometria.meridian.MeridianModule;
  * drawn for one frozen instant. Typing changes nothing until the
  * field is committed - Enter, or leaving the field - and committing
  * redraws the reference lines and leaves the page exactly where the
- * reader put it. The two deliberate actions are <em>Now</em>, which
+ * reader put it. The two deliberate actions are <em>Update to now</em>, which
  * re-freezes on the moment it is pressed (read once; it is a button,
  * not a state), and <em>Centre on zenith</em>, the one thing here
  * that moves the chart, because the reader asked.
@@ -209,7 +209,7 @@ public final class PlaceAndTimeDialog extends JDialog {
      * The dialog content; headless-constructible for the tests that
      * hold every claim above.
      *
-     * @param clock read once each time <em>Now</em> is pressed, and
+     * @param clock read once each time <em>Update to now</em> is pressed, and
      *     at no other moment - passed in, because a clock the dialog
      *     owned could not be held still by a test
      */

@@ -45,7 +45,10 @@ class SkyLanguageLedgerTest {
                 "every unresolved application-surface occurrence is"
                         + " reviewed, and every review still matches"
                         + " code that exists");
-        assertTrue(unresolved.size() < 150,
+        // 150 from #347 to #259, which brought three reviewed identifiers
+        // (the Place and Time box's identity, its action's, and the view
+        // report's furniture key) to a boundary that stood at 149.
+        assertTrue(unresolved.size() < 160,
                 "and the boundary stays small enough to read: "
                         + unresolved.size());
     }
