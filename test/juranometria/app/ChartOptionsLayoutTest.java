@@ -47,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ChartOptionsLayoutTest {
 
     /** Every switch on the dialog, across its four tabs. */
-    private static final int SWITCHES = 17;
+    private static final int SWITCHES = 18;
 
     /**
      * One geometry per language, from differing predecessors.

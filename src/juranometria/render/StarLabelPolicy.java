@@ -121,6 +121,23 @@ public final class StarLabelPolicy {
     }
 
     /** The text the policy labels this star with, or null: none. */
+    /**
+     * The forms a star may show while the reader asks for every identity
+     * where it fits (#558, rulings 1 and 4 on #557): its name and its
+     * Bayer letter - Greek or Latin - at every field and magnitude, and
+     * its Flamsteed number at any magnitude but, as in the released
+     * policy, only below 12°, where a bare number cannot be read as a
+     * Messier number beside a deep-sky label.
+     */
+    public Forms everyIdentity(Star star) {
+        StarIdentity identity = star.identity();
+        if (identity == null) {
+            return new Forms(null, null, null);
+        }
+        return new Forms(identity.name(), bayerNotation(identity),
+                fieldWidthDegrees < 12.0 ? identity.flamsteed() : null);
+    }
+
     public String labelFor(Star star) {
         return qualifying(star).text(true, true, true);
     }

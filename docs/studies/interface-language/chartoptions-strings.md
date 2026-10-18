@@ -49,6 +49,7 @@ because nobody looks at them.
 | Star names | Traditional proper names such as Betelgeuse. Shortcut: ⌘K then S. | Star names | Traditional proper names such as Betelgeuse. Switch it here or from the chart with ⌘K then S. |
 | Bayer letters | Greek and Latin Bayer designations such as alpha Orionis. Shortcut: ⌘K then Y. | Bayer letters | Greek and Latin Bayer designations such as alpha Orionis. Switch it here or from the chart with ⌘K then Y. |
 | Flamsteed numbers | Flamsteed catalogue numbers on the regional charts. Shortcut: ⌘K then M. | Flamsteed numbers | Flamsteed catalogue numbers on the regional charts. Switch it here or from the chart with ⌘K then M. |
+| All star identities where they fit | Every star name, letter and number that fits, beside the usual labels | Show all star identities where they fit | Writes every name, Bayer letter and Flamsteed number the star catalogue knows for the stars on the page - of the kinds switched on above - wherever one fits. The usual labels keep their places; an identity with no free room is left out, so not every identity appears. Flamsteed numbers still appear only on fields narrower than 12°. |
 
 ### Constellations
 
@@ -112,6 +113,7 @@ because nobody looks at them.
 | Stjernenavn | Tradisjonelle egennavn som Betelgeuse. Snarvei: ⌘K deretter S. | Stjernenavn | Tradisjonelle egennavn som Betelgeuse. Slå det av eller på her eller fra kartet med ⌘K deretter S. |
 | Bayer-bokstaver | Greske og latinske Bayer-betegnelser som alpha Orionis. Snarvei: ⌘K deretter Y. | Bayer-bokstaver | Greske og latinske Bayer-betegnelser som alpha Orionis. Slå det av eller på her eller fra kartet med ⌘K deretter Y. |
 | Flamsteed-numre | Flamsteed-katalognumre på regionkartene. Snarvei: ⌘K deretter M. | Flamsteed-numre | Flamsteed-katalognumre på regionkartene. Slå det av eller på her eller fra kartet med ⌘K deretter M. |
+| Alle stjerneidentiteter der de får plass | Alle stjernenavn, bokstaver og nummer som får plass, ved siden av de vanlige etikettene | Vis alle stjerneidentiteter der de får plass | Skriver alle navn, Bayer-bokstaver og Flamsteed-nummer stjernekatalogen kjenner for stjernene på siden - av de slagene som er slått på over - der det er plass. De vanlige etikettene beholder plassene sine; en identitet uten ledig plass utelates, så ikke alle identiteter vises. Flamsteed-nummer vises fortsatt bare i felt smalere enn 12°. |
 
 ### Stjernebilder
 

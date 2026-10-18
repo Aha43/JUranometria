@@ -33,7 +33,50 @@ public record ChartOptions(boolean deepSkyObjects, boolean deepSkyLabels,
                            boolean galaxies, boolean openClusters,
                            boolean globularClusters, boolean nebulae,
                            boolean planetaryNebulae,
-                           ChartPalette palette) {
+                           ChartPalette palette,
+                           boolean allStarIdentities) {
+
+    /**
+     * The options with the all-star-identities density off - every
+     * value before #558, and the released default (ruling 1 on #557).
+     */
+    public ChartOptions(boolean deepSkyObjects, boolean deepSkyLabels,
+                        boolean constellationFigures,
+                        boolean constellationBoundaries,
+                        boolean constellationNames,
+                        boolean starNames, boolean bayerLetters,
+                        boolean flamsteedNumbers,
+                        boolean equatorialGrid,
+                        boolean titleBlock, boolean magnitudeKey,
+                        boolean galaxies, boolean openClusters,
+                        boolean globularClusters, boolean nebulae,
+                        boolean planetaryNebulae,
+                        ChartPalette palette) {
+        this(deepSkyObjects, deepSkyLabels, constellationFigures,
+                constellationBoundaries, constellationNames, starNames,
+                bayerLetters, flamsteedNumbers, equatorialGrid, titleBlock,
+                magnitudeKey, galaxies, openClusters, globularClusters,
+                nebulae, planetaryNebulae, palette, false);
+    }
+
+    /**
+     * Whether the page writes every star identity where it fits (#558,
+     * the rulings on #557): the reader's switch, and something for it to
+     * widen - at least one of names, letters and numbers on.
+     */
+    public boolean effectiveAllStarIdentities() {
+        return allStarIdentities && anyStarLabels();
+    }
+
+    /** The same options with the density switched on or off. */
+    public ChartOptions withAllStarIdentities(boolean on) {
+        return new ChartOptions(deepSkyObjects, deepSkyLabels,
+                constellationFigures, constellationBoundaries,
+                constellationNames, starNames, bayerLetters,
+                flamsteedNumbers, equatorialGrid, titleBlock, magnitudeKey,
+                galaxies, openClusters, globularClusters, nebulae,
+                planetaryNebulae, palette, on);
+    }
 
     /**
      * The same options as a globe page draws them (Sprint 32, issue
@@ -83,7 +126,8 @@ public record ChartOptions(boolean deepSkyObjects, boolean deepSkyLabels,
                         starNames, bayerLetters, flamsteedNumbers,
                         equatorialGrid, titleBlock, magnitudeKey,
                         galaxies, openClusters, globularClusters,
-                        nebulae, planetaryNebulae, palette)
+                        nebulae, planetaryNebulae, palette,
+                        allStarIdentities)
                 : this;
     }
 
@@ -252,7 +296,7 @@ public record ChartOptions(boolean deepSkyObjects, boolean deepSkyLabels,
                         : globularClusters,
                 family == SymbolFamily.NEBULAE ? enabled : nebulae,
                 family == SymbolFamily.PLANETARY_NEBULAE ? enabled
-                        : planetaryNebulae, palette);
+                        : planetaryNebulae, palette, allStarIdentities);
     }
 
     /** This chart on the other ground, nothing else touched. */
@@ -262,7 +306,7 @@ public record ChartOptions(boolean deepSkyObjects, boolean deepSkyLabels,
                 constellationNames, starNames, bayerLetters,
                 flamsteedNumbers, equatorialGrid, titleBlock, magnitudeKey,
                 galaxies, openClusters, globularClusters, nebulae,
-                planetaryNebulae, chosen);
+                planetaryNebulae, chosen, allStarIdentities);
     }
 
     /** Names depend on figures: names anchor on visible figure ink. */

@@ -215,6 +215,8 @@ public final class EvidenceContractMain {
                 "docs/studies/chart-instant-furniture/measurements.md");
         REPORT_MAINS.put("juranometria.tool.StarIdentityDensityStudyMain",
                 "docs/studies/star-identity-density/measurements.md");
+        REPORT_MAINS.put("juranometria.tool.AllStarIdentitiesMain",
+                "docs/studies/all-star-identities/measurements.md");
         REPORT_MAINS.put("juranometria.tool.CloserFieldsStudyMain",
                 "docs/studies/closer-fields/measurements.md");
         REPORT_MAINS.put("juranometria.tool.PrintableChartStudyMain",
@@ -411,6 +413,8 @@ public final class EvidenceContractMain {
                 "docs/studies/chart-instant-furniture/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.StarIdentityDensityStudyMain",
                 "docs/studies/star-identity-density/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.AllStarIdentitiesMain",
+                "docs/studies/all-star-identities/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.CloserFieldsStudyMain",
                 "docs/studies/closer-fields/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.JovianCartographyStudyMain",
@@ -595,6 +599,9 @@ public final class EvidenceContractMain {
             // An all-star-identities density (issue #557): production pages
             // labelled by the released policy and by two candidate orderings.
             "juranometria.tool.StarIdentityDensityStudyMain",
+            // All star identities where they fit, as built (issue #558): the
+            // accepted pages through the production component, off and on.
+            "juranometria.tool.AllStarIdentitiesMain",
             // The Venus table mock-ups and diagrams (issue #500): the
             // proposed table in study-only arrangements; widget-rendered
             // inspection, the controls- prefix.

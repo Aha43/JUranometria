@@ -76,6 +76,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Chart Options | JCheckBox | Star names | Traditional proper names such as Betelgeuse. Shortcut: <prefix> then S. | Traditional proper names such as Betelgeuse. Switch it here or from the chart with <pre... | hovered |
 | Chart Options | JCheckBox | Bayer letters | Greek and Latin Bayer designations such as alpha Orionis. Shortcut: <prefix> then Y. | Greek and Latin Bayer designations such as alpha Orionis. Switch it here or from the ch... | hovered |
 | Chart Options | JCheckBox | Flamsteed numbers | Flamsteed catalogue numbers on the regional charts. Shortcut: <prefix> then M. | Flamsteed catalogue numbers on the regional charts. Switch it here or from the chart wi... | hovered |
+| Chart Options | JCheckBox | All star identities where they fit | Every star name, letter and number that fits, beside the usual labels | Writes every name, Bayer letter and Flamsteed number the star catalogue knows for the s... | hovered |
 | Chart Options | JCheckBox | Constellation figures | The joined stick figures of the constellations. Shortcut: <prefix> then F. | The joined stick figures of the constellations. Switch it here or from the chart with <... | hovered |
 | Chart Options | JCheckBox | Constellation boundaries | The IAU boundaries, precessed from B1875. Shortcut: <prefix> then B. | The IAU boundaries, precessed from B1875. Switch it here or from the chart with <prefix... | hovered |
 | Chart Options | JCheckBox | Constellation names | The figure's name, drawn where the figure is. Shortcut: <prefix> then N. | The figure's name, drawn where the figure is. Switch it here or from the chart with <pr... | hovered |
@@ -162,7 +163,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 
 ## The audit
 
-**145 operable controls** across 17 surfaces: **89** hovered, **12** dynamic, **44** left to their own visible words, **0 undecided**.
+**146 operable controls** across 17 surfaces: **90** hovered, **12** dynamic, **44** left to their own visible words, **0 undecided**.
 
 **0** say the same words twice - a tooltip read back as a description. The seam refuses it, so this is zero or a finding.
 

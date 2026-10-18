@@ -1296,11 +1296,26 @@ public final class ChartRenderer {
      */
     public java.util.List<LabelPlacement.Placement> textPlacements(
             TextMetrics metrics, ChartScene scene, ChartOptions options) {
-        return new LabelPlacement(scene.viewport().widthPx(),
+        LabelPlacement placement = new LabelPlacement(scene.viewport().widthPx(),
                 scene.viewport().heightPx(),
                 textObstacles(metrics, scene, options),
-                textPage(scene))
-                .placeAll(textRequests(metrics, scene, options));
+                textPage(scene));
+        java.util.List<LabelPlacement.Placement> placed =
+                placement.placeAll(textRequests(metrics, scene, options));
+        java.util.List<LabelPlacement.Request> extras = LabelGeometry.extraStarLabels(
+                this, metrics.labels(), page(scene), options);
+        if (extras.isEmpty()) {
+            return placed;
+        }
+        // Every identity where it fits (#558, ruling 2 on #557): after the
+        // whole page - its stars, deep-sky labels and constellation names -
+        // each extra identity, brightest first, only into clean room.
+        java.util.List<LabelPlacement.Placement> all =
+                new java.util.ArrayList<>(placed);
+        for (LabelPlacement.Request extra : extras) {
+            all.add(placement.placeIfClean(extra));
+        }
+        return java.util.List.copyOf(all);
     }
 
     /**

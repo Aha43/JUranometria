@@ -82,7 +82,8 @@ class ViewReportTest {
                 nebulae on, planetary-nebulae on, constellation-figures \
                 on, constellation-boundaries on, constellation-names on, \
                 star-names on, bayer-letters on, flamsteed-numbers on, \
-                equatorial-grid on, title-block on, magnitude-key off
+                all-star-identities off, equatorial-grid on, title-block on, \
+                magnitude-key off
                 page-overrides: none
                 emphasis: meridian+equatorial-grid+horizon
                 modules: place-and-time, ecliptic

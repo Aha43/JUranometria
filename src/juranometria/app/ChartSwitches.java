@@ -133,6 +133,12 @@ public interface ChartSwitches {
         };
     }
 
+    /**
+     * All star identities where they fit (#558, ruled on #557): a Chart
+     * Options switch with no chart-keyboard letter (ruling 1).
+     */
+    String ALL_STAR_IDENTITIES = "chart.allStarIdentities";
+
     /** The ecliptic, as its own session switches it. */
     interface Ecliptic {
         boolean showing();
@@ -183,6 +189,7 @@ public interface ChartSwitches {
             case "chart.magnitudeKey" -> chart.magnitudeKey();
             case "chart.blackSky" -> chart.palette()
                     == juranometria.render.ChartPalette.BLACK_SKY;
+            case ALL_STAR_IDENTITIES -> chart.allStarIdentities();
             default -> throw new IllegalArgumentException(
                     "no such chart switch: " + id);
         };
@@ -199,6 +206,9 @@ public interface ChartSwitches {
             if (id.equals(idOf(family))) {
                 return from.withFamily(family, to);
             }
+        }
+        if (id.equals(ALL_STAR_IDENTITIES)) {
+            return from.withAllStarIdentities(to);
         }
         if (id.equals("chart.blackSky")) {
             return from.withPalette(to
@@ -235,7 +245,8 @@ public interface ChartSwitches {
                 boundaries, names, starNames, bayer, flamsteed, grid,
                 titleBlock, magnitudeKey, from.galaxies(),
                 from.openClusters(), from.globularClusters(),
-                from.nebulae(), from.planetaryNebulae(), from.palette());
+                from.nebulae(), from.planetaryNebulae(), from.palette(),
+                from.allStarIdentities());
     }
 
     private static String idOf(SymbolFamily family) {

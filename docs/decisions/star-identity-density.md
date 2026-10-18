@@ -162,3 +162,27 @@ All six proposals of section 3 accepted as written:
 6. **Searched and selected stars - accepted.** No further guarantee.
 
 #558 implements this design.
+
+## As built (#558)
+
+- `ChartOptions.allStarIdentities`, off by default, stored as
+  `chart.allStarIdentities` (an older store reads off); effective only
+  while one of the three identity switches is on.
+- `StarLabelPolicy.everyIdentity`: the name and any Bayer letter at every
+  field and magnitude; the Flamsteed number at any magnitude, below 12°
+  only.
+- `LabelGeometry.starLabels` writes each star the released policy labels
+  with its full identity, in its released place in the order;
+  `LabelGeometry.extraStarLabels` asks for the rest, brightest first; the
+  renderer places them after the whole page with
+  `LabelPlacement.placeIfClean` - the first clean candidate or nothing.
+- Chart Options and the Controller hold one box (one `ChartOptionsControls`
+  over one controller), after Flamsteed numbers, unavailable while the
+  three switches are off; hover and accessible name in both languages; no
+  chart-keyboard letter, so its hover promises no shortcut. The view
+  report's `options:` line states `all-star-identities on|off`.
+- Evidence: `docs/studies/all-star-identities/` - the accepted pages
+  drawn by the production component, off and on; the packaged journey
+  *all star identities OK*; `AllStarIdentitiesTest` and
+  `AllStarIdentitiesOptionTest`.
+

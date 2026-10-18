@@ -86,7 +86,11 @@ public interface ChartOptionsStore {
                         // the released white paper, never a launch
                         // failure (docs/decisions/black-sky.md).
                         ChartPalette.stored(
-                                node.get("chart.palette", null)));
+                                node.get("chart.palette", null)),
+                        // All star identities where they fit (#558):
+                        // off by default, so every store before it reads
+                        // as the released page (ruling 1 on #557).
+                        offByDefaultFlag(node, "chart.allStarIdentities"));
             }
 
             @Override
@@ -124,6 +128,8 @@ public interface ChartOptionsStore {
                 node.put("chart.planetaryNebulae",
                         Boolean.toString(options.planetaryNebulae()));
                 node.put("chart.palette", options.palette().storedAs());
+                node.put("chart.allStarIdentities",
+                        Boolean.toString(options.allStarIdentities()));
             }
         };
     }

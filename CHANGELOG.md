@@ -7,6 +7,15 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**All star identities where they fit (#558, ruled on #557).** A new
+Chart Options switch, under Stars and in the Controller, writes every
+name, Bayer letter and Flamsteed number the star catalogue knows for
+the stars on the page - of the kinds switched on - wherever one fits.
+The usual labels keep their places, and each star they name is written
+in full (Mesarthim, not just γ¹); further identities take only free
+room and are left out where there is none. Bare Flamsteed numbers still
+appear only below 12°. Off by default and remembered. In both languages.
+
 **Emphasis survives zooming and panning (#537).** Raised constellation
 figures or boundaries stay raised when you zoom or pan to a
 page that draws none of them, can still be ticked or unticked there,

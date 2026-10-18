@@ -106,6 +106,15 @@ public final class ChartOptionsControls {
                 said.say("chartoptions.flamsteedNumbers.a11y"),
                 said.say("chartoptions.flamsteedNumbers.explain"),
                 "chart.flamsteedNumbers", said);
+        // All star identities where they fit (#558, ruling 1 on #557):
+        // a density over the three identity switches, after them.
+        JCheckBox allIdentities = ChartOptionsDialog.checkBoxWithoutShortcut(
+                said.say("chartoptions.allStarIdentities.label"), 'A',
+                initial.allStarIdentities(),
+                said.say("chartoptions.allStarIdentities.a11y"),
+                said.say("chartoptions.allStarIdentities.hover"),
+                said.say("chartoptions.allStarIdentities.explain"),
+                "allStarIdentities");
         JCheckBox grid = ChartOptionsDialog.checkBox(
                 said.say("chartoptions.equatorialGrid.label"), 'E',
                 initial.equatorialGrid(),
@@ -143,6 +152,7 @@ public final class ChartOptionsControls {
         switches.put(starNames, "chart.starNames");
         switches.put(bayerLetters, "chart.bayerLetters");
         switches.put(flamsteedNumbers, "chart.flamsteedNumbers");
+        switches.put(allIdentities, ChartSwitches.ALL_STAR_IDENTITIES);
         switches.put(figures, ChartKeys.FIGURES);
         switches.put(boundaries, "chart.constellationBoundaries");
         switches.put(names, "chart.constellationNames");
@@ -173,6 +183,10 @@ public final class ChartOptionsControls {
             }
             labels.setEnabled(current.deepSkyObjects());
             names.setEnabled(current.constellationFigures());
+            // Nothing to widen while names, letters and numbers are all
+            // off (ruling 1 on #557): unavailable, as a family is while
+            // its master is off; it keeps what the reader chose.
+            allIdentities.setEnabled(current.anyStarLabels());
             for (JCheckBox family : families) {
                 family.setEnabled(current.deepSkyObjects());
             }
@@ -184,7 +198,7 @@ public final class ChartOptionsControls {
                                 labels, said))),
                 new Subject("stars", said.say("chartoptions.tab.stars"),
                         marked(ChartOptionsDialog.column(starNames,
-                                bayerLetters, flamsteedNumbers))),
+                                bayerLetters, flamsteedNumbers, allIdentities))),
                 new Subject("constellations",
                         said.say("chartoptions.tab.constellations"),
                         marked(ChartOptionsDialog.column(figures, boundaries,

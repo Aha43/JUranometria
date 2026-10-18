@@ -133,6 +133,13 @@ public final class LabelGeometry {
             if (text == null) {
                 continue;
             }
+            // Every identity where it fits (#558, ruling 2 on #557): a
+            // star the released policy labels keeps its released place
+            // in the order, written with its full identity.
+            if (!target && options.effectiveAllStarIdentities()) {
+                text = policy.everyIdentity(star).text(options.starNames(),
+                        options.bayerLetters(), options.flamsteedNumbers());
+            }
             var plane = projection.project(star.position());
             if (plane.isEmpty()) {
                 continue;
@@ -153,6 +160,61 @@ public final class LabelGeometry {
                     star.id(), text, at.x(), at.y(),
                     around(metrics, text, at, reach), star.id(), null,
                     target, star.magnitude()));
+        }
+        return List.copyOf(asked);
+    }
+
+    /**
+     * The identities the density adds (#558, ruling 2 on #557): every star
+     * on the page, within its limit, that the released policy does not
+     * label but whose identity the switched-on forms can write -
+     * brightest first, to be placed after everything else and only into
+     * clean room. Empty while the density is off.
+     */
+    public static List<LabelPlacement.Request> extraStarLabels(
+            ChartRenderer renderer, FontMetrics metrics, DrawnPage page,
+            ChartOptions options) {
+        if (!options.effectiveAllStarIdentities()) {
+            return List.of();
+        }
+        ChartScene scene = page.scene();
+        ViewportMapping mapping = new ViewportMapping(page);
+        Projection projection = page.projection();
+        StarLabelPolicy policy =
+                new StarLabelPolicy(scene.viewport().fieldWidthDegrees());
+        List<Star> stars = new ArrayList<>(scene.stars());
+        stars.sort(Comparator.comparingDouble(Star::magnitude)
+                .thenComparing(Star::id));
+        List<LabelPlacement.Request> asked = new ArrayList<>();
+        for (Star star : stars) {
+            if (star.magnitude() > scene.limitingMagnitude()) {
+                continue;
+            }
+            boolean target = scene.targetIdentity() != null
+                    && scene.targetIdentity().equals(star.id());
+            if (target || policy.qualifying(star).text(options.starNames(),
+                    options.bayerLetters(), options.flamsteedNumbers()) != null) {
+                continue;
+            }
+            String text = policy.everyIdentity(star).text(options.starNames(),
+                    options.bayerLetters(), options.flamsteedNumbers());
+            if (text == null) {
+                continue;
+            }
+            var plane = projection.project(star.position());
+            if (plane.isEmpty()) {
+                continue;
+            }
+            PixelPoint at = mapping.toPixel(plane.get());
+            if (at.x() < 0 || at.x() >= scene.viewport().widthPx()
+                    || at.y() < 0 || at.y() >= scene.viewport().heightPx()) {
+                continue;
+            }
+            double reach = StarSizePolicyOf(renderer, star);
+            asked.add(new LabelPlacement.Request(LabelPlacement.Family.STAR,
+                    star.id(), text, at.x(), at.y(),
+                    around(metrics, text, at, reach), star.id(), null, false,
+                    star.magnitude()));
         }
         return List.copyOf(asked);
     }

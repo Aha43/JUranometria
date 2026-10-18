@@ -76,11 +76,13 @@ The gate test pins all of it: zero unprotected, and the
 non-preference locals list is exactly `SwingSession.java`.
 
 The standing counts, quoted from the scanner so the gate can hold
-this document to them: **76 files** touch process-wide state —
-**36** use the shared guard, **39** restore locally,
+this document to them: **77 files** touch process-wide state —
+**37** use the shared guard, **39** restore locally,
 **0 flagged unprotected** — and **57 files** depend on a display,
 of which **19** state a focus premise and **34** a reachability
-premise through the shared route helper. (#259 added one
+premise through the shared route helper. (#558 added one
+guard-protected toucher: the all-star-identities option test, whose
+scratch preference node is restored by the shared guard. #259 added one
 guard-protected toucher and one display journey: the chart-instant
 journey, which starts the real application on a counting clock and
 presses Update to now on every route a reader has, its premises
