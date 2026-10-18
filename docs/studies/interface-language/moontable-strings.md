@@ -39,12 +39,18 @@ The fresh state: a single row at the instant Place and Time holds. A waxing cres
 
 ![](moontable-en-1-instant.png)
 
-Packed 1489 × 425 px.
+Packed 1489 × 466 px.
 
 | shown, hovered or spoken |
 |---|
 | The Moon |
 | Where the Moon is, computed from the bundled ephemeris for the observing place and instant set in Place and Time: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
+| Agreement with the chart |
+| Same place and instant as the chart: 59.91° N · 10.75° E, 2026-06-21 10:00:00 UTC |
+| Update from Place and Time |
+| Read the place and instant from Place and Time again |
+| Read the observer and instant from Place and Time again |
+| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
 | Observer at latitude 59.91, longitude 10.75 east; instant 2026-06-21 10:00:00 UTC, from Place and Time. |
 | This instant |
 | One row, at the instant set in Place and Time |
@@ -88,10 +94,6 @@ Packed 1489 × 425 px.
 | The Moon's computed quantities |
 | Each row is one instant. The columns are the instant in UTC; right ascension and declination in the J2000 frame the chart is drawn in; altitude and azimuth without refraction; distance; apparent diameter; the illuminated fraction; the phase; the elongation from the Sun with the side of the Sun the Moon is on; and the lit side, the direction the light falls from. |
 | Dates before 1972-01-01 and after 2027-06-28 use an estimated clock correction. After 2026, uncertainty in local horizon coordinates cannot yet be stated precisely. The effect on the J2000 chart position remains below 90″ through 2100 under the adopted model. |
-| Update from Place and Time |
-| Read the place and instant from Place and Time again |
-| Read the observer and instant from Place and Time again |
-| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
 | Close |
 | Close the Moon table |
 | Closes the table. Nothing is changed or remembered; Place and Time keeps the place and instant. |
@@ -102,12 +104,19 @@ Daily rows from the instant, and an end that is not on the grid, added last and 
 
 ![](moontable-en-2-range.png)
 
-Packed 1489 × 425 px.
+Packed 1489 × 483 px.
 
 | shown, hovered or spoken |
 |---|
 | The Moon |
 | Where the Moon is, computed from the bundled ephemeris for the observing place and instant set in Place and Time: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
+| Agreement with the chart |
+| This range: 59.91° N · 10.75° E, from 2026-06-21 10:00:00 to 2026-06-24 07:30:00 UTCChart: 59.91° N · 10.75° E, 2026-06-21 10:00:00 UTC |
+| This range: 59.91° N · 10.75° E, from 2026-06-21 10:00:00 to 2026-06-24 07:30:00 UTC Chart: 59.91° N · 10.75° E, 2026-06-21 10:00:00 UTC |
+| Update from Place and Time |
+| Read the place and instant from Place and Time again |
+| Read the observer and instant from Place and Time again |
+| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
 | Observer at latitude 59.91, longitude 10.75 east; instant 2026-06-21 10:00:00 UTC, from Place and Time. |
 | This instant |
 | One row, at the instant set in Place and Time |
@@ -154,10 +163,6 @@ Packed 1489 × 425 px.
 | The Moon's computed quantities |
 | Each row is one instant. The columns are the instant in UTC; right ascension and declination in the J2000 frame the chart is drawn in; altitude and azimuth without refraction; distance; apparent diameter; the illuminated fraction; the phase; the elongation from the Sun with the side of the Sun the Moon is on; and the lit side, the direction the light falls from. |
 | Dates before 1972-01-01 and after 2027-06-28 use an estimated clock correction. After 2026, uncertainty in local horizon coordinates cannot yet be stated precisely. The effect on the J2000 chart position remains below 90″ through 2100 under the adopted model. |
-| Update from Place and Time |
-| Read the place and instant from Place and Time again |
-| Read the observer and instant from Place and Time again |
-| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
 | Close |
 | Close the Moon table |
 | Closes the table. Nothing is changed or remembered; Place and Time keeps the place and instant. |
@@ -168,12 +173,18 @@ The end is before the start. The table is empty and the status line says why; no
 
 ![](moontable-en-3-refused.png)
 
-Packed 1489 × 425 px.
+Packed 1489 × 466 px.
 
 | shown, hovered or spoken |
 |---|
 | The Moon |
 | Where the Moon is, computed from the bundled ephemeris for the observing place and instant set in Place and Time: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
+| Agreement with the chart |
+| Chart: 59.91° N · 10.75° E, 2026-06-21 10:00:00 UTC |
+| Update from Place and Time |
+| Read the place and instant from Place and Time again |
+| Read the observer and instant from Place and Time again |
+| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
 | Observer at latitude 59.91, longitude 10.75 east; instant 2026-06-21 10:00:00 UTC, from Place and Time. |
 | This instant |
 | One row, at the instant set in Place and Time |
@@ -216,10 +227,6 @@ Packed 1489 × 425 px.
 | The Moon's computed quantities |
 | Each row is one instant. The columns are the instant in UTC; right ascension and declination in the J2000 frame the chart is drawn in; altitude and azimuth without refraction; distance; apparent diameter; the illuminated fraction; the phase; the elongation from the Sun with the side of the Sun the Moon is on; and the lit side, the direction the light falls from. |
 | Dates before 1972-01-01 and after 2027-06-28 use an estimated clock correction. After 2026, uncertainty in local horizon coordinates cannot yet be stated precisely. The effect on the J2000 chart position remains below 90″ through 2100 under the adopted model. |
-| Update from Place and Time |
-| Read the place and instant from Place and Time again |
-| Read the observer and instant from Place and Time again |
-| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
 | Close |
 | Close the Moon table |
 | Closes the table. Nothing is changed or remembered; Place and Time keeps the place and instant. |
@@ -230,12 +237,18 @@ A southern observer at Espenak's full-Moon instant: the Moon 74° high, 99.9 % l
 
 ![](moontable-en-4-capetown.png)
 
-Packed 1489 × 425 px.
+Packed 1489 × 466 px.
 
 | shown, hovered or spoken |
 |---|
 | The Moon |
 | Where the Moon is, computed from the bundled ephemeris for the observing place and instant set in Place and Time: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
+| Agreement with the chart |
+| Same place and instant as the chart: 33.93° S · 18.42° E, 2026-06-29 23:57:00 UTC |
+| Update from Place and Time |
+| Read the place and instant from Place and Time again |
+| Read the observer and instant from Place and Time again |
+| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
 | Observer at latitude -33.93, longitude 18.42 east; instant 2026-06-29 23:57:00 UTC, from Place and Time. |
 | This instant |
 | One row, at the instant set in Place and Time |
@@ -279,10 +292,6 @@ Packed 1489 × 425 px.
 | The Moon's computed quantities |
 | Each row is one instant. The columns are the instant in UTC; right ascension and declination in the J2000 frame the chart is drawn in; altitude and azimuth without refraction; distance; apparent diameter; the illuminated fraction; the phase; the elongation from the Sun with the side of the Sun the Moon is on; and the lit side, the direction the light falls from. |
 | Dates before 1972-01-01 and after 2027-06-28 use an estimated clock correction. After 2026, uncertainty in local horizon coordinates cannot yet be stated precisely. The effect on the J2000 chart position remains below 90″ through 2100 under the adopted model. |
-| Update from Place and Time |
-| Read the place and instant from Place and Time again |
-| Read the observer and instant from Place and Time again |
-| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
 | Close |
 | Close the Moon table |
 | Closes the table. Nothing is changed or remembered; Place and Time keeps the place and instant. |
@@ -291,12 +300,18 @@ Packed 1489 × 425 px.
 
 ![](moontable-en-5-instant-dark.png)
 
-Packed 1489 × 425 px.
+Packed 1489 × 466 px.
 
 | shown, hovered or spoken |
 |---|
 | The Moon |
 | Where the Moon is, computed from the bundled ephemeris for the observing place and instant set in Place and Time: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
+| Agreement with the chart |
+| Same place and instant as the chart: 59.91° N · 10.75° E, 2026-06-21 10:00:00 UTC |
+| Update from Place and Time |
+| Read the place and instant from Place and Time again |
+| Read the observer and instant from Place and Time again |
+| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
 | Observer at latitude 59.91, longitude 10.75 east; instant 2026-06-21 10:00:00 UTC, from Place and Time. |
 | This instant |
 | One row, at the instant set in Place and Time |
@@ -340,10 +355,6 @@ Packed 1489 × 425 px.
 | The Moon's computed quantities |
 | Each row is one instant. The columns are the instant in UTC; right ascension and declination in the J2000 frame the chart is drawn in; altitude and azimuth without refraction; distance; apparent diameter; the illuminated fraction; the phase; the elongation from the Sun with the side of the Sun the Moon is on; and the lit side, the direction the light falls from. |
 | Dates before 1972-01-01 and after 2027-06-28 use an estimated clock correction. After 2026, uncertainty in local horizon coordinates cannot yet be stated precisely. The effect on the J2000 chart position remains below 90″ through 2100 under the adopted model. |
-| Update from Place and Time |
-| Read the place and instant from Place and Time again |
-| Read the observer and instant from Place and Time again |
-| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
 | Close |
 | Close the Moon table |
 | Closes the table. Nothing is changed or remembered; Place and Time keeps the place and instant. |
@@ -372,12 +383,18 @@ The fresh state: a single row at the instant Place and Time holds. A waxing cres
 
 ![](moontable-nb-NO-6-instant.png)
 
-Packed 1489 × 425 px.
+Packed 1489 × 466 px.
 
 | shown, hovered or spoken |
 |---|
 | Månen |
 | Hvor Månen er, beregnet fra den medfølgende efemeriden for observasjonsstedet og tidspunktet satt i Sted og tid: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
+| Samsvar med kartet |
+| Samme sted og tidspunkt som kartet: 59.91° N · 10.75° Ø, 2026-06-21 10:00:00 UTC |
+| Oppdater fra Sted og tid |
+| Les sted og tidspunkt fra Sted og tid på nytt |
+| Les observatør og tidspunkt fra Sted og tid på nytt |
+| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
 | Observatør på bredde 59,91, lengde 10,75 øst; tidspunkt 2026-06-21 10:00:00 UTC, fra Sted og tid. |
 | Dette tidspunktet |
 | Én rad, ved tidspunktet satt i Sted og tid |
@@ -421,10 +438,6 @@ Packed 1489 × 425 px.
 | Månens beregnede størrelser |
 | Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; høyde og asimut uten refraksjon; avstand; tilsynelatende diameter; belyst andel; fase; elongasjon fra Solen med hvilken side av Solen Månen står på; og belyst side, retningen lyset faller fra. |
 | Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 90″ fram til 2100 med den valgte modellen. |
-| Oppdater fra Sted og tid |
-| Les sted og tidspunkt fra Sted og tid på nytt |
-| Les observatør og tidspunkt fra Sted og tid på nytt |
-| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
 | Lukk |
 | Lukk månetabellen |
 | Lukker tabellen. Ingenting endres eller huskes; Sted og tid beholder stedet og tidspunktet. |
@@ -435,12 +448,19 @@ Daily rows from the instant, and an end that is not on the grid, added last and 
 
 ![](moontable-nb-NO-7-range.png)
 
-Packed 1489 × 425 px.
+Packed 1489 × 483 px.
 
 | shown, hovered or spoken |
 |---|
 | Månen |
 | Hvor Månen er, beregnet fra den medfølgende efemeriden for observasjonsstedet og tidspunktet satt i Sted og tid: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
+| Samsvar med kartet |
+| Dette tidsrommet: 59.91° N · 10.75° Ø, fra 2026-06-21 10:00:00 til 2026-06-24 07:30:00 UTCKartet: 59.91° N · 10.75° Ø, 2026-06-21 10:00:00 UTC |
+| Dette tidsrommet: 59.91° N · 10.75° Ø, fra 2026-06-21 10:00:00 til 2026-06-24 07:30:00 UTC Kartet: 59.91° N · 10.75° Ø, 2026-06-21 10:00:00 UTC |
+| Oppdater fra Sted og tid |
+| Les sted og tidspunkt fra Sted og tid på nytt |
+| Les observatør og tidspunkt fra Sted og tid på nytt |
+| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
 | Observatør på bredde 59,91, lengde 10,75 øst; tidspunkt 2026-06-21 10:00:00 UTC, fra Sted og tid. |
 | Dette tidspunktet |
 | Én rad, ved tidspunktet satt i Sted og tid |
@@ -487,10 +507,6 @@ Packed 1489 × 425 px.
 | Månens beregnede størrelser |
 | Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; høyde og asimut uten refraksjon; avstand; tilsynelatende diameter; belyst andel; fase; elongasjon fra Solen med hvilken side av Solen Månen står på; og belyst side, retningen lyset faller fra. |
 | Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 90″ fram til 2100 med den valgte modellen. |
-| Oppdater fra Sted og tid |
-| Les sted og tidspunkt fra Sted og tid på nytt |
-| Les observatør og tidspunkt fra Sted og tid på nytt |
-| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
 | Lukk |
 | Lukk månetabellen |
 | Lukker tabellen. Ingenting endres eller huskes; Sted og tid beholder stedet og tidspunktet. |
@@ -501,12 +517,18 @@ The end is before the start. The table is empty and the status line says why; no
 
 ![](moontable-nb-NO-8-refused.png)
 
-Packed 1489 × 425 px.
+Packed 1489 × 466 px.
 
 | shown, hovered or spoken |
 |---|
 | Månen |
 | Hvor Månen er, beregnet fra den medfølgende efemeriden for observasjonsstedet og tidspunktet satt i Sted og tid: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
+| Samsvar med kartet |
+| Kartet: 59.91° N · 10.75° Ø, 2026-06-21 10:00:00 UTC |
+| Oppdater fra Sted og tid |
+| Les sted og tidspunkt fra Sted og tid på nytt |
+| Les observatør og tidspunkt fra Sted og tid på nytt |
+| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
 | Observatør på bredde 59,91, lengde 10,75 øst; tidspunkt 2026-06-21 10:00:00 UTC, fra Sted og tid. |
 | Dette tidspunktet |
 | Én rad, ved tidspunktet satt i Sted og tid |
@@ -549,10 +571,6 @@ Packed 1489 × 425 px.
 | Månens beregnede størrelser |
 | Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; høyde og asimut uten refraksjon; avstand; tilsynelatende diameter; belyst andel; fase; elongasjon fra Solen med hvilken side av Solen Månen står på; og belyst side, retningen lyset faller fra. |
 | Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 90″ fram til 2100 med den valgte modellen. |
-| Oppdater fra Sted og tid |
-| Les sted og tidspunkt fra Sted og tid på nytt |
-| Les observatør og tidspunkt fra Sted og tid på nytt |
-| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
 | Lukk |
 | Lukk månetabellen |
 | Lukker tabellen. Ingenting endres eller huskes; Sted og tid beholder stedet og tidspunktet. |
@@ -563,12 +581,18 @@ A southern observer at Espenak's full-Moon instant: the Moon 74° high, 99.9 % l
 
 ![](moontable-nb-NO-9-capetown.png)
 
-Packed 1489 × 425 px.
+Packed 1489 × 466 px.
 
 | shown, hovered or spoken |
 |---|
 | Månen |
 | Hvor Månen er, beregnet fra den medfølgende efemeriden for observasjonsstedet og tidspunktet satt i Sted og tid: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
+| Samsvar med kartet |
+| Samme sted og tidspunkt som kartet: 33.93° S · 18.42° Ø, 2026-06-29 23:57:00 UTC |
+| Oppdater fra Sted og tid |
+| Les sted og tidspunkt fra Sted og tid på nytt |
+| Les observatør og tidspunkt fra Sted og tid på nytt |
+| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
 | Observatør på bredde -33,93, lengde 18,42 øst; tidspunkt 2026-06-29 23:57:00 UTC, fra Sted og tid. |
 | Dette tidspunktet |
 | Én rad, ved tidspunktet satt i Sted og tid |
@@ -612,10 +636,6 @@ Packed 1489 × 425 px.
 | Månens beregnede størrelser |
 | Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; høyde og asimut uten refraksjon; avstand; tilsynelatende diameter; belyst andel; fase; elongasjon fra Solen med hvilken side av Solen Månen står på; og belyst side, retningen lyset faller fra. |
 | Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 90″ fram til 2100 med den valgte modellen. |
-| Oppdater fra Sted og tid |
-| Les sted og tidspunkt fra Sted og tid på nytt |
-| Les observatør og tidspunkt fra Sted og tid på nytt |
-| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
 | Lukk |
 | Lukk månetabellen |
 | Lukker tabellen. Ingenting endres eller huskes; Sted og tid beholder stedet og tidspunktet. |
@@ -624,12 +644,18 @@ Packed 1489 × 425 px.
 
 ![](moontable-nb-NO-10-instant-dark.png)
 
-Packed 1489 × 425 px.
+Packed 1489 × 466 px.
 
 | shown, hovered or spoken |
 |---|
 | Månen |
 | Hvor Månen er, beregnet fra den medfølgende efemeriden for observasjonsstedet og tidspunktet satt i Sted og tid: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
+| Samsvar med kartet |
+| Samme sted og tidspunkt som kartet: 59.91° N · 10.75° Ø, 2026-06-21 10:00:00 UTC |
+| Oppdater fra Sted og tid |
+| Les sted og tidspunkt fra Sted og tid på nytt |
+| Les observatør og tidspunkt fra Sted og tid på nytt |
+| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
 | Observatør på bredde 59,91, lengde 10,75 øst; tidspunkt 2026-06-21 10:00:00 UTC, fra Sted og tid. |
 | Dette tidspunktet |
 | Én rad, ved tidspunktet satt i Sted og tid |
@@ -673,10 +699,6 @@ Packed 1489 × 425 px.
 | Månens beregnede størrelser |
 | Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; høyde og asimut uten refraksjon; avstand; tilsynelatende diameter; belyst andel; fase; elongasjon fra Solen med hvilken side av Solen Månen står på; og belyst side, retningen lyset faller fra. |
 | Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 90″ fram til 2100 med den valgte modellen. |
-| Oppdater fra Sted og tid |
-| Les sted og tidspunkt fra Sted og tid på nytt |
-| Les observatør og tidspunkt fra Sted og tid på nytt |
-| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
 | Lukk |
 | Lukk månetabellen |
 | Lukker tabellen. Ingenting endres eller huskes; Sted og tid beholder stedet og tidspunktet. |

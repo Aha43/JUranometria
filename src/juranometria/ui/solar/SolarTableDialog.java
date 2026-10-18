@@ -250,6 +250,15 @@ public final class SolarTableDialog extends JDialog {
 
             JPanel top = new JPanel();
             top.setLayout(new BoxLayout(top, BoxLayout.Y_AXIS));
+            // The agreement line opens the dialog as it opens the
+            // Controller's group (#259, ruling 5 on #556), Update from
+            // Place and Time in it when the table differs.
+            JComponent agreement = controls.agreementLine();
+            agreement.setAlignmentX(0.0f);
+            agreement.setMaximumSize(new Dimension(Integer.MAX_VALUE,
+                    Integer.MAX_VALUE));
+            top.add(agreement);
+            top.add(Box.createVerticalStrut(8));
             observerNote.setAlignmentX(0.0f);
             top.add(observerNote);
             top.add(Box.createVerticalStrut(8));
@@ -306,9 +315,7 @@ public final class SolarTableDialog extends JDialog {
             JPanel buttons = new JPanel();
             buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
             buttons.setAlignmentX(0.0f);
-            buttons.add(update);
             if (controls.centreOnChart != null) {
-                buttons.add(Box.createHorizontalStrut(8));
                 buttons.add(controls.centreOnChart);
             }
             buttons.add(Box.createHorizontalGlue());

@@ -762,6 +762,10 @@ public final class ChartRenderer {
         if (options.magnitudeKey()) {
             drawMagnitudeKey(g, scene, palette);
         }
+        // Then the modules' furniture, in the corners the page gave it
+        // (#259): opaque, in the title block's face, and absent from a
+        // page carrying none, which is therefore the released page.
+        drawFurniture(g, scene, options, palette);
         g.setClip(null);
 
         g.setColor(palette.frameInk());
@@ -1178,12 +1182,21 @@ public final class ChartRenderer {
     public EquatorialGrid.Grid gridFor(FontMetrics metrics,
                                        ChartScene scene,
                                        ChartOptions options) {
+        java.util.List<java.awt.Rectangle> reserved = new java.util.ArrayList<>();
+        reserved.add(options.titleBlock() ? titleBlockBounds(metrics, scene)
+                : null);
+        reserved.add(options.magnitudeKey()
+                ? magnitudeKeyBounds(metrics, scene, starSizePolicy)
+                : null);
+        // The modules' furniture reserves on the same terms (#259):
+        // only a box that will draw, so a page carrying none is the
+        // released page's grid to the label.
+        for (ChartFurniture.Placed placed
+                : furnitureLayout(metrics, scene, options)) {
+            reserved.add(placed.covers());
+        }
         return EquatorialGrid.gridFor(page(scene),
-                options.titleBlock() ? titleBlockBounds(metrics, scene)
-                        : null,
-                options.magnitudeKey()
-                        ? magnitudeKeyBounds(metrics, scene, starSizePolicy)
-                        : null);
+                reserved.toArray(new java.awt.Rectangle[0]));
     }
 
     /**
@@ -2766,6 +2779,158 @@ public final class ChartRenderer {
             g.setFont(i == 0 ? TITLE_FONT : LABEL_FONT);
             g.drawString(lines[i], box.x + TITLE_PADDING_PX,
                     baseline + i * lineHeight);
+        }
+    }
+
+    /** The furniture the page is asked to carry; none until a chart offers some. */
+    private java.util.function.Supplier<java.util.List<ChartFurniture>> furniture =
+            java.util.List::of;
+
+    /**
+     * What furniture beyond its own the page carries (Sprint 51, issue
+     * #259): asked whenever the page is laid out, so a box whose text
+     * changed is laid out afresh. {@code null} carries none.
+     */
+    public void setFurniture(
+            java.util.function.Supplier<java.util.List<ChartFurniture>> offered) {
+        this.furniture = offered == null ? java.util.List::of : offered;
+    }
+
+    /** The space between a framed action's words and its frame. */
+    private static final int ACTION_INSET_PX = 4;
+
+    /**
+     * Where each box of furniture goes on this page (ruling 3 on #556):
+     * in the order offered, each takes the first corner - the lower
+     * right, then the upper right while the magnitude key does not hold
+     * it, then the upper left - where it fits inside the margins and
+     * meets no furniture that will draw, the title block, the key or a
+     * box placed before it. A box no corner can hold is refused, as the
+     * title block is on a page too small for it.
+     */
+    public java.util.List<ChartFurniture.Placed> furnitureLayout(
+            FontMetrics metrics, ChartScene scene, ChartOptions options) {
+        java.util.List<ChartFurniture> offered = furniture.get();
+        if (offered == null || offered.isEmpty()) {
+            return java.util.List.of();
+        }
+        java.util.List<java.awt.Rectangle> taken = new java.util.ArrayList<>();
+        if (options.titleBlock()) {
+            java.awt.Rectangle block = titleBlockBounds(metrics, scene);
+            if (block != null) {
+                taken.add(block);
+            }
+        }
+        java.awt.Rectangle key = options.magnitudeKey()
+                ? magnitudeKeyBounds(metrics, scene, starSizePolicy) : null;
+        if (key != null) {
+            // The key's border is drawn one pixel outside its box.
+            taken.add(new java.awt.Rectangle(key.x, key.y, key.width + 1,
+                    key.height + 1));
+        }
+        FontMetrics bold = titleFontMetrics(metrics);
+        int pageWidth = scene.viewport().widthPx();
+        int pageHeight = scene.viewport().heightPx();
+        java.util.List<ChartFurniture.Placed> placed = new java.util.ArrayList<>();
+        for (ChartFurniture box : offered) {
+            int lineHeight = metrics.getHeight();
+            int textWidth = bold.stringWidth(box.heading());
+            for (String line : box.lines()) {
+                textWidth = Math.max(textWidth, metrics.stringWidth(line));
+            }
+            int actionWidth = box.action() == null ? 0
+                    : metrics.stringWidth(box.action()) + 2 * ACTION_INSET_PX;
+            textWidth = Math.max(textWidth, actionWidth + 1);
+            int rows = 1 + box.lines().size();
+            int boxWidth = textWidth + 2 * TITLE_PADDING_PX;
+            int boxHeight = rows * lineHeight + 2 * TITLE_PADDING_PX
+                    + (box.action() == null ? 0 : lineHeight + 2 + 4);
+            if (boxWidth + 2 * TITLE_MARGIN_PX > pageWidth
+                    || boxHeight + 2 * TITLE_MARGIN_PX > pageHeight) {
+                continue;
+            }
+            for (ChartFurniture.Corner corner : ChartFurniture.Corner.values()) {
+                if (corner == ChartFurniture.Corner.UPPER_RIGHT && key != null) {
+                    continue;
+                }
+                // The edges the page's own furniture keeps: the key's
+                // right edge, the title block's foot.
+                int x = corner == ChartFurniture.Corner.UPPER_LEFT
+                        ? TITLE_MARGIN_PX : pageWidth - TITLE_MARGIN_PX - boxWidth;
+                int y = corner == ChartFurniture.Corner.LOWER_RIGHT
+                        ? pageHeight - TITLE_MARGIN_PX - boxHeight : TITLE_MARGIN_PX;
+                java.awt.Rectangle layout = new java.awt.Rectangle(x, y, boxWidth,
+                        boxHeight);
+                java.awt.Rectangle covers = new java.awt.Rectangle(x, y,
+                        boxWidth + 1, boxHeight + 1);
+                boolean clear = true;
+                for (java.awt.Rectangle other : taken) {
+                    if (covers.intersects(other)) {
+                        clear = false;
+                        break;
+                    }
+                }
+                if (!clear) {
+                    continue;
+                }
+                java.awt.Rectangle action = null;
+                if (box.action() != null) {
+                    int top = y + TITLE_PADDING_PX + rows * lineHeight + 4;
+                    action = new java.awt.Rectangle(x + TITLE_PADDING_PX, top,
+                            actionWidth, lineHeight + 2);
+                }
+                placed.add(new ChartFurniture.Placed(box, corner, layout, covers,
+                        action));
+                taken.add(covers);
+                break;
+            }
+        }
+        return java.util.List.copyOf(placed);
+    }
+
+    /** Draws each placed box of furniture, opaque, in the title block's face and ink. */
+    private void drawFurniture(Graphics2D g, ChartScene scene, ChartOptions options,
+                               ChartPalette palette) {
+        java.util.List<ChartFurniture.Placed> placed =
+                furnitureLayout(g.getFontMetrics(LABEL_FONT), scene, options);
+        if (placed.isEmpty()) {
+            return;
+        }
+        Graphics2D g2 = (Graphics2D) g.create();
+        try {
+            g2.setFont(LABEL_FONT);
+            FontMetrics metrics = g2.getFontMetrics();
+            int lineHeight = metrics.getHeight();
+            for (ChartFurniture.Placed one : placed) {
+                java.awt.Rectangle box = one.box();
+                g2.setColor(palette.ground());
+                g2.fillRect(box.x, box.y, box.width, box.height);
+                g2.setColor(palette.frameInk());
+                g2.setStroke(new BasicStroke(1.0f));
+                g2.drawRect(box.x, box.y, box.width, box.height);
+                g2.setColor(palette.textInk());
+                int baseline = box.y + TITLE_PADDING_PX + metrics.getAscent();
+                g2.setFont(TITLE_FONT);
+                g2.drawString(one.furniture().heading(), box.x + TITLE_PADDING_PX,
+                        baseline);
+                g2.setFont(LABEL_FONT);
+                for (String line : one.furniture().lines()) {
+                    baseline += lineHeight;
+                    g2.drawString(line, box.x + TITLE_PADDING_PX, baseline);
+                }
+                if (one.action() != null) {
+                    // The one control, framed in the box's own ink: chart
+                    // furniture with something to press, not a button
+                    // borrowed from the application's chrome.
+                    java.awt.Rectangle action = one.action();
+                    g2.drawRoundRect(action.x, action.y, action.width, action.height,
+                            5, 5);
+                    g2.drawString(one.furniture().action(), action.x + ACTION_INSET_PX,
+                            action.y + 1 + metrics.getAscent());
+                }
+            }
+        } finally {
+            g2.dispose();
         }
     }
 

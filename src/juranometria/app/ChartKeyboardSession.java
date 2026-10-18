@@ -47,6 +47,22 @@ public final class ChartKeyboardSession {
                                Runnable eclipticToggle,
                                MeridianModule observer,
                                juranometria.ui.language.InterfaceText words) {
+        install(root, options, ecliptic, eclipticToggle, observer, null, words);
+    }
+
+    /**
+     * The same, with Place and Time's <em>Update to now</em> on W (#259,
+     * ruling 7 on #556): the one action every other route runs, so the
+     * letter reads the clock exactly once, as the button does. Null
+     * leaves the command out.
+     */
+    public static void install(JRootPane root,
+                               ChartOptionsController options,
+                               EclipticModule ecliptic,
+                               Runnable eclipticToggle,
+                               MeridianModule observer,
+                               Runnable updateToNow,
+                               juranometria.ui.language.InterfaceText words) {
         if (ecliptic == null || eclipticToggle == null
                 || observer == null) {
             throw new IllegalArgumentException(
@@ -89,7 +105,10 @@ public final class ChartKeyboardSession {
                         observer.showing(showMeridian, showHorizon,
                                 observer.zenithShowing());
                     }
-                }), words,
+                }),
+                updateToNow == null ? java.util.Map.of()
+                        : java.util.Map.of(ChartKeys.UPDATE_TO_NOW, updateToNow),
+                words,
                 keyboard -> keyboard.showIn(root));
     }
 }

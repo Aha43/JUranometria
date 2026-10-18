@@ -71,9 +71,9 @@ public final class PlaceAndTimePanel extends JPanel {
             .withZone(ZoneOffset.UTC);
 
     /**
-     * @param clock read once each time <em>Now</em> is pressed, and at
-     *     no other moment - passed in, because a clock the panel owned
-     *     could not be held still by a test
+     * @param clock read once each time <em>Update to now</em> is
+     *     pressed, and at no other moment - passed in, because a clock
+     *     the panel owned could not be held still by a test
      */
     public PlaceAndTimePanel(MeridianModule module, PlaceStore store,
                              Supplier<Instant> clock,
@@ -253,7 +253,11 @@ public final class PlaceAndTimePanel extends JPanel {
             return true;
         }, () -> SHOWN.format(module.observer().instant()));
 
-        // The two deliberate actions, and no others.
+        // The two deliberate actions, and no others. The first is
+        // Update to now - called Now until #259, renamed so the one
+        // action has one name everywhere (ruling 4 on #556) - and it
+        // is the same action the chart's Place and Time box offers.
+        UpdateToNow updateToNow = new UpdateToNow(module, clock);
         JButton now = new JButton(said.say("placeandtime.now.label"));
         now.setName("nowButton");
         now.getAccessibleContext().setAccessibleName(
@@ -263,7 +267,7 @@ public final class PlaceAndTimePanel extends JPanel {
                 said.say("placeandtime.now.hover"),
                 said.say("placeandtime.now.explain"));
         now.addActionListener(event -> {
-            module.observer(module.observer().at(clock.get()));
+            updateToNow.run();
             instant.setText(SHOWN.format(module.observer().instant()));
             accepted();
         });

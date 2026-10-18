@@ -71,6 +71,11 @@ public final class MeridianModule implements ChartModule {
     private Runnable withdraw;
     private long skyComputations;
 
+    /** The furniture this module offers the chart, once its presentation says what. */
+    private java.util.function.Supplier<List<juranometria.module.Furniture>> furniture;
+    private java.util.function.Consumer<String> furnitureActions;
+    private Runnable withdrawFurniture;
+
     public MeridianModule(Observer observer) {
         observer(observer);
     }
@@ -97,6 +102,42 @@ public final class MeridianModule implements ChartModule {
         // changing the place or the instant needs no announcement
         // and no guess about when the page is next drawn.
         this.withdraw = services.contribute(ID, this::contributedGeometry);
+        furnishIfOffered();
+    }
+
+    /**
+     * The box this module asks the chart to carry, and the handler its
+     * action is handed back to (Sprint 51, issue #259, the rulings on
+     * #556).
+     *
+     * <p>The words are the presentation's - the module carries no
+     * language - so the Place and Time presentation states them here;
+     * the lifecycle stays the module's. The box is offered while the
+     * module is attached and withdrawn with it, so detaching the module
+     * removes its box and its action and leaves the page as it was.
+     * Offered once: a second offer would be a presentation that has
+     * lost track of the first.
+     */
+    public void offerFurniture(
+            java.util.function.Supplier<List<juranometria.module.Furniture>> box,
+            java.util.function.Consumer<String> actions) {
+        if (box == null || actions == null) {
+            throw new IllegalArgumentException(
+                    "furniture is offered with the handler for its action");
+        }
+        if (this.furniture != null) {
+            throw new IllegalStateException(
+                    "this module already offers its furniture");
+        }
+        this.furniture = box;
+        this.furnitureActions = actions;
+        furnishIfOffered();
+    }
+
+    private void furnishIfOffered() {
+        if (services != null && furniture != null && withdrawFurniture == null) {
+            withdrawFurniture = services.furnish(ID, furniture, furnitureActions);
+        }
     }
 
     /**
@@ -111,6 +152,10 @@ public final class MeridianModule implements ChartModule {
 
     @Override
     public void detach() {
+        if (withdrawFurniture != null) {
+            withdrawFurniture.run();
+        }
+        withdrawFurniture = null;
         if (withdraw != null) {
             withdraw.run();
         }

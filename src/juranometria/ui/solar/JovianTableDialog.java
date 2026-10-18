@@ -138,9 +138,7 @@ public final class JovianTableDialog extends JDialog {
             buttons.setAlignmentX(0f);
             if (controls.centreOnChart != null) {
                 buttons.add(controls.centreOnChart);
-                buttons.add(Box.createHorizontalStrut(8));
             }
-            buttons.add(controls.update);
             buttons.add(Box.createHorizontalGlue());
             buttons.add(close);
             bottom.add(buttons);

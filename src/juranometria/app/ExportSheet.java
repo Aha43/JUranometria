@@ -184,6 +184,25 @@ public final class ExportSheet {
                 destination, replace, SINK, said, emphasized);
     }
 
+    /**
+     * The same, carrying the modules' furniture the screen shows, as
+     * paper carries it (#259, ruling 6 on #556).
+     */
+    public static Outcome write(ChartSheet.Pages pages,
+                                ChartViewState state, ChartOptions options,
+                                ChartRenderer.ReferenceLayer ink,
+                                ChartRenderer.ReferenceLayer bodies,
+                                ChartRenderer.ReferenceLayer overChart,
+                                Request request, File destination,
+                                ReplaceDecision replace,
+                                juranometria.ui.language.InterfaceText said,
+                                java.util.Set<juranometria.render.ChartStructure>
+                                        emphasized,
+                                java.util.List<ChartSheet.Furnished> furniture) {
+        return write(pages, state, options, ink, bodies, overChart, request,
+                destination, replace, SINK, said, emphasized, furniture);
+    }
+
     /** The same, writing however it is told to - a seam for tests. */
     static Outcome write(ChartSheet.Pages pages,
                          ChartViewState state, ChartOptions options,
@@ -220,6 +239,21 @@ public final class ExportSheet {
                          ReplaceDecision replace, ByteSink sink,
                          juranometria.ui.language.InterfaceText said,
                          java.util.Set<juranometria.render.ChartStructure> emphasized) {
+        return write(pages, state, options, ink, bodies, overChart, request,
+                destination, replace, sink, said, emphasized, java.util.List.of());
+    }
+
+    /** The deepest seam, with the furniture stated too (#259). */
+    static Outcome write(ChartSheet.Pages pages,
+                         ChartViewState state, ChartOptions options,
+                         ChartRenderer.ReferenceLayer ink,
+                         ChartRenderer.ReferenceLayer bodies,
+                         ChartRenderer.ReferenceLayer overChart,
+                         Request request, File destination,
+                         ReplaceDecision replace, ByteSink sink,
+                         juranometria.ui.language.InterfaceText said,
+                         java.util.Set<juranometria.render.ChartStructure> emphasized,
+                         java.util.List<ChartSheet.Furnished> furniture) {
         if (destination == null) {
             return new Outcome.Refused(said.say("export.refused.nofile"));
         }
@@ -277,7 +311,7 @@ public final class ExportSheet {
             SheetRecording sheet = ChartSheet.record(pages, state, options,
                     ink, bodies, overChart, request.paper(),
                     juranometria.ui.language.PageText.in(said),
-                    emphasized);
+                    emphasized, furniture);
             bytes = SheetWriters.write(sheet, request.format(),
                     request.dpi());
         } catch (IOException | RuntimeException failure) {

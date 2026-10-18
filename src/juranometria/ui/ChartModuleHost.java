@@ -263,6 +263,18 @@ public final class ChartModuleHost implements ChartServices {
     }
 
     @Override
+    public Runnable furnish(String moduleId,
+                            Supplier<List<juranometria.module.Furniture>> furniture,
+                            Consumer<String> actions) {
+        Runnable withdraw = chart.furniture().offer(moduleId, furniture, actions);
+        chart.furnitureChanged();
+        return () -> {
+            withdraw.run();
+            chart.furnitureChanged();
+        };
+    }
+
+    @Override
     public Runnable contribute(String moduleId,
                                Supplier<List<OverlayContribution>> geometry) {
         Runnable withdraw = chart.overlays().offer(moduleId, geometry);

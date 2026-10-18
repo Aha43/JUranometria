@@ -110,6 +110,67 @@ public final class ChartKeys {
         }
     }
 
+    /**
+     * Something the chart keyboard <em>does</em>, rather than switches
+     * (Sprint 51, issue #259, ruling 7 on #556): an action with a letter
+     * and no state.
+     *
+     * <p>Kept apart from {@link Toggle} because it has no on or off to
+     * read, remember or announce; it shares the letters, so the audit
+     * that no two actions claim one letter covers both.
+     *
+     * @param id the semantic action, the words' key
+     * @param key the letter, pressed after the prefix
+     */
+    public record Command(String id, char key) {
+
+        public Command {
+            if (id == null || id.isBlank()) {
+                throw new IllegalArgumentException("a command needs an action");
+            }
+        }
+
+        /** The second keystroke on its own, as a reader sees it. */
+        public String keyLetter() {
+            return String.valueOf(key).toUpperCase(Locale.ROOT);
+        }
+    }
+
+    /**
+     * Update to now (ruling 7 on #556): W, for <em>when</em> - N, the
+     * obvious letter, has named the constellation names since #312.
+     */
+    public static final String UPDATE_TO_NOW = "placeandtime.updateToNow";
+
+    private static final List<Command> COMMANDS = List.of(
+            new Command(UPDATE_TO_NOW, 'W'));
+
+    /** Every command the keyboard reaches, in the order the palette lists them. */
+    public static List<Command> commands() {
+        return COMMANDS;
+    }
+
+    /** One command by the letter a reader pressed, or null. */
+    public static Command commandForKey(char key) {
+        char wanted = Character.toUpperCase(key);
+        for (Command command : COMMANDS) {
+            if (Character.toUpperCase(command.key()) == wanted) {
+                return command;
+            }
+        }
+        return null;
+    }
+
+    /** One command by its action, or null. */
+    public static Command command(String id) {
+        for (Command command : COMMANDS) {
+            if (command.id().equals(id)) {
+                return command;
+            }
+        }
+        return null;
+    }
+
     /** Deep-sky objects, the master of the families and their labels. */
     public static final String DEEP_SKY = "chart.deepSkyObjects";
     /** Constellation figures, the master of the names. */
@@ -212,6 +273,9 @@ public final class ChartKeys {
         List<Character> letters = new ArrayList<>();
         for (Toggle toggle : TOGGLES) {
             letters.add(Character.toUpperCase(toggle.key()));
+        }
+        for (Command command : COMMANDS) {
+            letters.add(Character.toUpperCase(command.key()));
         }
         return letters;
     }

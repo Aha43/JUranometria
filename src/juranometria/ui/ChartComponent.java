@@ -90,7 +90,11 @@ public final class ChartComponent extends JComponent {
         // A closer page with no Mercury, Venus or Jupiter on it says why zoom in
         // offers nothing more (#544); every other page carries no note.
         this.renderer.setTitleNote(this::closerFieldNote);
+        // The modules' furniture (#259): none until a module offers
+        // some, which is the released page.
+        this.renderer.setFurniture(this::screenFurniture);
         this.assembler = assembler;
+        installFurnitureInteraction();
         setOpaque(true);
         setPreferredSize(new Dimension(900, 700));
         setBackground(javax.swing.UIManager.getColor("Panel.background") != null
@@ -474,6 +478,335 @@ public final class ChartComponent extends JComponent {
         return overlays;
     }
 
+    // ---- the modules' furniture (#259, the rulings on #556) ----------
+
+    /**
+     * What furniture the modules are asking the page to carry. Empty
+     * until one offers some, which is how the page stays the released
+     * page with every module absent.
+     */
+    private final juranometria.module.FurnitureRegistry furniture =
+            new juranometria.module.FurnitureRegistry();
+
+    /** The registry a module offers its furniture to. */
+    public juranometria.module.FurnitureRegistry furniture() {
+        return furniture;
+    }
+
+    /**
+     * A box the last paint drew: whose it is, and where the page put it.
+     *
+     * @param owned the module's offer, with the handler its action is
+     *     handed back to
+     * @param placed the corner, the box and the framed control
+     */
+    public record DrawnFurniture(juranometria.module.FurnitureRegistry.Owned owned,
+                                 juranometria.render.ChartFurniture.Placed placed) {
+
+        /** How the view report names it: the box's identity and its corner. */
+        public String report() {
+            return owned.furniture().identity() + " " + placed.corner().token();
+        }
+    }
+
+    /** The furniture the last paint drew, in the order the page allocated it. */
+    private java.util.List<DrawnFurniture> drawnFurniture = java.util.List.of();
+    /** The key of the box whose control holds the keyboard, or null. */
+    private String focusedAction;
+    /** The key of the box whose control the pointer is over, or null. */
+    private String hoveredAction;
+    private final java.util.List<Runnable> furnitureListeners =
+            new java.util.ArrayList<>();
+
+    /** The furniture the last paint drew; empty on a page carrying none. */
+    public java.util.List<DrawnFurniture> renderedFurniture() {
+        return drawnFurniture;
+    }
+
+    /**
+     * Told when a module offers or withdraws furniture - never during
+     * painting. The page repaints, and whatever reports the furniture
+     * asks again.
+     */
+    public void furnitureChanged() {
+        boolean actions = furniture.collect().stream()
+                .anyMatch(owned -> owned.furniture().action() != null);
+        // The control's explanation on hover, from the toolkit's own
+        // tooltip: registered only while some box offers a control, so
+        // a chart carrying none is the chart it always was.
+        if (actions) {
+            javax.swing.ToolTipManager.sharedInstance().registerComponent(this);
+        }
+        for (Runnable listener : java.util.List.copyOf(furnitureListeners)) {
+            listener.run();
+        }
+        repaint();
+    }
+
+    /** Told whenever a module offers or withdraws furniture. */
+    public void onFurnitureChange(Runnable listener) {
+        if (listener != null) {
+            furnitureListeners.add(listener);
+        }
+    }
+
+    /** The furniture as the screen draws it: each box with its framed control. */
+    private java.util.List<juranometria.render.ChartFurniture> screenFurniture() {
+        java.util.List<juranometria.render.ChartFurniture> boxes =
+                new java.util.ArrayList<>();
+        for (juranometria.module.FurnitureRegistry.Owned owned : furniture.collect()) {
+            juranometria.module.Furniture box = owned.furniture();
+            boxes.add(new juranometria.render.ChartFurniture(owned.key(),
+                    box.heading(), box.lines(),
+                    box.action() == null ? null : box.action().label()));
+        }
+        return java.util.List.copyOf(boxes);
+    }
+
+    /**
+     * The furniture as paper carries it (ruling 6 on #556): no control,
+     * since a control on paper cannot be pressed, and its honest
+     * sentence in the control's place; with the sentence the sheet's
+     * own description gains while the box is drawn.
+     */
+    public java.util.List<juranometria.sheet.ChartSheet.Furnished> paperFurniture() {
+        java.util.List<juranometria.sheet.ChartSheet.Furnished> boxes =
+                new java.util.ArrayList<>();
+        for (juranometria.module.FurnitureRegistry.Owned owned : furniture.collect()) {
+            juranometria.module.Furniture box = owned.furniture();
+            java.util.List<String> lines = new java.util.ArrayList<>(box.lines());
+            if (box.action() != null) {
+                lines.add(box.action().paperLine());
+            }
+            boxes.add(new juranometria.sheet.ChartSheet.Furnished(
+                    new juranometria.render.ChartFurniture(owned.key(), box.heading(),
+                            lines, null),
+                    box.described()));
+        }
+        return java.util.List.copyOf(boxes);
+    }
+
+    /** The drawn box whose control lies under a page point, if any. */
+    public java.util.Optional<DrawnFurniture> furnitureActionAt(double x, double y) {
+        for (DrawnFurniture drawn : drawnFurniture) {
+            java.awt.Rectangle action = drawn.placed().action();
+            if (action != null && x >= action.x && x <= action.x + action.width
+                    && y >= action.y && y <= action.y + action.height) {
+                return java.util.Optional.of(drawn);
+            }
+        }
+        return java.util.Optional.empty();
+    }
+
+    /**
+     * Activates a drawn box's control: hands its identity back to the
+     * module that offered it, and does nothing else. Every route - the
+     * pointer, the keyboard, assistive technology - ends here.
+     */
+    public void activateFurniture(DrawnFurniture drawn) {
+        juranometria.module.Furniture.Action action = drawn.owned().furniture().action();
+        if (action != null) {
+            drawn.owned().actions().accept(action.identity());
+        }
+    }
+
+    /** The drawn box with this key, if the last paint drew it. */
+    private java.util.Optional<DrawnFurniture> drawnFurniture(String key) {
+        if (key == null) {
+            return java.util.Optional.empty();
+        }
+        return drawnFurniture.stream()
+                .filter(drawn -> drawn.owned().key().equals(key)).findFirst();
+    }
+
+    /** The first drawn box that offers a control, if any. */
+    private java.util.Optional<DrawnFurniture> firstAction() {
+        return drawnFurniture.stream()
+                .filter(drawn -> drawn.placed().action() != null).findFirst();
+    }
+
+    /** Whether a drawn control holds the keyboard - for the journeys. */
+    public boolean furnitureActionFocused() {
+        return isFocusOwner() && drawnFurniture(focusedAction).isPresent();
+    }
+
+    @Override
+    public String getToolTipText(java.awt.event.MouseEvent event) {
+        return furnitureActionAt(event.getX(), event.getY() - pageOffsetY())
+                .map(drawn -> drawn.owned().furniture().action().explanation())
+                .orElse(null);
+    }
+
+    /**
+     * The pointer and the keyboard reach a drawn control (ruling 7 on
+     * #556). A click on it activates it; hovering marks it and explains
+     * it; Tab from the chart gives it the keyboard - a focus ring drawn
+     * by the chart - and Enter or Space activates it, and a second Tab
+     * goes on to the next component as Tab always has. With no control
+     * drawn, Tab and Shift Tab are the ordinary focus traversal.
+     */
+    private void installFurnitureInteraction() {
+        java.awt.event.MouseAdapter pointer = new java.awt.event.MouseAdapter() {
+            private java.awt.Point pressed;
+
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent event) {
+                pressed = javax.swing.SwingUtilities.isLeftMouseButton(event)
+                        ? event.getPoint() : null;
+            }
+
+            @Override
+            public void mouseReleased(java.awt.event.MouseEvent event) {
+                java.awt.Point at = pressed;
+                pressed = null;
+                if (at == null || event.getPoint().distance(at)
+                        >= PanInteraction.DRAG_THRESHOLD_PX) {
+                    return;
+                }
+                furnitureActionAt(at.x, at.y - pageOffsetY())
+                        .ifPresent(ChartComponent.this::activateFurniture);
+            }
+
+            @Override
+            public void mouseMoved(java.awt.event.MouseEvent event) {
+                hover(furnitureActionAt(event.getX(), event.getY() - pageOffsetY())
+                        .map(drawn -> drawn.owned().key()).orElse(null));
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent event) {
+                hover(null);
+            }
+        };
+        addMouseListener(pointer);
+        addMouseMotionListener(pointer);
+        setFocusTraversalKeysEnabled(false);
+        javax.swing.InputMap keys = getInputMap(WHEN_FOCUSED);
+        keys.put(javax.swing.KeyStroke.getKeyStroke("TAB"), "furniture.forward");
+        keys.put(javax.swing.KeyStroke.getKeyStroke("ctrl TAB"), "furniture.leave");
+        keys.put(javax.swing.KeyStroke.getKeyStroke("shift TAB"), "furniture.backward");
+        keys.put(javax.swing.KeyStroke.getKeyStroke("ctrl shift TAB"),
+                "furniture.leaveBackward");
+        keys.put(javax.swing.KeyStroke.getKeyStroke("ENTER"), "furniture.activate");
+        keys.put(javax.swing.KeyStroke.getKeyStroke("SPACE"), "furniture.activate");
+        getActionMap().put("furniture.forward", new javax.swing.AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent event) {
+                java.util.Optional<DrawnFurniture> first = firstAction();
+                if (focusedAction == null && first.isPresent()) {
+                    focus(first.get().owned().key());
+                } else {
+                    focus(null);
+                    transferFocus();
+                }
+            }
+        });
+        getActionMap().put("furniture.leave", new javax.swing.AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent event) {
+                focus(null);
+                transferFocus();
+            }
+        });
+        getActionMap().put("furniture.backward", new javax.swing.AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent event) {
+                if (focusedAction != null) {
+                    focus(null);
+                } else {
+                    transferFocusBackward();
+                }
+            }
+        });
+        getActionMap().put("furniture.leaveBackward", new javax.swing.AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent event) {
+                focus(null);
+                transferFocusBackward();
+            }
+        });
+        getActionMap().put("furniture.activate", new javax.swing.AbstractAction() {
+            // Enabled only while a control holds the keyboard, so Enter
+            // and Space reach whatever else answers them otherwise.
+            @Override
+            public boolean isEnabled() {
+                return drawnFurniture(focusedAction).isPresent();
+            }
+
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent event) {
+                drawnFurniture(focusedAction).ifPresent(
+                        ChartComponent.this::activateFurniture);
+            }
+        });
+        addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusLost(java.awt.event.FocusEvent event) {
+                focus(null);
+            }
+        });
+    }
+
+    private void hover(String key) {
+        if (!java.util.Objects.equals(hoveredAction, key)) {
+            hoveredAction = key;
+            repaint();
+        }
+    }
+
+    private void focus(String key) {
+        if (!java.util.Objects.equals(focusedAction, key)) {
+            focusedAction = key;
+            repaint();
+        }
+    }
+
+    /**
+     * The control's states, drawn by the chart over the drawn box: a
+     * heavier frame under the pointer, and a focus ring around it while
+     * it holds the keyboard. Neither is drawn on a page with no control.
+     */
+    private void paintFurnitureStates(Graphics2D g, juranometria.render.ChartPalette palette) {
+        for (DrawnFurniture drawn : drawnFurniture) {
+            java.awt.Rectangle action = drawn.placed().action();
+            if (action == null) {
+                continue;
+            }
+            String key = drawn.owned().key();
+            Graphics2D g2 = (Graphics2D) g.create();
+            try {
+                g2.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
+                        java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+                if (key.equals(hoveredAction)) {
+                    g2.setColor(palette.textInk());
+                    g2.setStroke(new java.awt.BasicStroke(2.0f));
+                    g2.drawRoundRect(action.x, action.y, action.width, action.height,
+                            5, 5);
+                }
+                if (key.equals(focusedAction) && isFocusOwner()) {
+                    g2.setColor(palette.selectionInk());
+                    g2.setStroke(new java.awt.BasicStroke(1.5f));
+                    g2.drawRoundRect(action.x - 3, action.y - 3, action.width + 6,
+                            action.height + 6, 9, 9);
+                }
+            } finally {
+                g2.dispose();
+            }
+        }
+    }
+
+    /** The drawn furniture, appended to what a reader who cannot see the page is told. */
+    static String withFurniture(String base, java.util.List<DrawnFurniture> drawn) {
+        if (drawn.isEmpty()) {
+            return base;
+        }
+        StringBuilder said = new StringBuilder(base);
+        for (DrawnFurniture box : drawn) {
+            said.append(' ').append(box.owned().furniture().spoken());
+        }
+        return said.toString();
+    }
+
     /**
      * The bodies whose presence on a page offers a closer field (#544,
      * ruled on #539, rulings 5 and 6, Jupiter added by the owner at the
@@ -733,6 +1066,43 @@ public final class ChartComponent extends JComponent {
                 public AccessibleRole getAccessibleRole() {
                     return AccessibleRole.CANVAS;
                 }
+
+                /**
+                 * The drawn furniture's controls, as actions of the
+                 * chart (#259, ruling 7 on #556): named as the page
+                 * names them, and reaching the same activation the
+                 * pointer and the keyboard reach. None while no control
+                 * is drawn.
+                 */
+                @Override
+                public javax.accessibility.AccessibleAction getAccessibleAction() {
+                    java.util.List<DrawnFurniture> controls = drawnFurniture.stream()
+                            .filter(drawn -> drawn.placed().action() != null).toList();
+                    if (controls.isEmpty()) {
+                        return null;
+                    }
+                    return new javax.accessibility.AccessibleAction() {
+                        @Override
+                        public int getAccessibleActionCount() {
+                            return controls.size();
+                        }
+
+                        @Override
+                        public String getAccessibleActionDescription(int i) {
+                            return i < 0 || i >= controls.size() ? null
+                                    : controls.get(i).owned().furniture().action().label();
+                        }
+
+                        @Override
+                        public boolean doAccessibleAction(int i) {
+                            if (i < 0 || i >= controls.size()) {
+                                return false;
+                            }
+                            activateFurniture(controls.get(i));
+                            return true;
+                        }
+                    };
+                }
             };
         }
         return accessibleContext;
@@ -786,6 +1156,29 @@ public final class ChartComponent extends JComponent {
                                         .membersOf(emphasized));
                     },
                     null, emphasized);
+            // The furniture this paint drew (#259), exactly as the
+            // renderer allocated it: what the pointer, the keyboard,
+            // the description and the report all read.
+            java.util.Map<String, juranometria.module.FurnitureRegistry.Owned> offered =
+                    new java.util.HashMap<>();
+            for (juranometria.module.FurnitureRegistry.Owned owned : furniture.collect()) {
+                offered.put(owned.key(), owned);
+            }
+            java.util.List<DrawnFurniture> drew = new java.util.ArrayList<>();
+            for (juranometria.render.ChartFurniture.Placed placed
+                    : renderer.furnitureLayout(
+                            ChartRenderer.TextMetrics.of(g2).labels(), scene, drawn)) {
+                juranometria.module.FurnitureRegistry.Owned owned =
+                        offered.get(placed.furniture().key());
+                if (owned != null) {
+                    drew.add(new DrawnFurniture(owned, placed));
+                }
+            }
+            drawnFurniture = java.util.List.copyOf(drew);
+            if (drawnFurniture(focusedAction).isEmpty()) {
+                focusedAction = null;
+            }
+            paintFurnitureStates(g2, drawn.palette());
             // A paint that drew other bodies, or the same for another
             // moment or place, is told to whoever resolves a selected
             // occurrence against the page (#513); an unchanged repaint
@@ -809,9 +1202,9 @@ public final class ChartComponent extends JComponent {
             // A direction the page omitted is not spoken, because a
             // description of ink that is not there would be the lie
             // accessibility exists to prevent.
-            getAccessibleContext().setAccessibleDescription(
+            getAccessibleContext().setAccessibleDescription(withFurniture(
                     withBodies(withDirections(describe(scene), spokenDirections),
-                            drawnBodies, words));
+                            drawnBodies, words), drawnFurniture));
             // One ring per selected drawn member (issue #261): the
             // renderer draws nothing for an identity the page does
             // not draw, so an on-page undrawn member is left to its

@@ -148,6 +148,28 @@ public final class SolarTableSession {
         return observer.get();
     }
 
+    /** How a host is told Place and Time changed; nothing until the atlas says. */
+    private java.util.function.Function<Runnable, Runnable> observerChanges =
+            listener -> () -> { };
+
+    /**
+     * Where Place and Time's changes are announced (#259, ruling 5 on
+     * #556): a subscription that returns its cancel. A host follows it
+     * to say again whether its table agrees with the chart - never to
+     * recompute, which only the reader asks for.
+     */
+    public void followObserver(java.util.function.Function<Runnable, Runnable> subscribe) {
+        if (subscribe == null) {
+            throw new IllegalArgumentException("a subscription to follow");
+        }
+        this.observerChanges = subscribe;
+    }
+
+    /** Tells a host whenever Place and Time changes; returns its cancel. */
+    public Runnable onObserverChange(Runnable listener) {
+        return observerChanges.apply(listener);
+    }
+
     /** The service's time scales, for the note a host writes under its table. */
     public juranometria.solar.time.TimeScales timeScales() {
         return service.get().timeScales();

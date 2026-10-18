@@ -153,11 +153,60 @@ public final class ChartSheet {
                                         java.util.Set<juranometria.render
                                                 .ChartStructure>
                                                 emphasized) {
+        return record(pages, state, options, reference, bodies, overChart, paper,
+                words, emphasized, java.util.List.of());
+    }
+
+    /**
+     * A box of furniture for paper (Sprint 51, issue #259): the box as
+     * paper carries it - no control, its honest sentence in the
+     * control's place - and the sentence the sheet's own description
+     * gains while the box is drawn on it.
+     */
+    public record Furnished(juranometria.render.ChartFurniture box,
+                            String described) {
+
+        public Furnished {
+            if (box == null || box.action() != null) {
+                throw new IllegalArgumentException(
+                        "paper carries furniture with no control on it");
+            }
+            if (described == null || described.isBlank()) {
+                throw new IllegalArgumentException(
+                        "furniture on a sheet is described: " + box);
+            }
+        }
+    }
+
+    /**
+     * The same, with the modules' furniture the screen carries (#259,
+     * ruling 6 on #556): allocated on the paper's own page by the
+     * chart's corner order, drawn with no false action, and each box
+     * the page draws adds its sentence to the sheet's description. An
+     * empty list is the sheet as it was.
+     */
+    public static SheetRecording record(Pages pages,
+                                        ChartViewState state,
+                                        ChartOptions options,
+                                        ChartRenderer.ReferenceLayer reference,
+                                        ChartRenderer.ReferenceLayer bodies,
+                                        ChartRenderer.ReferenceLayer overChart,
+                                        PaperSize paper,
+                                        juranometria.project.PageWords words,
+                                        java.util.Set<juranometria.render
+                                                .ChartStructure>
+                                                emphasized,
+                                        java.util.List<Furnished> furniture) {
         requireBodies(bodies);
+        if (furniture == null) {
+            throw new IllegalArgumentException(
+                    "a sheet carries its furniture, or an empty list");
+        }
         return recorded(pages, state, options, reference, overChart, paper,
                 words, (renderer, g, scene, onPaper) -> renderer.render(
                         g, scene, onPaper, reference, bodies, null, emphasized),
-                juranometria.render.ChartStructure.joinedTokens(emphasized));
+                juranometria.render.ChartStructure.joinedTokens(emphasized),
+                furniture);
     }
 
     private static void requireBodies(ChartRenderer.ReferenceLayer bodies) {
@@ -229,6 +278,24 @@ public final class ChartSheet {
                                            Draw draw,
                                            java.util.Optional<String>
                                                    emphasis) {
+        return recorded(pages, state, options, reference, overChart, paper,
+                words, draw, emphasis, java.util.List.of());
+    }
+
+    private static SheetRecording recorded(Pages pages,
+                                           ChartViewState state,
+                                           ChartOptions options,
+                                           ChartRenderer.ReferenceLayer
+                                                   reference,
+                                           ChartRenderer.ReferenceLayer
+                                                   overChart,
+                                           PaperSize paper,
+                                           juranometria.project.PageWords
+                                                   words,
+                                           Draw draw,
+                                           java.util.Optional<String>
+                                                   emphasis,
+                                           java.util.List<Furnished> furniture) {
         if (pages == null || state == null || options == null
                 || paper == null || words == null) {
             throw new IllegalArgumentException(
@@ -272,13 +339,29 @@ public final class ChartSheet {
         SheetRecorder recorder = new SheetRecorder(paper.chartWideUnits(),
                 paper.chartHighUnits());
         Graphics2D g = (Graphics2D) recorder.create();
+        java.util.List<String> furnitureSaid = new java.util.ArrayList<>();
         try {
             // One words instance, two consumers. The renderer draws
             // the title block with it and the metadata is written
             // from it, so the pixels and the file's own description
             // cannot end up in different languages (#350).
-            draw.chart(new ChartRenderer(StarSizePolicy.DEFAULT, words),
-                    g, scene, onPaper);
+            ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, words);
+            // The modules' furniture, as paper carries it (#259): the
+            // page allocates it here, on the paper's own extent, and a
+            // box it draws is a box the description speaks of.
+            java.util.List<juranometria.render.ChartFurniture> boxes =
+                    furniture.stream().map(Furnished::box).toList();
+            renderer.setFurniture(() -> boxes);
+            draw.chart(renderer, g, scene, onPaper);
+            for (juranometria.render.ChartFurniture.Placed placed
+                    : renderer.furnitureLayout(
+                            ChartRenderer.TextMetrics.of(g).labels(), scene, onPaper)) {
+                for (Furnished one : furniture) {
+                    if (one.box() == placed.furniture()) {
+                        furnitureSaid.add(one.described());
+                    }
+                }
+            }
             // After the chart, in the order the screen paints it.
             // Nothing is reserved against it: the reader's own marks
             // belong OVER the finished chart, which is the whole of
@@ -287,8 +370,8 @@ public final class ChartSheet {
         } finally {
             g.dispose();
         }
-        SheetMetadata about =
-                SheetMetadata.of(scene, state, onPaper, paper, words);
+        SheetMetadata about = SheetMetadata.of(scene, state, onPaper, paper, words)
+                .withFurniture(furnitureSaid);
         return new SheetRecording(recorder, paper, scene, onPaper,
                 emphasis.map(about::withEmphasis).orElse(about));
     }

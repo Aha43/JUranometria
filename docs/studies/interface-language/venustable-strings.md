@@ -41,12 +41,18 @@ The fresh state: a single row at the instant Place and Time holds - Espenak's ho
 
 ![](venustable-en-1-instant.png)
 
-Packed 1854 × 425 px.
+Packed 1854 × 466 px.
 
 | shown, hovered or spoken |
 |---|
 | Venus |
 | Where Venus is, computed from the bundled ephemeris for the observing place and instant set in Place and Time: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
+| Agreement with the chart |
+| Same place and instant as the chart: 59.91° N · 10.75° E, 2026-08-15 06:00:00 UTC |
+| Update from Place and Time |
+| Read the place and instant from Place and Time again |
+| Read the observer and instant from Place and Time again |
+| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
 | Observer at latitude 59.91, longitude 10.75 east; instant 2026-08-15 06:00:00 UTC, from Place and Time. |
 | This instant |
 | One row, at the instant set in Place and Time |
@@ -90,10 +96,6 @@ Packed 1854 × 425 px.
 | Venus's computed quantities |
 | Each row is one instant. The columns are the instant in UTC; right ascension and declination in the J2000 frame the chart is drawn in; altitude and azimuth without refraction; distance; the solid body's apparent diameter; the illuminated fraction; the phase; the elongation from the Sun with the side of the Sun Venus is on; and the lit side, the direction the light falls from. |
 | Dates before 1972-01-01 and after 2027-06-28 use an estimated clock correction. After 2026, uncertainty in local horizon coordinates cannot yet be stated precisely. The effect on the J2000 chart position remains below 8″ through 2100 under the adopted model. |
-| Update from Place and Time |
-| Read the place and instant from Place and Time again |
-| Read the observer and instant from Place and Time again |
-| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
 | Close |
 | Close the Venus table |
 | Closes the table. Nothing is changed or remembered; Place and Time keeps the place and instant. |
@@ -104,12 +106,19 @@ Daily rows from the instant, and an end that is not on the grid, added last and 
 
 ![](venustable-en-2-range.png)
 
-Packed 1854 × 425 px.
+Packed 1854 × 483 px.
 
 | shown, hovered or spoken |
 |---|
 | Venus |
 | Where Venus is, computed from the bundled ephemeris for the observing place and instant set in Place and Time: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
+| Agreement with the chart |
+| This range: 59.91° N · 10.75° E, from 2026-10-20 03:00:00 to 2026-10-27 09:30:00 UTCChart: 59.91° N · 10.75° E, 2026-10-20 03:00:00 UTC |
+| This range: 59.91° N · 10.75° E, from 2026-10-20 03:00:00 to 2026-10-27 09:30:00 UTC Chart: 59.91° N · 10.75° E, 2026-10-20 03:00:00 UTC |
+| Update from Place and Time |
+| Read the place and instant from Place and Time again |
+| Read the observer and instant from Place and Time again |
+| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
 | Observer at latitude 59.91, longitude 10.75 east; instant 2026-10-20 03:00:00 UTC, from Place and Time. |
 | This instant |
 | One row, at the instant set in Place and Time |
@@ -161,10 +170,6 @@ Packed 1854 × 425 px.
 | Venus's computed quantities |
 | Each row is one instant. The columns are the instant in UTC; right ascension and declination in the J2000 frame the chart is drawn in; altitude and azimuth without refraction; distance; the solid body's apparent diameter; the illuminated fraction; the phase; the elongation from the Sun with the side of the Sun Venus is on; and the lit side, the direction the light falls from. |
 | Dates before 1972-01-01 and after 2027-06-28 use an estimated clock correction. After 2026, uncertainty in local horizon coordinates cannot yet be stated precisely. The effect on the J2000 chart position remains below 8″ through 2100 under the adopted model. |
-| Update from Place and Time |
-| Read the place and instant from Place and Time again |
-| Read the observer and instant from Place and Time again |
-| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
 | Close |
 | Close the Venus table |
 | Closes the table. Nothing is changed or remembered; Place and Time keeps the place and instant. |
@@ -175,12 +180,18 @@ The end is after the last civil day Venus is computed for. The table is empty an
 
 ![](venustable-en-3-refused.png)
 
-Packed 1854 × 425 px.
+Packed 1854 × 466 px.
 
 | shown, hovered or spoken |
 |---|
 | Venus |
 | Where Venus is, computed from the bundled ephemeris for the observing place and instant set in Place and Time: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
+| Agreement with the chart |
+| Chart: 59.91° N · 10.75° E, 2100-12-28 00:00:00 UTC |
+| Update from Place and Time |
+| Read the place and instant from Place and Time again |
+| Read the observer and instant from Place and Time again |
+| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
 | Observer at latitude 59.91, longitude 10.75 east; instant 2100-12-28 00:00:00 UTC, from Place and Time. |
 | This instant |
 | One row, at the instant set in Place and Time |
@@ -223,10 +234,6 @@ Packed 1854 × 425 px.
 | Venus's computed quantities |
 | Each row is one instant. The columns are the instant in UTC; right ascension and declination in the J2000 frame the chart is drawn in; altitude and azimuth without refraction; distance; the solid body's apparent diameter; the illuminated fraction; the phase; the elongation from the Sun with the side of the Sun Venus is on; and the lit side, the direction the light falls from. |
 | Dates before 1972-01-01 and after 2027-06-28 use an estimated clock correction. After 2026, uncertainty in local horizon coordinates cannot yet be stated precisely. The effect on the J2000 chart position remains below 8″ through 2100 under the adopted model. |
-| Update from Place and Time |
-| Read the place and instant from Place and Time again |
-| Read the observer and instant from Place and Time again |
-| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
 | Close |
 | Close the Venus table |
 | Closes the table. Nothing is changed or remembered; Place and Time keeps the place and instant. |
@@ -237,12 +244,18 @@ Espenak's hour of the 2012 inferior conjunction, while Venus crossed the Sun's d
 
 ![](venustable-en-4-transit.png)
 
-Packed 1854 × 425 px.
+Packed 1854 × 466 px.
 
 | shown, hovered or spoken |
 |---|
 | Venus |
 | Where Venus is, computed from the bundled ephemeris for the observing place and instant set in Place and Time: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
+| Agreement with the chart |
+| Same place and instant as the chart: 59.91° N · 10.75° E, 2012-06-06 01:00:00 UTC |
+| Update from Place and Time |
+| Read the place and instant from Place and Time again |
+| Read the observer and instant from Place and Time again |
+| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
 | Observer at latitude 59.91, longitude 10.75 east; instant 2012-06-06 01:00:00 UTC, from Place and Time. |
 | This instant |
 | One row, at the instant set in Place and Time |
@@ -286,10 +299,6 @@ Packed 1854 × 425 px.
 | Venus's computed quantities |
 | Each row is one instant. The columns are the instant in UTC; right ascension and declination in the J2000 frame the chart is drawn in; altitude and azimuth without refraction; distance; the solid body's apparent diameter; the illuminated fraction; the phase; the elongation from the Sun with the side of the Sun Venus is on; and the lit side, the direction the light falls from. |
 | Dates before 1972-01-01 and after 2027-06-28 use an estimated clock correction. After 2026, uncertainty in local horizon coordinates cannot yet be stated precisely. The effect on the J2000 chart position remains below 8″ through 2100 under the adopted model. |
-| Update from Place and Time |
-| Read the place and instant from Place and Time again |
-| Read the observer and instant from Place and Time again |
-| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
 | Close |
 | Close the Venus table |
 | Closes the table. Nothing is changed or remembered; Place and Time keeps the place and instant. |
@@ -298,12 +307,18 @@ Packed 1854 × 425 px.
 
 ![](venustable-en-5-instant-dark.png)
 
-Packed 1854 × 425 px.
+Packed 1854 × 466 px.
 
 | shown, hovered or spoken |
 |---|
 | Venus |
 | Where Venus is, computed from the bundled ephemeris for the observing place and instant set in Place and Time: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
+| Agreement with the chart |
+| Same place and instant as the chart: 59.91° N · 10.75° E, 2026-08-15 06:00:00 UTC |
+| Update from Place and Time |
+| Read the place and instant from Place and Time again |
+| Read the observer and instant from Place and Time again |
+| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
 | Observer at latitude 59.91, longitude 10.75 east; instant 2026-08-15 06:00:00 UTC, from Place and Time. |
 | This instant |
 | One row, at the instant set in Place and Time |
@@ -347,10 +362,6 @@ Packed 1854 × 425 px.
 | Venus's computed quantities |
 | Each row is one instant. The columns are the instant in UTC; right ascension and declination in the J2000 frame the chart is drawn in; altitude and azimuth without refraction; distance; the solid body's apparent diameter; the illuminated fraction; the phase; the elongation from the Sun with the side of the Sun Venus is on; and the lit side, the direction the light falls from. |
 | Dates before 1972-01-01 and after 2027-06-28 use an estimated clock correction. After 2026, uncertainty in local horizon coordinates cannot yet be stated precisely. The effect on the J2000 chart position remains below 8″ through 2100 under the adopted model. |
-| Update from Place and Time |
-| Read the place and instant from Place and Time again |
-| Read the observer and instant from Place and Time again |
-| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
 | Close |
 | Close the Venus table |
 | Closes the table. Nothing is changed or remembered; Place and Time keeps the place and instant. |
@@ -379,12 +390,18 @@ The fresh state: a single row at the instant Place and Time holds - Espenak's ho
 
 ![](venustable-nb-NO-6-instant.png)
 
-Packed 1854 × 425 px.
+Packed 1854 × 466 px.
 
 | shown, hovered or spoken |
 |---|
 | Venus |
 | Hvor Venus er, beregnet fra den medfølgende efemeriden for observasjonsstedet og tidspunktet satt i Sted og tid: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
+| Samsvar med kartet |
+| Samme sted og tidspunkt som kartet: 59.91° N · 10.75° Ø, 2026-08-15 06:00:00 UTC |
+| Oppdater fra Sted og tid |
+| Les sted og tidspunkt fra Sted og tid på nytt |
+| Les observatør og tidspunkt fra Sted og tid på nytt |
+| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
 | Observatør på bredde 59,91, lengde 10,75 øst; tidspunkt 2026-08-15 06:00:00 UTC, fra Sted og tid. |
 | Dette tidspunktet |
 | Én rad, ved tidspunktet satt i Sted og tid |
@@ -428,10 +445,6 @@ Packed 1854 × 425 px.
 | Venus' beregnede størrelser |
 | Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; høyde og asimut uten refraksjon; avstand; den faste kroppens tilsynelatende diameter; belyst andel; fase; elongasjon fra Solen med hvilken side av Solen Venus står på; og belyst side, retningen lyset faller fra. |
 | Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 8″ fram til 2100 med den valgte modellen. |
-| Oppdater fra Sted og tid |
-| Les sted og tidspunkt fra Sted og tid på nytt |
-| Les observatør og tidspunkt fra Sted og tid på nytt |
-| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
 | Lukk |
 | Lukk venustabellen |
 | Lukker tabellen. Ingenting endres eller huskes; Sted og tid beholder stedet og tidspunktet. |
@@ -442,12 +455,19 @@ Daily rows from the instant, and an end that is not on the grid, added last and 
 
 ![](venustable-nb-NO-7-range.png)
 
-Packed 1854 × 425 px.
+Packed 1854 × 483 px.
 
 | shown, hovered or spoken |
 |---|
 | Venus |
 | Hvor Venus er, beregnet fra den medfølgende efemeriden for observasjonsstedet og tidspunktet satt i Sted og tid: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
+| Samsvar med kartet |
+| Dette tidsrommet: 59.91° N · 10.75° Ø, fra 2026-10-20 03:00:00 til 2026-10-27 09:30:00 UTCKartet: 59.91° N · 10.75° Ø, 2026-10-20 03:00:00 UTC |
+| Dette tidsrommet: 59.91° N · 10.75° Ø, fra 2026-10-20 03:00:00 til 2026-10-27 09:30:00 UTC Kartet: 59.91° N · 10.75° Ø, 2026-10-20 03:00:00 UTC |
+| Oppdater fra Sted og tid |
+| Les sted og tidspunkt fra Sted og tid på nytt |
+| Les observatør og tidspunkt fra Sted og tid på nytt |
+| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
 | Observatør på bredde 59,91, lengde 10,75 øst; tidspunkt 2026-10-20 03:00:00 UTC, fra Sted og tid. |
 | Dette tidspunktet |
 | Én rad, ved tidspunktet satt i Sted og tid |
@@ -499,10 +519,6 @@ Packed 1854 × 425 px.
 | Venus' beregnede størrelser |
 | Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; høyde og asimut uten refraksjon; avstand; den faste kroppens tilsynelatende diameter; belyst andel; fase; elongasjon fra Solen med hvilken side av Solen Venus står på; og belyst side, retningen lyset faller fra. |
 | Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 8″ fram til 2100 med den valgte modellen. |
-| Oppdater fra Sted og tid |
-| Les sted og tidspunkt fra Sted og tid på nytt |
-| Les observatør og tidspunkt fra Sted og tid på nytt |
-| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
 | Lukk |
 | Lukk venustabellen |
 | Lukker tabellen. Ingenting endres eller huskes; Sted og tid beholder stedet og tidspunktet. |
@@ -513,12 +529,18 @@ The end is after the last civil day Venus is computed for. The table is empty an
 
 ![](venustable-nb-NO-8-refused.png)
 
-Packed 1854 × 425 px.
+Packed 1854 × 466 px.
 
 | shown, hovered or spoken |
 |---|
 | Venus |
 | Hvor Venus er, beregnet fra den medfølgende efemeriden for observasjonsstedet og tidspunktet satt i Sted og tid: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
+| Samsvar med kartet |
+| Kartet: 59.91° N · 10.75° Ø, 2100-12-28 00:00:00 UTC |
+| Oppdater fra Sted og tid |
+| Les sted og tidspunkt fra Sted og tid på nytt |
+| Les observatør og tidspunkt fra Sted og tid på nytt |
+| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
 | Observatør på bredde 59,91, lengde 10,75 øst; tidspunkt 2100-12-28 00:00:00 UTC, fra Sted og tid. |
 | Dette tidspunktet |
 | Én rad, ved tidspunktet satt i Sted og tid |
@@ -561,10 +583,6 @@ Packed 1854 × 425 px.
 | Venus' beregnede størrelser |
 | Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; høyde og asimut uten refraksjon; avstand; den faste kroppens tilsynelatende diameter; belyst andel; fase; elongasjon fra Solen med hvilken side av Solen Venus står på; og belyst side, retningen lyset faller fra. |
 | Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 8″ fram til 2100 med den valgte modellen. |
-| Oppdater fra Sted og tid |
-| Les sted og tidspunkt fra Sted og tid på nytt |
-| Les observatør og tidspunkt fra Sted og tid på nytt |
-| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
 | Lukk |
 | Lukk venustabellen |
 | Lukker tabellen. Ingenting endres eller huskes; Sted og tid beholder stedet og tidspunktet. |
@@ -575,12 +593,18 @@ Espenak's hour of the 2012 inferior conjunction, while Venus crossed the Sun's d
 
 ![](venustable-nb-NO-9-transit.png)
 
-Packed 1854 × 425 px.
+Packed 1854 × 466 px.
 
 | shown, hovered or spoken |
 |---|
 | Venus |
 | Hvor Venus er, beregnet fra den medfølgende efemeriden for observasjonsstedet og tidspunktet satt i Sted og tid: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
+| Samsvar med kartet |
+| Samme sted og tidspunkt som kartet: 59.91° N · 10.75° Ø, 2012-06-06 01:00:00 UTC |
+| Oppdater fra Sted og tid |
+| Les sted og tidspunkt fra Sted og tid på nytt |
+| Les observatør og tidspunkt fra Sted og tid på nytt |
+| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
 | Observatør på bredde 59,91, lengde 10,75 øst; tidspunkt 2012-06-06 01:00:00 UTC, fra Sted og tid. |
 | Dette tidspunktet |
 | Én rad, ved tidspunktet satt i Sted og tid |
@@ -624,10 +648,6 @@ Packed 1854 × 425 px.
 | Venus' beregnede størrelser |
 | Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; høyde og asimut uten refraksjon; avstand; den faste kroppens tilsynelatende diameter; belyst andel; fase; elongasjon fra Solen med hvilken side av Solen Venus står på; og belyst side, retningen lyset faller fra. |
 | Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 8″ fram til 2100 med den valgte modellen. |
-| Oppdater fra Sted og tid |
-| Les sted og tidspunkt fra Sted og tid på nytt |
-| Les observatør og tidspunkt fra Sted og tid på nytt |
-| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
 | Lukk |
 | Lukk venustabellen |
 | Lukker tabellen. Ingenting endres eller huskes; Sted og tid beholder stedet og tidspunktet. |
@@ -636,12 +656,18 @@ Packed 1854 × 425 px.
 
 ![](venustable-nb-NO-10-instant-dark.png)
 
-Packed 1854 × 425 px.
+Packed 1854 × 466 px.
 
 | shown, hovered or spoken |
 |---|
 | Venus |
 | Hvor Venus er, beregnet fra den medfølgende efemeriden for observasjonsstedet og tidspunktet satt i Sted og tid: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
+| Samsvar med kartet |
+| Samme sted og tidspunkt som kartet: 59.91° N · 10.75° Ø, 2026-08-15 06:00:00 UTC |
+| Oppdater fra Sted og tid |
+| Les sted og tidspunkt fra Sted og tid på nytt |
+| Les observatør og tidspunkt fra Sted og tid på nytt |
+| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
 | Observatør på bredde 59,91, lengde 10,75 øst; tidspunkt 2026-08-15 06:00:00 UTC, fra Sted og tid. |
 | Dette tidspunktet |
 | Én rad, ved tidspunktet satt i Sted og tid |
@@ -685,10 +711,6 @@ Packed 1854 × 425 px.
 | Venus' beregnede størrelser |
 | Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; høyde og asimut uten refraksjon; avstand; den faste kroppens tilsynelatende diameter; belyst andel; fase; elongasjon fra Solen med hvilken side av Solen Venus står på; og belyst side, retningen lyset faller fra. |
 | Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 8″ fram til 2100 med den valgte modellen. |
-| Oppdater fra Sted og tid |
-| Les sted og tidspunkt fra Sted og tid på nytt |
-| Les observatør og tidspunkt fra Sted og tid på nytt |
-| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
 | Lukk |
 | Lukk venustabellen |
 | Lukker tabellen. Ingenting endres eller huskes; Sted og tid beholder stedet og tidspunktet. |

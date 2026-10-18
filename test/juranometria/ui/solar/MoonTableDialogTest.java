@@ -166,7 +166,9 @@ class MoonTableDialogTest {
         rig.observer = new Observer(-0.18, -78.5, MIDSUMMER);
         assertEquals(altitude, rig.cell(0, 3), "nothing moves until the table reads");
         rig.content.update();
-        assertEquals(reads + 1, rig.reads, "one read per update");
+        // One read computes; since #259 the agreement line reads Place and
+        // Time once more, to compare against the chart - never to compute.
+        assertEquals(reads + 2, rig.reads, "one read per update, and one to compare");
         assertNotEquals(altitude, rig.cell(0, 3), "a different sky");
         assertNotEquals(distance, rig.cell(0, 5), "a different topocentric distance");
         assertEquals(phase, rig.cell(0, 8), "but the same phase word: waxing or"

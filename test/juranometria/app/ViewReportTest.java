@@ -54,7 +54,9 @@ class ViewReportTest {
                         new SkyPosition(310.36, 45.28)),
                 List.of("star:hip-102098", "dso:ngc-7000"),
                 "star:hip-102098",
-                "TestOS", "9.9", "x9", "21.0.99");
+                "TestOS", "9.9", "x9", "21.0.99",
+                // The box the page drew (#259), by identity and corner.
+                List.of("place-and-time lower-right"));
     }
 
     @Test
@@ -84,6 +86,7 @@ class ViewReportTest {
                 page-overrides: none
                 emphasis: meridian+equatorial-grid+horizon
                 modules: place-and-time, ecliptic
+                furniture: place-and-time lower-right
                 observer-lines: meridian on, horizon on, zenith off, altitude-ticks off
                 observer: latitude +59.913000; longitude-east +10.752000
                 instant-utc: 2026-03-20T21:33:00Z
@@ -246,7 +249,7 @@ class ViewReportTest {
                 b.skyLanguageChosen(), b.skyLanguageOnChart(), emphasis,
                 b.modules(), place, b.eclipticShowing(), b.selection(),
                 b.workingSet(), b.workingLead(), b.osName(),
-                b.osVersion(), b.osArch(), b.javaVersion());
+                b.osVersion(), b.osArch(), b.javaVersion(), b.furniture());
     }
 
     @Test

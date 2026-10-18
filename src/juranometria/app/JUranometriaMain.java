@@ -93,6 +93,17 @@ public final class JUranometriaMain {
      * the one it asked for.
      */
     static JFrame start(boolean darkOverride, StartupStores stores) {
+        return start(darkOverride, stores, java.time.Instant::now);
+    }
+
+    /**
+     * The same, reading time from a stated clock (#259): the start-up
+     * instant and every <em>Update to now</em> read it, once each, and
+     * nothing else does - so a journey can count the reads on the
+     * application's own routes rather than on a reconstruction of them.
+     */
+    static JFrame start(boolean darkOverride, StartupStores stores,
+                        java.util.function.Supplier<java.time.Instant> clock) {
         // The appearance session policy: the saved preference decides an
         // ordinary launch; an active --dark override keeps this whole
         // session dark and can never be converted into a stored choice
@@ -255,7 +266,17 @@ public final class JUranometriaMain {
                 stores.place();
         juranometria.meridian.MeridianModule meridian =
                 juranometria.ui.placeandtime.PlaceAndTimeSession.begin(
-                        modules, placeStore, java.time.Instant.now());
+                        modules, placeStore, clock.get());
+        // Update to now (#259, rulings 4 and 7 on #556): one action, one
+        // clock read per activation, and every route below runs this
+        // same instance - the chart's Place and Time box, the chart
+        // keyboard's W and the Controller's Solar System tab.
+        juranometria.ui.placeandtime.UpdateToNow updateToNow =
+                new juranometria.ui.placeandtime.UpdateToNow(meridian, clock);
+        // How a presentation hears that Place and Time changed: the
+        // module's own subscription, cancelled by the handle it returns.
+        java.util.function.Function<Runnable, Runnable> placeAndTimeChanges =
+                listener -> meridian.onChange(listener)::cancel;
         // The third module (issue #274), begun through its own seam:
         // attached, then told what the reader last chose. A reader
         // who never chose gets the released default, which is
@@ -285,7 +306,7 @@ public final class JUranometriaMain {
                 ecliptic,
                 juranometria.ui.ecliptic.EclipticSession.toggle(
                         ecliptic, eclipticStore),
-                meridian,
+                meridian, updateToNow,
                 juranometria.ui.language.InterfaceText.forLanguage(
                         language.interfaceLanguage()));
         // The reviewed layout rule: below 640 px of window the
@@ -368,7 +389,7 @@ public final class JUranometriaMain {
         companion.addSection("placeandtime",
                 companionWords.say("placeandtime.title"),
                 new juranometria.ui.placeandtime.PlaceAndTimePanel(meridian,
-                        placeStore, java.time.Instant::now, companionWords));
+                        placeStore, clock, companionWords));
         shutdown.onShutdown(companion::dispose);
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -454,6 +475,12 @@ public final class JUranometriaMain {
         juranometria.ui.solar.SolarTableSession mercuryTable =
                 new juranometria.ui.solar.SolarTableSession(observerNow,
                         solarSystem, juranometria.ui.solar.SolarTable.mercury());
+        // Each table's agreement line follows Place and Time (#259, ruling
+        // 5 on #556) - said again on every change, never recomputed.
+        for (juranometria.ui.solar.SolarTableSession session
+                : java.util.List.of(sunTable, moonTable, venusTable, mercuryTable)) {
+            session.followObserver(placeAndTimeChanges);
+        }
         // Jupiter and the four Galilean moons (#474): one session shared
         // by the Controller's Jupiter group and the Jupiter dialog, over
         // the same observer; the 53 MB Jovian pack is read once, when a
@@ -474,6 +501,7 @@ public final class JUranometriaMain {
                 };
         juranometria.ui.solar.JovianTableSession jupiterTable =
                 new juranometria.ui.solar.JovianTableSession(observerNow, jovianSystem);
+        jupiterTable.followObserver(placeAndTimeChanges);
         // Jupiter on the chart (#484, ruled on #482): one Jovian module
         // over the same observer and the same lazy pack, with its one
         // remembered switch, off by default. The pack loads only when
@@ -522,17 +550,32 @@ public final class JUranometriaMain {
         juranometria.ui.solar.BodyOnChart jupiterLayer =
                 juranometria.ui.solar.JovianChartSession.switchOf(jovianOnChart,
                         jovianChartStore);
+        // Place and Time's box on the chart (#259, the rulings on #556):
+        // drawn whenever a layer drawn for the instant is on - Place and
+        // Time's own lines, or a Solar System body, whose switches are
+        // composed here so the module learns nothing of the others - and
+        // never otherwise. Its action is the one Update to now.
+        juranometria.ui.placeandtime.PlaceAndTimeFurniture.offer(meridian,
+                () -> sunLayer.showing() || mercuryLayer.showing()
+                        || venusLayer.showing() || moonLayer.showing()
+                        || jupiterLayer.showing(),
+                updateToNow,
+                juranometria.ui.language.InterfaceText.forLanguage(
+                        language.interfaceLanguage()));
         // Solar System in the Controller (ruled on #457), since #507 a
         // tab of its own after Chart: the Sun, Mercury (#530), Venus
         // (#502), Moon and Jupiter groups over those sessions and the
         // module's own switches, each remembering its own collapse, with
         // no outer group repeating the tab's name; building and choosing
-        // the tab compute nothing; the Sun, Venus and the Moon with
-        // Centre on chart, Mercury with neither switch nor button.
+        // the tab compute nothing; every group with its Show on chart and
+        // Centre on chart, Mercury's since #542 and Jupiter's since #484.
         juranometria.ui.solar.SolarSystemSection solarSection =
                 new juranometria.ui.solar.SolarSystemSection(sunTable, mercuryTable,
                         venusTable, moonTable, sunLayer, mercuryLayer, venusLayer, moonLayer,
                         jupiterTable, jupiterLayer, centreOnChart, companionWords);
+        // The tab opens with the instant the chart is frozen at and Update
+        // to now (#259, ruling 9 on #556).
+        solarSection.showChartInstant(observerNow, placeAndTimeChanges, updateToNow);
         companion.addTab(juranometria.ui.solar.SolarSystemSection.ID,
                 companionWords.say("companion.tab.solarsystem"),
                 solarSection.inController(companionStore, companionWords));
@@ -577,7 +620,7 @@ public final class JUranometriaMain {
                 },
                 () -> juranometria.ui.placeandtime.PlaceAndTimeDialog.open(
                         frame, meridian, placeStore,
-                        java.time.Instant::now,
+                        clock,
                         juranometria.ui.language.InterfaceText.forLanguage(
                                 language.interfaceLanguage())),
                 // One switch, and its whole behaviour lives in the
