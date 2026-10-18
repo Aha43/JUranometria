@@ -107,7 +107,8 @@ class EmphasisControlsTest {
     }
 
     @Test
-    void aStructureThatStopsBeingDrawnLeavesAndItsBoxFollows() throws Exception {
+    void aStructureNavigationStopsDrawingKeepsItsBox() throws Exception {
+        // #537, amending #361: navigation is not a choice.
         ChartComponent[] chart = chartWithModules();
         EmphasisControls[] group = new EmphasisControls[1];
         SwingUtilities.invokeAndWait(() -> {
@@ -117,10 +118,17 @@ class EmphasisControlsTest {
             chart[0].setViewState(new ChartViewState(new SkyPosition(83.0, 0.0), 1.0, 8.0));
         });
         JCheckBox figures = group[0].box(ChartStructure.CONSTELLATION_FIGURES);
-        assertFalse(chart[0].emphasizedSet().contains(ChartStructure.CONSTELLATION_FIGURES),
-                "the detail policy settles what it stops drawing");
-        assertFalse(figures.isSelected() || figures.isEnabled(),
-                "and the box is unchecked and unavailable with it");
+        assertTrue(chart[0].emphasizedSet().contains(ChartStructure.CONSTELLATION_FIGURES),
+                "the choice survives the zoom");
+        assertTrue(figures.isSelected() && figures.isEnabled(),
+                "and its box stays checked and available");
+        JCheckBox boundaries = group[0].box(ChartStructure.CONSTELLATION_BOUNDARIES);
+        assertTrue(boundaries.isEnabled(),
+                "an unchecked structure absent from this field may be raised");
+        SwingUtilities.invokeAndWait(() ->
+                group[0].choose(ChartStructure.CONSTELLATION_BOUNDARIES));
+        assertTrue(boundaries.isSelected()
+                && chart[0].emphasizedSet().contains(ChartStructure.CONSTELLATION_BOUNDARIES));
     }
 
     @Test

@@ -37,7 +37,7 @@ The fresh state: a single row at the instant Place and Time holds. The Sun stand
 
 ![](suntable-en-1-instant.png)
 
-Packed 959 × 466 px.
+Packed 959 × 479 px.
 
 | shown, hovered or spoken |
 |---|
@@ -99,7 +99,7 @@ Daily rows from the instant, and an end that is not on the grid, added last and 
 
 ![](suntable-en-2-range.png)
 
-Packed 959 × 483 px.
+Packed 959 × 479 px.
 
 | shown, hovered or spoken |
 |---|
@@ -165,7 +165,7 @@ The end is before the start. The table is empty and the status line says why; no
 
 ![](suntable-en-3-refused.png)
 
-Packed 959 × 466 px.
+Packed 959 × 479 px.
 
 | shown, hovered or spoken |
 |---|
@@ -226,7 +226,7 @@ An equatorial observer at the IMCCE's solstice instant: the Sun is up, 32° high
 
 ![](suntable-en-4-quito.png)
 
-Packed 959 × 466 px.
+Packed 959 × 479 px.
 
 | shown, hovered or spoken |
 |---|
@@ -286,7 +286,7 @@ Packed 959 × 466 px.
 
 ![](suntable-en-5-instant-dark.png)
 
-Packed 959 × 466 px.
+Packed 959 × 479 px.
 
 | shown, hovered or spoken |
 |---|
@@ -363,7 +363,7 @@ The fresh state: a single row at the instant Place and Time holds. The Sun stand
 
 ![](suntable-nb-NO-6-instant.png)
 
-Packed 959 × 466 px.
+Packed 959 × 479 px.
 
 | shown, hovered or spoken |
 |---|
@@ -425,7 +425,7 @@ Daily rows from the instant, and an end that is not on the grid, added last and 
 
 ![](suntable-nb-NO-7-range.png)
 
-Packed 959 × 483 px.
+Packed 959 × 479 px.
 
 | shown, hovered or spoken |
 |---|
@@ -491,7 +491,7 @@ The end is before the start. The table is empty and the status line says why; no
 
 ![](suntable-nb-NO-8-refused.png)
 
-Packed 959 × 466 px.
+Packed 959 × 479 px.
 
 | shown, hovered or spoken |
 |---|
@@ -552,7 +552,7 @@ An equatorial observer at the IMCCE's solstice instant: the Sun is up, 32° high
 
 ![](suntable-nb-NO-9-quito.png)
 
-Packed 959 × 466 px.
+Packed 959 × 479 px.
 
 | shown, hovered or spoken |
 |---|
@@ -612,7 +612,7 @@ Packed 959 × 466 px.
 
 ![](suntable-nb-NO-10-instant-dark.png)
 
-Packed 959 × 466 px.
+Packed 959 × 479 px.
 
 | shown, hovered or spoken |
 |---|

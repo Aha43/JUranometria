@@ -41,7 +41,7 @@ The fresh state: a single row at the instant Place and Time holds - Espenak's ho
 
 ![](venustable-en-1-instant.png)
 
-Packed 1854 × 466 px.
+Packed 1854 × 479 px.
 
 | shown, hovered or spoken |
 |---|
@@ -106,7 +106,7 @@ Daily rows from the instant, and an end that is not on the grid, added last and 
 
 ![](venustable-en-2-range.png)
 
-Packed 1854 × 483 px.
+Packed 1854 × 479 px.
 
 | shown, hovered or spoken |
 |---|
@@ -180,7 +180,7 @@ The end is after the last civil day Venus is computed for. The table is empty an
 
 ![](venustable-en-3-refused.png)
 
-Packed 1854 × 466 px.
+Packed 1854 × 479 px.
 
 | shown, hovered or spoken |
 |---|
@@ -244,7 +244,7 @@ Espenak's hour of the 2012 inferior conjunction, while Venus crossed the Sun's d
 
 ![](venustable-en-4-transit.png)
 
-Packed 1854 × 466 px.
+Packed 1854 × 479 px.
 
 | shown, hovered or spoken |
 |---|
@@ -307,7 +307,7 @@ Packed 1854 × 466 px.
 
 ![](venustable-en-5-instant-dark.png)
 
-Packed 1854 × 466 px.
+Packed 1854 × 479 px.
 
 | shown, hovered or spoken |
 |---|
@@ -390,7 +390,7 @@ The fresh state: a single row at the instant Place and Time holds - Espenak's ho
 
 ![](venustable-nb-NO-6-instant.png)
 
-Packed 1854 × 466 px.
+Packed 1854 × 479 px.
 
 | shown, hovered or spoken |
 |---|
@@ -455,7 +455,7 @@ Daily rows from the instant, and an end that is not on the grid, added last and 
 
 ![](venustable-nb-NO-7-range.png)
 
-Packed 1854 × 483 px.
+Packed 1854 × 479 px.
 
 | shown, hovered or spoken |
 |---|
@@ -529,7 +529,7 @@ The end is after the last civil day Venus is computed for. The table is empty an
 
 ![](venustable-nb-NO-8-refused.png)
 
-Packed 1854 × 466 px.
+Packed 1854 × 479 px.
 
 | shown, hovered or spoken |
 |---|
@@ -593,7 +593,7 @@ Espenak's hour of the 2012 inferior conjunction, while Venus crossed the Sun's d
 
 ![](venustable-nb-NO-9-transit.png)
 
-Packed 1854 × 466 px.
+Packed 1854 × 479 px.
 
 | shown, hovered or spoken |
 |---|
@@ -656,7 +656,7 @@ Packed 1854 × 466 px.
 
 ![](venustable-nb-NO-10-instant-dark.png)
 
-Packed 1854 × 466 px.
+Packed 1854 × 479 px.
 
 | shown, hovered or spoken |
 |---|

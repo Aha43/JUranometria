@@ -103,7 +103,8 @@ it reads the chart rather than remembering it.
   the chart component beside the options, survives panning and
   zooming, and dies with the session. No preference key exists;
   the persisted chart options carry no trace of it.
-- **Availability and clearing.** A target is choosable only while
+- **Availability and clearing** (amended by #537, below). A target
+  is choosable only while
   its layer is switched on and drawn at the current field, or some
   module is contributing geometry the chart maps to it; unavailable
   targets arrive disabled. The moment an emphasized structure stops
@@ -303,3 +304,37 @@ keyboard access.
   the companion photographed with the group (`companion-*-8-emphasis-open`
   added, the others retaken); the control-explanation audit gains the
   group's eight controls.
+
+## Amendment: navigation is not a choice (#537, Sprint 51)
+
+Owner testing found the ruling above too strict in one case: raise the
+constellation figures or boundaries, zoom in until the detail policy
+draws none, zoom back out - and the emphasis was gone, and while no
+lines were drawn it could not be chosen at all. That reads as lost
+state, not as a mode settling.
+
+So availability now follows the **reader's own switches**, never what
+the page in view happens to draw:
+
+- Zooming past the field where the detail policy stops drawing a
+  structure, panning, or a globe that turns boundaries off for its own
+  page leaves the emphasis raised and its box checked and enabled; an
+  unchecked structure may be raised while absent; its deep-red ink
+  returns when the structure is drawn again.
+- Switching the structure's layer off, or a module hiding its lines or
+  detaching, is an explicit choice and still settles the emphasis at
+  once and makes it unavailable - the useful half of the ruling: no
+  layer is hidden with a forgotten emphasis attached.
+
+Of the seven choices, the change reaches two: the figures and the
+boundaries, which the detail policy suppresses by field - and the
+boundaries, which a globe turns off for its own page. The grid follows
+the reader's switch as it effectively did. The meridian, the horizon and the ecliptic
+were already offered while their module draws them anywhere, and the
+Solar System labels while a body layer is on.
+
+Evidence: `StructureEmphasisSessionTest`, `EmphasisControlsTest`, and
+the packaged journey *emphasis through navigation OK* - both raised at
+42°, kept and toggleable through a zoom to 8° and a pan, the same ink
+returning byte for byte, and the figures' layer switched off settling
+theirs.

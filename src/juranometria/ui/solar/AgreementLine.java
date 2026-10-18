@@ -37,7 +37,25 @@ final class AgreementLine {
 
     private final SolarTableWords said;
     private final JPanel panel = new JPanel(new BorderLayout(0, 4));
-    private final JLabel words = new JLabel();
+    /**
+     * The words, never shorter than two lines (the owner's ruling at the
+     * #537 gate): agreeing says one sentence and differing or a range
+     * says two, and a line that grew and shrank with them made the
+     * dialog jump whenever Place and Time changed - and made every
+     * captured table sheet resize between its states.
+     */
+    private final JLabel words = new JLabel() {
+        @Override
+        public java.awt.Dimension getPreferredSize() {
+            java.awt.Dimension size = super.getPreferredSize();
+            java.awt.Insets insets = getInsets();
+            int twoLines = 2 * getFontMetrics(getFont()).getHeight()
+                    + insets.top + insets.bottom;
+            return new java.awt.Dimension(size.width, Math.max(size.height, twoLines));
+        }
+    };
+    /** Holds the update button: below the words, or beside them in a dialog. */
+    private final JPanel button = new JPanel(new BorderLayout());
     private final JButton update;
     private int wrapWidth = Integer.MAX_VALUE;
     private String text = "";
@@ -53,7 +71,6 @@ final class AgreementLine {
                 BorderFactory.createEmptyBorder(5, 7, 5, 7)));
         panel.getAccessibleContext().setAccessibleName(said.say("agreement.a11y"));
         panel.add(words, BorderLayout.CENTER);
-        JPanel button = new JPanel(new BorderLayout());
         button.setOpaque(false);
         button.add(update, BorderLayout.WEST);
         panel.add(button, BorderLayout.SOUTH);
@@ -67,6 +84,23 @@ final class AgreementLine {
     /** What the line says now, one line per sentence; empty while hidden. */
     String text() {
         return text;
+    }
+
+    /**
+     * Puts the update button beside the two lines rather than under
+     * them - a dialog's arrangement, where the room is wide - so showing
+     * or hiding the button never changes the line's height either.
+     */
+    void besideTheWords() {
+        panel.remove(button);
+        button.setBorder(BorderFactory.createEmptyBorder(0, 12, 0, 0));
+        JPanel centred = new JPanel(new java.awt.GridBagLayout());
+        centred.setOpaque(false);
+        centred.add(button);
+        panel.add(centred, BorderLayout.EAST);
+        // A hidden button keeps its room, so the line's width does not
+        // move either.
+        button.setPreferredSize(update.getPreferredSize());
     }
 
     /** Wraps each sentence to this width - the narrow Controller group's room. */

@@ -253,7 +253,7 @@ public final class SolarTableDialog extends JDialog {
             // The agreement line opens the dialog as it opens the
             // Controller's group (#259, ruling 5 on #556), Update from
             // Place and Time in it when the table differs.
-            JComponent agreement = controls.agreementLine();
+            JComponent agreement = controls.agreementLineInDialog();
             agreement.setAlignmentX(0.0f);
             agreement.setMaximumSize(new Dimension(Integer.MAX_VALUE,
                     Integer.MAX_VALUE));
