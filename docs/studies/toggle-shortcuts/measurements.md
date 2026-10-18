@@ -24,6 +24,7 @@ in their head.
 | Star names | `S` | — | Traditional proper names such as Betelgeuse. Shortcut: <p... |
 | Bayer letters | `Y` | — | Greek and Latin Bayer designations such as alpha Orionis.... |
 | Flamsteed numbers | `F` | — | Flamsteed catalogue numbers on the regional charts. Short... |
+| All star identities where they fit | `A` | — | Every star name, letter and number that fits, beside the ... |
 | Constellation figures | `F` | — | The joined stick figures of the constellations. Shortcut:... |
 | Constellation boundaries | `B` | — | The IAU boundaries, precessed from B1875. Shortcut: <pref... |
 | Constellation names | `N` | Constellation figures | The figure's name, drawn where the figure is. Shortcut: <... |
@@ -31,7 +32,7 @@ in their head.
 | Title block | `T` | — | The panel in the lower left stating the target, centre, f... |
 | Stellar-magnitude key | `K` | — | A key in the upper right showing the circle size the char... |
 | Black sky | `B` | — | White stars and restrained light ink on a black ground, i... |
-| **17 controls** | | | |
+| **18 controls** | | | |
 
 Every one of them is reachable today by opening Chart Options and pressing the
 control's own mnemonic - a route that needs the dialog open, which is the thing
@@ -73,7 +74,7 @@ to assign its own letters, and say where they came from.
 
 ## What sixteen accelerators would cost
 
-The controls want 15 distinct letters for 17 controls. Bound with the platform's own menu key,
+The controls want 16 distinct letters for 18 controls. Bound with the platform's own menu key,
 **1** of them collide with something the application already answers - E.
 
 That is the smaller half of the objection. The larger half is that sixteen new
@@ -84,7 +85,7 @@ and the atlas has four in total today.
 
 | | new global strokes | to reach one toggle | what a reader must remember | shows current state |
 |---|---:|---|---|---|
-| direct accelerators for all | 17 | one stroke | 17 letters | no |
+| direct accelerators for all | 18 | one stroke | 18 letters | no |
 | a prefix, then the control's own letter | 1 | two strokes | one prefix, then the letter already on the control | only if the prefix says so |
 | a palette listing every state | 1 | a stroke, then a letter or a click | one stroke | yes, all of it |
 | direct for the few, prefix for the rest | 3-4 | one or two strokes | the few, and the prefix | partly |
