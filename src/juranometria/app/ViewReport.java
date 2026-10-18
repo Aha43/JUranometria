@@ -301,6 +301,7 @@ public final class ViewReport {
                 new Switch("star-names", o.starNames()),
                 new Switch("bayer-letters", o.bayerLetters()),
                 new Switch("flamsteed-numbers", o.flamsteedNumbers()),
+                new Switch("all-star-identities", o.allStarIdentities()),
                 new Switch("equatorial-grid", o.equatorialGrid()),
                 new Switch("title-block", o.titleBlock()),
                 new Switch("magnitude-key", o.magnitudeKey()));

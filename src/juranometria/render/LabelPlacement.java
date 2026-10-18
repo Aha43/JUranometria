@@ -417,6 +417,23 @@ public final class LabelPlacement {
                 : accept(request, fallback, refusals, true);
     }
 
+    /**
+     * Places a request in its first clean candidate, or omits it - never
+     * under duress (#558, ruling 2 on #557: an extra identity takes only
+     * room that is free, and is simply not drawn where none is).
+     */
+    public Placement placeIfClean(Request request) {
+        List<Refused> refusals = new ArrayList<>();
+        for (int at = 0; at < request.candidates().size(); at++) {
+            Refused refused = refuse(request, at);
+            if (refused == null) {
+                return accept(request, at, refusals, false);
+            }
+            refusals.add(refused);
+        }
+        return new Placement(request, null, -1, List.copyOf(refusals), false);
+    }
+
     /** The obstacles this placement is deciding against. */
     public List<Obstacle> obstacles() {
         return List.copyOf(obstacles);

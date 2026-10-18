@@ -458,6 +458,7 @@ public final class PackagedAcceptanceMain {
         meridianJourney();
         emphasisJourney();
         emphasisThroughNavigation();
+        allStarIdentities();
         combinedEmphasisJourney();
         solarSystemLabelsJourney();
         emphasisControlsJourney();
@@ -4344,6 +4345,65 @@ public final class PackagedAcceptanceMain {
      * the same deep-red ink, byte for byte; switching the figures' layer
      * off still settles theirs.
      */
+    /**
+     * All star identities where they fit (#558, the rulings on #557): the
+     * Aries page at 8° drawn through the packaged component with the switch
+     * off and on - Mesarthim named, every released label kept, no extra
+     * identity forced - and the 60° Orion page with no bare number.
+     */
+    private static void allStarIdentities() throws Exception {
+        juranometria.chart.SkyPosition mesarthim = Atlas.search().search("Mesarthim")
+                .stream().filter(r -> r.kind() == juranometria.search.SearchResult.Kind.STAR)
+                .findFirst().orElseThrow().position();
+        juranometria.ui.ChartComponent chart =
+                new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
+        chart.setSize(900, 700);
+        chart.setViewState(new ChartViewState(mesarthim, 8.0, 8.0));
+        juranometria.render.ChartRenderer renderer = new juranometria.render.ChartRenderer(
+                juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH_PAGE);
+        java.util.List<juranometria.render.LabelPlacement.Placement> released =
+                renderer.textPlacements(juranometria.render.ChartRenderer.TextMetrics
+                        .offscreen(), chart.currentScene(), chart.drawnOptions());
+        java.awt.image.BufferedImage off = paint(chart);
+        chart.setChartOptions(chart.chartOptions().withAllStarIdentities(true));
+        java.util.List<juranometria.render.LabelPlacement.Placement> dense =
+                renderer.textPlacements(juranometria.render.ChartRenderer.TextMetrics
+                        .offscreen(), chart.currentScene(), chart.drawnOptions());
+        require(dense.stream().anyMatch(p -> p.at() != null
+                        && p.request().text().equals("Mesarthim γ¹")),
+                "Mesarthim is named with the switch on");
+        require(released.stream().noneMatch(p -> p.at() != null
+                        && p.request().text().startsWith("Mesarthim")),
+                "and only by its letter with it off");
+        java.util.Set<String> kept = new java.util.HashSet<>();
+        for (var p : dense) {
+            if (p.at() != null) {
+                kept.add(p.request().family() + "/" + p.request().id());
+            }
+        }
+        for (var p : released) {
+            require(p.at() == null || kept.contains(p.request().family() + "/"
+                    + p.request().id()), "every released label is kept: " + p.request().text());
+        }
+        long forced = dense.subList(released.size(), dense.size()).stream()
+                .filter(p -> p.underDuress()).count();
+        require(forced == 0, "no extra identity is forced: " + forced);
+        int extra = (int) dense.subList(released.size(), dense.size()).stream()
+                .filter(p -> p.at() != null).count();
+        require(differingPixels(off, paint(chart)) > 0, "the page shows the added identities");
+        chart.setViewState(new ChartViewState(Atlas.search().search("Alnilam").stream()
+                .filter(r -> r.kind() == juranometria.search.SearchResult.Kind.STAR)
+                .findFirst().orElseThrow().position(), 60.0, 8.0));
+        for (var p : renderer.textPlacements(juranometria.render.ChartRenderer.TextMetrics
+                .offscreen(), chart.currentScene(), chart.drawnOptions())) {
+            require(p.at() == null || !p.request().text().matches("\\d+"),
+                    "no bare Flamsteed number at 60°: " + p.request().text());
+        }
+        System.out.println("all star identities OK (Aries at 8°: Mesarthim named, every"
+                + " released label kept, " + extra + " identities added in free room and none"
+                + " forced; Orion at 60° with no bare number)");
+    }
+
     private static void emphasisThroughNavigation() throws Exception {
         juranometria.ui.ChartComponent chart =
                 new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);

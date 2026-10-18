@@ -415,6 +415,24 @@ public final class ChartOptionsDialog extends JDialog {
     }
 
     /**
+     * A switch the chart keyboard deliberately does not reach (#558:
+     * All star identities where they fit, ruling 1 on #557), so its hover
+     * and spoken description promise no shortcut.
+     */
+    static JCheckBox checkBoxWithoutShortcut(String text, char mnemonic,
+                                             boolean selected, String accessibleName,
+                                             String hover, String description,
+                                             String name) {
+        JCheckBox box = new JCheckBox(text, selected);
+        box.setMnemonic(mnemonic);
+        box.setOpaque(false);
+        box.setAlignmentX(0.0f);
+        box.setName(name);
+        box.getAccessibleContext().setAccessibleName(accessibleName);
+        return juranometria.ui.Explain.control(box, hover, description);
+    }
+
+    /**
      * A dependency's name as this language writes it here.
      *
      * <p>Its own key rather than a visible label transformed at
