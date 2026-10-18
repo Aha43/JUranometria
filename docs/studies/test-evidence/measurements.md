@@ -197,7 +197,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 
 - files dispatching real pointer events: 22
 - files dispatching real keyboard events: 2
-- files using doClick somewhere: 40
+- files using doClick somewhere: 39
 - files using postActionEvent somewhere: 4
 
 ## Platform assumptions written into tests

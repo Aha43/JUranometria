@@ -97,9 +97,11 @@ class AgreementLineTest {
                 "saying it recomputed nothing");
         assertEquals(result, controls.session().result(), "and changed no result");
 
-        controls.update.doClick();
+        // The button applies this host's draft, as Compute does; the
+        // Controller journey presses it for real.
+        controls.apply();
         assertEquals(computed + 1, controls.session().computations(),
-                "the button is the reader asking: it recomputes, once");
+                "the reader asking recomputes, once");
         assertTrue(controls.agreementText().startsWith("Same place and instant"));
     }
 
