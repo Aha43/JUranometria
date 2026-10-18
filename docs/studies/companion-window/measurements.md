@@ -23,7 +23,7 @@ nothing - is one machine's answer, in `platform.md` beside this.
 | JCheckBox | Mathematical horizon | Show Mathematical horizon |
 | JCheckBox | Zenith | Show Zenith |
 | JCheckBox | Altitude ticks | Show Altitude ticks |
-| JButton | Now | Now |
+| JButton | Update to now | Update to now |
 | JButton | Centre on zenith | Centre on zenith |
 
 **9 operable controls.** A companion that hosts this content offers
@@ -40,7 +40,7 @@ exactly these; it adds only its own shell.
 | JCheckBox | Matematisk horisont | Vis matematisk horisont |
 | JCheckBox | Senit | Vis senit |
 | JCheckBox | Høydemerker | Vis høydemerker |
-| JButton | Nå | Nå |
+| JButton | Oppdater til nå | Oppdater til nå |
 | JButton | Sentrer på senit | Sentrer på senit |
 
 **9 operable controls.** A companion that hosts this content offers

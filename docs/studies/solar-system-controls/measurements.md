@@ -122,18 +122,18 @@ of their own (the dialogs keep theirs), or distinct ones.
 
 | arrangement | headings | controls | stops |
 |---|---:|---:|---:|
-| the Sun dialog's content | 0 | 9 | 9 |
-| the Sun group, card | 1 | 8 | 9 |
-| Solar System, both open, card | 3 | 16 | 19 |
+| the Sun dialog's content | 0 | 8 | 8 |
+| the Sun group, card | 1 | 7 | 8 |
+| Solar System, both open, card | 3 | 14 | 17 |
 | Solar System, collapsed | 3 | 0 | 3 |
 
 ## Keyboard stops, `nb-NO`
 
 | arrangement | headings | controls | stops |
 |---|---:|---:|---:|
-| the Sun dialog's content | 0 | 9 | 9 |
-| the Sun group, card | 1 | 8 | 9 |
-| Solar System, both open, card | 3 | 16 | 19 |
+| the Sun dialog's content | 0 | 8 | 8 |
+| the Sun group, card | 1 | 7 | 8 |
+| Solar System, both open, card | 3 | 14 | 17 |
 | Solar System, collapsed | 3 | 0 | 3 |
 
 ## The images
