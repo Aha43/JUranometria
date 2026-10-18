@@ -552,6 +552,7 @@ public final class JovianTableControls {
         top.setLayout(new BoxLayout(top, BoxLayout.Y_AXIS));
         top.putClientProperty(MARK, Boolean.TRUE);
         // The agreement line opens the dialog too (#259, ruling 5 on #556).
+        agreement.besideTheWords();
         JComponent line = agreement.panel();
         line.setAlignmentX(0f);
         top.add(line);

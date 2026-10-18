@@ -165,6 +165,32 @@ class AgreementLineTest {
     }
 
     @Test
+    void aDialogsLineKeepsOneHeightWhateverItSays() {
+        // The owner's ruling at the #537 gate: a fixed two-line height, the
+        // button beside the words, so the dialog never jumps - and a sheet
+        // captured state by state never resizes between them.
+        PlaceAndTime chart = new PlaceAndTime();
+        SolarTableControls controls = venus(chart);
+        javax.swing.JComponent line = controls.agreementLineInDialog();
+        List<java.awt.Dimension> sizes = new ArrayList<>();
+        sizes.add(line.getPreferredSize());
+        controls.apply();
+        sizes.add(line.getPreferredSize());
+        chart.set(chart.now.get().at(Instant.parse("2026-08-15T21:30:00Z")));
+        assertTrue(controls.update.isVisible());
+        sizes.add(line.getPreferredSize());
+        controls.rangeView.setSelected(true);
+        controls.start.setText("2026-08-01 00:00:00");
+        controls.end.setText("2026-08-03 00:00:00");
+        controls.apply();
+        sizes.add(line.getPreferredSize());
+        for (java.awt.Dimension size : sizes) {
+            assertEquals(sizes.get(0).height, size.height,
+                    "nothing computed, agreeing, differing, a range: one height " + sizes);
+        }
+    }
+
+    @Test
     void releasingThePanelStopsFollowingPlaceAndTime() {
         PlaceAndTime chart = new PlaceAndTime();
         SolarTableControls controls = venus(chart);

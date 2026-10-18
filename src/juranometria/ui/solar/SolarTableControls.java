@@ -263,6 +263,12 @@ public final class SolarTableControls {
         return agreement.panel();
     }
 
+    /** The agreement line as a dialog holds it: the button beside the two lines. */
+    public JComponent agreementLineInDialog() {
+        agreement.besideTheWords();
+        return agreement.panel();
+    }
+
     /**
      * This host's body for Centre on chart: its typed draft applied to
      * the shared session, and the J2000 place of the first row the

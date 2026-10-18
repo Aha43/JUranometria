@@ -298,7 +298,11 @@ sheet.
   range was computed for another place. Places that differ are written
   with more decimals until they read differently. Each table's session
   follows Place and Time's change notice; the line re-reads, never
-  recomputes.
+  recomputes. The line is never shorter than two lines, and in a
+  dialog the button stands beside it, so agreeing, differing and a
+  range all take one height and the dialog never jumps (the owner's
+  ruling at the #537 gate, where the growing line made table sheets
+  resize between states and refuse captures twice).
 - **Paper (ruling 6).** The sheet's box carries the frozen sentence in
   the control's place; the sheet's description gains the box's sentence
   only when the box is drawn on the sheet.

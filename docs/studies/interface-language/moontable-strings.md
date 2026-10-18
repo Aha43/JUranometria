@@ -39,7 +39,7 @@ The fresh state: a single row at the instant Place and Time holds. A waxing cres
 
 ![](moontable-en-1-instant.png)
 
-Packed 1489 × 466 px.
+Packed 1489 × 479 px.
 
 | shown, hovered or spoken |
 |---|
@@ -104,7 +104,7 @@ Daily rows from the instant, and an end that is not on the grid, added last and 
 
 ![](moontable-en-2-range.png)
 
-Packed 1489 × 483 px.
+Packed 1489 × 479 px.
 
 | shown, hovered or spoken |
 |---|
@@ -173,7 +173,7 @@ The end is before the start. The table is empty and the status line says why; no
 
 ![](moontable-en-3-refused.png)
 
-Packed 1489 × 466 px.
+Packed 1489 × 479 px.
 
 | shown, hovered or spoken |
 |---|
@@ -237,7 +237,7 @@ A southern observer at Espenak's full-Moon instant: the Moon 74° high, 99.9 % l
 
 ![](moontable-en-4-capetown.png)
 
-Packed 1489 × 466 px.
+Packed 1489 × 479 px.
 
 | shown, hovered or spoken |
 |---|
@@ -300,7 +300,7 @@ Packed 1489 × 466 px.
 
 ![](moontable-en-5-instant-dark.png)
 
-Packed 1489 × 466 px.
+Packed 1489 × 479 px.
 
 | shown, hovered or spoken |
 |---|
@@ -383,7 +383,7 @@ The fresh state: a single row at the instant Place and Time holds. A waxing cres
 
 ![](moontable-nb-NO-6-instant.png)
 
-Packed 1489 × 466 px.
+Packed 1489 × 479 px.
 
 | shown, hovered or spoken |
 |---|
@@ -448,7 +448,7 @@ Daily rows from the instant, and an end that is not on the grid, added last and 
 
 ![](moontable-nb-NO-7-range.png)
 
-Packed 1489 × 483 px.
+Packed 1489 × 479 px.
 
 | shown, hovered or spoken |
 |---|
@@ -517,7 +517,7 @@ The end is before the start. The table is empty and the status line says why; no
 
 ![](moontable-nb-NO-8-refused.png)
 
-Packed 1489 × 466 px.
+Packed 1489 × 479 px.
 
 | shown, hovered or spoken |
 |---|
@@ -581,7 +581,7 @@ A southern observer at Espenak's full-Moon instant: the Moon 74° high, 99.9 % l
 
 ![](moontable-nb-NO-9-capetown.png)
 
-Packed 1489 × 466 px.
+Packed 1489 × 479 px.
 
 | shown, hovered or spoken |
 |---|
@@ -644,7 +644,7 @@ Packed 1489 × 466 px.
 
 ![](moontable-nb-NO-10-instant-dark.png)
 
-Packed 1489 × 466 px.
+Packed 1489 × 479 px.
 
 | shown, hovered or spoken |
 |---|
