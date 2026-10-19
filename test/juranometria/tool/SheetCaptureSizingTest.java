@@ -948,7 +948,23 @@ class SheetCaptureSizingTest {
         }
     }
 
-    /** A window that cannot be made wider than 300 content pixels. */
+    /**
+     * A window that cannot be made wider than 300 content pixels.
+     *
+     * <p>The width is held at {@code setBounds}, the one method every
+     * Java-side resize reaches - {@code setSize(Dimension)},
+     * {@code setSize(int, int)} and {@code pack()} alike - so the native
+     * window is never asked to be wider. It once held only
+     * {@code setSize(Dimension)}, while {@link #floorPolicy}'s own apply
+     * asks through {@code setSize(int, int)}: on macOS that request was
+     * read back at once as the packed width, then carried out by the
+     * native window a moment later, with no Java call. Landing after the
+     * restatement's resize and before its validation, it brought window
+     * and content to the declared 420, so the declaration the test calls
+     * unrealizable was realized and nothing was refused - gate 1 on
+     * {@code 553e1c0b} (#584). The capture was right to accept a window
+     * at its declaration; the window was not what the test said it was.
+     */
     private static final class NarrowerThanDeclared extends JDialog {
 
         NarrowerThanDeclared(JFrame owner) {
@@ -956,10 +972,10 @@ class SheetCaptureSizingTest {
         }
 
         @Override
-        public void setSize(Dimension size) {
+        public void setBounds(int x, int y, int width, int height) {
             java.awt.Insets chrome = getInsets();
-            super.setSize(Math.min(size.width,
-                    300 + chrome.left + chrome.right), size.height);
+            super.setBounds(x, y, Math.min(width,
+                    300 + chrome.left + chrome.right), height);
         }
     }
 
