@@ -80,7 +80,7 @@ B and B′ are compared on Horizons' planetodetic reading of the service's plane
 | after | 3841 | horizontal | 1.8588" | oslo 2098-03-24T00:00:00Z |
 | after | 3841 | position angle deg | 6.9067 deg | oslo 2084-01-31T00:00:00Z |
 | after | 3841 | position angle deg, ill-conditioned rows | 6.9067 deg | oslo 2084-01-31T00:00:00Z |
-| after | 3841 | position angle deg, well-conditioned rows | 0.1007 deg | oslo 2030-05-13T00:00:00Z |
+| after | 3841 | position angle deg, well-conditioned rows | 0.1990 deg | oslo 2045-11-20T00:00:00Z |
 | after | 3841 | separation | 0.2908" | oslo 2098-03-31T00:00:00Z |
 
 ### enceladus
@@ -108,7 +108,7 @@ B and B′ are compared on Horizons' planetodetic reading of the service's plane
 | after | 3841 | horizontal | 1.8293" | oslo 2098-03-31T00:00:00Z |
 | after | 3841 | position angle deg | 6.4628 deg | oslo 2068-08-13T00:00:00Z |
 | after | 3841 | position angle deg, ill-conditioned rows | 6.4628 deg | oslo 2068-08-13T00:00:00Z |
-| after | 3841 | position angle deg, well-conditioned rows | 0.1005 deg | oslo 2079-08-28T00:00:00Z |
+| after | 3841 | position angle deg, well-conditioned rows | 0.1860 deg | oslo 2049-12-27T00:00:00Z |
 | after | 3841 | separation | 0.2579" | oslo 2098-03-31T00:00:00Z |
 
 ### tethys
@@ -136,7 +136,7 @@ B and B′ are compared on Horizons' planetodetic reading of the service's plane
 | after | 3841 | horizontal | 1.8170" | oslo 2099-03-23T00:00:00Z |
 | after | 3841 | position angle deg | 8.4304 deg | oslo 2098-05-05T00:00:00Z |
 | after | 3841 | position angle deg, ill-conditioned rows | 8.4304 deg | oslo 2098-05-05T00:00:00Z |
-| after | 3841 | position angle deg, well-conditioned rows | 0.0977 deg | oslo 2046-11-12T00:00:00Z |
+| after | 3841 | position angle deg, well-conditioned rows | 0.1916 deg | oslo 2040-11-26T00:00:00Z |
 | after | 3841 | separation | 0.2300" | oslo 2098-03-17T00:00:00Z |
 
 ### dione
@@ -164,7 +164,7 @@ B and B′ are compared on Horizons' planetodetic reading of the service's plane
 | after | 3841 | horizontal | 1.7681" | oslo 2097-02-25T00:00:00Z |
 | after | 3841 | position angle deg | 8.0758 deg | oslo 2097-10-28T00:00:00Z |
 | after | 3841 | position angle deg, ill-conditioned rows | 8.0758 deg | oslo 2097-10-28T00:00:00Z |
-| after | 3841 | position angle deg, well-conditioned rows | 0.0979 deg | oslo 2050-01-17T00:00:00Z |
+| after | 3841 | position angle deg, well-conditioned rows | 0.1940 deg | oslo 2064-03-03T00:00:00Z |
 | after | 3841 | separation | 0.2052" | oslo 2098-04-28T00:00:00Z |
 
 ### rhea
@@ -192,7 +192,7 @@ B and B′ are compared on Horizons' planetodetic reading of the service's plane
 | after | 3841 | horizontal | 1.7533" | oslo 2100-04-26T00:00:00Z |
 | after | 3841 | position angle deg | 2.8687 deg | oslo 2083-06-14T00:00:00Z |
 | after | 3841 | position angle deg, ill-conditioned rows | 2.8687 deg | oslo 2083-06-14T00:00:00Z |
-| after | 3841 | position angle deg, well-conditioned rows | 0.0996 deg | oslo 2061-11-21T00:00:00Z |
+| after | 3841 | position angle deg, well-conditioned rows | 0.1956 deg | oslo 2071-11-23T00:00:00Z |
 | after | 3841 | separation | 0.1712" | oslo 2098-02-24T00:00:00Z |
 
 ### titan
@@ -220,7 +220,7 @@ B and B′ are compared on Horizons' planetodetic reading of the service's plane
 | after | 3841 | horizontal | 1.7079" | oslo 2099-04-06T00:00:00Z |
 | after | 3841 | position angle deg | 0.8255 deg | oslo 2084-03-13T00:00:00Z |
 | after | 3841 | position angle deg, ill-conditioned rows | 0.8255 deg | oslo 2084-03-13T00:00:00Z |
-| after | 3841 | position angle deg, well-conditioned rows | 0.0986 deg | oslo 2093-12-21T00:00:00Z |
+| after | 3841 | position angle deg, well-conditioned rows | 0.1794 deg | oslo 2100-05-10T00:00:00Z |
 | after | 3841 | separation | 0.1149" | oslo 2098-05-05T00:00:00Z |
 
 ### iapetus
@@ -247,32 +247,31 @@ B and B′ are compared on Horizons' planetodetic reading of the service's plane
 | after | 3841 | distance km | 4256.47 km | oslo 2100-07-05T00:00:00Z |
 | after | 3841 | horizontal | 1.6398" | oslo 2097-03-04T00:00:00Z |
 | after | 3841 | position angle deg | 0.1017 deg | oslo 2093-12-28T00:00:00Z |
-| after | 3841 | position angle deg, ill-conditioned rows | 0.1017 deg | oslo 2093-12-28T00:00:00Z |
-| after | 3841 | position angle deg, well-conditioned rows | 0.0802 deg | oslo 2096-08-13T00:00:00Z |
+| after | 3841 | position angle deg, well-conditioned rows | 0.1017 deg | oslo 2093-12-28T00:00:00Z |
 | after | 3841 | separation | 0.0663" | oslo 2096-01-30T00:00:00Z |
 
 Moon rows before the moons' interval (skipped, Saturn alone answers there): 36631.
 
 ## Position angle: conditioning
 
-As Jupiter's: X and Y are authoritative; a row is ill-conditioned where their residual could turn the angle by more than the ruled 0.1 degrees at the row's separation.
+As Jupiter's: X and Y are authoritative; a row is ill-conditioned where their residual could turn the angle by more than the row's ruled target at its separation - 0.1 degrees through the exact interval, 0.2 degrees after it.
 
 | body | era | rows | ill-conditioned |
 |---|---|---:|---:|
 | mimas | 1972-exact | 1819 | 0 |
-| mimas | after | 3841 | 2675 |
+| mimas | after | 3841 | 1901 |
 | enceladus | 1972-exact | 1819 | 0 |
-| enceladus | after | 3841 | 2293 |
+| enceladus | after | 3841 | 1451 |
 | tethys | 1972-exact | 1819 | 0 |
-| tethys | after | 3841 | 1907 |
+| tethys | after | 3841 | 1101 |
 | dione | 1972-exact | 1819 | 0 |
-| dione | after | 3841 | 1445 |
+| dione | after | 3841 | 730 |
 | rhea | 1972-exact | 1819 | 0 |
-| rhea | after | 3841 | 914 |
+| rhea | after | 3841 | 361 |
 | titan | 1972-exact | 1819 | 0 |
-| titan | after | 3841 | 109 |
+| titan | after | 3841 | 30 |
 | iapetus | 1972-exact | 1819 | 0 |
-| iapetus | after | 3841 | 3 |
+| iapetus | after | 3841 | 0 |
 
 ## Visibility states against Horizons' codes (equatorial sphere, limb to limb)
 

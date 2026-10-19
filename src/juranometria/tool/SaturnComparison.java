@@ -389,11 +389,12 @@ public final class SaturnComparison {
             double paResidual = wrapped(p.positionAngleDegrees() - d(f[pa]));
             w.note("position angle deg", paResidual, at);
             // As Jupiter's: X and Y are authoritative, and where their
-            // residual could turn the angle by more than the target at the
-            // row's separation, the angle is ill-conditioned.
+            // residual could turn the angle by more than the row's ruled
+            // target at the row's separation - 0.1° through the exact
+            // interval, 0.2° after it (#575) - the angle is ill-conditioned.
             double displacement = Math.hypot(p.xArcseconds() - d(f[x]), p.yArcseconds() - d(f[y]));
             double cone = Math.toDegrees(Math.atan2(displacement, d(f[sep])));
-            if (cone > 0.1) {
+            if (cone > positionAngleTarget(era)) {
                 result.positionAnglesIllConditioned.merge(body + "|" + era, 1, Integer::sum);
                 w.note("position angle deg, ill-conditioned rows", paResidual, at);
             } else {
@@ -421,6 +422,11 @@ public final class SaturnComparison {
                         p.separationArcseconds(), limbSum));
             }
         }
+    }
+
+    /** The ruled position-angle target for an era: 0.1° (#574), 0.2° after the exact interval (#575). */
+    public static double positionAngleTarget(String era) {
+        return era.equals("after") ? 0.2 : 0.1;
     }
 
     /** Horizons' code for a disc and shadow relation. */
@@ -618,8 +624,9 @@ public final class SaturnComparison {
                 + " answers there): %d.\n\n", r.outsideTheMoonsInterval));
         md.append("## Position angle: conditioning\n\n")
                 .append("As Jupiter's: X and Y are authoritative; a row is ill-conditioned where their")
-                .append(" residual could turn the angle by more than the ruled 0.1 degrees at the row's")
-                .append(" separation.\n\n| body | era | rows | ill-conditioned |\n|---|---|---:|---:|\n");
+                .append(" residual could turn the angle by more than the row's ruled target at its")
+                .append(" separation - 0.1 degrees through the exact interval, 0.2 degrees after it.\n\n")
+                .append("| body | era | rows | ill-conditioned |\n|---|---|---:|---:|\n");
         for (String body : BODIES.subList(1, BODIES.size())) {
             for (String era : ERAS) {
                 if (r.rowsOf(body, era) == 0) {

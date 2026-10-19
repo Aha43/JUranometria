@@ -553,3 +553,36 @@ From `service-accuracy.md`:
 
 - **Notice:** `NOTICE-saturn-system.md` joins the licensing inventory, which now has 13 resources, the archive, LICENSING.md and the About notices in both languages. The About sheets were regenerated.
 - **Acceptance:** it prints "saturn system pack OK". Inside the packaged image, Saturn at Oslo on 2026-06-21 10:00 must agree with Horizons' row within 0.01″, and the card's instant must show the states above.
+
+### The ruling on the #575 checkpoint
+
+The owner's rulings of 2026-10-19, recorded as given:
+
+1. Saturn distance, 1900–1961: amend to 40 km.
+2. Saturn astrometric position after 2027-06-28: amend to 3″.
+3. Saturn and moon apparent positions after 2027-06-28: set 3″, beyond 1° from the Sun.
+4. Saturn distance after 2027-06-28: amend to 7,000 km.
+5. Ring openings B and B′ after 2027-06-28: amend to 1″.
+6. Moon position angle after 2027-06-28: do not leave it wholly unasserted. Use the same well-conditioned-row principle as Jupiter and assert 0.2° where separation makes position angle meaningful. For ill-conditioned near-centre rows, print the measurement without asserting it. If 0.2° does not hold on the established conditioning rule, stop and return with the measured result.
+7. Moon visibility states after 2027-06-28: keep as measured output, not asserted.
+8. Apparent place through the exact interval: accept 0.2″ from 1962 onward and 0.3″ before 1962, beyond 1° from the Sun.
+9. Horizontal place: retain 20″.
+10. Everything else: remains as ruled on #574.
+
+**The production pack's 43,008-byte overhead is accepted.** It is required attribution and modification notice, not ephemeris data or an unexplained layout change. Each kernel's comment area carries two things: the modification notice NAIF's rules require for a modified kernel (renamed, with JUranometria's attribution in place of the producer's), and `sat441.bsp`'s own comment area, kept as source attribution. Every ephemeris record is identical to the source, and the segment layout is the ruled one. The pack is 79,345,664 bytes raw and 71,349,434 bytes gzipped.
+
+**As held.** `SaturnReferenceVectorTest` asserts every amended target.
+
+Position angle after 2027-06 uses Jupiter's conditioning rule. A row is ill-conditioned where the X and Y residual could turn the angle by more than the row's ruled target at its separation: 0.1° through the exact interval, 0.2° after it. On the well-conditioned rows 0.2° holds, with these worsts:
+
+| moon | worst | ill-conditioned rows (printed, not asserted) |
+|---|---:|---:|
+| Mimas | 0.1990° | 1,901 of 3,841 |
+| Enceladus | 0.1860° | 1,451 |
+| Tethys | 0.1916° | 1,101 |
+| Dione | 0.1940° | 730 |
+| Rhea | 0.1956° | 361 |
+| Titan | 0.1794° | 30 |
+| Iapetus | 0.1017° | 0 |
+
+The margin is thin by construction: the rule admits a row only where its X and Y residual cannot turn the angle by more than the target. After the expiry the ΔT prediction's 0.3″ residual is large against the inner moons' separations, so many of their rows are ill-conditioned. The states after the expiry stay measured output (31 rows differ), as ruled.
