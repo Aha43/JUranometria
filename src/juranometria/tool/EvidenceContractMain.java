@@ -164,6 +164,10 @@ public final class EvidenceContractMain {
                 "docs/studies/venus/measurements.md");
         REPORT_MAINS.put("juranometria.tool.MercuryContractStudyMain",
                 "docs/studies/mercury/measurements.md");
+        // The Saturn table, moons and ring geometry, proposed (#574): read from
+        // the committed Horizons responses and the retained PDS ring table.
+        REPORT_MAINS.put("juranometria.tool.SaturnContractStudyMain",
+                "docs/studies/saturn-system/measurements.md");
         // Venus on the page (#512): deterministic over the bundled packs,
         // the committed named instants and the production projection; its
         // mock-ups are held through IMAGE_MAINS.
@@ -423,6 +427,8 @@ public final class EvidenceContractMain {
                 "docs/studies/venus/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.MercuryContractStudyMain",
                 "docs/studies/mercury/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.SaturnContractStudyMain",
+                "docs/studies/saturn-system/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.ToggleShortcutStudyMain",
                 "docs/studies/toggle-shortcuts/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.ControlExplanationStudyMain",
@@ -575,6 +581,9 @@ public final class EvidenceContractMain {
             // The Mercury table mock-ups and diagrams (issue #528): the proposed table
             // in study-only arrangements, widget-rendered, in both languages.
             "juranometria.tool.MercuryContractStudyMain",
+            // The Saturn table mock-ups and ring diagrams (issue #574): the proposed
+            // table in study-only arrangements, widget-rendered, in both languages.
+            "juranometria.tool.SaturnContractStudyMain",
             // The meridian's graduation (issue #515): production pages
             // composed by the component with the module attached.
             "juranometria.tool.MeridianTicksStudyMain",

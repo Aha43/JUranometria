@@ -1,0 +1,8 @@
+1900-01-01 00:00:00  boundary-start
+1962-01-01 00:00:00  eop-record-begins
+1972-01-01 00:00:00  first-leap-second
+2000-01-01 12:00:00  j2000
+2017-01-01 00:00:00  last-leap-second
+2026-06-21 10:00:00  oslo-sample-row
+2026-10-19 12:00:00  today
+2100-12-31 23:59:59  boundary-end

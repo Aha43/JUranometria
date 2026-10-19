@@ -117,6 +117,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | src/juranometria/tool/PlaceAndTimeControlsMockupMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/tool/PlaceAndTimeDialogStudyMain.java | look-and-feel, default-font, preferences | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/tool/PlaceAndTimeSheetMain.java | look-and-feel, preferences | UNPROTECTED: look-and-feel |
+| src/juranometria/tool/SaturnContractStudyMain.java | look-and-feel, default-font | protected-locally |
 | src/juranometria/tool/SettingsSheetMain.java | look-and-feel | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/SolarSystemControlsStudyMain.java | look-and-feel, default-font, preferences | protected-locally |
 | src/juranometria/tool/SunTableSheetMain.java | look-and-feel | UNPROTECTED: look-and-feel |
@@ -128,7 +129,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | src/juranometria/tool/WorkingSelectionMockupMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/app/PackagedAcceptanceMain.java | look-and-feel, locale, preferences | protected-locally |
 
-**33 evidence executables** touch process-wide state; 24 carry an unpaired touch.
+**34 evidence executables** touch process-wide state; 24 carry an unpaired touch.
 
 ## Display-dependent tests, their premises and their routes
 
@@ -228,11 +229,11 @@ Whether a particular read happens on the event thread is control flow, which tex
 
 | class | the contract | files |
 |---|---|---|
-| deterministic-report | regenerates byte-for-byte on the same tree | 142 |
-| byte-exact-fixture | committed data with provenance; never regenerated casually | 187 |
+| deterministic-report | regenerates byte-for-byte on the same tree | 151 |
+| byte-exact-fixture | committed data with provenance; never regenerated casually | 269 |
 | captured-evidence | an operating-system screenshot, digest-pinned; a re-capture is a provenance event | 13 |
 | renderer-drawn | byte-reproducible per machine; production ink, no widgets | 714 |
-| widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 176 |
+| widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 186 |
 | session-photograph | a packed window on a display; drifts between desktop sessions | 3 |
 
 The byte-exact fixtures:
@@ -356,6 +357,88 @@ The byte-exact fixtures:
 - docs/studies/mercury/horizons/transits-quito-199.txt
 - docs/studies/mercury/mercury-events.txt
 - docs/studies/place-and-time/reference-vectors.txt
+- docs/studies/saturn-system/horizons/NAMED-CASES.txt
+- docs/studies/saturn-system/horizons/dense-2026-dione-oslo.txt
+- docs/studies/saturn-system/horizons/dense-2026-enceladus-oslo.txt
+- docs/studies/saturn-system/horizons/dense-2026-hyperion-oslo.txt
+- docs/studies/saturn-system/horizons/dense-2026-iapetus-oslo.txt
+- docs/studies/saturn-system/horizons/dense-2026-mimas-oslo.txt
+- docs/studies/saturn-system/horizons/dense-2026-rhea-oslo.txt
+- docs/studies/saturn-system/horizons/dense-2026-saturn-oslo.txt
+- docs/studies/saturn-system/horizons/dense-2026-tethys-oslo.txt
+- docs/studies/saturn-system/horizons/dense-2026-titan-oslo.txt
+- docs/studies/saturn-system/horizons/magnitudes-30d-dione-geocentric.txt
+- docs/studies/saturn-system/horizons/magnitudes-30d-enceladus-geocentric.txt
+- docs/studies/saturn-system/horizons/magnitudes-30d-hyperion-geocentric.txt
+- docs/studies/saturn-system/horizons/magnitudes-30d-iapetus-geocentric.txt
+- docs/studies/saturn-system/horizons/magnitudes-30d-mimas-geocentric.txt
+- docs/studies/saturn-system/horizons/magnitudes-30d-rhea-geocentric.txt
+- docs/studies/saturn-system/horizons/magnitudes-30d-saturn-geocentric.txt
+- docs/studies/saturn-system/horizons/magnitudes-30d-tethys-geocentric.txt
+- docs/studies/saturn-system/horizons/magnitudes-30d-titan-geocentric.txt
+- docs/studies/saturn-system/horizons/matrix-7d-dione-oslo.txt
+- docs/studies/saturn-system/horizons/matrix-7d-enceladus-oslo.txt
+- docs/studies/saturn-system/horizons/matrix-7d-hyperion-oslo.txt
+- docs/studies/saturn-system/horizons/matrix-7d-iapetus-oslo.txt
+- docs/studies/saturn-system/horizons/matrix-7d-mimas-oslo.txt
+- docs/studies/saturn-system/horizons/matrix-7d-rhea-oslo.txt
+- docs/studies/saturn-system/horizons/matrix-7d-saturn-oslo.txt
+- docs/studies/saturn-system/horizons/matrix-7d-tethys-oslo.txt
+- docs/studies/saturn-system/horizons/matrix-7d-titan-oslo.txt
+- docs/studies/saturn-system/horizons/named-dione-alert.txt
+- docs/studies/saturn-system/horizons/named-dione-cape-town.txt
+- docs/studies/saturn-system/horizons/named-dione-chatham.txt
+- docs/studies/saturn-system/horizons/named-dione-oslo.txt
+- docs/studies/saturn-system/horizons/named-dione-quito.txt
+- docs/studies/saturn-system/horizons/named-enceladus-alert.txt
+- docs/studies/saturn-system/horizons/named-enceladus-cape-town.txt
+- docs/studies/saturn-system/horizons/named-enceladus-chatham.txt
+- docs/studies/saturn-system/horizons/named-enceladus-oslo.txt
+- docs/studies/saturn-system/horizons/named-enceladus-quito.txt
+- docs/studies/saturn-system/horizons/named-hyperion-alert.txt
+- docs/studies/saturn-system/horizons/named-hyperion-cape-town.txt
+- docs/studies/saturn-system/horizons/named-hyperion-chatham.txt
+- docs/studies/saturn-system/horizons/named-hyperion-oslo.txt
+- docs/studies/saturn-system/horizons/named-hyperion-quito.txt
+- docs/studies/saturn-system/horizons/named-iapetus-alert.txt
+- docs/studies/saturn-system/horizons/named-iapetus-cape-town.txt
+- docs/studies/saturn-system/horizons/named-iapetus-chatham.txt
+- docs/studies/saturn-system/horizons/named-iapetus-oslo.txt
+- docs/studies/saturn-system/horizons/named-iapetus-quito.txt
+- docs/studies/saturn-system/horizons/named-mimas-alert.txt
+- docs/studies/saturn-system/horizons/named-mimas-cape-town.txt
+- docs/studies/saturn-system/horizons/named-mimas-chatham.txt
+- docs/studies/saturn-system/horizons/named-mimas-oslo.txt
+- docs/studies/saturn-system/horizons/named-mimas-quito.txt
+- docs/studies/saturn-system/horizons/named-rhea-alert.txt
+- docs/studies/saturn-system/horizons/named-rhea-cape-town.txt
+- docs/studies/saturn-system/horizons/named-rhea-chatham.txt
+- docs/studies/saturn-system/horizons/named-rhea-oslo.txt
+- docs/studies/saturn-system/horizons/named-rhea-quito.txt
+- docs/studies/saturn-system/horizons/named-saturn-alert.txt
+- docs/studies/saturn-system/horizons/named-saturn-cape-town.txt
+- docs/studies/saturn-system/horizons/named-saturn-chatham.txt
+- docs/studies/saturn-system/horizons/named-saturn-oslo.txt
+- docs/studies/saturn-system/horizons/named-saturn-quito.txt
+- docs/studies/saturn-system/horizons/named-tethys-alert.txt
+- docs/studies/saturn-system/horizons/named-tethys-cape-town.txt
+- docs/studies/saturn-system/horizons/named-tethys-chatham.txt
+- docs/studies/saturn-system/horizons/named-tethys-oslo.txt
+- docs/studies/saturn-system/horizons/named-tethys-quito.txt
+- docs/studies/saturn-system/horizons/named-titan-alert.txt
+- docs/studies/saturn-system/horizons/named-titan-cape-town.txt
+- docs/studies/saturn-system/horizons/named-titan-chatham.txt
+- docs/studies/saturn-system/horizons/named-titan-oslo.txt
+- docs/studies/saturn-system/horizons/named-titan-quito.txt
+- docs/studies/saturn-system/horizons/ring-plane-window-2024-2025-saturn-oslo.txt
+- docs/studies/saturn-system/horizons/titan-orbit-2026-08-hourly-oslo.txt
+- docs/studies/saturn-system/imcce-quoted-rows.txt
+- docs/studies/saturn-system/rings/pds-rings-sources.tsv
+- docs/studies/saturn-system/rings/pds-rings-table.tsv
+- docs/studies/saturn-system/rings/satringfact.html
+- docs/studies/saturn-system/rings/satringfact.html.headers
+- docs/studies/saturn-system/rings/saturn_tables.html
+- docs/studies/saturn-system/rings/saturn_tables.html.headers
 - docs/studies/sky-language/iau-constellations.tsv
 - docs/studies/solar-system/horizons-moon/NAMED-CASES.txt
 - docs/studies/solar-system/horizons-moon/dense-2026-oslo.txt
@@ -572,6 +655,16 @@ The widget-rendered artifacts (a new one arrives by a reviewed addition to the s
 - docs/studies/place-and-time/controls-dialog-enlarged.png
 - docs/studies/place-and-time/controls-dialog.png
 - docs/studies/place-and-time/controls-sidebar-240.png
+- docs/studies/saturn-system/controls-saturn-4-ring-geometry.png
+- docs/studies/saturn-system/controls-saturn-5-ring-opening.png
+- docs/studies/saturn-system/controls-saturn-en-1-saturn-card.png
+- docs/studies/saturn-system/controls-saturn-en-2-moons-table-dark.png
+- docs/studies/saturn-system/controls-saturn-en-2-moons-table.png
+- docs/studies/saturn-system/controls-saturn-en-3-controller-group.png
+- docs/studies/saturn-system/controls-saturn-nb-NO-1-saturn-card.png
+- docs/studies/saturn-system/controls-saturn-nb-NO-2-moons-table-dark.png
+- docs/studies/saturn-system/controls-saturn-nb-NO-2-moons-table.png
+- docs/studies/saturn-system/controls-saturn-nb-NO-3-controller-group.png
 - docs/studies/solar-system-controls/controls-solar-en-1-sun-dialog.png
 - docs/studies/solar-system-controls/controls-solar-en-10-controller-sun-open-900.png
 - docs/studies/solar-system-controls/controls-solar-en-11-view-menu-today.png

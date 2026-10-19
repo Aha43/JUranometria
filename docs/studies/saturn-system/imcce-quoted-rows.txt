@@ -1,0 +1,37 @@
+# IMCCE, Phenomena of the Saturnian satellites 2006-2013 (TT): quoted rows for the #574 comparison
+# source: https://ftp.imcce.fr/pub/ephem/satel/phensaturne/ (retrieved 2026-10-19; whole files kept outside Git)
+# attribution: Institut de mecanique celeste et de calcul des ephemerides (IMCCE), Paris Observatory; predictions by W. Thuillot from TASS 1.6 (Vienne & Duriez 1995); each event for the satellite centre
+# terms: https://www.imcce.fr/mentions-legales - "The data contained in the Web and FTP servers of the IMCCE can be used as an example to illustrate documents if the source is clearly identified." Quoted, not redistributed.
+# layout (README): sat phen year m d hh mm ss X Y sd d - X toward East, Y toward North in planet radii; sd the semi-duration in seconds; d the distance from the planet's edge in arcsec
+# imcce-phensaturne-phenE-S1.dat sha256 fa462f76bce97e89441da5ea58b992ad5c2e6d1d0db62ba3cf56905cf8937145
+# imcce-phensaturne-phenE-S2.dat sha256 7fc95bdfc246f5cee825397604e39c01d2b1d8a13d244ef458b61cfef765626c
+# imcce-phensaturne-phenE-S3.dat sha256 ffe39d0bbace5edb145409c0e1df4213689a839e02a0ca19a1e15261d0f1ce7b
+# imcce-phensaturne-phenE-S4.dat sha256 0a8431191a27be84acd8d85a7e58046edfe57a89a75faa5750ae543c05c1c302
+# imcce-phensaturne-phenE-S5.dat sha256 30a04db8a9a75b5a8ccf851b0003559ee89f8891c95cf5c0c9327e6243cb7661
+# imcce-phensaturne-phenE-S6.dat sha256 bb1fafd2855dcc343c3a0bcc6b5211c3a0887eb3c7e1155df7c91e86178d04c8
+# imcce-phensaturne-phenE-S7.dat sha256 0961de801d13c8c33b467906311134c47b3ec21cb9ee01a81d2a448d598aaf82
+# imcce-phensaturne-phenE-S8.dat sha256 59e88532bfb959c65cbc70695f61fff3c247912a715dd5994426af0d192e81b2
+imcce-phensaturne-phenE-S1.dat:15261	  1  EC.R  2013  1 13  12. 44. 17. -0.2  1.0  -188.  1.
+imcce-phensaturne-phenE-S1.dat:15290	  1  OC.R  2013  7 13  11. 17. 26.  0.0  0.9  -518.  0.
+imcce-phensaturne-phenE-S1.dat:15133	  1  TR.I  2012 12 12  22. 52. 31.  0.1 -0.9   319.  0.
+imcce-phensaturne-phenE-S2.dat:299	  2  EC.D  2007  3 17   2. 27. 41.  0.3 -1.0   296.  1.
+imcce-phensaturne-phenE-S2.dat:7847	  2  OC.R  2012  5  3  18. 49. 16.  0.0  0.9  -344.  0.
+imcce-phensaturne-phenE-S2.dat:7565	  2  TR.E  2011 11 13  19. 51. 16.  0.0 -0.9  -300.  0.
+imcce-phensaturne-phenE-S3.dat:4703	  3  EC.R  2011 10 16   0. 16. 20.  0.0  0.9  -623.  0.
+imcce-phensaturne-phenE-S3.dat:6	  3  OC.R  2007  9  9  18.  7.  1.  0.2 -0.9  -450.  0.
+imcce-phensaturne-phenE-S3.dat:3	  3  TR.I  2007  9  8  19. 12.  1. -0.1  0.9  1073.  0.
+imcce-phensaturne-phenE-S4.dat:2405	  4  EC.D  2011  2 13   5. 56.  6. -0.7  1.1   518.  3.
+imcce-phensaturne-phenE-S4.dat:196	  4  OC.R  2008  2 19  17. 16. 39.  0.2 -0.9  -454.  0.
+imcce-phensaturne-phenE-S4.dat:6	  4  TR.E  2007 10 12  17.  9. 29. -0.2  0.9  -451.  0.
+imcce-phensaturne-phenE-S5.dat:7	  5  EC.D  2008  7  9  20. 27.  6.  0.6 -1.1   594.  3.
+imcce-phensaturne-phenE-S5.dat:1048	  5  OC.R  2010  9 17  18. 41. 48.  0.2  0.9  -471.  0.
+imcce-phensaturne-phenE-S5.dat:1049	  5  TR.I  2010  9 20   0. 22. 56.  0.1 -0.9  1251.  0.
+imcce-phensaturne-phenE-S6.dat:129	  6  EC.D  2010  1  1  21. 31. 23. -2.4  1.7  1432. 17.
+imcce-phensaturne-phenE-S6.dat:40	  6  OC.R  2009  3  4  14. 50. 11.  0.5 -0.8 -1285.  0.
+imcce-phensaturne-phenE-S6.dat:43	  6  TR.E  2009  3 12  11. 34. 11. -0.3  0.9 -2466.  0.
+imcce-phensaturne-phenE-S7.dat:32	  7  EC.R  2009  3 23   8.  0.  2.  1.2 -1.0   -46.  6.
+imcce-phensaturne-phenE-S7.dat:93	  7  OC.D  2010  6 12  11. 22. 54. -0.5  0.8    65.  0.
+imcce-phensaturne-phenE-S7.dat:91	  7  TR.I  2010  6  2   0.  2. 37.  0.1 -0.9   352.  0.
+imcce-phensaturne-phenE-S8.dat:15	  8  EC.D  2007  5  5   2.  3. 13.  5.3 -1.7   253. 42.
+imcce-phensaturne-phenE-S8.dat:11	  8  OC.D  2007  2 14   2. 12. 35. -0.7 -0.7   370.  0.
+imcce-phensaturne-phenE-S8.dat:17	  8  TR.I  2007  6 14   1. 37. 13.  0.5  0.8   582.  0.
