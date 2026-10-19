@@ -440,3 +440,116 @@ The owner's rulings of 2026-10-19, recorded as given:
 - **What was wrong.** At the checkpoint this record gave the recommended pack as 43,002,424 bytes. That was a sum of the per-body record bytes from the segment directories, the "candidate intervals" table. It is not what a pack weighs: it left out Saturn's barycentre (0 → 6) and each kernel's own layout, meaning its file record, comment area, segment summaries and directories.
 - **Why it mattered.** The owner asked for the real cost before ruling 2. The production layout was then cut with the released writer and proved bit-identical to `sat441.bsp` (`contract/pack-measurements.md`, *The production layout, cut*). It weighs 43,433,984 bytes with five moons and 79,302,656 with seven.
 - **The rule from now on.** The cut figures are the record. Per-body sums stay in the record only as uncut estimates, and are labelled as such.
+
+## #575, measured: the numerical checkpoint
+
+**Not yet qualified.** These are the measurements #575 returns before any qualification. A few cells miss the targets ruled on #574 for reasons the time model explains, and those wait for the owner's ruling below. The report is `docs/studies/saturn-system/service-accuracy.md` (`make saturn-accuracy-report`), and `SaturnReferenceVectorTest` holds it.
+
+### The pack, as built
+
+`make import-saturn-system` (`juranometria.tool.SaturnPackMain`) writes `src/resources/saturn-system/`. A rebuild is byte-identical.
+
+| file | bytes | gzip -9 | SHA-256 |
+|---|---:|---:|---|
+| `juranometria-sat441-saturn-1900-2100.bsp` (6, 699) | 16,516,096 | 14,846,477 | `28438fff5d8cf7c401390f6e109be4733398e591902c2ff5f471ee257374758d` |
+| `juranometria-sat441-moons-2000-2100.bsp` (601–606, 608) | 62,829,568 | 56,502,957 | `8844bf082d391006c4b73c98c325bea8fb22ce0c31b3c61371a872bbeb6c297b` |
+| the two kernels | 79,345,664 | 71,349,434 | |
+
+- **Larger than the ruled figure.** The two kernels are 43,008 bytes larger than ruling 2's 79,302,656, and 16,745 bytes larger gzipped. The cause is each kernel's comment area: NAIF's rules require the modification notice, and sat441's own comments are kept as source attribution. The study cut carried a one-line comment. No ephemeris byte differs.
+- **The bodies.** The moons' kernel carries both SAT441 segments of each of the seven moons; Hyperion is left out.
+- **Proved against the source.** Each excerpt is identical to `sat441.bsp`, state for state:
+  - Saturn's kernel over 86,370 states at 1.7-day spacing;
+  - the moons' kernel over 151,900;
+  - the barycentre over 43,222 states, identical to the released `de440s.bsp`.
+- **The manifest** carries the PCK values verbatim, and the four ruled ring radii (74,491, 117,570, 122,050 and 136,770 km) read from the PDS extraction.
+- **The PCK** assigns no nutation terms to Saturn's pole, and the builder checks this.
+
+### Invariance
+
+- **Released packs untouched.** The builder refuses to write unless the released Solar System, Jovian and planets kernels carry their released digests. `SaturnPackTest` holds all five digests.
+- **Services untouched.** No released service changed. The Saturn service is new code beside them, and its deflection is held equal to Jupiter's by `SaturnServiceTest`.
+- **Answers untouched.** The released Sun, Moon, Mercury, Venus and Jupiter reference tests run unchanged in the suite.
+
+### Worst errors against Horizons
+
+These are the ruled targets of #574, as measured over the committed fixtures. Each was met or missed as follows:
+
+| quantity | target | 1900–1961 | 1962–1971 | 1972 to 2027-06 | after 2027-06 |
+|---|---|---:|---:|---:|---:|
+| Saturn astrometric | 0.01″ | 0.0059″ | 0.0018″ | 0.0000″ | **0.6840″** |
+| Saturn distance | 20 km | **33.43 km** | 5.98 km | 0.22 km | **3,877.47 km** |
+| B, on Horizons' reading | 0.01″ | 0.0046″ | 0.0022″ | 0.0018″ | **0.3831″** |
+| B′, on Horizons' reading | 0.01″ | 0.0026″ | 0.0019″ | 0.0018″ | **0.1031″** |
+| Saturn pole angle | 0.5″ | met | met | met | met |
+| moons X, Y and separation | 0.5″ | – | – | 0.0006″ at most | 0.3031″ at most (Mimas X) |
+| moons position angle | 0.1° | – | – | 0.0361° at most (Iapetus) | **0.1007°** on well-conditioned rows (Mimas) |
+| states on Horizons' sphere | exact | – | – | 1,819 of 1,819 rows, each moon | **31 rows disagree** in all |
+
+**Why some cells miss.** Every missed cell is the time model's, the same causes Jupiter's targets met on #473:
+- **Before 1962,** the accepted ΔT model sits about a second from Horizons' record. Jupiter measured 32.6 km there; Saturn measures 33.43 km.
+- **After the leap-second record's expiry (2027-06-28),** the atlas and Horizons predict ΔT differently and name instants up to 133 s apart (the Moon's contract). Saturn moves on the sky in that time, and a few near-limb moon states change.
+- **Through the exact interval,** every target is met.
+
+**The apparent place, measured with the Sun's deflection** (ruling 7 left it to #575):
+
+| body | 1900–1961 | 1962–1971 | 1972 to 2027-06 | after 2027-06 |
+|---|---:|---:|---:|---:|
+| Saturn | 0.0881″ | 0.0837″ | 0.1364″ | 0.8085″ |
+| each moon | – | – | 0.1329″ | up to 1.0153″ |
+
+All are beyond 1° from the Sun. Within 1° the difference is measured and printed, never asserted, as Jupiter's is.
+
+The horizontal place, under the inherited UT1 = UTC rule, is at most 11.98″ through the exact interval. Jupiter measured 11.85″ against the inherited 20″ budget.
+
+### For the ruling: proposed amendments
+
+These follow Jupiter's amendments on #473; each widened number bounds a measured cause in the time model:
+
+| quantity | ruled on #574 | proposed | measured |
+|---|---|---|---:|
+| Saturn distance, 1900–1961 | 20 km | **40 km**, as Jupiter's | 33.43 km |
+| Saturn astrometric, after 2027-06 | 0.01″ | **3″**, as Jupiter's | 0.6840″ |
+| Saturn and moons apparent, after 2027-06 | – | **3″**, as Jupiter's | 1.0153″ |
+| Saturn distance, after 2027-06 | 20 km | **7,000 km**, as Jupiter's | 3,877.47 km |
+| B and B′, after 2027-06 | 0.01″ | **1″** | 0.3831″ |
+| moons position angle, after 2027-06 | 0.1° | printed by conditioning, not asserted, as Jupiter's | |
+| states, after 2027-06 | exact | measured output, not asserted, as Jupiter's | |
+
+- **The apparent place:** **0.2″ from 1962 and 0.3″ before**, beyond 1° from the Sun, as Jupiter's ruled targets.
+- **The horizontal place:** the inherited **20″**.
+- **Everything else** stays as ruled on #574.
+
+### Named cases
+
+From `service-accuracy.md`:
+- **Ring-plane crossings, validated only against Horizons.**
+  - The 2025 crossings in the daily window agree to the minute: the Earth's at 2025-03-23 17:51 and the Sun's at 2025-05-06 15:35 (Oslo).
+  - All 44 crossings of 1900–2100 in the weekly matrix (30 Earth, 14 Sun) agree within a minute through the exact interval.
+  - After it they drift from the time model, by 2 minutes at most (−0.035 h) by 2098.
+  - No independent published authority checks these instants (#574, ruling 8).
+- **Titan's greatest elongations, August 2026.** Both agree with Horizons' hourly rows within 0.001″.
+- **IMCCE's 21 quoted events** for the seven ruled moons (TASS 1.6, recorded, not gated). Each is found by the reader's relations within three hours of IMCCE's contact. The differences are tens of seconds to minutes for the inner moons and Titan, and about 20 minutes for Iapetus's slow events. These compare the reader's limb contact with IMCCE's centre instant less its semi-duration, so they mix the two theories' timing with the two definitions of contact; #574's centre-to-centre comparison is the like-for-like one.
+- **The card's instant, 2026-10-05 00:00 UTC at Oslo.**
+  - The rings open 7.43° to the south face, which is lit, so the unlit face is not seen.
+  - Tethys is behind Saturn in its shadow, as Horizons codes it.
+  - The other six moons are clear.
+
+### The first table
+
+`docs/studies/saturn-system/table-measurements.md` (`make saturn-table-study`) is deterministic over the bundled packs and the fixtures' instants. The evidence contract holds it. It contains:
+- Saturn for the five established observers at the named instants, the card's instant and Titan's two elongations;
+- the seven moons at Oslo for each instant from 2000;
+- a 2-hour range around the card's instant, with the appended end marked.
+
+### Mutation proof
+
+`SaturnMutationTest` asks the service four wrong ways, and each misses its ruled target while the service meets it:
+- Saturn's barycentre for its centre misses the 0.01″ astrometric target.
+- The planetodetic latitude for the opening misses the B target by degrees.
+- An unaberrated Sun misses the B′ target by arcseconds.
+- Iapetus's offsets from the J2000 places miss the 0.5″ target over the century.
+
+### Packaged
+
+- **Notice:** `NOTICE-saturn-system.md` joins the licensing inventory, which now has 13 resources, the archive, LICENSING.md and the About notices in both languages. The About sheets were regenerated.
+- **Acceptance:** it prints "saturn system pack OK". Inside the packaged image, Saturn at Oslo on 2026-06-21 10:00 must agree with Horizons' row within 0.01″, and the card's instant must show the states above.

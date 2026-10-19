@@ -53,6 +53,20 @@ public final class PackagedAcceptanceMain {
     static final double MERCURY_SAMPLE_RA = 349.258401325;
     static final double MERCURY_SAMPLE_DEC = -3.334449558;
 
+    /**
+     * The packaged Saturn journey's samples (#575), restated once: Oslo at
+     * the named sample row of docs/studies/saturn-system/horizons/named-saturn-oslo.txt
+     * (2026-Jun-21 10:00), held equal to that row, and the card's instant -
+     * the 2026 daily Oslo row nearest the Earth - held equal to the
+     * fixture by {@code PackagedSaturnSampleTest}.
+     */
+    static final java.time.Instant SATURN_SAMPLE_INSTANT =
+            java.time.Instant.parse("2026-06-21T10:00:00Z");
+    static final double SATURN_SAMPLE_RA = 13.179527229;
+    static final double SATURN_SAMPLE_DEC = 3.104845694;
+    static final java.time.Instant SATURN_CARD_INSTANT =
+            java.time.Instant.parse("2026-10-05T00:00:00Z");
+
     /** M31's catalogue identity: the opening page's own galaxy. */
     private static final String ANDROMEDA_ID = "NGC 224";
 
@@ -6006,6 +6020,46 @@ public final class PackagedAcceptanceMain {
                 + String.format(java.util.Locale.ROOT, "%.4f", mercuryOff)
                 + " arcsecond of Horizons; near half lit in the evening sky on 2026-02-19;"
                 + " the 2019 transit in front of the Sun)");
+        // The Saturn System pack (issue #575), inside the packaged image: both
+        // kernels load through the image's own classpath and verify their
+        // checksums; Saturn for Oslo at the named sample row agrees with
+        // Horizons' astrometric row (docs/studies/saturn-system/horizons/
+        // named-saturn-oslo.txt, 2026-Jun-21 10:00, R.A. 13.179527229,
+        // DEC 3.104845694) to the ruled 0.01 arcsecond; and at the card's
+        // instant the rings open to the south face, the lit one, with Tethys
+        // behind Saturn in its shadow and the other six moons clear.
+        juranometria.solar.SaturnSystemService saturnService =
+                juranometria.solar.SaturnSystemService.load();
+        double saturnOff = saturnService.observeSaturn(new juranometria.sky.Observer(59.91, 10.75,
+                        SATURN_SAMPLE_INSTANT)).astrometricJ2000().separationDegrees(
+                new juranometria.chart.SkyPosition(SATURN_SAMPLE_RA, SATURN_SAMPLE_DEC)) * 3600.0;
+        require(saturnOff < 0.01, "the packaged Saturn agrees with Horizons for Oslo,"
+                + " 2026-06-21 10:00 UTC, within 0.01 arcsecond: " + saturnOff);
+        juranometria.solar.SaturnSystemService.Configuration saturnCard = saturnService.observeMoons(
+                new juranometria.sky.Observer(59.91, 10.75, SATURN_CARD_INSTANT));
+        require(saturnCard.saturn().ringOpeningDegrees() < 0.0 && !saturnCard.saturn().unlitFaceSeen(),
+                "on 2026-10-05 the rings open to their lit south face: "
+                        + saturnCard.saturn().ringOpeningDegrees() + ", "
+                        + saturnCard.saturn().sunRingOpeningDegrees());
+        for (juranometria.solar.SaturnSystemService.MoonPlace moon : saturnCard.moons()) {
+            juranometria.solar.SaturnSystemService.VisibilityState expected =
+                    moon.moon() == juranometria.solar.SaturnSystemService.Moon.TETHYS
+                            ? juranometria.solar.SaturnSystemService.VisibilityState.BEHIND_SATURN_IN_ITS_SHADOW
+                            : juranometria.solar.SaturnSystemService.VisibilityState.CLEAR_OF_SATURN;
+            require(moon.state() == expected, "on 2026-10-05 at Oslo " + moon.moon() + " is "
+                    + expected + ": " + moon.state());
+        }
+        require(PackagedAcceptanceMain.class.getResourceAsStream(
+                        "/resources/saturn-system/NOTICE-saturn-system.md") != null
+                        && PackagedAcceptanceMain.class.getResourceAsStream(
+                                "/resources/saturn-system/PROVENANCE.md") != null,
+                "the Saturn System pack's notice and provenance travel with it");
+        System.out.println("saturn system pack OK (SAT441 excerpts v"
+                + saturnService.pack().manifest().get("pack.version") + ", Saturn at Oslo within "
+                + String.format(java.util.Locale.ROOT, "%.4f", saturnOff)
+                + " arcsecond of Horizons; on 2026-10-05 the rings open "
+                + String.format(java.util.Locale.ROOT, "%.2f", -saturnCard.saturn().ringOpeningDegrees())
+                + " degrees to the lit south face, Tethys behind Saturn in its shadow, six moons clear)");
         System.out.println("jovian system pack OK (JUP365 excerpts v"
                 + jovian.pack().manifest().get("pack.version") + ", Jupiter at Oslo within "
                 + String.format(java.util.Locale.ROOT, "%.4f", jupiterOff)

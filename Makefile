@@ -89,6 +89,9 @@ help:
 	@echo "  mercury-accuracy-report  The Mercury service against Horizons and Espenak, the report the tests hold (issue #529)"
 	@echo "  import-planets       Build the planets pack (one DE440 kernel per planet) from de440s.bsp and pck00011.tpc, proved against the sources (issue #501)"
 	@echo "  jovian-accuracy-report  The Jovian service against Horizons, the report the tests hold (issue #473)"
+	@echo "  import-saturn-system  Build the Saturn System pack from sat441.bsp, pck00011.tpc and the PDS ring table, proved against the sources (issue #575)"
+	@echo "  saturn-accuracy-report  The Saturn service against Horizons and the named cases, the report the tests hold (issue #575)"
+	@echo "  saturn-table-study    The first Saturn table: Saturn, the rings and the seven moons for the established observers and cases (issue #575)"
 	@echo "  jovian-cartography-study  Measure Jupiter and the moons on the atlas's pages, with mockups (issue #482)"
 	@echo "  venus-cartography-study  Measure Venus on the atlas's pages and the fields below 1°, with mockups (issue #512)"
 	@echo "  sun-on-the-chart-study  The Sun on production pages through the module (issue #415)"
@@ -300,6 +303,29 @@ jovian-accuracy-report: classes
 	$(JAVA) -Xmx2g -cp "$(CLASSES_DIR)" juranometria.tool.JovianAccuracyReportMain \
 		> docs/studies/jovian-system/service-accuracy.md
 	@echo "written to docs/studies/jovian-system/service-accuracy.md"
+
+# The Saturn System pack (issue #575): two modified excerpts of sat441.bsp
+# proved against their source and against the released de440s.bsp, the
+# PCK constants and the PDS ring radii copied into the manifest, the
+# released Solar System, Jovian and planets packs proved untouched.
+import-saturn-system: classes
+	$(JAVA) -Xmx6g -cp "$(CLASSES_DIR)" juranometria.tool.SaturnPackMain
+
+# The Saturn service against Horizons and the named cases (issue #575):
+# the accuracy report the tests hold, with the first generated table.
+saturn-accuracy-report: classes
+	mkdir -p docs/studies/saturn-system
+	$(JAVA) -Xmx2g -cp "$(CLASSES_DIR)" juranometria.tool.SaturnAccuracyReportMain \
+		> docs/studies/saturn-system/service-accuracy.md
+	@echo "written to docs/studies/saturn-system/service-accuracy.md"
+
+# The first Saturn table (issue #575): deterministic over the bundled
+# packs and the fixtures' named instants; the evidence contract holds it.
+saturn-table-study: classes
+	mkdir -p docs/studies/saturn-system
+	$(JAVA) -Xmx2g -cp "$(CLASSES_DIR)" juranometria.tool.SaturnTableStudyMain \
+		> docs/studies/saturn-system/table-measurements.md
+	@echo "written to docs/studies/saturn-system/table-measurements.md"
 
 # The Jovian System pack (issue #473): two modified excerpts of jup365.bsp
 # proved against their source and against the released de440s.bsp, the
@@ -648,7 +674,7 @@ black-sky-study: classes
 		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BlackSkyStudyMain \
 		> docs/studies/black-sky/measurements.md
 
-.PHONY: spk-boundary-fixture import-jovian-system import-planets venus-accuracy-report venus-table-study mercury-accuracy-report mercury-table-study jovian-accuracy-report jovian-cartography-study venus-cartography-study evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study venus-pack-study sun-on-the-chart-study moon-on-the-chart-study venus-on-the-chart-study mercury-on-the-chart-study jupiter-on-the-chart-study mercury-cartography-study solar-system-labels-study printable-chart-study meridian-ticks-study mercury-pack-study mercury-system-study closer-fields-study chart-instant-study chart-instant-furniture star-identity-density-study all-star-identities saturn-pack-study saturn-system-study
+.PHONY: spk-boundary-fixture import-saturn-system saturn-accuracy-report saturn-table-study import-jovian-system import-planets venus-accuracy-report venus-table-study mercury-accuracy-report mercury-table-study jovian-accuracy-report jovian-cartography-study venus-cartography-study evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study venus-pack-study sun-on-the-chart-study moon-on-the-chart-study venus-on-the-chart-study mercury-on-the-chart-study jupiter-on-the-chart-study mercury-cartography-study solar-system-labels-study printable-chart-study meridian-ticks-study mercury-pack-study mercury-system-study closer-fields-study chart-instant-study chart-instant-furniture star-identity-density-study all-star-identities saturn-pack-study saturn-system-study
 # The heap is stated rather than inherited from whatever a machine's
 # ergonomics chose for it: the CI runner's default quarter-of-RAM is
 # not the same number as a developer's.

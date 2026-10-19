@@ -40,6 +40,7 @@ $name/licenses/NOTICE-jovian-system.md
 $name/licenses/NOTICE-openngc.md
 $name/licenses/NOTICE-planets.md
 $name/licenses/NOTICE-runtime-libraries.md
+$name/licenses/NOTICE-saturn-system.md
 $name/licenses/NOTICE-solar-system.md
 $name/licenses/NOTICE-star-identities.md
 $name/licenses/NOTICE-tycho2.md
