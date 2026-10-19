@@ -219,8 +219,13 @@ class SheetCaptureSizingTest {
                 dialog[0] = new JDialog(owner[0]);
                 content[0] = new Bistable();
                 content[0].setOpaque(true);
-                dialog[0].setContentPane(content[0]);
-                dialog[0].pack();
+                // Not a plain pack: its request for 333x255 can be answered
+                // by the native window inside the premise's own pack to
+                // 326x238, putting 333x255 back with no Java call - then
+                // the premise has moved nothing, the capture photographs
+                // the proved 333x223 as it should, and the move this test
+                // is about never happened (#584).
+                realizedAtItsPreference(owner, content[0], dialog[0]);
             });
             IllegalStateException refused = assertThrows(
                     IllegalStateException.class,
@@ -526,6 +531,41 @@ class SheetCaptureSizingTest {
         return made;
     }
 
+    /**
+     * A dialog around a content whose native window is created already
+     * at its packed frame, so that packing asks the native window for
+     * nothing (#584).
+     *
+     * <p>On macOS a native window answers a resize request later than
+     * Java reads it back, and the answer carries the whole frame. A
+     * packed window's first {@code pack()} is such a request (from 0x0
+     * to the packed frame); its late answer can land inside a resize the
+     * scenario makes afterwards - the restatement, or a premise's own
+     * pack - and put the packed frame back, with no Java call. Created
+     * at the frame {@code pack()} would choose, the window has no request
+     * in flight when the scenario begins, so the only native answers are
+     * to what the scenario itself asks. The chrome is read from a probe
+     * of the same kind, since a window has no insets before its peer.
+     */
+    private static JDialog realizedAtItsPreference(JFrame[] owner, JPanel content,
+                                                   JDialog dialog) {
+        if (owner[0] == null) {
+            owner[0] = new JFrame("owner");
+        }
+        JDialog made = dialog != null ? dialog : new JDialog(owner[0]);
+        made.setContentPane(content);
+        JDialog probe = new JDialog(owner[0]);
+        probe.addNotify();
+        java.awt.Insets chrome = probe.getInsets();
+        probe.dispose();
+        Dimension packed = made.getPreferredSize();
+        made.setBounds(made.getX(), made.getY(),
+                packed.width + chrome.left + chrome.right,
+                packed.height + chrome.top + chrome.bottom);
+        made.pack();
+        return made;
+    }
+
     /** The floor's content width on this window. */
     private static int floorContent(JDialog dialog) {
         java.awt.Insets chrome = dialog.getInsets();
@@ -819,7 +859,13 @@ class SheetCaptureSizingTest {
                 owner[0] = new JFrame("owner");
                 dialog[0] = new RolledBackUntilRestated(owner[0]);
                 content[0] = canvas(326, 263);
-                packedAround(owner, content[0], dialog[0]);
+                // Not packedAround: its first pack asks the native window
+                // for the packed 326, and on macOS that answer can land
+                // inside the restatement's own resize to 420 and put 326
+                // back - a real rollback AFTER the restatement, which the
+                // capture rightly refuses (aRollbackAfterTheRestatementRefuses),
+                // not the rollback BEFORE it this test is about (#584).
+                realizedAtItsPreference(owner, content[0], dialog[0]);
             });
             var drawn = SheetCapture.of(dialog[0], content[0],
                     SheetCapture.applicationSized("test.rolledBackEarly",
@@ -948,7 +994,23 @@ class SheetCaptureSizingTest {
         }
     }
 
-    /** A window that cannot be made wider than 300 content pixels. */
+    /**
+     * A window that cannot be made wider than 300 content pixels.
+     *
+     * <p>The width is held at {@code setBounds}, the one method every
+     * Java-side resize reaches - {@code setSize(Dimension)},
+     * {@code setSize(int, int)} and {@code pack()} alike - so the native
+     * window is never asked to be wider. It once held only
+     * {@code setSize(Dimension)}, while {@link #floorPolicy}'s own apply
+     * asks through {@code setSize(int, int)}: on macOS that request was
+     * read back at once as the packed width, then carried out by the
+     * native window a moment later, with no Java call. Landing after the
+     * restatement's resize and before its validation, it brought window
+     * and content to the declared 420, so the declaration the test calls
+     * unrealizable was realized and nothing was refused - gate 1 on
+     * {@code 553e1c0b} (#584). The capture was right to accept a window
+     * at its declaration; the window was not what the test said it was.
+     */
     private static final class NarrowerThanDeclared extends JDialog {
 
         NarrowerThanDeclared(JFrame owner) {
@@ -956,10 +1018,10 @@ class SheetCaptureSizingTest {
         }
 
         @Override
-        public void setSize(Dimension size) {
+        public void setBounds(int x, int y, int width, int height) {
             java.awt.Insets chrome = getInsets();
-            super.setSize(Math.min(size.width,
-                    300 + chrome.left + chrome.right), size.height);
+            super.setBounds(x, y, Math.min(width,
+                    300 + chrome.left + chrome.right), height);
         }
     }
 
