@@ -31,12 +31,12 @@ ObsSub-LAT reads -32.049°. In 248 rows the Earth and the Sun are on opposite si
 ## The moon set, from the fixtures
 
 Separations and Horizons' visibility codes from the weekly Oslo matrix 1900-2100; brightness from Horizons' geocentric
-30-day magnitudes (airless, no extinction). Proposed: the bodies marked yes; the reasons for each are in the decision record.
+30-day magnitudes (airless, no extinction). Ruled (#574, ruling 2): the bodies marked yes; the reasons are in the decision record.
 
-| moon | proposed | separation ″ (min-max) | diameter ″ (max) | APmag (brightest-faintest) | rows not clear of Saturn |
+| moon | ruled | separation ″ (min-max) | diameter ″ (max) | APmag (brightest-faintest) | rows not clear of Saturn |
 |---|---|---|---:|---|---:|
-| mimas | no | 0.3-32.2 | 0.0714 | 12.60-13.53 | 972 of 10488 |
-| enceladus | no | 0.0-40.9 | 0.0881 | 11.40-12.33 | 553 of 10488 |
+| mimas | yes | 0.3-32.2 | 0.0714 | 12.60-13.53 | 972 of 10488 |
+| enceladus | yes | 0.0-40.9 | 0.0881 | 11.40-12.33 | 553 of 10488 |
 | tethys | yes | 0.6-50.4 | 0.1848 | 9.90-10.83 | 380 of 10488 |
 | dione | yes | 0.5-64.6 | 0.1934 | 10.10-11.03 | 227 of 10488 |
 | rhea | yes | 0.0-90.4 | 0.2627 | 9.40-10.33 | 121 of 10488 |
@@ -90,7 +90,7 @@ the ladder's fields and then the closer fields:
 | `faceSouth` | south face | sørsiden |
 | `unlitFace` | the unlit face is seen | den ubelyste siden sees |
 | `edgeOn` | edge-on | på kant |
-| `moonsHeading` | The five moons | De fem månene |
+| `moonsHeading` | The seven moons | De sju månene |
 | `moon` | Moon | Måne |
 | `side` | Side | Side |
 | `eastwest` | East–west | Øst–vest |

@@ -1,6 +1,6 @@
 # Knowing where Saturn, its rings and its moons are
 
-**Sprint 52, issue #574.** This is the numerical contract for Saturn, its ring geometry and its major moons. It is proposed from measurement before any production data or code exists, and awaits the owner's rulings. It inherits the Sun's, the Moon's and Jupiter's contracts (`sun-computation.md`, `moon-computation.md`, `jovian-system.md`) wherever it does not say otherwise.
+**Sprint 52, issue #574.** This is the numerical contract for Saturn, its ring geometry and its major moons. It is proposed from measurement before any production data or code exists. **Ruled by the owner on 2026-10-19.** [The ruling](#the-ruling), at the end, governs wherever it differs from the proposal. It inherits the Sun's, the Moon's and Jupiter's contracts (`sun-computation.md`, `moon-computation.md`, `jovian-system.md`) wherever it does not say otherwise.
 
 The study is `docs/studies/saturn-system/`:
 - `make saturn-system-study` builds the proposal's mock-ups and diagrams, from the committed fixtures.
@@ -417,3 +417,26 @@ The globe stays under Rule M's 6 pixels on every ladder field (5.17 px at most a
     - #576: the tables (wide).
     - #577: the cartography handoff.
     - Then Sprint 53's #578–#581.
+
+## The ruling
+
+The owner's rulings of 2026-10-19, recorded as given:
+
+1. **Interval and layout.** Saturn and its barycentre cover 1900–2100; the moons cover 2000–2100, using the Jupiter-style separate-kernel layout.
+2. **Moon set.** Include Mimas, Enceladus, Tethys, Dione, Rhea, Titan and Iapetus. Exclude Hyperion from 5.4.0. Accept the measured seven-moon pack size of 79,302,656 bytes raw / 71,332,689 bytes gzipped.
+3. **Ring opening.** Use the true geometric opening angle. Never present Horizons' planetodetic sub-observer latitude as the ring opening. State when the unlit face is seen.
+4. **Ring model.** Use the proposed two flat PDS-derived bands, with the B-ring outer edge at 117,570 km. No minor rings, gaps beyond the ruled division, thickness, shadows or invented detail in this release.
+5. **Visibility states.** Use Jupiter's six states with Saturn's flattened figure. Do not add a "behind the rings" state without independent validation.
+6. **Vocabulary.** Accept the proposed English and Norwegian terminology, including Saturn-specific separation wording.
+7. **Accuracy.** Accept the proposed measured targets. #575 must measure and rule apparent-place accuracy after adding light deflection.
+8. **Published-event limitation.** State plainly that ring-plane crossings and oppositions are validated only against Horizons.
+
+**Where the ruling departs from the proposal.**
+- **The moon set** is seven, not five. Mimas and Enceladus are included; Hyperion stays out.
+- **The pack** is therefore the seven-moon layout as cut: the Saturn kernel 16,494,592 bytes plus the moons kernel 62,808,064 bytes. The reasons, from the recommendation the owner adopted with this ruling: "Enceladus is too important to omit from a 'major moons' feature"; Mimas "is iconic and completes the classical inner-moon sequence"; both "can matter at closer fields and in event configurations even when their labels or marks are often suppressed"; and the extra data cost is "exactly the kind of bounded offline capability the planet packs exist to provide."
+- **The mock-ups** were regenerated with the ruled seven moons.
+
+**The superseded pack figure.**
+- **What was wrong.** At the checkpoint this record gave the recommended pack as 43,002,424 bytes. That was a sum of the per-body record bytes from the segment directories, the "candidate intervals" table. It is not what a pack weighs: it left out Saturn's barycentre (0 → 6) and each kernel's own layout, meaning its file record, comment area, segment summaries and directories.
+- **Why it mattered.** The owner asked for the real cost before ruling 2. The production layout was then cut with the released writer and proved bit-identical to `sat441.bsp` (`contract/pack-measurements.md`, *The production layout, cut*). It weighs 43,433,984 bytes with five moons and 79,302,656 with seven.
+- **The rule from now on.** The cut figures are the record. Per-body sums stay in the record only as uncut estimates, and are labelled as such.

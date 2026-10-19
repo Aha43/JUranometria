@@ -23,10 +23,10 @@ Every mock-up at the Controller's default width, 360 px, light appearance unless
 | image | width | height |
 |---|---:|---:|
 | `controls-saturn-en-1-saturn-card.png` | 360 | 228 |
-| `controls-saturn-en-2-moons-table.png` | 742 | 150 |
+| `controls-saturn-en-2-moons-table.png` | 742 | 190 |
 | `controls-saturn-en-3-controller-group.png` | 360 | 403 |
-| `controls-saturn-en-2-moons-table-dark.png` | 742 | 150 |
+| `controls-saturn-en-2-moons-table-dark.png` | 742 | 190 |
 | `controls-saturn-nb-NO-1-saturn-card.png` | 360 | 228 |
-| `controls-saturn-nb-NO-2-moons-table.png` | 742 | 150 |
+| `controls-saturn-nb-NO-2-moons-table.png` | 742 | 190 |
 | `controls-saturn-nb-NO-3-controller-group.png` | 360 | 403 |
-| `controls-saturn-nb-NO-2-moons-table-dark.png` | 742 | 150 |
+| `controls-saturn-nb-NO-2-moons-table-dark.png` | 742 | 190 |

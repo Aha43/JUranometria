@@ -79,8 +79,9 @@ public final class SaturnContractStudyMain {
     private static final int PAGE_W = 900;
     private static final int PAGE_H = 700;
     private static final double AU_KM = 149597870.7;
-    /** The proposed set, outward from Saturn: the reasons are in docs/decisions/saturn-system.md. */
-    static final List<String> PROPOSED = List.of("tethys", "dione", "rhea", "titan", "iapetus");
+    /** The ruled set (#574, ruling 2), outward from Saturn: the inventory without Hyperion. */
+    static final List<String> PROPOSED = List.of("mimas", "enceladus", "tethys", "dione", "rhea",
+            "titan", "iapetus");
     static final List<String> INVENTORY = List.of("mimas", "enceladus", "tethys", "dione", "rhea",
             "titan", "hyperion", "iapetus");
     /** The ring edges the diagrams draw, as the PDS table names the features. */
@@ -253,7 +254,7 @@ public final class SaturnContractStudyMain {
         w.put("faceSouth", en ? "south face" : "sørsiden");
         w.put("unlitFace", en ? "the unlit face is seen" : "den ubelyste siden sees");
         w.put("edgeOn", en ? "edge-on" : "på kant");
-        w.put("moonsHeading", en ? "The five moons" : "De fem månene");
+        w.put("moonsHeading", en ? "The seven moons" : "De sju månene");
         w.put("moon", released(language, "jupitertable.column.moon"));
         w.put("side", released(language, "jupitertable.column.side"));
         w.put("eastwest", released(language, "jupitertable.column.eastwest"));
@@ -844,8 +845,8 @@ public final class SaturnContractStudyMain {
         out.append("## The moon set, from the fixtures\n\n")
                 .append("Separations and Horizons' visibility codes from the weekly Oslo matrix 1900-2100;"
                         + " brightness from Horizons' geocentric\n30-day magnitudes (airless, no extinction)."
-                        + " Proposed: the bodies marked yes; the reasons for each are in the decision record.\n\n")
-                .append("| moon | proposed | separation ″ (min-max) | diameter ″ (max) | APmag (brightest-faintest)"
+                        + " Ruled (#574, ruling 2): the bodies marked yes; the reasons are in the decision record.\n\n")
+                .append("| moon | ruled | separation ″ (min-max) | diameter ″ (max) | APmag (brightest-faintest)"
                         + " | rows not clear of Saturn |\n|---|---|---|---:|---|---:|\n");
         for (String m : INVENTORY) {
             List<MoonRow> rows = moon(m, "matrix-7d-" + m + "-oslo.txt");
