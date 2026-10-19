@@ -866,6 +866,12 @@ class TestEvidenceGateTest {
                 TestEvidenceScan.artifactClass("jup365-boundary-1997.bsp"),
                 "a kernel kept as a fixture is committed data pinned by"
                         + " digest (#473), never a renderer's drawing");
+        assertEquals("byte-exact-fixture",
+                TestEvidenceScan.artifactClass("saturn_tables.html"),
+                "a published page retained whole as an authority is committed"
+                        + " data pinned by digest (#574), never a renderer's drawing");
+        assertEquals("byte-exact-fixture",
+                TestEvidenceScan.artifactClass("saturn_tables.html.headers"));
         assertEquals("renderer-drawn",
                 TestEvidenceScan.artifactClass("m31-08.png"),
                 "a chart study keeps its byte-reproducibility"

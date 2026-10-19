@@ -382,10 +382,15 @@ public final class TestEvidenceScan {
         // JUP365 segment-split excerpt) is committed data pinned by
         // digest too; the fallthrough would have asked a renderer's
         // provenance row of it.
+        // A published page retained whole as an authority, and the
+        // response headers kept beside it (#574, the PDS and NSSDCA
+        // ring pages), are committed data pinned by digest as well.
         if (fileName.endsWith(".txt") || fileName.endsWith(".c")
                 || fileName.endsWith(".tsv")
                 || fileName.endsWith(".manifest")
-                || fileName.endsWith(".bsp")) {
+                || fileName.endsWith(".bsp")
+                || fileName.endsWith(".html")
+                || fileName.endsWith(".headers")) {
             return "byte-exact-fixture";
         }
         for (String prefix : new String[] {"screenshot-"}) {

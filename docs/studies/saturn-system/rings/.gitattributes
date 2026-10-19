@@ -1,3 +1,0 @@
-# #574: retained ring-authority responses are kept byte-exact (their SHA-256 is recorded).
-*.html -text
-*.headers -text
