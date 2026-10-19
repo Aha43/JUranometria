@@ -144,6 +144,15 @@ class PlaceAndTimeGateTest {
     private static final Path PLANETS_PACK =
             Path.of("src/resources/planets");
 
+    /**
+     * The fourth, ruled on #574 (Jupiter's layout) and built in #575:
+     * Saturn and its seven ruled moons, owned by the Saturn service and
+     * carrying its own source, digests, coverage and terms beside its
+     * data. It carries no time scales either.
+     */
+    private static final Path SATURN_SYSTEM_PACK =
+            Path.of("src/resources/saturn-system");
+
     private static final List<String> TIME_AND_EPHEMERIS_NAMES =
             List.of("leap", "ut1", "ephemeris", "iers", "horizon",
                     "de440", "delta-t", "deltat", ".bsp", ".tls");
@@ -167,7 +176,8 @@ class PlaceAndTimeGateTest {
                 boolean astronomical = TIME_AND_EPHEMERIS_NAMES.stream()
                         .anyMatch(name::contains);
                 boolean jovianEphemeris = (path.startsWith(JOVIAN_SYSTEM_PACK)
-                        || path.startsWith(PLANETS_PACK)) && name.endsWith(".bsp");
+                        || path.startsWith(PLANETS_PACK)
+                        || path.startsWith(SATURN_SYSTEM_PACK)) && name.endsWith(".bsp");
                 if (astronomical && !path.startsWith(SOLAR_SYSTEM_PACK)
                         && !jovianEphemeris) {
                     strays.add(path.toString());
@@ -178,7 +188,8 @@ class PlaceAndTimeGateTest {
                 "no time-scale table, no ephemeris, nothing with a"
                         + " provenance of its own outside "
                         + SOLAR_SYSTEM_PACK + ", and nothing but ephemeris in "
-                        + JOVIAN_SYSTEM_PACK + " and " + PLANETS_PACK);
+                        + JOVIAN_SYSTEM_PACK + ", " + PLANETS_PACK + " and "
+                        + SATURN_SYSTEM_PACK);
     }
 
     /**

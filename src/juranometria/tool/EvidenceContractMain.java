@@ -145,6 +145,13 @@ public final class EvidenceContractMain {
         // bundled packs in the Moon table's columns and rounding.
         REPORT_MAINS.put("juranometria.tool.VenusTableStudyMain",
                 "docs/studies/venus/table-measurements.md");
+        // The Saturn service against Horizons and the named cases (#575),
+        // and the first Saturn table: deterministic over the bundled packs
+        // and the committed fixtures, rounded as printed.
+        REPORT_MAINS.put("juranometria.tool.SaturnAccuracyReportMain",
+                "docs/studies/saturn-system/service-accuracy.md");
+        REPORT_MAINS.put("juranometria.tool.SaturnTableStudyMain",
+                "docs/studies/saturn-system/table-measurements.md");
         // The Mercury service against Horizons and Espenak (#529) and the
         // first Mercury table, the same way: the bundled packs and the
         // committed fixtures only, never the gitignored raw sources.

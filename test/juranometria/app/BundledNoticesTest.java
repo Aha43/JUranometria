@@ -198,6 +198,43 @@ class BundledNoticesTest {
     }
 
     @Test
+    void theSaturnSystemPackShipsWithItsNoticeAndProvenance() {
+        String notice = resourceText("/resources/saturn-system/NOTICE-saturn-system.md");
+        assertTrue(notice.contains("modified kernels"),
+                "the excerpts are called what NAIF's rules call them");
+        assertTrue(notice.contains("not original JPL files") && notice.contains("JPL did not produce them"),
+                "and never presented as JPL's own");
+        assertTrue(notice.contains("NAIF") && notice.contains("SAT441") && notice.contains("DE440"));
+        assertTrue(notice.contains("doi:10.3847/1538-3881/abd414"),
+                "the ephemeris authors are acknowledged");
+        assertTrue(notice.contains("pck00011.tpc") && notice.contains("not")
+                        && notice.contains("redistributed"),
+                "the constants' source is named and the file is not shipped");
+        assertTrue(notice.contains("pds-rings.seti.org") && notice.contains("Ring-Moon Systems Node"),
+                "the ring radii's source is named");
+        assertTrue(notice.contains("Nothing of the IMCCE's"),
+                "nothing of IMCCE's travels with the application (#574)");
+        assertTrue(notice.contains("does not change"),
+                "the Solar System, Jovian and planets packs beside it are untouched");
+        String provenance = resourceText("/resources/saturn-system/PROVENANCE.md");
+        for (String required : new String[] {"naif.jpl.nasa.gov", "SHA-256", "SpkExcerpt", "Validation",
+                "identical to the source", "untouched", "pck00011.tpc", "pds-rings.seti.org",
+                "BODY699_NUT_PREC"}) {
+            assertTrue(provenance.contains(required), "the provenance records " + required);
+        }
+    }
+
+    @Test
+    void everySaturnSystemResourceShipsOnTheClasspath() {
+        for (String resource : new String[] {
+                "manifest.properties", "juranometria-sat441-saturn-1900-2100.bsp",
+                "juranometria-sat441-moons-2000-2100.bsp", "NOTICE-saturn-system.md", "PROVENANCE.md"}) {
+            assertNotNull(BundledNoticesTest.class.getResource("/resources/saturn-system/" + resource),
+                    resource + " must ship as a resource");
+        }
+    }
+
+    @Test
     void everySolarSystemResourceShipsOnTheClasspath() {
         for (String resource : new String[] {
                 "manifest.properties",

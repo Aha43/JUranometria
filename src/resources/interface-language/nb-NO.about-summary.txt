@@ -29,4 +29,10 @@ av JUranometria etter NAIF-reglene for endrede SPICE-kjerner (ingen
 avgift eller lisens); IAU 2015-radiene kopiert fra NAIFs
 planetkonstantkjerne.
 
+Saturnsystemefemeride: to utdrag av NASA/JPLs SAT441 (med
+Saturns barysenter fra DE440), endret av JUranometria etter
+NAIF-reglene for endrede SPICE-kjerner (ingen avgift eller lisens);
+IAU 2015-konstantene kopiert fra NAIFs planetkonstantkjerne og fire
+ringradier sitert fra NASAs Planetary Data System Rings Node.
+
 Verktøylinjeikoner fra ikonsettet Tabler: MIT-lisens.

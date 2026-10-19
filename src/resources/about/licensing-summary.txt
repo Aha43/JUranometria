@@ -29,4 +29,10 @@ modified by JUranometria under NAIF's rules for modified SPICE
 kernels (no fee or licence); the IAU 2015 radii copied from NAIF's
 planetary-constants kernel.
 
+Saturn System ephemeris: two excerpts of NASA/JPL's SAT441 (with
+DE440's Saturn barycentre), modified by JUranometria under NAIF's
+rules for modified SPICE kernels (no fee or licence); the IAU 2015
+constants copied from NAIF's planetary-constants kernel and four
+ring radii quoted from NASA's Planetary Data System Rings Node.
+
 Toolbar icons from the Tabler icon set: MIT license.

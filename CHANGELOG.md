@@ -7,6 +7,19 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Saturn, computed offline (#575, ruled on #574).** A fourth ephemeris
+pack carries two JUranometria-modified excerpts of NASA/JPL's SAT441:
+Saturn and its barycentre for 1900 to 2100, and Mimas, Enceladus,
+Tethys, Dione, Rhea, Titan and Iapetus for 2000 to 2100, with the IAU
+2015 constants and four ring radii quoted from NASA's Planetary Data
+System Rings Node. A new Saturn service computes Saturn's place,
+distance and size, the rings' true opening to the observer and to the
+Sun - and when their unlit face is seen - and each moon's offsets,
+separation and state: clear of Saturn, in front of it, behind it or in
+its flattened figure's shadow. Its notice is in About, in both
+languages. No table or chart draws Saturn yet. The released Sun, Moon,
+Mercury, Venus and Jupiter answers are unchanged.
+
 **All star identities where they fit (#558, ruled on #557).** A new
 Chart Options switch, under Stars and in the Controller, writes every
 name, Bayer letter and Flamsteed number the star catalogue knows for
