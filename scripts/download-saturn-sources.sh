@@ -4,7 +4,10 @@
 # small moons about the Saturn barycentre, 1749-2250), its comment and
 # merge files; and, for comparison only (approved 2026-10-19, not the
 # Saturn authority), NAIF's DE442s planetary ephemeris (1849-2150), its
-# merge file and the planets directory's checksum record. Each is held to the SHA-256 pinned here, recorded on first
+# merge file and the planets directory's checksum record; and IMCCE's
+# predictions of the Saturnian satellites' phenomena 2006-2013 (TASS 1.6,
+# W. Thuillot), kept whole and never committed or bundled - only quoted
+# rows are committed, with attribution (approved 2026-10-19). Each is held to the SHA-256 pinned here, recorded on first
 # retrieval (2026-10-19) and verified before anything reads it. Gitignored downloads,
 # kept whole and unmodified; nothing at build, test or run time reaches
 # the network, and nothing here is distributed. Whether any excerpt ships
@@ -55,4 +58,14 @@ fetch_pinned "$NAIF_SPK/sat441.mrg" "$RAW_DIR/sat441.mrg" "$SAT441_MRG_SHA256"
 fetch_pinned "$NAIF_PLANETS/de442s.bsp" "$RAW_DIR/de442s.bsp" "$DE442S_SHA256"
 fetch_pinned "$NAIF_PLANETS/de442s.mrg" "$RAW_DIR/de442s.mrg" "$DE442S_MRG_SHA256"
 fetch_pinned "$NAIF_PLANETS/aa_checksums.txt" "$RAW_DIR/planets-aa_checksums.txt" "$PLANETS_CHECKSUMS_SHA256"
+IMCCE_PHENSATURNE="https://ftp.imcce.fr/pub/ephem/satel/phensaturne"
+fetch_pinned "$IMCCE_PHENSATURNE/README.txt" "$RAW_DIR/imcce-phensaturne-README.txt" "9fba712de344e3dd76b205d089d903fc464a9331fb7c4aa6c11073589630c637"
+fetch_pinned "$IMCCE_PHENSATURNE/phenE-S1.dat" "$RAW_DIR/imcce-phensaturne-phenE-S1.dat" "fa462f76bce97e89441da5ea58b992ad5c2e6d1d0db62ba3cf56905cf8937145"
+fetch_pinned "$IMCCE_PHENSATURNE/phenE-S2.dat" "$RAW_DIR/imcce-phensaturne-phenE-S2.dat" "7fc95bdfc246f5cee825397604e39c01d2b1d8a13d244ef458b61cfef765626c"
+fetch_pinned "$IMCCE_PHENSATURNE/phenE-S3.dat" "$RAW_DIR/imcce-phensaturne-phenE-S3.dat" "ffe39d0bbace5edb145409c0e1df4213689a839e02a0ca19a1e15261d0f1ce7b"
+fetch_pinned "$IMCCE_PHENSATURNE/phenE-S4.dat" "$RAW_DIR/imcce-phensaturne-phenE-S4.dat" "0a8431191a27be84acd8d85a7e58046edfe57a89a75faa5750ae543c05c1c302"
+fetch_pinned "$IMCCE_PHENSATURNE/phenE-S5.dat" "$RAW_DIR/imcce-phensaturne-phenE-S5.dat" "30a04db8a9a75b5a8ccf851b0003559ee89f8891c95cf5c0c9327e6243cb7661"
+fetch_pinned "$IMCCE_PHENSATURNE/phenE-S6.dat" "$RAW_DIR/imcce-phensaturne-phenE-S6.dat" "bb1fafd2855dcc343c3a0bcc6b5211c3a0887eb3c7e1155df7c91e86178d04c8"
+fetch_pinned "$IMCCE_PHENSATURNE/phenE-S7.dat" "$RAW_DIR/imcce-phensaturne-phenE-S7.dat" "0961de801d13c8c33b467906311134c47b3ec21cb9ee01a81d2a448d598aaf82"
+fetch_pinned "$IMCCE_PHENSATURNE/phenE-S8.dat" "$RAW_DIR/imcce-phensaturne-phenE-S8.dat" "59e88532bfb959c65cbc70695f61fff3c247912a715dd5994426af0d192e81b2"
 date -u +"retrieved %Y-%m-%dT%H:%M:%SZ" > "$RAW_DIR/RETRIEVED.txt"

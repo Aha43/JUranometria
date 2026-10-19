@@ -1,6 +1,6 @@
 # JPL Horizons responses for Saturn and its candidate moons (#574)
 
-Approved by the owner on 2026-10-19 for #574 measurement only. Fetched once by `scripts/horizons-saturn-fetch.py`: 74 requests, paced at 2 s, every response kept whole. Each file is headed by its complete request URL (every query parameter), the UTC of the request, and the SHA-256 and byte count of the body. A fixtures test is to re-hash each file. Nothing at build, test or run time reaches Horizons.
+Approved by the owner on 2026-10-19 for #574 measurement only. Fetched by `scripts/horizons-saturn-fetch.py`: 74 requests in the first run (nine more for magnitudes are described below), paced at 2 s, every response kept whole. Each file is headed by its complete request URL (every query parameter), the UTC of the request, and the SHA-256 and byte count of the body. A fixtures test is to re-hash each file. Nothing at build, test or run time reaches Horizons.
 
 - **Observers:** five at sea level, the Jovian study's: Oslo, Quito, Cape Town, Alert and Chatham.
 - **Bodies:** Saturn (699), with quantities 1,2,4,10,13,14,15,17,20,24,32,43; and Mimas–Iapetus (601–608), with 1,2,4,6,12,13,20,24. For Saturn, 14 and 15 give the sub-observer and sub-solar latitude, Horizons' measure of the ring opening to the observer and to the Sun.
@@ -83,6 +83,33 @@ Approved by the owner on 2026-10-19 for #574 measurement only. Fetched once by `
 | `titan-orbit-2026-08-hourly-oslo.txt` | 100943 | 385 | 2026-10-19T05:09:31Z | `818d11a6515888e2df597f48303d7032415be9b5c1274374d7971cc70fadd055` |
 
 Committed responses: 24,642,296 bytes in all, with `NAMED-CASES.txt`.
+
+## Magnitudes, a second run
+
+Approved by the owner on 2026-10-19 as exactly nine requests: `scripts/horizons-saturn-fetch.py --magnitudes`. Each request is for apparent magnitude (quantity 9: `APmag` and `S-brt`), geocentric (`CENTER='500@399'`), every 30 days from 1900-01-01 to 2100-12-31, one per body. The run took requests 75 to 83 and brought the committed responses to 25,676,145 bytes. The log is `~/juranometria-runs/runs/saturn-horizons-magnitudes-2026-10-19.log`.
+
+**Findings recorded at retrieval.** Every body is answered from `sat441l`, and no data row contains `n.a.`. Horizons' own notes say three things:
+- For natural satellites, magnitudes are given only within the solar phase angles that observations cover.
+- Saturn's value "includes the ring system when the solar phase angle of the observer is less than 6.5 degrees ... AND effective ring inclination is less than 27 degrees", and is that of the globe alone otherwise.
+- Atmospheric extinction is not included.
+
+| file | bytes | rows | requested (UTC) | body sha256 |
+|---|---:|---:|---|---|
+| `magnitudes-30d-dione-geocentric.txt` | 114770 | 2448 | 2026-10-19T09:07:06Z | `b5d19959a3d56e557a425eda44e79e4484bd2465b75f645f3b1ba30ea50719e0` |
+| `magnitudes-30d-enceladus-geocentric.txt` | 114780 | 2448 | 2026-10-19T09:06:58Z | `99236ff95d84c0c1f6c6caa95516d8c6cec138db632ff1457d6a4dbb96cb6880` |
+| `magnitudes-30d-hyperion-geocentric.txt` | 114716 | 2448 | 2026-10-19T09:07:17Z | `3a86061b0cba23d28d383a7cf621e96a5df4dbbb0be0a54cf76687409f8f346c` |
+| `magnitudes-30d-iapetus-geocentric.txt` | 114794 | 2448 | 2026-10-19T09:07:20Z | `e97690f81f97b202eaec6be7054ccf46b08ca7e38796676d28319f42e380fe7f` |
+| `magnitudes-30d-mimas-geocentric.txt` | 114776 | 2448 | 2026-10-19T09:06:55Z | `351c7d123f760c4e02f64ad02a75f684fc807b8fd67cffc37182ebe3cc4317cb` |
+| `magnitudes-30d-rhea-geocentric.txt` | 114766 | 2448 | 2026-10-19T09:07:09Z | `c00c47a777ab0a4cf464a05e1ba5fea04b3d11b7b4fcd4d4a52d7429064b6ee3` |
+| `magnitudes-30d-saturn-geocentric.txt` | 115469 | 2448 | 2026-10-19T09:06:51Z | `c9eb2cdf9e4baccc72e3807fe59d131a157e59a7bbd138596218cf63895e5b23` |
+| `magnitudes-30d-tethys-geocentric.txt` | 114784 | 2448 | 2026-10-19T09:07:02Z | `6bb6507bb49da1487e8885ee2977920042757366d02654b9808488c2413b01a4` |
+| `magnitudes-30d-titan-geocentric.txt` | 114717 | 2448 | 2026-10-19T09:07:13Z | `6f6d2fd9cbe94e1a7ceb5ac87f41f623aeee9cea2e961ba6929a0c43eaa44a08` |
+
+For example, from `magnitudes-30d-titan-geocentric.txt`:
+
+```
+https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND=%27606%27&MAKE_EPHEM=%27YES%27&EPHEM_TYPE=%27OBSERVER%27&CENTER=%27500%40399%27&COORD_TYPE=%27GEODETIC%27&QUANTITIES=%279%27&EXTRA_PREC=%27YES%27&ANG_FORMAT=%27DEG%27&APPARENT=%27AIRLESS%27&CSV_FORMAT=%27YES%27&TIME_DIGITS=%27SECONDS%27&START_TIME=%271900-01-01%2000%3A00%27&STOP_TIME=%272100-12-31%2000%3A00%27&STEP_SIZE=%2730%20d%27
+```
 
 ## Retained outside Git
 

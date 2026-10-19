@@ -139,7 +139,30 @@ def keep(directory, name, body_id, url, when, body, retained=False):
           f" committed {state['committed']:,}, retained {state['retained']:,}", flush=True)
 
 
+# The first run (2026-10-19, log ~/juranometria-runs/runs/saturn-horizons-
+# fetch-2026-10-19.log) made 74 requests; --magnitudes continues within the
+# same limits.
+FIRST_RUN_REQUESTS = 74
+
+
+def magnitudes():
+    """Apparent magnitude (quantity 9), geocentric, every 30 days 1900-2100,
+    one request per body: approved 2026-10-19 as exactly nine requests."""
+    state["requests"] = FIRST_RUN_REQUESTS
+    state["committed"] = sum(p.stat().st_size for p in OUT.glob("*.txt"))
+    for label, body in BODIES.items():
+        url, when, text = query(body, {"CENTER": "'500@399'", "QUANTITIES": "'9'",
+                                       "START_TIME": "'1900-01-01 00:00'",
+                                       "STOP_TIME": "'2100-12-31 00:00'",
+                                       "STEP_SIZE": "'30 d'"})
+        keep(OUT, f"magnitudes-30d-{label}-geocentric", body, url, when, text)
+    print(f"done: {state['requests']} requests in all, committed {state['committed']:,} bytes")
+
+
 def main():
+    if "--magnitudes" in sys.argv:
+        magnitudes()
+        return
     tlist = " ".join(f"'{t}'" for t, _ in NAMED)
     oslo = "'10.75,59.91,0.0'"
     for site, (lon, lat, alt) in OBSERVERS.items():

@@ -99,9 +99,33 @@ gitignored, under `imports/raw/saturn-system/`. Each is pinned in
 - **Terms.** These are NAIF's rules above. Both quoted sentences were still
   on https://naif.jpl.nasa.gov/naif/rules.html on 2026-10-19.
 
+## IMCCE's Saturnian satellite phenomena, for comparison only
+
+The owner approved this on 2026-10-19. These are IMCCE's predictions of the eclipses, occultations, transits and shadow transits of Saturn's first eight satellites. They were computed by W. Thuillot from the TASS 1.6 theory (Vienne & Duriez 1995), independent of JPL's sat441. They are used only to compare event times for #574.
+
+The nine files are kept whole and unmodified, gitignored, under `imports/raw/saturn-system/`. Each is pinned in `scripts/download-saturn-sources.sh` and verified before every use. They are never committed, bundled in the application or republished. Only the minimum quoted rows are committed, with attribution and the source file's digest. Each was fetched with `curl -fsS -D <file>.headers`, and the response headers are kept beside each file.
+
+| file | URL | retrieved (UTC) | bytes | SHA-256 |
+|---|---|---|---:|---|
+| `imcce-phensaturne-README.txt` | https://ftp.imcce.fr/pub/ephem/satel/phensaturne/README.txt | 2026-10-19T09:06:16Z | 4803 | `9fba712de344e3dd76b205d089d903fc464a9331fb7c4aa6c11073589630c637` |
+| `imcce-phensaturne-phenE-S1.dat` | https://ftp.imcce.fr/pub/ephem/satel/phensaturne/phenE-S1.dat | 2026-10-19T09:06:17Z | 878200 | `fa462f76bce97e89441da5ea58b992ad5c2e6d1d0db62ba3cf56905cf8937145` |
+| `imcce-phensaturne-phenE-S2.dat` | https://ftp.imcce.fr/pub/ephem/satel/phensaturne/phenE-S2.dat | 2026-10-19T09:06:17Z | 462442 | `7fc95bdfc246f5cee825397604e39c01d2b1d8a13d244ef458b61cfef765626c` |
+| `imcce-phensaturne-phenE-S3.dat` | https://ftp.imcce.fr/pub/ephem/satel/phensaturne/phenE-S3.dat | 2026-10-19T09:06:18Z | 268243 | `ffe39d0bbace5edb145409c0e1df4213689a839e02a0ca19a1e15261d0f1ce7b` |
+| `imcce-phensaturne-phenE-S4.dat` | https://ftp.imcce.fr/pub/ephem/satel/phensaturne/phenE-S4.dat | 2026-10-19T09:06:18Z | 146206 | `0a8431191a27be84acd8d85a7e58046edfe57a89a75faa5750ae543c05c1c302` |
+| `imcce-phensaturne-phenE-S5.dat` | https://ftp.imcce.fr/pub/ephem/satel/phensaturne/phenE-S5.dat | 2026-10-19T09:06:18Z | 59794 | `30a04db8a9a75b5a8ccf851b0003559ee89f8891c95cf5c0c9327e6243cb7661` |
+| `imcce-phensaturne-phenE-S6.dat` | https://ftp.imcce.fr/pub/ephem/satel/phensaturne/phenE-S6.dat | 2026-10-19T09:06:18Z | 8722 | `bb1fafd2855dcc343c3a0bcc6b5211c3a0887eb3c7e1155df7c91e86178d04c8` |
+| `imcce-phensaturne-phenE-S7.dat` | https://ftp.imcce.fr/pub/ephem/satel/phensaturne/phenE-S7.dat | 2026-10-19T09:06:19Z | 5302 | `0961de801d13c8c33b467906311134c47b3ec21cb9ee01a81d2a448d598aaf82` |
+| `imcce-phensaturne-phenE-S8.dat` | https://ftp.imcce.fr/pub/ephem/satel/phensaturne/phenE-S8.dat | 2026-10-19T09:06:19Z | 1198 | `59e88532bfb959c65cbc70695f61fff3c247912a715dd5994426af0d192e81b2` |
+
+- **Size.** The total is 1,834,910 bytes, the figure stated before approval. Each file equals the `Content-Length` served. The server gives `Last-Modified` dates of 4 October 2008 for the data files and 10 October 2008 for the README.
+- **Contents.** The README was compared byte for byte with the one read before approval, and is identical. It says the predictions are "in Terrestrial Time" and cover "the season 2006-2013". They are "based on the TASS 1.6 ephemerides (Vienne & Duriez, 1995)", and "Each event is computed for the satellite centre". The years in the data files run from 2006 to 2013. Satellite 8, Iapetus, has events only in 2006–2007.
+- **Events.** The data files list 32,099 events in all: 15,406 for Mimas, 8,112 Enceladus, 4,705 Tethys, 2,564 Dione, 1,048 Rhea, 152 Titan, 92 Hyperion and 20 Iapetus. Each is given as EC.D/EC.R, OC.D/OC.R, TR.I/TR.E or SH.I/SH.E, as the mid-event time in TT.
+- **Attribution.** IMCCE (Institut de mécanique céleste et de calcul des éphémérides), Paris Observatory. The predictions are by W. Thuillot, after Thuillot (1983, A&A 127, 63-67), from TASS 1.6 (Vienne & Duriez 1995, A&A 297, 588-605).
+- **Terms.** Quoted from https://www.imcce.fr/mentions-legales, read on 2026-10-19: "The data contained in the Web and FTP servers of the IMCCE can be used as an example to illustrate documents if the source is clearly identified." The same page says "Requests for the reproduction of data or publications from the site of the IMCCE are made using the form provided for this purpose", so the files are not reproduced. The README and the directory listing both say "THE USE OF THESE DATA IS SUBJECTED TO CONDITIONS", pointing to IMCCE's copyright page.
+
 ## Not downloaded
 
 DE441 was not approved; the owner said "Do not download DE441". It stays
 unapproved unless the measurements raise a question that only it can answer.
-The Horizons fixtures and the ring authority were approved separately. Their
-records are `horizons/README.md` and `rings/SOURCES.md`.
+The Horizons fixtures (and their magnitude run), the ring authority and the IMCCE predictions were approved separately. Their
+records are `horizons/README.md`, `rings/SOURCES.md` and the section above.
