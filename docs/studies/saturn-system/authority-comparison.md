@@ -249,6 +249,22 @@ Ours on Horizons' definition: limb to limb on Saturn's equatorial sphere, each m
 | hyperion | 10488 | 2.3-283.2 | 0.0449-0.0619 | 0 | 0 | * 10477, O 2, t 6, u 3 |
 | iapetus | 10488 | 7.9-625.5 | 0.1857-0.2567 | 0 | 3 | * 10482, O 2, p 1, t 3 |
 
+## Brightness, from Horizons' magnitudes (geocentric, every 30 days, 1900-2100)
+
+Horizons' `APmag`, read as given: airless, no extinction; Saturn's includes the rings only under the conditions its notes state.
+
+| body | rows | brightest | median | faintest | n.a. |
+|---|---:|---:|---:|---:|---:|
+| saturn | 2448 | -0.54 | 0.50 | 1.18 | 0 |
+| mimas | 2448 | 12.60 | 13.10 | 13.53 | 0 |
+| enceladus | 2448 | 11.40 | 11.90 | 12.33 | 0 |
+| tethys | 2448 | 9.90 | 10.40 | 10.83 | 0 |
+| dione | 2448 | 10.10 | 10.60 | 11.03 | 0 |
+| rhea | 2448 | 9.40 | 9.90 | 10.33 | 0 |
+| titan | 2448 | 8.02 | 8.52 | 8.95 | 0 |
+| hyperion | 2448 | 13.93 | 14.43 | 14.86 | 0 |
+| iapetus | 2448 | 10.80 | 11.30 | 11.74 | 0 |
+
 ## The planetary ephemeris, separated from sat441
 
 Weekly over 1900-2100 (TDB): DE442s (`de442s.bsp`) against the released DE440 (`de440s.bsp`), each carrying Saturn's centre by sat441's own 6 -> 699; then sat441's barycentre and Earth against de440s's; then the size of the centre offset itself and the direction it moves Saturn by, seen from the Earth.

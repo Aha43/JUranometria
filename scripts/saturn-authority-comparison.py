@@ -157,6 +157,8 @@ def say(s=""):
 
 def horizons_files(pattern):
     files = sorted(HORIZONS.glob(pattern)) + sorted(RETAINED.glob(pattern))
+    if not pattern.startswith("magnitudes-"):
+        files = [p for p in files if not p.name.startswith("magnitudes-")]
     for path in files:
         data = path.read_bytes()
         head = data.split(b"\n", 6)
@@ -708,6 +710,24 @@ def main():
         say(f"| {label} | {r['rows']} | {r['separation min″']:.1f}-{r['separation max″']:.1f} |"
             f" {r['diameter min″']:.4f}-{r['diameter max″']:.4f} | {r['behind the rings']} |"
             f" {r['before the rings']} | " + ", ".join(f"{k} {v}" for k, v in r["codes"].items()) + " |")
+
+    # brightness, from the magnitude run
+    say()
+    say("## Brightness, from Horizons' magnitudes (geocentric, every 30 days, 1900-2100)")
+    say()
+    say("Horizons' `APmag`, read as given: airless, no extinction; Saturn's includes the rings only"
+        " under the conditions its notes state.")
+    say()
+    say("| body | rows | brightest | median | faintest | n.a. |")
+    say("|---|---:|---:|---:|---:|---:|")
+    for label in ["saturn"] + list(MOONS):
+        path = horizons_files(f"magnitudes-30d-{label}-geocentric.txt")[0]
+        names, rows = table(path)
+        i = column(names, "APmag")
+        raw = [f[i] for _, f in rows]
+        values = np.array([float(v) for v in raw if v != "n.a."])
+        say(f"| {label} | {len(rows)} | {values.min():.2f} | {np.median(values):.2f} |"
+            f" {values.max():.2f} | {len(raw) - values.size} |")
 
     # the planetary ephemeris, separated
     years, sep = ephemeris_separation()
