@@ -79,14 +79,21 @@ Bytes per body:
 | 2000–2100 | 8,080,344 | 19,708,064 | 16,160,624 | 9,262,824 | 7,489,104 | 4,992,960 | 4,040,368 | 3,449,104 | 1,150,024 |
 | 2020–2080 | 4,805,888 | 11,721,232 | 9,611,416 | 5,509,184 | 4,454,240 | 2,969,504 | 2,402,960 | 2,051,312 | 683,792 |
 
-Mimas and Enceladus alone are 71 MB of the 1900–2100 moons. Sums of the table's per-body bytes for the candidate packs:
+Mimas and Enceladus alone are 71 MB of the 1900–2100 moons.
 
-| candidate | bytes |
-|---|---:|
-| Saturn and all eight moons, 1900–2100 | 147,804,560 |
-| Saturn and the five proposed moons, 1900–2100 | 69,624,896 |
-| Saturn 1900–2100, the five proposed moons 2000–2100 | 43,002,424 |
-| Saturn 1900–2100, the five proposed moons 2020–2080 | 32,086,824 |
+**The production layout, cut and proved** (`contract/pack-measurements.md`, *The production layout, cut*). These are the real pack sizes, not sums of the per-body bytes above. Each is cut as Jupiter's packs are, with the released `SpkExcerpt`, and proved bit-identical to `sat441.bsp`:
+- **One kernel** holds Saturn (6 → 699) and its barycentre (0 → 6, sat441's own, bit-identical to de440s's) over 1900–2100.
+- **The other** holds the moons over 2000–2100.
+
+| kernel | bytes | gzip -9 |
+|---|---:|---:|
+| Saturn and barycentre, 1900–2100 | 16,494,592 | 14,838,070 |
+| Tethys, Dione, Rhea, Titan, Iapetus, 2000–2100 | 26,939,392 | 24,193,239 |
+| Mimas, Enceladus, Tethys, Dione, Rhea, Titan, Iapetus, 2000–2100 | 62,808,064 | 56,494,619 |
+| **the pack with the five moons** | **43,433,984** | **39,031,309** |
+| **the pack with the seven moons** | **79,302,656** | **71,332,689** |
+
+The checkpoint's earlier 43,002,424 bytes was a sum of per-body record bytes. It left out the barycentre and the kernels' own layout, and is superseded by the cut figure.
 
 The released packs today are the Sun/Earth/Moon, Mercury and Venus packs and the two Jovian packs. Layout A, as Jupiter's, adds a Saturn pack beside them and leaves every released pack byte-identical.
 
@@ -260,7 +267,7 @@ Separations, codes and brightness are from the weekly Oslo matrix and Horizons' 
 **The five.**
 - **Titan, Rhea, Tethys and Dione** sit clear of the rings for most of their orbits.
 - **Iapetus** is the farthest and the cheapest. Horizons' magnitude model spans only 0.94 mag for it. Whether it models Iapetus's two-toned hemispheres is not stated in its notes, so the table should not print a magnitude for it without a further authority.
-- **Size.** Together they are 43.0 MB with Saturn 1900–2100 and the moons 2000–2100.
+- **Size.** The pack as cut is 43,433,984 bytes with Saturn 1900–2100 and the moons 2000–2100. With Mimas and Enceladus as well it is 79,302,656 bytes.
 
 **Enceladus and Mimas: the owner's option.** Each is accurate.
 - **Enceladus** is never farther from Saturn than 40.9″, so it stays close to the rings, whose A Ring outer edge spans 34.13–46.97″ across. It would add 16.2 MB (2000–2100).
@@ -364,9 +371,11 @@ The globe stays under Rule M's 6 pixels on every ladder field (5.17 px at most a
    - A modified, renamed sat441 excerpt under NAIF's rules, with the released notice pattern.
    - IMCCE: rows quoted only; never bundled, never republished.
    - PDS: values quoted with the table's footnotes.
-3. **Pack layout and interval.** Layout A: a Saturn pack beside the untouched released packs. Recommended: **Saturn 1900–2100 and the five moons 2000–2100**, 43,002,424 bytes. The moons refuse outside their interval and name it. Alternatives:
+3. **Pack layout and interval.** Layout A: a Saturn pack beside the untouched released packs. Recommended: **Saturn 1900–2100 and the five moons 2000–2100**, 43,433,984 bytes as cut (the seven moons: 79,302,656 bytes). The moons refuse outside their interval and name it. Alternatives:
    - 69,624,896 bytes with the five moons over 1900–2100;
    - 32,086,824 bytes with the moons over 2020–2080.
+
+   Both alternatives are per-body sums, not cut.
 4. **The moon set.** **Tethys, Dione, Rhea, Titan and Iapetus.** Enceladus (+16.2 MB) and Mimas (+19.7 MB) are the owner's option. Hyperion is out. The reasons are tabled above.
 5. **Frames and meanings** as frozen above:
    - B planetocentric, never Horizons' planetodetic latitude;

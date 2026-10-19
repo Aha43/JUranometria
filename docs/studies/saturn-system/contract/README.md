@@ -14,3 +14,8 @@ was measured.
   - Every candidate interval, sized per body from the segment directories.
   - The Saturn barycentre, cut from `de440s.bsp`. `sat441`'s own barycentre is
     bit-identical to it.
+  - The production layout, cut as Jupiter's packs are (added 2026-10-19, before
+    ruling 2). Saturn and its barycentre cover 1900–2100 in one kernel, and the
+    moons 2000–2100 in another, for the five proposed moons and for seven with
+    Mimas and Enceladus. Each is proved bit-identical to `sat441.bsp`, and each
+    pack's real byte count is stated.

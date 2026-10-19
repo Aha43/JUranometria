@@ -54,6 +54,8 @@ public final class SaturnPackStudyMain {
     private static final double COVERAGE_START_JD = 2415020.5; // 1900-01-01 00:00 TDB
     private static final double COVERAGE_END_JD = 2488434.5;   // 2101-01-01 00:00 TDB
     private static final double MARGIN_DAYS = 31.0;
+    /** The ruled Jovian moons' start, 2000-01-01 00:00 TDB (JovianPackMain). */
+    private static final double MOONS_START_JD = 2451544.5;
     private static final double J2000_JD = 2451545.0;
     private static final int RECORD_BYTES = 1024;
 
@@ -209,6 +211,50 @@ public final class SaturnPackStudyMain {
         report.append(String.format(Locale.ROOT,
                 "%ngzip -9: full excerpt %,d bytes, barycentre %,d bytes.%n",
                 gzipSize(excerpt), gzipSize(barycentre)));
+
+        // The production layout, cut (the Jovian layout ruled on #472): Saturn and
+        // its barycentre over 1900-2100 in one kernel, the moons over 2000-2100 in
+        // another - for the five proposed moons and for the seven with Mimas and
+        // Enceladus - each written by the released writer and proved.
+        double moonsStartEt = (MOONS_START_JD - MARGIN_DAYS - J2000_JD) * 86400.0;
+        List<SpkExcerpt.Pick> planetPicks = List.of(new SpkExcerpt.Pick(0, SATURN_BARYCENTRE),
+                new SpkExcerpt.Pick(SATURN_BARYCENTRE, 699));
+        byte[] planet = SpkExcerpt.of(sat441, planetPicks, startEt, endEt,
+                "JURANOMETRIA SAT441 SATURN 1900-2100 STUDY", "Study excerpt (#574), not released.\n");
+        report.append(String.format(Locale.ROOT,
+                "%n## The production layout, cut%n%n"
+                        + "As Jupiter's packs are laid out (#472): Saturn (6 -> 699) and its barycentre"
+                        + " (0 -> 6, sat441's own, bit-identical to de440s's as shown above) over 1899-12-01"
+                        + " to 2101-02-01 in one kernel; the moons (6 -> 6xx) over 1999-12-01 to 2101-02-01"
+                        + " in another. Each cut with the released `SpkExcerpt` and proved against"
+                        + " `sat441.bsp`.%n%n"
+                        + "| kernel | bodies | bytes | gzip -9 bytes | sha256 |%n|---|---|---:|---:|---|%n"));
+        report.append(String.format(Locale.ROOT, "| Saturn, 1900-2100 | 6, 699 | %,d | %,d | `%s` |%n",
+                planet.length, gzipSize(planet), sha256(planet)));
+        String proofs = prove(full, SpkKernel.read(planet), planetPicks, startEt, endEt);
+        long[] totals = new long[2];
+        long[] gzipTotals = new long[2];
+        int[][] sets = {{603, 604, 605, 606, 608}, {601, 602, 603, 604, 605, 606, 608}};
+        String[] setNames = {"five moons", "seven moons"};
+        for (int k = 0; k < sets.length; k++) {
+            List<SpkExcerpt.Pick> moonPicks = new ArrayList<>();
+            StringBuilder ids = new StringBuilder();
+            for (int body : sets[k]) {
+                moonPicks.add(new SpkExcerpt.Pick(SATURN_BARYCENTRE, body));
+                ids.append(ids.length() == 0 ? "" : ", ").append(body);
+            }
+            byte[] moons = SpkExcerpt.of(sat441, moonPicks, moonsStartEt, endEt,
+                    "JURANOMETRIA SAT441 SATURN MOONS 2000-2100 STUDY", "Study excerpt (#574), not released.\n");
+            report.append(String.format(Locale.ROOT, "| %s, 2000-2100 | %s | %,d | %,d | `%s` |%n",
+                    setNames[k], ids, moons.length, gzipSize(moons), sha256(moons)));
+            proofs += prove(full, SpkKernel.read(moons), moonPicks, moonsStartEt, endEt);
+            totals[k] = planet.length + moons.length;
+            gzipTotals[k] = gzipSize(planet) + gzipSize(moons);
+        }
+        report.append(String.format(Locale.ROOT,
+                "%nThe Saturn pack, both kernels: **%,d bytes with the five moons** (%,d gzipped);"
+                        + " **%,d bytes with the seven** (%,d gzipped).%n%nProofs, in the order above:%n%s",
+                totals[0], gzipTotals[0], totals[1], gzipTotals[1], proofs));
         Files.writeString(OUT.resolve("report.md"), report, StandardCharsets.UTF_8);
         System.out.print(report);
     }

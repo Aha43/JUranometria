@@ -68,3 +68,23 @@ Proof: 43,223 states on a 1.7-day grid, excerpt against source, worst difference
 sat441's own Saturn barycentre (0 -> 6) against de440s's, 43,222 states on a 1.7-day grid: worst position difference 0 (bit-identical).
 
 gzip -9: full excerpt 133,516,596 bytes, barycentre 392,212 bytes.
+
+## The production layout, cut
+
+As Jupiter's packs are laid out (#472): Saturn (6 -> 699) and its barycentre (0 -> 6, sat441's own, bit-identical to de440s's as shown above) over 1899-12-01 to 2101-02-01 in one kernel; the moons (6 -> 6xx) over 1999-12-01 to 2101-02-01 in another. Each cut with the released `SpkExcerpt` and proved against `sat441.bsp`.
+
+| kernel | bodies | bytes | gzip -9 bytes | sha256 |
+|---|---|---:|---:|---|
+| Saturn, 1900-2100 | 6, 699 | 16,494,592 | 14,838,070 | `fd4a500e9cbf0724ff42830428c68b2c64ce84e6809377af55acddf692b10fe7` |
+| five moons, 2000-2100 | 603, 604, 605, 606, 608 | 26,939,392 | 24,193,239 | `bd07e592ffc96f1f2a083e19253a0d917fab79715f3e104b9d9915d46873d3dc` |
+| seven moons, 2000-2100 | 601, 602, 603, 604, 605, 606, 608 | 62,808,064 | 56,494,619 | `1062c78084858f19e07f21cb09f53eec8a2a4dd9670a0decdcec4e018c157998` |
+
+The Saturn pack, both kernels: **43,433,984 bytes with the five moons** (39,031,309 gzipped); **79,302,656 bytes with the seven** (71,332,689 gzipped).
+
+Proofs, in the order above:
+
+Proof: 86,446 states on a 1.7-day grid, excerpt against source, worst difference 0 (bit-identical).
+
+Proof: 108,690 states on a 1.7-day grid, excerpt against source, worst difference 0 (bit-identical).
+
+Proof: 152,166 states on a 1.7-day grid, excerpt against source, worst difference 0 (bit-identical).
