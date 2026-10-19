@@ -502,6 +502,27 @@ public final class JUranometriaMain {
         juranometria.ui.solar.JovianTableSession jupiterTable =
                 new juranometria.ui.solar.JovianTableSession(observerNow, jovianSystem);
         jupiterTable.followObserver(placeAndTimeChanges);
+        // Saturn, its rings and its seven ruled moons (#576): one session
+        // shared by the Controller's Saturn group and the Saturn dialog,
+        // over the same observer; the 79 MB Saturn pack is read once, when
+        // a host first computes - never at startup, never on opening.
+        java.util.function.Supplier<juranometria.solar.SaturnSystemService>
+                saturnSystem = new java.util.function.Supplier<>() {
+                    private juranometria.solar.SaturnSystemService loaded;
+
+                    @Override
+                    public synchronized juranometria.solar.SaturnSystemService get() {
+                        if (loaded == null) {
+                            loaded = new juranometria.solar.SaturnSystemService(
+                                    juranometria.solar.SolarSystemPack.load(),
+                                    juranometria.solar.SaturnPack.load());
+                        }
+                        return loaded;
+                    }
+                };
+        juranometria.ui.solar.SaturnTableSession saturnTable =
+                new juranometria.ui.solar.SaturnTableSession(observerNow, saturnSystem);
+        saturnTable.followObserver(placeAndTimeChanges);
         // Jupiter on the chart (#484, ruled on #482): one Jovian module
         // over the same observer and the same lazy pack, with its one
         // remembered switch, off by default. The pack loads only when
@@ -573,6 +594,8 @@ public final class JUranometriaMain {
                 new juranometria.ui.solar.SolarSystemSection(sunTable, mercuryTable,
                         venusTable, moonTable, sunLayer, mercuryLayer, venusLayer, moonLayer,
                         jupiterTable, jupiterLayer, centreOnChart, companionWords);
+        // Saturn's group after Jupiter's (#576), with no chart switch.
+        solarSection.withSaturn(saturnTable, companionWords);
         // The tab opens with the instant the chart is frozen at and Update
         // to now (#259, ruling 9 on #556).
         solarSection.showChartInstant(observerNow, placeAndTimeChanges, updateToNow);
@@ -734,6 +757,14 @@ public final class JUranometriaMain {
                 () -> juranometria.ui.solar.JovianTableDialog.open(frame, jupiterTable,
                         juranometria.ui.language.InterfaceText.forLanguage(
                                 language.interfaceLanguage()), centreOnChart, jupiterLayer));
+        // View > Solar System > Saturn... (#576), directly after Jupiter...:
+        // the dialog host of the same Saturn session the Controller holds.
+        AppMenuBar.addSaturnTable(frame.getJMenuBar(),
+                juranometria.ui.language.InterfaceText.forLanguage(
+                        language.interfaceLanguage()),
+                () -> juranometria.ui.solar.SaturnTableDialog.open(frame, saturnTable,
+                        juranometria.ui.language.InterfaceText.forLanguage(
+                                language.interfaceLanguage())));
         // View > Solar System > Jupiter and moons on the chart (#484),
         // directly after Moon on the chart: the Jovian module's switch.
         javax.swing.JCheckBoxMenuItem jupiterOnChartItem = AppMenuBar.addJupiterOnChart(

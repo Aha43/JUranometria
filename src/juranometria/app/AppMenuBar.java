@@ -1081,4 +1081,33 @@ public final class AppMenuBar {
         jupiter.addActionListener(event -> openJupiterTable.run());
         solar.add(jupiter);
     }
+
+    /**
+     * Adds View > Solar System > Saturn... directly after Jupiter... (#576):
+     * the Saturn table's dialog, kept beside the Controller's Saturn group
+     * for dogfooding as Jupiter's is. Opening it computes nothing. No
+     * Saturn on the chart item: no Saturn is drawn yet.
+     */
+    public static void addSaturnTable(javax.swing.JMenuBar bar,
+                                      juranometria.ui.language.InterfaceText said,
+                                      Runnable openSaturnTable) {
+        JMenu solar = solarSystemMenu(bar);
+        if (solar == null || openSaturnTable == null) {
+            return;
+        }
+        JMenuItem saturn = new JMenuItem(said.say("menu.saturn.label"));
+        saturn.setName("saturnTableItem");
+        juranometria.ui.language.MnemonicText.in(said).apply(saturn, "menu.saturn.mnemonic");
+        saturn.getAccessibleContext().setAccessibleName(said.say("menu.saturn.a11y"));
+        juranometria.ui.Explain.control(saturn, said.say("menu.saturn.hover"),
+                said.say("menu.saturn.explain"));
+        saturn.addActionListener(event -> openSaturnTable.run());
+        int at = solar.getMenuComponentCount();
+        for (int i = 0; i < solar.getMenuComponentCount(); i++) {
+            if ("jupiterTableItem".equals(solar.getMenuComponent(i).getName())) {
+                at = i + 1;
+            }
+        }
+        solar.insert(saturn, at);
+    }
 }

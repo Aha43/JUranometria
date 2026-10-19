@@ -384,7 +384,7 @@ Text cannot decide whether a read runs on the event thread — that
 is control flow, and #220 proved the cost of guessing, three times
 (the journey's mark derivation, its page offset, and finally its
 own premise capture). The measurements count the traffic: **472
-reads of live chart state** against **1060 explicit hand-offs**
+reads of live chart state** against **1061 explicit hand-offs**
 suite-wide (requoted for the #261 reader-surface tests, which read
 scenes and marks under the same one-hand-off discipline; for #275's
 closing journey, which reads the page's own objects and takes its
@@ -461,7 +461,9 @@ the chart and its module host, paints, clicks and reads the Inspector on
 the event thread, and reads the current scene once per page to place
 its click; and for #514's Venus chart journey and ink test, which build
 the component, paint and click on the event thread and read the scene
-to find the drawn disc, the journey restoring its own preference node).
+to find the drawn disc, the journey restoring its own preference node;
+and for #576's Saturn table test, which builds Saturn's two hosts of one
+session and reads what each shows on the event thread).
 The discipline
 that closed #220 — derive, read and act
 in **one** `invokeAndWait`, with the deterministic queued-change

@@ -586,3 +586,57 @@ Position angle after 2027-06 uses Jupiter's conditioning rule. A row is ill-cond
 | Iapetus | 0.1017° | 0 |
 
 The margin is thin by construction: the rule admits a row only where its X and Y residual cannot turn the angle by more than the target. After the expiry the ΔT prediction's 0.3″ residual is large against the inner moons' separations, so many of their rows are ill-conditioned. The states after the expiry stay measured output (31 rows differ), as ruled.
+
+## #576, the table, as built
+
+The table proposed on #574 under *The reader's table, proposed*, with the vocabulary ruled in point 6 of the ruling, was built over the service accepted on #575. The classes are `SaturnTableSession`, `SaturnTableControls`, `SaturnMoonsModel`, `SaturnTableFormat` and `SaturnTableDialog`.
+
+**One applied query and result, two hosts.**
+- **Where.** The Controller's Solar System tab gains a Saturn group after Jupiter's, introduced collapsed. View > Solar System gains *Saturn...* directly after *Jupiter...*: the dialog host, kept for dogfooding as Jupiter's is.
+- **Shared.** Both follow one session. Each keeps its own draft, and a result applied in either never writes into the other's fields.
+- **Not drawn.** There is no Show on chart and no Centre on chart: no Saturn is drawn yet.
+
+**Nothing computes from building, opening, expanding or restoring.**
+- The session computes only on Compute, a view, Enter or Update from Place and Time.
+- The 79 MB pack is read on the first computation, never at startup or on expanding the group.
+- Opening the dialog reads the pack's time scales for its note, as Jupiter's dialog does, and computes nothing.
+
+**One instant: the Saturn card** has eleven lines.
+- **Position and figure:** right ascension and declination (J2000), altitude, azimuth, distance (AU), apparent diameter equator / poles (the polar diameter at the ring opening), illuminated fraction, and the north pole's position angle.
+- **The rings:**
+  - *Rings, opening to the observer*: the planetocentric opening to a hundredth of a degree, with its face. It reads *edge-on* exactly when the shown value would be 0.00°.
+  - *Rings, opening to the Sun*: the same, followed by "the unlit face is seen" when the observer and the Sun are on opposite sides of the ring plane.
+  - *Rings, apparent size*: the A ring's outer edge across its major and minor axes.
+
+**Then the seven moons**, in the fixed order Mimas, Enceladus, Tethys, Dione, Rhea, Titan and Iapetus, in Jupiter's columns:
+- side;
+- the east–west and north–south offsets with their letters;
+- separation in arcseconds and in Saturn radii;
+- the state in words.
+
+Every value is the service's result, rounded; the table recomputes nothing.
+
+**A range**, timestamp-grouped. Each group is one Saturn result and its seven moons:
+- a heading naming the sampled instant;
+- three lines of Saturn's summary, with the card's eleven values labelled: position; figure; rings. Saturn's own summary is never left out (#576, required).
+- the seven moons.
+
+A range answers at most 142 instants, seven moon rows each, within the 1,000-row cap. Outside the moons' years a single instant shows Saturn and its rings and says the moons are refused, naming their years. A range that leaves those years is refused whole.
+
+**The words** are the vocabulary ruled on #574, in English and Norwegian. That includes the faces, *edge-on*, the unlit face, "Avstand fra Saturn", "Saturnradier" and the six states with Saturn's name. Shared words come from the Solar System tables' common keys. The Norwegian sentences beyond the ruled vocabulary await the owner's review, as Jupiter's did.
+
+**Tests**
+- `SaturnTableTest`:
+  - Building and expanding compute nothing and read no pack.
+  - Both hosts show one result, and each draft is its own.
+  - Every cell and card value is the service's.
+  - The card's instant reads in both languages: Tethys behind Saturn in its shadow, the rings open 7.43° to the south face.
+  - The 2025 crossing reads edge-on, and the unlit face is named between the Earth's and the Sun's crossings.
+  - A date-line observer is answered for its own place.
+  - Every 2026 day at Oslo reads Horizons' state in words wherever the flattened figure and the sphere agree, and the reader's where they differ.
+  - The refusals and the 142-instant cap are covered.
+  - Every range group is one Saturn result with three summary lines.
+  - An estimated instant is marked.
+- `SolarSystemCompanionJourneyTest`, in the real application: the Saturn group follows Jupiter's, collapsed; opened, it has computed nothing and has no chart switch; the menu ends with *Saturn...*.
+- **Packaged acceptance** runs the journey in every image, printing "saturn table OK".
+- **The companion sheets** were regenerated with the Saturn group after Jupiter's, as the application holds it.
