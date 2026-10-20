@@ -39,8 +39,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * chart box ticks View's item and is remembered under the key it always
  * had; the window's own focus traversal reaches the group's controls;
  * and View holds the Solar System submenu with its entries in the
- * ruled order - Jupiter... last since #474, whose group follows the
- * Moon's, introduced collapsed, and opened computes nothing.
+ * ruled order - Jupiter... after Moon... since #474 and Saturn... last
+ * since #576, whose groups follow the Moon's, introduced collapsed, and
+ * opened compute nothing.
  */
 class SolarSystemCompanionJourneyTest {
 
@@ -114,7 +115,7 @@ class SolarSystemCompanionJourneyTest {
                     }
                     assertEquals(List.of("heading.solarsystem.sun", "heading.solarsystem.mercury",
                             "heading.solarsystem.venus", "heading.solarsystem.moon",
-                            "heading.solarsystem.jupiter"), headings,
+                            "heading.solarsystem.jupiter", "heading.solarsystem.saturn"), headings,
                             "outward from the Sun, the bodies the atlas has");
                     // Mercury (#530): between the Sun and Venus, introduced
                     // collapsed; opened, it has computed nothing; since #542
@@ -163,6 +164,22 @@ class SolarSystemCompanionJourneyTest {
                             "Jupiter and moons on the chart, in Jupiter's group (#484)");
                     assertFalse(((javax.swing.JCheckBox) find(content, "jupiterOnChart"))
                             .isSelected(), "off by default: opening draws nothing");
+
+                    // Saturn (#576): after Jupiter, introduced collapsed;
+                    // opened, it has computed nothing, and offers no chart
+                    // switch and no Centre on chart - no Saturn is drawn.
+                    AbstractButton saturnHeading = (AbstractButton) named(content,
+                            "heading.solarsystem.saturn");
+                    assertFalse(saturnHeading.isSelected(), "Saturn introduced collapsed");
+                    reveal(saturnHeading);
+                    ReaderInput.click(saturnHeading);
+                    drain();
+                    assertTrue(saturnHeading.isSelected(), "Saturn opened");
+                    assertNull(find(content, "saturnCard"), "Saturn, opened, has computed nothing: no card");
+                    assertNull(find(content, "saturnTable"), "and no moons");
+                    assertNotNull(find(content, "saturnCompute"), "but its controls are there");
+                    assertNull(find(content, "saturnOnChart"), "no Show on chart for Saturn");
+                    assertNull(find(content, "saturnCentreOnChart"), "and no Centre on chart");
 
                     // Show on chart, pressed for real: View's item follows,
                     // and the key is the one it always was.
@@ -268,8 +285,9 @@ class SolarSystemCompanionJourneyTest {
                     assertEquals(List.of("Sun on the chart", "Mercury on the chart",
                             "Venus on the chart", "Moon on the chart",
                             "Jupiter and moons on the chart", "—",
-                            "Sun...", "Mercury...", "Venus...", "Moon...", "Jupiter..."), order,
-                            "outward from the Sun, the switches and the tables (#530, #542)");
+                            "Sun...", "Mercury...", "Venus...", "Moon...", "Jupiter...", "Saturn..."),
+                            order, "outward from the Sun, the switches and the tables (#530, #542,"
+                                    + " #576)");
 
                     // The window's own focus traversal reaches the group: the
                     // chosen view (its sibling is reached by the arrow keys,

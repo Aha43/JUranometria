@@ -7,6 +7,21 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Saturn, its rings and seven moons in the Solar System tables (#576,
+ruled on #574).** The Controller's Solar System tab gains a Saturn group
+after Jupiter's, and View > Solar System gains *Saturn...* after
+*Jupiter...*, both showing one table. For an instant: Saturn's position,
+height, distance, apparent size, illuminated fraction and pole; how far
+its rings are open to you and to the Sun, which face you see - edge-on
+when it is too thin to name, and the unlit face when that is the one
+you see - and how large the rings appear; then Mimas, Enceladus, Tethys,
+Dione, Rhea, Titan and Iapetus, each with its side, offsets, separation
+and whether it is clear of Saturn, in front of it, behind it or in its
+shadow. A range groups every instant as Saturn's summary - position,
+figure and rings - and its seven moons, up to 142 instants. Opening the
+group or the dialog computes nothing. Saturn is not drawn on the chart
+yet. In both languages.
+
 **Saturn, computed offline (#575, ruled on #574).** A fourth ephemeris
 pack carries two JUranometria-modified excerpts of NASA/JPL's SAT441:
 Saturn and its barycentre for 1900 to 2100, and Mimas, Enceladus,

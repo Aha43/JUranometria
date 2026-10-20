@@ -27,7 +27,11 @@ import juranometria.ui.language.InterfaceText;
  * Since #530 a Mercury group stands between the Sun and Venus - the
  * same order, outward from the Sun - introduced collapsed, holding one
  * {@link SolarTableControls} over Mercury's shared session, with no
- * chart switch and no Centre on chart: no Mercury is drawn.
+ * chart switch and no Centre on chart: no Mercury is drawn. Since #576 a
+ * Saturn group follows Jupiter's - the same order - introduced
+ * collapsed, holding one {@link SaturnTableControls} over Saturn's
+ * shared session, with no chart switch and no Centre on chart: no Saturn
+ * is drawn yet.
  *
  * <p>Building the section computes nothing: each set of controls
  * reads the observer for its note and seeds, and shows whatever its
@@ -48,6 +52,8 @@ public final class SolarSystemSection {
     private final SolarTableControls venus;
     /** Jupiter's controls, or null for a host built without Jupiter. */
     private final JovianTableControls jupiter;
+    /** Saturn's controls, or null until a host gives the section Saturn's session. */
+    private SaturnTableControls saturn;
 
     public SolarSystemSection(SolarTableSession sunSession, SolarTableSession moonSession,
                               BodyOnChart sunOnChart, BodyOnChart moonOnChart,
@@ -175,6 +181,27 @@ public final class SolarSystemSection {
     /** Jupiter's controls, or null for a host built without Jupiter. */
     public JovianTableControls jupiter() {
         return jupiter;
+    }
+
+    /**
+     * Gives the section Saturn's group after Jupiter's (#576): its
+     * controls over Saturn's shared session, with no chart switch and no
+     * Centre on chart. Stated before the tab is built; building them
+     * computes nothing and reads no pack.
+     */
+    public void withSaturn(SaturnTableSession session, InterfaceText said) {
+        if (session == null || said == null) {
+            throw new IllegalArgumentException("Saturn's session, in a language");
+        }
+        if (saturn != null) {
+            saturn.release();
+        }
+        saturn = new SaturnTableControls(session, said, false);
+    }
+
+    /** Saturn's controls, or null for a host built without Saturn. */
+    public SaturnTableControls saturn() {
+        return saturn;
     }
 
     /** Where the chart's instant is read, and how the tab follows it; null for none. */
@@ -306,6 +333,11 @@ public final class SolarSystemSection {
                     said.say("solarsystem.jupiter"), jupiter.inController(), said, store,
                     true));
         }
+        if (saturn != null) {
+            groups.add(CompanionSection.remembered(ID + ".saturn",
+                    said.say("solarsystem.saturn"), saturn.inController(), said, store,
+                    true));
+        }
         return groups;
     }
 
@@ -323,6 +355,9 @@ public final class SolarSystemSection {
         moon.release();
         if (jupiter != null) {
             jupiter.release();
+        }
+        if (saturn != null) {
+            saturn.release();
         }
     }
 }

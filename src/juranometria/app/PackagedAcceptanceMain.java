@@ -499,6 +499,7 @@ public final class PackagedAcceptanceMain {
         cleanChartJourney();
         solarSystemControlsJourney();
         jupiterTableJourney();
+        saturnTableJourney();
         centreOnChartJourney();
         jupiterOnTheChartJourney();
         jovianMoonsOnTheChartJourney();
@@ -2173,6 +2174,154 @@ public final class PackagedAcceptanceMain {
                 + " grouped by instant, each group Jupiter's position and its four moons,"
                 + " unfinished text untouched; Jupiter before 2000 with the"
                 + " moons refused; View > Solar System ends in Jupiter...)");
+    }
+
+    /**
+     * The Saturn table (#576), inside the packaged image: one session in
+     * the Controller's Saturn group and the dialog; building, expanding and
+     * opening compute nothing; at the card's instant (2026-10-05 00:00 UTC,
+     * Oslo) the rings read open to their south face and Tethys behind Saturn
+     * in its shadow, in English and Norwegian; a range is grouped by instant,
+     * each group Saturn's three summary lines and its seven moons; Saturn
+     * answers in 1950 with the moons refused; View > Solar System has
+     * Saturn... directly after Jupiter....
+     */
+    private static void saturnTableJourney() throws Exception {
+        Preferences scratch = Preferences.userRoot()
+                .node("juranometria-packaged-saturn-" + System.nanoTime());
+        try {
+            juranometria.ui.language.InterfaceText en =
+                    juranometria.ui.language.InterfaceText.forLanguage("en");
+            juranometria.ui.language.InterfaceText nb =
+                    juranometria.ui.language.InterfaceText.forLanguage("nb-NO");
+            juranometria.sky.Observer[] at = {new juranometria.sky.Observer(59.91, 10.75,
+                    SATURN_CARD_INSTANT)};
+            juranometria.solar.SaturnSystemService saturnService =
+                    juranometria.solar.SaturnSystemService.load();
+            int[] loads = {0};
+            juranometria.ui.solar.SaturnTableSession saturn =
+                    new juranometria.ui.solar.SaturnTableSession(() -> at[0], () -> {
+                        loads[0]++;
+                        return saturnService;
+                    });
+            juranometria.solar.SolarSystemService solar =
+                    juranometria.solar.SolarSystemService.load();
+            juranometria.ui.solar.SolarTableSession sun =
+                    new juranometria.ui.solar.SolarTableSession(() -> at[0], solar,
+                            juranometria.ui.solar.SolarTable.sun());
+            juranometria.ui.solar.SolarTableSession moon =
+                    new juranometria.ui.solar.SolarTableSession(() -> at[0], solar,
+                            juranometria.ui.solar.SolarTable.moon());
+            juranometria.solarchart.SolarSystemModule module =
+                    new juranometria.solarchart.SolarSystemModule(() -> at[0],
+                            () -> solar, () -> true);
+            juranometria.ui.solar.SolarSystemSection[] section =
+                    new juranometria.ui.solar.SolarSystemSection[1];
+            juranometria.ui.solar.SaturnTableDialog.Content[] norsk =
+                    new juranometria.ui.solar.SaturnTableDialog.Content[1];
+            javax.swing.JMenuBar[] bar = new javax.swing.JMenuBar[1];
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                section[0] = new juranometria.ui.solar.SolarSystemSection(sun, moon,
+                        juranometria.ui.solar.SunChartSession.switchOf(module,
+                                juranometria.ui.solar.SunChartStore.forNode(scratch)),
+                        juranometria.ui.solar.MoonChartSession.switchOf(module,
+                                juranometria.ui.solar.MoonChartStore.forNode(scratch)),
+                        null, en);
+                section[0].withSaturn(saturn, en);
+                section[0].inController(
+                        juranometria.ui.companion.CompanionStore.forNode(scratch), en);
+            });
+            require(saturn.computations() == 0 && loads[0] == 0,
+                    "building the Saturn group computes nothing and reads no pack");
+            javax.swing.SwingUtilities.invokeAndWait(() ->
+                    norsk[0] = juranometria.ui.solar.SaturnTableDialog.content(saturn, nb));
+            require(saturn.computations() == 0, "opening the Saturn dialog computes nothing");
+
+            juranometria.ui.solar.SaturnTableControls group = section[0].saturn();
+            juranometria.ui.solar.SaturnTableControls dialog = norsk[0].controls();
+            javax.swing.SwingUtilities.invokeAndWait(group::apply);
+            require(saturn.computations() == 1 && group.shown() == dialog.shown()
+                            && group.model.getRowCount() == 7,
+                    "one computation in the Controller is the dialog's result too");
+            java.util.List<String> states = new java.util.ArrayList<>();
+            java.util.List<String> tilstand = new java.util.ArrayList<>();
+            for (int row = 0; row < 7; row++) {
+                states.add((String) group.model.getValueAt(row, 6));
+                tilstand.add((String) dialog.model.getValueAt(row, 6));
+            }
+            require("behind Saturn, in its shadow".equals(states.get(2))
+                            && states.stream().filter("clear of Saturn"::equals).count() == 6,
+                    "on 2026-10-05 Tethys is behind Saturn in its shadow, six moons clear: " + states);
+            require("bak Saturn, i skyggen".equals(tilstand.get(2))
+                            && "Avstand fra Saturn".equals(dialog.model.getColumnName(4)),
+                    "and in Norwegian: " + tilstand);
+            require(group.cardValue("ringOpening").endsWith("° (south face)")
+                            && dialog.cardValue("ringOpening").endsWith("° (sørsiden)"),
+                    "the rings open to their south face: " + group.cardValue("ringOpening"));
+            require(group.cardTitle.getText().equals("Saturn · 2026-10-05 00:00:00 UTC"),
+                    "the Saturn card names its instant: " + group.cardTitle.getText());
+
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                group.rangeView.setSelected(true);
+                group.start.setText("2026-10-04 23:00");
+                group.end.setText("2026-10-05 00:30");
+                group.step.setSelectedIndex(0);
+                group.apply();
+            });
+            require(group.model.groups() == 3 && group.model.moonRows() == 21
+                            && group.model.getRowCount() == 33,
+                    "a range grouped by instant: a heading, Saturn's three lines and seven moons each");
+            juranometria.ui.solar.SaturnTableSession.Entry first = saturn.result().entries().get(0);
+            java.util.List<String> values = juranometria.ui.solar.SaturnMoonsModel
+                    .saturnValues(first.saturn(), group.words());
+            String rings = (String) group.model.getValueAt(3, 0);
+            require(rings.contains(values.get(8)) && rings.contains(values.get(10)),
+                    "each instant of the range carries Saturn's rings: " + rings);
+
+            at[0] = new juranometria.sky.Observer(59.91, 10.75,
+                    java.time.Instant.parse("1950-06-01T00:00:00Z"));
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                group.instantView.setSelected(true);
+                group.apply();
+            });
+            require(group.cardTitle.getText().startsWith("Saturn · 1950-06-01")
+                            && group.model.getRowCount() == 0
+                            && group.status().contains("2000-01-01"),
+                    "Saturn answers in 1950, the moons refuse: " + group.status());
+
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                bar[0] = AppMenuBar.create(new ChartViewController(), () -> { },
+                        () -> { }, () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
+                        () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
+                        () -> { }, () -> { }, en);
+                AppMenuBar.addJupiterTable(bar[0], en, () -> { });
+                AppMenuBar.addSaturnTable(bar[0], en, () -> { });
+            });
+            javax.swing.JMenu solarMenu = AppMenuBar.solarSystemMenu(bar[0]);
+            int jupiterAt = -1;
+            int saturnAt = -1;
+            for (int i = 0; i < solarMenu.getItemCount(); i++) {
+                javax.swing.JMenuItem item = solarMenu.getItem(i);
+                if (item != null && "jupiterTableItem".equals(item.getName())) {
+                    jupiterAt = i;
+                }
+                if (item != null && "saturnTableItem".equals(item.getName())) {
+                    saturnAt = i;
+                }
+            }
+            require(jupiterAt >= 0 && saturnAt == jupiterAt + 1,
+                    "View > Solar System has Saturn... directly after Jupiter...");
+            section[0].release();
+            norsk[0].controls().release();
+        } finally {
+            scratch.removeNode();
+        }
+        System.out.println("saturn table OK (one session in two hosts, building computes nothing"
+                + " and reads no pack; on 2026-10-05 00:00 UTC at Oslo the rings open to the"
+                + " south face and Tethys is behind Saturn in its shadow, six moons clear, in"
+                + " English and Norwegian; a range grouped by instant, each group Saturn's"
+                + " position, figure and rings and its seven moons; Saturn before 2000 with the"
+                + " moons refused; View > Solar System has Saturn... after Jupiter...)");
     }
 
     private static void solarSystemControlsJourney() throws Exception {

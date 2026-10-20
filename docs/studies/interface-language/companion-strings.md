@@ -336,6 +336,7 @@ arrangement at its frozen instant.
 | ▸ Venus | Show or hide this section | Venus, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Moon | Show or hide this section | Moon, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Jupiter | Show or hide this section | Jupiter, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
+| ▸ Saturn | Show or hide this section | Saturn, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 
 ### jupiter-open
 
@@ -368,6 +369,7 @@ arrangement at its frozen instant.
 | — | The elapsed time between rows | — | The elapsed time between rows |
 | Compute | Fill the table for the range above | Compute the range | Computes a row for every step of the range above. |
 | Jupiter and moons on the chart | — | Jupiter and moons on the chart | Shows or hides Jupiter on the chart where it stands for the place and instant set in Place and Time, at its true size or as a 6-pixel cartographic symbol, whichever is larger; the same choice as View's. Io, Europa, Ganymede and Callisto are drawn as 3-pixel symbols at their own places: a filled dot clear of Jupiter, a dot ringed in the page's ground in front of it, a hollow ring in its shadow, and nothing behind it; at wider fields only the moons whose marks can be told apart are drawn. |
+| ▸ Saturn | Show or hide this section | Saturn, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 
 ### emphasis-open
 
@@ -737,6 +739,7 @@ arrangement at its frozen instant.
 | ▸ Venus | Vis eller skjul denne delen | Venus, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Månen | Vis eller skjul denne delen | Månen, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Jupiter | Vis eller skjul denne delen | Jupiter, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
+| ▸ Saturn | Vis eller skjul denne delen | Saturn, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 
 ### jupiter-open
 
@@ -769,6 +772,7 @@ arrangement at its frozen instant.
 | — | Tiden som går mellom radene | — | Tiden som går mellom radene |
 | Beregn | Fyll tabellen for tidsrommet over | Beregn tidsrommet | Beregner én rad for hvert steg i tidsrommet over. |
 | Jupiter og månene på kartet | — | Jupiter og månene på kartet | Viser eller skjuler Jupiter på kartet der den står for stedet og tidspunktet satt i Sted og tid, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst; samme valg som i Vis-menyen. Io, Europa, Ganymedes og Callisto tegnes som symboler på 3 piksler der de står: en fylt prikk klar av Jupiter, en prikk med en ring i sidens bunnfarge foran den, en hul ring i skyggen, og ingenting bak den; i videre felt tegnes bare de månene som kan skilles fra hverandre. |
+| ▸ Saturn | Vis eller skjul denne delen | Saturn, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 
 ### emphasis-open
 

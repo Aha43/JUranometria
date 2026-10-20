@@ -299,6 +299,11 @@ public final class CompanionSheetMain {
                                         () -> observer,
                                         juranometria.solar.JovianSystemService::load),
                                 new StillSwitch(), null, words);
+                // Saturn's group (#576) after Jupiter's, as the application's
+                // Controller holds it: introduced collapsed, it computes
+                // nothing, so the pack is never read.
+                solarSection.withSaturn(new juranometria.ui.solar.SaturnTableSession(
+                        () -> observer, juranometria.solar.SaturnSystemService::load), words);
                 // The tab opens with the chart's instant and Update to now
                 // (#259, ruling 9 on #556), as the application holds it.
                 solarSection.showChartInstant(() -> observer, listener -> () -> { },
