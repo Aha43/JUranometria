@@ -7,6 +7,20 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Saturn handed to cartography (#577).** `docs/decisions/saturn-handover.md`
+closes Part I of the road to 5.4.0. It records the settled numerical contract:
+- the authority, the pack and its licensing;
+- the seven moons, with Hyperion left out;
+- the rings' opening and its faces;
+- the measured accuracy by era and the named cases, including the crossings
+  validated only against Horizons;
+- the table's verdict;
+- every stopped or incomplete run, and the late native-resize repair of #584;
+- the routes and the evidence movement, with no released chart output moved;
+- the questions Part II must decide: Saturn's size on the page and its minimum
+  mark, the rings and their near half, the inner moons inside the ring
+  ellipse, vocabulary, selection, the closer fields and export.
+
 **Saturn, its rings and seven moons in the Solar System tables (#576,
 ruled on #574).** The Controller's Solar System tab gains a Saturn group
 after Jupiter's, and View > Solar System gains *Saturn...* after
