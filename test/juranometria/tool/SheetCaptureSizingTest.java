@@ -566,6 +566,24 @@ class SheetCaptureSizingTest {
         return made;
     }
 
+    /**
+     * A dialog whose native window is created already at the floor's
+     * width and its content's packed height, without packing, so no
+     * request is left for the native window to answer (#590).
+     */
+    private static void realizedAtTheFloor(JFrame[] owner, JPanel content,
+                                           JDialog dialog) {
+        dialog.setContentPane(content);
+        JDialog probe = new JDialog(owner[0]);
+        probe.addNotify();
+        java.awt.Insets chrome = probe.getInsets();
+        probe.dispose();
+        Dimension packed = dialog.getPreferredSize();
+        dialog.setBounds(dialog.getX(), dialog.getY(), FLOOR,
+                packed.height + chrome.top + chrome.bottom);
+        dialog.addNotify();
+    }
+
     /** The floor's content width on this window. */
     private static int floorContent(JDialog dialog) {
         java.awt.Insets chrome = dialog.getInsets();
@@ -585,7 +603,12 @@ class SheetCaptureSizingTest {
         try {
             SwingUtilities.invokeAndWait(() -> {
                 content[0] = canvas(300, 200);
-                dialog[0] = packedAround(owner, content[0], null);
+                // Created at its packed frame, so the setup asks the
+                // native window for nothing: packed after creation,
+                // its late answer could land inside the restatement
+                // and take the window back to 300 (#590, traced).
+                dialog[0] = realizedAtItsPreference(owner, content[0],
+                        null);
             });
             var drawn = SheetCapture.of(dialog[0], content[0],
                     SheetCapture.applicationSized("test.floorPolicy",
@@ -793,7 +816,12 @@ class SheetCaptureSizingTest {
                 owner[0] = new JFrame("owner");
                 dialog[0] = new LaysOutAtItsPackedWidth(owner[0]);
                 content[0] = canvas(371, 280);
-                packedAround(owner, content[0], dialog[0]);
+                // Created at its packed frame, so the setup asks the
+                // native window for nothing: packed after creation,
+                // its late answer could take the window back to 371
+                // inside the restatement, where the declared lay-out
+                // needs it at 420 (#590, traced).
+                realizedAtItsPreference(owner, content[0], dialog[0]);
             });
             var drawn = SheetCapture.of(dialog[0], content[0],
                     SheetCapture.applicationSized("test.packedLayout",
@@ -903,6 +931,16 @@ class SheetCaptureSizingTest {
     /**
      * A rollback after the restatement contradicts what was
      * established, and refuses.
+     *
+     * <p>The rollback is the test's own, and it must be the only
+     * resize the native window is asked for (#590). Packed at 300 and
+     * then raised to the floor, the window had two earlier requests in
+     * flight, and on macOS either answer could land after the
+     * rollback: the packed 300 made the refusal name the wrong width,
+     * and the policy's 420 undid the rollback, so nothing was refused.
+     * So the window is created already at the floor, and this policy
+     * applies the floor without packing: its resize changes nothing
+     * and asks the native window for nothing.
      */
     @Test
     void aRollbackAfterTheRestatementRefuses() throws Exception {
@@ -916,8 +954,11 @@ class SheetCaptureSizingTest {
                 owner[0] = new JFrame("owner");
                 dialog[0] = new RolledBackAfterRestating(owner[0]);
                 content[0] = canvas(300, 263);
-                packedAround(owner, content[0], dialog[0]);
+                realizedAtTheFloor(owner, content[0], dialog[0]);
             });
+            assertEquals(FLOOR, dialog[0].getWidth(),
+                    "the window starts at the floor, so applying the"
+                            + " floor asks the native window for nothing");
             SheetCapture.ApplicationPolicy rule = floorPolicy(dialog[0]);
             IllegalStateException refused = assertThrows(
                     IllegalStateException.class,
@@ -932,7 +973,15 @@ class SheetCaptureSizingTest {
 
                                         @Override
                                         public void apply() {
-                                            rule.apply();
+                                            // The floor rule without
+                                            // its pack: the window
+                                            // already holds the floor.
+                                            dialog[0].setSize(Math.max(
+                                                    dialog[0].getWidth(),
+                                                    FLOOR),
+                                                    dialog[0].getHeight());
+                                            dialog[0].invalidate();
+                                            dialog[0].validate();
                                             dialog[0].armed = true;
                                         }
                                     })));
@@ -965,7 +1014,12 @@ class SheetCaptureSizingTest {
         try {
             SwingUtilities.invokeAndWait(() -> {
                 content[0] = canvas(300, 263);
-                dialog[0] = packedAround(owner, content[0], null);
+                // Created at its packed frame, so the setup asks the
+                // native window for nothing: packed after creation,
+                // its late answer could land inside the restatement
+                // and take the window back to 300 (#590, traced).
+                dialog[0] = realizedAtItsPreference(owner, content[0],
+                        null);
             });
             SheetCapture.ApplicationPolicy rule = floorPolicy(dialog[0]);
             var drawn = SheetCapture.of(dialog[0], content[0],
