@@ -284,13 +284,26 @@ class SheetCaptureSizingTest {
                 dialog[0] = new JDialog(owner[0]);
                 content[0] = new Bistable();
                 content[0].setOpaque(true);
-                dialog[0].setContentPane(content[0]);
+                // Created at its own wide packed frame, so the
+                // capture's pack asks the native window for nothing.
+                // Packed narrow first, the capture's pack had to ask
+                // for 333x223, and on X11 the native answer to that
+                // request could land after the leftover resize below
+                // and put the window back: the layout then settled
+                // at what was established, and the transition this
+                // test is about never happened (#588: 2 of 500
+                // harness runs on CI's display).
+                realizedAtItsPreference(owner, content[0], dialog[0]);
                 // The previous sheet's window, which is the size the
-                // leftover resize puts back.
+                // leftover resize puts back: the narrow preference in
+                // this window's chrome, derived without resizing it.
                 content[0].narrow = true;
-                dialog[0].pack();
-                stale[0] = dialog[0].getSize();
+                Dimension narrow = content[0].getPreferredSize();
                 content[0].narrow = false;
+                java.awt.Insets chrome = dialog[0].getInsets();
+                stale[0] = new Dimension(
+                        narrow.width + chrome.left + chrome.right,
+                        narrow.height + chrome.top + chrome.bottom);
             });
             SheetCapture.Sizing packedThenStale = (window, held) -> {
                 SheetCapture.Established packed =
