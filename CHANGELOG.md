@@ -19,7 +19,10 @@ closes Part I of the road to 5.4.0. It records the settled numerical contract:
 - the routes and the evidence movement, with no released chart output moved;
 - the questions Part II must decide: Saturn's size on the page and its minimum
   mark, the rings and their near half, the inner moons inside the ring
-  ellipse, vocabulary, selection, the closer fields and export.
+  ellipse, vocabulary, selection, the closer fields and export;
+- apart from the Saturn work, the test-only repair chain it needed to
+  qualify: four capture sizing tests that left a native resize in flight
+  (#588, #590).
 
 **Saturn, its rings and seven moons in the Solar System tables (#576,
 ruled on #574).** The Controller's Solar System tab gains a Saturn group

@@ -11,8 +11,18 @@ checkpoint rulings, #575 and #576 as built); this document says what
 stands, what was measured, what stopped, what moved, and what the next
 milestone must decide.
 
-Main after the sprint: `58ffa6d7` (2026-10-20). No `VERSION` change
-(5.3.0), no tag, no release.
+**Two baselines, kept apart:**
+
+- **The Saturn feature work** (#574-#576) was complete at main
+  `58ffa6d7` (2026-10-20). Every Saturn number, file and table in
+  section 1 is as of that main.
+- **The infrastructure repair chain** this handover needed before it
+  could qualify (section 2.2): #587's own CI stop, then #588 and #590,
+  four capture sizing tests repaired in the test file only. The chain
+  ends at main `224058e0` (2026-10-21), this handover's baseline. It
+  changed no production code, no Saturn result and no evidence.
+
+No `VERSION` change (5.3.0), no tag, no release.
 
 ## 1. What is settled
 
@@ -222,7 +232,9 @@ checkpoint on candidate `09d4537b`: **accepted by the owner
 `imcce-comparison.md`, `measurements.md`, `contract/`,
 `service-accuracy.md`, `table-measurements.md`, the mock-ups).
 
-## 2. A finding carried forward: late native resizes (#584, under #362)
+## 2. Late native resizes: #584, and the repair chain before this handover (under #362)
+
+### 2.1 #584, during #576
 
 Gate 1 on #576's `553e1c0b` stopped on
 `SheetCaptureSizingTest.invalidOrUnrealizableDeclarationsAreRefused`: an
@@ -244,6 +256,69 @@ refusal (`ExportSheetDialogSheetMain`, established 333x223 then proved
 at 326x206) has the same signature. It may share the cause; #362 owns
 it.
 
+### 2.2 The repair chain before this handover could qualify (#587, #588, #590)
+
+This is infrastructure, not Saturn work. Each repair changed
+`test/juranometria/tool/SheetCaptureSizingTest.java` only; in every
+traced case the production capture was right.
+
+1. **#587's CI stopped** (run 39407972656, this handover's first head
+   `2bebef0b`, after all seven local gates passed):
+   `aGeometryThePolicyDidNotEstablishIsRefused` - "Expected
+   IllegalStateException ... nothing was thrown", 2,288 found, 1
+   failed. An expected refusal that did not happen is outside the
+   capture-refusal precedent (the owner's #584 ruling). **The run was
+   never retried and is kept as evidence**; the handover head was
+   abandoned, and #587 stayed stopped and unmerged until the chain
+   below landed.
+2. **#588 reproduced it on CI's own display.** The failure was on
+   ubuntu-latest under bare `xvfb-run` (no window manager), not macOS.
+   - **One diagnostic run** (39470749157, a throwaway branch,
+     deleted): an instrumented harness of exactly that test, 2 of 500
+     runs alone not refused, 0 of 500 after the suite.
+   - **The cause:** the setup packed the window narrow, so the
+     capture's establishing pack had to ask for 326 → 333x223. The
+     native window's late answer to that request landed after the
+     test's stale `setSize(326x206)` and put the window back. The
+     layout settled at what was established, and the capture correctly
+     refused nothing. This was not the proposed hypothesis, a late
+     answer to the setup's own request.
+   - **The repair:** the window is created at its wide packed frame,
+     and the stale size is derived without resizing it. The refusal
+     and its 333x223/326x206 assertion are unchanged.
+   - **One validation run of the fixed head** (39476504548): all 1,000
+     iterations refused. The establishing pack's 326 → 333 request and
+     the native revert, present 1,000 and 9 times in the original
+     record, appeared 0 times.
+   - **Landed as `224058e0`** (PR #592, CI 39515898947: display 2,288
+     of 2,288), after #590 as ruled.
+3. **#590, four sibling tests**, found while stress-testing #588's fix
+   on macOS. Each was traced independently in its failing context
+   (instrumented scratch copies, never committed; diagnosis only).
+   - `aLaggingContentCatchesUpToTheDeclaration`,
+     `contentTheWindowLaysOutAtItsPackedWidthIsLaidOutAtTheDeclaration`
+     and `applicationSizedPaintsTheDeclaredGeometry`: the native
+     window's late answer to the setup's pack took the window back to
+     the packed width inside the restatement, and the capture refused
+     an established declaration. Each is now created at its packed
+     frame.
+   - `aRollbackAfterTheRestatementRefuses` had two causes: the same
+     setup answer, and the late answer to the policy's own
+     `setSize(420)`, which undid the simulated rollback. It is
+     redesigned: created at the floor, its policy applies the floor
+     without packing, and its rollback to 326 is the only resize the
+     native window is asked for. It still proves that a rollback after
+     the restatement is refused, naming 326. The owner accepted the
+     window creation's two 420x295 events, both before the rollback.
+   - **Qualified uninstrumented:** each test 40 of 40 alone, the whole
+     class 0 failing runs in 500 fresh JVMs. **Landed as `a564d720`**
+     (PR #591, CI 39498107479: display 2,288 of 2,288).
+4. **#589, record only.** A Place and Time field saving to a removed
+   preferences node on the event thread, seen in CI display logs
+   (including a passing run). Its presence in a passing run does not
+   establish that it is harmless; no action was taken, pending its own
+   ruling.
+
 ## 3. Every stopped, superseded or incomplete run
 
 All records are kept under `~/juranometria-runs/runs/` on the owner's
@@ -257,6 +332,9 @@ for a new head qualified from gate 1.
 | `402b0631` | #575 | the measured, not-qualified checkpoint head; no gate run | the owner's ten checkpoint rulings, held on `4b9b32b2` |
 | `4b9b32b2` | #575 | gates 1-5 OK; STOPPED at gate 6: the archive lacked `NOTICE-saturn-system.md` - `verify-dist.sh` expected it, the Makefile's `dist` copy had not gained it | added on `e69dcaa0` (all seven OK, CI once) |
 | `553e1c0b` | #576 | STOPPED at gate 1: `SheetCaptureSizingTest`, an expected refusal that did not happen (2,288 found, 1 failed, 12 aborted) | not covered by the precedent (owner's ruling); repaired in #584; #576 rebased onto it as `09d4537b` (all seven OK, CI once) |
+| `2bebef0b` | #577 | all seven gates OK; **CI STOPPED** (run 39407972656): `aGeometryThePolicyDidNotEstablishIsRefused`, an expected refusal that did not happen | never retried, kept as evidence; repaired in #588 after #590 (section 2.2); this handover rebased onto `224058e0` as a new head, qualified from gate 1 |
+| `929dc3cd` | #588 | the diagnostic run on CI's display (39470749157), a throwaway branch: 2 of 500 not refused | the cause traced; the branch deleted after capture |
+| `28cd87b2` | #588 | the fixed head's validation run (39476504548): 1,000 of 1,000 refused | validation of a new head, not a retry; the branch deleted after capture |
 | `41765d1c` | #584 | gate 1 INCOMPLETE: `ExportSheetDialogSheetMain` refused 333x223 → 326x206, a production capture refusing fail-closed | all seven precedent conditions held and written in `INCOMPLETE.md`; the test recorded unexecuted, never passed; CI's display run 39327105644 executed it (2,275 successful, 0 failed, 0 aborted, 0 skipped); gates 2-7 OK via `gates-from2.sh` |
 
 Development runs before the gates, kept beside them, found what the
@@ -268,6 +346,14 @@ capture-family failures in two export generators
 (`ExportSheetDialogSheetMain`, `ExportCompanionTest`), which are
 development findings, not gate results; the export-dialog refusal
 recurred in #584's gate 1 and was handled under the precedent (above).
+
+**A development pre-check refusal, recorded under #362.** The full-suite
+pre-check before #588's gates (head `94074711`, a development run, not a
+gate) met `PlaceAndTimeSheetMain`'s capture refusing correctly: the
+established 420x284 layout was replaced by 326x284 before proof, and the
+capture failed closed. Gate 1 on the same head did not meet it. The
+evidence is kept in
+`~/juranometria-runs/runs/pre-check-588-94074711-refusal-PlaceAndTimeSheetMain/`.
 
 Gate 1's aborted count ranged from 12 to 49 across the qualified heads,
 and every gate record's list of unexplained aborts is empty: each abort
@@ -282,7 +368,13 @@ Lessons the next milestone inherits:
 - a menu or Controller group added in the outward order moves every
   journey that pins that order, and the companion sheets;
 - an expected refusal that does not happen is never an incomplete
-  capture.
+  capture;
+- a test that sizes a real window must not leave an earlier native
+  resize in flight when its scenario begins: create the window at the
+  frame it needs, and never assume the native answer has arrived
+  (#584, #588, #590);
+- a failure seen on one platform is diagnosed on that platform, and
+  instrumentation changes rates - diagnose with it, qualify without it.
 
 ## 4. Routes, evidence movement and performance
 
@@ -304,9 +396,12 @@ moved (`765cc55d`, `2d3186e9`).
 | #583 | #575 | `e69dcaa0` → `2d3186e9` | 39294880240 | 39303316921 |
 | #585 | #584 | `41765d1c` → `56fbb819` | 39327105644 | 39336359829 |
 | #586 | #576 | `09d4537b` → `58ffa6d7` | 39342330940 | 39367534970 |
+| #591 | #590 | `e46c1347` → `a564d720` | 39498107479 | 39508327402 |
+| #592 | #588 | `94074711` → `224058e0` | 39515898947 | 39541741327 |
 
-Every PR's display job ran the whole suite with 0 failed, 0 aborted and
-0 skipped (2,240, 2,275, 2,275 and 2,288 tests).
+Every landed PR's display job ran the whole suite with 0 failed, 0
+aborted and 0 skipped (2,240, 2,275, 2,275, 2,288, 2,288 and 2,288
+tests). #591 and #592, one test file each, ran the narrow route.
 
 ### 4.2 What evidence moved
 
@@ -316,6 +411,8 @@ Every PR's display job ran the whole suite with 0 failed, 0 aborted and
 | `2d3186e9` (#575) | 10 files: `service-accuracy.md`, `table-measurements.md`, the About sheets and strings (the new notice), the language ledger (three rows), provenance, the test-evidence measurements | 43 files, +4,949 |
 | `56fbb819` (#584) | none: one test file | 1 file, +69 |
 | `58ffa6d7` (#576) | 7 files: the companion sheets and strings with the Saturn group, provenance, the test-evidence measurements | 24 files, +2,402 |
+| `a564d720` (#590) | none: one test file | 1 file, +59 |
+| `224058e0` (#588) | none: one test file | 1 file, +17 |
 
 **No released chart output moved.** Since Sprint 51's close
 (`cbf9849d`) no chart, sheet, on-the-chart, printable, regional,
@@ -428,8 +525,14 @@ bundled.
 
 ### 5.5 Deferred by name
 
-- The export-dialog refusal's possible late-resize cause (section 2),
-  under #362.
+- The export-dialog refusal's possible late-resize cause (section 2.1),
+  under #362, and the Place and Time pre-check refusal recorded there.
+- The class's remaining `packedAround` users, which have not failed in
+  any stress run, are reported candidates only:
+  `packingAnApplicationSizedWindowProducesTheWidthNobodySees`,
+  `theDeclarationIsFrozenAndRestatedExactlyOnce`,
+  `invalidOrUnrealizableDeclarationsAreRefused`.
+- #589, record only, pending its own ruling.
 - The cross-planet article on ephemerides and provenance waits for the
   6.0 wrap-up.
 - A Saturn magnitude needs its own model and authority.
