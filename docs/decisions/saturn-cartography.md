@@ -278,7 +278,9 @@ closer-field eligibility. The moons follow in the second.
   figure at 1° (12.2 × 4.5 px at the card instant), 0.5° (22.3 × 8.9 px)
   and 0.25° (44.6 × 17.8 px) - `docs/studies/saturn-on-the-chart`.
 - **Ruling 2: the rings.** The two ruled annuli at asin(R/Δ) and
-  asin(R/Δ)·|sin B|, one annulus where the Cassini gap is under a pixel;
+  asin(R/Δ)·|sin B|, the Cassini gap cut between them only on the arcs
+  about the ansae where it is a pixel across - its width at the ansae
+  foreshortened toward the minor axis by sin B - and one band elsewhere;
   the major axis across the pole turned by the page's own north and east
   (`PageBasis`); the far half painted behind the globe and the near half
   over it, the near half away from the projected pole when B > 0 and
@@ -288,6 +290,15 @@ closer-field eligibility. The moons follow in the second.
   tones between the star ink and the ground, both quieter when the unlit
   face is seen, all dimmed below a drawn horizon. No shadows.
   `SaturnInkTest` holds each rule on the page.
+  *The checkpoint finding (2026-10-21):* at the first packaged checkpoint
+  the owner saw two dark dots at twelve o'clock on the open rings of
+  2034-01-08 at 0.25°. The gap had been decided once, by its width at the
+  ansae, and then cut all the way round, so toward the minor axis - where
+  it is only sin B as wide - a sub-pixel sliver was painted as a row of
+  dots on the far half. The cut is now confined to where the gap is a
+  pixel across; the study's 900 px pages never reach a pixel and did not
+  move; `SaturnInkTest` holds the gap open at the ansae and closed on the
+  minor axis at 1.9 px by 0.95 px, and open all round at 3.8 px by 1.9 px.
 - **Ruling 5: identity and words.** `saturn`, named from
   `page.body.saturn` with its symbol note in both languages; Centre on
   chart lands at the chart's normal minimum field, through #483's seam

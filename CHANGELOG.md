@@ -15,7 +15,8 @@ rings at their true size once the rings are at least 6 pixels across
 (at 1° and the closer fields), otherwise a 6-pixel cartographic symbol
 that hides nothing and says what it is. The rings' near half is drawn
 over the globe and the far half behind it, by the ruled opening; seen
-edge-on they are a line; when their unlit face is seen they are dimmed;
+edge-on they are a line; the Cassini Division is a gap only on the arcs
+where it is a pixel across; when their unlit face is seen they are dimmed;
 below a drawn horizon the figure is dimmed and says so. Saturn joins
 Mercury, Venus and Jupiter as a body that offers the 0.5° and 0.25°
 closer fields. Exported sheets carry the same figure. Its moons are not

@@ -1696,8 +1696,9 @@ public final class ReferenceInk {
      * The ringed body's mark on this page, or null when none of it is
      * there (#579; rulings 1 and 2 on #578). The figure is measured by
      * the rings' major axis: under the minimum mark it is the mark's
-     * circle, a symbol; otherwise the two ruled annuli (one, where the
-     * Cassini gap is under a pixel) with semi-axes asin(R/Δ) and
+     * circle, a symbol; otherwise the two ruled annuli (one band wherever
+     * the Cassini gap, foreshortened toward the minor axis, is under a
+     * pixel across) with semi-axes asin(R/Δ) and
      * asin(R/Δ)·|sin B| at the page's scale, the major axis across the
      * pole turned by the page's own north and east, split into the far
      * half and the near half - away from the projected pole when B &gt; 0,
@@ -1757,20 +1758,38 @@ public final class ReferenceInk {
             return new RingedMark(centre, ink, reach, false, onPage, null, globe, null,
                     line, null);
         }
+        double far = 4.0 * aPx + 4.0;
+        Area rings = ringAnnulus(body, edges.get(0), edges.get(3), perArcsec, sinB);
+        // The Cassini gap is drawn only where it is a pixel (ruling 2):
+        // its width across the rings is its width along the major axis
+        // at the ansae, foreshortened toward the minor axis - between two
+        // similar ellipses with axes (a, a sin B) the normal distance at
+        // parametric angle t is d sin B / sqrt(sin^2 B cos^2 t + sin^2 t).
+        // So the gap is cut from the rings on the two arcs about the
+        // major axis where that distance is at least a pixel, and the
+        // two annuli read as one band elsewhere - never a sub-pixel
+        // sliver that the page would paint as a row of dots.
         double cassiniPx = (body.ringSemiMajorArcseconds(edges.get(2))
                 - body.ringSemiMajorArcseconds(edges.get(1))) * perArcsec;
-        double[][] bands = cassiniPx >= 1.0
-                ? new double[][] {{edges.get(0), edges.get(1)}, {edges.get(2), edges.get(3)}}
-                : new double[][] {{edges.get(0), edges.get(3)}};
-        Area rings = new Area();
-        for (double[] band : bands) {
-            double ao = body.ringSemiMajorArcseconds(band[1]) * perArcsec;
-            double ai = body.ringSemiMajorArcseconds(band[0]) * perArcsec;
-            Area annulus = new Area(new Ellipse2D.Double(-ao, -ao * sinB, 2 * ao, 2 * ao * sinB));
-            annulus.subtract(new Area(new Ellipse2D.Double(-ai, -ai * sinB, 2 * ai, 2 * ai * sinB)));
-            rings.add(annulus);
+        if (cassiniPx >= 1.0) {
+            Area gap = ringAnnulus(body, edges.get(1), edges.get(2), perArcsec, sinB);
+            if (cassiniPx * sinB < 1.0) {
+                double s2 = sinB * sinB;
+                double sinT = Math.sqrt(s2 * (cassiniPx * cassiniPx - 1.0) / (1.0 - s2));
+                double tanWedge = sinB * sinT / Math.sqrt(1.0 - sinT * sinT);
+                java.awt.geom.Path2D.Double wedge = new java.awt.geom.Path2D.Double();
+                wedge.moveTo(0.0, 0.0);
+                wedge.lineTo(far, far * tanWedge);
+                wedge.lineTo(far, -far * tanWedge);
+                wedge.closePath();
+                wedge.moveTo(0.0, 0.0);
+                wedge.lineTo(-far, far * tanWedge);
+                wedge.lineTo(-far, -far * tanWedge);
+                wedge.closePath();
+                gap.intersect(new Area(wedge));
+            }
+            rings.subtract(gap);
         }
-        double far = 4.0 * aPx + 4.0;
         Area near = new Area(rings);
         near.intersect(new Area(body.ringOpeningDegrees() > 0.0
                 ? new Rectangle2D.Double(-far, 0.0, 2 * far, far)
@@ -1787,6 +1806,16 @@ public final class ReferenceInk {
         return new RingedMark(centre, ink, reach, false, onPage,
                 turn.createTransformedShape(farHalf), globe,
                 turn.createTransformedShape(near), null, ringOutline);
+    }
+
+    /** The flat annulus between two ring edges, in the figure's own frame, at the page's scale. */
+    private static Area ringAnnulus(OverlayContribution.RingedBody body, double innerKm,
+                                    double outerKm, double perArcsec, double sinB) {
+        double ao = body.ringSemiMajorArcseconds(outerKm) * perArcsec;
+        double ai = body.ringSemiMajorArcseconds(innerKm) * perArcsec;
+        Area annulus = new Area(new Ellipse2D.Double(-ao, -ao * sinB, 2 * ao, 2 * ao * sinB));
+        annulus.subtract(new Area(new Ellipse2D.Double(-ai, -ai * sinB, 2 * ai, 2 * ai * sinB)));
+        return annulus;
     }
 
     /** A tone between the star ink and the ground, {@code share} of the way to the ink. */

@@ -292,18 +292,33 @@ class SaturnInkTest {
         ReferenceInk.RingedMark large = ReferenceInk.ringedOn(page,
                 saturn(at, FAR_KM / 10.0, -30.0, false, 0.0, false));
         assertNotNull(large.ringOutline(), "wide and thick: the A Ring's outer edge outlined");
-        // Along the minor axis, below the centre (the near half for B < 0 with the
-        // pole up is toward the pole, so the far half is below): a point in the
-        // Cassini gap is not ring ink at the large scale, and is at the small.
+        // The gap is 1.9 px across at the ansae and 0.95 px across on the
+        // minor axis (foreshortened by sin 30°): ruling 2's "only where it
+        // is a pixel" opens it along the major axis and closes it along the
+        // minor - the owner's checkpoint finding on #579, two dots at twelve
+        // o'clock where a sub-pixel sliver was painted. With the pole up and
+        // B < 0 the far half is below the centre.
         double perArcsec = large.reach() / (Math.toDegrees(Math.asin(RINGS.get(3) / (FAR_KM / 10.0))) * 3600.0);
         double sinB = Math.sin(Math.toRadians(30.0));
         double gapArcsec = (Math.toDegrees(Math.asin(RINGS.get(2) / (FAR_KM / 10.0)))
                 + Math.toDegrees(Math.asin(RINGS.get(1) / (FAR_KM / 10.0)))) / 2.0 * 3600.0;
         double gapPx = gapArcsec * perArcsec * sinB;
         double y = large.centre().y() + gapPx;
-        boolean inRings = large.farRings().contains(large.centre().x(), y)
-                || large.nearRings().contains(large.centre().x(), y);
-        assertFalse(inRings, "the Cassini gap is a gap at " + gapPx + " px down the minor axis");
+        assertTrue(inRings(large, large.centre().x(), y),
+                "0.95 px across on the minor axis: one band at " + gapPx + " px down");
+        double x = large.centre().x() + gapArcsec * perArcsec;
+        assertFalse(inRings(large, x, large.centre().y()),
+                "1.9 px across at the ansa: the Cassini gap is a gap " + (x - large.centre().x())
+                        + " px along the major axis");
+        // Twenty times nearer: 3.8 px at the ansae, 1.9 px on the minor axis - open all round.
+        ReferenceInk.RingedMark nearer = ReferenceInk.ringedOn(page,
+                saturn(at, FAR_KM / 20.0, -30.0, false, 0.0, false));
+        double perNearer = nearer.reach() / (Math.toDegrees(Math.asin(RINGS.get(3) / (FAR_KM / 20.0))) * 3600.0);
+        double gapNearerArcsec = (Math.toDegrees(Math.asin(RINGS.get(2) / (FAR_KM / 20.0)))
+                + Math.toDegrees(Math.asin(RINGS.get(1) / (FAR_KM / 20.0)))) / 2.0 * 3600.0;
+        assertFalse(inRings(nearer, nearer.centre().x(),
+                nearer.centre().y() + gapNearerArcsec * perNearer * sinB),
+                "a pixel across on the minor axis too: the gap runs all round");
         ReferenceInk.RingedMark openSmall = ReferenceInk.ringedOn(page,
                 saturn(at, FAR_KM, -30.0, false, 0.0, false));
         double perSmall = openSmall.reach() / (Math.toDegrees(Math.asin(RINGS.get(3) / FAR_KM)) * 3600.0);
@@ -313,6 +328,10 @@ class SaturnInkTest {
         assertTrue(openSmall.farRings().contains(openSmall.centre().x(), ySmall)
                         || openSmall.nearRings().contains(openSmall.centre().x(), ySmall),
                 "under a pixel the gap closes: one band at " + gapSmallPx + " px");
+    }
+
+    private static boolean inRings(ReferenceInk.RingedMark mark, double x, double y) {
+        return mark.farRings().contains(x, y) || mark.nearRings().contains(x, y);
     }
 
     @Test
