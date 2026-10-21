@@ -7,6 +7,19 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Saturn's cartography measured (#578).** Before any Saturn ink, a study
+measures Saturn, its rings and the seven ruled moons on the atlas's own
+pages: the figure is a symbol on every ordinary field but 1°, where the
+rings are 8.5-11.7 px across; the globe separates from the rings only on
+the closer fields; the rings are edge-on at 1° in 30 % of the century's
+weeks; each moon is decided on its own, with the drawn figure as the
+primary's extent. Thirty-six mock-ups over production pages draw the
+candidate rules - the true figure with its near half over the globe, the
+6 px mark, the edge-on line, the dimmed unlit face, vocabulary A for the
+moons - from 36° to 0.25°, and `docs/decisions/saturn-cartography.md`
+proposes the eight rulings #578 asks for. Nothing is drawn by the
+application yet.
+
 **Saturn handed to cartography (#577).** `docs/decisions/saturn-handover.md`
 closes Part I of the road to 5.4.0. It records the settled numerical contract:
 - the authority, the pack and its licensing;
