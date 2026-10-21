@@ -253,10 +253,6 @@ public final class AppMenuBar {
 
     /** The name the Moon-on-the-chart switch carries, for tests to find (#416). */
     public static final String MOON_CHART_ITEM = "moonOnChartItem";
-    /** The name of View > Solar System > Jupiter and moons on the chart (#484). */
-    public static final String JUPITER_CHART_ITEM = "jupiterOnChartItem";
-    /** The name of View > Solar System > Saturn on the chart (#579). */
-    public static final String SATURN_CHART_ITEM = "saturnOnChartItem";
     /**
      * Venus on the chart's item (#514), between the Sun's and the Moon's:
      * named by the Moon's rule - the body's identity and the item's
@@ -925,7 +921,7 @@ public final class AppMenuBar {
         }
         javax.swing.JCheckBoxMenuItem item = new javax.swing.JCheckBoxMenuItem(
                 said.say("menu.saturnchart.label"));
-        item.setName(SATURN_CHART_ITEM);
+        item.setName("saturnOnChartItem");
         juranometria.ui.language.MnemonicText.in(said).apply(item, "menu.saturnchart.mnemonic");
         item.getAccessibleContext().setAccessibleName(said.say("menu.saturnchart.a11y"));
         juranometria.ui.Explain.selfExplanatory(item, said.say("menu.saturnchart.explain"));
@@ -933,7 +929,7 @@ public final class AppMenuBar {
         int after = -1;
         for (int i = 0; i < solar.getMenuComponentCount(); i++) {
             String name = solar.getMenuComponent(i).getName();
-            if (JUPITER_CHART_ITEM.equals(name) || MOON_CHART_ITEM.equals(name)
+            if ("jupiterOnChartItem".equals(name) || MOON_CHART_ITEM.equals(name)
                     || SUN_CHART_ITEM.equals(name)) {
                 after = i;
             }
@@ -963,7 +959,7 @@ public final class AppMenuBar {
         }
         javax.swing.JCheckBoxMenuItem item = new javax.swing.JCheckBoxMenuItem(
                 said.say("menu.jupiterchart.label"));
-        item.setName(JUPITER_CHART_ITEM);
+        item.setName("jupiterOnChartItem");
         juranometria.ui.language.MnemonicText.in(said).apply(item, "menu.jupiterchart.mnemonic");
         item.getAccessibleContext().setAccessibleName(said.say("menu.jupiterchart.a11y"));
         juranometria.ui.Explain.selfExplanatory(item, said.say("menu.jupiterchart.explain"));

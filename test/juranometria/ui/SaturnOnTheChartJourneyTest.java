@@ -178,12 +178,12 @@ class SaturnOnTheChartJourneyTest {
         javax.swing.JMenu solar = AppMenuBar.solarSystemMenu(bar[0]);
         int jupiter = -1;
         for (int i = 0; i < solar.getMenuComponentCount(); i++) {
-            if (AppMenuBar.JUPITER_CHART_ITEM.equals(solar.getMenuComponent(i).getName())) {
+            if ("jupiterOnChartItem".equals(solar.getMenuComponent(i).getName())) {
                 jupiter = i;
             }
         }
         assertTrue(jupiter >= 0, "Jupiter's item is there");
-        assertEquals(AppMenuBar.SATURN_CHART_ITEM, solar.getMenuComponent(jupiter + 1).getName(),
+        assertEquals("saturnOnChartItem", solar.getMenuComponent(jupiter + 1).getName(),
                 "directly after Jupiter and moons on the chart");
         SwingUtilities.invokeAndWait(() -> SaturnChartSession.restore(module, store, item[0]));
         assertTrue(module.showing() && item[0].isSelected(),

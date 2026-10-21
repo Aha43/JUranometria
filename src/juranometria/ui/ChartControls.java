@@ -466,7 +466,7 @@ public final class ChartControls {
         if (next == null) {
             // At the floor, or a closer field short of the closest, zoom
             // in is not at the end of anything: a closer field is offered
-            // where Mercury, Venus or Jupiter is on the page, and here is not (#544).
+            // where Mercury, Venus, Jupiter or Saturn is on the page, and here is not (#544, #579).
             heard = said.say("toolbar.zoomIn".equals(stem)
                     && state.closerStep().isPresent()
                     ? "toolbar.zoomIn.closer.unavailable" : stem + ".end");

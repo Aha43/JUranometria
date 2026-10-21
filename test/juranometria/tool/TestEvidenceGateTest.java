@@ -491,12 +491,13 @@ class TestEvidenceGateTest {
                         "MoonChartStore.us" + "er(",
                         "PackagedAcceptanceMain.ma" + "in(",
                         "PlaceStore.us" + "er(",
+                        "SaturnChartStore.us" + "er(",
                         "SkyLanguageStore.us" + "er(",
                         "SunChartStore.us" + "er(",
                         "VenusChartStore.us" + "er(",
                         "ZoomLockStore.us" + "er("),
                 TestEvidenceScan.realPreferenceDoors(),
-                "the sixteen production entry points to the reader's"
+                "the seventeen production entry points to the reader's"
                         + " store - the sixth is #274's, which keeps"
                         + " one key for whether the ecliptic is shown,"
                         + " the seventh is #348's, which keeps the"
@@ -512,8 +513,9 @@ class TestEvidenceGateTest {
                         + " window was, the fourteenth is #484's,"
                         + " whether Jupiter and its moons are on the"
                         + " chart, the fifteenth is #514's, whether"
-                        + " Venus is on the chart, and the sixteenth is"
-                        + " #542's, whether Mercury is. Each arrived by this"
+                        + " Venus is on the chart, the sixteenth is"
+                        + " #542's, whether Mercury is, and the seventeenth"
+                        + " is #579's, whether Saturn is. Each arrived by this"
                         + " pin changing rather than by a silent gap"
                         + " in a remembered list, which is the whole"
                         + " reason the set is derived");
