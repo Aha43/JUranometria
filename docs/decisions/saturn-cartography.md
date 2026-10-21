@@ -200,3 +200,46 @@ the study draws its candidate figure over pages the production renderer
 painted, in a study-only step, and offers nothing to the production
 bodies layer but the Sun on one page. The pack, the service, the table
 and every earlier body's evidence are unchanged.
+
+## The ruling
+
+The owner's rulings of 2026-10-21 on the eight proposals, recorded as
+given:
+
+1. **Saturn's mark.** The proposed rule is accepted: draw the larger of
+   the true globe-and-rings figure and the 6 px cartographic minimum,
+   measured by the rings' major axis. It is a discrete switch, never a
+   blended scale. The symbol lies beneath the stars; the true figure is
+   opaque.
+2. **The rings.** The proposed two-annulus treatment is accepted: the
+   near-half ordering, the outline thresholds, the edge-on 1 px line, the
+   dimmed unlit face, the conditional Cassini gap, and no shadows.
+3. **The moons.** The seven moons are drawn as 3 px symbols under
+   Jupiter's separability rule, with Saturn's drawn globe-and-rings figure
+   as the primary's extent. **Labels are attempted for every drawn moon,
+   and individual refusals accepted.** A label is not precluded merely
+   because the moon's mark lies over or close to the figure; those are
+   often the most interesting configurations. A refused label must not
+   block another label.
+4. **Vocabulary.** Vocabulary A, the proposed spoken and page wording,
+   and no unverified ring-obscuration state are accepted.
+5. **Selection and controls.** The `saturn` and `saturn.<moon>`
+   identities are accepted, with the moons unselectable. Centre on chart
+   uses 1°. Saturn is placed after Jupiter, in outward-from-the-Sun
+   order.
+6. **The closer fields.** Saturn is eligible for 0.5° and 0.25°.
+7. **The inherited contracts.** Horizon, page edge, star precedence,
+   export sizing and Solar System label emphasis are accepted as
+   proposed.
+8. **The implementation split.** Two wide-route PRs for #579:
+   - Saturn's globe and rings, including closer-field eligibility;
+   - the seven moons and their states, symbols, labels and suppression.
+
+   Each PR stops at its own packaged checkpoint before merging.
+
+**Where the ruling departs from the proposal.** Nowhere in substance;
+on proposal 3 the owner chose the first of the two offered label
+policies - every drawn moon's label attempted, refusals accepted one by
+one - and declined any rule that withholds a name near the figure.
+
+No production Saturn drawing begins before this study's landing.
