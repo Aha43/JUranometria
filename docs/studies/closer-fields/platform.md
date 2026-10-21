@@ -12,7 +12,7 @@ never across two - the portable half of this study is the document beside it.
 | operating system | Mac OS X |
 | architecture | aarch64 |
 | Java | 21.0.12.1 |
-| headless | false |
+| headless | true |
 
 Recorded on: `Mac OS X 27.0.1/aarch64/Homebrew 21.0.12.1`
 

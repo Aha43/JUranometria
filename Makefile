@@ -1003,7 +1003,8 @@ chart-instant-furniture: classes
 
 closer-fields-study: classes
 	mkdir -p docs/studies/closer-fields
-	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.CloserFieldsStudyMain \
+	$(JAVA) -Djava.awt.headless=true -cp "$(CLASSES_DIR):$(LIB_DIR)/*" \
+		juranometria.tool.CloserFieldsStudyMain \
 		> docs/studies/closer-fields/measurements.md
 	@echo "written to docs/studies/closer-fields/measurements.md"
 
