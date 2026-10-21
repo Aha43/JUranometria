@@ -243,3 +243,66 @@ policies - every drawn moon's label attempted, refusals accepted one by
 one - and declined any rule that withholds a name near the figure.
 
 No production Saturn drawing begins before this study's landing.
+
+## Saturn on the chart, as built (#579, the figure)
+
+The first of #579's two pull requests under the rulings above: Saturn's
+globe and rings, the switch, Centre on chart, the words and the
+closer-field eligibility. The moons follow in the second.
+
+- **One module, one switch.** `juranometria.saturnchart.SaturnModule`
+  offers Saturn while *Saturn on the chart* is on. The switch is off by
+  default and remembered (`SaturnChartStore`, `saturn.onChartShown`).
+  View > Solar System carries it directly after *Jupiter and moons on the
+  chart* (access letter A in both languages), and the Controller's Saturn
+  group carries the same switch as a box with Centre on chart beside it,
+  as Jupiter's group does; the Saturn dialog gains Centre on chart too.
+  All of them follow the module, the single visibility authority of
+  #458. Place and Time's box on the chart counts the switch among the
+  layers that bring it.
+- **The contribution.** Saturn is an `OverlayContribution.RingedBody`:
+  the service's astrometric J2000 place, its equatorial diameter and the
+  polar diameter at the ring opening, the pole derived in the chart's
+  frame (`SaturnSystemService.poleAngleJ2000Degrees`), the planetocentric
+  opening B and whether the unlit face is seen, the ruled four ring edges,
+  and Jupiter's 6 px minimum. `SaturnModuleTest` holds each equal to the
+  service's.
+- **Ruling 1: the switch.** `ReferenceInk.ringedOn` measures the figure
+  by the rings' major axis at the page's scale. Under 6 px the mark is a
+  6 px circle, a cartographic symbol painted in the reference layer
+  beneath the catalogue's marks, consuming no click and spoken as *Saturn
+  (a cartographic symbol, not Saturn's apparent diameter)*. From 6 px the
+  true figure is painted in the bodies layer, opaque, spoken as *Saturn*;
+  a click on it is Saturn's occurrence (#513). On the production pages
+  the figure is the symbol on every ladder field above 1° and the true
+  figure at 1° (12.2 × 4.5 px at the card instant), 0.5° (22.3 × 8.9 px)
+  and 0.25° (44.6 × 17.8 px) - `docs/studies/saturn-on-the-chart`.
+- **Ruling 2: the rings.** The two ruled annuli at asin(R/Δ) and
+  asin(R/Δ)·|sin B|, one annulus where the Cassini gap is under a pixel;
+  the major axis across the pole turned by the page's own north and east
+  (`PageBasis`); the far half painted behind the globe and the near half
+  over it, the near half away from the projected pole when B > 0 and
+  toward it when B < 0; a minor axis under 2 px drawn as a 1 px line over
+  the globe; the A Ring's outer edge outlined only where the figure is at
+  least 20 px wide and the minor axis at least 6 px; the ring ink two
+  tones between the star ink and the ground, both quieter when the unlit
+  face is seen, all dimmed below a drawn horizon. No shadows.
+  `SaturnInkTest` holds each rule on the page.
+- **Ruling 5: identity and words.** `saturn`, named from
+  `page.body.saturn` with its symbol note in both languages; Centre on
+  chart lands at the chart's normal minimum field, through #483's seam
+  (`CentreOnChart.Body.SATURN`).
+- **Ruling 6: the closer fields.** Saturn joins the bodies named to
+  `ChartComponent.setCloserFieldBodies`; the zoom-in explanations and the
+  title block's note now name *Mercury, Venus, Jupiter or Saturn*.
+  `CloserFieldJourneyTest` zooms to 0.25° on Saturn at the card instant.
+- **Ruling 7: inherited.** Below a drawn horizon the figure takes the
+  ground's dimmed ink with the status; off the page nothing is drawn; the
+  symbol never erases a star; export draws through the same module in
+  page units (the study's A4 sheet). The Solar System labels class
+  raises Saturn's name with the other bodies', through the bodies layer's
+  own classification.
+- **Packaged acceptance** runs the journey in every image, printing
+  *saturn on the chart OK*.
+- **Not in this pull request:** the seven moons, their marks, states,
+  labels and suppression (the second pull request).

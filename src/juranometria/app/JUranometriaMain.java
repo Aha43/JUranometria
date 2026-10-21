@@ -179,14 +179,15 @@ public final class JUranometriaMain {
         ChartComponent chart = new ChartComponent(assembler, pageWords);
         controller.onChange(chart::setViewState);
         // The closer fields (#544, ruled on #539, rulings 5 and 6; Jupiter
-        // added by the owner at the #544 checkpoint): offered where
-        // Mercury, Venus or Jupiter, as their modules draw them, lies on the
-        // page the step would display - not the Sun, not the Moon, and not
-        // Saturn until its own cartography study.
+        // added by the owner at the #544 checkpoint; Saturn by ruling 6 on
+        // #578): offered where Mercury, Venus, Jupiter or Saturn, as their
+        // modules draw them, lies on the page the step would display - not
+        // the Sun and not the Moon.
         chart.setCloserFieldBodies(java.util.Set.of(
                 juranometria.solarchart.SolarSystemModule.MERCURY,
                 juranometria.solarchart.SolarSystemModule.VENUS,
-                juranometria.jovianchart.JovianModule.JUPITER));
+                juranometria.jovianchart.JovianModule.JUPITER,
+                juranometria.saturnchart.SaturnModule.SATURN));
         controller.offerCloserFields(chart::offersCloserField);
         chart.onPageContentsChange(controller::closerOfferChanged);
         // Choosing a language rebuilds the page in it. Reconstruction
@@ -571,6 +572,17 @@ public final class JUranometriaMain {
         juranometria.ui.solar.BodyOnChart jupiterLayer =
                 juranometria.ui.solar.JovianChartSession.switchOf(jovianOnChart,
                         jovianChartStore);
+        // Saturn on the chart (#579, ruled on #578): one Saturn module over
+        // the same observer and the same lazy pack, with its one remembered
+        // switch, off by default; the pack loads only when the switch is on
+        // and a page asks.
+        juranometria.ui.solar.SaturnChartStore saturnChartStore = stores.saturnChart();
+        juranometria.saturnchart.SaturnModule saturnOnChart = modules.attach(
+                new juranometria.saturnchart.SaturnModule(observerNow, saturnSystem,
+                        meridian::horizonShowing));
+        juranometria.ui.solar.BodyOnChart saturnLayer =
+                juranometria.ui.solar.SaturnChartSession.switchOf(saturnOnChart,
+                        saturnChartStore);
         // Place and Time's box on the chart (#259, the rulings on #556):
         // drawn whenever a layer drawn for the instant is on - Place and
         // Time's own lines, or a Solar System body, whose switches are
@@ -579,7 +591,7 @@ public final class JUranometriaMain {
         juranometria.ui.placeandtime.PlaceAndTimeFurniture.offer(meridian,
                 () -> sunLayer.showing() || mercuryLayer.showing()
                         || venusLayer.showing() || moonLayer.showing()
-                        || jupiterLayer.showing(),
+                        || jupiterLayer.showing() || saturnLayer.showing(),
                 updateToNow,
                 juranometria.ui.language.InterfaceText.forLanguage(
                         language.interfaceLanguage()));
@@ -594,8 +606,9 @@ public final class JUranometriaMain {
                 new juranometria.ui.solar.SolarSystemSection(sunTable, mercuryTable,
                         venusTable, moonTable, sunLayer, mercuryLayer, venusLayer, moonLayer,
                         jupiterTable, jupiterLayer, centreOnChart, companionWords);
-        // Saturn's group after Jupiter's (#576), with no chart switch.
-        solarSection.withSaturn(saturnTable, companionWords);
+        // Saturn's group after Jupiter's (#576), with its Show on chart and
+        // Centre on chart since #579.
+        solarSection.withSaturn(saturnTable, companionWords, saturnLayer, centreOnChart);
         // The tab opens with the instant the chart is frozen at and Update
         // to now (#259, ruling 9 on #556).
         solarSection.showChartInstant(observerNow, placeAndTimeChanges, updateToNow);
@@ -764,7 +777,7 @@ public final class JUranometriaMain {
                         language.interfaceLanguage()),
                 () -> juranometria.ui.solar.SaturnTableDialog.open(frame, saturnTable,
                         juranometria.ui.language.InterfaceText.forLanguage(
-                                language.interfaceLanguage())));
+                                language.interfaceLanguage()), centreOnChart, saturnLayer));
         // View > Solar System > Jupiter and moons on the chart (#484),
         // directly after Moon on the chart: the Jovian module's switch.
         javax.swing.JCheckBoxMenuItem jupiterOnChartItem = AppMenuBar.addJupiterOnChart(
@@ -773,6 +786,14 @@ public final class JUranometriaMain {
                         language.interfaceLanguage()),
                 juranometria.ui.solar.JovianChartSession.toggle(jovianOnChart,
                         jovianChartStore));
+        // View > Solar System > Saturn on the chart (#579), directly after
+        // Jupiter and moons on the chart: the Saturn module's switch.
+        javax.swing.JCheckBoxMenuItem saturnOnChartItem = AppMenuBar.addSaturnOnChart(
+                frame.getJMenuBar(),
+                juranometria.ui.language.InterfaceText.forLanguage(
+                        language.interfaceLanguage()),
+                juranometria.ui.solar.SaturnChartSession.toggle(saturnOnChart,
+                        saturnChartStore));
         // Both of these read the bar, so both come AFTER it is set.
         // They sat above the menu until the bar moved down to be
         // built in the session's language (#350), and reading a bar
@@ -791,6 +812,8 @@ public final class JUranometriaMain {
                 moonChartStore, AppMenuBar.moonChartItem(frame.getJMenuBar()));
         juranometria.ui.solar.JovianChartSession.restore(jovianOnChart,
                 jovianChartStore, jupiterOnChartItem);
+        juranometria.ui.solar.SaturnChartSession.restore(saturnOnChart,
+                saturnChartStore, saturnOnChartItem);
         // The tick follows the window, however it was closed.
         javax.swing.JCheckBoxMenuItem companionItem =
                 AppMenuBar.companionItem(frame.getJMenuBar());

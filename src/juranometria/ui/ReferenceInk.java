@@ -8,6 +8,7 @@ import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
+import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
@@ -1436,6 +1437,27 @@ public final class ReferenceInk {
     }
 
     /**
+     * Where a ringed body lands on a page (#579, the owner's rulings on
+     * #578): its centre; its opaque ink - the globe and the rings, or the
+     * minimum mark's circle while the rings' major axis is under it - as
+     * {@code outline}; its reach from the centre, for words; whether it
+     * is a cartographic symbol; and, for the true figure, the far half of
+     * the rings, the globe, the near half, the edge-on line and the A
+     * Ring's hairline outline, each null where the rule leaves it out.
+     */
+    record RingedMark(PixelPoint centre, Shape outline, double reach, boolean symbol,
+                      boolean onPage, Shape farRings, Shape globe, Shape nearRings,
+                      Shape edgeLine, Shape ringOutline) {
+    }
+
+    /** Ruling 2 on #578: rings whose minor axis is under this many pixels are a 1 px line. */
+    static final double RINGS_EDGE_ON_PX = 2.0;
+    /** Ruling 2 on #578: the A Ring's outer edge is outlined only where the figure is this wide ... */
+    static final double RINGS_OUTLINE_MAJOR_PX = 20.0;
+    /** ... and the rings' minor axis this thick. */
+    static final double RINGS_OUTLINE_MINOR_PX = 6.0;
+
+    /**
      * A satellite's mark on a page (#485): where it lands, its symbol, and
      * whether it is painted with its primary's opaque disc - in front of
      * it, or touching it - rather than beneath the stars.
@@ -1671,6 +1693,172 @@ public final class ReferenceInk {
     }
 
     /**
+     * The ringed body's mark on this page, or null when none of it is
+     * there (#579; rulings 1 and 2 on #578). The figure is measured by
+     * the rings' major axis: under the minimum mark it is the mark's
+     * circle, a symbol; otherwise the two ruled annuli (one, where the
+     * Cassini gap is under a pixel) with semi-axes asin(R/Δ) and
+     * asin(R/Δ)·|sin B| at the page's scale, the major axis across the
+     * pole turned by the page's own north and east, split into the far
+     * half and the near half - away from the projected pole when B &gt; 0,
+     * toward it when B &lt; 0 - about the globe at its equatorial and
+     * polar diameters; a minor axis under {@value #RINGS_EDGE_ON_PX} px
+     * as a 1 px line along the major axis; the outer edge outlined only
+     * where the figure is at least {@value #RINGS_OUTLINE_MAJOR_PX} px wide
+     * and the minor axis at least {@value #RINGS_OUTLINE_MINOR_PX} px.
+     */
+    static RingedMark ringedOn(DrawnPage page, OverlayContribution.RingedBody body) {
+        Projection projection = page.projection();
+        ViewportMapping mapping = new ViewportMapping(page);
+        Rectangle2D paper = ChartRenderer.paperOf(page.scene());
+        PageRegion region = mapping.regionFor(page.scene().viewport(), projection);
+        Shape sky = skyOf(region, paper);
+        Optional<juranometria.project.PlanePoint> projected = projection.project(body.at());
+        if (projected.isEmpty()) {
+            return null;
+        }
+        PixelPoint centre = mapping.toPixel(projected.get());
+        java.util.List<Double> edges = body.ringRadiiKm();
+        double outerArcsec = body.ringSemiMajorArcseconds(edges.get(3));
+        double aPx = radiusPx(projection, mapping, body.at(), outerArcsec / 3600.0);
+        double perArcsec = aPx / outerArcsec;
+        double sinB = Math.abs(Math.sin(Math.toRadians(body.ringOpeningDegrees())));
+        double minimum = body.minimumMarkPx();
+        boolean symbol = 2.0 * aPx < minimum;
+        double reach = symbol ? minimum / 2.0 : aPx;
+        boolean onPage = discOn(centre, reach, paper, sky, region.bounded()) != null;
+        if (symbol) {
+            Shape circle = new Ellipse2D.Double(centre.x() - minimum / 2.0,
+                    centre.y() - minimum / 2.0, minimum, minimum);
+            return new RingedMark(centre, circle, reach, true, onPage, null, null, null,
+                    null, null);
+        }
+        double[] up = PageBasis.at(page, body.at())
+                .map(basis -> basis.direction(body.poleAngleDegrees()))
+                .orElse(new double[] {0.0, -1.0});
+        java.awt.geom.AffineTransform turn = new java.awt.geom.AffineTransform();
+        turn.translate(centre.x(), centre.y());
+        // Local x is the equator and the rings' major axis, local y the
+        // pole: turned so that local -y lies along the pole's page
+        // direction (local +y points away from the projected pole).
+        turn.rotate(Math.atan2(up[1], up[0]) + Math.PI / 2.0);
+        double eq = 2.0 * body.equatorialDiameterArcseconds() / 2.0 * perArcsec;
+        double pol = 2.0 * body.polarDiameterArcseconds() / 2.0 * perArcsec;
+        Shape globe = turn.createTransformedShape(
+                new Ellipse2D.Double(-eq / 2.0, -pol / 2.0, eq, pol));
+        boolean edgeOn = 2.0 * aPx * sinB < RINGS_EDGE_ON_PX;
+        if (edgeOn) {
+            // Seen edge-on, the rings are a line through the globe: the
+            // near half crosses in front of it.
+            Shape line = turn.createTransformedShape(new BasicStroke(1.0f)
+                    .createStrokedShape(new java.awt.geom.Line2D.Double(-aPx, 0.0, aPx, 0.0)));
+            Area ink = new Area(globe);
+            ink.add(new Area(line));
+            return new RingedMark(centre, ink, reach, false, onPage, null, globe, null,
+                    line, null);
+        }
+        double cassiniPx = (body.ringSemiMajorArcseconds(edges.get(2))
+                - body.ringSemiMajorArcseconds(edges.get(1))) * perArcsec;
+        double[][] bands = cassiniPx >= 1.0
+                ? new double[][] {{edges.get(0), edges.get(1)}, {edges.get(2), edges.get(3)}}
+                : new double[][] {{edges.get(0), edges.get(3)}};
+        Area rings = new Area();
+        for (double[] band : bands) {
+            double ao = body.ringSemiMajorArcseconds(band[1]) * perArcsec;
+            double ai = body.ringSemiMajorArcseconds(band[0]) * perArcsec;
+            Area annulus = new Area(new Ellipse2D.Double(-ao, -ao * sinB, 2 * ao, 2 * ao * sinB));
+            annulus.subtract(new Area(new Ellipse2D.Double(-ai, -ai * sinB, 2 * ai, 2 * ai * sinB)));
+            rings.add(annulus);
+        }
+        double far = 4.0 * aPx + 4.0;
+        Area near = new Area(rings);
+        near.intersect(new Area(body.ringOpeningDegrees() > 0.0
+                ? new Rectangle2D.Double(-far, 0.0, 2 * far, far)
+                : new Rectangle2D.Double(-far, -far, 2 * far, far)));
+        Area farHalf = new Area(rings);
+        farHalf.subtract(near);
+        Shape ringOutline = 2.0 * aPx >= RINGS_OUTLINE_MAJOR_PX
+                && 2.0 * aPx * sinB >= RINGS_OUTLINE_MINOR_PX
+                ? turn.createTransformedShape(new Ellipse2D.Double(-aPx, -aPx * sinB,
+                        2 * aPx, 2 * aPx * sinB))
+                : null;
+        Area ink = new Area(turn.createTransformedShape(rings));
+        ink.add(new Area(globe));
+        return new RingedMark(centre, ink, reach, false, onPage,
+                turn.createTransformedShape(farHalf), globe,
+                turn.createTransformedShape(near), null, ringOutline);
+    }
+
+    /** A tone between the star ink and the ground, {@code share} of the way to the ink. */
+    private static Color between(Color ink, Color ground, double share) {
+        return new Color(
+                (int) Math.round(ground.getRed() + (ink.getRed() - ground.getRed()) * share),
+                (int) Math.round(ground.getGreen() + (ink.getGreen() - ground.getGreen()) * share),
+                (int) Math.round(ground.getBlue() + (ink.getBlue() - ground.getBlue()) * share));
+    }
+
+    /**
+     * A ringed body's ink (#579): the far half of the rings, the globe
+     * (its face filled, its limb drawn, as the oblate body's), the near
+     * half over it, and the outer edge's hairline where the rule gives
+     * one; or, edge-on, the globe and the line across it. The near half
+     * is the darker ring tone, the far half the lighter; both are quieter
+     * still when the unlit face is seen, and dimmed below a drawn horizon.
+     */
+    private static void paintRinged(Graphics2D g2, RingedMark mark,
+            OverlayContribution.RingedBody body, juranometria.render.ChartPalette palette) {
+        Color face = brightness(palette.ground()) >= brightness(palette.starInk())
+                ? palette.ground() : palette.starInk();
+        Color limb = palette.starInk();
+        Color near = between(palette.starInk(), palette.ground(),
+                body.unlitFaceSeen() ? 0.32 : 0.58);
+        Color farInk = between(palette.starInk(), palette.ground(),
+                body.unlitFaceSeen() ? 0.18 : 0.32);
+        if (body.belowHorizon()) {
+            face = ChartRenderer.quiet(face, palette.ground());
+            limb = ChartRenderer.quiet(limb, palette.ground());
+            near = ChartRenderer.quiet(near, palette.ground());
+            farInk = ChartRenderer.quiet(farInk, palette.ground());
+        }
+        if (mark.symbol()) {
+            g2.setColor(face);
+            g2.fill(mark.outline());
+            g2.setColor(limb);
+            g2.setStroke(new BasicStroke(1.0f));
+            g2.draw(mark.outline());
+            return;
+        }
+        g2.setStroke(new BasicStroke(1.0f));
+        if (mark.farRings() != null) {
+            g2.setColor(farInk);
+            g2.fill(mark.farRings());
+        }
+        g2.setColor(face);
+        g2.fill(mark.globe());
+        g2.setColor(limb);
+        g2.draw(mark.globe());
+        if (mark.nearRings() != null) {
+            g2.setColor(near);
+            g2.fill(mark.nearRings());
+        }
+        if (mark.edgeLine() != null) {
+            g2.setColor(near);
+            g2.fill(mark.edgeLine());
+        }
+        if (mark.ringOutline() != null) {
+            g2.setColor(limb);
+            g2.draw(mark.ringOutline());
+        }
+    }
+
+    /** The ink a ringed mark keeps clear of words: its reach grown by a stroke and a pixel. */
+    private static Shape inkOf(RingedMark mark) {
+        double grown = mark.reach() + 1.5;
+        return new Ellipse2D.Double(mark.centre().x() - grown, mark.centre().y() - grown,
+                2.0 * grown, 2.0 * grown);
+    }
+
+    /**
      * What an oblate body's system paints beneath the catalogue's marks
      * (#484, #485; ruling 7 on #482): the body itself while it is a
      * cartographic symbol, and every satellite mark not painted with an
@@ -1684,13 +1872,18 @@ public final class ReferenceInk {
         // rule M on #512): the mark, phased as the disc would be, beneath
         // the stars - Venus at the fields where its true disc is smaller.
         List<OverlayContribution.Body> rounds = new ArrayList<>();
+        // A ringed body whose minimum mark stands in for its figure (#579):
+        // the mark beneath the stars, as Jupiter's.
+        List<OverlayContribution.RingedBody> ringed = new ArrayList<>();
         for (OverlayRegistry.Owned owned : contributions) {
             if (owned.geometry() instanceof OverlayContribution.Body body
                     && body.minimumMarkPx() > 0.0) {
                 rounds.add(body);
+            } else if (owned.geometry() instanceof OverlayContribution.RingedBody r) {
+                ringed.add(r);
             }
         }
-        if (systems.isEmpty() && rounds.isEmpty()) {
+        if (systems.isEmpty() && rounds.isEmpty() && ringed.isEmpty()) {
             return;
         }
         Graphics2D g2 = (Graphics2D) g.create();
@@ -1731,6 +1924,12 @@ public final class ReferenceInk {
                     if (!m.withPrimary()) {
                         paintSatellite(g2, m, palette);
                     }
+                }
+            }
+            for (OverlayContribution.RingedBody r : ringed) {
+                RingedMark mark = ringedOn(page, r);
+                if (mark != null && mark.symbol() && mark.onPage()) {
+                    paintRinged(g2, mark, r, palette);
                 }
             }
         } finally {
@@ -1795,7 +1994,8 @@ public final class ReferenceInk {
         List<OverlayContribution> bodies = new ArrayList<>();
         for (OverlayRegistry.Owned owned : contributions) {
             if (owned.geometry() instanceof OverlayContribution.Body
-                    || owned.geometry() instanceof OverlayContribution.OblateBody) {
+                    || owned.geometry() instanceof OverlayContribution.OblateBody
+                    || owned.geometry() instanceof OverlayContribution.RingedBody) {
                 bodies.add(owned.geometry());
             }
         }
@@ -1821,6 +2021,8 @@ public final class ReferenceInk {
         List<Shape> discs = new ArrayList<>();
         List<Shape> inks = new ArrayList<>();
         List<OblateMark> oblates = new ArrayList<>();
+        // The ringed body's mark (#579), beside the oblate marks.
+        List<RingedMark> ringedMarks = new ArrayList<>();
         // Whether a round body's mark stands in for its disc (rule M on
         // #512): then it is a symbol, painted beneath the stars and not
         // opaque, as Jupiter's is.
@@ -1836,7 +2038,22 @@ public final class ReferenceInk {
                 discs.add(mark.outline());
                 inks.add(inkOf(mark));
                 oblates.add(mark);
+                ringedMarks.add(null);
                 bodySymbols.add(false);
+                continue;
+            }
+            if (contribution instanceof OverlayContribution.RingedBody ringed) {
+                RingedMark mark = ringedOn(page, ringed);
+                if (mark == null || !mark.onPage()) {
+                    continue;
+                }
+                drawn.add(ringed);
+                centres.add(mark.centre());
+                discs.add(mark.outline());
+                inks.add(inkOf(mark));
+                oblates.add(null);
+                ringedMarks.add(mark);
+                bodySymbols.add(mark.symbol());
                 continue;
             }
             OverlayContribution.Body body = (OverlayContribution.Body) contribution;
@@ -1849,6 +2066,7 @@ public final class ReferenceInk {
             discs.add(mark.disc());
             inks.add(inkOf(mark.disc(), body.lit() != null));
             oblates.add(null);
+            ringedMarks.add(null);
             bodySymbols.add(mark.symbol());
         }
         String[] names = new String[drawn.size()];
@@ -1887,6 +2105,14 @@ public final class ReferenceInk {
                                 }
                             }
                         }
+                    }
+                    continue;
+                }
+                if (drawn.get(i) instanceof OverlayContribution.RingedBody ringed) {
+                    // The true figure, opaque (#579); its symbol was the
+                    // reference layer's to paint, beneath the stars.
+                    if (!ringedMarks.get(i).symbol()) {
+                        paintRinged(g2, ringedMarks.get(i), ringed, palette);
                     }
                     continue;
                 }
@@ -1973,7 +2199,9 @@ public final class ReferenceInk {
         for (int i = 0; i < drawn.size(); i++) {
             placed.add(new BodyPlacement(drawn.get(i).identity(), centres.get(i),
                     discs.get(i), names[i], boxes[i], belowHorizonOf(drawn.get(i)),
-                    oblates.get(i) != null ? oblates.get(i).symbol() : bodySymbols.get(i),
+                    oblates.get(i) != null ? oblates.get(i).symbol()
+                            : ringedMarks.get(i) != null ? ringedMarks.get(i).symbol()
+                            : bodySymbols.get(i),
                     drawn.get(i) instanceof OverlayContribution.Body round
                             ? round.state() : null,
                     momentOf(drawn.get(i)), selectableOf(drawn.get(i))));
@@ -1992,22 +2220,26 @@ public final class ReferenceInk {
     /** The moment a body was computed for, or null when it states none. */
     private static OverlayContribution.Moment momentOf(OverlayContribution body) {
         return body instanceof OverlayContribution.OblateBody oblate ? oblate.moment()
+                : body instanceof OverlayContribution.RingedBody ringed ? ringed.moment()
                 : ((OverlayContribution.Body) body).moment();
     }
 
     private static boolean selectableOf(OverlayContribution body) {
         return body instanceof OverlayContribution.OblateBody oblate ? oblate.selectable()
+                : body instanceof OverlayContribution.RingedBody ringed ? ringed.selectable()
                 : ((OverlayContribution.Body) body).selectable();
     }
 
     private static double distanceOf(OverlayContribution body) {
-        return body instanceof OverlayContribution.OblateBody oblate
-                ? oblate.distanceKm() : ((OverlayContribution.Body) body).distanceKm();
+        return body instanceof OverlayContribution.OblateBody oblate ? oblate.distanceKm()
+                : body instanceof OverlayContribution.RingedBody ringed ? ringed.distanceKm()
+                : ((OverlayContribution.Body) body).distanceKm();
     }
 
     private static boolean belowHorizonOf(OverlayContribution body) {
-        return body instanceof OverlayContribution.OblateBody oblate
-                ? oblate.belowHorizon() : ((OverlayContribution.Body) body).belowHorizon();
+        return body instanceof OverlayContribution.OblateBody oblate ? oblate.belowHorizon()
+                : body instanceof OverlayContribution.RingedBody ringed ? ringed.belowHorizon()
+                : ((OverlayContribution.Body) body).belowHorizon();
     }
 
     /**
@@ -2209,6 +2441,14 @@ public final class ReferenceInk {
                 if (theirs != null && theirs.onPage() && !theirs.symbol()) {
                     disc = theirs.outline();
                 }
+            } else if (other instanceof OverlayContribution.RingedBody ringed) {
+                if (ringed.distanceKm() <= body.distanceKm()) {
+                    continue;
+                }
+                RingedMark theirs = ringedOn(page, ringed);
+                if (theirs != null && theirs.onPage() && !theirs.symbol()) {
+                    disc = theirs.outline();
+                }
             } else if (other instanceof OverlayContribution.Body round) {
                 if (round == body || round.distanceKm() <= body.distanceKm()) {
                     continue;
@@ -2255,6 +2495,7 @@ public final class ReferenceInk {
         boolean bounded = false;
         for (OverlayRegistry.Owned owned : contributions) {
             if (owned.geometry() instanceof OverlayContribution.OblateBody
+                    || owned.geometry() instanceof OverlayContribution.RingedBody
                     || owned.geometry() instanceof OverlayContribution.Satellite) {
                 continue;
             }

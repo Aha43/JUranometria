@@ -141,6 +141,7 @@ class ChartControlsCompanionJourneyTest {
                 juranometria.ui.solar.VenusChartStore.forNode(node),
                 juranometria.ui.solar.MoonChartStore.forNode(node),
                 juranometria.ui.solar.JovianChartStore.forNode(node),
+                juranometria.ui.solar.SaturnChartStore.forNode(node),
                 ZoomLockStore.forNode(node),
                 juranometria.ui.companion.CompanionStore.forNode(node),
                 juranometria.ui.ChartChromeStore.forNode(node),

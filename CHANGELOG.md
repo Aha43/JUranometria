@@ -7,6 +7,20 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Saturn on the chart (#579, ruled on #578).** A new switch, *Saturn on
+the chart* - in View > Solar System after Jupiter's, and in the
+Controller's Saturn group with Centre on chart - draws Saturn where it
+stands for the place and instant set in Place and Time: its globe and
+rings at their true size once the rings are at least 6 pixels across
+(at 1° and the closer fields), otherwise a 6-pixel cartographic symbol
+that hides nothing and says what it is. The rings' near half is drawn
+over the globe and the far half behind it, by the ruled opening; seen
+edge-on they are a line; when their unlit face is seen they are dimmed;
+below a drawn horizon the figure is dimmed and says so. Saturn joins
+Mercury, Venus and Jupiter as a body that offers the 0.5° and 0.25°
+closer fields. Exported sheets carry the same figure. Its moons are not
+drawn yet. In both languages.
+
 **Saturn's cartography measured (#578).** Before any Saturn ink, a study
 measures Saturn, its rings and the seven ruled moons on the atlas's own
 pages: the figure is a symbol on every ordinary field but 1°, where the

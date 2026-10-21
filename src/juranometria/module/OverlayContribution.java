@@ -454,6 +454,104 @@ public sealed interface OverlayContribution {
     }
 
     /**
+     * A ringed Solar System body drawn as a figure - its oblate globe
+     * and its flat rings - at true scale (Sprint 53, issue #579; the
+     * owner's rulings on #578): Saturn. The page draws the larger of the
+     * figure and the {@code minimumMarkPx} circle, measured by the rings'
+     * major axis, as a discrete switch: while the rings' major axis is
+     * under the minimum the mark is a cartographic symbol, beneath the
+     * stars; otherwise the figure, opaque. The rings are the ruled two
+     * annuli, semi-axes asin(R/Δ) and asin(R/Δ)·|sin B|, the major axis
+     * across the pole; the near half is painted over the globe (away
+     * from the projected pole when B &gt; 0, toward it when B &lt; 0),
+     * a minor axis under two pixels as a one-pixel line, the unlit face
+     * in a dimmed ink.
+     *
+     * @param equatorialDiameterArcseconds the globe's, 2·asin(R_e/Δ)
+     * @param polarDiameterArcseconds the globe's at the ring opening B,
+     *                                the contract's
+     * @param poleAngleDegrees the north pole's position angle at the
+     *                         body's J2000 place, from J2000 north through
+     *                         east - the chart's frame, as the oblate body's
+     * @param ringOpeningDegrees B, the planetocentric opening of the ring
+     *                           plane to the observer, signed: positive
+     *                           when the north face is seen
+     * @param unlitFaceSeen whether the observer and the Sun are on opposite
+     *                      sides of the ring plane
+     * @param ringRadiiKm the ruled annuli's edges, inner to outer: the C
+     *                    Ring's inner edge, the B Ring's outer edge, the
+     *                    Cassini Division's outer edge, the A Ring's outer edge
+     * @param minimumMarkPx the smallest mark the page draws, in pixels
+     */
+    record RingedBody(String identity, String accessibleName, SkyPosition at,
+                      double equatorialDiameterArcseconds,
+                      double polarDiameterArcseconds, double poleAngleDegrees,
+                      double ringOpeningDegrees, boolean unlitFaceSeen,
+                      java.util.List<Double> ringRadiiKm, double minimumMarkPx,
+                      boolean belowHorizon, double distanceKm, InkRole role,
+                      Moment moment, boolean selectable)
+            implements OverlayContribution {
+        public RingedBody {
+            requireIdentified(identity, accessibleName, role);
+            requireMomentIfSelectable(identity, moment, selectable);
+            if (at == null) {
+                throw new IllegalArgumentException("a body is somewhere: " + identity);
+            }
+            if (!(equatorialDiameterArcseconds > 0.0)
+                    || !Double.isFinite(equatorialDiameterArcseconds)
+                    || !(polarDiameterArcseconds > 0.0)
+                    || !(polarDiameterArcseconds <= equatorialDiameterArcseconds)) {
+                throw new IllegalArgumentException("a ringed body has a positive"
+                        + " equatorial diameter no smaller than its polar one: " + identity);
+            }
+            if (!Double.isFinite(poleAngleDegrees)) {
+                throw new IllegalArgumentException("a pole has an angle: " + identity);
+            }
+            if (!Double.isFinite(ringOpeningDegrees)
+                    || Math.abs(ringOpeningDegrees) > 90.0) {
+                throw new IllegalArgumentException("a ring opening is an angle within"
+                        + " 90 degrees of the plane: " + identity);
+            }
+            if (ringRadiiKm == null || ringRadiiKm.size() != 4) {
+                throw new IllegalArgumentException("the ruled rings have four edges,"
+                        + " inner to outer: " + identity);
+            }
+            ringRadiiKm = java.util.List.copyOf(ringRadiiKm);
+            double last = 0.0;
+            for (double radius : ringRadiiKm) {
+                if (!(radius > last) || !Double.isFinite(radius)) {
+                    throw new IllegalArgumentException("ring edges are positive and"
+                            + " increase outward: " + identity);
+                }
+                last = radius;
+            }
+            if (!(minimumMarkPx > 0.0) || !Double.isFinite(minimumMarkPx)) {
+                throw new IllegalArgumentException("a minimum mark is a positive size: "
+                        + identity);
+            }
+            if (!(distanceKm > 0.0) || !Double.isFinite(distanceKm)) {
+                throw new IllegalArgumentException("a body is at a positive distance: "
+                        + identity);
+            }
+            if (role != InkRole.BODY) {
+                throw new IllegalArgumentException("a body is drawn in the body role: "
+                        + identity);
+            }
+        }
+
+        /** A ring edge's apparent semi-major axis, asin(R/Δ), in arcseconds. */
+        public double ringSemiMajorArcseconds(double radiusKm) {
+            return Math.toDegrees(Math.asin(radiusKm / distanceKm)) * 3600.0;
+        }
+
+        /** The same edge's apparent semi-minor axis: the semi-major times |sin B|. */
+        public double ringSemiMinorArcseconds(double radiusKm) {
+            return ringSemiMajorArcseconds(radiusKm)
+                    * Math.abs(Math.sin(Math.toRadians(ringOpeningDegrees)));
+        }
+    }
+
+    /**
      * A satellite of an {@link OblateBody} (issue #485, the owner's
      * rulings 4 and 5 on #482): a Galilean moon. Its true disc is below
      * a pixel on every page, so the page draws a symbol of

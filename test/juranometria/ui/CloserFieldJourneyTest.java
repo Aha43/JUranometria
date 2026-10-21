@@ -255,7 +255,8 @@ class CloserFieldJourneyTest {
             controller = new ChartViewController();
             controller.onChange(chart::setViewState);
             chart.setCloserFieldBodies(Set.of(SolarSystemModule.MERCURY, SolarSystemModule.VENUS,
-                    juranometria.jovianchart.JovianModule.JUPITER));
+                    juranometria.jovianchart.JovianModule.JUPITER,
+                    juranometria.saturnchart.SaturnModule.SATURN));
             controller.offerCloserFields(chart::offersCloserField);
             chart.onPageContentsChange(controller::closerOfferChanged);
             controller.onAvailabilityChange(availability::incrementAndGet);
@@ -321,7 +322,7 @@ class CloserFieldJourneyTest {
         assertFalse(controller.canZoomIn());
         String note = chart.closerFieldNote(chart.currentScene());
         assertEquals(ENGLISH.closerFieldWithoutBody(), note);
-        assertTrue(note.contains("Mercury, Venus or Jupiter"), note);
+        assertTrue(note.contains("Mercury, Venus, Jupiter or Saturn"), note);
         SwingUtilities.invokeAndWait(controller::zoomOut);
         SwingUtilities.invokeAndWait(controller::zoomOut);
         assertEquals(1.0, controller.state().fieldWidthDegrees(), "back to the ladder");
@@ -343,6 +344,67 @@ class CloserFieldJourneyTest {
         assertEquals(ChartViewController.PointerZoomOutcome.ACCEPTED,
                 controller.zoomAt(onJupiter, true, 900, 700));
         assertEquals(0.5, controller.state().fieldWidthDegrees());
+    }
+
+    // ---- Saturn (#579; ruling 6 on #578) --------------------------------------
+
+    /** The contract's card instant (#574): the 2026 Oslo day nearest the Earth. */
+    private static final Instant CARD = Instant.parse("2026-10-05T00:00:00Z");
+
+    private juranometria.saturnchart.SaturnModule saturnModule;
+
+    private void buildSaturn(SkyPosition centre, double field) throws Exception {
+        Observer at = new Observer(OSLO_LAT, OSLO_LON, CARD);
+        juranometria.solar.SaturnSystemService service =
+                juranometria.solar.SaturnSystemService.load();
+        SwingUtilities.invokeAndWait(() -> {
+            chart = new ChartComponent(Atlas.assembler(), ENGLISH);
+            chart.setSize(900, 700);
+            controller = new ChartViewController();
+            controller.onChange(chart::setViewState);
+            chart.setCloserFieldBodies(Set.of(SolarSystemModule.MERCURY, SolarSystemModule.VENUS,
+                    juranometria.jovianchart.JovianModule.JUPITER,
+                    juranometria.saturnchart.SaturnModule.SATURN));
+            controller.offerCloserFields(chart::offersCloserField);
+            chart.onPageContentsChange(controller::closerOfferChanged);
+            controller.onAvailabilityChange(availability::incrementAndGet);
+            controller.recenter(centre, field);
+            ChartModuleHost host = new ChartModuleHost(chart, new SelectionModel(),
+                    request -> { });
+            MeridianModule meridian = host.attach(new MeridianModule(at));
+            meridian.showing(false, false, false);
+            saturnModule = host.attach(new juranometria.saturnchart.SaturnModule(
+                    () -> meridian.attached() ? meridian.observer() : null,
+                    () -> service, meridian::horizonShowing));
+            saturnModule.showing(false);
+        });
+        flush();
+    }
+
+    @Test
+    void saturnAtTheCardInstantOffersTheCloserFields() throws Exception {
+        SkyPosition place = juranometria.solar.SaturnSystemService.load()
+                .observeSaturn(new Observer(OSLO_LAT, OSLO_LON, CARD)).astrometricJ2000();
+        buildSaturn(place, 1.0);
+        assertFalse(controller.canZoomIn(), "Saturn hidden: 1° is the floor");
+        int before = availability.get();
+        SwingUtilities.invokeAndWait(() -> saturnModule.showing(true));
+        flush();
+        assertTrue(availability.get() > before, "switching Saturn on tells the controls");
+        assertTrue(controller.canZoomIn(), "Saturn on the page 0.5° would show");
+        SwingUtilities.invokeAndWait(controller::zoomIn);
+        flush();
+        SwingUtilities.invokeAndWait(controller::zoomIn);
+        flush();
+        assertEquals(0.25, controller.state().fieldWidthDegrees());
+        paint();
+        ReferenceInk.BodyPlacement saturn = chart.renderedBodies().stream()
+                .filter(b -> juranometria.saturnchart.SaturnModule.SATURN.equals(b.identity()))
+                .findFirst().orElseThrow(() -> new AssertionError(
+                        "Saturn is drawn on the closer page: " + chart.renderedBodies()));
+        assertFalse(saturn.symbol(), "at 0.25° the true figure, the rings about 44 px across");
+        String said = chart.getAccessibleContext().getAccessibleDescription();
+        assertTrue(said.contains(" Saturn. ") || said.endsWith(" Saturn."), said);
     }
 
     @Test

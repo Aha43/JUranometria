@@ -186,17 +186,28 @@ public final class SolarSystemSection {
     /**
      * Gives the section Saturn's group after Jupiter's (#576): its
      * controls over Saturn's shared session, with no chart switch and no
-     * Centre on chart. Stated before the tab is built; building them
-     * computes nothing and reads no pack.
+     * Centre on chart (a host built without the module). Stated before
+     * the tab is built; building them computes nothing and reads no pack.
      */
     public void withSaturn(SaturnTableSession session, InterfaceText said) {
+        withSaturn(session, said, null, null);
+    }
+
+    /**
+     * The same, with the Saturn module's switch (#579, ruling 5 on #578):
+     * Show on chart over {@code onChart}, and Centre on chart through
+     * {@code centre} where both are given, as Jupiter's group has them.
+     */
+    public void withSaturn(SaturnTableSession session, InterfaceText said,
+                           BodyOnChart onChart, CentreOnChart centre) {
         if (session == null || said == null) {
             throw new IllegalArgumentException("Saturn's session, in a language");
         }
         if (saturn != null) {
             saturn.release();
         }
-        saturn = new SaturnTableControls(session, said, false);
+        saturn = new SaturnTableControls(session, said, false, onChart,
+                onChart == null ? null : centre, onChart);
     }
 
     /** Saturn's controls, or null for a host built without Saturn. */
