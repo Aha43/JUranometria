@@ -502,6 +502,7 @@ public final class PackagedAcceptanceMain {
         saturnTableJourney();
         centreOnChartJourney();
         jupiterOnTheChartJourney();
+        saturnOnTheChartJourney();
         jovianMoonsOnTheChartJourney();
         jovianSheetJourney();
 
@@ -3482,6 +3483,172 @@ public final class PackagedAcceptanceMain {
      * empty sky - and Centre on chart in Jupiter's Controller group turns
      * the module's own switch on and centres there at that field.
      */
+    /**
+     * Saturn on the chart in the packaged image (issue #579, the owner's
+     * rulings on #578): at 8° a 6 px cartographic symbol, spoken as one,
+     * that hides nothing; at the normal minimum field its true figure -
+     * globe and rings - spoken as Saturn, a click on it selecting nothing
+     * behind it; Centre on chart from Saturn's Controller group turning
+     * the switch on and centring there.
+     */
+    private static void saturnOnTheChartJourney() throws Exception {
+        juranometria.solar.SaturnSystemService saturnService =
+                juranometria.solar.SaturnSystemService.load();
+        juranometria.sky.Observer oslo = new juranometria.sky.Observer(59.91, 10.75,
+                SATURN_CARD_INSTANT);
+        juranometria.solar.SaturnSystemService.SaturnObservation saturn =
+                saturnService.observeSaturn(oslo);
+        for (double field : new double[] {8.0,
+                juranometria.chart.ChartViewState.normalMinimumFieldDegrees()}) {
+            juranometria.ui.ChartComponent[] chart = new juranometria.ui.ChartComponent[1];
+            juranometria.chart.SelectionModel selection = new juranometria.chart.SelectionModel();
+            juranometria.saturnchart.SaturnModule[] module =
+                    new juranometria.saturnchart.SaturnModule[1];
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                chart[0] = new juranometria.ui.ChartComponent(Atlas.assembler(),
+                        juranometria.ui.language.PageText.in(
+                                juranometria.ui.language.InterfaceText.forLanguage("en")));
+                chart[0].setSize(900, 700);
+                chart[0].setViewState(new juranometria.chart.ChartViewState(
+                        saturn.astrometricJ2000(), field, 8.0, null, null));
+                juranometria.ui.SelectInteraction.install(chart[0], selection,
+                        new juranometria.chart.WorkingSelection(),
+                        new juranometria.chart.SelectionMode());
+                module[0] = new juranometria.saturnchart.SaturnModule(() -> oslo,
+                        () -> saturnService, () -> false);
+                module[0].showing(true);
+                chart[0].overlays().offer(juranometria.saturnchart.SaturnModule.ID,
+                        module[0]::contributedGeometry);
+            });
+            javax.swing.SwingUtilities.invokeAndWait(() -> { });
+            java.awt.image.BufferedImage image = new java.awt.image.BufferedImage(
+                    900, 700, java.awt.image.BufferedImage.TYPE_INT_RGB);
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                java.awt.Graphics2D g = image.createGraphics();
+                try {
+                    chart[0].paint(g);
+                } finally {
+                    g.dispose();
+                }
+            });
+            java.util.List<juranometria.ui.ReferenceInk.BodyPlacement> drawn =
+                    chart[0].renderedBodies();
+            require(drawn.size() == 1 && juranometria.saturnchart.SaturnModule.SATURN.equals(
+                            drawn.get(0).identity()),
+                    "the packaged chart drew Saturn alone at " + field + "°: " + drawn);
+            juranometria.project.DrawnPage page =
+                    juranometria.project.DrawnPage.of(chart[0].currentScene());
+            juranometria.project.PixelPoint expected =
+                    new juranometria.project.ViewportMapping(page).toPixel(
+                            page.projection().project(saturn.astrometricJ2000()).orElseThrow());
+            juranometria.project.PixelPoint centre = drawn.get(0).centre();
+            require(Math.hypot(centre.x() - expected.x(), centre.y() - expected.y()) < 0.01,
+                    "at the service's J2000 place at " + field + "°");
+            String said = chart[0].getAccessibleContext().getAccessibleDescription();
+            boolean symbol = field > juranometria.chart.ChartViewState.normalMinimumFieldDegrees();
+            require(drawn.get(0).symbol() == symbol,
+                    "a symbol at 8°, the true figure at the minimum field: " + field + "° "
+                            + drawn.get(0).symbol());
+            if (symbol) {
+                double width = drawn.get(0).disc().getBounds2D().getWidth();
+                require(Math.abs(width - juranometria.saturnchart.SaturnModule.MINIMUM_MARK_PX) < 0.05,
+                        "the 6 px minimum: " + width);
+                require(said.contains(" Saturn (a cartographic symbol, not Saturn's apparent"
+                        + " diameter)."), "spoken as a symbol: " + said);
+                require(chart[0].bodyAt(centre.x(), centre.y()).isEmpty(),
+                        "a click through the symbol is not consumed");
+            } else {
+                double width = drawn.get(0).disc().getBounds2D().getWidth();
+                require(width > 8.0 && width < 13.0,
+                        "the rings 8.5-11.7 px across at 1° (the #578 study): " + width);
+                require(said.contains(" Saturn. ") || said.endsWith(" Saturn."),
+                        "spoken as Saturn: " + said);
+                int cx = (int) Math.round(centre.x()) + chart[0].pageOffsetX();
+                int cy = (int) Math.round(centre.y()) + chart[0].pageOffsetY();
+                for (int id : new int[] {java.awt.event.MouseEvent.MOUSE_PRESSED,
+                        java.awt.event.MouseEvent.MOUSE_RELEASED,
+                        java.awt.event.MouseEvent.MOUSE_CLICKED}) {
+                    javax.swing.SwingUtilities.invokeAndWait(() -> chart[0].dispatchEvent(
+                            new java.awt.event.MouseEvent(chart[0], id,
+                                    System.nanoTime() / 1_000_000, 0, cx, cy, 1, false,
+                                    java.awt.event.MouseEvent.BUTTON1)));
+                }
+                javax.swing.SwingUtilities.invokeAndWait(() -> { });
+                require(selection.selection() instanceof juranometria.chart.Selection.Occurrence o
+                                && juranometria.saturnchart.SaturnModule.SATURN.equals(o.identity())
+                                && selection.candidates().isEmpty(),
+                        "a click on Saturn's figure is Saturn's occurrence, nothing behind it"
+                                + " offered (#513): " + selection.selection());
+            }
+        }
+        // Centre on chart from Saturn's Controller group: the module's own
+        // switch turns on, and the chart is sent to Saturn at the minimum.
+        juranometria.saturnchart.SaturnModule module =
+                new juranometria.saturnchart.SaturnModule(() -> oslo, () -> saturnService, () -> false);
+        java.util.prefs.Preferences scratch = java.util.prefs.Preferences.userRoot()
+                .node("juranometria-packaged-saturn-chart-" + System.nanoTime());
+        try {
+            juranometria.ui.solar.BodyOnChart layer =
+                    juranometria.ui.solar.SaturnChartSession.switchOf(module,
+                            juranometria.ui.solar.SaturnChartStore.forNode(scratch));
+            juranometria.chart.SkyPosition[] sent = new juranometria.chart.SkyPosition[1];
+            double[] field = new double[1];
+            juranometria.ui.solar.CentreOnChart action = new juranometria.ui.solar.CentreOnChart(
+                    new juranometria.ui.solar.CentreOnChart.Chart() {
+                        @Override
+                        public void centre(juranometria.chart.SkyPosition at, double width) {
+                            sent[0] = at;
+                            field[0] = width;
+                        }
+
+                        @Override
+                        public void bringForward() {
+                        }
+
+                        @Override
+                        public double normalMinimumFieldDegrees() {
+                            return juranometria.chart.ChartViewState.normalMinimumFieldDegrees();
+                        }
+                    });
+            juranometria.ui.solar.SaturnTableSession session =
+                    new juranometria.ui.solar.SaturnTableSession(() -> oslo, () -> saturnService);
+            javax.swing.JButton[] button = new javax.swing.JButton[1];
+            juranometria.ui.solar.SaturnTableControls[] controls =
+                    new juranometria.ui.solar.SaturnTableControls[1];
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                controls[0] = new juranometria.ui.solar.SaturnTableControls(session,
+                        juranometria.ui.language.InterfaceText.forLanguage("en"), false,
+                        layer, action, layer);
+                button[0] = controls[0].centreOnChart;
+            });
+            require(button[0] != null && !module.showing(), "the button, the switch off");
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                Object pressed = button[0].getInputMap(javax.swing.JComponent.WHEN_FOCUSED)
+                        .get(javax.swing.KeyStroke.getKeyStroke("SPACE"));
+                Object released = button[0].getInputMap(javax.swing.JComponent.WHEN_FOCUSED)
+                        .get(javax.swing.KeyStroke.getKeyStroke("released SPACE"));
+                button[0].getActionMap().get(pressed).actionPerformed(
+                        new java.awt.event.ActionEvent(button[0], 0, "SPACE"));
+                button[0].getActionMap().get(released).actionPerformed(
+                        new java.awt.event.ActionEvent(button[0], 0, "SPACE"));
+            });
+            require(module.showing(), "Centre on chart turned Saturn's switch on");
+            require(saturn.astrometricJ2000().equals(sent[0])
+                            && field[0] == juranometria.chart.ChartViewState
+                                    .normalMinimumFieldDegrees(),
+                    "and centred on Saturn's J2000 place at the minimum field: " + sent[0]
+                            + " " + field[0]);
+            javax.swing.SwingUtilities.invokeAndWait(() -> controls[0].release());
+        } finally {
+            scratch.removeNode();
+        }
+        System.out.println("saturn on the chart OK (the packaged component draws Saturn"
+                + " where the Saturn pack puts it: at 8° a 6 px cartographic symbol, spoken"
+                + " as one, that hides nothing; at the normal minimum field its true figure"
+                + " of globe and rings, spoken as Saturn, a click on it selecting nothing"
+                + " behind it; Centre on chart turns the switch on and centres there)");
+    }
+
     private static void jupiterOnTheChartJourney() throws Exception {
         juranometria.solar.JovianSystemService jovian =
                 juranometria.solar.JovianSystemService.load();

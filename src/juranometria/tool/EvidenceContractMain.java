@@ -218,6 +218,10 @@ public final class EvidenceContractMain {
         // deterministic; its mock-ups are held through IMAGE_MAINS.
         REPORT_MAINS.put("juranometria.tool.SaturnCartographyStudyMain",
                 "docs/studies/saturn-cartography/measurements.md");
+        // Saturn on the chart (#579): production pages through the component
+        // with the Saturn module attached; its pages are held through IMAGE_MAINS.
+        REPORT_MAINS.put("juranometria.tool.SaturnOnTheChartStudyMain",
+                "docs/studies/saturn-on-the-chart/measurements.md");
         // The closer fields' foundations (#543): production pages at 1°,
         // 0.5° and 0.25° set by state; name and grid-figure placements in
         // its platform record.
@@ -424,6 +428,8 @@ public final class EvidenceContractMain {
                 "docs/studies/mercury-cartography/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.SaturnCartographyStudyMain",
                 "docs/studies/saturn-cartography/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.SaturnOnTheChartStudyMain",
+                "docs/studies/saturn-on-the-chart/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.ChartInstantStudyMain",
                 "docs/studies/chart-instant/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.ChartInstantFurnitureMain",
@@ -613,6 +619,9 @@ public final class EvidenceContractMain {
             // pages painted by the renderer, the study's candidate figure and marks
             // drawn over them; renderer-drawn contract, as #482's.
             "juranometria.tool.SaturnCartographyStudyMain",
+            // Saturn on the chart (issue #579): production pages composed by the
+            // component with the Saturn module attached, and the exported sheet.
+            "juranometria.tool.SaturnOnTheChartStudyMain",
             // The closer fields' foundations (issue #543): production pages
             // at 1°, 0.5° and 0.25°, and an exported A4 sheet at 0.25°.
             "juranometria.tool.CloserFieldsStudyMain",

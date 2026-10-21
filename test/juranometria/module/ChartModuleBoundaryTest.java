@@ -121,10 +121,14 @@ class ChartModuleBoundaryTest {
         // the satellite: a Galilean moon's place and state, for the page
         // to decide moon by moon - typed geometry still. #515 added the
         // tick: a graduation of a reference line, its altitude a number
-        // and its words the page's - typed geometry, no appearance.
+        // and its words the page's - typed geometry, no appearance. #579
+        // added the ringed body: Saturn, its globe's diameters, its pole
+        // in the chart's frame, the ring opening and the ruled ring
+        // edges - typed geometry still, and the page, not the module,
+        // decides when the minimum is a symbol and how the rings are inked.
         java.util.List<String> vocabulary = java.util.List.of("GreatCircle",
                 "Point", "Path", "Region", "DirectionMark", "Tick", "Body",
-                "OblateBody", "Satellite");
+                "OblateBody", "RingedBody", "Satellite");
         assertEquals(vocabulary,
                 java.util.Arrays.stream(OverlayContribution.class
                                 .getPermittedSubclasses())
@@ -132,7 +136,7 @@ class ChartModuleBoundaryTest {
                                 java.util.Comparator.comparingInt(vocabulary::indexOf))
                         .toList(),
                 "a great circle, a point, a path, a region, a direction mark, a"
-                        + " tick, a body, an oblate body and a satellite - the geometry"
+                        + " tick, a body, an oblate body, a ringed body and a satellite - the geometry"
                         + " a module may contribute, and nothing else");
     }
 

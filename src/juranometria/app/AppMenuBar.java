@@ -907,6 +907,38 @@ public final class AppMenuBar {
     }
 
     /**
+     * Adds View > Solar System > Saturn on the chart directly after
+     * Jupiter and moons on the chart (#579; ruling 5 on #578): the one
+     * remembered switch for the Saturn module, toggled like Jupiter's.
+     * Returns the item, which the session then keeps in step with the
+     * module, or null on a bar without the submenu.
+     */
+    public static javax.swing.JCheckBoxMenuItem addSaturnOnChart(javax.swing.JMenuBar bar,
+            juranometria.ui.language.InterfaceText said, Runnable toggleSaturnOnChart) {
+        JMenu solar = solarSystemMenu(bar);
+        if (solar == null || toggleSaturnOnChart == null) {
+            return null;
+        }
+        javax.swing.JCheckBoxMenuItem item = new javax.swing.JCheckBoxMenuItem(
+                said.say("menu.saturnchart.label"));
+        item.setName("saturnOnChartItem");
+        juranometria.ui.language.MnemonicText.in(said).apply(item, "menu.saturnchart.mnemonic");
+        item.getAccessibleContext().setAccessibleName(said.say("menu.saturnchart.a11y"));
+        juranometria.ui.Explain.selfExplanatory(item, said.say("menu.saturnchart.explain"));
+        item.addActionListener(event -> toggleSaturnOnChart.run());
+        int after = -1;
+        for (int i = 0; i < solar.getMenuComponentCount(); i++) {
+            String name = solar.getMenuComponent(i).getName();
+            if ("jupiterOnChartItem".equals(name) || MOON_CHART_ITEM.equals(name)
+                    || SUN_CHART_ITEM.equals(name)) {
+                after = i;
+            }
+        }
+        solar.insert(item, after + 1);
+        return item;
+    }
+
+    /**
      * Adds View > Solar System > Jupiter... after Moon... (#474): the
      * Jupiter table's dialog, kept beside the Controller's Jupiter group
      * during dogfooding as the Sun's and the Moon's are. Does nothing on

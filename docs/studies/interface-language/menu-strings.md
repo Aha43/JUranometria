@@ -85,7 +85,7 @@ Bar packed 843 × 287 px; widest popup 232 px.
 | item spoken description \| Shows or hides the ecliptic and its equinox and solstice marks. The chart shortcut is ⌘K then I. |
 | submenu label \| Solar System |
 | submenu spoken name \| Solar System menu |
-| submenu spoken description \| The Sun, Mercury, Venus, the Moon and Jupiter: whether each is drawn on the chart, and their tables |
+| submenu spoken description \| The Sun, Mercury, Venus, the Moon, Jupiter and Saturn: whether each is drawn on the chart, and their tables |
 | submenu access letter (language) \| Y |
 | item label \| Sun on the chart |
 | item spoken name \| Sun on the chart |
@@ -196,7 +196,7 @@ Bar packed 843 × 287 px; widest popup 232 px.
 | item spoken description \| Shows or hides the ecliptic and its equinox and solstice marks. The chart shortcut is ⌘K then I. |
 | submenu label \| Solar System |
 | submenu spoken name \| Solar System menu |
-| submenu spoken description \| The Sun, Mercury, Venus, the Moon and Jupiter: whether each is drawn on the chart, and their tables |
+| submenu spoken description \| The Sun, Mercury, Venus, the Moon, Jupiter and Saturn: whether each is drawn on the chart, and their tables |
 | submenu access letter (language) \| Y |
 | item label [checked] \| Sun on the chart |
 | item spoken name \| Sun on the chart |
@@ -307,7 +307,7 @@ Bar packed 843 × 287 px; widest popup 232 px.
 | item spoken description \| Shows or hides the ecliptic and its equinox and solstice marks. The chart shortcut is ⌘K then I. |
 | submenu label \| Solar System |
 | submenu spoken name \| Solar System menu |
-| submenu spoken description \| The Sun, Mercury, Venus, the Moon and Jupiter: whether each is drawn on the chart, and their tables |
+| submenu spoken description \| The Sun, Mercury, Venus, the Moon, Jupiter and Saturn: whether each is drawn on the chart, and their tables |
 | submenu access letter (language) \| Y |
 | item label \| Sun on the chart |
 | item spoken name \| Sun on the chart |
@@ -418,7 +418,7 @@ Bar packed 843 × 287 px; widest popup 232 px.
 | item spoken description \| Shows or hides the ecliptic and its equinox and solstice marks. The chart shortcut is ⌘K then I. |
 | submenu label \| Solar System |
 | submenu spoken name \| Solar System menu |
-| submenu spoken description \| The Sun, Mercury, Venus, the Moon and Jupiter: whether each is drawn on the chart, and their tables |
+| submenu spoken description \| The Sun, Mercury, Venus, the Moon, Jupiter and Saturn: whether each is drawn on the chart, and their tables |
 | submenu access letter (language) \| Y |
 | item label \| Sun on the chart |
 | item spoken name \| Sun on the chart |
@@ -463,7 +463,7 @@ Bar packed 843 × 287 px; widest popup 232 px.
 | item access letter (language) \| J |
 | item label [unavailable] \| Zoom In |
 | item spoken name [unavailable] \| Zoom In |
-| item spoken description [unavailable] \| Unavailable: a closer field is offered only when Mercury, Venus or Jupiter, shown on the chart, is on the page the step would show |
+| item spoken description [unavailable] \| Unavailable: a closer field is offered only when Mercury, Venus, Jupiter or Saturn, shown on the chart, is on the page the step would show |
 | item accelerator (platform notation) \| ⌘= |
 | item label \| Zoom Out |
 | item spoken name \| Zoom Out |
@@ -531,7 +531,7 @@ Bar packed 844 × 287 px; widest popup 214 px.
 | item spoken description \| Viser eller skjuler ekliptikken og merkene for jevndøgn og solverv. Hurtigtasten for kartet er ⌘K deretter I. |
 | submenu label \| Solsystem |
 | submenu spoken name \| Solsystem-meny |
-| submenu spoken description \| Solen, Merkur, Venus, Månen og Jupiter: om hver av dem tegnes på kartet, og tabellene deres |
+| submenu spoken description \| Solen, Merkur, Venus, Månen, Jupiter og Saturn: om hver av dem tegnes på kartet, og tabellene deres |
 | submenu access letter (language) \| Y |
 | item label \| Solen på kartet |
 | item spoken name \| Solen på kartet |
@@ -642,7 +642,7 @@ Bar packed 844 × 287 px; widest popup 214 px.
 | item spoken description \| Viser eller skjuler ekliptikken og merkene for jevndøgn og solverv. Hurtigtasten for kartet er ⌘K deretter I. |
 | submenu label \| Solsystem |
 | submenu spoken name \| Solsystem-meny |
-| submenu spoken description \| Solen, Merkur, Venus, Månen og Jupiter: om hver av dem tegnes på kartet, og tabellene deres |
+| submenu spoken description \| Solen, Merkur, Venus, Månen, Jupiter og Saturn: om hver av dem tegnes på kartet, og tabellene deres |
 | submenu access letter (language) \| Y |
 | item label [checked] \| Solen på kartet |
 | item spoken name \| Solen på kartet |
@@ -753,7 +753,7 @@ Bar packed 844 × 287 px; widest popup 214 px.
 | item spoken description \| Viser eller skjuler ekliptikken og merkene for jevndøgn og solverv. Hurtigtasten for kartet er ⌘K deretter I. |
 | submenu label \| Solsystem |
 | submenu spoken name \| Solsystem-meny |
-| submenu spoken description \| Solen, Merkur, Venus, Månen og Jupiter: om hver av dem tegnes på kartet, og tabellene deres |
+| submenu spoken description \| Solen, Merkur, Venus, Månen, Jupiter og Saturn: om hver av dem tegnes på kartet, og tabellene deres |
 | submenu access letter (language) \| Y |
 | item label \| Solen på kartet |
 | item spoken name \| Solen på kartet |
@@ -864,7 +864,7 @@ Bar packed 844 × 287 px; widest popup 214 px.
 | item spoken description \| Viser eller skjuler ekliptikken og merkene for jevndøgn og solverv. Hurtigtasten for kartet er ⌘K deretter I. |
 | submenu label \| Solsystem |
 | submenu spoken name \| Solsystem-meny |
-| submenu spoken description \| Solen, Merkur, Venus, Månen og Jupiter: om hver av dem tegnes på kartet, og tabellene deres |
+| submenu spoken description \| Solen, Merkur, Venus, Månen, Jupiter og Saturn: om hver av dem tegnes på kartet, og tabellene deres |
 | submenu access letter (language) \| Y |
 | item label \| Solen på kartet |
 | item spoken name \| Solen på kartet |
@@ -909,7 +909,7 @@ Bar packed 844 × 287 px; widest popup 214 px.
 | item access letter (language) \| J |
 | item label [unavailable] \| Zoom inn |
 | item spoken name [unavailable] \| Zoom inn |
-| item spoken description [unavailable] \| Utilgjengelig: et nærfelt tilbys bare når Merkur, Venus eller Jupiter, vist på kartet, står på siden steget ville vise |
+| item spoken description [unavailable] \| Utilgjengelig: et nærfelt tilbys bare når Merkur, Venus, Jupiter eller Saturn, vist på kartet, står på siden steget ville vise |
 | item accelerator (platform notation) \| ⌘= |
 | item label \| Zoom ut |
 | item spoken name \| Zoom ut |

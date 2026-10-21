@@ -83,6 +83,10 @@ public final class SaturnTableControls {
     public final JComboBox<String> step;
     public final JButton compute;
     public final JButton update;
+    /** The Controller's Show on chart box (#579), or null where the host has none. */
+    public final javax.swing.JCheckBox onChart;
+    /** Centre on chart (#579, through #483's seam), or null where the host has none. */
+    public final JButton centreOnChart;
     public final JLabel status = new JLabel(" ");
     /** The card's title: Saturn, the instant, its marks. */
     public final JLabel cardTitle = new JLabel(" ");
@@ -103,6 +107,18 @@ public final class SaturnTableControls {
     /** @param letters whether the controls carry access letters (the dialog's do) */
     public SaturnTableControls(SaturnTableSession session, InterfaceText language,
                                boolean letters) {
+        this(session, language, letters, null, null, null);
+    }
+
+    /**
+     * With the Saturn module's switch (#579, ruling 5 on #578): a Show on
+     * chart box where {@code onChart} is given (the Controller's group),
+     * and Centre on chart where {@code centre} is given, turning
+     * {@code layer} on and choosing the chart's normal minimum field.
+     */
+    public SaturnTableControls(SaturnTableSession session, InterfaceText language,
+                               boolean letters, BodyOnChart onChart, CentreOnChart centre,
+                               BodyOnChart layer) {
         if (session == null || language == null) {
             throw new IllegalArgumentException(
                     "the controls follow a session, in a language");
@@ -134,6 +150,27 @@ public final class SaturnTableControls {
         compute = button("compute", "saturnCompute", access);
         update = button("update", "saturnUpdate", access);
         status.setName("saturnStatus");
+        if (onChart != null) {
+            String stem = "solarsystem.saturn.onChart";
+            this.onChart = new javax.swing.JCheckBox(language.say(stem + ".label"),
+                    onChart.showing());
+            this.onChart.setName("saturnOnChart");
+            this.onChart.getAccessibleContext().setAccessibleName(language.say(stem + ".a11y"));
+            Explain.selfExplanatory(this.onChart, language.say(stem + ".explain"));
+            // Ask, then let the answer come back through the switch.
+            this.onChart.addActionListener(e -> onChart.show(this.onChart.isSelected()));
+            onChart.onChange(this.onChart::setSelected);
+        } else {
+            this.onChart = null;
+        }
+        if (centre != null) {
+            if (layer == null) {
+                throw new IllegalArgumentException("Centre on chart turns a layer on");
+            }
+            centreOnChart = centre.button(target(layer), said, "saturnCentreOnChart", access);
+        } else {
+            centreOnChart = null;
+        }
 
         // The card: a title, then one heading-and-value line per quantity.
         card.setName("saturnCard");
@@ -277,6 +314,38 @@ public final class SaturnTableControls {
         agreement = new AgreementLine(said, update, "saturn");
         following = session.onChange(this::show);
         followingChart = session.onObserverChange(this::sayAgreement);
+    }
+
+    /**
+     * This host's Centre on chart target (#579, through #483's seam): the
+     * application never offers to centre on something it does not draw.
+     * The target applies this host's typed draft and answers Saturn's
+     * J2000 place, or null when the session refused; the field is the
+     * chart's normal minimum, as for every body (ruling 5 on #578).
+     */
+    public CentreOnChart.Target target(BodyOnChart layer) {
+        return new CentreOnChart.Target() {
+            @Override
+            public CentreOnChart.Body body() {
+                return CentreOnChart.Body.SATURN;
+            }
+
+            @Override
+            public juranometria.chart.SkyPosition applyTypedAndLocate() {
+                apply();
+                SaturnTableSession.Result result = session.result();
+                boolean answered = result.outcome() == SaturnTableSession.Outcome.ROWS
+                        || result.outcome() == SaturnTableSession.Outcome.APPENDED
+                        || result.outcome() == SaturnTableSession.Outcome.MOONS_OUTSIDE;
+                return answered && !result.entries().isEmpty()
+                        ? result.entries().get(0).saturn().astrometricJ2000() : null;
+            }
+
+            @Override
+            public BodyOnChart layer() {
+                return layer;
+            }
+        };
     }
 
     /** This host's draft, as a query. */
@@ -582,6 +651,14 @@ public final class SaturnTableControls {
         resultHolder.setAlignmentX(0f);
         column.add(resultHolder);
         column.add(Box.createVerticalStrut(6));
+        if (onChart != null) {
+            column.add(leading(onChart));
+            column.add(Box.createVerticalStrut(4));
+        }
+        if (centreOnChart != null) {
+            column.add(leading(centreOnChart));
+            column.add(Box.createVerticalStrut(4));
+        }
         refreshResult();
         return column;
     }

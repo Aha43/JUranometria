@@ -87,7 +87,7 @@ public final class ChartComponent extends JComponent {
         }
         this.words = words;
         this.renderer = new ChartRenderer(StarSizePolicy.DEFAULT, words);
-        // A closer page with no Mercury, Venus or Jupiter on it says why zoom in
+        // A closer page with no Mercury, Venus, Jupiter or Saturn on it says why zoom in
         // offers nothing more (#544); every other page carries no note.
         this.renderer.setTitleNote(this::closerFieldNote);
         // The modules' furniture (#259): none until a module offers
@@ -853,7 +853,7 @@ public final class ChartComponent extends JComponent {
         juranometria.project.ViewportMapping mapping =
                 new juranometria.project.ViewportMapping(drawn);
         for (juranometria.module.OverlayRegistry.Owned owned : overlays.collect()) {
-            // Mercury and Venus are round bodies, Jupiter an oblate one.
+            // Mercury and Venus are round bodies, Jupiter an oblate one, Saturn a ringed one.
             juranometria.chart.SkyPosition at = null;
             if (owned.geometry() instanceof juranometria.module.OverlayContribution.Body body
                     && closerFieldBodies.contains(body.identity())) {
@@ -862,6 +862,11 @@ public final class ChartComponent extends JComponent {
                     instanceof juranometria.module.OverlayContribution.OblateBody oblate
                     && closerFieldBodies.contains(oblate.identity())) {
                 at = oblate.at();
+            } else if (owned.geometry()
+                    instanceof juranometria.module.OverlayContribution.RingedBody ringed
+                    && closerFieldBodies.contains(ringed.identity())) {
+                // Saturn, a ringed figure (#579; ruling 6 on #578).
+                at = ringed.at();
             }
             if (at != null) {
                 var plane = drawn.projection().project(at);
