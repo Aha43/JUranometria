@@ -640,3 +640,12 @@ A range answers at most 142 instants, seven moon rows each, within the 1,000-row
 - `SolarSystemCompanionJourneyTest`, in the real application: the Saturn group follows Jupiter's, collapsed; opened, it has computed nothing and has no chart switch; the menu ends with *Saturn...*.
 - **Packaged acceptance** runs the journey in every image, printing "saturn table OK".
 - **The companion sheets** were regenerated with the Saturn group after Jupiter's, as the application holds it.
+
+## Handed over (#577)
+
+The Saturn work of Part I of the road to 5.4.0 was complete on
+2026-10-20 at main `58ffa6d7`; the handover's baseline is `224058e0`,
+after a test-only repair chain (#588, #590).
+`saturn-handover.md` is the handover to cartography: what is settled,
+what was measured and why, every stopped or incomplete run, what moved,
+and what Part II must decide. This record stays the contract.
