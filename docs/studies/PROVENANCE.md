@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**714 promoted artifacts.**
+**750 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -633,6 +633,42 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/regional-zoom/m45-18deg.png` | `faf69d207360b5009d2572f9c68cbc7ea74945a380bb86ebc56d2d7897acc783` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | RegionalStudyMain |
 | `docs/studies/regional-zoom/m45-36deg.png` | `0ab5d7b35bb747ea98ec5032624bbece196a4e76aabc3c12e770ecc6b58d2b41` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | RegionalStudyMain |
 | `docs/studies/regional-zoom/polar-36deg.png` | `caed8071b91cd85ec6090fe09bf970998e3471dbd4bbb873e271959099decb6a` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | RegionalStudyMain |
+| `docs/studies/saturn-cartography/behind-0.25.png` | `1a21380a1dc877f463e10d31a714bf3c5616f3763f5b82f9ca0c6ea40b5d5bfa` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/behind-1.png` | `a1466d5d26028a624a98792799bdad13c63cb578a3c762a0e5f0b1cd340f1aec` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/conjunction-8.png` | `1c0ced5c5726972f7926bff7e840c7522ccaf38a04c791ec082f5052cb1d2d65` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/crowded-0.25.png` | `4bc3575d2897fcf2f60b1d196bab847891008b9af44e244fc5d8e71a4a0ebc66` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/crowded-1.png` | `5ee8d7ac77809c36e9e091eaa7c65181217bbd8a646a47eeec5c2d46b9519353` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/edge-on-0.25.png` | `d3ad2d54cc37dc65e87c9f89b5eb194025a6e2107f2690f570f46004ba5a1d90` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/edge-on-1.png` | `3b67ccda63140541220fc1407522feac3d4c5a553c9fffc3e65e23e34b291a93` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/field-0.25.png` | `65731f6702b43dd1ee666154c48064ad9e36a6743f648dca3a89151fedcae3c8` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/field-0.5.png` | `ba8663b4ba031af4f7165f8c6d5b6cc1fb75af6898cea6bae71ed6de50d5002b` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/field-1.png` | `a17da12477df4ef5db2d74a53d03dbbf6d596e40986a700d6524ae901076ffa5` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/field-3.png` | `3c3e8d4f3d16a8b6fee4d6b45467d2a344936f65656fc2e0bbb9778d9082cfc3` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/field-36.png` | `e1b260dde09dbbbc47e5e8ef391997a70ea49596359112a6cd07fc6af99dfdd3` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/field-8.png` | `da9cb64450eaa37d683aabcf82c114bfc381dea60762cdf60bb392503ef2ace3` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/horizon-drawn-8.png` | `dd14724ed566553cff92ff28282eb157bd833a5b202e3b638466f7bbd5fa5274` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/horizon-hidden-8.png` | `45f84922ce4927648356deea7b2c15799b3dde6b69ad21d12b6de3a5b4052a6a` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/iapetus-far-1.png` | `084bf33188bdce4e53990b5fdf4a2667b04050326a9a2c602054d6c04c957c42` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/iapetus-far-3.png` | `37277d96095c70fe0f1b9296a862a5955782631da10bfb746f8dc6910fa76e4e` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/in-front-0.25.png` | `35d1b67c574479e83027d9ea0a49231d171bfa3311c8fee664ec1e66e0897dd3` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/in-front-1.png` | `27bd65791c4b1c0ad60e8b00bba9ca79c124abcea2d09688b50ed9a8dd80631f` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/open-north-0.25.png` | `1e127ca8afdc77991ebb707abd7f3f53ae8a349d20df73887c41666fbc0baaf1` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/open-north-1.png` | `3a8b9c5289f51785673346f3157b66d228d6064840554cdae6a30e57e71294eb` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/open-south-0.25.png` | `91696b0580a186dcfcfc4c56672463b477098de453fef6075d1a9f854a77b546` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/open-south-1.png` | `5ae5fca1c852e1752c710ea6dba4ac82ae93113ec35a0fa95aa671278debca5a` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/page-edge-3.png` | `1dbde0b149dde41bedca668a3529c70940e77368be2e0bb7c4e0c0e96755d28f` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/printable-a4-1.png` | `8a908250a70ff9282805338069a004284e8b57f7f9aa3d7313173b7993829cad` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/printable-a4-8.png` | `ec5fce241c0537941fdfb456477f248ee8311769a483acac940363de4eb0d5b6` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/sagittarius-3.png` | `211dc4ec6a8cb141cd3072592c5abf4a353c517e199047930bc7f78ce6977941` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/sagittarius-8.png` | `956d38c02ca188762b165bf739e4cbfc85daa640842eea3aeebb8c4a85e55156` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/shadow-0.25.png` | `e232342461939bbfb466ab1c0afaa1c3f859a876235ef356e48e0aceb302e425` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/shadow-1.png` | `a00dc21be3dfa1a4d48a05aef99f7b92e463c9edbaaf976f2fc2c3da64dbf4fb` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/shadow-partial-0.25.png` | `bc184d7f141f997bd83a463e8b57249e3e55892f3921d8d8ed931d7ad006cad8` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/shadow-partial-1.png` | `3cd89962cd991d34aee84b7e69a4484454fbf4ae789c1354c9c1c9dc95f401b5` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/states-vocabulary.png` | `c9b0a90c0a6a8fb493abb8b2c9f988017f07a9a9345124ee1b9f56c36fec9fc3` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/titan-elongation-1.png` | `d2acdd9584266d901a36dc6a39aee8d2d85f2b580d161307c5c5c1b5f27b2768` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/unlit-0.25.png` | `6caeb12d8ffc1be69f2e016bb90d1553106e76bf5197db3c51f618d6e992b68d` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-cartography/unlit-1.png` | `17855c67e51899b2e34d2cb5259ec8b7ea520e39eafde9532402b4bcb9c33566` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/sky-language/omissions.png` | `86676e3340c06d386c708708fbc446ad0ba5357e6a6c313c10f7ceb88c21fbec` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/sky-language/pair-north-pole-globe-180.png` | `554e6186b7a4eefc1c547dae95096d9607c89da2066d4e16eaed60c3284748ca` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/sky-language/pair-orion-120.png` | `875904baa600edd7df769190c984682a21ad431cfaec7f87f73393dbac3a823c` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
