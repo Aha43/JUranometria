@@ -23,6 +23,11 @@ behind that argument.
   Venus, why a planet needs a phase on the chart, how to read the mark, and
   what it does not claim. Also in Norwegian: [Venus'
   faser](venus-faser.md).
+- [Mercury, never far from the Sun](mercury-never-far-from-the-sun.md) —
+  what the atlas draws of Mercury, why the drawing so often has to be a
+  symbol, what the closer fields add, and what it does not claim. Also in
+  Norwegian: [Merkur, aldri langt fra
+  Solen](merkur-aldri-langt-fra-solen.md).
 
 ## How JUranometria works
 
