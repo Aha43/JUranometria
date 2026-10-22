@@ -503,6 +503,7 @@ public final class PackagedAcceptanceMain {
         centreOnChartJourney();
         jupiterOnTheChartJourney();
         saturnOnTheChartJourney();
+        saturnMoonsOnTheChartJourney();
         jovianMoonsOnTheChartJourney();
         jovianSheetJourney();
 
@@ -3393,6 +3394,115 @@ public final class PackagedAcceptanceMain {
      * 36° field none is distinguishable from Jupiter's mark and none is
      * drawn, while Jupiter stays.
      */
+    /**
+     * The seven Saturnian moons on the packaged chart (#579, ruling 3 on
+     * #578): at the normal minimum field every moon not behind Saturn is
+     * drawn at its own J2000 place as a 3 px symbol with its state, no
+     * click is consumed by a moon and none is selectable; at 36° none can
+     * be told apart from the figure and none is drawn.
+     */
+    private static void saturnMoonsOnTheChartJourney() throws Exception {
+        juranometria.solar.SaturnSystemService saturnService =
+                juranometria.solar.SaturnSystemService.load();
+        juranometria.sky.Observer oslo = new juranometria.sky.Observer(59.91, 10.75,
+                SATURN_CARD_INSTANT);
+        juranometria.solar.SaturnSystemService.Configuration c = saturnService.observeMoons(oslo);
+        int[] moonsDrawn = new int[2];
+        int notBehind = 0;
+        for (juranometria.solar.SaturnSystemService.MoonPlace m : c.moons()) {
+            notBehind += m.discRelation()
+                    == juranometria.solar.SaturnSystemService.DiscRelation.BEHIND ? 0 : 1;
+        }
+        double[] fields = {juranometria.chart.ChartViewState.normalMinimumFieldDegrees(), 36.0};
+        String spoken = null;
+        for (int f = 0; f < fields.length; f++) {
+            double field = fields[f];
+            juranometria.ui.ChartComponent[] chart = new juranometria.ui.ChartComponent[1];
+            juranometria.chart.SelectionModel selection = new juranometria.chart.SelectionModel();
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                chart[0] = new juranometria.ui.ChartComponent(Atlas.assembler(),
+                        juranometria.ui.language.PageText.in(
+                                juranometria.ui.language.InterfaceText.forLanguage("en")));
+                chart[0].setSize(900, 700);
+                chart[0].setViewState(new juranometria.chart.ChartViewState(
+                        c.saturn().astrometricJ2000(), field, 8.0, null, null));
+                juranometria.ui.SelectInteraction.install(chart[0], selection,
+                        new juranometria.chart.WorkingSelection(),
+                        new juranometria.chart.SelectionMode());
+                juranometria.saturnchart.SaturnModule module =
+                        new juranometria.saturnchart.SaturnModule(() -> oslo,
+                                () -> saturnService, () -> false);
+                module.showing(true);
+                chart[0].overlays().offer(juranometria.saturnchart.SaturnModule.ID,
+                        module::contributedGeometry);
+            });
+            javax.swing.SwingUtilities.invokeAndWait(() -> { });
+            java.awt.image.BufferedImage image = new java.awt.image.BufferedImage(
+                    900, 700, java.awt.image.BufferedImage.TYPE_INT_RGB);
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                java.awt.Graphics2D g = image.createGraphics();
+                try {
+                    chart[0].paint(g);
+                } finally {
+                    g.dispose();
+                }
+            });
+            java.util.List<juranometria.ui.ReferenceInk.BodyPlacement> drawn =
+                    chart[0].renderedBodies();
+            require(!drawn.isEmpty() && juranometria.saturnchart.SaturnModule.SATURN.equals(
+                    drawn.get(0).identity()), "Saturn is drawn first at " + field + "°");
+            juranometria.project.DrawnPage page =
+                    juranometria.project.DrawnPage.of(chart[0].currentScene());
+            juranometria.project.ViewportMapping mapping =
+                    new juranometria.project.ViewportMapping(page);
+            for (juranometria.ui.ReferenceInk.BodyPlacement p : drawn.subList(1, drawn.size())) {
+                moonsDrawn[f]++;
+                juranometria.solar.SaturnSystemService.MoonPlace m = null;
+                for (juranometria.solar.SaturnSystemService.MoonPlace each : c.moons()) {
+                    if (juranometria.saturnchart.SaturnModule.identityOf(each.moon())
+                            .equals(p.identity())) {
+                        m = each;
+                    }
+                }
+                require(m != null && m.discRelation()
+                                != juranometria.solar.SaturnSystemService.DiscRelation.BEHIND,
+                        "a drawn moon is a moon not behind Saturn: " + p.identity());
+                juranometria.project.PixelPoint expected = mapping.toPixel(
+                        page.projection().project(m.astrometricJ2000()).orElseThrow());
+                require(Math.hypot(p.centre().x() - expected.x(), p.centre().y() - expected.y())
+                        < 0.01, p.identity() + " at its own J2000 place");
+                require(p.symbol(), p.identity() + " is a symbol");
+                require(!p.selectable(), p.identity() + " is not selectable (ruling 5)");
+                java.util.Optional<juranometria.ui.ReferenceInk.BodyPlacement> under =
+                        chart[0].selectableBodyAt(p.centre().x(), p.centre().y());
+                require(under.isEmpty() || !under.get().identity().equals(p.identity()),
+                        "a click on " + p.identity() + " never selects the moon");
+            }
+            if (f == 0) {
+                spoken = chart[0].getAccessibleContext().getAccessibleDescription();
+            }
+        }
+        require(moonsDrawn[0] == notBehind, "at the normal minimum field every moon not behind"
+                + " Saturn is drawn: " + moonsDrawn[0] + " of " + notBehind);
+        require(moonsDrawn[1] == 0, "at 36° no moon can be told apart from the figure: "
+                + moonsDrawn[1]);
+        boolean namedOne = false;
+        for (juranometria.solar.SaturnSystemService.MoonPlace m : c.moons()) {
+            if (m.discRelation() == juranometria.solar.SaturnSystemService.DiscRelation.BEHIND) {
+                continue;
+            }
+            String name = juranometria.saturnchart.SaturnModule.nameOf(m.moon());
+            namedOne |= spoken.contains(" " + name + " (a cartographic symbol, not " + name
+                    + "'s apparent diameter).") || spoken.contains(" " + name + ", ");
+        }
+        require(namedOne, "a drawn moon is spoken with the symbol note: " + spoken);
+        System.out.println("saturn moons on the chart OK (the packaged component draws the"
+                + " seven ruled moons with Saturn at the card instant: at the normal minimum"
+                + " field " + moonsDrawn[0] + " of " + notBehind + " moons not behind Saturn,"
+                + " each a 3 px symbol at its own J2000 place with its state, none selectable,"
+                + " no click consumed by a moon; at 36° none is told apart from the figure)");
+    }
+
     private static void jovianMoonsOnTheChartJourney() throws Exception {
         juranometria.solar.JovianSystemService jovian =
                 juranometria.solar.JovianSystemService.load();
@@ -3533,9 +3643,9 @@ public final class PackagedAcceptanceMain {
             });
             java.util.List<juranometria.ui.ReferenceInk.BodyPlacement> drawn =
                     chart[0].renderedBodies();
-            require(drawn.size() == 1 && juranometria.saturnchart.SaturnModule.SATURN.equals(
+            require(!drawn.isEmpty() && juranometria.saturnchart.SaturnModule.SATURN.equals(
                             drawn.get(0).identity()),
-                    "the packaged chart drew Saturn alone at " + field + "°: " + drawn);
+                    "the packaged chart drew Saturn first at " + field + "°: " + drawn);
             juranometria.project.DrawnPage page =
                     juranometria.project.DrawnPage.of(chart[0].currentScene());
             juranometria.project.PixelPoint expected =

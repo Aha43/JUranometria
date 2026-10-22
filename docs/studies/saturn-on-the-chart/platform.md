@@ -31,3 +31,12 @@ Recorded on: `Mac OS X 27.0.1/aarch64/Homebrew 21.0.12.1`
 - **The unlit face seen, 2025-05-06 00:00 UTC, the 0.25° closer field** (`unlit-0.25.png`): Saturn placed.
 - **Saturn below the drawn horizon, 2026-12-01 12:40 UTC, 8° field** (`horizon-drawn-8.png`): Saturn (below the horizon) placed.
 - **The same page with the horizon hidden** (`horizon-hidden-8.png`): Saturn placed.
+- **Titan at greatest elongation (the handover's named case), 2026-08-01 18:00 UTC, 1° field** (`titan-elongation-1.png`): Saturn placed.
+- **Iapetus at its farthest 2026 day, 2026-10-03 00:00 UTC, 3° field** (`iapetus-farthest-3.png`): Saturn placed.
+- **The most crowded 2026 configuration with all seven moons clear, 2026-04-11 00:00 UTC, 1° field** (`crowded-1.png`): Saturn placed.
+- **The most crowded 2026 configuration, 2026-04-11 00:00 UTC, the 0.25° closer field, black sky** (`crowded-0.25-dark.png`): Saturn placed.
+- **A moon in front of Saturn, 2026-07-01 03:00 UTC, 1° field** (`in-front-1.png`): Saturn placed.
+- **A moon in front of Saturn, 2026-07-01 03:00 UTC, the 0.25° closer field** (`in-front-0.25.png`): Saturn placed.
+- **A moon behind Saturn, not drawn, 2026-07-01 16:00 UTC, the 0.25° closer field** (`behind-0.25.png`): Saturn placed.
+- **A moon in Saturn's shadow, 2026-07-01 14:00 UTC, the 0.25° closer field, black sky** (`in-shadow-0.25-dark.png`): Saturn placed.
+- **A moon partly in Saturn's shadow, 2026-08-06 07:00 UTC, 1° field** (`partly-in-shadow-1.png`): Saturn placed.

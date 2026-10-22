@@ -19,8 +19,17 @@ edge-on they are a line; the Cassini Division is a gap only on the arcs
 where it is a pixel across; when their unlit face is seen they are dimmed;
 below a drawn horizon the figure is dimmed and says so. Saturn joins
 Mercury, Venus and Jupiter as a body that offers the 0.5° and 0.25°
-closer fields. Exported sheets carry the same figure. Its moons are not
-drawn yet. In both languages.
+closer fields. Exported sheets carry the same figure. Its seven ruled
+moons - Mimas, Enceladus, Tethys, Dione, Rhea, Titan and Iapetus - are
+drawn with it under the same switch as 3-pixel symbols, each decided on
+its own against the drawn figure: behind Saturn omitted; at 1° and the
+closer fields every other moon at its own place; above 1° only where its
+mark stands clear of the figure and of every higher-priority moon, and in
+front only over a globe wide enough to hold it. A moon in front is a dot
+ringed in the page's ground over the figure; a moon in or partly in
+Saturn's shadow a hollow ring; each is spoken with the table's state. Their
+names are attempted one by one and refused where no clean place exists.
+The moons consume no click and are never selectable. In both languages.
 
 **Saturn's cartography measured (#578).** Before any Saturn ink, a study
 measures Saturn, its rings and the seven ruled moons on the atlas's own

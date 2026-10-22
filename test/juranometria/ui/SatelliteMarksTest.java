@@ -68,6 +68,34 @@ class SatelliteMarksTest {
     }
 
     @Test
+    void aRingedPrimaryIsMeasuredByItsFigureNotByADisc() {
+        // Saturn's rings 40 px across and 16 px high (#579, ruling 3 on
+        // #578): a moon 23 px out along the major axis is 3 px from the
+        // rings' edge, at the figure; the same distance along the minor
+        // axis is 15 px clear of it. In front needs the globe's width,
+        // not the rings'.
+        java.util.function.ToDoubleFunction<double[]> rings = offset -> {
+            double len = Math.hypot(offset[0], offset[1]);
+            double cos = offset[0] / len;
+            double sin = Math.abs(offset[1]) / len;
+            return 20.0 * 8.0 / Math.hypot(8.0 * cos, 20.0 * sin);
+        };
+        Satellite titan = new Satellite("saturn.titan", "Titan", new SkyPosition(0, 0), "saturn",
+                Relation.CLEAR, false, 0, 3.0, false, InkRole.BODY);
+        Satellite rhea = new Satellite("saturn.rhea", "Rhea", new SkyPosition(0, 0), "saturn",
+                Relation.CLEAR, false, 1, 3.0, false, InkRole.BODY);
+        assertEquals(List.of(AT_PRIMARY, DRAWN), SatelliteMarks.decide(false, 18.0, rings,
+                List.of(titan, rhea), List.of(new double[] {23, 0}, new double[] {0, 23})));
+        Satellite inFront = new Satellite("saturn.titan", "Titan", new SkyPosition(0, 0),
+                "saturn", Relation.IN_FRONT, false, 0, 3.0, false, InkRole.BODY);
+        assertEquals(List.of(IN_FRONT_UNRESOLVED), SatelliteMarks.decide(false, 11.0, rings,
+                List.of(inFront), List.<double[]>of(new double[] {1, 0})),
+                "a globe under 12 px cannot hold a mark, however wide the rings");
+        assertEquals(List.of(DRAWN), SatelliteMarks.decide(false, 12.0, rings,
+                List.of(inFront), List.<double[]>of(new double[] {1, 0})));
+    }
+
+    @Test
     void precedenceIsInFrontThenClearThenShadowedThenTheModulesOrder() {
         Satellite shadowed = moon("io", Relation.CLEAR, true, 2);
         Satellite clear = moon("europa", Relation.CLEAR, false, 3);

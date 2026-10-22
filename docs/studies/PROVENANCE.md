@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**765 promoted artifacts.**
+**774 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -669,21 +669,30 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/saturn-cartography/titan-elongation-1.png` | `d2acdd9584266d901a36dc6a39aee8d2d85f2b580d161307c5c5c1b5f27b2768` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/saturn-cartography/unlit-0.25.png` | `6caeb12d8ffc1be69f2e016bb90d1553106e76bf5197db3c51f618d6e992b68d` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/saturn-cartography/unlit-1.png` | `17855c67e51899b2e34d2cb5259ec8b7ea520e39eafde9532402b4bcb9c33566` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/saturn-on-the-chart/card-0.25-dark.png` | `4c0e74a5f8279fec7d4ca12dc41054653a45873dc45174f432d08e874f35dbe7` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/saturn-on-the-chart/card-0.5.png` | `b766a3f44f968718c5452edd97d06c5abe7292ea693c39ac993f1116e59d2d10` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/saturn-on-the-chart/card-1.png` | `5ea9397ea4c36923db3a6ee33e416bd8029449968070d7957662657ddc34a5e6` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/saturn-on-the-chart/card-3-dark.png` | `d27e4926e5ff0c9db5dc07e49aa9c0375c191fa0091197cc37c0954409f27b11` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-on-the-chart/behind-0.25.png` | `d61dc13deb45fe8a27ab05d2f826737fbd6dc60e8875f34022cccc1dd7d3de37` | 2026-10-22 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-on-the-chart/card-0.25-dark.png` | `63c4489266d4ffa698bdc7a4a14212d8f432020a292f8af3c6fcb3fd8aa72241` | 2026-10-22 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-on-the-chart/card-0.5.png` | `36f0ee9a311064dc603bb836e1d3d90aaa1997e173d422216e45817a9d514f10` | 2026-10-22 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-on-the-chart/card-1.png` | `5e79e7e669e6e93bf668eddccc0d8815f0a6fb10532bdda9d4345deeec1d28d2` | 2026-10-22 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-on-the-chart/card-3-dark.png` | `58e63fbdf06c82bfe322cec71a54ef4abc4fddfa45c02ee4fe1441fd9a5e1f6f` | 2026-10-22 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/saturn-on-the-chart/card-36.png` | `9db3eeef3ded619a404a51ff2bc961fb239039d34134c9729116de24217e9507` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/saturn-on-the-chart/card-8.png` | `b51de1c59648b0e01c9849985db19829ed48335fabe1cdebae3ab38f027b0bbf` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/saturn-on-the-chart/edge-on-0.25.png` | `cd5cf90efbc349367d1b8899141bdb0fda9f990fd9bfdd8c3e4a8347caa92f00` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-on-the-chart/card-8.png` | `bb455e20e12e5cda21736f12c10301ee508f6037ed14470a4f7db14d877d70e7` | 2026-10-22 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-on-the-chart/crowded-0.25-dark.png` | `a90c40fdbca0b3a1d81d1061fabb4aa50cb0aad1e809c3d258a0ff95167c3514` | 2026-10-22 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-on-the-chart/crowded-1.png` | `3939dcfd7892ead0db515c2734f97cd1c9875f38675898051534e4e7daa87627` | 2026-10-22 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-on-the-chart/edge-on-0.25.png` | `423e13331e97a2f7ae633c1495e0171e22bd589f863094e2c2221aa43ab22581` | 2026-10-22 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/saturn-on-the-chart/horizon-drawn-8.png` | `4bec604f3710979870863ea28fdb1f9f4a39d6844ad388752f5418d3017ddded` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/saturn-on-the-chart/horizon-hidden-8.png` | `a4dcedd45b4eb66c525fff6c7848e4177ee239256bc5c0b2e2af955eee782e0f` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/saturn-on-the-chart/open-north-0.25.png` | `6409fffd2f531527dbb9521252a8f273fd35bc99974830c49ffe5eb035f955ea` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/saturn-on-the-chart/open-north-1.png` | `f956af5057804aeea2f7dca4c761f987f085a0715b5eeb83f534234b8d47604b` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/saturn-on-the-chart/open-south-0.25-dark.png` | `fd691286cb7fd5566c096af0a1b4e701e49557b9bdec9f063fabc19caaac43f2` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/saturn-on-the-chart/sheet-a4-saturn.pdf` | `03ce1d34674991c2f2f727eafc9d1d2b597824d764a261d93e59103f129cb772` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/saturn-on-the-chart/sheet-a4-saturn.png` | `2443b1ea706c5d8edddd4be8e54139519a1b04da2841af73632d0485f096ba34` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/saturn-on-the-chart/unlit-0.25.png` | `0dc08fe4b4de0d134b4b239aae91b5d2602d00836e7129bd8cf83b0490dbb346` | 2026-10-21 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-on-the-chart/iapetus-farthest-3.png` | `3e87629139d197e8f8f2eb5005b1b5930c6000512d9fdacbb5e230869de1e512` | 2026-10-22 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-on-the-chart/in-front-0.25.png` | `2fba9bb876cca2dd5c7cf2d934d3cf591c2b8e9bd1347c078e610d2c558761be` | 2026-10-22 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-on-the-chart/in-front-1.png` | `75404c8df49d9d498f330126626774e7411b598173bf01e5abf3c08c0f47595b` | 2026-10-22 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-on-the-chart/in-shadow-0.25-dark.png` | `96532f153cea9111c8798e577cc2de236ca06bda2433a5ac15a0197341cfdffd` | 2026-10-22 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-on-the-chart/open-north-0.25.png` | `7590f6d718d2466e034048cbbdf92285a9e56a8712399533b466758e5378d2e6` | 2026-10-22 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-on-the-chart/open-north-1.png` | `0099c4c84d87db940c20b8e76989a5d7ef493bc2d8404603413e6862fc65b22c` | 2026-10-22 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-on-the-chart/open-south-0.25-dark.png` | `d8a86eac09ae3c63b44beb5ae115241ceb9443c009d3b07ebe5d2fba77401946` | 2026-10-22 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-on-the-chart/partly-in-shadow-1.png` | `604d569901c2e2b9f90d32afa752903ea449ae56a035ed0a6289cf7a194177f6` | 2026-10-22 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-on-the-chart/sheet-a4-saturn.pdf` | `c6a692f7133bd2fda91e21a604a8097d56fde2039878825ddb722a94e97867c5` | 2026-10-22 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-on-the-chart/sheet-a4-saturn.png` | `72e706812cd898a0de2ae57d457d6afddae13a2d700d9ec77e2901056e4b9c59` | 2026-10-22 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-on-the-chart/titan-elongation-1.png` | `b4c355ec50de75925d4b08aa0cac23e675b1f31c527b1566d4ac2c5c94a7a5df` | 2026-10-22 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/saturn-on-the-chart/unlit-0.25.png` | `cfed34361463f80a6ad2b164d917485281138ba2dca88af8edceee5a74d3f8b5` | 2026-10-22 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/sky-language/omissions.png` | `86676e3340c06d386c708708fbc446ad0ba5357e6a6c313c10f7ceb88c21fbec` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/sky-language/pair-north-pole-globe-180.png` | `554e6186b7a4eefc1c547dae95096d9607c89da2066d4e16eaed60c3284748ca` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/sky-language/pair-orion-120.png` | `875904baa600edd7df769190c984682a21ad431cfaec7f87f73393dbac3a823c` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |

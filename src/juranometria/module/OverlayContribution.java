@@ -574,8 +574,9 @@ public sealed interface OverlayContribution {
      */
     record Satellite(String identity, String accessibleName, SkyPosition at,
                      String primary, Relation relation, boolean shadowed,
-                     int precedence, double markPx, boolean belowHorizon,
-                     InkRole role, Moment moment, boolean selectable)
+                     boolean partlyShadowed, int precedence, double markPx,
+                     boolean belowHorizon, InkRole role, Moment moment,
+                     boolean selectable)
             implements OverlayContribution {
 
         /** Where a satellite stands against its primary's disc. */
@@ -588,13 +589,26 @@ public sealed interface OverlayContribution {
                          String primary, Relation relation, boolean shadowed,
                          int precedence, double markPx, boolean belowHorizon,
                          InkRole role) {
-            this(identity, accessibleName, at, primary, relation, shadowed, precedence,
-                    markPx, belowHorizon, role, null, false);
+            this(identity, accessibleName, at, primary, relation, shadowed, false,
+                    precedence, markPx, belowHorizon, role, null, false);
+        }
+
+        /** Wholly or partly in shadow alike (the Galilean moons, #485): no partly word. */
+        public Satellite(String identity, String accessibleName, SkyPosition at,
+                         String primary, Relation relation, boolean shadowed,
+                         int precedence, double markPx, boolean belowHorizon,
+                         InkRole role, Moment moment, boolean selectable) {
+            this(identity, accessibleName, at, primary, relation, shadowed, false,
+                    precedence, markPx, belowHorizon, role, moment, selectable);
         }
 
         public Satellite {
             requireIdentified(identity, accessibleName, role);
             requireMomentIfSelectable(identity, moment, selectable);
+            if (partlyShadowed && !shadowed) {
+                throw new IllegalArgumentException("a satellite partly in shadow is"
+                        + " a shadowed satellite: " + identity);
+            }
             if (at == null || primary == null || relation == null) {
                 throw new IllegalArgumentException("a satellite is somewhere, of"
                         + " something, in some relation to it: " + identity);
