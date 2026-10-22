@@ -347,7 +347,11 @@ asked:
   by one byte. At 5.3.0 (2→3) the second cell moved again, 104 pixels
   in each image, columns 222–232 of rows 33–47 - the wider glyph
   reaching one column further; every sheet PNG stayed pixel-identical
-  and each PDF and SVG differed by one byte.
+  and each PDF and SVG differed by one byte. At 5.4.0 (3→4) the same
+  second cell moved again, 125 pixels in each image, columns 222–232
+  of rows 33–47; every sheet PNG stayed pixel-identical, the Saturn
+  A4 sheet now among the seven, and each of the ten PDFs and SVGs
+  differed by one byte.
 - **The articles.** Their footer names the release, and
   `scripts/build-articles.py` reads it from `VERSION` when the site is
   built rather than carrying a number - so there is nothing to

@@ -7,6 +7,8 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [5.4.0] - 2026-10-22
+
 **Mercury, never far from the Sun (#580).** A new reader article, in
 English and Norwegian (*Merkur, aldri langt fra Solen*): what the atlas
 draws of Mercury as released in 5.3 - where its numbers come from and
