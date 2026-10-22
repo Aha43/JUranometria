@@ -2,6 +2,7 @@ package juranometria.ui;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.ToDoubleFunction;
 
 import juranometria.module.OverlayContribution;
 import juranometria.module.OverlayContribution.Satellite;
@@ -62,6 +63,23 @@ final class SatelliteMarks {
      */
     static List<Decision> decide(boolean atFloor, double primaryDrawnPx,
                                  List<Satellite> satellites, List<double[]> offsetsPx) {
+        return decide(atFloor, primaryDrawnPx, offset -> primaryDrawnPx / 2.0, satellites,
+                offsetsPx);
+    }
+
+    /**
+     * Each satellite's decision against a primary whose drawn figure is
+     * not a disc (#579, ruling 3 on #578: Saturn's globe-and-rings figure
+     * as the primary's extent).
+     *
+     * @param inFrontRoomPx the width that must hold a mark in front - the
+     *        globe's drawn equator for a ringed primary
+     * @param extentToward the figure's drawn extent from its centre toward
+     *        a page offset, in pixels
+     */
+    static List<Decision> decide(boolean atFloor, double inFrontRoomPx,
+                                 ToDoubleFunction<double[]> extentToward,
+                                 List<Satellite> satellites, List<double[]> offsetsPx) {
         Decision[] out = new Decision[satellites.size()];
         List<Integer> order = new ArrayList<>();
         for (int i = 0; i < satellites.size(); i++) {
@@ -81,9 +99,10 @@ final class SatelliteMarks {
             if (atFloor) {
                 out[i] = Decision.DRAWN;
             } else if (s.relation() == Satellite.Relation.IN_FRONT) {
-                out[i] = primaryDrawnPx >= IN_FRONT_ROOM_PX ? Decision.DRAWN
+                out[i] = inFrontRoomPx >= IN_FRONT_ROOM_PX ? Decision.DRAWN
                         : Decision.IN_FRONT_UNRESOLVED;
-            } else if (Math.hypot(at[0], at[1]) - primaryDrawnPx / 2.0 < DISTINCT_PX / 2.0 + r) {
+            } else if (Math.hypot(at[0], at[1]) - extentToward.applyAsDouble(at)
+                    < DISTINCT_PX / 2.0 + r) {
                 out[i] = Decision.AT_PRIMARY;
             } else {
                 out[i] = Decision.DRAWN;

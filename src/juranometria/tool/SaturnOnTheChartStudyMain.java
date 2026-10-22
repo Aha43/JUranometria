@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.swing.SwingUtilities;
 import juranometria.app.Atlas;
@@ -21,7 +22,10 @@ import juranometria.render.ChartPalette;
 import juranometria.saturnchart.SaturnModule;
 import juranometria.sky.Observer;
 import juranometria.solar.SaturnSystemService;
+import juranometria.solar.SaturnSystemService.Configuration;
+import juranometria.solar.SaturnSystemService.MoonPlace;
 import juranometria.solar.SaturnSystemService.SaturnObservation;
+import juranometria.solar.SaturnSystemService.VisibilityState;
 import juranometria.solarchart.SolarSystemModule;
 import juranometria.ui.ChartComponent;
 import juranometria.ui.ChartViewController;
@@ -83,16 +87,22 @@ public final class SaturnOnTheChartStudyMain {
         q("");
         p("# Saturn on the chart: production pages");
         p("");
-        p("Sprint 53, issue #579 - the figure, the first of #579's two pull requests under"
-                + " the owner's rulings on #578. Each page is the production `ChartComponent`"
-                + " over the bundled catalogue with the Saturn module attached and switched"
-                + " on: Saturn's globe and rings at their true size where the rings' major"
-                + " axis is at least the 6 px minimum, otherwise the 6 px cartographic"
-                + " symbol; the rings' far half behind the globe and the near half over it;"
-                + " a line when edge-on; dimmed when the unlit face is seen; dimmed below a"
-                + " drawn horizon. The closer fields are reached as the application reaches"
-                + " them, through the controller's zoom in at the floor. Regenerate with"
-                + " `make saturn-on-the-chart-study`.");
+        p("Sprint 53, issue #579 - the figure and the seven moons, #579's two pull requests"
+                + " under the owner's rulings on #578. Each page is the production"
+                + " `ChartComponent` over the bundled catalogue with the Saturn module attached"
+                + " and switched on: Saturn's globe and rings at their true size where the"
+                + " rings' major axis is at least the 6 px minimum, otherwise the 6 px"
+                + " cartographic symbol; the rings' far half behind the globe and the near half"
+                + " over it; a line when edge-on; dimmed when the unlit face is seen; dimmed"
+                + " below a drawn horizon. The seven ruled moons are 3 px symbols, each decided"
+                + " on its own against the drawn figure (ruling 3): behind Saturn omitted; at"
+                + " the normal minimum field and the closer fields every other moon drawn at"
+                + " its own J2000 place; above it only where its mark stands 6 px clear of the"
+                + " figure's drawn edge and of every higher-precedence moon, and in front only"
+                + " over a globe at least 12 px wide. Labels are attempted for every drawn moon"
+                + " and refused one by one. The closer fields are reached as the application"
+                + " reaches them, through the controller's zoom in at the floor. Regenerate"
+                + " with `make saturn-on-the-chart-study`.");
         p("");
         scales();
         // The card's instant, the ladder, then the closer fields.
@@ -132,6 +142,7 @@ public final class SaturnOnTheChartStudyMain {
                 OSLO.at(low), 8.0, ENGLISH, ChartPalette.WHITE_PAPER, true, 0);
         page("horizon-hidden-8", "The same page with the horizon hidden", OSLO.at(low), 8.0,
                 NORSK, ChartPalette.WHITE_PAPER, false, 0);
+        moons();
         sheet();
         System.out.print(REPORT);
         System.out.flush();
@@ -248,24 +259,61 @@ public final class SaturnOnTheChartStudyMain {
             PixelPoint expected = mapping.toPixel(page.projection()
                     .project(saturn.astrometricJ2000()).orElseThrow());
             java.awt.geom.Rectangle2D b = placed.disc().getBounds2D();
+            // The name's fate depends on this desktop's fonts: it is in the
+            // platform record, not in this deterministic report.
             p(String.format(Locale.ROOT, "Saturn drawn at (%.1f, %.1f), %.4f px off the service's"
-                    + " place; %s, its ink %.1f × %.1f px; its name %s%s.",
+                    + " place; %s, its ink %.1f × %.1f px%s.",
                     placed.centre().x(), placed.centre().y(),
                     Math.hypot(placed.centre().x() - expected.x(), placed.centre().y() - expected.y()),
                     placed.symbol() ? "the 6 px cartographic symbol" : "the true figure",
-                    b.getWidth(), b.getHeight(), placed.box() == null ? "refused" : "placed",
+                    b.getWidth(), b.getHeight(),
                     placed.belowHorizon() ? "; below the horizon, dimmed" : ""));
         } else {
             p("Saturn off the page: nothing drawn.");
         }
         p("");
+        Map<String, String> decided = ReferenceInk.satelliteDecisions(page,
+                chart.overlays().collect());
+        Configuration c = null;
+        try {
+            c = service.observeMoons(observer);
+        } catch (IllegalArgumentException outsideTheMoonsYears) {
+            p("No moons: outside the moons' years.");
+        }
+        String moonNames = "";
+        if (c != null) {
+            // What is drawn is the page's decision, deterministic; what is
+            // named depends on this desktop's fonts and goes to the
+            // platform record with Saturn's own name.
+            int drawnMoons = 0;
+            StringBuilder line = new StringBuilder();
+            StringBuilder names = new StringBuilder();
+            for (MoonPlace m : c.moons()) {
+                String id = SaturnModule.identityOf(m.moon());
+                ReferenceInk.BodyPlacement moon = find(drawn, id);
+                if (moon != null) {
+                    drawnMoons++;
+                    names.append(names.length() == 0 ? "" : ", ").append(SaturnModule.nameOf(m.moon()))
+                            .append(moon.box() == null ? " refused" : " placed");
+                }
+                line.append(line.length() == 0 ? "" : "; ").append(SaturnModule.nameOf(m.moon()))
+                        .append(' ').append(stateWords(m)).append(", ")
+                        .append(String.format(Locale.ROOT, "%.1f″", m.separationArcseconds()))
+                        .append(moon == null ? " - " + decided.getOrDefault(id, "?").toLowerCase(Locale.ROOT).replace('_', ' ')
+                                : " - drawn");
+            }
+            p(String.format(Locale.ROOT, "Moons: %d of 7 drawn. %s.", drawnMoons, line));
+            p("");
+            moonNames = names.length() == 0 ? "" : "; moon names: " + names;
+        }
         String said = chart.getAccessibleContext().getAccessibleDescription();
         int from = said.indexOf("Saturn");
         p("Spoken: " + (from < 0 ? "(Saturn not on the page)" : said.substring(from)));
         p("");
         q("- **" + title + "** (`" + name + ".png`): "
                 + (placed == null ? "Saturn off the page."
-                        : placed.name() + (placed.box() == null ? " refused." : " placed.")));
+                        : placed.name() + (placed.box() == null ? " refused" : " placed"))
+                + moonNames + ".");
     }
 
     /** What the figure is at each field of the ladder and the closer fields, at the card's instant. */
@@ -323,6 +371,185 @@ public final class SaturnOnTheChartStudyMain {
      * the bodies layer - and its symbol in the reference layer, beneath
      * the stars - exactly as an export from the screen carries them.
      */
+    private static String stateWords(MoonPlace m) {
+        return switch (m.state()) {
+            case CLEAR_OF_SATURN -> "clear";
+            case IN_FRONT_OF_SATURN -> "in front";
+            case BEHIND_SATURN -> "behind";
+            case BEHIND_SATURN_IN_ITS_SHADOW -> "behind, in shadow";
+            case IN_SATURNS_SHADOW -> "in shadow";
+            case PARTLY_IN_SATURNS_SHADOW -> "partly in shadow";
+        };
+    }
+
+    /** The first hour at Oslo from July 2026 with a moon in the state, found rather than typed. */
+    private static Instant firstWith(VisibilityState state) {
+        for (Instant t = Instant.parse("2026-07-01T00:00:00Z");
+                t.isBefore(Instant.parse("2027-01-01T00:00:00Z")); t = t.plusSeconds(3600)) {
+            for (MoonPlace m : service.observeMoons(OSLO.at(t)).moons()) {
+                if (m.state() == state) {
+                    return t;
+                }
+            }
+        }
+        throw new IllegalStateException("no 2026 hour at Oslo with a moon " + state);
+    }
+
+    /** The 2026 day at Oslo with Iapetus farthest from Saturn. */
+    private static Instant iapetusFarthest() {
+        Instant best = null;
+        double most = 0;
+        for (Instant t = Instant.parse("2026-01-01T00:00:00Z");
+                t.isBefore(Instant.parse("2027-01-01T00:00:00Z")); t = t.plusSeconds(86400)) {
+            double sep = service.observeMoons(OSLO.at(t)).moon(SaturnSystemService.Moon.IAPETUS)
+                    .separationArcseconds();
+            if (sep > most) {
+                most = sep;
+                best = t;
+            }
+        }
+        return best;
+    }
+
+    /** The 2026 six-hourly configuration at Oslo with all seven moons clear and the closest pair nearest. */
+    private static Instant crowded() {
+        Instant best = null;
+        double least = Double.MAX_VALUE;
+        for (Instant t = Instant.parse("2026-01-01T00:00:00Z");
+                t.isBefore(Instant.parse("2027-01-01T00:00:00Z")); t = t.plusSeconds(6 * 3600)) {
+            Configuration c = service.observeMoons(OSLO.at(t));
+            if (c.moons().stream().anyMatch(m -> m.state() != VisibilityState.CLEAR_OF_SATURN)) {
+                continue;
+            }
+            for (int a = 0; a < c.moons().size(); a++) {
+                for (int b = a + 1; b < c.moons().size(); b++) {
+                    MoonPlace ma = c.moons().get(a);
+                    MoonPlace mb = c.moons().get(b);
+                    double d = Math.hypot(ma.xArcseconds() - mb.xArcseconds(),
+                            ma.yArcseconds() - mb.yArcseconds());
+                    if (d < least) {
+                        least = d;
+                        best = t;
+                    }
+                }
+            }
+        }
+        return best;
+    }
+
+    /**
+     * The moons: the decision ladder at the card's instant, the named
+     * configurations of the #578 study drawn by the production page, and
+     * the labels' fortunes over 2026.
+     */
+    private static void moons() throws Exception {
+        p("## The moons");
+        p("");
+        p("Each moon decided on its own by the page against the drawn figure (ruling 3 on"
+                + " #578): the rings' ellipse where the figure is true, the 6 px mark otherwise,"
+                + " and the globe's width for a moon in front. At the card's instant, by field:");
+        p("");
+        p("| field | drawn | at Saturn | collides | in front unresolved | behind |");
+        p("|---|---|---|---|---|---|");
+        Configuration card = service.observeMoons(OSLO.at(CARD));
+        for (double field : new double[] {36.0, 12.0, 8.0, 3.0, 2.0, 1.0}) {
+            juranometria.module.OverlayRegistry registry = new juranometria.module.OverlayRegistry();
+            Observer at = OSLO.at(CARD);
+            SaturnModule module = new SaturnModule(() -> at, () -> service, () -> false);
+            module.showing(true);
+            registry.offer(SaturnModule.ID, module::contributedGeometry);
+            juranometria.chart.ChartScene scene = Atlas.assembler().assemble(
+                    new ChartViewState(card.saturn().astrometricJ2000(), field, 8.0, null, null),
+                    900, 700);
+            Map<String, String> decided = ReferenceInk.satelliteDecisions(DrawnPage.of(scene),
+                    registry.collect());
+            int[] n = new int[5];
+            for (String d : decided.values()) {
+                switch (d) {
+                    case "DRAWN" -> n[0]++;
+                    case "AT_PRIMARY" -> n[1]++;
+                    case "COLLIDES" -> n[2]++;
+                    case "IN_FRONT_UNRESOLVED" -> n[3]++;
+                    case "BEHIND" -> n[4]++;
+                    default -> { }
+                }
+            }
+            p(String.format(Locale.ROOT, "| %s° | %d | %d | %d | %d | %d |", trim(field), n[0], n[1],
+                    n[2], n[3], n[4]));
+        }
+        p("");
+        Instant titan = Instant.parse("2026-08-01T18:00:00Z");
+        page("titan-elongation-1", "Titan at greatest elongation (the handover's named case), "
+                + when(titan) + ", 1° field", OSLO.at(titan), 1.0, ENGLISH,
+                ChartPalette.WHITE_PAPER, false, 0);
+        Instant iapetus = iapetusFarthest();
+        page("iapetus-farthest-3", "Iapetus at its farthest 2026 day, " + when(iapetus)
+                + ", 3° field", OSLO.at(iapetus), 3.0, ENGLISH, ChartPalette.WHITE_PAPER, false, 0);
+        Instant crowd = crowded();
+        page("crowded-1", "The most crowded 2026 configuration with all seven moons clear, "
+                + when(crowd) + ", 1° field", OSLO.at(crowd), 1.0, ENGLISH,
+                ChartPalette.WHITE_PAPER, false, 0);
+        page("crowded-0.25-dark", "The most crowded 2026 configuration, " + when(crowd)
+                + ", the 0.25° closer field, black sky", OSLO.at(crowd), 1.0, NORSK,
+                ChartPalette.BLACK_SKY, false, 2);
+        Instant front = firstWith(VisibilityState.IN_FRONT_OF_SATURN);
+        page("in-front-1", "A moon in front of Saturn, " + when(front) + ", 1° field",
+                OSLO.at(front), 1.0, ENGLISH, ChartPalette.WHITE_PAPER, false, 0);
+        page("in-front-0.25", "A moon in front of Saturn, " + when(front)
+                + ", the 0.25° closer field", OSLO.at(front), 1.0, NORSK,
+                ChartPalette.WHITE_PAPER, false, 2);
+        Instant behind = firstWith(VisibilityState.BEHIND_SATURN);
+        page("behind-0.25", "A moon behind Saturn, not drawn, " + when(behind)
+                + ", the 0.25° closer field", OSLO.at(behind), 1.0, ENGLISH,
+                ChartPalette.WHITE_PAPER, false, 2);
+        Instant shadow = firstWith(VisibilityState.IN_SATURNS_SHADOW);
+        page("in-shadow-0.25-dark", "A moon in Saturn's shadow, " + when(shadow)
+                + ", the 0.25° closer field, black sky", OSLO.at(shadow), 1.0, ENGLISH,
+                ChartPalette.BLACK_SKY, false, 2);
+        Instant partly = firstWith(VisibilityState.PARTLY_IN_SATURNS_SHADOW);
+        page("partly-in-shadow-1", "A moon partly in Saturn's shadow, " + when(partly)
+                + ", 1° field", OSLO.at(partly), 1.0, NORSK, ChartPalette.WHITE_PAPER, false, 0);
+        // The labels' fortunes over 2026, weekly at the normal minimum field.
+        int placedNames = 0;
+        int refusedNames = 0;
+        int configurations = 0;
+        int allRefused = 0;
+        for (Instant t = Instant.parse("2026-01-01T00:00:00Z");
+                t.isBefore(Instant.parse("2027-01-01T00:00:00Z")); t = t.plusSeconds(7 * 86400)) {
+            Observer at = OSLO.at(t);
+            juranometria.module.OverlayRegistry registry = new juranometria.module.OverlayRegistry();
+            SaturnModule module = new SaturnModule(() -> at, () -> service, () -> false);
+            module.showing(true);
+            registry.offer(SaturnModule.ID, module::contributedGeometry);
+            juranometria.chart.ChartScene scene = Atlas.assembler().assemble(
+                    new ChartViewState(service.observeSaturn(at).astrometricJ2000(),
+                            ChartViewState.normalMinimumFieldDegrees(), 8.0, null, null), 900, 700);
+            int here = 0;
+            int named = 0;
+            for (ReferenceInk.BodyPlacement b : ReferenceInk.bodyPlacements(DrawnPage.of(scene),
+                    registry.collect(), ChartPalette.WHITE_PAPER, ENGLISH, List.of())) {
+                if (b.identity().equals(SaturnModule.SATURN)) {
+                    continue;
+                }
+                here++;
+                named += b.box() == null ? 0 : 1;
+            }
+            placedNames += named;
+            refusedNames += here - named;
+            configurations++;
+            allRefused += here > 0 && named == 0 ? 1 : 0;
+        }
+        p("The moons' names are attempted for every drawn moon and refused one by one, a"
+                + " refused label never blocking another (ruling 3 on #578); which names this"
+                + " desktop's fonts place is in `platform.md`, with the count over 2026.");
+        p("");
+        q("");
+        q(String.format(Locale.ROOT, "**Moon labels over 2026** (weekly at Oslo, %d configurations"
+                + " at the normal minimum field, on this desktop's fonts): %d moon names placed"
+                + " and %d refused one by one; %d configurations lost every moon name.",
+                configurations, placedNames, refusedNames, allRefused));
+    }
+
     public static juranometria.sheet.SheetRecording saturnSheet(SaturnSystemService saturnSystem) {
         Observer at = OSLO.at(CARD);
         juranometria.module.OverlayRegistry registry = new juranometria.module.OverlayRegistry();

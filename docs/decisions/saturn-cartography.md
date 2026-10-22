@@ -299,6 +299,32 @@ closer-field eligibility. The moons follow in the second.
   pixel across; the study's 900 px pages never reach a pixel and did not
   move; `SaturnInkTest` holds the gap open at the ansae and closed on the
   minor axis at 1.9 px by 0.95 px, and open all round at 3.8 px by 1.9 px.
+- **Ruling 3: the moons (#579, the second pull request).** The module
+  offers the seven ruled moons as `Satellite`s of `saturn` after the
+  figure, where they have numbers (2000-2100; before that Saturn alone):
+  each at its own astrometric J2000 place with the table's disc and shadow
+  states, partly in shadow kept, in the ruled precedence (in front, clear,
+  shadowed; then Titan, Rhea, Iapetus, Dione, Tethys, Enceladus, Mimas),
+  Jupiter's 3 px mark. The page decides each moon on its own with
+  `SatelliteMarks.decide` against the drawn figure's extent toward the
+  moon - `RingedMark.extentToward`: the rings' outer ellipse (a 1 px line
+  when edge-on) or the globe, whichever reaches farther, the 6 px mark
+  while the symbol stands in - and a moon in front needs the globe's
+  drawn equator to be 12 px, never the rings' width. A moon in front of
+  the figure, or touching it, is painted with the figure over it; every
+  other drawn moon beneath the stars, as Jupiter's. Labels are attempted
+  for every drawn moon through the production placement and refused one
+  by one; a refused label never blocks another (`SaturnMoonsInkTest`,
+  weekly over 2026). `docs/studies/saturn-on-the-chart`, "The moons",
+  carries the decision ladder at the card's instant, the #578 study's
+  named configurations drawn by the production page, and the labels'
+  fortunes over 2026.
+- **Ruling 4 as built.** Vocabulary A through the shared satellite ink:
+  clear a filled dot, in front a dot ringed in the ground, shadowed a
+  hollow ring, behind not drawn; no ring-obscuration state. Spoken with
+  the table's words: `page.body.state.saturn.inFront`, `.shadowed` and
+  `.partlyShadowed`, and each moon's name with its symbol note
+  (`page.body.saturn.<moon>`, the names identical in both languages).
 - **Ruling 5: identity and words.** `saturn`, named from
   `page.body.saturn` with its symbol note in both languages; Centre on
   chart lands at the chart's normal minimum field, through #483's seam

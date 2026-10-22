@@ -56,7 +56,7 @@ class SaturnModuleTest {
         SaturnModule module = new SaturnModule(() -> OSLO, () -> service, () -> false);
         module.showing(true);
         List<OverlayContribution> offered = module.contributedGeometry();
-        assertEquals(1, offered.size(), "Saturn alone in this pull request: the moons follow");
+        assertEquals(8, offered.size(), "Saturn first, then the seven ruled moons");
         OverlayContribution.RingedBody saturn = (OverlayContribution.RingedBody) offered.get(0);
         SaturnObservation s = service.observeSaturn(OSLO);
         assertEquals(SaturnModule.SATURN, saturn.identity());
@@ -74,6 +74,49 @@ class SaturnModuleTest {
         assertFalse(saturn.belowHorizon());
         assertTrue(saturn.selectable(), "a selectable occurrence (#513)");
         assertEquals(OSLO.instant(), saturn.moment().instant());
+    }
+
+    @Test
+    void theSevenMoonsAreOfferedAsSatellitesOfSaturnWithTheTablesStates() {
+        SaturnModule module = new SaturnModule(() -> OSLO, () -> service, () -> false);
+        module.showing(true);
+        List<OverlayContribution> offered = module.contributedGeometry();
+        SaturnSystemService.Configuration c = service.observeMoons(OSLO);
+        for (int i = 0; i < 7; i++) {
+            OverlayContribution.Satellite s = (OverlayContribution.Satellite) offered.get(1 + i);
+            SaturnSystemService.MoonPlace m = c.moons().get(i);
+            assertEquals(SaturnModule.identityOf(m.moon()), s.identity(),
+                    "the ruled order, saturn.<moon>");
+            assertEquals(SaturnModule.nameOf(m.moon()), s.accessibleName());
+            assertEquals(SaturnModule.SATURN, s.primary(), "Saturn's satellite");
+            assertEquals(m.astrometricJ2000(), s.at(), "its own J2000 place, never the X/Y offsets");
+            assertEquals(m.discRelation().name(), s.relation().name(), "the table's disc state");
+            assertEquals(m.shadowRelation() != SaturnSystemService.ShadowRelation.SUNLIT,
+                    s.shadowed());
+            assertEquals(m.shadowRelation() == SaturnSystemService.ShadowRelation.PARTLY_IN_SHADOW,
+                    s.partlyShadowed(), "partly in shadow kept for the page's words");
+            assertEquals(SaturnModule.PRECEDENCE.indexOf(m.moon()), s.precedence());
+            assertEquals(3.0, s.markPx(), "Jupiter's 3 px symbol (ruling 3 on #578)");
+            assertFalse(s.selectable(), "not selectable (ruling 5 on #578)");
+            assertEquals(OSLO.instant(), s.moment().instant());
+        }
+        assertEquals("saturn.mimas", SaturnModule.identityOf(SaturnSystemService.Moon.MIMAS));
+        assertEquals("saturn.iapetus", SaturnModule.identityOf(SaturnSystemService.Moon.IAPETUS));
+        assertEquals(List.of(SaturnSystemService.Moon.TITAN, SaturnSystemService.Moon.RHEA,
+                SaturnSystemService.Moon.IAPETUS, SaturnSystemService.Moon.DIONE,
+                SaturnSystemService.Moon.TETHYS, SaturnSystemService.Moon.ENCELADUS,
+                SaturnSystemService.Moon.MIMAS), SaturnModule.PRECEDENCE,
+                "the larger moon keeps its mark");
+    }
+
+    @Test
+    void beforeTheMoonsYearsSaturnIsOfferedAlone() {
+        SaturnModule module = new SaturnModule(
+                () -> OSLO.at(Instant.parse("1950-06-01T00:00:00Z")), () -> service, () -> false);
+        module.showing(true);
+        List<OverlayContribution> offered = module.contributedGeometry();
+        assertEquals(1, offered.size(), "1950: Saturn drawn, the moons have no numbers");
+        assertTrue(offered.get(0) instanceof OverlayContribution.RingedBody);
     }
 
     @Test

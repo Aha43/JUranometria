@@ -40,8 +40,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * then drawn where the service puts it and spoken - as a cartographic
  * symbol at ordinary fields, as Saturn itself at the normal minimum
  * field; a click through the symbol is not consumed, a click on the
- * figure is; the switch remembered and restored with its View item,
- * directly after Jupiter's, in both languages.
+ * figure is; the seven moons with it under the same switch, symbols that
+ * consume no click and are never selectable; the switch remembered and
+ * restored with its View item, directly after Jupiter's, in both
+ * languages.
  */
 class SaturnOnTheChartJourneyTest {
 
@@ -116,7 +118,7 @@ class SaturnOnTheChartJourneyTest {
         SwingUtilities.invokeAndWait(() -> module.showing(true));
         paint();
         List<ReferenceInk.BodyPlacement> drawn = chart.renderedBodies();
-        assertEquals(1, drawn.size(), "Saturn alone; its moons follow in the second pull request");
+        assertFalse(drawn.isEmpty(), "Saturn drawn");
         ReferenceInk.BodyPlacement placed = drawn.get(0);
         assertEquals(SaturnModule.SATURN, placed.identity());
         SaturnObservation saturn = service.observeSaturn(OSLO);
@@ -150,6 +152,41 @@ class SaturnOnTheChartJourneyTest {
         assertEquals(SaturnModule.SATURN, chart.selectableBodyAt(placed.centre().x(),
                 placed.centre().y()).orElseThrow().identity(),
                 "and the figure is pointed at as Saturn's occurrence (#513)");
+    }
+
+    @Test
+    void theMoonsAreDrawnWithSaturnAsSymbolsThatConsumeNoClickAndAreNotSelectable()
+            throws Exception {
+        build(ChartViewState.normalMinimumFieldDegrees());
+        SwingUtilities.invokeAndWait(() -> module.showing(true));
+        paint();
+        List<ReferenceInk.BodyPlacement> drawn = chart.renderedBodies();
+        juranometria.solar.SaturnSystemService.Configuration c = service.observeMoons(OSLO);
+        int moons = 0;
+        for (juranometria.solar.SaturnSystemService.MoonPlace m : c.moons()) {
+            ReferenceInk.BodyPlacement p = drawn.stream()
+                    .filter(b -> b.identity().equals(SaturnModule.identityOf(m.moon())))
+                    .findFirst().orElse(null);
+            if (m.discRelation() == juranometria.solar.SaturnSystemService.DiscRelation.BEHIND) {
+                assertTrue(p == null, m.moon() + " behind Saturn is not drawn");
+                continue;
+            }
+            assertNotNull(p, m.moon() + " drawn at the normal minimum field");
+            assertTrue(p.symbol(), "a 3 px symbol");
+            assertTrue(chart.bodyAt(p.centre().x(), p.centre().y()).isEmpty()
+                    || chart.bodyAt(p.centre().x(), p.centre().y()).get().identity()
+                            .equals(SaturnModule.SATURN),
+                    "a click through the symbol is consumed only by the figure beneath it");
+            assertTrue(chart.selectableBodyAt(p.centre().x(), p.centre().y())
+                    .map(b -> !b.identity().equals(p.identity())).orElse(true),
+                    "the moon itself is never the selectable occurrence (ruling 5)");
+            moons++;
+        }
+        assertTrue(moons >= 5, "most moons drawn: " + moons);
+        String said = chart.getAccessibleContext().getAccessibleDescription();
+        assertTrue(said.contains("(a cartographic symbol, not Titan's apparent diameter)")
+                || c.moon(juranometria.solar.SaturnSystemService.Moon.TITAN).discRelation()
+                        == juranometria.solar.SaturnSystemService.DiscRelation.BEHIND, said);
     }
 
     @Test
