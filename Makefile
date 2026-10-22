@@ -997,7 +997,8 @@ star-identity-density-study: classes
 
 chart-instant-furniture: classes
 	mkdir -p docs/studies/chart-instant-furniture
-	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.ChartInstantFurnitureMain \
+	$(JAVA) -Djava.awt.headless=true -cp "$(CLASSES_DIR):$(LIB_DIR)/*" \
+		juranometria.tool.ChartInstantFurnitureMain \
 		> docs/studies/chart-instant-furniture/measurements.md
 	@echo "written to docs/studies/chart-instant-furniture/measurements.md"
 

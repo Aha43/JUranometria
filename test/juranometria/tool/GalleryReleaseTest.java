@@ -64,12 +64,23 @@ class GalleryReleaseTest {
             Path.of("docs/studies/chart-sheet");
 
     /**
-     * Every study that commits exported sheets: the chart-sheet study, and
-     * the Jovian study's A4 sheet (#486), which carries the producer line
-     * like any other and was not named here until 5.1.0 (#495).
+     * Every study that commits exported sheets: the chart-sheet study; the
+     * Jovian study's A4 sheet (#486), which carries the producer line like
+     * any other and was not named here until 5.1.0 (#495); the closer-field
+     * sheets (#544) and the Saturn A4 sheet (#579); and the chart-instant
+     * furniture sheet (#259), which carried 5.3.0 into the 5.4.0 release
+     * preparation unnoticed because this list did not name its study -
+     * the canonical evidence contract caught it, this test did not.
      */
     private static final List<Path> SHEET_STUDIES = List.of(SHEETS,
-            Path.of("docs/studies/jupiter-on-the-chart"));
+            Path.of("docs/studies/jupiter-on-the-chart"),
+            Path.of("docs/studies/closer-fields"),
+            Path.of("docs/studies/saturn-on-the-chart"),
+            Path.of("docs/studies/chart-instant-furniture"));
+
+    /** Exported sheets named otherwise than {@code sheet-*}: the Mercury printable (#539). */
+    private static final List<Path> NAMED_SHEETS = List.of(
+            Path.of("docs/studies/mercury-cartography/printable-a4-1.png"));
 
     /** The page-language study's committed companion. */
     private static final Path PAGE_LANGUAGE = Path.of(
@@ -220,9 +231,12 @@ class GalleryReleaseTest {
                 }).sorted().forEach(sheets::add);
             }
         }
-        assertTrue(sheets.size() >= 12, "the studies' sheets are all found: " + sheets);
+        sheets.addAll(NAMED_SHEETS);
+        assertTrue(sheets.size() >= 18, "the studies' sheets are all found: " + sheets);
         assertTrue(sheets.contains(Path.of("docs/studies/jupiter-on-the-chart/sheet-a4-jovian.pdf")),
                 "the Jovian sheet is among them");
+        assertTrue(sheets.contains(Path.of("docs/studies/chart-instant-furniture/sheet-a4.png")),
+                "and the chart-instant furniture sheet");
 
         List<String> current = new ArrayList<>();
         List<String> stale = new ArrayList<>();
@@ -242,8 +256,12 @@ class GalleryReleaseTest {
         assertEquals(List.of(), current,
                 "every committed chart sheet names the release it was"
                         + " drawn at. Regenerate them with"
-                        + " `make chart-sheet-study` and"
-                        + " `make jupiter-on-the-chart-study`, then"
+                        + " `make chart-sheet-study`,"
+                        + " `make jupiter-on-the-chart-study`,"
+                        + " `make saturn-on-the-chart-study`,"
+                        + " `make closer-fields-study`,"
+                        + " `make mercury-cartography-study` and"
+                        + " `make chart-instant-furniture`, then"
                         + " `make evidence-provenance`, after changing"
                         + " VERSION");
         assertEquals(List.of(), stale,

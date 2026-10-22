@@ -135,7 +135,7 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/chart-instant-furniture/narrow-key-lines-8.png` | `3bab3a5c075a313ea680df68a7ffac80c65a00c5e21da9c0c82d91e506641c26` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/chart-instant-furniture/narrow-lines-8.png` | `fae4bb608eea7218a58bc8d0fd3ea1d5946180e81c6b4f1e09a8d762617cfde0` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/chart-instant-furniture/polar-lines-8.png` | `2f56bbc4696394b2ff3f85827fd2d00c4b6d91273e71fdd78e9e79b55bd7c293` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/chart-instant-furniture/sheet-a4.png` | `afb0829f58d815e3f09f293c06ec3cf5b9fd3f6ddf53fcc099a8f5c8985de530` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/chart-instant-furniture/sheet-a4.png` | `6be78e8edda74caaf5c9573f5ce121630632c044fc3c195f27c34000f9bd2ab3` | 2026-10-22 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/chart-instant-furniture/sparse-lines-8-dark.png` | `fe19df7fa6ceb76e94d255935f1fdfcdae419611450436a8d03a5827d323da97` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/chart-instant-furniture/sparse-lines-8-nb.png` | `b23b89c0f7256a5a04199026da42a52dce71c5e822f5986297e46563e372048f` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/chart-instant-furniture/sparse-lines-8.png` | `b056afff6b06aaeae408756b65393774aa420bc37890f4a816173f613fb88a79` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
