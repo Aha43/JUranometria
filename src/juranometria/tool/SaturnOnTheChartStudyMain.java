@@ -259,12 +259,14 @@ public final class SaturnOnTheChartStudyMain {
             PixelPoint expected = mapping.toPixel(page.projection()
                     .project(saturn.astrometricJ2000()).orElseThrow());
             java.awt.geom.Rectangle2D b = placed.disc().getBounds2D();
+            // The name's fate depends on this desktop's fonts: it is in the
+            // platform record, not in this deterministic report.
             p(String.format(Locale.ROOT, "Saturn drawn at (%.1f, %.1f), %.4f px off the service's"
-                    + " place; %s, its ink %.1f × %.1f px; its name %s%s.",
+                    + " place; %s, its ink %.1f × %.1f px%s.",
                     placed.centre().x(), placed.centre().y(),
                     Math.hypot(placed.centre().x() - expected.x(), placed.centre().y() - expected.y()),
                     placed.symbol() ? "the 6 px cartographic symbol" : "the true figure",
-                    b.getWidth(), b.getHeight(), placed.box() == null ? "refused" : "placed",
+                    b.getWidth(), b.getHeight(),
                     placed.belowHorizon() ? "; below the horizon, dimmed" : ""));
         } else {
             p("Saturn off the page: nothing drawn.");
@@ -278,26 +280,31 @@ public final class SaturnOnTheChartStudyMain {
         } catch (IllegalArgumentException outsideTheMoonsYears) {
             p("No moons: outside the moons' years.");
         }
+        String moonNames = "";
         if (c != null) {
+            // What is drawn is the page's decision, deterministic; what is
+            // named depends on this desktop's fonts and goes to the
+            // platform record with Saturn's own name.
             int drawnMoons = 0;
-            int namedMoons = 0;
             StringBuilder line = new StringBuilder();
+            StringBuilder names = new StringBuilder();
             for (MoonPlace m : c.moons()) {
                 String id = SaturnModule.identityOf(m.moon());
                 ReferenceInk.BodyPlacement moon = find(drawn, id);
                 if (moon != null) {
                     drawnMoons++;
-                    namedMoons += moon.box() == null ? 0 : 1;
+                    names.append(names.length() == 0 ? "" : ", ").append(SaturnModule.nameOf(m.moon()))
+                            .append(moon.box() == null ? " refused" : " placed");
                 }
                 line.append(line.length() == 0 ? "" : "; ").append(SaturnModule.nameOf(m.moon()))
                         .append(' ').append(stateWords(m)).append(", ")
                         .append(String.format(Locale.ROOT, "%.1f″", m.separationArcseconds()))
                         .append(moon == null ? " - " + decided.getOrDefault(id, "?").toLowerCase(Locale.ROOT).replace('_', ' ')
-                                : " - drawn" + (moon.box() == null ? ", name refused" : ", named"));
+                                : " - drawn");
             }
-            p(String.format(Locale.ROOT, "Moons: %d of 7 drawn, %d named. %s.", drawnMoons,
-                    namedMoons, line));
+            p(String.format(Locale.ROOT, "Moons: %d of 7 drawn. %s.", drawnMoons, line));
             p("");
+            moonNames = names.length() == 0 ? "" : "; moon names: " + names;
         }
         String said = chart.getAccessibleContext().getAccessibleDescription();
         int from = said.indexOf("Saturn");
@@ -305,7 +312,8 @@ public final class SaturnOnTheChartStudyMain {
         p("");
         q("- **" + title + "** (`" + name + ".png`): "
                 + (placed == null ? "Saturn off the page."
-                        : placed.name() + (placed.box() == null ? " refused." : " placed.")));
+                        : placed.name() + (placed.box() == null ? " refused" : " placed"))
+                + moonNames + ".");
     }
 
     /** What the figure is at each field of the ladder and the closer fields, at the card's instant. */
@@ -531,12 +539,15 @@ public final class SaturnOnTheChartStudyMain {
             configurations++;
             allRefused += here > 0 && named == 0 ? 1 : 0;
         }
-        p(String.format(Locale.ROOT, "**Labels over 2026** (weekly at Oslo, %d configurations at"
-                + " the normal minimum field, on this desktop's fonts): %d moon names placed and"
-                + " %d refused one by one; %d configurations lost every moon name. A refused"
-                + " label never blocks another (ruling 3 on #578).", configurations, placedNames,
-                refusedNames, allRefused));
+        p("The moons' names are attempted for every drawn moon and refused one by one, a"
+                + " refused label never blocking another (ruling 3 on #578); which names this"
+                + " desktop's fonts place is in `platform.md`, with the count over 2026.");
         p("");
+        q("");
+        q(String.format(Locale.ROOT, "**Moon labels over 2026** (weekly at Oslo, %d configurations"
+                + " at the normal minimum field, on this desktop's fonts): %d moon names placed"
+                + " and %d refused one by one; %d configurations lost every moon name.",
+                configurations, placedNames, refusedNames, allRefused));
     }
 
     public static juranometria.sheet.SheetRecording saturnSheet(SaturnSystemService saturnSystem) {

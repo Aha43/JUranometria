@@ -26,9 +26,9 @@ On the 900 × 700 page at the card's instant: the mark the page draws, and the d
 
 White paper, Norwegian; the page's field 36°. B = -7.43° (south face), B′ = -7.71°; Saturn 31.2° above the horizon.
 
-Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the 6 px cartographic symbol, its ink 6.0 × 6.0 px; its name placed.
+Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the 6 px cartographic symbol, its ink 6.0 × 6.0 px.
 
-Moons: 0 of 7 drawn, 0 named. Mimas clear, 30.5″ - at primary; Enceladus clear, 24.8″ - at primary; Tethys behind, in shadow, 8.1″ - behind; Dione clear, 59.2″ - at primary; Rhea clear, 32.7″ - at primary; Titan clear, 196.4″ - at primary; Iapetus clear, 577.7″ - at primary.
+Moons: 0 of 7 drawn. Mimas clear, 30.5″ - at primary; Enceladus clear, 24.8″ - at primary; Tethys behind, in shadow, 8.1″ - behind; Dione clear, 59.2″ - at primary; Rhea clear, 32.7″ - at primary; Titan clear, 196.4″ - at primary; Iapetus clear, 577.7″ - at primary.
 
 Spoken: Saturn (et kartografisk symbol, ikke Saturns tilsynelatende diameter).
 
@@ -38,9 +38,9 @@ Spoken: Saturn (et kartografisk symbol, ikke Saturns tilsynelatende diameter).
 
 White paper, English; the page's field 8°. B = -7.43° (south face), B′ = -7.71°; Saturn 31.2° above the horizon.
 
-Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the 6 px cartographic symbol, its ink 6.0 × 6.0 px; its name placed.
+Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the 6 px cartographic symbol, its ink 6.0 × 6.0 px.
 
-Moons: 1 of 7 drawn, 1 named. Mimas clear, 30.5″ - at primary; Enceladus clear, 24.8″ - at primary; Tethys behind, in shadow, 8.1″ - behind; Dione clear, 59.2″ - at primary; Rhea clear, 32.7″ - at primary; Titan clear, 196.4″ - at primary; Iapetus clear, 577.7″ - drawn, named.
+Moons: 1 of 7 drawn. Mimas clear, 30.5″ - at primary; Enceladus clear, 24.8″ - at primary; Tethys behind, in shadow, 8.1″ - behind; Dione clear, 59.2″ - at primary; Rhea clear, 32.7″ - at primary; Titan clear, 196.4″ - at primary; Iapetus clear, 577.7″ - drawn.
 
 Spoken: Saturn (a cartographic symbol, not Saturn's apparent diameter). Iapetus (a cartographic symbol, not Iapetus's apparent diameter).
 
@@ -50,9 +50,9 @@ Spoken: Saturn (a cartographic symbol, not Saturn's apparent diameter). Iapetus 
 
 Black sky, English; the page's field 3°. B = -7.43° (south face), B′ = -7.71°; Saturn 31.2° above the horizon.
 
-Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the 6 px cartographic symbol, its ink 6.0 × 6.0 px; its name placed.
+Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the 6 px cartographic symbol, its ink 6.0 × 6.0 px.
 
-Moons: 2 of 7 drawn, 2 named. Mimas clear, 30.5″ - at primary; Enceladus clear, 24.8″ - at primary; Tethys behind, in shadow, 8.1″ - behind; Dione clear, 59.2″ - at primary; Rhea clear, 32.7″ - at primary; Titan clear, 196.4″ - drawn, named; Iapetus clear, 577.7″ - drawn, named.
+Moons: 2 of 7 drawn. Mimas clear, 30.5″ - at primary; Enceladus clear, 24.8″ - at primary; Tethys behind, in shadow, 8.1″ - behind; Dione clear, 59.2″ - at primary; Rhea clear, 32.7″ - at primary; Titan clear, 196.4″ - drawn; Iapetus clear, 577.7″ - drawn.
 
 Spoken: Saturn (a cartographic symbol, not Saturn's apparent diameter). Iapetus (a cartographic symbol, not Iapetus's apparent diameter). Titan (a cartographic symbol, not Titan's apparent diameter).
 
@@ -62,9 +62,9 @@ Spoken: Saturn (a cartographic symbol, not Saturn's apparent diameter). Iapetus 
 
 White paper, English; the page's field 1°. B = -7.43° (south face), B′ = -7.71°; Saturn 31.2° above the horizon.
 
-Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 12.2 × 4.5 px; its name placed.
+Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 12.2 × 4.5 px.
 
-Moons: 6 of 7 drawn, 6 named. Mimas clear, 30.5″ - drawn, named; Enceladus clear, 24.8″ - drawn, named; Tethys behind, in shadow, 8.1″ - behind; Dione clear, 59.2″ - drawn, named; Rhea clear, 32.7″ - drawn, named; Titan clear, 196.4″ - drawn, named; Iapetus clear, 577.7″ - drawn, named.
+Moons: 6 of 7 drawn. Mimas clear, 30.5″ - drawn; Enceladus clear, 24.8″ - drawn; Tethys behind, in shadow, 8.1″ - behind; Dione clear, 59.2″ - drawn; Rhea clear, 32.7″ - drawn; Titan clear, 196.4″ - drawn; Iapetus clear, 577.7″ - drawn.
 
 Spoken: Saturn. Mimas (a cartographic symbol, not Mimas's apparent diameter). Enceladus (a cartographic symbol, not Enceladus's apparent diameter). Dione (a cartographic symbol, not Dione's apparent diameter). Iapetus (a cartographic symbol, not Iapetus's apparent diameter). Rhea (a cartographic symbol, not Rhea's apparent diameter). Titan (a cartographic symbol, not Titan's apparent diameter).
 
@@ -74,9 +74,9 @@ Spoken: Saturn. Mimas (a cartographic symbol, not Mimas's apparent diameter). En
 
 White paper, Norwegian; the page's field 0.5°. B = -7.43° (south face), B′ = -7.71°; Saturn 31.2° above the horizon.
 
-Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 22.3 × 8.9 px; its name placed.
+Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 22.3 × 8.9 px.
 
-Moons: 6 of 7 drawn, 6 named. Mimas clear, 30.5″ - drawn, named; Enceladus clear, 24.8″ - drawn, named; Tethys behind, in shadow, 8.1″ - behind; Dione clear, 59.2″ - drawn, named; Rhea clear, 32.7″ - drawn, named; Titan clear, 196.4″ - drawn, named; Iapetus clear, 577.7″ - drawn, named.
+Moons: 6 of 7 drawn. Mimas clear, 30.5″ - drawn; Enceladus clear, 24.8″ - drawn; Tethys behind, in shadow, 8.1″ - behind; Dione clear, 59.2″ - drawn; Rhea clear, 32.7″ - drawn; Titan clear, 196.4″ - drawn; Iapetus clear, 577.7″ - drawn.
 
 Spoken: Saturn. Mimas (et kartografisk symbol, ikke Mimas' tilsynelatende diameter). Enceladus (et kartografisk symbol, ikke Enceladus' tilsynelatende diameter). Dione (et kartografisk symbol, ikke Diones tilsynelatende diameter). Iapetus (et kartografisk symbol, ikke Iapetus' tilsynelatende diameter). Rhea (et kartografisk symbol, ikke Rheas tilsynelatende diameter). Titan (et kartografisk symbol, ikke Titans tilsynelatende diameter).
 
@@ -86,9 +86,9 @@ Spoken: Saturn. Mimas (et kartografisk symbol, ikke Mimas' tilsynelatende diamet
 
 Black sky, English; the page's field 0.25°. B = -7.43° (south face), B′ = -7.71°; Saturn 31.2° above the horizon.
 
-Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 44.6 × 17.8 px; its name placed.
+Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 44.6 × 17.8 px.
 
-Moons: 5 of 7 drawn, 5 named. Mimas clear, 30.5″ - drawn, named; Enceladus clear, 24.8″ - drawn, named; Tethys behind, in shadow, 8.1″ - behind; Dione clear, 59.2″ - drawn, named; Rhea clear, 32.7″ - drawn, named; Titan clear, 196.4″ - drawn, named; Iapetus clear, 577.7″ - off page.
+Moons: 5 of 7 drawn. Mimas clear, 30.5″ - drawn; Enceladus clear, 24.8″ - drawn; Tethys behind, in shadow, 8.1″ - behind; Dione clear, 59.2″ - drawn; Rhea clear, 32.7″ - drawn; Titan clear, 196.4″ - drawn; Iapetus clear, 577.7″ - off page.
 
 Spoken: Saturn. Mimas (a cartographic symbol, not Mimas's apparent diameter). Enceladus (a cartographic symbol, not Enceladus's apparent diameter). Dione (a cartographic symbol, not Dione's apparent diameter). Rhea (a cartographic symbol, not Rhea's apparent diameter). Titan (a cartographic symbol, not Titan's apparent diameter).
 
@@ -98,9 +98,9 @@ Spoken: Saturn. Mimas (a cartographic symbol, not Mimas's apparent diameter). En
 
 White paper, English; the page's field 1°. B = +26.97° (north face), B′ = +26.61°; Saturn 36.9° below the horizon.
 
-Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 9.0 × 4.2 px; its name placed.
+Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 9.0 × 4.2 px.
 
-Moons: 7 of 7 drawn, 7 named. Mimas clear, 24.5″ - drawn, named; Enceladus clear, 19.6″ - drawn, named; Tethys clear, 34.5″ - drawn, named; Dione clear, 49.9″ - drawn, named; Rhea clear, 38.6″ - drawn, named; Titan clear, 156.5″ - drawn, named; Iapetus clear, 385.3″ - drawn, named.
+Moons: 7 of 7 drawn. Mimas clear, 24.5″ - drawn; Enceladus clear, 19.6″ - drawn; Tethys clear, 34.5″ - drawn; Dione clear, 49.9″ - drawn; Rhea clear, 38.6″ - drawn; Titan clear, 156.5″ - drawn; Iapetus clear, 385.3″ - drawn.
 
 Spoken: Saturn. Mimas (a cartographic symbol, not Mimas's apparent diameter). Enceladus (a cartographic symbol, not Enceladus's apparent diameter). Tethys (a cartographic symbol, not Tethys's apparent diameter). Dione (a cartographic symbol, not Dione's apparent diameter). Iapetus (a cartographic symbol, not Iapetus's apparent diameter). Rhea (a cartographic symbol, not Rhea's apparent diameter). Titan (a cartographic symbol, not Titan's apparent diameter).
 
@@ -110,9 +110,9 @@ Spoken: Saturn. Mimas (a cartographic symbol, not Mimas's apparent diameter). En
 
 White paper, English; the page's field 0.25°. B = +26.97° (north face), B′ = +26.61°; Saturn 36.9° below the horizon.
 
-Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 36.1 × 16.7 px; its name placed.
+Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 36.1 × 16.7 px.
 
-Moons: 7 of 7 drawn, 7 named. Mimas clear, 24.5″ - drawn, named; Enceladus clear, 19.6″ - drawn, named; Tethys clear, 34.5″ - drawn, named; Dione clear, 49.9″ - drawn, named; Rhea clear, 38.6″ - drawn, named; Titan clear, 156.5″ - drawn, named; Iapetus clear, 385.3″ - drawn, named.
+Moons: 7 of 7 drawn. Mimas clear, 24.5″ - drawn; Enceladus clear, 19.6″ - drawn; Tethys clear, 34.5″ - drawn; Dione clear, 49.9″ - drawn; Rhea clear, 38.6″ - drawn; Titan clear, 156.5″ - drawn; Iapetus clear, 385.3″ - drawn.
 
 Spoken: Saturn. Mimas (a cartographic symbol, not Mimas's apparent diameter). Enceladus (a cartographic symbol, not Enceladus's apparent diameter). Tethys (a cartographic symbol, not Tethys's apparent diameter). Dione (a cartographic symbol, not Dione's apparent diameter). Iapetus (a cartographic symbol, not Iapetus's apparent diameter). Rhea (a cartographic symbol, not Rhea's apparent diameter). Titan (a cartographic symbol, not Titan's apparent diameter).
 
@@ -122,9 +122,9 @@ Spoken: Saturn. Mimas (a cartographic symbol, not Mimas's apparent diameter). En
 
 Black sky, Norwegian; the page's field 0.25°. B = -26.99° (south face), B′ = -26.57°; Saturn 5.4° above the horizon.
 
-Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 40.2 × 18.6 px; its name placed.
+Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 40.2 × 18.6 px.
 
-Moons: 7 of 7 drawn, 7 named. Mimas clear, 26.8″ - drawn, named; Enceladus clear, 33.8″ - drawn, named; Tethys clear, 42.7″ - drawn, named; Dione clear, 54.4″ - drawn, named; Rhea clear, 45.4″ - drawn, named; Titan clear, 175.3″ - drawn, named; Iapetus clear, 426.8″ - drawn, named.
+Moons: 7 of 7 drawn. Mimas clear, 26.8″ - drawn; Enceladus clear, 33.8″ - drawn; Tethys clear, 42.7″ - drawn; Dione clear, 54.4″ - drawn; Rhea clear, 45.4″ - drawn; Titan clear, 175.3″ - drawn; Iapetus clear, 426.8″ - drawn.
 
 Spoken: Saturn. Mimas (et kartografisk symbol, ikke Mimas' tilsynelatende diameter). Enceladus (et kartografisk symbol, ikke Enceladus' tilsynelatende diameter). Tethys (et kartografisk symbol, ikke Tethys' tilsynelatende diameter). Dione (et kartografisk symbol, ikke Diones tilsynelatende diameter). Iapetus (et kartografisk symbol, ikke Iapetus' tilsynelatende diameter). Rhea (et kartografisk symbol, ikke Rheas tilsynelatende diameter). Titan (et kartografisk symbol, ikke Titans tilsynelatende diameter).
 
@@ -134,9 +134,9 @@ Spoken: Saturn. Mimas (et kartografisk symbol, ikke Mimas' tilsynelatende diamet
 
 White paper, Norwegian; the page's field 0.25°. B = +0.00° (north face), B′ = +0.65°; Saturn 11.3° below the horizon.
 
-Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 36.6 × 14.2 px; its name placed.
+Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 36.6 × 14.2 px.
 
-Moons: 6 of 7 drawn, 6 named. Mimas clear, 24.1″ - drawn, named; Enceladus clear, 30.8″ - drawn, named; Tethys clear, 37.6″ - drawn, named; Dione clear, 36.6″ - drawn, named; Rhea clear, 15.3″ - drawn, named; Titan clear, 150.9″ - drawn, named; Iapetus clear, 467.4″ - off page.
+Moons: 6 of 7 drawn. Mimas clear, 24.1″ - drawn; Enceladus clear, 30.8″ - drawn; Tethys clear, 37.6″ - drawn; Dione clear, 36.6″ - drawn; Rhea clear, 15.3″ - drawn; Titan clear, 150.9″ - drawn; Iapetus clear, 467.4″ - off page.
 
 Spoken: Saturn. Mimas (et kartografisk symbol, ikke Mimas' tilsynelatende diameter). Enceladus (et kartografisk symbol, ikke Enceladus' tilsynelatende diameter). Tethys (et kartografisk symbol, ikke Tethys' tilsynelatende diameter). Dione (et kartografisk symbol, ikke Diones tilsynelatende diameter). Rhea (et kartografisk symbol, ikke Rheas tilsynelatende diameter). Titan (et kartografisk symbol, ikke Titans tilsynelatende diameter).
 
@@ -146,9 +146,9 @@ Spoken: Saturn. Mimas (et kartografisk symbol, ikke Mimas' tilsynelatende diamet
 
 White paper, English; the page's field 0.25°. B = -2.19° (south face, the unlit face seen), B′ = +0.01°; Saturn 18.7° below the horizon.
 
-Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 37.8 × 14.6 px; its name placed.
+Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 37.8 × 14.6 px.
 
-Moons: 7 of 7 drawn, 6 named. Mimas clear, 21.5″ - drawn, name refused; Enceladus clear, 28.8″ - drawn, named; Tethys clear, 36.3″ - drawn, named; Dione clear, 22.6″ - drawn, named; Rhea clear, 12.6″ - drawn, named; Titan clear, 102.9″ - drawn, named; Iapetus clear, 455.5″ - drawn, named.
+Moons: 7 of 7 drawn. Mimas clear, 21.5″ - drawn; Enceladus clear, 28.8″ - drawn; Tethys clear, 36.3″ - drawn; Dione clear, 22.6″ - drawn; Rhea clear, 12.6″ - drawn; Titan clear, 102.9″ - drawn; Iapetus clear, 455.5″ - drawn.
 
 Spoken: Saturn. Mimas (a cartographic symbol, not Mimas's apparent diameter). Enceladus (a cartographic symbol, not Enceladus's apparent diameter). Tethys (a cartographic symbol, not Tethys's apparent diameter). Dione (a cartographic symbol, not Dione's apparent diameter). Iapetus (a cartographic symbol, not Iapetus's apparent diameter). Rhea (a cartographic symbol, not Rhea's apparent diameter). Titan (a cartographic symbol, not Titan's apparent diameter).
 
@@ -158,9 +158,9 @@ Spoken: Saturn. Mimas (a cartographic symbol, not Mimas's apparent diameter). En
 
 White paper, English; the page's field 8°. B = -6.10° (south face), B′ = -8.56°; Saturn 2.9° below the horizon.
 
-Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the 6 px cartographic symbol, its ink 6.0 × 6.0 px; its name placed; below the horizon, dimmed.
+Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the 6 px cartographic symbol, its ink 6.0 × 6.0 px; below the horizon, dimmed.
 
-Moons: 0 of 7 drawn, 0 named. Mimas clear, 27.9″ - at primary; Enceladus clear, 21.9″ - at primary; Tethys in front, 4.1″ - in front unresolved; Dione clear, 52.5″ - at primary; Rhea clear, 74.6″ - at primary; Titan clear, 111.7″ - at primary; Iapetus clear, 104.6″ - at primary.
+Moons: 0 of 7 drawn. Mimas clear, 27.9″ - at primary; Enceladus clear, 21.9″ - at primary; Tethys in front, 4.1″ - in front unresolved; Dione clear, 52.5″ - at primary; Rhea clear, 74.6″ - at primary; Titan clear, 111.7″ - at primary; Iapetus clear, 104.6″ - at primary.
 
 Spoken: Saturn (below the horizon) (a cartographic symbol, not Saturn's apparent diameter).
 
@@ -170,9 +170,9 @@ Spoken: Saturn (below the horizon) (a cartographic symbol, not Saturn's apparent
 
 White paper, Norwegian; the page's field 8°. B = -6.10° (south face), B′ = -8.56°; Saturn 2.9° below the horizon.
 
-Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the 6 px cartographic symbol, its ink 6.0 × 6.0 px; its name placed.
+Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the 6 px cartographic symbol, its ink 6.0 × 6.0 px.
 
-Moons: 0 of 7 drawn, 0 named. Mimas clear, 27.9″ - at primary; Enceladus clear, 21.9″ - at primary; Tethys in front, 4.1″ - in front unresolved; Dione clear, 52.5″ - at primary; Rhea clear, 74.6″ - at primary; Titan clear, 111.7″ - at primary; Iapetus clear, 104.6″ - at primary.
+Moons: 0 of 7 drawn. Mimas clear, 27.9″ - at primary; Enceladus clear, 21.9″ - at primary; Tethys in front, 4.1″ - in front unresolved; Dione clear, 52.5″ - at primary; Rhea clear, 74.6″ - at primary; Titan clear, 111.7″ - at primary; Iapetus clear, 104.6″ - at primary.
 
 Spoken: Saturn (et kartografisk symbol, ikke Saturns tilsynelatende diameter).
 
@@ -195,9 +195,9 @@ Each moon decided on its own by the page against the drawn figure (ruling 3 on #
 
 White paper, English; the page's field 1°. B = -9.10° (south face), B′ = -6.76°; Saturn 20.5° below the horizon.
 
-Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 11.5 × 4.2 px; its name placed.
+Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 11.5 × 4.2 px.
 
-Moons: 6 of 7 drawn, 6 named. Mimas behind, 9.1″ - behind; Enceladus clear, 35.2″ - drawn, named; Tethys in shadow, 9.3″ - drawn, named; Dione clear, 53.5″ - drawn, named; Rhea clear, 78.3″ - drawn, named; Titan clear, 189.8″ - drawn, named; Iapetus clear, 185.8″ - drawn, named.
+Moons: 6 of 7 drawn. Mimas behind, 9.1″ - behind; Enceladus clear, 35.2″ - drawn; Tethys in shadow, 9.3″ - drawn; Dione clear, 53.5″ - drawn; Rhea clear, 78.3″ - drawn; Titan clear, 189.8″ - drawn; Iapetus clear, 185.8″ - drawn.
 
 Spoken: Saturn. Tethys, in Saturn's shadow (a cartographic symbol, not Tethys's apparent diameter). Enceladus (a cartographic symbol, not Enceladus's apparent diameter). Dione (a cartographic symbol, not Dione's apparent diameter). Iapetus (a cartographic symbol, not Iapetus's apparent diameter). Rhea (a cartographic symbol, not Rhea's apparent diameter). Titan (a cartographic symbol, not Titan's apparent diameter).
 
@@ -207,9 +207,9 @@ Spoken: Saturn. Tethys, in Saturn's shadow (a cartographic symbol, not Tethys's 
 
 White paper, English; the page's field 3°. B = -7.50° (south face), B′ = -7.68°; Saturn 31.5° above the horizon.
 
-Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the 6 px cartographic symbol, its ink 6.0 × 6.0 px; its name placed.
+Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the 6 px cartographic symbol, its ink 6.0 × 6.0 px.
 
-Moons: 2 of 7 drawn, 2 named. Mimas clear, 19.8″ - at primary; Enceladus clear, 31.6″ - at primary; Tethys clear, 13.1″ - at primary; Dione clear, 25.8″ - at primary; Rhea clear, 11.1″ - at primary; Titan clear, 173.0″ - drawn, named; Iapetus clear, 581.8″ - drawn, named.
+Moons: 2 of 7 drawn. Mimas clear, 19.8″ - at primary; Enceladus clear, 31.6″ - at primary; Tethys clear, 13.1″ - at primary; Dione clear, 25.8″ - at primary; Rhea clear, 11.1″ - at primary; Titan clear, 173.0″ - drawn; Iapetus clear, 581.8″ - drawn.
 
 Spoken: Saturn (a cartographic symbol, not Saturn's apparent diameter). Iapetus (a cartographic symbol, not Iapetus's apparent diameter). Titan (a cartographic symbol, not Titan's apparent diameter).
 
@@ -219,9 +219,9 @@ Spoken: Saturn (a cartographic symbol, not Saturn's apparent diameter). Iapetus 
 
 White paper, English; the page's field 1°. B = -5.95° (south face), B′ = -5.07°; Saturn 26.8° below the horizon.
 
-Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 10.1 × 3.6 px; its name placed.
+Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 10.1 × 3.6 px.
 
-Moons: 7 of 7 drawn, 6 named. Mimas clear, 12.6″ - drawn, named; Enceladus clear, 12.8″ - drawn, name refused; Tethys clear, 38.7″ - drawn, named; Dione clear, 37.1″ - drawn, named; Rhea clear, 69.0″ - drawn, named; Titan clear, 154.5″ - drawn, named; Iapetus clear, 178.8″ - drawn, named.
+Moons: 7 of 7 drawn. Mimas clear, 12.6″ - drawn; Enceladus clear, 12.8″ - drawn; Tethys clear, 38.7″ - drawn; Dione clear, 37.1″ - drawn; Rhea clear, 69.0″ - drawn; Titan clear, 154.5″ - drawn; Iapetus clear, 178.8″ - drawn.
 
 Spoken: Saturn. Mimas (a cartographic symbol, not Mimas's apparent diameter). Enceladus (a cartographic symbol, not Enceladus's apparent diameter). Tethys (a cartographic symbol, not Tethys's apparent diameter). Dione (a cartographic symbol, not Dione's apparent diameter). Iapetus (a cartographic symbol, not Iapetus's apparent diameter). Rhea (a cartographic symbol, not Rhea's apparent diameter). Titan (a cartographic symbol, not Titan's apparent diameter).
 
@@ -231,9 +231,9 @@ Spoken: Saturn. Mimas (a cartographic symbol, not Mimas's apparent diameter). En
 
 Black sky, Norwegian; the page's field 0.25°. B = -5.95° (south face), B′ = -5.07°; Saturn 26.8° below the horizon.
 
-Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 36.0 × 14.4 px; its name placed.
+Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 36.0 × 14.4 px.
 
-Moons: 7 of 7 drawn, 6 named. Mimas clear, 12.6″ - drawn, name refused; Enceladus clear, 12.8″ - drawn, named; Tethys clear, 38.7″ - drawn, named; Dione clear, 37.1″ - drawn, named; Rhea clear, 69.0″ - drawn, named; Titan clear, 154.5″ - drawn, named; Iapetus clear, 178.8″ - drawn, named.
+Moons: 7 of 7 drawn. Mimas clear, 12.6″ - drawn; Enceladus clear, 12.8″ - drawn; Tethys clear, 38.7″ - drawn; Dione clear, 37.1″ - drawn; Rhea clear, 69.0″ - drawn; Titan clear, 154.5″ - drawn; Iapetus clear, 178.8″ - drawn.
 
 Spoken: Saturn. Mimas (et kartografisk symbol, ikke Mimas' tilsynelatende diameter). Enceladus (et kartografisk symbol, ikke Enceladus' tilsynelatende diameter). Tethys (et kartografisk symbol, ikke Tethys' tilsynelatende diameter). Dione (et kartografisk symbol, ikke Diones tilsynelatende diameter). Iapetus (et kartografisk symbol, ikke Iapetus' tilsynelatende diameter). Rhea (et kartografisk symbol, ikke Rheas tilsynelatende diameter). Titan (et kartografisk symbol, ikke Titans tilsynelatende diameter).
 
@@ -243,9 +243,9 @@ Spoken: Saturn. Mimas (et kartografisk symbol, ikke Mimas' tilsynelatende diamet
 
 White paper, English; the page's field 1°. B = -9.01° (south face), B′ = -6.29°; Saturn 26.1° above the horizon.
 
-Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 11.0 × 4.0 px; its name placed.
+Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 11.0 × 4.0 px.
 
-Moons: 7 of 7 drawn, 6 named. Mimas in front, 5.5″ - drawn, named; Enceladus clear, 24.8″ - drawn, name refused; Tethys clear, 42.2″ - drawn, named; Dione clear, 54.8″ - drawn, named; Rhea clear, 74.1″ - drawn, named; Titan clear, 178.5″ - drawn, named; Iapetus clear, 203.4″ - drawn, named.
+Moons: 7 of 7 drawn. Mimas in front, 5.5″ - drawn; Enceladus clear, 24.8″ - drawn; Tethys clear, 42.2″ - drawn; Dione clear, 54.8″ - drawn; Rhea clear, 74.1″ - drawn; Titan clear, 178.5″ - drawn; Iapetus clear, 203.4″ - drawn.
 
 Spoken: Saturn. Enceladus (a cartographic symbol, not Enceladus's apparent diameter). Tethys (a cartographic symbol, not Tethys's apparent diameter). Dione (a cartographic symbol, not Dione's apparent diameter). Iapetus (a cartographic symbol, not Iapetus's apparent diameter). Rhea (a cartographic symbol, not Rhea's apparent diameter). Titan (a cartographic symbol, not Titan's apparent diameter). Mimas, in front of Saturn (a cartographic symbol, not Mimas's apparent diameter).
 
@@ -255,9 +255,9 @@ Spoken: Saturn. Enceladus (a cartographic symbol, not Enceladus's apparent diame
 
 White paper, Norwegian; the page's field 0.25°. B = -9.01° (south face), B′ = -6.29°; Saturn 26.1° above the horizon.
 
-Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 39.7 × 15.8 px; its name placed.
+Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 39.7 × 15.8 px.
 
-Moons: 7 of 7 drawn, 7 named. Mimas in front, 5.5″ - drawn, named; Enceladus clear, 24.8″ - drawn, named; Tethys clear, 42.2″ - drawn, named; Dione clear, 54.8″ - drawn, named; Rhea clear, 74.1″ - drawn, named; Titan clear, 178.5″ - drawn, named; Iapetus clear, 203.4″ - drawn, named.
+Moons: 7 of 7 drawn. Mimas in front, 5.5″ - drawn; Enceladus clear, 24.8″ - drawn; Tethys clear, 42.2″ - drawn; Dione clear, 54.8″ - drawn; Rhea clear, 74.1″ - drawn; Titan clear, 178.5″ - drawn; Iapetus clear, 203.4″ - drawn.
 
 Spoken: Saturn. Enceladus (et kartografisk symbol, ikke Enceladus' tilsynelatende diameter). Tethys (et kartografisk symbol, ikke Tethys' tilsynelatende diameter). Dione (et kartografisk symbol, ikke Diones tilsynelatende diameter). Iapetus (et kartografisk symbol, ikke Iapetus' tilsynelatende diameter). Rhea (et kartografisk symbol, ikke Rheas tilsynelatende diameter). Titan (et kartografisk symbol, ikke Titans tilsynelatende diameter). Mimas, foran Saturn (et kartografisk symbol, ikke Mimas' tilsynelatende diameter).
 
@@ -267,9 +267,9 @@ Spoken: Saturn. Enceladus (et kartografisk symbol, ikke Enceladus' tilsynelatend
 
 White paper, English; the page's field 0.25°. B = -9.02° (south face), B′ = -6.29°; Saturn 24.0° below the horizon.
 
-Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 39.7 × 15.9 px; its name placed.
+Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 39.7 × 15.9 px.
 
-Moons: 6 of 7 drawn, 6 named. Mimas clear, 10.7″ - drawn, named; Enceladus behind, 7.4″ - behind; Tethys in front, 6.5″ - drawn, named; Dione clear, 17.4″ - drawn, named; Rhea clear, 67.4″ - drawn, named; Titan clear, 170.9″ - drawn, named; Iapetus clear, 220.6″ - drawn, named.
+Moons: 6 of 7 drawn. Mimas clear, 10.7″ - drawn; Enceladus behind, 7.4″ - behind; Tethys in front, 6.5″ - drawn; Dione clear, 17.4″ - drawn; Rhea clear, 67.4″ - drawn; Titan clear, 170.9″ - drawn; Iapetus clear, 220.6″ - drawn.
 
 Spoken: Saturn. Mimas (a cartographic symbol, not Mimas's apparent diameter). Dione (a cartographic symbol, not Dione's apparent diameter). Iapetus (a cartographic symbol, not Iapetus's apparent diameter). Rhea (a cartographic symbol, not Rhea's apparent diameter). Titan (a cartographic symbol, not Titan's apparent diameter). Tethys, in front of Saturn (a cartographic symbol, not Tethys's apparent diameter).
 
@@ -279,9 +279,9 @@ Spoken: Saturn. Mimas (a cartographic symbol, not Mimas's apparent diameter). Di
 
 Black sky, English; the page's field 0.25°. B = -9.02° (south face), B′ = -6.29°; Saturn 14.2° below the horizon.
 
-Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 39.7 × 15.9 px; its name placed.
+Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 39.7 × 15.9 px.
 
-Moons: 6 of 7 drawn, 6 named. Mimas behind, in shadow, 6.0″ - behind; Enceladus in shadow, 9.6″ - drawn, named; Tethys clear, 10.8″ - drawn, named; Dione clear, 26.2″ - drawn, named; Rhea clear, 71.1″ - drawn, named; Titan clear, 172.5″ - drawn, named; Iapetus clear, 217.9″ - drawn, named.
+Moons: 6 of 7 drawn. Mimas behind, in shadow, 6.0″ - behind; Enceladus in shadow, 9.6″ - drawn; Tethys clear, 10.8″ - drawn; Dione clear, 26.2″ - drawn; Rhea clear, 71.1″ - drawn; Titan clear, 172.5″ - drawn; Iapetus clear, 217.9″ - drawn.
 
 Spoken: Saturn. Enceladus, in Saturn's shadow (a cartographic symbol, not Enceladus's apparent diameter). Tethys (a cartographic symbol, not Tethys's apparent diameter). Dione (a cartographic symbol, not Dione's apparent diameter). Iapetus (a cartographic symbol, not Iapetus's apparent diameter). Rhea (a cartographic symbol, not Rhea's apparent diameter). Titan (a cartographic symbol, not Titan's apparent diameter).
 
@@ -291,13 +291,13 @@ Spoken: Saturn. Enceladus, in Saturn's shadow (a cartographic symbol, not Encela
 
 White paper, Norwegian; the page's field 1°. B = -9.06° (south face), B′ = -6.82°; Saturn 19.3° above the horizon.
 
-Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 11.6 × 4.2 px; its name placed.
+Saturn drawn at (450.0, 350.0), 0.0000 px off the service's place; the true figure, its ink 11.6 × 4.2 px.
 
-Moons: 6 of 7 drawn, 5 named. Mimas clear, 21.3″ - drawn, named; Enceladus behind, 7.9″ - behind; Tethys clear, 31.2″ - drawn, named; Dione partly in shadow, 13.8″ - drawn, name refused; Rhea clear, 79.6″ - drawn, named; Titan clear, 43.4″ - drawn, named; Iapetus clear, 113.9″ - drawn, named.
+Moons: 6 of 7 drawn. Mimas clear, 21.3″ - drawn; Enceladus behind, 7.9″ - behind; Tethys clear, 31.2″ - drawn; Dione partly in shadow, 13.8″ - drawn; Rhea clear, 79.6″ - drawn; Titan clear, 43.4″ - drawn; Iapetus clear, 113.9″ - drawn.
 
 Spoken: Saturn. Dione, delvis i Saturns skygge (et kartografisk symbol, ikke Diones tilsynelatende diameter). Mimas (et kartografisk symbol, ikke Mimas' tilsynelatende diameter). Tethys (et kartografisk symbol, ikke Tethys' tilsynelatende diameter). Iapetus (et kartografisk symbol, ikke Iapetus' tilsynelatende diameter). Rhea (et kartografisk symbol, ikke Rheas tilsynelatende diameter). Titan (et kartografisk symbol, ikke Titans tilsynelatende diameter).
 
-**Labels over 2026** (weekly at Oslo, 53 configurations at the normal minimum field, on this desktop's fonts): 329 moon names placed and 25 refused one by one; 0 configurations lost every moon name. A refused label never blocks another (ruling 3 on #578).
+The moons' names are attempted for every drawn moon and refused one by one, a refused label never blocking another (ruling 3 on #578); which names this desktop's fonts place is in `platform.md`, with the count over 2026.
 
 ## The exported sheet
 
