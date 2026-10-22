@@ -190,6 +190,84 @@ are executable, not aspirational:
   not, and each rewrote its own `platform.md` with `headless | false` for
   anyone who followed their own instructions (issue #323).
 
+## Qualifying a change
+
+A head is qualified once, by name, before its pull request is merged;
+the records of every run - passed, stopped or incomplete - are kept
+under the run directory outside the repository, each under the head it
+ran on, and a stopped run is never rerun into green: a gate that passes
+on the second try has not been shown to hold. A fix is a new head,
+qualified from the first gate.
+
+### The seven local gates
+
+For any change to the application, its tests, its evidence, its
+decision records, its packaging or its build machinery:
+
+1. **The full suite** (`make test`): zero failures, zero skipped, every
+   test found started, and no abort outside the desktop-focus family
+   (the display journeys abort honestly when the desktop declines
+   keyboard focus; CI's display job is the zero-abort proof).
+2. **The interface evidence gate** (`InterfaceEvidenceGateTest`): every
+   registered photographer reproduces its committed sheets.
+3. **The canonical evidence contract** (`make evidence-contracts`).
+4. **The portable evidence contract** (`make evidence-contracts-ci`).
+5. **Packaged acceptance** (`make app-image`): the packaged
+   application's own journeys, every expected acceptance line present,
+   the image at `VERSION`.
+6. **The portable archive** (`make dist`), built twice and verified.
+7. **The tree unchanged**: the gates moved no file and no provenance
+   row.
+
+Then CI once on the head, on its pull request, and the merge pinned to
+that head under the merge-identity rule (issue #494): the landing's
+second parent is the accepted head, its first parent the qualified
+base, its tree the qualified trial merge's.
+
+**A capture refusal** - a photographer refusing fail-closed because a
+native window answered a resize late, the kind recorded on issue #362 -
+may let a run continue past its gate without a new ruling only when
+all seven conditions of the owner's precedent hold: the refusal's trace
+and output kept; a known kind of transition; no generated artifact
+disagreeing with committed bytes; no unrelated failure; a change that
+cannot affect capture sizing, window lifecycle, the refused generator
+or its surface; a record calling the refused test unexecuted, never
+passed, on that head; and CI's display run executing that exact test
+with zero failures, aborts and skips. The refused gate is not rerun; the
+remaining gates run once. If any condition is unclear, the run stops
+for a ruling.
+
+### The prose route
+
+A later, prose-only correction to an already qualified article cannot
+be faulted by gates 2-7, which never read `docs/articles`; what can
+fault it is the article's own test and the site builder. So such a
+correction takes a narrower route, decided by the diff and never by
+judgement. The whole change against the merge base with `main` must
+lie within this allowlist:
+
+- `docs/articles/**/*.md` (the index included);
+- `CHANGELOG.md`;
+- the article's `test/juranometria/tool/*ArticleTest.java`.
+
+Images are not in it; nor is `scripts/build-articles.py`, which is
+build-system code. A new article, a changed figure, or any other path
+takes the seven gates. On the route:
+
+1. the full suite once, under gate 1's rules - the article test holds
+   every figure byte for byte and every cited number to its report,
+   and the ledger and evidence-register pins run with it;
+2. the article site built as the Pages workflow builds it
+   (`make gallery-site`), into a clean directory, with its link and
+   image validation;
+3. the tree unchanged;
+4. CI once on the head, on its pull request.
+
+The tooling inspects the diff and refuses the route when any other
+path changed, so a change is never under-tested by a judgement call.
+Ruled on 2026-10-22, after the Mercury article's review correction
+(PR #597) had taken the seven gates for a change they could not see.
+
 ## Releases
 
 Merging is not the same as releasing. Changes accumulate under `Unreleased`.
