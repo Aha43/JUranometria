@@ -263,15 +263,16 @@ application), #607 (the Saturn article), #553 (time-range paths), #554
 #373, #370, #356, #355, #351, #339, #327, #326, #324, #295, #293, #282,
 and the Milky Way sprint #189–#192 with PR #199, blocked on licensing.
 
-### 9.1 Immediate successor: the Mars road
+### 9.1 Next planet road: Mars
 
 [#600](https://github.com/Aha43/JUranometria/issues/600), *Road: Mars,
-Phobos and Deimos*, with its eight issues in order - #601 the system
-contract, #602 the offline service, #603 the tables, #604 the numerical
-handover, #605 the cartography study, #606 Mars and its moons on the
-chart, #607 the Saturn article, #608 the handover to release
-preparation. It begins only on the owner's instruction after 5.4.0
-closes; no Mars work has begun.
+Phobos and Deimos*, is the next planet road, with its eight issues in
+order - #601 the system contract, #602 the offline service, #603 the
+tables, #604 the numerical handover, #605 the cartography study, #606
+Mars and its moons on the chart, #607 the Saturn article, #608 the
+handover to release preparation. It begins only on the owner's
+instruction after 5.4.0 and any chosen between-planets milestones
+close; no Mars work has begun.
 
 ### 9.2 The longer road
 
