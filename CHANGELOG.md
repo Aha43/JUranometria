@@ -7,6 +7,16 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Mercury, never far from the Sun (#580).** A new reader article, in
+English and Norwegian (*Merkur, aldri langt fra Solen*): what the atlas
+draws of Mercury as released in 5.3 - where its numbers come from and
+how closely they match JPL Horizons, the phase words of the Mercury
+table, why the chart so often has to draw Mercury as a phased symbol,
+what the 0.5° and 0.25° closer fields add, a transit, a conjunction
+and a whole apparition held against the table - and what it does not
+claim. Every figure is a released evidence page and every number is
+quoted from the report that measured it.
+
 **Saturn on the chart (#579, ruled on #578).** A new switch, *Saturn on
 the chart* - in View > Solar System after Jupiter's, and in the
 Controller's Saturn group with Centre on chart - draws Saturn where it
