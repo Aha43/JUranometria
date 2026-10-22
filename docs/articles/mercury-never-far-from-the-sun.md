@@ -61,9 +61,10 @@ not the planet.
 The named events are Fred Espenak's almanac rows and the NASA/GSFC
 transit catalogue: conjunctions fall **−16 to +37** minutes from the
 listed hour, greatest elongations match the printed angle to the
-tenth of a degree, and the **28 greatest transits** of 1900–2100 fall
-**−0.5 to +0.7** minutes from the catalogue's minute, the separation
-of the two centres agreeing to **0.1″**.
+tenth of a degree, and the greatest-transit instants of all **28**
+transits of 1900–2100 fall **−0.5 to +0.7** minutes from the
+catalogue's minute, the separation of the two centres agreeing to
+**0.1″**.
 
 One of those transits is honest about a boundary. On **1937-05-11**
 Mercury grazed the Sun's limb; the catalogue counts it as a transit,

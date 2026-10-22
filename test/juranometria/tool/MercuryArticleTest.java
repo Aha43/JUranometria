@@ -122,10 +122,11 @@ class MercuryArticleTest {
      */
     private static final List<String[]> PHRASES = List.of(
             new String[] {"−16 to +37 min", "**−16 to +37** minutes", "**−16 til +37**\nminutter", HANDOVER},
-            new String[] {"28 greatest transits", "**28 greatest transits**", "**28** største passasjene", HANDOVER},
-            new String[] {"+0.7 min", "**−0.5 to +0.7** minutes", "**−0.5 til +0.7** minutter", HANDOVER},
+            new String[] {"28 greatest transits", "greatest-transit instants of all **28**\ntransits",
+                    "tidspunktene for største\npassasje for alle **28** passasjene", HANDOVER},
+            new String[] {"+0.7 min", "**−0.5 to +0.7** minutes", "**−0.5 til\n+0.7** minutter", HANDOVER},
             new String[] {"no week at any field", "**no week at any field**", "**ingen uke ved noe felt**", HANDOVER},
-            new String[] {"every 3 days", "every **3 days**", "hver **3. dag**", CHART},
+            new String[] {"every 3 days", "every **3 days**", "hver **tredje dag**", CHART},
             new String[] {"50 days beyond", "**50 days** beyond", "**50 dager** videre", CHART},
             new String[] {"some two dozen pixels", "**some two dozen** pixels", "**omtrent to dusin** piksler", CHART},
             new String[] {"within 45°", "**within 45°**", "**innenfor\n45°**", CHART},

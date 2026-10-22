@@ -36,8 +36,8 @@ aldri om.
 Merkurs størrelse er den faste kroppen: IAU-figuren er treakset,
 **2440.53 km** langs to akser og **2438.26 km** langs den tredje, og
 atlaset tegner den **ekvatoriale 2440.53 km**, aldri en middelradius.
-Det finnes ikke noe skydekke å diskutere; det et teleskop viser av
-Merkur, er stein, og atlaset tegner den steinen som en figur, ikke
+Det finnes ikke noe skydekke å diskutere; det som et teleskop viser
+av Merkur, er stein, og atlaset tegner den steinen som en figur, ikke
 som et bilde.
 
 ## Holdt opp mot en autoritet
@@ -62,9 +62,10 @@ seg fort, så klokkens usikkerhet koster mer her enn for Venus - opptil
 De navngitte hendelsene er Fred Espenaks almanakkrader og
 NASA/GSFCs passasjekatalog: konjunksjonene faller **−16 til +37**
 minutter fra den oppgitte timen, de største elongasjonene stemmer med
-den trykte vinkelen til tidels grad, og de **28** største passasjene
-i 1900–2100 faller **−0.5 til +0.7** minutter fra katalogens minutt,
-med avstanden mellom de to sentrene stemmende til **0.1″**.
+den trykte vinkelen til tidels grad, og tidspunktene for største
+passasje for alle **28** passasjene i 1900–2100 faller **−0.5 til
++0.7** minutter fra katalogens minutt, med avstanden mellom de to
+sentrene stemmende til **0.1″**.
 
 Én av passasjene er ærlig om en grense. **1937-05-11** streifet Merkur
 Solens rand; katalogen regner det som en passasje, men etter atlasets
@@ -100,7 +101,7 @@ siden mot **243°**, vest-sørvest - mot Solen, slik den må være. Skiven
 er **7.2″** bred, Merkur er **0.937962** AE borte, omtrent **140.317**
 millioner kilometer, og den står **1.80°** over den atmosfæreløse
 horisonten: Merkur på sitt beste i en norsk februar er en planet i det
-siste dagslyset, en håndsbredd over bakken.
+siste dagslyset, en håndsbredde over bakken.
 
 ![Merkur-tabellen 2026-02-19 18:00 UTC for Oslo: én rad med
 rektascensjon 23h 17m 02.0s, deklinasjon −3° 20′ 04″, høyde 1.80°,
@@ -262,7 +263,7 @@ side.](images/mercury-inferior-conjunction-2026-1.png)
 ## En hel synlighetsperiode
 
 Atlaset holder den tegnede fasen opp mot tabellens. Fra den øvre
-konjunksjonen i 2026, **2026-01-21**, hver **3. dag** gjennom den
+konjunksjonen i 2026, **2026-01-21**, hver **tredje dag** gjennom den
 nedre konjunksjonen og **50 dager** videre, tegnes en 1°-side av
 produksjonskartet, og merket klippes ut av den. Pikslene i hvert merke
 telles: hvor mye av det som er tegnet belyst, og hvilken vei den
@@ -273,13 +274,13 @@ enn halvt belyst merke mer, og at den belyste siden vender **innenfor
 45°** av tabellens retning. Det gjør den for **alle 19** trinn der
 tabellen oppgir en retning.
 
-![Tre rader med små merker klippet fra 1-graders sider hver 3. dag
+![Tre rader med små merker klippet fra 1-graders sider hver tredje dag
 gjennom første halvdel av 2026, hvert med bokstaven M fra navnet ved
 siden av: nesten fulle merker først, så mer enn halvt belyste, så
 sigder som blir mørke, så sigder som åpner seg igjen på den andre
 siden og fylles opp.](images/mercury-apparition-2026.png)
 
-*Synlighetsperioden i 2026, ett merke hver 3. dag, fra venstre mot
+*Synlighetsperioden i 2026, ett merke hver tredje dag, fra venstre mot
 høyre. Navnene er klippet bort med rutene; sidene de kommer fra, står
 i dokumentasjonen.*
 
