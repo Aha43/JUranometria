@@ -120,7 +120,7 @@ class ChartInstantJourneyTest {
                     ReaderInput.chooseTab(tabs, "Solar System");
                     drain();
                     JComponent solar = tabs.content("solarsystem");
-                    assertEquals("Chart: " + clock.answered(3),
+                    assertEquals("Chart time: " + clock.answered(3),
                             ((JLabel) named(solar, "solarSystemChartInstant")).getText(),
                             "the tab opens with the instant the chart is frozen at");
                     JButton tabUpdate = (JButton) named(solar, "solarSystemUpdateToNow");
@@ -128,7 +128,7 @@ class ChartInstantJourneyTest {
                     ReaderInput.click(tabUpdate);
                     drain();
                     assertEquals(4, clock.reads.get(), "the tab's Update to now, once");
-                    assertEquals("Chart: " + clock.answered(4),
+                    assertEquals("Chart time: " + clock.answered(4),
                             ((JLabel) named(solar, "solarSystemChartInstant")).getText(),
                             "and the line follows the chart");
                     assertEquals(clock.answered(4), instantOnTheBox(painted(chart)));

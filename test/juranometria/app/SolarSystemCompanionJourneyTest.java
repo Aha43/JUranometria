@@ -299,7 +299,7 @@ class SolarSystemCompanionJourneyTest {
                     // table the chart moved on from says it is stale, and
                     // Compute computes for the chart's context now.
                     assertReachable(companion, content,
-                            "Show the Sun at the instant set in Place and Time",
+                            "Show the Sun at the chart time",
                             "From (UTC)", "To (UTC)", "Step between rows", "Compute the range",
                             "Sun on the chart");
 
@@ -307,7 +307,7 @@ class SolarSystemCompanionJourneyTest {
                     // then Compute, pressed for real: the card and the four
                     // moons appear, and the table is reached too (#474).
                     assertReachable(companion, content,
-                            "Show Jupiter and its moons at the instant set in Place and Time",
+                            "Show Jupiter and its moons at the chart time",
                             "Jupiter and moons on the chart", "Centre the chart on Jupiter");
                     reveal((JComponent) named(content, "jupiterCompute"));
                     ReaderInput.click((JComponent) named(content, "jupiterCompute"));

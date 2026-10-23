@@ -309,9 +309,8 @@ class MoonTableDialogTest {
             assertEquals(List.of(), shared, language);
             // Seven since #612: Update from Place and Time is gone.
             assertTrue(letters.size() >= 7, language + ": " + letters.size());
-            assertEquals(language.equals("en") ? "Show the Moon at the instant"
-                    + " set in Place and Time" : "Vis Månen ved tidspunktet satt"
-                    + " i Sted og tid", rig.content.instantView
+            assertEquals(language.equals("en") ? "Show the Moon at the chart time"
+                    : "Vis Månen ved karttiden", rig.content.instantView
                     .getAccessibleContext().getAccessibleName(),
                     "the body's own a11y word overrides the shared one");
         }
