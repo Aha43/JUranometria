@@ -53,7 +53,9 @@ class ChartInstantWordingTest {
                     "furniture.placeandtime.explain", "furniture.placeandtime.spoken",
                     "furniture.placeandtime.sheet", "furniture.placeandtime.paper",
                     "solartable.stale.message", "solartable.observer.note",
-                    "solartable.observer.computed",
+                    "solartable.observer.computed", "placeandtime.sidereal.label",
+                    "placeandtime.sidereal.hover", "placeandtime.sidereal.explain",
+                    "inspector.transit.explain", "inspector.transit.set",
                     "solarsystem.chartinstant")) {
                 String text = said.say(key).toLowerCase(java.util.Locale.ROOT);
                 for (String civil : List.of("zone", "sone", "cet", "gmt", "offset",

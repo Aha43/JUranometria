@@ -530,6 +530,12 @@ public final class JUranometriaMain {
         juranometria.ui.solar.SaturnTableSession saturnTable =
                 new juranometria.ui.solar.SaturnTableSession(observerNow, saturnSystem);
         saturnTable.followContext(meridian.context());
+        // Set chart time to its next meridian transit (#612 absorbing #569,
+        // ruling P4): the Inspector's action over the selected object,
+        // installing through the meridian module as Place and Time does.
+        inspector.offerMeridianTransit(new MeridianTransitAction(meridian, solarSystem,
+                jovianSystem, saturnSystem, juranometria.ui.language.InterfaceText
+                        .forLanguage(language.interfaceLanguage())));
         // Jupiter on the chart (#484, ruled on #482): one Jovian module
         // over the same observer and the same lazy pack, with its one
         // remembered switch, off by default. The pack loads only when

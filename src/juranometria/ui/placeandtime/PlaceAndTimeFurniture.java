@@ -109,15 +109,23 @@ public final class PlaceAndTimeFurniture {
                 longitude(at, said, decimals));
     }
 
+    /**
+     * The local apparent sidereal time as the box states it: minutes
+     * from 0 to 1439, truncated - a box that rounded up would state a
+     * sidereal minute the chart has not reached. The Place and Time
+     * panel's sidereal field reads and writes the same minute (#612).
+     */
+    public static int siderealMinutes(Observer at) {
+        return (int) Math.floor(
+                new LocalSky(at).localSiderealTimeDegrees() / 15.0 * 60.0) % (24 * 60);
+    }
+
     /** What the box says for this observer, in this language. */
     public static Furniture box(Observer at, InterfaceText said) {
         String latitude = latitude(at, said, 2);
         String longitude = longitude(at, said, 2);
         String instant = SHOWN.format(at.instant());
-        // To the minute, truncated: a box that rounded up would state a
-        // sidereal minute the chart has not reached.
-        int minutes = (int) Math.floor(
-                new LocalSky(at).localSiderealTimeDegrees() / 15.0 * 60.0) % (24 * 60);
+        int minutes = siderealMinutes(at);
         String hours = String.format(Locale.ROOT, "%02d", minutes / 60);
         String mins = String.format(Locale.ROOT, "%02d", minutes % 60);
         return new Furniture(IDENTITY,

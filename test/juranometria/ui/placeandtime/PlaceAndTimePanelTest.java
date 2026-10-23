@@ -192,4 +192,59 @@ class PlaceAndTimePanelTest {
         assertEquals("Breddegraden må ligge mellom −90° og 90°. Beholdt 59.913.",
                 norwegian.refusalText());
     }
+
+    // ---- local sidereal time (#612 absorbing #569, ruling P3) ----------
+
+    private static String minuteOf(juranometria.sky.Observer at) {
+        int minutes = PlaceAndTimeFurniture.siderealMinutes(at);
+        return String.format(java.util.Locale.ROOT, "%02d:%02d", minutes / 60, minutes % 60);
+    }
+
+    @Test
+    void theSiderealFieldShowsTheBoxsMinuteAndMovesTheChartTimeOnItsDate() {
+        PlaceAndTimePanel panel = host("en");
+        JTextField sidereal = field(panel, "siderealField");
+        assertEquals(minuteOf(module.observer()), sidereal.getText(),
+                "the field shows the box's own minute");
+
+        commit(sidereal, "03:17");
+
+        Instant at = module.observer().instant();
+        assertEquals(WHEN.atOffset(java.time.ZoneOffset.UTC).toLocalDate(),
+                at.atOffset(java.time.ZoneOffset.UTC).toLocalDate(),
+                "resolved on the chart time's UTC date: the date never changes here");
+        assertEquals("03:17", sidereal.getText(), "and reads the entered minute back");
+        assertEquals("03:17", minuteOf(module.observer()), "as the box does");
+        assertEquals(java.time.format.DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss",
+                java.util.Locale.ROOT).withZone(java.time.ZoneOffset.UTC).format(at),
+                field(panel, "instantField").getText(),
+                "the instant field shows the resolved instant");
+        assertEquals(59.913, module.observer().latitudeDegrees(), "the place is untouched");
+        assertEquals("", panel.refusalText());
+    }
+
+    @Test
+    void aSiderealTimeThatCannotBeReadIsRefusedAndTheFieldPutBack() {
+        PlaceAndTimePanel panel = host("en");
+        JTextField sidereal = field(panel, "siderealField");
+        String before = sidereal.getText();
+        for (String wrong : java.util.List.of("25:00", "3:60", "three", "")) {
+            commit(sidereal, wrong);
+            assertEquals(before, sidereal.getText(), "put back after " + wrong);
+            assertEquals(WHEN, module.observer().instant(), "the module never saw " + wrong);
+            assertEquals("Write the sidereal time as hours:minutes, 00:00 to 23:59. Kept "
+                    + before + ".", panel.refusalText());
+        }
+    }
+
+    @Test
+    void aChartTimeSetElsewhereRefreshesTheSiderealField() {
+        PlaceAndTimePanel panel = host("nb-NO");
+        JTextField sidereal = field(panel, "siderealField");
+        edt(() -> module.observer(module.observer().at(WHEN.plusSeconds(3600))));
+        assertEquals(minuteOf(module.observer()), sidereal.getText(),
+                "an hour on, the field follows the module");
+        assertEquals("Lokal stjernetid", ((javax.swing.JLabel) named(panel,
+                "siderealField").getParent().getComponent(0)).getText());
+    }
 }
