@@ -92,6 +92,7 @@ public final class InspectorPanel extends JPanel {
     /** Set chart time to its next meridian transit (#612, P4); shown once the application offers it. */
     private final JButton transitHere;
     private final JLabel transitSaid = new JLabel();
+    private final JPanel transitBox = new JPanel();
     private java.util.function.Function<Selection, String> transit;
     /**
      * The pane's own dismissal (issue #197). The toolbar toggle
@@ -239,7 +240,6 @@ public final class InspectorPanel extends JPanel {
                 said.say("inspector.transit.hover"),
                 said.say("inspector.transit.explain"));
         transitHere.setAlignmentX(0.0f);
-        transitHere.setVisible(false);
         transitHere.addActionListener(event -> {
             if (transit != null) {
                 sayTransit(transit.apply(selection.selection()));
@@ -249,6 +249,13 @@ public final class InspectorPanel extends JPanel {
         transitSaid.setAlignmentX(0.0f);
         transitSaid.setFocusable(false);
         transitSaid.setVisible(false);
+        transitBox.setLayout(new BoxLayout(transitBox, BoxLayout.Y_AXIS));
+        transitBox.setAlignmentX(0.0f);
+        transitBox.add(gap(6));
+        transitBox.add(transitHere);
+        transitBox.add(gap(4));
+        transitBox.add(transitSaid);
+        transitBox.setVisible(false);
 
         close.getAccessibleContext().setAccessibleName(
                 said.say("inspector.close.a11y"));
@@ -305,10 +312,7 @@ public final class InspectorPanel extends JPanel {
         selectedMode.add(workingSet);
         selectedMode.add(stretch());
         selectedMode.add(centreHere);
-        selectedMode.add(gap(6));
-        selectedMode.add(transitHere);
-        selectedMode.add(gap(4));
-        selectedMode.add(transitSaid);
+        selectedMode.add(transitBox);
         modes.add(selectedMode, SELECTED_MODE);
 
         // Two equal halves of whatever room there is, rather than
@@ -803,7 +807,7 @@ said.say("inspector.tab.page.explain"));
             throw new IllegalArgumentException("an action that answers in words");
         }
         this.transit = action;
-        transitHere.setVisible(true);
+        transitBox.setVisible(true);
         revalidate();
     }
 

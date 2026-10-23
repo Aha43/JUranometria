@@ -160,6 +160,21 @@ public final class SolarTableDialog extends JDialog {
                 new SolarTableSession(observer, service, table), said);
     }
 
+    /**
+     * A packed dialog for a photographer over the chart's holder (#612):
+     * its session follows the holder, so a sheet can show the table
+     * stale after the chart moved on, and the row action is offered.
+     */
+    public static SolarTableDialog packedForStudy(Frame owner,
+                                                  juranometria.context.ChartContextHolder chart,
+                                                  SolarSystemService service,
+                                                  InterfaceText said,
+                                                  SolarTable table) {
+        SolarTableSession session = new SolarTableSession(chart::observer, service, table);
+        session.followContext(chart);
+        return new SolarTableDialog(owner, session, said);
+    }
+
     /** The content over a session of its own, headless-constructible, for tests and studies. */
     public static Content content(Supplier<Observer> observer,
                                   SolarSystemService service,

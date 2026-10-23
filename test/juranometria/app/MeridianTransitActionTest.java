@@ -128,10 +128,10 @@ class MeridianTransitActionTest {
         edt(() -> {
             panel[0] = new InspectorPanel(selection, () -> null, () -> null, s -> { },
                     InterfaceText.forLanguage("en"));
-            assertFalse(panel[0].transitButton().isVisible(), "not offered until the application offers it");
+            assertFalse(panel[0].transitButton().isShowing(), "not offered until the application offers it");
             panel[0].offerMeridianTransit(action(module, "en"));
         });
-        assertTrue(panel[0].transitButton().isVisible());
+        assertTrue(panel[0].transitButton().getParent().isVisible(), "offered: the box is shown");
         assertFalse(panel[0].transitButton().isEnabled(), "nothing selected: nothing to follow");
         assertEquals("", panel[0].transitText());
         assertEquals("Set chart time to its next meridian transit", panel[0].transitButton().getText());
