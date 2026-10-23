@@ -7,6 +7,36 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**One chart, one time and place (#612, absorbing #569; Sprint 54).**
+The chart's time and place are one shared context, installed together
+on the event thread and read once per paint and export. Every Solar
+System table computes for that context and no other: *Update from
+Place and Time* is gone, and when the chart time or place moves on
+after a table was computed the rows stay, readable but dimmed, under
+*Computed for the previous chart time and place — Compute again*,
+until the reader computes; nothing recomputes on its own, not even a
+dialog coming to the front. Each table has a third view, *From chart
+time*: a span from 1 day to 365 days, forward or back, at the shared
+step, its first row the chart time itself and nothing stored; the
+absolute range keeps *From (UTC)* / *To (UTC)*, seeded once from the
+chart time. A selected row offers *Set chart time to this instant*,
+which installs the row's instant through the path Place and Time uses
+and redraws every enabled body. Place and Time gains a *Local sidereal
+time* field (hh:mm) that resolves to the instant on the chart time's
+UTC date, the nearer when the date holds it twice, and reads the
+entered minute back; the Inspector gains *Set chart time to its next
+meridian transit* for the selected star, deep-sky object or drawn
+body, solved on the apparent right ascension of date, iterated to the
+second for a moving body and refused past a declared bound, its answer
+stating the altitude and naming *below the horizon*. The instant field
+is labelled *Chart time (UTC)*, the Solar System tab says *Chart time:
+… UTC*, and every explanation that located a table or a body "for the
+place and instant set in Place and Time" says "for the chart time and
+place"; the dialog, the furniture heading, the menu and the frozen note
+keep *Place and Time*. The place still persists and the instant still
+starts at the clock's now. Rulings and the inventory behind them are in
+`docs/decisions/chart-context.md` and the `chart-instant.md` amendment.
+
 ## [5.4.0] - 2026-10-22
 
 **Mercury, never far from the Sun (#580).** A new reader article, in

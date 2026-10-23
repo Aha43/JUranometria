@@ -385,3 +385,70 @@ temporal path drawing; #553 and #497 consume this contract later; no
 silent migration of a saved panel draft into chart state; no local
 civil time; no renaming of the Place and Time surface beyond
 ruling 8's *chart time*.
+
+## 9. As built (the unqualified candidate, 2026-10-24)
+
+What the production commits after the study's landing built, on the
+feature branch and before any gate; the candidate the owner tests is
+built from this head and is not qualified. Every item names the ruling
+it carries out.
+
+- **The holder** (`juranometria.context.ChartContext`,
+  `ChartContextHolder`): an immutable snapshot of the observer and a
+  revision, in an atomic reference; `install` refuses off the event
+  thread and while a paint or export holds the snapshot; listeners are
+  told on the event thread after the swap (P6). The meridian module
+  owns a holder and reads it; the Place and Time panel, *Update to
+  now*, the row action and the transit action all install through the
+  module's `observer(Observer)`, which is the holder's `install`. The
+  chart component holds the snapshot for the whole of `paintComponent`
+  and the export session for the whole of a sheet (P6).
+- **Stamped results, no recomputation** (P1, ruling 3): every table
+  session's `Result` carries the revision it was computed at; a session
+  over the holder says `stale()` when the revision moved; the controls
+  show the stale line - two-line height kept, frame only with the
+  words - and dim the rows and the card in the theme's disabled tone.
+  *Update from Place and Time* and its keys are gone; the Sun and Moon
+  dialog no longer recomputes on focus, and opening a dialog over a
+  session another host has computed shows the result as it stands.
+  The note under a computed table states the context the rows are for.
+- **The relative range and the row action** (P2): `Mode.RELATIVE`, a
+  span index and a direction in the query, resolved from the chart time
+  at every `apply`; whole steps within the span, the chart time an edge
+  and the first row (a backward range is read backwards). The absolute
+  range is seeded from the chart time at build and is the reader's
+  afterwards. *Set chart time to this instant* exists only over a
+  session that follows the holder, is enabled while a row is chosen
+  (or an instant view shows its one row), and installs the row's
+  instant at the chart's place.
+- **Sidereal time** (P3): `juranometria.sky.SiderealSolver`, inverting
+  `LocalSky.localSiderealTimeDegrees` with the rate read from
+  `SkyFrame.gastDegrees` over a UTC day - no typed sidereal constant.
+  The panel's field resolves on the chart time's UTC date to the
+  nearer of the date's occurrences (a sidereal day apart) as a whole
+  second at or after the solution, so the box reads the entered minute
+  back; the date is never left; refusals say *Kept hh:mm*.
+- **The next meridian transit** (P4): the Inspector's action over the
+  selection, wired by the application: a catalogue place precessed and
+  nutated to the date; a drawn body's place from its service - the
+  Moon's topocentric, as #408 computes it - re-read every round until
+  the instant moves by under one second, twelve rounds at most, else
+  refused with the chart time unchanged. The answer states the instant
+  set and the geometric altitude on the meridian, naming *below the
+  horizon*. On the meridian the parallax in right ascension vanishes to
+  first order (it scales with the sine of the hour angle), so the
+  topocentric place is held by construction - the service's - rather
+  than proven by a measurable miss against a geocentric stand-in.
+- **Words** (P5): *Chart time (UTC)*, *Chart time: … UTC*, "for the
+  chart time and place", "at the chart time"; the surfaces that keep
+  *Place and Time* keep it. No article prose changed.
+- **Unchanged** (P7, P8): place persistence, the start-up instant from
+  the clock, the Inspector's occurrence line as the labelled context.
+
+Development checks, recorded as such and never as qualification: the
+full suite on `c5e1d560` (2320 of 2334; the two failures were the
+control-explanations count and the committed table sheets, the
+evidence this sprint regenerates after acceptance), focused suites on
+every later head, and the five photographers run into a scratch folder
+on `f4fb9654`. The committed evidence is not regenerated before the
+owner's acceptance; the gates are not run.
