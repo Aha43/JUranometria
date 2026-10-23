@@ -4202,7 +4202,9 @@ public final class PackagedAcceptanceMain {
         // Setting a place or an instant redraws and does not move the
         // page; only a reader asking does that.
         juranometria.chart.ChartViewState where = chart.viewState();
-        module.observer(module.observer().from(-33.87, 151.21));
+        // Installed on the event thread, as every chart-context change is (#612).
+        javax.swing.SwingUtilities.invokeAndWait(() ->
+                module.observer(module.observer().from(-33.87, 151.21)));
         require(chart.viewState().equals(where)
                         && asked.isEmpty(),
                 "changing the place redraws the lines and leaves the"
