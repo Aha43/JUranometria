@@ -253,6 +253,28 @@ agreement line that compares the instant alone* - a table computed for
 another place at the chart's instant must not read as agreeing.
 
 
+## Amendment (owner, 2026-10-23, #612)
+
+Recorded before #612's production work, from the owner's rulings on
+the one-chart-one-time inventory (`chart-context.md`):
+
+- **Rulings 4 and 5 are superseded.** *Update from Place and Time*
+  and the permanent agreement line disappear: a panel can no longer
+  show a result as current for a context other than the chart's.
+  Changing chart time or place repaints every enabled body at once; a
+  computed table becomes visibly stale and says *Computed for the
+  previous chart time and place - Compute again* until the reader
+  computes it again. *Update to now* stays exactly as ruling 4 gives
+  it; opening, expanding and restoring a panel still compute nothing.
+  The mutation case *an agreement line that recomputes* retires with
+  the line; its successor is *a result shown as current after a
+  context change*.
+- **Ruling 8 is unchanged.** The place may persist; the instant starts
+  at UTC now, read once, every session.
+- **Ruling 2's words gain one term.** The instant is called *chart
+  time* wherever the distinction from a table's or a range's instants
+  matters; the dialog, the menu and the box keep *Place and Time*.
+
 ## As built (#259)
 
 The ruled design, as #259 implements it. The evidence is
