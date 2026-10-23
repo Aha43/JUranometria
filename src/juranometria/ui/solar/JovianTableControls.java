@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,10 +78,16 @@ public final class JovianTableControls {
     public final JLabel observerNote = new JLabel();
     public final JRadioButton instantView;
     public final JRadioButton rangeView;
+    /** From chart time (#612, P2): a span forward or back, the chart time the first row. */
+    public final JRadioButton relativeView;
     public final JTextField start = new JTextField(19);
     public final JTextField end = new JTextField(19);
     public final JComboBox<String> step;
+    public final JComboBox<String> span;
+    public final JComboBox<String> direction;
     public final JButton compute;
+    /** Set chart time to this instant (#612, P2), or null over a session that cannot install. */
+    public final JButton setChartTime;
     /** The Controller's Show on chart box (#484), or null where the host has none. */
     public final javax.swing.JCheckBox onChart;
     /** Centre on chart (#484, through #483's seam), or null where the host has none. */
@@ -128,9 +135,11 @@ public final class JovianTableControls {
         observerNote.setName("jupiterObserverNote");
         instantView = view("view.instant", "jupiterInstantView", true, access);
         rangeView = view("view.range", "jupiterRangeView", false, access);
+        relativeView = view("view.relative", "jupiterRelativeView", false, access);
         ButtonGroup views = new ButtonGroup();
         views.add(instantView);
         views.add(rangeView);
+        views.add(relativeView);
         start.setName("jupiterRangeStart");
         end.setName("jupiterRangeEnd");
         for (JTextField field : List.of(start, end)) {
@@ -145,7 +154,24 @@ public final class JovianTableControls {
         step.setMaximumSize(step.getPreferredSize());
         step.getAccessibleContext().setAccessibleName(said.say("range.step.a11y"));
         Explain.control(step, said.say("range.step.hover"), said.say("range.step.explain"));
+        span = new JComboBox<>(SolarTableSession.SPAN_KEYS.stream().map(said::say)
+                .toArray(String[]::new));
+        span.setName("jupiterRangeSpan");
+        span.setSelectedIndex(1);
+        span.setMaximumSize(span.getPreferredSize());
+        span.getAccessibleContext().setAccessibleName(said.say("span.a11y"));
+        Explain.control(span, said.say("span.hover"), said.say("span.explain"));
+        direction = new JComboBox<>(new String[] {said.say("direction.forward"),
+                said.say("direction.back")});
+        direction.setName("jupiterRangeDirection");
+        direction.setMaximumSize(direction.getPreferredSize());
+        direction.getAccessibleContext().setAccessibleName(said.say("direction.a11y"));
+        Explain.control(direction, said.say("direction.hover"),
+                said.say("direction.explain"));
         compute = button("compute", "jupiterCompute", access);
+        // The row action, only over a session that can install (#612, P2).
+        setChartTime = session.canSetChartTime()
+                ? button("setchart", "jupiterSetChartTime", access) : null;
         status.setName("jupiterStatus");
 
         // The card: a title, then one heading-and-value line per quantity.
@@ -266,6 +292,9 @@ public final class JovianTableControls {
         if (applied.applied()) {
             instantView.setSelected(applied.query().mode() == Mode.INSTANT);
             rangeView.setSelected(applied.query().mode() == Mode.RANGE);
+            relativeView.setSelected(applied.query().mode() == Mode.RELATIVE);
+            span.setSelectedIndex(applied.query().span());
+            direction.setSelectedIndex(applied.query().back() ? 1 : 0);
             if (!applied.query().start().isEmpty()) {
                 start.setText(applied.query().start());
                 end.setText(applied.query().end());
@@ -282,9 +311,20 @@ public final class JovianTableControls {
 
         instantView.addActionListener(e -> apply());
         rangeView.addActionListener(e -> apply());
+        relativeView.addActionListener(e -> apply());
         compute.addActionListener(e -> apply());
         start.addActionListener(e -> apply());
         end.addActionListener(e -> apply());
+        if (setChartTime != null) {
+            setChartTime.addActionListener(e -> {
+                Instant at = selectedInstant();
+                if (at != null) {
+                    session.setChartTime(at);
+                }
+            });
+            table.getSelectionModel().addListSelectionListener(e -> offerSetChartTime());
+            offerSetChartTime();
+        }
 
         if (onChart != null) {
             String stem = "solarsystem.jupiter.onChart";
@@ -315,8 +355,10 @@ public final class JovianTableControls {
 
     /** This host's draft, as a query. */
     public Query draft() {
-        return new Query(instantView.isSelected() ? Mode.INSTANT : Mode.RANGE,
-                start.getText(), end.getText(), step.getSelectedIndex());
+        return new Query(instantView.isSelected() ? Mode.INSTANT
+                        : relativeView.isSelected() ? Mode.RELATIVE : Mode.RANGE,
+                start.getText(), end.getText(), step.getSelectedIndex(),
+                span.getSelectedIndex(), direction.getSelectedIndex() == 1);
     }
 
     /** Applies this host's draft to the session, which tells every host. */
@@ -446,7 +488,8 @@ public final class JovianTableControls {
         shown = result;
         Observer now = result.applied() ? result.observer() : session.observerNow();
         boolean present = now != null;
-        for (JComponent c : List.of(instantView, rangeView, start, end, step, compute)) {
+        for (JComponent c : List.of(instantView, relativeView, rangeView, start, end, step,
+                span, direction, compute)) {
             c.setEnabled(present);
         }
         if (!present) {
@@ -457,6 +500,7 @@ public final class JovianTableControls {
             say(" ");
             refreshResult();
             sayStale();
+            offerSetChartTime();
             return;
         }
         sayNote(now, result.applied());
@@ -504,6 +548,7 @@ public final class JovianTableControls {
         say(text);
         refreshResult();
         sayStale();
+        offerSetChartTime();
     }
 
     /** The card for one instant, or blank. */
@@ -549,6 +594,29 @@ public final class JovianTableControls {
         observerNote.getAccessibleContext().setAccessibleName(note);
     }
 
+    /**
+     * The instant of the selected row - or of the one row an instant
+     * view shows - for Set chart time to this instant (#612, P2); null
+     * while no row is chosen.
+     */
+    public Instant selectedInstant() {
+        int row = table.getSelectedRow();
+        if (row >= 0 && row < model.getRowCount()) {
+            return model.lines().get(row).jupiter().instant();
+        }
+        if (shown != null && shown.applied() && shown.entries().size() == 1) {
+            return shown.entries().get(0).sample().instant();
+        }
+        return null;
+    }
+
+    /** Offers the row action while a row is chosen. */
+    private void offerSetChartTime() {
+        if (setChartTime != null) {
+            setChartTime.setEnabled(selectedInstant() != null);
+        }
+    }
+
     private void say(String text) {
         status.setText(narrow && text.length() > 1
                 ? juranometria.ui.WrappedText.html(text, NARROW,
@@ -586,8 +654,14 @@ public final class JovianTableControls {
         viewRow.setAlignmentX(0f);
         viewRow.add(instantView);
         viewRow.add(Box.createHorizontalStrut(12));
+        viewRow.add(relativeView);
+        viewRow.add(Box.createHorizontalStrut(12));
         viewRow.add(rangeView);
         top.add(viewRow);
+        top.add(Box.createVerticalStrut(8));
+        JComponent relativeRow = spanRow();
+        relativeRow.setAlignmentX(0f);
+        top.add(relativeRow);
         top.add(Box.createVerticalStrut(8));
         JPanel rangeRow = new JPanel();
         rangeRow.setLayout(new BoxLayout(rangeRow, BoxLayout.X_AXIS));
@@ -652,12 +726,12 @@ public final class JovianTableControls {
         observerNote.putClientProperty("FlatLaf.styleClass", "small");
         column.add(leadingWide(observerNote));
         column.add(Box.createVerticalStrut(6));
-        JPanel views = new JPanel();
-        views.setLayout(new BoxLayout(views, BoxLayout.X_AXIS));
-        views.add(instantView);
-        views.add(Box.createHorizontalStrut(10));
-        views.add(rangeView);
-        column.add(leading(views));
+        // Three views, one per row in the narrow group (#612, P2): the
+        // instant; from chart time with its span and direction; a range.
+        column.add(leading(instantView));
+        column.add(leading(relativeView));
+        column.add(leading(spanRow()));
+        column.add(leading(rangeView));
         column.add(labelled("range.start", start));
         column.add(labelled("range.end", end));
         JPanel stepRow = new JPanel();
@@ -683,6 +757,10 @@ public final class JovianTableControls {
         }
         if (centreOnChart != null) {
             column.add(leading(centreOnChart));
+            column.add(Box.createVerticalStrut(4));
+        }
+        if (setChartTime != null) {
+            column.add(leading(setChartTime));
             column.add(Box.createVerticalStrut(4));
         }
         refreshResult();
@@ -763,6 +841,20 @@ public final class JovianTableControls {
         holder.setAlignmentX(0f);
         holder.add(label, BorderLayout.CENTER);
         return holder;
+    }
+
+    /** The relative range's span and direction on one row (#612, P2). */
+    JComponent spanRow() {
+        JPanel row = new JPanel();
+        row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
+        JLabel over = new JLabel(said.say("span.label"));
+        over.setLabelFor(span);
+        row.add(over);
+        row.add(Box.createHorizontalStrut(6));
+        row.add(span);
+        row.add(Box.createHorizontalStrut(6));
+        row.add(direction);
+        return row;
     }
 
     private static JComponent leading(JComponent row) {

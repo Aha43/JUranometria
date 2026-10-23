@@ -3,6 +3,7 @@ package juranometria.ui.solar;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -72,10 +73,16 @@ public final class SolarTableControls {
     public final JLabel observerNote = new JLabel();
     public final JRadioButton instantView;
     public final JRadioButton rangeView;
+    /** From chart time (#612, P2): a span forward or back, the chart time the first row. */
+    public final JRadioButton relativeView;
     public final JTextField start = new JTextField(19);
     public final JTextField end = new JTextField(19);
     public final JComboBox<String> step;
+    public final JComboBox<String> span;
+    public final JComboBox<String> direction;
     public final JButton compute;
+    /** Set chart time to this instant (#612, P2), or null over a session that cannot install. */
+    public final JButton setChartTime;
     public final JLabel status = new JLabel(" ");
     /** The body's Show on chart box, or null for a host without a switch. */
     public final JCheckBox onChart;
@@ -127,9 +134,11 @@ public final class SolarTableControls {
         observerNote.setName(names + "ObserverNote");
         instantView = view("view.instant", names + "InstantView", true, access);
         rangeView = view("view.range", names + "RangeView", false, access);
+        relativeView = view("view.relative", names + "RelativeView", false, access);
         ButtonGroup views = new ButtonGroup();
         views.add(instantView);
         views.add(rangeView);
+        views.add(relativeView);
 
         start.setName(names + "RangeStart");
         end.setName(names + "RangeEnd");
@@ -145,7 +154,24 @@ public final class SolarTableControls {
         step.setMaximumSize(step.getPreferredSize());
         step.getAccessibleContext().setAccessibleName(said.say("range.step.a11y"));
         Explain.control(step, said.say("range.step.hover"), said.say("range.step.explain"));
+        span = new JComboBox<>(SolarTableSession.SPAN_KEYS.stream().map(said::say)
+                .toArray(String[]::new));
+        span.setName(names + "RangeSpan");
+        span.setSelectedIndex(1);
+        span.setMaximumSize(span.getPreferredSize());
+        span.getAccessibleContext().setAccessibleName(said.say("span.a11y"));
+        Explain.control(span, said.say("span.hover"), said.say("span.explain"));
+        direction = new JComboBox<>(new String[] {said.say("direction.forward"),
+                said.say("direction.back")});
+        direction.setName(names + "RangeDirection");
+        direction.setMaximumSize(direction.getPreferredSize());
+        direction.getAccessibleContext().setAccessibleName(said.say("direction.a11y"));
+        Explain.control(direction, said.say("direction.hover"),
+                said.say("direction.explain"));
         compute = button("compute", names + "Compute", access);
+        // The row action, only over a session that can install (#612, P2).
+        setChartTime = session.canSetChartTime()
+                ? button("setchart", names + "SetChartTime", access) : null;
         status.setName(names + "Status");
 
         model = new SolarTableModel(language, body);
@@ -198,6 +224,9 @@ public final class SolarTableControls {
         if (applied.applied()) {
             instantView.setSelected(applied.query().mode() == SolarTableSession.Mode.INSTANT);
             rangeView.setSelected(applied.query().mode() == SolarTableSession.Mode.RANGE);
+            relativeView.setSelected(applied.query().mode() == SolarTableSession.Mode.RELATIVE);
+            span.setSelectedIndex(applied.query().span());
+            direction.setSelectedIndex(applied.query().back() ? 1 : 0);
             if (!applied.query().start().isEmpty()) {
                 start.setText(applied.query().start());
                 end.setText(applied.query().end());
@@ -214,9 +243,20 @@ public final class SolarTableControls {
 
         instantView.addActionListener(e -> apply());
         rangeView.addActionListener(e -> apply());
+        relativeView.addActionListener(e -> apply());
         compute.addActionListener(e -> apply());
         start.addActionListener(e -> apply());
         end.addActionListener(e -> apply());
+        if (setChartTime != null) {
+            setChartTime.addActionListener(e -> {
+                Instant at = selectedInstant();
+                if (at != null) {
+                    session.setChartTime(at);
+                }
+            });
+            table.getSelectionModel().addListSelectionListener(e -> offerSetChartTime());
+            offerSetChartTime();
+        }
 
         if (centre != null) {
             if (layer == null) {
@@ -331,8 +371,10 @@ public final class SolarTableControls {
     public SolarTableSession.Query draft() {
         return new SolarTableSession.Query(
                 instantView.isSelected() ? SolarTableSession.Mode.INSTANT
+                        : relativeView.isSelected() ? SolarTableSession.Mode.RELATIVE
                         : SolarTableSession.Mode.RANGE,
-                start.getText(), end.getText(), step.getSelectedIndex());
+                start.getText(), end.getText(), step.getSelectedIndex(),
+                span.getSelectedIndex(), direction.getSelectedIndex() == 1);
     }
 
     /** Applies this host's draft to the session, which tells every host. */
@@ -366,7 +408,8 @@ public final class SolarTableControls {
         shown = result;
         Observer now = result.applied() ? result.observer() : session.observerNow();
         boolean present = now != null;
-        for (JComponent c : List.of(instantView, rangeView, start, end, step, compute)) {
+        for (JComponent c : List.of(instantView, relativeView, rangeView, start, end, step,
+                span, direction, compute)) {
             c.setEnabled(present);
         }
         if (!present) {
@@ -376,6 +419,7 @@ public final class SolarTableControls {
             say(" ");
             refreshResult();
             sayStale();
+            offerSetChartTime();
             return;
         }
         sayNote(now, result.applied());
@@ -399,6 +443,7 @@ public final class SolarTableControls {
         }
         refreshResult();
         sayStale();
+        offerSetChartTime();
     }
 
     /**
@@ -419,6 +464,29 @@ public final class SolarTableControls {
                         observerNote.getFontMetrics(observerNote.getFont()))
                 : note);
         observerNote.getAccessibleContext().setAccessibleName(note);
+    }
+
+    /**
+     * The instant of the selected row - or of the one row an instant
+     * view shows - for Set chart time to this instant (#612, P2); null
+     * while no row is chosen.
+     */
+    public Instant selectedInstant() {
+        int row = table.getSelectedRow();
+        if (row >= 0 && row < model.getRowCount()) {
+            return model.rows().get(row).sample().instant();
+        }
+        if (shown != null && shown.applied() && shown.rows().size() == 1) {
+            return shown.rows().get(0).sample().instant();
+        }
+        return null;
+    }
+
+    /** Offers the row action while a row is chosen. */
+    private void offerSetChartTime() {
+        if (setChartTime != null) {
+            setChartTime.setEnabled(selectedInstant() != null);
+        }
     }
 
     private void say(String text) {
@@ -463,12 +531,12 @@ public final class SolarTableControls {
         column.add(wrapped(observerNote));
         column.add(Box.createVerticalStrut(6));
 
-        JPanel views = new JPanel();
-        views.setLayout(new BoxLayout(views, BoxLayout.X_AXIS));
-        views.add(instantView);
-        views.add(Box.createHorizontalStrut(10));
-        views.add(rangeView);
-        column.add(leading(views));
+        // Three views, one per row in the narrow group (#612, P2): the
+        // instant; from chart time with its span and direction; a range.
+        column.add(leading(instantView));
+        column.add(leading(relativeView));
+        column.add(leading(spanRow()));
+        column.add(leading(rangeView));
 
         column.add(labelled("range.start", start));
         column.add(labelled("range.end", end));
@@ -496,6 +564,10 @@ public final class SolarTableControls {
         }
         if (centreOnChart != null) {
             column.add(leading(centreOnChart));
+            column.add(Box.createVerticalStrut(4));
+        }
+        if (setChartTime != null) {
+            column.add(leading(setChartTime));
             column.add(Box.createVerticalStrut(4));
         }
         refreshResult();
@@ -586,6 +658,20 @@ public final class SolarTableControls {
         holder.setAlignmentX(0f);
         holder.add(label, BorderLayout.CENTER);
         return holder;
+    }
+
+    /** The relative range's span and direction on one row (#612, P2). */
+    JComponent spanRow() {
+        JPanel row = new JPanel();
+        row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
+        JLabel over = new JLabel(said.say("span.label"));
+        over.setLabelFor(span);
+        row.add(over);
+        row.add(Box.createHorizontalStrut(6));
+        row.add(span);
+        row.add(Box.createHorizontalStrut(6));
+        row.add(direction);
+        return row;
     }
 
     private static JComponent leading(JComponent row) {

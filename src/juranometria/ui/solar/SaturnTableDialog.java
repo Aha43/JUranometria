@@ -133,6 +133,10 @@ public final class SaturnTableDialog extends JDialog {
             JPanel buttons = new JPanel();
             buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
             buttons.setAlignmentX(0f);
+            if (controls.setChartTime != null) {
+                buttons.add(controls.setChartTime);
+                buttons.add(Box.createHorizontalStrut(8));
+            }
             if (controls.centreOnChart != null) {
                 buttons.add(controls.centreOnChart);
             }

@@ -609,8 +609,8 @@ public final class SolarSystemControlsStudyMain {
             InterfaceText said = InterfaceText.forLanguage(language);
             Map<Character, String> table = new LinkedHashMap<>();
             SolarTableDialog.Content content = content(SolarTable.sun(), said);
-            for (AbstractButton button : List.of(content.instantView, content.rangeView,
-                    content.compute, content.close)) {
+            for (AbstractButton button : List.of(content.instantView, content.relativeView,
+                    content.rangeView, content.compute, content.close)) {
                 if (button.getMnemonic() != 0) {
                     table.put(Character.toUpperCase((char) button.getMnemonic()),
                             button.getText());

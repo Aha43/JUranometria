@@ -92,6 +92,8 @@ public final class JovianTableSession {
 
     /** The chart's context, read once per application: the observer and the revision it is at. */
     private Supplier<ChartContext> context;
+    /** The holder a row may set the chart time through (#612, P2); null over a plain supplier. */
+    private ChartContextHolder installer;
     private final Supplier<JovianSystemService> service;
     private final List<Consumer<Result>> listeners = new ArrayList<>();
     private Result result = Result.none();
@@ -155,6 +157,7 @@ public final class JovianTableSession {
             throw new IllegalArgumentException("a holder to follow");
         }
         this.context = holder::current;
+        this.installer = holder;
         this.observerChanges = listener -> holder.onChange(change -> listener.run())::cancel;
     }
 
@@ -172,6 +175,28 @@ public final class JovianTableSession {
     public boolean stale() {
         return result.applied() && result.observer() != null
                 && result.revision() != revision();
+    }
+
+    /** Whether a host may set the chart time from a row: only over the chart's holder (#612, P2). */
+    public boolean canSetChartTime() {
+        return installer != null;
+    }
+
+    /**
+     * Sets the chart time to this instant at the chart's place - the
+     * row action <em>Set chart time to this instant</em> (#612, ruling
+     * P2) - through the holder Place and Time installs through, so
+     * every enabled body is redrawn for it. On the event thread, as
+     * every installation is; this table is then stale until computed.
+     */
+    public void setChartTime(Instant instant) {
+        if (instant == null) {
+            throw new IllegalArgumentException("an instant to set the chart time to");
+        }
+        if (installer == null) {
+            throw new IllegalStateException("this session follows no chart holder");
+        }
+        installer.install(installer.observer().at(instant));
     }
 
     /** The first civil day Jupiter answers for. */
@@ -270,11 +295,20 @@ public final class JovianTableSession {
     }
 
     private Result range(Query query, Observer now) {
-        Instant from = SolarTableSession.parse(query.start());
-        Instant to = SolarTableSession.parse(query.end());
-        if (from == null || to == null) {
-            return new Result(query, Outcome.REFUSED_INSTANT, List.of(), now,
-                    from == null ? query.start() : query.end(), 0);
+        Instant from;
+        Instant to;
+        if (query.mode() == Mode.RELATIVE) {
+            // From the chart time read now (#612, P2), never a stored instant.
+            Instant[] edges = SolarTableSession.relativeEdges(query, now.instant());
+            from = edges[0];
+            to = edges[1];
+        } else {
+            from = SolarTableSession.parse(query.start());
+            to = SolarTableSession.parse(query.end());
+            if (from == null || to == null) {
+                return new Result(query, Outcome.REFUSED_INSTANT, List.of(), now,
+                        from == null ? query.start() : query.end(), 0);
+            }
         }
         Duration by = SolarTableSession.STEPS.get(query.step());
         if (to.isBefore(from)) {
@@ -304,7 +338,9 @@ public final class JovianTableSession {
             entries.add(new Entry(sample, c.jupiter(), c));
         }
         boolean appended = entries.get(entries.size() - 1).sample().appendedEnd();
+        List<Entry> ordered = query.mode() == Mode.RELATIVE && query.back()
+                ? SolarTableSession.backwards(entries) : List.copyOf(entries);
         return new Result(query, appended ? Outcome.APPENDED : Outcome.ROWS,
-                List.copyOf(entries), now, "", entries.size());
+                ordered, now, "", entries.size());
     }
 }

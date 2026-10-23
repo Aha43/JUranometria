@@ -206,10 +206,15 @@ public final class SolarTableDialog extends JDialog {
         public final JLabel observerNote;
         public final JRadioButton instantView;
         public final JRadioButton rangeView;
+        public final JRadioButton relativeView;
         public final JTextField start;
         public final JTextField end;
         public final JComboBox<String> step;
+        public final JComboBox<String> span;
+        public final JComboBox<String> direction;
         public final JButton compute;
+        /** Set chart time to this instant (#612, P2), or null over a session that cannot install. */
+        public final JButton setChartTime;
         public final JButton close;
         public final JLabel status;
         public final JLabel timeNote = new JLabel();
@@ -231,10 +236,14 @@ public final class SolarTableDialog extends JDialog {
             observerNote = controls.observerNote;
             instantView = controls.instantView;
             rangeView = controls.rangeView;
+            relativeView = controls.relativeView;
             start = controls.start;
             end = controls.end;
             step = controls.step;
+            span = controls.span;
+            direction = controls.direction;
             compute = controls.compute;
+            setChartTime = controls.setChartTime;
             status = controls.status;
             SolarTableWords said = controls.words();
             MnemonicText letters = MnemonicText.in(language);
@@ -261,8 +270,26 @@ public final class SolarTableDialog extends JDialog {
             viewRow.setAlignmentX(0.0f);
             viewRow.add(instantView);
             viewRow.add(Box.createHorizontalStrut(12));
+            viewRow.add(relativeView);
+            viewRow.add(Box.createHorizontalStrut(12));
             viewRow.add(rangeView);
             top.add(viewRow);
+            top.add(Box.createVerticalStrut(8));
+
+            // From chart time (#612, P2): the span and the direction; the
+            // step below is shared with the absolute range.
+            JPanel relativeRow = new JPanel();
+            relativeRow.setLayout(new BoxLayout(relativeRow, BoxLayout.X_AXIS));
+            relativeRow.setAlignmentX(0.0f);
+            JLabel over = new JLabel(said.say("span.label"));
+            over.setLabelFor(span);
+            letters.apply(over, said.key("span.mnemonic"));
+            relativeRow.add(over);
+            relativeRow.add(Box.createHorizontalStrut(6));
+            relativeRow.add(span);
+            relativeRow.add(Box.createHorizontalStrut(6));
+            relativeRow.add(direction);
+            top.add(relativeRow);
             top.add(Box.createVerticalStrut(8));
 
             JPanel rangeRow = new JPanel();
@@ -308,6 +335,10 @@ public final class SolarTableDialog extends JDialog {
             JPanel buttons = new JPanel();
             buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
             buttons.setAlignmentX(0.0f);
+            if (controls.setChartTime != null) {
+                buttons.add(controls.setChartTime);
+                buttons.add(Box.createHorizontalStrut(8));
+            }
             if (controls.centreOnChart != null) {
                 buttons.add(controls.centreOnChart);
             }
