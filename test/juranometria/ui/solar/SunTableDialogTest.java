@@ -67,8 +67,8 @@ class SunTableDialogTest {
         assertTrue(rig.content.instantView.isSelected(), "the instant view");
         assertFalse(rig.content.rangeView.isSelected());
         assertEquals(1, rig.content.model.getRowCount());
-        assertEquals("Observer at latitude 59.91, longitude 10.75 east; instant"
-                + " 2026-06-21 10:00:00 UTC, from Place and Time.",
+        assertEquals("Computed for chart time 2026-06-21 10:00:00 UTC at latitude 59.91,"
+                + " longitude 10.75 east.",
                 rig.content.observerNote.getText());
         assertEquals("1 rows.", rig.content.status());
         assertEquals("2026-06-21 10:00:00", rig.content.start.getText(),
@@ -108,8 +108,8 @@ class SunTableDialogTest {
         assertEquals(before, rig.content.model.getValueAt(0, 4),
                 "nothing moves until the table reads again");
         rig.content.update();
-        // One read computes; since #259 the agreement line reads Place and
-        // Time once more, to compare against the chart - never to compute.
+        // One read computes; the stale line reads the chart's revision once
+        // more, to compare against the stamp - never to compute (#612).
         assertEquals(reads + 2, rig.reads, "one read per update, and one to compare");
         assertNotEquals(before, rig.content.model.getValueAt(0, 4),
                 "Quito's Sun stands at a different height");
@@ -226,7 +226,8 @@ class SunTableDialogTest {
         assertTrue(String.valueOf(nb.content.model.getValueAt(0, 4))
                 .endsWith("° (under horisonten)"),
                 "the status below the horizon is the language's own words");
-        assertTrue(nb.content.observerNote.getText().startsWith("Observatør"));
+        assertTrue(nb.content.observerNote.getText().startsWith("Beregnet for karttid"),
+                nb.content.observerNote.getText());
     }
 
     @Test
@@ -265,7 +266,8 @@ class SunTableDialogTest {
                     + " names itself to a screen reader");
             assertEquals(List.of(), shared, language + ": no two controls"
                     + " share an access letter");
-            assertTrue(letters.size() >= 8, language + ": the eight controls"
+            // Seven since #612: Update from Place and Time is gone.
+            assertTrue(letters.size() >= 7, language + ": the seven controls"
                     + " have letters: " + letters.size());
             String tableName = rig.content.table.getAccessibleContext()
                     .getAccessibleName();

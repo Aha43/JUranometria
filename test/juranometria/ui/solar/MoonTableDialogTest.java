@@ -73,8 +73,8 @@ class MoonTableDialogTest {
         Rig rig = new Rig("en");
         assertTrue(rig.content.instantView.isSelected());
         assertEquals(1, rig.content.model.getRowCount());
-        assertEquals("Observer at latitude 59.91, longitude 10.75 east; instant"
-                + " 2026-06-21 10:00:00 UTC, from Place and Time.",
+        assertEquals("Computed for chart time 2026-06-21 10:00:00 UTC at latitude 59.91,"
+                + " longitude 10.75 east.",
                 rig.content.observerNote.getText());
         assertEquals("1 rows.", rig.content.status());
         assertEquals("2026-06-21 10:00:00", rig.content.start.getText());
@@ -166,8 +166,8 @@ class MoonTableDialogTest {
         rig.observer = new Observer(-0.18, -78.5, MIDSUMMER);
         assertEquals(altitude, rig.cell(0, 3), "nothing moves until the table reads");
         rig.content.update();
-        // One read computes; since #259 the agreement line reads Place and
-        // Time once more, to compare against the chart - never to compute.
+        // One read computes; the stale line reads the chart's revision once
+        // more, to compare against the stamp - never to compute (#612).
         assertEquals(reads + 2, rig.reads, "one read per update, and one to compare");
         assertNotEquals(altitude, rig.cell(0, 3), "a different sky");
         assertNotEquals(distance, rig.cell(0, 5), "a different topocentric distance");
@@ -307,7 +307,8 @@ class MoonTableDialogTest {
             }
             assertEquals(List.of(), nameless, language);
             assertEquals(List.of(), shared, language);
-            assertTrue(letters.size() >= 8, language + ": " + letters.size());
+            // Seven since #612: Update from Place and Time is gone.
+            assertTrue(letters.size() >= 7, language + ": " + letters.size());
             assertEquals(language.equals("en") ? "Show the Moon at the instant"
                     + " set in Place and Time" : "Vis Månen ved tidspunktet satt"
                     + " i Sted og tid", rig.content.instantView

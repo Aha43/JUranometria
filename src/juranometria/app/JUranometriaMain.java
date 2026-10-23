@@ -480,11 +480,13 @@ public final class JUranometriaMain {
         juranometria.ui.solar.SolarTableSession mercuryTable =
                 new juranometria.ui.solar.SolarTableSession(observerNow,
                         solarSystem, juranometria.ui.solar.SolarTable.mercury());
-        // Each table's agreement line follows Place and Time (#259, ruling
-        // 5 on #556) - said again on every change, never recomputed.
+        // Each table follows the chart's one context (#612): a result is
+        // stamped with the revision it was computed at, and when the
+        // chart moves on the table says it is stale - never recomputed
+        // until the reader computes (ruling P1).
         for (juranometria.ui.solar.SolarTableSession session
                 : java.util.List.of(sunTable, moonTable, venusTable, mercuryTable)) {
-            session.followObserver(placeAndTimeChanges);
+            session.followContext(meridian.context());
         }
         // Jupiter and the four Galilean moons (#474): one session shared
         // by the Controller's Jupiter group and the Jupiter dialog, over
@@ -506,7 +508,7 @@ public final class JUranometriaMain {
                 };
         juranometria.ui.solar.JovianTableSession jupiterTable =
                 new juranometria.ui.solar.JovianTableSession(observerNow, jovianSystem);
-        jupiterTable.followObserver(placeAndTimeChanges);
+        jupiterTable.followContext(meridian.context());
         // Saturn, its rings and its seven ruled moons (#576): one session
         // shared by the Controller's Saturn group and the Saturn dialog,
         // over the same observer; the 79 MB Saturn pack is read once, when
@@ -527,7 +529,7 @@ public final class JUranometriaMain {
                 };
         juranometria.ui.solar.SaturnTableSession saturnTable =
                 new juranometria.ui.solar.SaturnTableSession(observerNow, saturnSystem);
-        saturnTable.followObserver(placeAndTimeChanges);
+        saturnTable.followContext(meridian.context());
         // Jupiter on the chart (#484, ruled on #482): one Jovian module
         // over the same observer and the same lazy pack, with its one
         // remembered switch, off by default. The pack loads only when

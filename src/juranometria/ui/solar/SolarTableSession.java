@@ -13,6 +13,8 @@ import java.util.Locale;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import juranometria.context.ChartContext;
+import juranometria.context.ChartContextHolder;
 import juranometria.sky.Observer;
 import juranometria.solar.SolarSystemService;
 import juranometria.solar.TimeRange;
@@ -23,13 +25,14 @@ import juranometria.solar.TimeRange;
  *
  * <p>A host keeps its own draft - which view, and the range's start,
  * end and step as typed - and <strong>applies</strong> it here.
- * Applying reads Place and Time's observer, computes, and tells every
+ * Applying reads the chart's context once, computes, and tells every
  * subscriber; the dialog and the Controller then show the same rows
- * and the same outcome, whichever host asked. {@link #update()}
- * re-reads the observer and recomputes the applied query: the
- * dialog's <em>Update from Place and Time</em>, and its coming to the
- * front (ruled on #400, kept on #457). Nothing here calculates unless
- * asked, and nothing is persisted (ruled on #400).
+ * and the same outcome, whichever host asked. A result is stamped
+ * with the revision of the context it was computed at (#612); when
+ * the chart moves on, the result stays as it was and {@link #stale()}
+ * says so - nothing recomputes until a host applies again (ruling P1).
+ * Nothing here calculates unless asked, and nothing is persisted
+ * (ruled on #400).
  *
  * <p>The refusals are the dialog's, moved here so both hosts refuse
  * the same thing: a range that cannot be read, runs backwards, asks
@@ -83,7 +86,18 @@ public final class SolarTableSession {
      * and how many rows a refused range asked for.
      */
     public record Result(Query query, Outcome outcome, List<SolarTableModel.Row> rows,
-                         Observer observer, String detail, long rowsAsked) {
+                         Observer observer, String detail, long rowsAsked, long revision) {
+
+        /** A result before its stamp: revision 0, which a plain supplier never leaves. */
+        public Result(Query query, Outcome outcome, List<SolarTableModel.Row> rows,
+                      Observer observer, String detail, long rowsAsked) {
+            this(query, outcome, rows, observer, detail, rowsAsked, 0);
+        }
+
+        /** This result stamped with the revision of the context it was computed at (#612). */
+        Result at(long revision) {
+            return new Result(query, outcome, rows, observer, detail, rowsAsked, revision);
+        }
 
         /** Before any query: nothing applied, nothing to show. */
         static Result none() {
@@ -108,7 +122,8 @@ public final class SolarTableSession {
             .ofPattern("uuuu-MM-dd HH:mm", Locale.ROOT)
             .withResolverStyle(ResolverStyle.STRICT).withZone(ZoneOffset.UTC);
 
-    private final Supplier<Observer> observer;
+    /** The chart's context, read once per application: the observer and the revision it is at. */
+    private Supplier<ChartContext> context;
     private final Supplier<SolarSystemService> service;
     private final SolarTable table;
     private final List<Consumer<Result>> listeners = new ArrayList<>();
@@ -133,7 +148,12 @@ public final class SolarTableSession {
             throw new IllegalArgumentException(
                     "a session reads an observer and a service, for a body");
         }
-        this.observer = observer;
+        // A plain supplier of the observer (tests and photographers)
+        // stands at revision 0 for ever: nothing it answers is ever stale.
+        this.context = () -> {
+            Observer now = observer.get();
+            return now == null ? null : new ChartContext(now, 0);
+        };
         this.service = service;
         this.table = table;
     }
@@ -143,9 +163,10 @@ public final class SolarTableSession {
         return table;
     }
 
-    /** The observer Place and Time holds now, or null while it holds none. */
+    /** The observer the chart holds now, or null while it holds none. */
     public Observer observerNow() {
-        return observer.get();
+        ChartContext at = context.get();
+        return at == null ? null : at.observer();
     }
 
     /** How a host is told Place and Time changed; nothing until the atlas says. */
@@ -168,6 +189,36 @@ public final class SolarTableSession {
     /** Tells a host whenever Place and Time changes; returns its cancel. */
     public Runnable onObserverChange(Runnable listener) {
         return observerChanges.apply(listener);
+    }
+
+    /**
+     * Follows the chart's one context (#612): the observer and the
+     * revision it stands at are read together from the holder, and every
+     * host is told on the holder's own subscription - to say the table is
+     * stale (ruling P1), never to recompute.
+     */
+    public void followContext(ChartContextHolder holder) {
+        if (holder == null) {
+            throw new IllegalArgumentException("a holder to follow");
+        }
+        this.context = holder::current;
+        this.observerChanges = listener -> holder.onChange(change -> listener.run())::cancel;
+    }
+
+    /** The revision the chart's context stands at now, or -1 while it holds none. */
+    public long revision() {
+        ChartContext at = context.get();
+        return at == null ? -1 : at.revision();
+    }
+
+    /**
+     * Whether the result was computed at an earlier revision of the
+     * chart's context than the chart holds now (ruling P1 on #612): the
+     * stamp decides, not a comparison of observers.
+     */
+    public boolean stale() {
+        return result.applied() && result.observer() != null
+                && result.revision() != revision();
     }
 
     /** The service's time scales, for the note a host writes under its table. */
@@ -205,10 +256,12 @@ public final class SolarTableSession {
         if (query == null) {
             throw new IllegalArgumentException("a query is required");
         }
-        Observer now = observer.get();
+        ChartContext at = context.get();
+        Observer now = at == null ? null : at.observer();
         Result answered = now == null
                 ? new Result(query, Outcome.OBSERVER_ABSENT, List.of(), null, "", 0)
-                : query.mode() == Mode.INSTANT ? instant(query, now) : range(query, now);
+                : (query.mode() == Mode.INSTANT ? instant(query, now) : range(query, now))
+                        .at(at.revision());
         result = answered;
         for (Consumer<Result> listener : List.copyOf(listeners)) {
             listener.accept(answered);
@@ -216,7 +269,7 @@ public final class SolarTableSession {
     }
 
     /**
-     * Re-reads the observer and recomputes the applied query - the
+     * Recomputes the applied query at the chart's context now - the
      * single instant when nothing has been applied yet, which is what
      * a dialog opens on.
      */

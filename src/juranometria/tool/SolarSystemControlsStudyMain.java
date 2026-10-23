@@ -328,8 +328,6 @@ public final class SolarSystemControlsStudyMain {
                 ? "menu.sunchart.label" : "menu.moonchart.label"));
         onChart.getAccessibleContext().setAccessibleName(onChart.getText());
         column.add(leading(onChart));
-        column.add(Box.createVerticalStrut(4));
-        column.add(leading(content.update));
         return CompanionSection.forStudy(table.prefix(),
                 study(language, table.prefix()), column, said);
     }
@@ -506,9 +504,6 @@ public final class SolarSystemControlsStudyMain {
                     .append(" | JComboBox | draft | no |\n");
             out.append("| ").append(b).append(" | ").append(content.compute.getText())
                     .append(" | JButton | action: compute the draft | no |\n");
-            out.append("| ").append(b).append(" | ").append(content.update.getText())
-                    .append(" | JButton | action: re-read the observer, recompute"
-                            + " | no |\n");
             out.append("| ").append(b).append(" | ").append(content.status.getName())
                     .append(" | JLabel | result: rows or a refusal | no |\n");
             out.append("| ").append(b).append(" | ").append(content.table.getName())
@@ -615,7 +610,7 @@ public final class SolarSystemControlsStudyMain {
             Map<Character, String> table = new LinkedHashMap<>();
             SolarTableDialog.Content content = content(SolarTable.sun(), said);
             for (AbstractButton button : List.of(content.instantView, content.rangeView,
-                    content.compute, content.update, content.close)) {
+                    content.compute, content.close)) {
                 if (button.getMnemonic() != 0) {
                     table.put(Character.toUpperCase((char) button.getMnemonic()),
                             button.getText());

@@ -2093,12 +2093,12 @@ public final class PackagedAcceptanceMain {
             require(jupiter.computations() == 0,
                     "building the Jupiter group and opening the dialog compute nothing");
 
-            javax.swing.SwingUtilities.invokeAndWait(() -> section[0].jupiter().update.doClick());
+            javax.swing.SwingUtilities.invokeAndWait(() -> section[0].jupiter().compute.doClick());
             juranometria.ui.solar.JovianTableControls group = section[0].jupiter();
             juranometria.ui.solar.JovianTableControls shown = dialog[0].controls();
             require(jupiter.computations() == 1 && group.shown() == shown.shown()
                             && shown.model.getRowCount() == 4,
-                    "one Update in the Controller is the dialog's result too");
+                    "one Compute in the Controller is the dialog's result too");
             java.util.List<String> states = new java.util.ArrayList<>();
             java.util.List<String> tilstand = new java.util.ArrayList<>();
             for (int row = 0; row < 4; row++) {

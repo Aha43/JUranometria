@@ -81,7 +81,6 @@ public final class JovianTableControls {
     public final JTextField end = new JTextField(19);
     public final JComboBox<String> step;
     public final JButton compute;
-    public final JButton update;
     /** The Controller's Show on chart box (#484), or null where the host has none. */
     public final javax.swing.JCheckBox onChart;
     /** Centre on chart (#484, through #483's seam), or null where the host has none. */
@@ -96,9 +95,9 @@ public final class JovianTableControls {
     private final JPanel card = new JPanel();
     private final SolarTableSession.Subscription following;
     private JovianTableSession.Result shown;
-    /** The agreement line (#259), opening every arrangement. */
-    AgreementLine agreement;
-    /** Following Place and Time, to say the agreement again; never to recompute. */
+    /** The stale line (#612, ruling P1), opening every arrangement. */
+    StaleLine stale;
+    /** Following the chart's context, to say the table is stale; never to recompute. */
     private Runnable followingChart = () -> { };
     private JPanel resultHolder;
     private boolean narrow;
@@ -147,7 +146,6 @@ public final class JovianTableControls {
         step.getAccessibleContext().setAccessibleName(said.say("range.step.a11y"));
         Explain.control(step, said.say("range.step.hover"), said.say("range.step.explain"));
         compute = button("compute", "jupiterCompute", access);
-        update = button("update", "jupiterUpdate", access);
         status.setName("jupiterStatus");
 
         // The card: a title, then one heading-and-value line per quantity.
@@ -285,7 +283,6 @@ public final class JovianTableControls {
         instantView.addActionListener(e -> apply());
         rangeView.addActionListener(e -> apply());
         compute.addActionListener(e -> apply());
-        update.addActionListener(e -> apply());
         start.addActionListener(e -> apply());
         end.addActionListener(e -> apply());
 
@@ -311,9 +308,9 @@ public final class JovianTableControls {
         } else {
             centreOnChart = null;
         }
-        agreement = new AgreementLine(said, update, "jupiter");
+        stale = new StaleLine(said, "jupiter");
         following = session.onChange(this::show);
-        followingChart = session.onObserverChange(this::sayAgreement);
+        followingChart = session.onObserverChange(this::sayStale);
     }
 
     /** This host's draft, as a query. */
@@ -359,11 +356,12 @@ public final class JovianTableControls {
     }
 
     /**
-     * Says again whether the table shown is for the chart's place and
-     * instant (#259, ruling 5 on #556). Reads, never computes.
+     * Says whether the rows shown were computed for the chart's context
+     * now, and dims them - the table, the card - while they were not
+     * (#612, ruling P1). Reads the revision, never computes.
      */
-    private void sayAgreement() {
-        if (agreement == null) {
+    private void sayStale() {
+        if (stale == null) {
             return;
         }
         JovianTableSession.Result result = shown;
@@ -372,21 +370,36 @@ public final class JovianTableControls {
                         || result.outcome() == JovianTableSession.Outcome.APPENDED
                         || result.outcome() == JovianTableSession.Outcome.MOONS_OUTSIDE)
                 && !result.entries().isEmpty();
-        boolean range = rows && result.query().mode() == Mode.RANGE;
-        agreement.show(session.observerNow(), rows ? result.observer() : null,
-                range ? result.entries().get(0).sample().instant() : null,
-                range ? result.entries().get(result.entries().size() - 1).sample().instant()
-                        : null);
+        boolean old = rows && session.stale();
+        stale.show(old);
+        java.awt.Color tone = StaleLine.tone(old);
+        if (result != null && !result.applied()) {
+            // Nothing computed: the note follows the chart.
+            Observer now = session.observerNow();
+            if (now != null) {
+                sayNote(now, false);
+            }
+        }
+        table.setForeground(tone);
+        cardTitle.setForeground(tone);
+        for (JLabel value : cardValues) {
+            value.setForeground(tone);
+        }
     }
 
-    /** What the agreement line says now, a line per sentence. */
-    public String agreementText() {
-        return agreement.text();
+    /** What the stale line says now; empty while the table is current or never computed. */
+    public String staleText() {
+        return stale.text();
     }
 
-    /** The agreement line, for a host laying these controls out. */
-    public JComponent agreementLine() {
-        return agreement.panel();
+    /** Whether the rows shown are stale: computed at an earlier chart context. */
+    public boolean stale() {
+        return stale.stale();
+    }
+
+    /** The stale line, for a host laying these controls out. */
+    public JComponent staleLine() {
+        return stale.panel();
     }
 
     /**
@@ -443,17 +456,10 @@ public final class JovianTableControls {
             showCard(null);
             say(" ");
             refreshResult();
-            sayAgreement();
+            sayStale();
             return;
         }
-        String note = said.say("observer.note", said.n(degrees(now.latitudeDegrees())),
-                said.n(degrees(now.eastLongitudeFolded())),
-                SolarTableSession.shown(now.instant()));
-        observerNote.setText(narrow
-                ? juranometria.ui.WrappedText.html(note, NARROW,
-                        observerNote.getFontMetrics(observerNote.getFont()))
-                : note);
-        observerNote.getAccessibleContext().setAccessibleName(note);
+        sayNote(now, result.applied());
         model.show(result.entries());
         boolean single = result.entries().size() == 1
                 && result.query().mode() == Mode.INSTANT;
@@ -497,7 +503,7 @@ public final class JovianTableControls {
         }
         say(text);
         refreshResult();
-        sayAgreement();
+        sayStale();
     }
 
     /** The card for one instant, or blank. */
@@ -527,6 +533,22 @@ public final class JovianTableControls {
         }
     }
 
+    /**
+     * The note under the controls: the context the rows were computed
+     * for, or - while nothing is computed - the chart's now (#612, P1).
+     */
+    private void sayNote(Observer now, boolean computed) {
+        String note = said.say(computed ? "observer.computed" : "observer.note",
+                said.n(degrees(now.latitudeDegrees())),
+                said.n(degrees(now.eastLongitudeFolded())),
+                SolarTableSession.shown(now.instant()));
+        observerNote.setText(narrow
+                ? juranometria.ui.WrappedText.html(note, NARROW,
+                        observerNote.getFontMetrics(observerNote.getFont()))
+                : note);
+        observerNote.getAccessibleContext().setAccessibleName(note);
+    }
+
     private void say(String text) {
         status.setText(narrow && text.length() > 1
                 ? juranometria.ui.WrappedText.html(text, NARROW,
@@ -551,9 +573,8 @@ public final class JovianTableControls {
         JPanel top = new JPanel();
         top.setLayout(new BoxLayout(top, BoxLayout.Y_AXIS));
         top.putClientProperty(MARK, Boolean.TRUE);
-        // The agreement line opens the dialog too (#259, ruling 5 on #556).
-        agreement.besideTheWords();
-        JComponent line = agreement.panel();
+        // The stale line opens the dialog too (#612, ruling P1).
+        JComponent line = stale.panel();
         line.setAlignmentX(0f);
         top.add(line);
         top.add(Box.createVerticalStrut(8));
@@ -612,8 +633,7 @@ public final class JovianTableControls {
      * These controls as the Controller's Jupiter group holds them: the
      * note wrapped; the views; start and end on rows of their own; the
      * step and Compute; the status; the card and the four moons, or the
-     * grouped moons for a range, the table scrolling sideways; Update
-     * from Place and Time. No Show on chart box, and no Close.
+     * grouped moons for a range, the table scrolling sideways. No Show on chart box, and no Close.
      */
     public JComponent inController() {
         JPanel column = new JPanel();
@@ -624,11 +644,10 @@ public final class JovianTableControls {
         if (shown != null) {
             show(shown);
         }
-        // The agreement line opens the group (#259, ruling 5 on #556),
-        // with Update from Place and Time in it when the table differs.
-        agreement.wrapTo(NARROW - 20);
-        sayAgreement();
-        column.add(agreement.panel());
+        // The stale line opens the group (#612, ruling P1).
+        stale.wrapTo(NARROW - 20);
+        sayStale();
+        column.add(stale.panel());
         column.add(Box.createVerticalStrut(6));
         observerNote.putClientProperty("FlatLaf.styleClass", "small");
         column.add(leadingWide(observerNote));

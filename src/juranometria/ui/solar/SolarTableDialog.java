@@ -40,10 +40,11 @@ import juranometria.ui.language.MnemonicText;
  * at that instant or over a range of instants. One shell, built over the
  * {@link SolarTable} that says which body, which columns and which words.
  *
- * <p>Place and Time is the authority. The dialog is handed a supplier
- * of the module's current observer and reads it - never copies it,
- * never stores it, never keeps a clock of its own - when it opens,
- * whenever it comes to the front, and when the reader asks. A range
+ * <p>The chart's context is the authority (#612). The dialog reads it -
+ * never copies it, never stores it, never keeps a clock of its own -
+ * when it opens on nothing computed yet, and when the reader asks;
+ * when the chart moves on, the rows stay, dimmed under the stale line,
+ * until the reader computes again (ruling P1). A range
  * is a specification the reader types here: start, end and a fixed
  * step, refused with a stated reason when it runs backwards, asks for
  * more rows than are shown, or leaves the years the ephemeris covers.
@@ -62,8 +63,7 @@ import juranometria.ui.language.MnemonicText;
  * {@link SolarTableSession}: the controls, their words and their
  * following of the session live there, and the JUranometria
  * Controller holds a second set of the same class. What is the
- * dialog's own is this layout, the time note, Close, and its coming to
- * the front being an Update.
+ * dialog's own is this layout, the time note and Close.
  */
 public final class SolarTableDialog extends JDialog {
 
@@ -101,12 +101,8 @@ public final class SolarTableDialog extends JDialog {
         getRootPane().registerKeyboardAction(e -> dispose(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
-        addWindowFocusListener(new WindowAdapter() {
-            @Override
-            public void windowGainedFocus(WindowEvent e) {
-                content.update();
-            }
-        });
+        // Coming to the front computes nothing (#612, ruling 3): a table
+        // the chart moved on from says it is stale until Compute.
         pack();
         setLocationRelativeTo(owner);
     }
@@ -214,7 +210,6 @@ public final class SolarTableDialog extends JDialog {
         public final JTextField end;
         public final JComboBox<String> step;
         public final JButton compute;
-        public final JButton update;
         public final JButton close;
         public final JLabel status;
         public final JLabel timeNote = new JLabel();
@@ -240,7 +235,6 @@ public final class SolarTableDialog extends JDialog {
             end = controls.end;
             step = controls.step;
             compute = controls.compute;
-            update = controls.update;
             status = controls.status;
             SolarTableWords said = controls.words();
             MnemonicText letters = MnemonicText.in(language);
@@ -250,14 +244,13 @@ public final class SolarTableDialog extends JDialog {
 
             JPanel top = new JPanel();
             top.setLayout(new BoxLayout(top, BoxLayout.Y_AXIS));
-            // The agreement line opens the dialog as it opens the
-            // Controller's group (#259, ruling 5 on #556), Update from
-            // Place and Time in it when the table differs.
-            JComponent agreement = controls.agreementLineInDialog();
-            agreement.setAlignmentX(0.0f);
-            agreement.setMaximumSize(new Dimension(Integer.MAX_VALUE,
+            // The stale line opens the dialog as it opens the
+            // Controller's group (#612, ruling P1).
+            JComponent stale = controls.staleLine();
+            stale.setAlignmentX(0.0f);
+            stale.setMaximumSize(new Dimension(Integer.MAX_VALUE,
                     Integer.MAX_VALUE));
-            top.add(agreement);
+            top.add(stale);
             top.add(Box.createVerticalStrut(8));
             observerNote.setAlignmentX(0.0f);
             top.add(observerNote);
@@ -325,12 +318,15 @@ public final class SolarTableDialog extends JDialog {
 
             close.addActionListener(e -> closeAction.run());
 
-            // The dialog computes when it is built (ruled on #400, kept
-            // on #457): an Update, which every host of the session shows.
-            update();
+            // A fresh session opens on the single instant (ruled on #400,
+            // kept on #457); a session another host has computed is shown
+            // as it stands - opening recomputes nothing (#612, ruling 3).
+            if (!session.result().applied()) {
+                update();
+            }
         }
 
-        /** Reads the observer again and computes this content's view, for every host to see. */
+        /** Applies this content's draft at the chart's context now, for every host to see. */
         public void update() {
             controls.apply();
         }

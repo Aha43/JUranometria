@@ -45,15 +45,15 @@ class ChartInstantWordingTest {
     }
 
     @Test
-    void noWordOfTheBoxOrTheAgreementLinesNamesAZoneOrAnOffset() {
+    void noWordOfTheBoxOrTheTablesNotesNamesAZoneOrAnOffset() {
         for (String language : List.of("en", "nb-NO")) {
             InterfaceText said = InterfaceText.forLanguage(language);
             for (String key : List.of("furniture.placeandtime.heading",
                     "furniture.placeandtime.instant", "furniture.placeandtime.lst",
                     "furniture.placeandtime.explain", "furniture.placeandtime.spoken",
                     "furniture.placeandtime.sheet", "furniture.placeandtime.paper",
-                    "solartable.agreement.same", "solartable.agreement.chart",
-                    "solartable.agreement.table", "solartable.agreement.range",
+                    "solartable.stale.message", "solartable.observer.note",
+                    "solartable.observer.computed",
                     "solarsystem.chartinstant")) {
                 String text = said.say(key).toLowerCase(java.util.Locale.ROOT);
                 for (String civil : List.of("zone", "sone", "cet", "gmt", "offset",

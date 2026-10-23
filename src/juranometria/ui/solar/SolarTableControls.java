@@ -42,10 +42,12 @@ import juranometria.ui.language.MnemonicText;
  * <p><strong>Drafts are the host's; the applied query and its result
  * are the session's.</strong> What a reader types here is this host's
  * draft, seeded once from the applied query or the observer; Compute,
- * Update, a view's button or Enter applies the draft to the shared
- * {@link SolarTableSession} - reading Place and Time's observer afresh
+ * a view's button or Enter applies the draft to the shared
+ * {@link SolarTableSession} - reading the chart's context afresh
  * every time - and every host then shows the session's rows and
- * outcome through one subscription. A result arriving from
+ * outcome through one subscription. When the chart's time or place
+ * moves on, the rows stay, dimmed under the stale line, until the
+ * reader computes again (#612, ruling P1). A result arriving from
  * the other host never writes into these fields (ruling 3). Nothing
  * here computes on its own: building these controls reads the
  * observer for its note and seeds, and asks the service nothing.
@@ -74,17 +76,18 @@ public final class SolarTableControls {
     public final JTextField end = new JTextField(19);
     public final JComboBox<String> step;
     public final JButton compute;
-    public final JButton update;
     public final JLabel status = new JLabel(" ");
     /** The body's Show on chart box, or null for a host without a switch. */
     public final JCheckBox onChart;
     /** Centre on chart (#483), or null for a host built without the action. */
     public final JButton centreOnChart;
     private final SolarTableSession.Subscription following;
-    /** The agreement line (#259), opening every arrangement. */
-    final AgreementLine agreement;
-    /** Following Place and Time, to say the agreement again; never to recompute. */
+    /** The stale line (#612, ruling P1), opening every arrangement. */
+    final StaleLine stale;
+    /** Following the chart's context, to say the table is stale; never to recompute. */
     private final Runnable followingChart;
+    /** Whether the rows and the card are shown dimmed, as stale. */
+    private boolean dimmed;
     private SolarTableSession.Result shown;
     private JPanel resultHolder;
     /** Whether the host is the narrow one, whose note wraps. */
@@ -143,7 +146,6 @@ public final class SolarTableControls {
         step.getAccessibleContext().setAccessibleName(said.say("range.step.a11y"));
         Explain.control(step, said.say("range.step.hover"), said.say("range.step.explain"));
         compute = button("compute", names + "Compute", access);
-        update = button("update", names + "Update", access);
         status.setName(names + "Status");
 
         model = new SolarTableModel(language, body);
@@ -213,9 +215,6 @@ public final class SolarTableControls {
         instantView.addActionListener(e -> apply());
         rangeView.addActionListener(e -> apply());
         compute.addActionListener(e -> apply());
-        // Update from Place and Time: this host's own view, over the
-        // observer read afresh - which applying always does.
-        update.addActionListener(e -> apply());
         start.addActionListener(e -> apply());
         end.addActionListener(e -> apply());
 
@@ -228,17 +227,18 @@ public final class SolarTableControls {
             centreOnChart = null;
         }
 
-        agreement = new AgreementLine(said, update, names);
+        stale = new StaleLine(said, names);
         following = session.onChange(this::show);
-        followingChart = session.onObserverChange(this::sayAgreement);
+        followingChart = session.onObserverChange(this::sayStale);
     }
 
     /**
-     * Says again whether the table shown is for the chart's place and
-     * instant (#259, ruling 5 on #556). Reads, never computes.
+     * Says whether the rows shown were computed for the chart's context
+     * now, and dims them while they were not (#612, ruling P1). Reads
+     * the revision, never computes.
      */
-    private void sayAgreement() {
-        if (agreement == null) {
+    private void sayStale() {
+        if (stale == null) {
             return;
         }
         SolarTableSession.Result result = shown;
@@ -246,27 +246,36 @@ public final class SolarTableControls {
                 && (result.outcome() == SolarTableSession.Outcome.ROWS
                         || result.outcome() == SolarTableSession.Outcome.APPENDED)
                 && !result.rows().isEmpty();
-        boolean range = rows && result.query().mode() == SolarTableSession.Mode.RANGE;
-        agreement.show(session.observerNow(), rows ? result.observer() : null,
-                range ? result.rows().get(0).sample().instant() : null,
-                range ? result.rows().get(result.rows().size() - 1).sample().instant()
-                        : null);
+        boolean old = rows && session.stale();
+        stale.show(old);
+        table.setForeground(StaleLine.tone(old));
+        if (result != null && !result.applied()) {
+            // Nothing computed: the note follows the chart.
+            Observer now = session.observerNow();
+            if (now != null) {
+                sayNote(now, false);
+            }
+        }
+        if (old != dimmed) {
+            dimmed = old;
+            // The narrow host's card is built with its tone.
+            refreshResult();
+        }
     }
 
-    /** What the agreement line says now, a line per sentence. */
-    public String agreementText() {
-        return agreement.text();
+    /** What the stale line says now; empty while the table is current or never computed. */
+    public String staleText() {
+        return stale.text();
     }
 
-    /** The agreement line, for a host laying these controls out. */
-    public JComponent agreementLine() {
-        return agreement.panel();
+    /** Whether the rows shown are stale: computed at an earlier chart context. */
+    public boolean stale() {
+        return stale.stale();
     }
 
-    /** The agreement line as a dialog holds it: the button beside the two lines. */
-    public JComponent agreementLineInDialog() {
-        agreement.besideTheWords();
-        return agreement.panel();
+    /** The stale line, for a host laying these controls out. */
+    public JComponent staleLine() {
+        return stale.panel();
     }
 
     /**
@@ -366,22 +375,10 @@ public final class SolarTableControls {
             model.show(List.of());
             say(" ");
             refreshResult();
-            sayAgreement();
+            sayStale();
             return;
         }
-        String note = said.say("observer.note",
-                said.n(degrees(now.latitudeDegrees())),
-                said.n(degrees(now.eastLongitudeFolded())),
-                SolarTableSession.shown(now.instant()));
-        // The narrow host wraps the note to the room a 360 px group
-        // gives it, broken against real metrics as every wrapped line
-        // in the atlas is (#350); the dialog's note is one line, as it
-        // always was.
-        observerNote.setText(narrow
-                ? juranometria.ui.WrappedText.html(note, CARD_LINES_WIDTH,
-                        observerNote.getFontMetrics(observerNote.getFont()))
-                : note);
-        observerNote.getAccessibleContext().setAccessibleName(note);
+        sayNote(now, result.applied());
         model.show(result.rows());
         switch (result.outcome()) {
             case ROWS -> say(result.applied()
@@ -401,7 +398,27 @@ public final class SolarTableControls {
                     result.detail()));
         }
         refreshResult();
-        sayAgreement();
+        sayStale();
+    }
+
+    /**
+     * The note under the controls: the context the rows were computed
+     * for, or - while nothing is computed - the chart's now (#612, P1).
+     */
+    private void sayNote(Observer now, boolean computed) {
+        String note = said.say(computed ? "observer.computed" : "observer.note",
+                said.n(degrees(now.latitudeDegrees())),
+                said.n(degrees(now.eastLongitudeFolded())),
+                SolarTableSession.shown(now.instant()));
+        // The narrow host wraps the note to the room a 360 px group
+        // gives it, broken against real metrics as every wrapped line
+        // in the atlas is (#350); the dialog's note is one line, as it
+        // always was.
+        observerNote.setText(narrow
+                ? juranometria.ui.WrappedText.html(note, CARD_LINES_WIDTH,
+                        observerNote.getFontMetrics(observerNote.getFont()))
+                : note);
+        observerNote.getAccessibleContext().setAccessibleName(note);
     }
 
     private void say(String text) {
@@ -425,8 +442,7 @@ public final class SolarTableControls {
      * group; the step and Compute; the status line; the result - the
      * instant's one row as a card of heading-and-value lines, a range
      * as the complete table scrolling sideways; the body's Show on
-     * chart box; Update from Place and Time. No Close: a group is not
-     * a window.
+     * chart box. No Close: a group is not a window.
      */
     public JComponent inController() {
         JPanel column = new JPanel();
@@ -438,11 +454,10 @@ public final class SolarTableControls {
             show(shown);
         }
 
-        // The agreement line opens the group (#259, ruling 5 on #556),
-        // with Update from Place and Time in it when the table differs.
-        agreement.wrapTo(CARD_LINES_WIDTH - 20);
-        sayAgreement();
-        column.add(agreement.panel());
+        // The stale line opens the group (#612, ruling P1).
+        stale.wrapTo(CARD_LINES_WIDTH - 20);
+        sayStale();
+        column.add(stale.panel());
         column.add(Box.createVerticalStrut(6));
         observerNote.putClientProperty("FlatLaf.styleClass", "small");
         column.add(wrapped(observerNote));
@@ -520,6 +535,9 @@ public final class SolarTableControls {
                     "foreground: $Label.disabledForeground");
             heading.setToolTipText(model.columnExplanation(c));
             JLabel value = new JLabel(String.valueOf(model.getValueAt(0, c)));
+            if (dimmed) {
+                value.setForeground(StaleLine.tone(true));
+            }
             value.getAccessibleContext().setAccessibleName(
                     model.getColumnName(c) + ": " + value.getText());
             line.add(heading, BorderLayout.WEST);

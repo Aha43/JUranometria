@@ -142,7 +142,7 @@ public final class SaturnTableDialog extends JDialog {
             add(bottom, BorderLayout.SOUTH);
         }
 
-        /** Reads the observer again and computes this content's view. */
+        /** Applies this content's draft at the chart's context now. */
         public void update() {
             controls.apply();
         }
