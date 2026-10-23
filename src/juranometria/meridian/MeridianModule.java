@@ -3,6 +3,7 @@ package juranometria.meridian;
 import java.util.ArrayList;
 import java.util.List;
 
+import juranometria.context.ChartContextHolder;
 import juranometria.module.ChartModule;
 import juranometria.module.ChartServices;
 import juranometria.module.InkRole;
@@ -58,7 +59,8 @@ public final class MeridianModule implements ChartModule {
     /** The name this module's ink is owned under. */
     public static final String ID = "meridian";
 
-    private Observer observer;
+    /** The chart's one time and place (#612): read here, owned by the holder. */
+    private final ChartContextHolder context;
     private boolean meridianShowing = true;
     private boolean horizonShowing = true;
     private boolean zenithShowing = true;
@@ -76,8 +78,31 @@ public final class MeridianModule implements ChartModule {
     private java.util.function.Consumer<String> furnitureActions;
     private Runnable withdrawFurniture;
 
+    /** Over its own holder: a module begun with an observer owns the context. */
     public MeridianModule(Observer observer) {
-        observer(observer);
+        this(new ChartContextHolder(observer));
+    }
+
+    /**
+     * Over the application's holder (#612): the module reads the chart's
+     * time and place there, redraws and announces on every installation,
+     * and no longer owns an observer of its own.
+     */
+    public MeridianModule(ChartContextHolder context) {
+        if (context == null) {
+            throw new IllegalArgumentException(
+                    "the module is always somewhere, at some moment");
+        }
+        this.context = context;
+        context.onChange(change -> {
+            redraw();
+            changed();
+        });
+    }
+
+    /** The holder of the chart's one time and place. */
+    public ChartContextHolder context() {
+        return context;
     }
 
     @Override
@@ -166,20 +191,20 @@ public final class MeridianModule implements ChartModule {
     // ---- what the module owns ---------------------------------------
 
     public Observer observer() {
-        return observer;
+        return context.observer();
     }
 
     /**
      * Somewhere else, or some other moment. The page does not move.
+     * Installed through the holder, on the event thread (#612): the
+     * redraw and the announcement follow from the installation.
      */
     public void observer(Observer observer) {
         if (observer == null) {
             throw new IllegalArgumentException(
                     "the module is always somewhere, at some moment");
         }
-        this.observer = observer;
-        redraw();
-        changed();
+        context.install(observer);
     }
 
     /** Which of the three a reader is being shown. */
@@ -355,7 +380,7 @@ public final class MeridianModule implements ChartModule {
         }
         skyComputations++;
         services.request(new NavigationRequest(
-                new LocalSky(observer).zenith(), null,
+                new LocalSky(observer()).zenith(), null,
                 "Centre on zenith"));
     }
 
@@ -373,6 +398,7 @@ public final class MeridianModule implements ChartModule {
             return List.of();
         }
         skyComputations++;
+        Observer observer = observer();
         LocalSky sky = new LocalSky(observer);
         List<OverlayContribution> offered = new ArrayList<>();
         if (meridianShowing) {

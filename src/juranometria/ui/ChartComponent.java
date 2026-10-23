@@ -474,6 +474,28 @@ public final class ChartComponent extends JComponent {
             new juranometria.module.OverlayRegistry();
 
     /** The registry a module contributes its geometry to. */
+    /** The chart's one time and place (#612), held across every paint; null for a chart without one. */
+    private juranometria.context.ChartContextHolder context;
+
+    /**
+     * Gives the chart the holder of its time and place (#612): every
+     * paint holds it, so an installation during a paint is refused and
+     * one paint reads one snapshot throughout.
+     */
+    public void setContext(juranometria.context.ChartContextHolder context) {
+        this.context = context;
+    }
+
+    /** The holder of the chart's time and place, or null. */
+    public juranometria.context.ChartContextHolder context() {
+        return context;
+    }
+
+    /** Runs an export or another whole-page reading over one snapshot of the context. */
+    public <T> T holdingContext(java.util.function.Supplier<T> work) {
+        return context == null ? work.get() : context.hold(work);
+    }
+
     public juranometria.module.OverlayRegistry overlays() {
         return overlays;
     }
@@ -1133,6 +1155,15 @@ public final class ChartComponent extends JComponent {
         }
         g.setColor(getBackground());
         g.fillRect(0, 0, getWidth(), getHeight());
+        // One paint, one snapshot of the chart's time and place (#612):
+        // the holder refuses an installation until this paint returns.
+        holdingContext(() -> {
+            paintPage(g);
+            return null;
+        });
+    }
+
+    private void paintPage(Graphics g) {
         Graphics2D g2 = (Graphics2D) g.create();
         try {
             g2.translate(pageOffsetX(), pageOffsetY());

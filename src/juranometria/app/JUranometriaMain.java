@@ -268,6 +268,10 @@ public final class JUranometriaMain {
         juranometria.meridian.MeridianModule meridian =
                 juranometria.ui.placeandtime.PlaceAndTimeSession.begin(
                         modules, placeStore, clock.get());
+        // The chart's one time and place (#612): the module's holder is
+        // the application's; every paint holds it, so one paint reads
+        // one snapshot and an installation during a paint is refused.
+        chart.setContext(meridian.context());
         // Update to now (#259, rulings 4 and 7 on #556): one action, one
         // clock read per activation, and every route below runs this
         // same instance - the chart's Place and Time box, the chart

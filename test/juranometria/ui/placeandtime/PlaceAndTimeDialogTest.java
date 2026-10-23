@@ -105,9 +105,21 @@ class PlaceAndTimeDialogTest {
     }
 
     /** Commits a field the way Enter does. */
+
+    /** Chart time and place are installed on the event thread (#612), so the fields are driven there. */
+    private static void edt(Runnable work) {
+        try {
+            javax.swing.SwingUtilities.invokeAndWait(work);
+        } catch (Exception e) {
+            throw new AssertionError(e);
+        }
+    }
+
     private static void commit(JTextField field, String text) {
-        field.setText(text);
-        field.postActionEvent();
+        edt(() -> {
+            field.setText(text);
+            field.postActionEvent();
+        });
     }
 
     // ---- one state, whoever changes it (#434) -------------------------
@@ -141,7 +153,7 @@ class PlaceAndTimeDialogTest {
     @Test
     void theFieldsFollowAChangeMadeElsewhereButNotOverTyping() {
         Rig rig = new Rig(node);
-        rig.module.observer(rig.module.observer().from(-33.87, 151.21));
+        edt(() -> rig.module.observer(rig.module.observer().from(-33.87, 151.21)));
         assertEquals("-33.87", rig.field("latitudeField").getText(),
                 "a place changed elsewhere is shown here");
         assertEquals("151.21", rig.field("longitudeField").getText());
@@ -149,11 +161,11 @@ class PlaceAndTimeDialogTest {
         // The reader is typing a longitude, not yet committed, when the
         // place changes elsewhere: the typing stays.
         rig.field("longitudeField").setText("12.5");
-        rig.module.observer(rig.module.observer().from(59.913, 10.752));
+        edt(() -> rig.module.observer(rig.module.observer().from(59.913, 10.752)));
         assertEquals("59.913", rig.field("latitudeField").getText());
         assertEquals("12.5", rig.field("longitudeField").getText(),
                 "the field holding an uncommitted edit keeps it");
-        rig.field("longitudeField").postActionEvent();
+        edt(() -> rig.field("longitudeField").postActionEvent());
         assertEquals(12.5, rig.module.observer().eastLongitudeDegrees(),
                 "and committing it applies it, as before");
         assertEquals("12.5", rig.field("longitudeField").getText());
@@ -247,7 +259,7 @@ class PlaceAndTimeDialogTest {
         assertEquals(false, rig.store.remembered(),
                 "and nothing was remembered");
 
-        rig.field("latitudeField").postActionEvent();
+        edt(() -> rig.field("latitudeField").postActionEvent());
         assertEquals(-33.87, rig.module.observer().latitudeDegrees(),
                 "commitment applies it");
     }
@@ -374,8 +386,12 @@ class PlaceAndTimeDialogTest {
                 "and put back");
     }
 
-    /** What the toolkit does when focus leaves this field. */
+    /** What the toolkit does when focus leaves this field - on the event thread, where a commitment installs chart time and place (#612). */
     private static void focusLeft(JTextField field) {
+        edt(() -> focusLeftNow(field));
+    }
+
+    private static void focusLeftNow(JTextField field) {
         var event = new java.awt.event.FocusEvent(field,
                 java.awt.event.FocusEvent.FOCUS_LOST);
         for (var listener : field.getFocusListeners()) {
@@ -452,7 +468,7 @@ class PlaceAndTimeDialogTest {
         commit(rig.field("latitudeField"), "-33.87");
         commit(rig.field("longitudeField"), "151.21");
         commit(rig.field("instantField"), "2026-06-01 03:00:00");
-        rig.button("nowButton").doClick();
+        edt(() -> rig.button("nowButton").doClick());
         for (Component box : all(rig.content, JCheckBox.class)) {
             ((JCheckBox) box).doClick();
         }
@@ -474,7 +490,7 @@ class PlaceAndTimeDialogTest {
     void nowReadsTheClockOncePerPressAndNothingTicksAfterwards() {
         Rig rig = new Rig(node);
 
-        rig.button("nowButton").doClick();
+        edt(() -> rig.button("nowButton").doClick());
 
         assertEquals(1, rig.clockReads.size(),
                 "one press, one read: Now is a button, not a state");
@@ -488,7 +504,7 @@ class PlaceAndTimeDialogTest {
         assertEquals(1, rig.clockReads.size(),
                 "and the clock is not read again until the reader"
                         + " presses again - nothing polls it");
-        rig.button("nowButton").doClick();
+        edt(() -> rig.button("nowButton").doClick());
         assertEquals(2, rig.clockReads.size(),
                 "pressing again is how a reader moves the sky forward");
         assertEquals(rig.clockAnswer, rig.module.observer().instant());

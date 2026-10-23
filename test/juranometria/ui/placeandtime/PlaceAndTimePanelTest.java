@@ -80,9 +80,21 @@ class PlaceAndTimePanelTest {
         return (AbstractButton) named(panel, name);
     }
 
+
+    /** Chart time and place are installed on the event thread (#612), so the fields are driven there. */
+    private static void edt(Runnable work) {
+        try {
+            javax.swing.SwingUtilities.invokeAndWait(work);
+        } catch (Exception e) {
+            throw new AssertionError(e);
+        }
+    }
+
     private static void commit(JTextField field, String text) {
-        field.setText(text);
-        field.postActionEvent();
+        edt(() -> {
+            field.setText(text);
+            field.postActionEvent();
+        });
     }
 
     @Test
@@ -123,7 +135,7 @@ class PlaceAndTimePanelTest {
         assertTrue(button(dialog, "showMathematicalhorizon").isSelected()
                 && button(companion, "showMathematicalhorizon").isSelected());
 
-        button(companion, "nowButton").doClick();
+        edt(() -> button(companion, "nowButton").doClick());
         assertEquals("2026-03-20 22:33:00",
                 field(dialog, "instantField").getText(),
                 "Now in one is the instant in both");
@@ -163,9 +175,9 @@ class PlaceAndTimePanelTest {
             assertTrue(!field(dialog, "latitudeField").getAccessibleContext()
                     .getAccessibleDescription().equals(companion.refusalText()),
                     "and gives the field its own description back");
-            button(companion, "nowButton").doClick();
+            edt(() -> button(companion, "nowButton").doClick());
             assertEquals("", companion.refusalText(), "so does Now");
-            module.observer(module.observer().from(59.913, 10.752));
+            edt(() -> module.observer(module.observer().from(59.913, 10.752)));
         }
     }
 
