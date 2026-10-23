@@ -313,7 +313,16 @@ asked:
   solar-system sheet's three) carries the version that drew them. `make chart-sheet-study`, then `make evidence-provenance`,
   which re-dates only the rows whose bytes moved. The Jovian study's
   A4 sheet (`docs/studies/jupiter-on-the-chart/sheet-a4-jovian.*`,
-  #486) carries it too: `make jupiter-on-the-chart-study`. At 5.1.0
+  #486) carries it too: `make jupiter-on-the-chart-study`; so do the
+  Saturn study's (`saturn-on-the-chart/sheet-a4-saturn.*`, #579:
+  `make saturn-on-the-chart-study`), the two closer-field sheets
+  (#544: `make closer-fields-study`), the Mercury printable
+  (`mercury-cartography/printable-a4-1.png`, #539:
+  `make mercury-cartography-study`) and the chart-instant furniture
+  sheet (`chart-instant-furniture/sheet-a4.png`, #259:
+  `make chart-instant-furniture`) - the last of which reached the
+  5.4.0 preparation at 5.3.0 because `GalleryReleaseTest` did not yet
+  name its study; it does now, with every study above. At 5.1.0
   every sheet PNG stayed pixel-identical and each PDF differed by one
   byte, the version digit.
 - **The gallery.** `docs/gallery/manifest.json` carries `release` and
@@ -347,7 +356,11 @@ asked:
   by one byte. At 5.3.0 (2→3) the second cell moved again, 104 pixels
   in each image, columns 222–232 of rows 33–47 - the wider glyph
   reaching one column further; every sheet PNG stayed pixel-identical
-  and each PDF and SVG differed by one byte.
+  and each PDF and SVG differed by one byte. At 5.4.0 (3→4) the same
+  second cell moved again, 125 pixels in each image, columns 222–232
+  of rows 33–47; every sheet PNG stayed pixel-identical, the Saturn
+  A4 sheet now among the seven, and each of the ten PDFs and SVGs
+  differed by one byte.
 - **The articles.** Their footer names the release, and
   `scripts/build-articles.py` reads it from `VERSION` when the site is
   built rather than carrying a number - so there is nothing to
