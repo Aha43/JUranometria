@@ -564,7 +564,7 @@ public final class PackagedAcceptanceMain {
                         juranometria.ui.solar.SolarTable.sun()));
         require("Tidspunkt (UTC)".equals(norsk[0].model.getColumnName(0))
                         && "1 rader.".equals(norsk[0].status())
-                        && norsk[0].observerNote.getText().startsWith("Observat")
+                        && norsk[0].observerNote.getText().startsWith("Beregnet for karttid")
                         && String.valueOf(norsk[0].model.getValueAt(0, 4))
                                 .contains(",")
                         && !String.valueOf(norsk[0].model.getValueAt(0, 4))
