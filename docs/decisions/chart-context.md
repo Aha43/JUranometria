@@ -226,8 +226,10 @@ The choices that remain, each a proposal for a ruling:
   instant: a *Local sidereal time* field (hh:mm, to the minute, as the
   box shows it). Entering it resolves the UTC instant on the **same
   UTC date as the current chart time**, the occurrence nearest the
-  current instant when the date holds two (they are 3 min 56 s
-  apart); the resolved instant is shown in the instant field and
+  current instant when the date holds two (a sidereal day is about
+  23 h 56 min, so a UTC date holds two occurrences of one sidereal
+  time only when the first falls in its opening 3 min 56 s); the
+  resolved instant is shown in the instant field and
   installed through the same path; the box's sidereal time then reads
   back what was typed, to the minute. Apparent sidereal time
   (`SkyFrame.gastDegrees`) with the observer's longitude, as the box
@@ -263,6 +265,62 @@ The choices that remain, each a proposal for a ruling:
   invariant's exception it is a temporal construction, not a second
   clock.
 
+## The rulings (owner, 2026-10-23)
+
+Given on the study, as the owner's words, accepting P1, P5, P7 and P8
+as written and amending P2, P3, P4 and P6:
+
+1. **P1 accepted.** Stale rows remain readable but dimmed beneath the
+   temporary message. *Update from Place and Time* is removed.
+   *Compute* recomputes from the current chart context. A
+   never-computed table shows no stale message. The old context
+   remains stated clearly enough to identify what the visible rows
+   represent.
+2. **P2 accepted with one correction.** Both relative and absolute
+   range drafts are initially seeded from chart time, never from the
+   wall clock's "today". The relative form is re-seeded from current
+   chart time on *Compute*. The absolute form becomes independent
+   labelled analysis after seeding. Neither changes chart state
+   silently. A selected row may explicitly invoke *Set chart time to
+   this instant* through the same installation path as Place and Time.
+3. **P3 accepted with the astronomical correction.** Resolve the
+   entered local apparent sidereal time on the current chart time's
+   UTC date and choose the occurrence nearest the current chart
+   instant if that UTC date contains two. Those occurrences are
+   separated by approximately 23 h 56 min, not 3 min 56 s (the proposal
+   above is corrected accordingly). The field does not change the
+   date. Installation goes through the shared chart-context path, and
+   the resulting displayed sidereal time must round back to the
+   entered minute.
+4. **P4 accepted with two safeguards.** Solve the next upper
+   culmination using the observer-appropriate topocentric apparent
+   right ascension of date where parallax applies, especially for the
+   Moon. Moving bodies are iterated with a declared bound and a
+   convergence target of one second. If convergence is not reached,
+   refuse with a clear message rather than installing an
+   approximation. State the resulting altitude and whether the body is
+   below the horizon. No lower culmination or circumpolar choice in
+   this sprint.
+5. **P5 accepted.** *Chart time (UTC)* for the instant field, and
+   *chart time* where context must be distinguished. The dialog, the
+   furniture heading and the menu keep *Place and Time*. No article
+   prose is rewritten; only copied figures that genuinely move are
+   refreshed.
+6. **P6 accepted with a reading rule.** Context installation and
+   listener notification occur on the event thread. The holder remains
+   a plain object, but its immutable current snapshot must be safely
+   readable from rendering and export threads through an atomic or
+   volatile reference. One paint or export reads the snapshot once and
+   uses it throughout.
+7. **P7 accepted.** Place persistence and start-up-now behaviour remain
+   unchanged.
+8. **P8 accepted.** The inspector's occurrence line stays as the
+   labelled context of the selected occurrence: an explicit temporal
+   statement, not a second clock.
+
+The study head carrying these rulings is qualified and merged before
+any production implementation begins.
+
 ## 5. The mutation cases the implementation must prove
 
 | mutation | what must catch it |
@@ -278,7 +336,10 @@ The choices that remain, each a proposal for a ruling:
 | sidereal-time entry that keeps a second clock | after entry the only stored time is the installed instant; the box reads it back to the minute |
 | a transit that reads as observable | the resolved instant states its altitude and names *below the horizon* when it is |
 | a transit solved with a J2000 right ascension | the solver uses apparent right ascension of date; a J2000 stand-in fails the target by the precession of the epoch |
-| a moving body's transit solved once | the iterated instant moves the body by less than a second of time between the last two rounds |
+| a moving body's transit solved once | the iterated instant moves the body by less than a second of time between the last two rounds, within the declared bound; past the bound the action refuses with its message and installs nothing |
+| a transit solved with a geocentric place where parallax applies | the Moon's solver uses the observer's topocentric apparent right ascension of date; a geocentric stand-in misses the target by the parallax |
+| a range seeded from the wall clock | both forms seed from chart time; with the clock held still and chart time moved, the seeds follow chart time |
+| a snapshot read torn off the event thread | a render or export thread reading the holder sees one complete immutable snapshot, never a half-installed one |
 | *Update to now* reading the clock twice | unchanged from #259's case |
 | civil time from longitude | no wording names a zone or an offset |
 | a stale instant persisted | unchanged from #259's case |
