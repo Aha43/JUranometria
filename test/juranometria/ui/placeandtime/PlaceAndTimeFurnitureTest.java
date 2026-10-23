@@ -334,7 +334,10 @@ class PlaceAndTimeFurnitureTest {
         assertEquals(1, action.getAccessibleActionCount());
         assertEquals("Update to now", action.getAccessibleActionDescription(0));
 
-        assertTrue(action.doAccessibleAction(0));
+        boolean[] done = new boolean[1];
+        // The action installs chart time and place, on the event thread (#612).
+        javax.swing.SwingUtilities.invokeAndWait(() -> done[0] = action.doAccessibleAction(0));
+        assertTrue(done[0]);
 
         assertEquals(1, rig.clock.reads.get(), "one activation, one clock read");
         assertEquals(LATER, rig.module.observer().instant(), "the instant it read");
@@ -461,7 +464,7 @@ class PlaceAndTimeFurnitureTest {
             chart.setViewState(ChartViewState.DEFAULT);
             ChartModuleHost first = new ChartModuleHost(chart, new SelectionModel(), r -> { });
             MeridianModule session = PlaceAndTimeSession.begin(first, store, AUGUST);
-            new UpdateToNow(session, () -> LATER).run();
+            javax.swing.SwingUtilities.invokeAndWait(new UpdateToNow(session, () -> LATER));
             assertEquals(LATER, session.observer().instant());
             first.detachAll();
 
