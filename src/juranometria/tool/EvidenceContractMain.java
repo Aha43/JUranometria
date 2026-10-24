@@ -180,6 +180,10 @@ public final class EvidenceContractMain {
         // mock-ups are held through IMAGE_MAINS.
         REPORT_MAINS.put("juranometria.tool.VenusCartographyStudyMain",
                 "docs/studies/venus-cartography/measurements.md");
+        // Subdue below horizon (#615): the report is deterministic; its
+        // production pages and pixel mock-ups are held through IMAGE_MAINS.
+        REPORT_MAINS.put("juranometria.tool.BelowHorizonStudyMain",
+                "docs/studies/below-horizon/measurements.md");
         // The Sun on production pages (#415): the report is
         // deterministic; its pages are held through IMAGE_MAINS.
         REPORT_MAINS.put("juranometria.tool.SunOnTheChartStudyMain",
@@ -585,6 +589,9 @@ public final class EvidenceContractMain {
             // widget-rendered inspection, the controls- prefix.
             "juranometria.tool.SolarSystemControlsStudyMain",
             "juranometria.tool.JovianContractStudyMain",
+            // Subdue below horizon (issue #615): production pages composed
+            // by the component, and the pixel mock-ups beside them.
+            "juranometria.tool.BelowHorizonStudyMain",
             // The Sun on the chart (issue #415): production pages
             // composed by the component with the module attached.
             "juranometria.tool.SunOnTheChartStudyMain",

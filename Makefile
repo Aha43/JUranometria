@@ -48,7 +48,7 @@ JAR   := $(JDK_BIN)jar
 REQUIRED_LIBS := 	$(LIB_DIR)/flatlaf-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/flatlaf-extras-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/jsvg-$(JSVG_VERSION).jar
 JUNIT_JAR := $(TEST_LIB_DIR)/junit-platform-console-standalone-$(JUNIT_VERSION).jar
 
-.PHONY: all help clean classes jar app run run-log test classify globe-study globe-frame-study globe-density-study globe-furniture-study globe-grid-study globe-grid-fade-study globe-limb-study globe-family-study globe-name-study globe-pointing-study globe-module-study globe-export-study globe-drag-study chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study on-this-page-study wider-field-study chart-sheet-study overview-study overview-ink-study figure-anchor-study label-study released-text toggle-shortcut-study control-explanation-study sky-language-study evidence-contracts-ci evidence-provenance icons check-libs check-jdk dist app-image
+.PHONY: all help clean classes jar app run run-log test classify below-horizon-study globe-study globe-frame-study globe-density-study globe-furniture-study globe-grid-study globe-grid-fade-study globe-limb-study globe-family-study globe-name-study globe-pointing-study globe-module-study globe-export-study globe-drag-study chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study on-this-page-study wider-field-study chart-sheet-study overview-study overview-ink-study figure-anchor-study label-study released-text toggle-shortcut-study control-explanation-study sky-language-study evidence-contracts-ci evidence-provenance icons check-libs check-jdk dist app-image
 
 all: app
 
@@ -911,6 +911,16 @@ solar-system-controls-study: classes
 
 # The Sun on the chart (issue #415): the production composition's own
 # pages with the module attached - production ink, no study overlay.
+# Subdue below horizon (issue #615): production pages with the horizon
+# through the stars, unchanged, and pixel mock-ups at candidate strengths
+# beside them; the inks' contrast by number. A study before any ruling.
+below-horizon-study: classes
+	mkdir -p docs/studies/below-horizon
+	$(JAVA) -Djava.awt.headless=true -cp "$(CLASSES_DIR):$(LIB_DIR)/*" \
+		juranometria.tool.BelowHorizonStudyMain \
+		> docs/studies/below-horizon/measurements.md
+	@echo "written to docs/studies/below-horizon/measurements.md"
+
 sun-on-the-chart-study: classes
 	mkdir -p docs/studies/sun-on-the-chart
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.SunOnTheChartStudyMain \
