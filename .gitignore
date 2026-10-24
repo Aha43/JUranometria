@@ -58,7 +58,12 @@ replay_pid*
 !.gitignore
 
 # Raw catalogue import inputs (large, re-downloadable)
-/imports/
+# The downloaded dependencies and the imported sources are never
+# tracked - not as directories, and not as links either (#619: a
+# worktree's link to another checkout's lib was committed once; it
+# pointed at an absolute path that exists on one machine).
+/lib
+/imports
 
 # Scratch renders and working files. A stray Poppler rendering was
 # swept into a commit by "git add -A" (PR #292); this makes the
