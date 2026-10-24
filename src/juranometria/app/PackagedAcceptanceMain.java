@@ -1951,7 +1951,7 @@ public final class PackagedAcceptanceMain {
             });
             require(!module.moonShowing() && !module.sunShowing(), "both layers start off");
 
-            // The Moon from the dialog, its layer off, a typed range not yet applied.
+            // The Moon from the dialog, its layer off, a chosen range not yet applied.
             javax.swing.SwingUtilities.invokeAndWait(() -> {
                 juranometria.ui.solar.SolarTableControls d = moonDialog[0].controls();
                 d.rangeView.setSelected(true);
@@ -1965,9 +1965,8 @@ public final class PackagedAcceptanceMain {
             require(module.moonShowing(), "Centre on chart turned the Moon's layer on");
             require(navigation.state().centre().equals(first.astrometricJ2000())
                             && navigation.state().fieldWidthDegrees() == 1.0
-                            && java.time.Instant.parse("2026-06-22T21:00:00Z")
-                                    .equals(first.instant()),
-                    "the chart is on the typed range's first Moon, at 1°: "
+                            && at[0].instant().equals(first.instant()),
+                    "the chart is on the range's first Moon, the chart time's, at 1°: "
                             + navigation.state());
             require(section[0].moon().model.getRowCount() == moon.result().rows().size(),
                     "and the Controller's group shows what the dialog computed");
