@@ -202,31 +202,23 @@ class StaleLineTest {
     }
 
     @Test
-    void aDialogsLineKeepsOneHeightWhateverItSays() throws Exception {
-        // The owner's ruling at the #537 gate, kept: a fixed two-line
-        // height, so the dialog never jumps - and a sheet captured state
-        // by state never resizes between them.
+    void theLineTakesNoRoomWhileItSaysNothing() throws Exception {
+        // The owner's finding on the first #612 candidate: an empty band
+        // where the line stands is not furniture. Hidden until it speaks,
+        // framed when it does, and gone again once computed.
         ChartContextHolder chart = new ChartContextHolder(OSLO);
         SolarTableControls controls = venus(chart);
         javax.swing.JComponent line = controls.staleLine();
-        List<java.awt.Dimension> sizes = new ArrayList<>();
-        sizes.add(line.getPreferredSize());
+        assertFalse(line.isVisible(), "nothing computed: no room taken");
         controls.apply();
-        sizes.add(line.getPreferredSize());
+        assertFalse(line.isVisible(), "current: no room taken");
         edt(() -> chart.install(OSLO.at(Instant.parse("2026-08-15T21:30:00Z"))));
-        assertTrue(controls.stale());
-        sizes.add(line.getPreferredSize());
-        controls.rangeView.setSelected(true);
-        controls.start.setText("2026-08-01 00:00:00");
-        controls.end.setText("2026-08-03 00:00:00");
+        assertTrue(line.isVisible(), "stale: the line appears, framed");
+        assertTrue(line.getPreferredSize().height
+                >= 2 * line.getFontMetrics(line.getFont()).getHeight(),
+                "two lines high at least, so a wrapped message never clips");
         controls.apply();
-        sizes.add(line.getPreferredSize());
-        for (java.awt.Dimension size : sizes) {
-            assertEquals(sizes.get(0).height, size.height,
-                    "nothing computed, current, stale, a range: one height " + sizes);
-        }
-        assertTrue(UIManager.getColor("Separator.foreground") != null
-                || line.getBorder() != null, "the line has a border in every state");
+        assertFalse(line.isVisible(), "computed again: gone");
     }
 
     @Test

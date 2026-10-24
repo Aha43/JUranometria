@@ -21,10 +21,11 @@ import javax.swing.border.Border;
  * say is that the chart has moved on since this table was computed. A
  * never-computed table says nothing.
  *
- * <p>The line keeps its two-line height whether it says anything or
- * not, and its frame appears only with the words, so a dialog never
- * jumps and a captured table sheet never resizes when the chart
- * changes (the owner's ruling at the #537 gate, kept).
+ * <p>While it says nothing it takes no room at all (the owner's
+ * finding on the first #612 candidate: an empty band where the line
+ * stands is not furniture); when it speaks it appears framed, two
+ * lines high at least so the wrapped message in the narrow group
+ * never clips, and the host reflows around it.
  */
 final class StaleLine {
 
@@ -39,11 +40,10 @@ final class StaleLine {
             return new java.awt.Dimension(size.width, Math.max(size.height, twoLines));
         }
     };
-    /** The frame around the words, and the same room without it. */
+    /** The frame around the words. */
     private final Border framed = BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(UIManager.getColor("Separator.foreground")),
             BorderFactory.createEmptyBorder(5, 7, 5, 7));
-    private final Border silent = BorderFactory.createEmptyBorder(6, 8, 6, 8);
     private final String message;
     private int wrapWidth = Integer.MAX_VALUE;
     private boolean stale;
@@ -54,6 +54,7 @@ final class StaleLine {
         panel.setName(name + "StaleLine");
         panel.setAlignmentX(0f);
         panel.getAccessibleContext().setAccessibleName(said.say("stale.a11y"));
+        panel.setBorder(framed);
         panel.add(words, BorderLayout.CENTER);
         show(false);
     }
@@ -78,7 +79,7 @@ final class StaleLine {
         return stale ? message : "";
     }
 
-    /** Says the table is stale, or says nothing. */
+    /** Says the table is stale, or says nothing and takes no room. */
     void show(boolean stale) {
         this.stale = stale;
         if (stale) {
@@ -90,7 +91,7 @@ final class StaleLine {
             words.setText(" ");
             words.getAccessibleContext().setAccessibleName(" ");
         }
-        panel.setBorder(stale ? framed : silent);
+        panel.setVisible(stale);
         panel.revalidate();
         panel.repaint();
     }
