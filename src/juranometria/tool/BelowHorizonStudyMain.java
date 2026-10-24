@@ -70,6 +70,8 @@ public final class BelowHorizonStudyMain {
     private static final PageText NORSK = PageText.in(InterfaceText.forLanguage("nb-NO"));
 
     private static final StringBuilder REPORT = new StringBuilder();
+    /** What depends on this desktop's text and antialiasing: the mock-ups' changed-pixel counts. */
+    private static final StringBuilder PLATFORM = new StringBuilder();
 
     private BelowHorizonStudyMain() {
     }
@@ -80,7 +82,12 @@ public final class BelowHorizonStudyMain {
 
     public static void main(String[] args) throws Exception {
         REPORT.setLength(0);
+        PLATFORM.setLength(0);
         DIR.mkdirs();
+        PlatformEvidence.preface(PLATFORM,
+                "Pixels the below-horizon mock-ups change, as this desktop draws the pages",
+                "Sprint 55, issue #615.");
+        PLATFORM.append("| page | kept 25 % | kept 40 % | kept 55 % |\n|---|---:|---:|---:|\n");
         SolarSystemService service = SolarSystemService.load();
         LocalSky sky = new LocalSky(OSLO);
         SunObservation sun = (SunObservation) service.observe(Body.SUN, OSLO);
@@ -136,7 +143,8 @@ public final class BelowHorizonStudyMain {
         p("");
         p("Each page is production, unchanged; its mock-ups follow. The share of sky"
                 + " pixels below the horizon on the page is stated, so a ruling knows how"
-                + " much of a page the treatment touches.");
+                + " much of a page the treatment touches; how many pixels each mock-up"
+                + " changed depends on how this desktop draws text and is in `platform.md`.");
         p("");
         page("south-24", "The south, 24°: the horizon through the stars",
                 new ChartViewState(sky.cardinal(Cardinal.SOUTH), 24.0, 8.0, null, null),
@@ -180,7 +188,8 @@ public final class BelowHorizonStudyMain {
                 new ChartViewState(sky.cardinal(Cardinal.SOUTH), 180.0, 5.0, null, null),
                 ChartPalette.BLACK_SKY, ENGLISH, service, true, false,
                 "The globe: the horizon as a curve through the disc; below it, half the sky.");
-        System.out.print(REPORT);
+        System.out.print(PlatformEvidence.portable(REPORT.toString()));
+        PlatformEvidence.write(PLATFORM, new File(DIR, "platform.md").toString());
     }
 
     private static Color inkOf(ChartPalette palette, String name) {
@@ -294,6 +303,7 @@ public final class BelowHorizonStudyMain {
         }
         Color ground = palette.ground();
         List<String> mockups = new ArrayList<>();
+        StringBuilder counts = new StringBuilder("| ").append(name);
         for (double strength : STRENGTHS) {
             BufferedImage out = new BufferedImage(image.getWidth(), image.getHeight(),
                     BufferedImage.TYPE_INT_RGB);
@@ -314,9 +324,11 @@ public final class BelowHorizonStudyMain {
             String file = String.format(Locale.ROOT, "%s-kept-%02d.png", name,
                     Math.round(strength * 100));
             ImageIO.write(out, "png", new File(DIR, file));
-            mockups.add(String.format(Locale.ROOT, "![](%s) kept %d %%: %d pixels changed",
-                    file, Math.round(strength * 100), changed));
+            mockups.add(String.format(Locale.ROOT, "![](%s) kept %d %%",
+                    file, Math.round(strength * 100)));
+            counts.append(" | ").append(changed);
         }
+        PLATFORM.append(counts).append(" |\n");
         p("## " + title);
         p("");
         p("![](" + name + ".png)");

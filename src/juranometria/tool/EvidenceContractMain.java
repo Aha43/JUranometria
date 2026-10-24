@@ -444,6 +444,10 @@ public final class EvidenceContractMain {
                 "docs/studies/all-star-identities/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.CloserFieldsStudyMain",
                 "docs/studies/closer-fields/platform.md");
+        // Subdue below horizon (#615): the mock-ups' changed-pixel counts
+        // follow the desktop's text rendering; CI drew different counts.
+        PLATFORM_REPORTS.put("juranometria.tool.BelowHorizonStudyMain",
+                "docs/studies/below-horizon/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.JovianCartographyStudyMain",
                 "docs/studies/jovian-cartography/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.VenusContractStudyMain",

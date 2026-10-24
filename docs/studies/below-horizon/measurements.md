@@ -42,7 +42,7 @@ Contrast is the WCAG 2.x ratio (L1 + 0.05) / (L2 + 0.05) over sRGB relative lumi
 
 ## The pages
 
-Each page is production, unchanged; its mock-ups follow. The share of sky pixels below the horizon on the page is stated, so a ruling knows how much of a page the treatment touches.
+Each page is production, unchanged; its mock-ups follow. The share of sky pixels below the horizon on the page is stated, so a ruling knows how much of a page the treatment touches; how many pixels each mock-up changed depends on how this desktop draws text and is in `platform.md`.
 
 ## The south, 24°: the horizon through the stars
 
@@ -50,11 +50,11 @@ Each page is production, unchanged; its mock-ups follow. The share of sky pixels
 
 The ordinary field a reader meets: the mathematical horizon drawn, the meridian and the ecliptic drawn, the Sun and the Moon on; stars, their names and the constellation figures run across the horizon at full ink below it. Sky pixels on the page: 630000, of which 315000 (50.0 %) lie below the mathematical horizon.
 
-![](south-24-kept-25.png) kept 25 %: 24102 pixels changed
+![](south-24-kept-25.png) kept 25 %
 
-![](south-24-kept-40.png) kept 40 %: 24102 pixels changed
+![](south-24-kept-40.png) kept 40 %
 
-![](south-24-kept-55.png) kept 55 %: 23592 pixels changed
+![](south-24-kept-55.png) kept 55 %
 
 ## The same, on white paper
 
@@ -62,11 +62,11 @@ The ordinary field a reader meets: the mathematical horizon drawn, the meridian 
 
 The paper palette: the subdued share has to read on the lighter ground too. Sky pixels on the page: 630000, of which 315000 (50.0 %) lie below the mathematical horizon.
 
-![](south-24-paper-kept-25.png) kept 25 %: 24166 pixels changed
+![](south-24-paper-kept-25.png) kept 25 %
 
-![](south-24-paper-kept-40.png) kept 40 %: 24166 pixels changed
+![](south-24-paper-kept-40.png) kept 40 %
 
-![](south-24-paper-kept-55.png) kept 55 %: 23650 pixels changed
+![](south-24-paper-kept-55.png) kept 55 %
 
 ## The same, in Norwegian
 
@@ -74,11 +74,11 @@ The paper palette: the subdued share has to read on the lighter ground too. Sky 
 
 The Norwegian page: longer names cross the horizon in other places. Sky pixels on the page: 630000, of which 315000 (50.0 %) lie below the mathematical horizon.
 
-![](south-24-nb-kept-25.png) kept 25 %: 24523 pixels changed
+![](south-24-nb-kept-25.png) kept 25 %
 
-![](south-24-nb-kept-40.png) kept 40 %: 24523 pixels changed
+![](south-24-nb-kept-40.png) kept 40 %
 
-![](south-24-nb-kept-55.png) kept 55 %: 23930 pixels changed
+![](south-24-nb-kept-55.png) kept 55 %
 
 ## The same, the horizon line off
 
@@ -86,11 +86,11 @@ The Norwegian page: longer names cross the horizon in other places. Sky pixels o
 
 The horizon switch off: today nothing on this page says where the horizon is, and the Sun and the Moon are drawn at full ink. The mock-up shows the contrast boundary standing alone. Sky pixels on the page: 630000, of which 315000 (50.0 %) lie below the mathematical horizon.
 
-![](south-24-no-line-kept-25.png) kept 25 %: 23030 pixels changed
+![](south-24-no-line-kept-25.png) kept 25 %
 
-![](south-24-no-line-kept-40.png) kept 40 %: 23030 pixels changed
+![](south-24-no-line-kept-40.png) kept 40 %
 
-![](south-24-no-line-kept-55.png) kept 55 %: 22525 pixels changed
+![](south-24-no-line-kept-55.png) kept 55 %
 
 ## The same, figures and ecliptic emphasised
 
@@ -98,11 +98,11 @@ The horizon switch off: today nothing on this page says where the horizon is, an
 
 Constellation figures and the ecliptic raised: the accents cross the horizon; the proposal keeps their colour and applies the same reduction below it. Sky pixels on the page: 630000, of which 315000 (50.0 %) lie below the mathematical horizon.
 
-![](south-24-emphasis-kept-25.png) kept 25 %: 24585 pixels changed
+![](south-24-emphasis-kept-25.png) kept 25 %
 
-![](south-24-emphasis-kept-40.png) kept 40 %: 24585 pixels changed
+![](south-24-emphasis-kept-40.png) kept 40 %
 
-![](south-24-emphasis-kept-55.png) kept 55 %: 24090 pixels changed
+![](south-24-emphasis-kept-55.png) kept 55 %
 
 ## The east, 8°: names and figures at the horizon
 
@@ -110,11 +110,11 @@ Constellation figures and the ecliptic raised: the accents cross the horizon; th
 
 A closer field where labels are dense: words that straddle the horizon are the labels case. Sky pixels on the page: 630000, of which 315000 (50.0 %) lie below the mathematical horizon.
 
-![](east-8-kept-25.png) kept 25 %: 17866 pixels changed
+![](east-8-kept-25.png) kept 25 %
 
-![](east-8-kept-40.png) kept 40 %: 17866 pixels changed
+![](east-8-kept-40.png) kept 40 %
 
-![](east-8-kept-55.png) kept 55 %: 17502 pixels changed
+![](east-8-kept-55.png) kept 55 %
 
 ## The Sun below the horizon, 3°
 
@@ -122,11 +122,11 @@ A closer field where labels are dense: words that straddle the horizon are the l
 
 The motivating page: today the Sun alone is dimmed while every star around it stays bright, so the body reads as hidden rather than as below the horizon. Sky pixels on the page: 630000, of which 630000 (100.0 %) lie below the mathematical horizon.
 
-![](sun-3-kept-25.png) kept 25 %: 30470 pixels changed
+![](sun-3-kept-25.png) kept 25 %
 
-![](sun-3-kept-40.png) kept 40 %: 30470 pixels changed
+![](sun-3-kept-40.png) kept 40 %
 
-![](sun-3-kept-55.png) kept 55 %: 28901 pixels changed
+![](sun-3-kept-55.png) kept 55 %
 
 ## The whole sky, 180°
 
@@ -134,9 +134,9 @@ The motivating page: today the Sun alone is dimmed while every star around it st
 
 The globe: the horizon as a curve through the disc; below it, half the sky. Sky pixels on the page: 311756, of which 155878 (50.0 %) lie below the mathematical horizon.
 
-![](globe-180-kept-25.png) kept 25 %: 55434 pixels changed
+![](globe-180-kept-25.png) kept 25 %
 
-![](globe-180-kept-40.png) kept 40 %: 55434 pixels changed
+![](globe-180-kept-40.png) kept 40 %
 
-![](globe-180-kept-55.png) kept 55 %: 54288 pixels changed
+![](globe-180-kept-55.png) kept 55 %
 
