@@ -295,20 +295,11 @@ public final class JovianTableSession {
     }
 
     private Result range(Query query, Observer now) {
-        Instant from;
-        Instant to;
-        if (query.mode() == Mode.RELATIVE) {
-            // From the chart time read now (#612, P2), never a stored instant.
-            Instant[] edges = SolarTableSession.relativeEdges(query, now.instant());
-            from = edges[0];
-            to = edges[1];
-        } else {
-            from = SolarTableSession.parse(query.start());
-            to = SolarTableSession.parse(query.end());
-            if (from == null || to == null) {
-                return new Result(query, Outcome.REFUSED_INSTANT, List.of(), now,
-                        from == null ? query.start() : query.end(), 0);
-            }
+        Instant from = SolarTableSession.parse(query.start());
+        Instant to = SolarTableSession.parse(query.end());
+        if (from == null || to == null) {
+            return new Result(query, Outcome.REFUSED_INSTANT, List.of(), now,
+                    from == null ? query.start() : query.end(), 0);
         }
         Duration by = SolarTableSession.STEPS.get(query.step());
         if (to.isBefore(from)) {
@@ -338,9 +329,7 @@ public final class JovianTableSession {
             entries.add(new Entry(sample, c.jupiter(), c));
         }
         boolean appended = entries.get(entries.size() - 1).sample().appendedEnd();
-        List<Entry> ordered = query.mode() == Mode.RELATIVE && query.back()
-                ? SolarTableSession.backwards(entries) : List.copyOf(entries);
         return new Result(query, appended ? Outcome.APPENDED : Outcome.ROWS,
-                ordered, now, "", entries.size());
+                List.copyOf(entries), now, "", entries.size());
     }
 }

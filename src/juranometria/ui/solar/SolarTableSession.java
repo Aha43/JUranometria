@@ -8,7 +8,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
@@ -42,12 +41,9 @@ import juranometria.solar.TimeRange;
  */
 public final class SolarTableSession {
 
-    /**
-     * Which view a query asks for: the instant, a span from the chart
-     * time (#612, ruling P2), or an absolute range as typed.
-     */
+    /** Which view a query asks for: the chart's one instant, or a range as typed. */
     public enum Mode {
-        INSTANT, RELATIVE, RANGE
+        INSTANT, RANGE
     }
 
     /** The steps offered, in order, by key suffix and duration. */
@@ -57,21 +53,13 @@ public final class SolarTableSession {
             Duration.ofHours(6), Duration.ofDays(1), Duration.ofDays(7),
             Duration.ofDays(30));
 
-    /** The spans a relative range offers, in order, by key suffix and duration (#612, P2). */
-    public static final List<String> SPAN_KEYS = List.of("span.day", "span.week",
-            "span.month", "span.quarter", "span.year");
-    public static final List<Duration> SPANS = List.of(Duration.ofDays(1),
-            Duration.ofDays(7), Duration.ofDays(30), Duration.ofDays(90),
-            Duration.ofDays(365));
-
     /**
-     * A query as a host drafted it: the view; for an absolute range the
-     * start, end and step as typed; for a relative range (#612, ruling
-     * P2) the span, the direction and the step - its instants are read
-     * from the chart time whenever it is applied, never stored.
+     * A query as a host drafted it: the view, and for a range the start,
+     * end and step as typed. A range is the reader's labelled analysis
+     * (#612, ruling P2 as amended): seeded from the chart time, theirs
+     * from then on.
      */
-    public record Query(Mode mode, String start, String end, int step, int span,
-                        boolean back) {
+    public record Query(Mode mode, String start, String end, int step) {
 
         public Query {
             if (mode == null) {
@@ -82,30 +70,11 @@ public final class SolarTableSession {
             if (step < 0 || step >= STEPS.size()) {
                 throw new IllegalArgumentException("no such step: " + step);
             }
-            if (span < 0 || span >= SPANS.size()) {
-                throw new IllegalArgumentException("no such span: " + span);
-            }
-            if (mode == Mode.RELATIVE) {
-                // A relative range stores no instant: its edges are read
-                // from the chart time whenever it is applied.
-                start = "";
-                end = "";
-            }
-        }
-
-        /** An instant or absolute-range query, as before #612: a week's span, forward. */
-        public Query(Mode mode, String start, String end, int step) {
-            this(mode, start, end, step, 1, false);
         }
 
         /** The single-instant query, which needs no range. */
         public static Query instant() {
             return new Query(Mode.INSTANT, "", "", 2);
-        }
-
-        /** A relative range: this span from the chart time, forward or back, at this step. */
-        public static Query relative(int span, boolean back, int step) {
-            return new Query(Mode.RELATIVE, "", "", step, span, back);
         }
     }
 
@@ -352,20 +321,11 @@ public final class SolarTableSession {
     }
 
     private Result range(Query query, Observer now) {
-        Instant from;
-        Instant to;
-        if (query.mode() == Mode.RELATIVE) {
-            // From the chart time read now (#612, P2), never a stored instant.
-            Instant[] edges = relativeEdges(query, now.instant());
-            from = edges[0];
-            to = edges[1];
-        } else {
-            from = parse(query.start());
-            to = parse(query.end());
-            if (from == null || to == null) {
-                return new Result(query, Outcome.REFUSED_INSTANT, List.of(), now,
-                        from == null ? query.start() : query.end(), 0);
-            }
+        Instant from = parse(query.start());
+        Instant to = parse(query.end());
+        if (from == null || to == null) {
+            return new Result(query, Outcome.REFUSED_INSTANT, List.of(), now,
+                    from == null ? query.start() : query.end(), 0);
         }
         Duration by = STEPS.get(query.step());
         if (to.isBefore(from)) {
@@ -388,34 +348,9 @@ public final class SolarTableSession {
                 service.get().observe(table.body(), now, new TimeRange(from, to, by));
         List<SolarTableModel.Row> shown = answered.stream()
                 .map(r -> new SolarTableModel.Row(r.sample(), r.observation())).toList();
-        if (query.mode() == Mode.RELATIVE && query.back()) {
-            shown = backwards(shown);
-        }
         boolean appended = answered.get(answered.size() - 1).sample().appendedEnd();
         return new Result(query, appended ? Outcome.APPENDED : Outcome.ROWS, shown, now,
                 "", shown.size());
-    }
-
-    /**
-     * A relative range's edges from the chart time (#612, ruling P2): as
-     * many whole steps as the span holds, the chart time one edge - so
-     * the chart time is always a row, and the first row once the rows
-     * of a backward range are read backwards.
-     */
-    public static Instant[] relativeEdges(Query query, Instant chartTime) {
-        Duration by = STEPS.get(query.step());
-        long steps = SPANS.get(query.span()).toNanos() / by.toNanos();
-        Duration reach = by.multipliedBy(steps);
-        return query.back()
-                ? new Instant[] {chartTime.minus(reach), chartTime}
-                : new Instant[] {chartTime, chartTime.plus(reach)};
-    }
-
-    /** Rows read backwards: a backward range's first row is the chart time. */
-    public static <T> List<T> backwards(List<T> rows) {
-        List<T> reversed = new ArrayList<>(rows);
-        Collections.reverse(reversed);
-        return List.copyOf(reversed);
     }
 
     /** A typed instant, in either form the dialog accepts, or null. */

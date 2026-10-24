@@ -54,12 +54,12 @@ public final class VenusTableSheetMain {
 
     private record State(String name, String title, Observer observer,
                          boolean range, String end, String note,
-                         boolean relative, boolean stale) {
+                         boolean stale) {
 
         /** The states as before #612: an instant, or an absolute range. */
         State(String name, String title, Observer observer, boolean range,
               String end, String note) {
-            this(name, title, observer, range, end, note, false, false);
+            this(name, title, observer, range, end, note, false);
         }
     }
 
@@ -93,21 +93,13 @@ public final class VenusTableSheetMain {
                     "Espenak's hour of the 2012 inferior conjunction, while Venus crossed the"
                             + " Sun's disc: the phase reads in front of the Sun, and the lit side"
                             + " is stated as not well-defined rather than as a false angle."),
-            new State("relative", "From chart time, a day forward", ELONGATION,
-                    false, null,
-                    "The relative range (#612, ruling P2): a day forward from"
-                            + " the chart time in 6-hour steps, the first row the"
-                            + " chart time itself. Nothing is typed and nothing"
-                            + " stored; the rows are read from the chart time"
-                            + " whenever they are computed.",
-                    true, false),
             new State("stale", "The chart moved on after computing", ELONGATION,
                     false, null,
                     "The chart time moved six hours on after this instant was"
                             + " computed (#612, ruling P1): the rows stay, dimmed,"
                             + " under the stale message, until Compute; the note"
                             + " states the chart time and place the rows are for.",
-                    false, true));
+                    true));
 
     private VenusTableSheetMain() {
     }
@@ -224,12 +216,6 @@ public final class VenusTableSheetMain {
                     dialog[0].content().end.setText(state.end());
                     dialog[0].content().update();
                 }
-                if (state.relative()) {
-                    dialog[0].content().relativeView.setSelected(true);
-                    dialog[0].content().span.setSelectedIndex(0);
-                    dialog[0].content().step.setSelectedIndex(1);
-                    dialog[0].content().update();
-                }
                 if (state.stale()) {
                     chart.install(state.observer().at(
                             state.observer().instant().plus(java.time.Duration.ofHours(6))));
@@ -257,10 +243,6 @@ public final class VenusTableSheetMain {
         }
         if (state.range() && !state.end().equals(content.end.getText())) {
             return "the end field reads " + content.end.getText();
-        }
-        if (content.relativeView.isSelected() != state.relative()) {
-            return "the view is " + (content.relativeView.isSelected()
-                    ? "from chart time" : "not from chart time") + ", not the state's";
         }
         if (content.controls().stale() != state.stale()) {
             return "the table is " + (content.controls().stale() ? "stale" : "current")

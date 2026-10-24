@@ -283,6 +283,17 @@ as written and amending P2, P3, P4 and P6:
    labelled analysis after seeding. Neither changes chart state
    silently. A selected row may explicitly invoke *Set chart time to
    this instant* through the same installation path as Place and Time.
+   **Amended by the owner on the first candidate (2026-10-24):** two
+   views only - *At chart time* and *Over a time range*. A relative
+   form was a way of filling an absolute range, not a distinct kind
+   of result, and three radios made the panel read as more than it
+   is. The range is seeded from the chart time at build (From with
+   the chart time, To with the default span after it) and is the
+   reader's from then on; *Start at chart time* puts that seed back
+   from the chart time now, changing the fields and computing
+   nothing; *Set chart time to this instant* on a selected row stays.
+   Nothing computes until the reader chooses the range or presses
+   Compute.
 3. **P3 accepted with the astronomical correction.** Resolve the
    entered local apparent sidereal time on the current chart time's
    UTC date and choose the occurrence nearest the current chart
@@ -331,7 +342,7 @@ any production implementation begins.
 | a context installed off the event thread | refused with its message; nothing changes |
 | half a change observed | an observer and instant installed together are never seen one without the other by any listener |
 | a range row that changes chart time silently | computing, selecting or inspecting a row changes no context; only the row action does, and it redraws everything |
-| a relative range whose first row is not chart time | held on every host at every step |
+| *Start at chart time* that computes, or seeds from the clock | the fields change to the chart time and its span; the computation count does not |
 | a stale absolute range re-seeded behind the reader's back | the reader's typed start and end survive a context change |
 | sidereal-time entry that keeps a second clock | after entry the only stored time is the installed instant; the box reads it back to the minute |
 | a transit that reads as observable | the resolved instant states its altitude and names *below the horizon* when it is |
@@ -348,7 +359,7 @@ any production implementation begins.
 
 Planned, not measured: every table sheet of the Sun, the Moon, Venus
 and Mercury (44) and the Jovian and Saturn `controls-*` table pages
-(the agreement line gone, the stale message and the relative range
+(the agreement line gone, the stale message and *Start at chart time*
 present on the relevant states); the companion sheets (17), the
 Place and Time sheets (13, with the sidereal-time field), the
 solar-system-controls study (28), the companion-window study where the
@@ -412,15 +423,15 @@ it carries out.
   dialog no longer recomputes on focus, and opening a dialog over a
   session another host has computed shows the result as it stands.
   The note under a computed table states the context the rows are for.
-- **The relative range and the row action** (P2): `Mode.RELATIVE`, a
-  span index and a direction in the query, resolved from the chart time
-  at every `apply`; whole steps within the span, the chart time an edge
-  and the first row (a backward range is read backwards). The absolute
-  range is seeded from the chart time at build and is the reader's
-  afterwards. *Set chart time to this instant* exists only over a
-  session that follows the holder, is enabled while a row is chosen
-  (or an instant view shows its one row), and installs the row's
-  instant at the chart's place.
+- **The range and the row action** (P2 as amended): two views, the
+  chart's instant or a range as typed; From and To seeded from the
+  chart time at build and the reader's afterwards; *Start at chart
+  time* re-seeds them from the chart time now and computes nothing;
+  *Set chart time to this instant* exists only over a session that
+  follows the holder, is enabled while a row is chosen (or an instant
+  view shows its one row), and installs the row's instant at the
+  chart's place. The first candidate's third view, span and direction
+  were removed on the owner's finding.
 - **Sidereal time** (P3): `juranometria.sky.SiderealSolver`, inverting
   `LocalSky.localSiderealTimeDegrees` with the rate read from
   `SkyFrame.gastDegrees` over a UTC day - no typed sidereal constant.

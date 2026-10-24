@@ -15,11 +15,12 @@ Place and Time* is gone, and when the chart time or place moves on
 after a table was computed the rows stay, readable but dimmed, under
 *Computed for the previous chart time and place — Compute again*,
 until the reader computes; nothing recomputes on its own, not even a
-dialog coming to the front. Each table has a third view, *From chart
-time*: a span from 1 day to 365 days, forward or back, at the shared
-step, its first row the chart time itself and nothing stored; the
-absolute range keeps *From (UTC)* / *To (UTC)*, seeded once from the
-chart time. A selected row offers *Set chart time to this instant*,
+dialog coming to the front. The two views are *At chart time* and
+*Over a time range*; the range is seeded from the chart time once -
+*From (UTC)* with the chart time, *To (UTC)* with the default span -
+and is the reader's labelled analysis from then on, with *Start at
+chart time* to put that seed back from the chart time now, computing
+nothing. A selected row offers *Set chart time to this instant*,
 which installs the row's instant through the path Place and Time uses
 and redraws every enabled body. Place and Time gains a *Local sidereal
 time* field (hh:mm) that resolves to the instant on the chart time's
