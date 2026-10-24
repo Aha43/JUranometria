@@ -268,6 +268,23 @@ path changed, so a change is never under-tested by a judgement call.
 Ruled on 2026-10-22, after the Mercury article's review correction
 (PR #597) had taken the seven gates for a change they could not see.
 
+## Worktrees, dependencies and links
+
+Each checkout - the main one and every worktree - bootstraps its own
+`lib/` with `scripts/download-libs.sh` (idempotent: a jar whose pinned
+SHA-256 verifies is kept, anything else is fetched and verified) and
+fills its own `imports/` through the import targets. Neither is ever
+tracked, and since #619 neither may be a link either: a worktree once
+carried `lib` and `imports` as symbolic links to the main checkout, a
+`git add -A` committed both, and a clean clone's `make run` failed on
+a link that pointed at one machine's absolute path - and, in that
+checkout, at itself. No gate saw it: in the worktree the links
+resolved, and on CI the dependency cache restored a real `lib/` over
+the dangling link before the bootstrap ran. The ignore rules now
+refuse both names whatever their kind, and `TrackedLinksTest` reads
+the index: `lib` and `imports` tracked as nothing, and no tracked
+symbolic link naming an absolute path or leaving the tree.
+
 ## Releases
 
 Merging is not the same as releasing. Changes accumulate under `Unreleased`.
