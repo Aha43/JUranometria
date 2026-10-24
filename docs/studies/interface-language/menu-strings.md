@@ -89,44 +89,44 @@ Bar packed 843 × 287 px; widest popup 232 px.
 | submenu access letter (language) \| Y |
 | item label \| Sun on the chart |
 | item spoken name \| Sun on the chart |
-| item spoken description \| Shows or hides the Sun on the chart, drawn at its true size where it stands for the place and instant set in Place and Time; below a drawn horizon it is dimmed and says so. |
+| item spoken description \| Shows or hides the Sun on the chart, drawn at its true size where it stands for the chart time and place; below a drawn horizon it is dimmed and says so. |
 | item access letter (language) \| U |
 | item label \| Mercury on the chart |
 | item spoken name \| Mercury on the chart |
-| item spoken description \| Shows or hides Mercury on the chart where it stands for the place and instant set in Place and Time, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
+| item spoken description \| Shows or hides Mercury on the chart where it stands for the chart time and place, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
 | item label \| Venus on the chart |
 | item spoken name \| Venus on the chart |
-| item spoken description \| Shows or hides Venus on the chart where it stands for the place and instant set in Place and Time, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
+| item spoken description \| Shows or hides Venus on the chart where it stands for the chart time and place, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
 | item label \| Moon on the chart |
 | item spoken name \| Moon on the chart |
-| item spoken description \| Shows or hides the Moon on the chart, drawn at its true size where it stands for the place and instant set in Place and Time, lit on the side the Moon table states; below a drawn horizon it is dimmed and says so. |
+| item spoken description \| Shows or hides the Moon on the chart, drawn at its true size where it stands for the chart time and place, lit on the side the Moon table states; below a drawn horizon it is dimmed and says so. |
 | item access letter (language) \| O |
 | item label \| Jupiter and moons on the chart |
 | item spoken name \| Jupiter and moons on the chart |
-| item spoken description \| Shows or hides Jupiter on the chart where it stands for the place and instant set in Place and Time: at its true size once that is at least 6 pixels across, otherwise as a 6-pixel cartographic symbol, not its apparent diameter; below a drawn horizon it is dimmed and says so. Io, Europa, Ganymede and Callisto are drawn as 3-pixel symbols at their own places: a filled dot clear of Jupiter, a dot ringed in the page's ground in front of it, a hollow ring in its shadow, and nothing behind it; at wider fields only the moons whose marks can be told apart are drawn. |
+| item spoken description \| Shows or hides Jupiter on the chart where it stands for the chart time and place: at its true size once that is at least 6 pixels across, otherwise as a 6-pixel cartographic symbol, not its apparent diameter; below a drawn horizon it is dimmed and says so. Io, Europa, Ganymede and Callisto are drawn as 3-pixel symbols at their own places: a filled dot clear of Jupiter, a dot ringed in the page's ground in front of it, a hollow ring in its shadow, and nothing behind it; at wider fields only the moons whose marks can be told apart are drawn. |
 | item label \| Sun... |
-| item hover \| Where the Sun is, for the place and instant set in Place and Time |
+| item hover \| Where the Sun is, for the chart time and place |
 | item spoken name \| Sun table |
-| item spoken description \| Opens a table of the Sun's computed position, height above the horizon, distance and apparent size for the observing place and instant set in Place and Time, at that instant or over a range of instants. Nothing is drawn on the chart. |
+| item spoken description \| Opens a table of the Sun's computed position, height above the horizon, distance and apparent size for the chart time and place, at that instant or over a range of instants. Nothing is drawn on the chart. |
 | item access letter (language) \| S |
 | item label \| Mercury... |
-| item hover \| Where Mercury is, for the place and instant set in Place and Time |
+| item hover \| Where Mercury is, for the chart time and place |
 | item spoken name \| Mercury table |
-| item spoken description \| Opens a table of Mercury's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the observing place and instant set in Place and Time, at that instant or over a range of instants. |
+| item spoken description \| Opens a table of Mercury's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the chart time and place, at that instant or over a range of instants. |
 | item label \| Venus... |
-| item hover \| Where Venus is, for the place and instant set in Place and Time |
+| item hover \| Where Venus is, for the chart time and place |
 | item spoken name \| Venus table |
-| item spoken description \| Opens a table of Venus's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the observing place and instant set in Place and Time, at that instant or over a range of instants. |
+| item spoken description \| Opens a table of Venus's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the chart time and place, at that instant or over a range of instants. |
 | item access letter (language) \| V |
 | item label \| Moon... |
-| item hover \| Where the Moon is, for the place and instant set in Place and Time |
+| item hover \| Where the Moon is, for the chart time and place |
 | item spoken name \| Moon table |
-| item spoken description \| Opens a table of the Moon's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the observing place and instant set in Place and Time, at that instant or over a range of instants. |
+| item spoken description \| Opens a table of the Moon's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the chart time and place, at that instant or over a range of instants. |
 | item access letter (language) \| M |
 | item label \| Jupiter... |
-| item hover \| Where Jupiter and its four large moons are, for the place and instant set in Place and Time |
+| item hover \| Where Jupiter and its four large moons are, for the chart time and place |
 | item spoken name \| Jupiter table |
-| item spoken description \| Opens a table of Jupiter's computed position, height, distance, size and pole, and of where Io, Europa, Ganymede and Callisto stand beside it - clear of Jupiter, in front of it, behind it or in its shadow - for the observing place and instant set in Place and Time, at that instant or over a range of instants. The chart draws Jupiter only while Jupiter and moons on the chart is on. |
+| item spoken description \| Opens a table of Jupiter's computed position, height, distance, size and pole, and of where Io, Europa, Ganymede and Callisto stand beside it - clear of Jupiter, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The chart draws Jupiter only while Jupiter and moons on the chart is on. |
 | item access letter (language) \| J |
 | item label \| Zoom In |
 | item spoken name \| Zoom In |
@@ -200,44 +200,44 @@ Bar packed 843 × 287 px; widest popup 232 px.
 | submenu access letter (language) \| Y |
 | item label [checked] \| Sun on the chart |
 | item spoken name \| Sun on the chart |
-| item spoken description \| Shows or hides the Sun on the chart, drawn at its true size where it stands for the place and instant set in Place and Time; below a drawn horizon it is dimmed and says so. |
+| item spoken description \| Shows or hides the Sun on the chart, drawn at its true size where it stands for the chart time and place; below a drawn horizon it is dimmed and says so. |
 | item access letter (language) \| U |
 | item label [checked] \| Mercury on the chart |
 | item spoken name \| Mercury on the chart |
-| item spoken description \| Shows or hides Mercury on the chart where it stands for the place and instant set in Place and Time, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
+| item spoken description \| Shows or hides Mercury on the chart where it stands for the chart time and place, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
 | item label [checked] \| Venus on the chart |
 | item spoken name \| Venus on the chart |
-| item spoken description \| Shows or hides Venus on the chart where it stands for the place and instant set in Place and Time, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
+| item spoken description \| Shows or hides Venus on the chart where it stands for the chart time and place, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
 | item label [checked] \| Moon on the chart |
 | item spoken name \| Moon on the chart |
-| item spoken description \| Shows or hides the Moon on the chart, drawn at its true size where it stands for the place and instant set in Place and Time, lit on the side the Moon table states; below a drawn horizon it is dimmed and says so. |
+| item spoken description \| Shows or hides the Moon on the chart, drawn at its true size where it stands for the chart time and place, lit on the side the Moon table states; below a drawn horizon it is dimmed and says so. |
 | item access letter (language) \| O |
 | item label [checked] \| Jupiter and moons on the chart |
 | item spoken name \| Jupiter and moons on the chart |
-| item spoken description \| Shows or hides Jupiter on the chart where it stands for the place and instant set in Place and Time: at its true size once that is at least 6 pixels across, otherwise as a 6-pixel cartographic symbol, not its apparent diameter; below a drawn horizon it is dimmed and says so. Io, Europa, Ganymede and Callisto are drawn as 3-pixel symbols at their own places: a filled dot clear of Jupiter, a dot ringed in the page's ground in front of it, a hollow ring in its shadow, and nothing behind it; at wider fields only the moons whose marks can be told apart are drawn. |
+| item spoken description \| Shows or hides Jupiter on the chart where it stands for the chart time and place: at its true size once that is at least 6 pixels across, otherwise as a 6-pixel cartographic symbol, not its apparent diameter; below a drawn horizon it is dimmed and says so. Io, Europa, Ganymede and Callisto are drawn as 3-pixel symbols at their own places: a filled dot clear of Jupiter, a dot ringed in the page's ground in front of it, a hollow ring in its shadow, and nothing behind it; at wider fields only the moons whose marks can be told apart are drawn. |
 | item label \| Sun... |
-| item hover \| Where the Sun is, for the place and instant set in Place and Time |
+| item hover \| Where the Sun is, for the chart time and place |
 | item spoken name \| Sun table |
-| item spoken description \| Opens a table of the Sun's computed position, height above the horizon, distance and apparent size for the observing place and instant set in Place and Time, at that instant or over a range of instants. Nothing is drawn on the chart. |
+| item spoken description \| Opens a table of the Sun's computed position, height above the horizon, distance and apparent size for the chart time and place, at that instant or over a range of instants. Nothing is drawn on the chart. |
 | item access letter (language) \| S |
 | item label \| Mercury... |
-| item hover \| Where Mercury is, for the place and instant set in Place and Time |
+| item hover \| Where Mercury is, for the chart time and place |
 | item spoken name \| Mercury table |
-| item spoken description \| Opens a table of Mercury's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the observing place and instant set in Place and Time, at that instant or over a range of instants. |
+| item spoken description \| Opens a table of Mercury's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the chart time and place, at that instant or over a range of instants. |
 | item label \| Venus... |
-| item hover \| Where Venus is, for the place and instant set in Place and Time |
+| item hover \| Where Venus is, for the chart time and place |
 | item spoken name \| Venus table |
-| item spoken description \| Opens a table of Venus's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the observing place and instant set in Place and Time, at that instant or over a range of instants. |
+| item spoken description \| Opens a table of Venus's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the chart time and place, at that instant or over a range of instants. |
 | item access letter (language) \| V |
 | item label \| Moon... |
-| item hover \| Where the Moon is, for the place and instant set in Place and Time |
+| item hover \| Where the Moon is, for the chart time and place |
 | item spoken name \| Moon table |
-| item spoken description \| Opens a table of the Moon's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the observing place and instant set in Place and Time, at that instant or over a range of instants. |
+| item spoken description \| Opens a table of the Moon's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the chart time and place, at that instant or over a range of instants. |
 | item access letter (language) \| M |
 | item label \| Jupiter... |
-| item hover \| Where Jupiter and its four large moons are, for the place and instant set in Place and Time |
+| item hover \| Where Jupiter and its four large moons are, for the chart time and place |
 | item spoken name \| Jupiter table |
-| item spoken description \| Opens a table of Jupiter's computed position, height, distance, size and pole, and of where Io, Europa, Ganymede and Callisto stand beside it - clear of Jupiter, in front of it, behind it or in its shadow - for the observing place and instant set in Place and Time, at that instant or over a range of instants. The chart draws Jupiter only while Jupiter and moons on the chart is on. |
+| item spoken description \| Opens a table of Jupiter's computed position, height, distance, size and pole, and of where Io, Europa, Ganymede and Callisto stand beside it - clear of Jupiter, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The chart draws Jupiter only while Jupiter and moons on the chart is on. |
 | item access letter (language) \| J |
 | item label \| Zoom In |
 | item spoken name \| Zoom In |
@@ -311,44 +311,44 @@ Bar packed 843 × 287 px; widest popup 232 px.
 | submenu access letter (language) \| Y |
 | item label \| Sun on the chart |
 | item spoken name \| Sun on the chart |
-| item spoken description \| Shows or hides the Sun on the chart, drawn at its true size where it stands for the place and instant set in Place and Time; below a drawn horizon it is dimmed and says so. |
+| item spoken description \| Shows or hides the Sun on the chart, drawn at its true size where it stands for the chart time and place; below a drawn horizon it is dimmed and says so. |
 | item access letter (language) \| U |
 | item label \| Mercury on the chart |
 | item spoken name \| Mercury on the chart |
-| item spoken description \| Shows or hides Mercury on the chart where it stands for the place and instant set in Place and Time, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
+| item spoken description \| Shows or hides Mercury on the chart where it stands for the chart time and place, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
 | item label \| Venus on the chart |
 | item spoken name \| Venus on the chart |
-| item spoken description \| Shows or hides Venus on the chart where it stands for the place and instant set in Place and Time, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
+| item spoken description \| Shows or hides Venus on the chart where it stands for the chart time and place, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
 | item label \| Moon on the chart |
 | item spoken name \| Moon on the chart |
-| item spoken description \| Shows or hides the Moon on the chart, drawn at its true size where it stands for the place and instant set in Place and Time, lit on the side the Moon table states; below a drawn horizon it is dimmed and says so. |
+| item spoken description \| Shows or hides the Moon on the chart, drawn at its true size where it stands for the chart time and place, lit on the side the Moon table states; below a drawn horizon it is dimmed and says so. |
 | item access letter (language) \| O |
 | item label \| Jupiter and moons on the chart |
 | item spoken name \| Jupiter and moons on the chart |
-| item spoken description \| Shows or hides Jupiter on the chart where it stands for the place and instant set in Place and Time: at its true size once that is at least 6 pixels across, otherwise as a 6-pixel cartographic symbol, not its apparent diameter; below a drawn horizon it is dimmed and says so. Io, Europa, Ganymede and Callisto are drawn as 3-pixel symbols at their own places: a filled dot clear of Jupiter, a dot ringed in the page's ground in front of it, a hollow ring in its shadow, and nothing behind it; at wider fields only the moons whose marks can be told apart are drawn. |
+| item spoken description \| Shows or hides Jupiter on the chart where it stands for the chart time and place: at its true size once that is at least 6 pixels across, otherwise as a 6-pixel cartographic symbol, not its apparent diameter; below a drawn horizon it is dimmed and says so. Io, Europa, Ganymede and Callisto are drawn as 3-pixel symbols at their own places: a filled dot clear of Jupiter, a dot ringed in the page's ground in front of it, a hollow ring in its shadow, and nothing behind it; at wider fields only the moons whose marks can be told apart are drawn. |
 | item label \| Sun... |
-| item hover \| Where the Sun is, for the place and instant set in Place and Time |
+| item hover \| Where the Sun is, for the chart time and place |
 | item spoken name \| Sun table |
-| item spoken description \| Opens a table of the Sun's computed position, height above the horizon, distance and apparent size for the observing place and instant set in Place and Time, at that instant or over a range of instants. Nothing is drawn on the chart. |
+| item spoken description \| Opens a table of the Sun's computed position, height above the horizon, distance and apparent size for the chart time and place, at that instant or over a range of instants. Nothing is drawn on the chart. |
 | item access letter (language) \| S |
 | item label \| Mercury... |
-| item hover \| Where Mercury is, for the place and instant set in Place and Time |
+| item hover \| Where Mercury is, for the chart time and place |
 | item spoken name \| Mercury table |
-| item spoken description \| Opens a table of Mercury's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the observing place and instant set in Place and Time, at that instant or over a range of instants. |
+| item spoken description \| Opens a table of Mercury's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the chart time and place, at that instant or over a range of instants. |
 | item label \| Venus... |
-| item hover \| Where Venus is, for the place and instant set in Place and Time |
+| item hover \| Where Venus is, for the chart time and place |
 | item spoken name \| Venus table |
-| item spoken description \| Opens a table of Venus's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the observing place and instant set in Place and Time, at that instant or over a range of instants. |
+| item spoken description \| Opens a table of Venus's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the chart time and place, at that instant or over a range of instants. |
 | item access letter (language) \| V |
 | item label \| Moon... |
-| item hover \| Where the Moon is, for the place and instant set in Place and Time |
+| item hover \| Where the Moon is, for the chart time and place |
 | item spoken name \| Moon table |
-| item spoken description \| Opens a table of the Moon's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the observing place and instant set in Place and Time, at that instant or over a range of instants. |
+| item spoken description \| Opens a table of the Moon's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the chart time and place, at that instant or over a range of instants. |
 | item access letter (language) \| M |
 | item label \| Jupiter... |
-| item hover \| Where Jupiter and its four large moons are, for the place and instant set in Place and Time |
+| item hover \| Where Jupiter and its four large moons are, for the chart time and place |
 | item spoken name \| Jupiter table |
-| item spoken description \| Opens a table of Jupiter's computed position, height, distance, size and pole, and of where Io, Europa, Ganymede and Callisto stand beside it - clear of Jupiter, in front of it, behind it or in its shadow - for the observing place and instant set in Place and Time, at that instant or over a range of instants. The chart draws Jupiter only while Jupiter and moons on the chart is on. |
+| item spoken description \| Opens a table of Jupiter's computed position, height, distance, size and pole, and of where Io, Europa, Ganymede and Callisto stand beside it - clear of Jupiter, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The chart draws Jupiter only while Jupiter and moons on the chart is on. |
 | item access letter (language) \| J |
 | item label \| Zoom In |
 | item spoken name \| Zoom In |
@@ -422,44 +422,44 @@ Bar packed 843 × 287 px; widest popup 232 px.
 | submenu access letter (language) \| Y |
 | item label \| Sun on the chart |
 | item spoken name \| Sun on the chart |
-| item spoken description \| Shows or hides the Sun on the chart, drawn at its true size where it stands for the place and instant set in Place and Time; below a drawn horizon it is dimmed and says so. |
+| item spoken description \| Shows or hides the Sun on the chart, drawn at its true size where it stands for the chart time and place; below a drawn horizon it is dimmed and says so. |
 | item access letter (language) \| U |
 | item label \| Mercury on the chart |
 | item spoken name \| Mercury on the chart |
-| item spoken description \| Shows or hides Mercury on the chart where it stands for the place and instant set in Place and Time, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
+| item spoken description \| Shows or hides Mercury on the chart where it stands for the chart time and place, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
 | item label \| Venus on the chart |
 | item spoken name \| Venus on the chart |
-| item spoken description \| Shows or hides Venus on the chart where it stands for the place and instant set in Place and Time, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
+| item spoken description \| Shows or hides Venus on the chart where it stands for the chart time and place, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
 | item label \| Moon on the chart |
 | item spoken name \| Moon on the chart |
-| item spoken description \| Shows or hides the Moon on the chart, drawn at its true size where it stands for the place and instant set in Place and Time, lit on the side the Moon table states; below a drawn horizon it is dimmed and says so. |
+| item spoken description \| Shows or hides the Moon on the chart, drawn at its true size where it stands for the chart time and place, lit on the side the Moon table states; below a drawn horizon it is dimmed and says so. |
 | item access letter (language) \| O |
 | item label \| Jupiter and moons on the chart |
 | item spoken name \| Jupiter and moons on the chart |
-| item spoken description \| Shows or hides Jupiter on the chart where it stands for the place and instant set in Place and Time: at its true size once that is at least 6 pixels across, otherwise as a 6-pixel cartographic symbol, not its apparent diameter; below a drawn horizon it is dimmed and says so. Io, Europa, Ganymede and Callisto are drawn as 3-pixel symbols at their own places: a filled dot clear of Jupiter, a dot ringed in the page's ground in front of it, a hollow ring in its shadow, and nothing behind it; at wider fields only the moons whose marks can be told apart are drawn. |
+| item spoken description \| Shows or hides Jupiter on the chart where it stands for the chart time and place: at its true size once that is at least 6 pixels across, otherwise as a 6-pixel cartographic symbol, not its apparent diameter; below a drawn horizon it is dimmed and says so. Io, Europa, Ganymede and Callisto are drawn as 3-pixel symbols at their own places: a filled dot clear of Jupiter, a dot ringed in the page's ground in front of it, a hollow ring in its shadow, and nothing behind it; at wider fields only the moons whose marks can be told apart are drawn. |
 | item label \| Sun... |
-| item hover \| Where the Sun is, for the place and instant set in Place and Time |
+| item hover \| Where the Sun is, for the chart time and place |
 | item spoken name \| Sun table |
-| item spoken description \| Opens a table of the Sun's computed position, height above the horizon, distance and apparent size for the observing place and instant set in Place and Time, at that instant or over a range of instants. Nothing is drawn on the chart. |
+| item spoken description \| Opens a table of the Sun's computed position, height above the horizon, distance and apparent size for the chart time and place, at that instant or over a range of instants. Nothing is drawn on the chart. |
 | item access letter (language) \| S |
 | item label \| Mercury... |
-| item hover \| Where Mercury is, for the place and instant set in Place and Time |
+| item hover \| Where Mercury is, for the chart time and place |
 | item spoken name \| Mercury table |
-| item spoken description \| Opens a table of Mercury's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the observing place and instant set in Place and Time, at that instant or over a range of instants. |
+| item spoken description \| Opens a table of Mercury's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the chart time and place, at that instant or over a range of instants. |
 | item label \| Venus... |
-| item hover \| Where Venus is, for the place and instant set in Place and Time |
+| item hover \| Where Venus is, for the chart time and place |
 | item spoken name \| Venus table |
-| item spoken description \| Opens a table of Venus's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the observing place and instant set in Place and Time, at that instant or over a range of instants. |
+| item spoken description \| Opens a table of Venus's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the chart time and place, at that instant or over a range of instants. |
 | item access letter (language) \| V |
 | item label \| Moon... |
-| item hover \| Where the Moon is, for the place and instant set in Place and Time |
+| item hover \| Where the Moon is, for the chart time and place |
 | item spoken name \| Moon table |
-| item spoken description \| Opens a table of the Moon's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the observing place and instant set in Place and Time, at that instant or over a range of instants. |
+| item spoken description \| Opens a table of the Moon's computed position, height above the horizon, distance, apparent size, illuminated fraction, phase and lit side for the chart time and place, at that instant or over a range of instants. |
 | item access letter (language) \| M |
 | item label \| Jupiter... |
-| item hover \| Where Jupiter and its four large moons are, for the place and instant set in Place and Time |
+| item hover \| Where Jupiter and its four large moons are, for the chart time and place |
 | item spoken name \| Jupiter table |
-| item spoken description \| Opens a table of Jupiter's computed position, height, distance, size and pole, and of where Io, Europa, Ganymede and Callisto stand beside it - clear of Jupiter, in front of it, behind it or in its shadow - for the observing place and instant set in Place and Time, at that instant or over a range of instants. The chart draws Jupiter only while Jupiter and moons on the chart is on. |
+| item spoken description \| Opens a table of Jupiter's computed position, height, distance, size and pole, and of where Io, Europa, Ganymede and Callisto stand beside it - clear of Jupiter, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The chart draws Jupiter only while Jupiter and moons on the chart is on. |
 | item access letter (language) \| J |
 | item label [unavailable] \| Zoom In |
 | item spoken name [unavailable] \| Zoom In |
@@ -535,44 +535,44 @@ Bar packed 844 × 287 px; widest popup 214 px.
 | submenu access letter (language) \| Y |
 | item label \| Solen på kartet |
 | item spoken name \| Solen på kartet |
-| item spoken description \| Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid; under en tegnet horisont dempes den og sier fra. |
+| item spoken description \| Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for karttiden og stedet; under en tegnet horisont dempes den og sier fra. |
 | item access letter (language) \| T |
 | item label \| Merkur på kartet |
 | item spoken name \| Merkur på kartet |
-| item spoken description \| Viser eller skjuler Merkur på kartet der den står for stedet og tidspunktet satt i Sted og tid, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om det. |
+| item spoken description \| Viser eller skjuler Merkur på kartet der den står for karttiden og stedet, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om det. |
 | item label \| Venus på kartet |
 | item spoken name \| Venus på kartet |
-| item spoken description \| Viser eller skjuler Venus på kartet der den står for stedet og tidspunktet satt i Sted og tid, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om den. |
+| item spoken description \| Viser eller skjuler Venus på kartet der den står for karttiden og stedet, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om den. |
 | item label \| Månen på kartet |
 | item spoken name \| Månen på kartet |
-| item spoken description \| Viser eller skjuler Månen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid, opplyst på den siden Månetabellen oppgir; under en tegnet horisont dempes den og sier fra. |
+| item spoken description \| Viser eller skjuler Månen på kartet, tegnet i sann størrelse der den står for karttiden og stedet, opplyst på den siden Månetabellen oppgir; under en tegnet horisont dempes den og sier fra. |
 | item access letter (language) \| N |
 | item label \| Jupiter og månene på kartet |
 | item spoken name \| Jupiter og månene på kartet |
-| item spoken description \| Viser eller skjuler Jupiter på kartet der den står for stedet og tidspunktet satt i Sted og tid: i sann størrelse når den er minst 6 piksler bred, ellers som et kartografisk symbol på 6 piksler, ikke den tilsynelatende diameteren; under en tegnet horisont dempes den og sier fra. Io, Europa, Ganymedes og Callisto tegnes som symboler på 3 piksler der de står: en fylt prikk klar av Jupiter, en prikk med en ring i sidens bunnfarge foran den, en hul ring i skyggen, og ingenting bak den; i videre felt tegnes bare de månene som kan skilles fra hverandre. |
+| item spoken description \| Viser eller skjuler Jupiter på kartet der den står for karttiden og stedet: i sann størrelse når den er minst 6 piksler bred, ellers som et kartografisk symbol på 6 piksler, ikke den tilsynelatende diameteren; under en tegnet horisont dempes den og sier fra. Io, Europa, Ganymedes og Callisto tegnes som symboler på 3 piksler der de står: en fylt prikk klar av Jupiter, en prikk med en ring i sidens bunnfarge foran den, en hul ring i skyggen, og ingenting bak den; i videre felt tegnes bare de månene som kan skilles fra hverandre. |
 | item access letter (language) \| P |
 | item label \| Solen... |
-| item hover \| Hvor Solen er, for stedet og tidspunktet satt i Sted og tid |
+| item hover \| Hvor Solen er, for karttiden og stedet |
 | item spoken name \| Soltabell |
-| item spoken description \| Åpner en tabell over Solens beregnede posisjon, høyde over horisonten, avstand og tilsynelatende størrelse for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. Ingenting tegnes på kartet. |
+| item spoken description \| Åpner en tabell over Solens beregnede posisjon, høyde over horisonten, avstand og tilsynelatende størrelse for karttiden og observasjonsstedet, ved det tidspunktet eller over et tidsrom. Ingenting tegnes på kartet. |
 | item access letter (language) \| O |
 | item label \| Merkur... |
-| item hover \| Hvor Merkur er, for stedet og tidspunktet satt i Sted og tid |
+| item hover \| Hvor Merkur er, for karttiden og stedet |
 | item spoken name \| Merkurtabell |
-| item spoken description \| Åpner en tabell over Merkurs beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. |
+| item spoken description \| Åpner en tabell over Merkurs beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for karttiden og observasjonsstedet, ved det tidspunktet eller over et tidsrom. |
 | item label \| Venus... |
-| item hover \| Hvor Venus er, for stedet og tidspunktet satt i Sted og tid |
+| item hover \| Hvor Venus er, for karttiden og stedet |
 | item spoken name \| Venustabell |
-| item spoken description \| Åpner en tabell over Venus' beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. |
+| item spoken description \| Åpner en tabell over Venus' beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for karttiden og observasjonsstedet, ved det tidspunktet eller over et tidsrom. |
 | item label \| Månen... |
-| item hover \| Hvor Månen er, for stedet og tidspunktet satt i Sted og tid |
+| item hover \| Hvor Månen er, for karttiden og stedet |
 | item spoken name \| Månetabell |
-| item spoken description \| Åpner en tabell over Månens beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. |
+| item spoken description \| Åpner en tabell over Månens beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for karttiden og observasjonsstedet, ved det tidspunktet eller over et tidsrom. |
 | item access letter (language) \| M |
 | item label \| Jupiter... |
-| item hover \| Hvor Jupiter og de fire store månene er, for stedet og tidspunktet satt i Sted og tid |
+| item hover \| Hvor Jupiter og de fire store månene er, for karttiden og stedet |
 | item spoken name \| Jupitertabell |
-| item spoken description \| Åpner en tabell over Jupiters beregnede posisjon, høyde, avstand, størrelse og pol, og over hvor Io, Europa, Ganymedes og Callisto står ved siden av - klar av Jupiter, foran, bak eller i skyggen - for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. Kartet tegner Jupiter bare mens Jupiter og månene på kartet er på. |
+| item spoken description \| Åpner en tabell over Jupiters beregnede posisjon, høyde, avstand, størrelse og pol, og over hvor Io, Europa, Ganymedes og Callisto står ved siden av - klar av Jupiter, foran, bak eller i skyggen - for karttiden og observasjonsstedet, ved det tidspunktet eller over et tidsrom. Kartet tegner Jupiter bare mens Jupiter og månene på kartet er på. |
 | item access letter (language) \| J |
 | item label \| Zoom inn |
 | item spoken name \| Zoom inn |
@@ -646,44 +646,44 @@ Bar packed 844 × 287 px; widest popup 214 px.
 | submenu access letter (language) \| Y |
 | item label [checked] \| Solen på kartet |
 | item spoken name \| Solen på kartet |
-| item spoken description \| Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid; under en tegnet horisont dempes den og sier fra. |
+| item spoken description \| Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for karttiden og stedet; under en tegnet horisont dempes den og sier fra. |
 | item access letter (language) \| T |
 | item label [checked] \| Merkur på kartet |
 | item spoken name \| Merkur på kartet |
-| item spoken description \| Viser eller skjuler Merkur på kartet der den står for stedet og tidspunktet satt i Sted og tid, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om det. |
+| item spoken description \| Viser eller skjuler Merkur på kartet der den står for karttiden og stedet, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om det. |
 | item label [checked] \| Venus på kartet |
 | item spoken name \| Venus på kartet |
-| item spoken description \| Viser eller skjuler Venus på kartet der den står for stedet og tidspunktet satt i Sted og tid, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om den. |
+| item spoken description \| Viser eller skjuler Venus på kartet der den står for karttiden og stedet, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om den. |
 | item label [checked] \| Månen på kartet |
 | item spoken name \| Månen på kartet |
-| item spoken description \| Viser eller skjuler Månen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid, opplyst på den siden Månetabellen oppgir; under en tegnet horisont dempes den og sier fra. |
+| item spoken description \| Viser eller skjuler Månen på kartet, tegnet i sann størrelse der den står for karttiden og stedet, opplyst på den siden Månetabellen oppgir; under en tegnet horisont dempes den og sier fra. |
 | item access letter (language) \| N |
 | item label [checked] \| Jupiter og månene på kartet |
 | item spoken name \| Jupiter og månene på kartet |
-| item spoken description \| Viser eller skjuler Jupiter på kartet der den står for stedet og tidspunktet satt i Sted og tid: i sann størrelse når den er minst 6 piksler bred, ellers som et kartografisk symbol på 6 piksler, ikke den tilsynelatende diameteren; under en tegnet horisont dempes den og sier fra. Io, Europa, Ganymedes og Callisto tegnes som symboler på 3 piksler der de står: en fylt prikk klar av Jupiter, en prikk med en ring i sidens bunnfarge foran den, en hul ring i skyggen, og ingenting bak den; i videre felt tegnes bare de månene som kan skilles fra hverandre. |
+| item spoken description \| Viser eller skjuler Jupiter på kartet der den står for karttiden og stedet: i sann størrelse når den er minst 6 piksler bred, ellers som et kartografisk symbol på 6 piksler, ikke den tilsynelatende diameteren; under en tegnet horisont dempes den og sier fra. Io, Europa, Ganymedes og Callisto tegnes som symboler på 3 piksler der de står: en fylt prikk klar av Jupiter, en prikk med en ring i sidens bunnfarge foran den, en hul ring i skyggen, og ingenting bak den; i videre felt tegnes bare de månene som kan skilles fra hverandre. |
 | item access letter (language) \| P |
 | item label \| Solen... |
-| item hover \| Hvor Solen er, for stedet og tidspunktet satt i Sted og tid |
+| item hover \| Hvor Solen er, for karttiden og stedet |
 | item spoken name \| Soltabell |
-| item spoken description \| Åpner en tabell over Solens beregnede posisjon, høyde over horisonten, avstand og tilsynelatende størrelse for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. Ingenting tegnes på kartet. |
+| item spoken description \| Åpner en tabell over Solens beregnede posisjon, høyde over horisonten, avstand og tilsynelatende størrelse for karttiden og observasjonsstedet, ved det tidspunktet eller over et tidsrom. Ingenting tegnes på kartet. |
 | item access letter (language) \| O |
 | item label \| Merkur... |
-| item hover \| Hvor Merkur er, for stedet og tidspunktet satt i Sted og tid |
+| item hover \| Hvor Merkur er, for karttiden og stedet |
 | item spoken name \| Merkurtabell |
-| item spoken description \| Åpner en tabell over Merkurs beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. |
+| item spoken description \| Åpner en tabell over Merkurs beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for karttiden og observasjonsstedet, ved det tidspunktet eller over et tidsrom. |
 | item label \| Venus... |
-| item hover \| Hvor Venus er, for stedet og tidspunktet satt i Sted og tid |
+| item hover \| Hvor Venus er, for karttiden og stedet |
 | item spoken name \| Venustabell |
-| item spoken description \| Åpner en tabell over Venus' beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. |
+| item spoken description \| Åpner en tabell over Venus' beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for karttiden og observasjonsstedet, ved det tidspunktet eller over et tidsrom. |
 | item label \| Månen... |
-| item hover \| Hvor Månen er, for stedet og tidspunktet satt i Sted og tid |
+| item hover \| Hvor Månen er, for karttiden og stedet |
 | item spoken name \| Månetabell |
-| item spoken description \| Åpner en tabell over Månens beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. |
+| item spoken description \| Åpner en tabell over Månens beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for karttiden og observasjonsstedet, ved det tidspunktet eller over et tidsrom. |
 | item access letter (language) \| M |
 | item label \| Jupiter... |
-| item hover \| Hvor Jupiter og de fire store månene er, for stedet og tidspunktet satt i Sted og tid |
+| item hover \| Hvor Jupiter og de fire store månene er, for karttiden og stedet |
 | item spoken name \| Jupitertabell |
-| item spoken description \| Åpner en tabell over Jupiters beregnede posisjon, høyde, avstand, størrelse og pol, og over hvor Io, Europa, Ganymedes og Callisto står ved siden av - klar av Jupiter, foran, bak eller i skyggen - for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. Kartet tegner Jupiter bare mens Jupiter og månene på kartet er på. |
+| item spoken description \| Åpner en tabell over Jupiters beregnede posisjon, høyde, avstand, størrelse og pol, og over hvor Io, Europa, Ganymedes og Callisto står ved siden av - klar av Jupiter, foran, bak eller i skyggen - for karttiden og observasjonsstedet, ved det tidspunktet eller over et tidsrom. Kartet tegner Jupiter bare mens Jupiter og månene på kartet er på. |
 | item access letter (language) \| J |
 | item label \| Zoom inn |
 | item spoken name \| Zoom inn |
@@ -757,44 +757,44 @@ Bar packed 844 × 287 px; widest popup 214 px.
 | submenu access letter (language) \| Y |
 | item label \| Solen på kartet |
 | item spoken name \| Solen på kartet |
-| item spoken description \| Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid; under en tegnet horisont dempes den og sier fra. |
+| item spoken description \| Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for karttiden og stedet; under en tegnet horisont dempes den og sier fra. |
 | item access letter (language) \| T |
 | item label \| Merkur på kartet |
 | item spoken name \| Merkur på kartet |
-| item spoken description \| Viser eller skjuler Merkur på kartet der den står for stedet og tidspunktet satt i Sted og tid, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om det. |
+| item spoken description \| Viser eller skjuler Merkur på kartet der den står for karttiden og stedet, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om det. |
 | item label \| Venus på kartet |
 | item spoken name \| Venus på kartet |
-| item spoken description \| Viser eller skjuler Venus på kartet der den står for stedet og tidspunktet satt i Sted og tid, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om den. |
+| item spoken description \| Viser eller skjuler Venus på kartet der den står for karttiden og stedet, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om den. |
 | item label \| Månen på kartet |
 | item spoken name \| Månen på kartet |
-| item spoken description \| Viser eller skjuler Månen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid, opplyst på den siden Månetabellen oppgir; under en tegnet horisont dempes den og sier fra. |
+| item spoken description \| Viser eller skjuler Månen på kartet, tegnet i sann størrelse der den står for karttiden og stedet, opplyst på den siden Månetabellen oppgir; under en tegnet horisont dempes den og sier fra. |
 | item access letter (language) \| N |
 | item label \| Jupiter og månene på kartet |
 | item spoken name \| Jupiter og månene på kartet |
-| item spoken description \| Viser eller skjuler Jupiter på kartet der den står for stedet og tidspunktet satt i Sted og tid: i sann størrelse når den er minst 6 piksler bred, ellers som et kartografisk symbol på 6 piksler, ikke den tilsynelatende diameteren; under en tegnet horisont dempes den og sier fra. Io, Europa, Ganymedes og Callisto tegnes som symboler på 3 piksler der de står: en fylt prikk klar av Jupiter, en prikk med en ring i sidens bunnfarge foran den, en hul ring i skyggen, og ingenting bak den; i videre felt tegnes bare de månene som kan skilles fra hverandre. |
+| item spoken description \| Viser eller skjuler Jupiter på kartet der den står for karttiden og stedet: i sann størrelse når den er minst 6 piksler bred, ellers som et kartografisk symbol på 6 piksler, ikke den tilsynelatende diameteren; under en tegnet horisont dempes den og sier fra. Io, Europa, Ganymedes og Callisto tegnes som symboler på 3 piksler der de står: en fylt prikk klar av Jupiter, en prikk med en ring i sidens bunnfarge foran den, en hul ring i skyggen, og ingenting bak den; i videre felt tegnes bare de månene som kan skilles fra hverandre. |
 | item access letter (language) \| P |
 | item label \| Solen... |
-| item hover \| Hvor Solen er, for stedet og tidspunktet satt i Sted og tid |
+| item hover \| Hvor Solen er, for karttiden og stedet |
 | item spoken name \| Soltabell |
-| item spoken description \| Åpner en tabell over Solens beregnede posisjon, høyde over horisonten, avstand og tilsynelatende størrelse for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. Ingenting tegnes på kartet. |
+| item spoken description \| Åpner en tabell over Solens beregnede posisjon, høyde over horisonten, avstand og tilsynelatende størrelse for karttiden og observasjonsstedet, ved det tidspunktet eller over et tidsrom. Ingenting tegnes på kartet. |
 | item access letter (language) \| O |
 | item label \| Merkur... |
-| item hover \| Hvor Merkur er, for stedet og tidspunktet satt i Sted og tid |
+| item hover \| Hvor Merkur er, for karttiden og stedet |
 | item spoken name \| Merkurtabell |
-| item spoken description \| Åpner en tabell over Merkurs beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. |
+| item spoken description \| Åpner en tabell over Merkurs beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for karttiden og observasjonsstedet, ved det tidspunktet eller over et tidsrom. |
 | item label \| Venus... |
-| item hover \| Hvor Venus er, for stedet og tidspunktet satt i Sted og tid |
+| item hover \| Hvor Venus er, for karttiden og stedet |
 | item spoken name \| Venustabell |
-| item spoken description \| Åpner en tabell over Venus' beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. |
+| item spoken description \| Åpner en tabell over Venus' beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for karttiden og observasjonsstedet, ved det tidspunktet eller over et tidsrom. |
 | item label \| Månen... |
-| item hover \| Hvor Månen er, for stedet og tidspunktet satt i Sted og tid |
+| item hover \| Hvor Månen er, for karttiden og stedet |
 | item spoken name \| Månetabell |
-| item spoken description \| Åpner en tabell over Månens beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. |
+| item spoken description \| Åpner en tabell over Månens beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for karttiden og observasjonsstedet, ved det tidspunktet eller over et tidsrom. |
 | item access letter (language) \| M |
 | item label \| Jupiter... |
-| item hover \| Hvor Jupiter og de fire store månene er, for stedet og tidspunktet satt i Sted og tid |
+| item hover \| Hvor Jupiter og de fire store månene er, for karttiden og stedet |
 | item spoken name \| Jupitertabell |
-| item spoken description \| Åpner en tabell over Jupiters beregnede posisjon, høyde, avstand, størrelse og pol, og over hvor Io, Europa, Ganymedes og Callisto står ved siden av - klar av Jupiter, foran, bak eller i skyggen - for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. Kartet tegner Jupiter bare mens Jupiter og månene på kartet er på. |
+| item spoken description \| Åpner en tabell over Jupiters beregnede posisjon, høyde, avstand, størrelse og pol, og over hvor Io, Europa, Ganymedes og Callisto står ved siden av - klar av Jupiter, foran, bak eller i skyggen - for karttiden og observasjonsstedet, ved det tidspunktet eller over et tidsrom. Kartet tegner Jupiter bare mens Jupiter og månene på kartet er på. |
 | item access letter (language) \| J |
 | item label \| Zoom inn |
 | item spoken name \| Zoom inn |
@@ -868,44 +868,44 @@ Bar packed 844 × 287 px; widest popup 214 px.
 | submenu access letter (language) \| Y |
 | item label \| Solen på kartet |
 | item spoken name \| Solen på kartet |
-| item spoken description \| Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid; under en tegnet horisont dempes den og sier fra. |
+| item spoken description \| Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for karttiden og stedet; under en tegnet horisont dempes den og sier fra. |
 | item access letter (language) \| T |
 | item label \| Merkur på kartet |
 | item spoken name \| Merkur på kartet |
-| item spoken description \| Viser eller skjuler Merkur på kartet der den står for stedet og tidspunktet satt i Sted og tid, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om det. |
+| item spoken description \| Viser eller skjuler Merkur på kartet der den står for karttiden og stedet, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om det. |
 | item label \| Venus på kartet |
 | item spoken name \| Venus på kartet |
-| item spoken description \| Viser eller skjuler Venus på kartet der den står for stedet og tidspunktet satt i Sted og tid, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om den. |
+| item spoken description \| Viser eller skjuler Venus på kartet der den står for karttiden og stedet, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om den. |
 | item label \| Månen på kartet |
 | item spoken name \| Månen på kartet |
-| item spoken description \| Viser eller skjuler Månen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid, opplyst på den siden Månetabellen oppgir; under en tegnet horisont dempes den og sier fra. |
+| item spoken description \| Viser eller skjuler Månen på kartet, tegnet i sann størrelse der den står for karttiden og stedet, opplyst på den siden Månetabellen oppgir; under en tegnet horisont dempes den og sier fra. |
 | item access letter (language) \| N |
 | item label \| Jupiter og månene på kartet |
 | item spoken name \| Jupiter og månene på kartet |
-| item spoken description \| Viser eller skjuler Jupiter på kartet der den står for stedet og tidspunktet satt i Sted og tid: i sann størrelse når den er minst 6 piksler bred, ellers som et kartografisk symbol på 6 piksler, ikke den tilsynelatende diameteren; under en tegnet horisont dempes den og sier fra. Io, Europa, Ganymedes og Callisto tegnes som symboler på 3 piksler der de står: en fylt prikk klar av Jupiter, en prikk med en ring i sidens bunnfarge foran den, en hul ring i skyggen, og ingenting bak den; i videre felt tegnes bare de månene som kan skilles fra hverandre. |
+| item spoken description \| Viser eller skjuler Jupiter på kartet der den står for karttiden og stedet: i sann størrelse når den er minst 6 piksler bred, ellers som et kartografisk symbol på 6 piksler, ikke den tilsynelatende diameteren; under en tegnet horisont dempes den og sier fra. Io, Europa, Ganymedes og Callisto tegnes som symboler på 3 piksler der de står: en fylt prikk klar av Jupiter, en prikk med en ring i sidens bunnfarge foran den, en hul ring i skyggen, og ingenting bak den; i videre felt tegnes bare de månene som kan skilles fra hverandre. |
 | item access letter (language) \| P |
 | item label \| Solen... |
-| item hover \| Hvor Solen er, for stedet og tidspunktet satt i Sted og tid |
+| item hover \| Hvor Solen er, for karttiden og stedet |
 | item spoken name \| Soltabell |
-| item spoken description \| Åpner en tabell over Solens beregnede posisjon, høyde over horisonten, avstand og tilsynelatende størrelse for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. Ingenting tegnes på kartet. |
+| item spoken description \| Åpner en tabell over Solens beregnede posisjon, høyde over horisonten, avstand og tilsynelatende størrelse for karttiden og observasjonsstedet, ved det tidspunktet eller over et tidsrom. Ingenting tegnes på kartet. |
 | item access letter (language) \| O |
 | item label \| Merkur... |
-| item hover \| Hvor Merkur er, for stedet og tidspunktet satt i Sted og tid |
+| item hover \| Hvor Merkur er, for karttiden og stedet |
 | item spoken name \| Merkurtabell |
-| item spoken description \| Åpner en tabell over Merkurs beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. |
+| item spoken description \| Åpner en tabell over Merkurs beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for karttiden og observasjonsstedet, ved det tidspunktet eller over et tidsrom. |
 | item label \| Venus... |
-| item hover \| Hvor Venus er, for stedet og tidspunktet satt i Sted og tid |
+| item hover \| Hvor Venus er, for karttiden og stedet |
 | item spoken name \| Venustabell |
-| item spoken description \| Åpner en tabell over Venus' beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. |
+| item spoken description \| Åpner en tabell over Venus' beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for karttiden og observasjonsstedet, ved det tidspunktet eller over et tidsrom. |
 | item label \| Månen... |
-| item hover \| Hvor Månen er, for stedet og tidspunktet satt i Sted og tid |
+| item hover \| Hvor Månen er, for karttiden og stedet |
 | item spoken name \| Månetabell |
-| item spoken description \| Åpner en tabell over Månens beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. |
+| item spoken description \| Åpner en tabell over Månens beregnede posisjon, høyde over horisonten, avstand, tilsynelatende størrelse, belyst andel, fase og belyst side for karttiden og observasjonsstedet, ved det tidspunktet eller over et tidsrom. |
 | item access letter (language) \| M |
 | item label \| Jupiter... |
-| item hover \| Hvor Jupiter og de fire store månene er, for stedet og tidspunktet satt i Sted og tid |
+| item hover \| Hvor Jupiter og de fire store månene er, for karttiden og stedet |
 | item spoken name \| Jupitertabell |
-| item spoken description \| Åpner en tabell over Jupiters beregnede posisjon, høyde, avstand, størrelse og pol, og over hvor Io, Europa, Ganymedes og Callisto står ved siden av - klar av Jupiter, foran, bak eller i skyggen - for observasjonsstedet og tidspunktet satt i Sted og tid, ved det tidspunktet eller over et tidsrom. Kartet tegner Jupiter bare mens Jupiter og månene på kartet er på. |
+| item spoken description \| Åpner en tabell over Jupiters beregnede posisjon, høyde, avstand, størrelse og pol, og over hvor Io, Europa, Ganymedes og Callisto står ved siden av - klar av Jupiter, foran, bak eller i skyggen - for karttiden og observasjonsstedet, ved det tidspunktet eller over et tidsrom. Kartet tegner Jupiter bare mens Jupiter og månene på kartet er på. |
 | item access letter (language) \| J |
 | item label [unavailable] \| Zoom inn |
 | item spoken name [unavailable] \| Zoom inn |

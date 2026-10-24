@@ -31,7 +31,7 @@ class VenusArticleTest {
     /** Each figure, and the evidence page it is a copy of. */
     private static final List<String[]> FIGURES = List.of(
             new String[] {"venus-table-en.png", "docs/studies/interface-language/venustable-en-1-instant.png"},
-            new String[] {"venus-table-nb-NO.png", "docs/studies/interface-language/venustable-nb-NO-6-instant.png"},
+            new String[] {"venus-table-nb-NO.png", "docs/studies/interface-language/venustable-nb-NO-7-instant.png"},
             new String[] {"venus-elongation-8-nb.png", "docs/studies/venus-on-the-chart/elongation-8-nb.png"},
             new String[] {"venus-elongation-1.png", "docs/studies/venus-on-the-chart/elongation-1.png"},
             new String[] {"venus-elongation-3-dark.png", "docs/studies/venus-on-the-chart/elongation-3-dark.png"},

@@ -18,7 +18,8 @@ nothing - is one machine's answer, in `platform.md` beside this.
 |---|---|---|
 | JTextField | 59.913 | Latitude |
 | JTextField | 10.752 | Longitude, east positive |
-| JTextField | 2026-03-20 21:33:00 | Instant (UTC) |
+| JTextField | 2026-03-20 21:33:00 | Chart time (UTC) |
+| JTextField | 10:09 | Local sidereal time |
 | JCheckBox | Meridian | Show Meridian |
 | JCheckBox | Mathematical horizon | Show Mathematical horizon |
 | JCheckBox | Zenith | Show Zenith |
@@ -26,7 +27,7 @@ nothing - is one machine's answer, in `platform.md` beside this.
 | JButton | Update to now | Update to now |
 | JButton | Centre on zenith | Centre on zenith |
 
-**9 operable controls.** A companion that hosts this content offers
+**10 operable controls.** A companion that hosts this content offers
 exactly these; it adds only its own shell.
 
 ## The content in `nb-NO`
@@ -35,7 +36,8 @@ exactly these; it adds only its own shell.
 |---|---|---|
 | JTextField | 59.913 | Breddegrad |
 | JTextField | 10.752 | Lengdegrad, øst positiv |
-| JTextField | 2026-03-20 21:33:00 | Tidspunkt (UTC) |
+| JTextField | 2026-03-20 21:33:00 | Karttid (UTC) |
+| JTextField | 10:09 | Lokal stjernetid |
 | JCheckBox | Meridian | Vis meridianen |
 | JCheckBox | Matematisk horisont | Vis matematisk horisont |
 | JCheckBox | Senit | Vis senit |
@@ -43,7 +45,7 @@ exactly these; it adds only its own shell.
 | JButton | Oppdater til nå | Oppdater til nå |
 | JButton | Sentrer på senit | Sentrer på senit |
 
-**9 operable controls.** A companion that hosts this content offers
+**10 operable controls.** A companion that hosts this content offers
 exactly these; it adds only its own shell.
 
 ## Placement at four screen sizes

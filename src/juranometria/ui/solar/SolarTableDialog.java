@@ -174,6 +174,17 @@ public final class SolarTableDialog extends JDialog {
         return new SolarTableDialog(owner, session, said);
     }
 
+    /**
+     * A packed dialog for a photographer over a session prepared first -
+     * computed, and the chart moved on, before the dialog packs once at
+     * its final size (#612): a window packed at two sizes in quick
+     * succession is what a late native reply refuses.
+     */
+    public static SolarTableDialog packedForStudy(Frame owner, SolarTableSession session,
+                                                  InterfaceText said) {
+        return new SolarTableDialog(owner, session, said);
+    }
+
     /** The content over a session of its own, headless-constructible, for tests and studies. */
     public static Content content(Supplier<Observer> observer,
                                   SolarSystemService service,

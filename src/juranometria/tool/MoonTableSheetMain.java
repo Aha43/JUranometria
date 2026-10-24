@@ -202,17 +202,23 @@ public final class MoonTableSheetMain {
                 // and a state may move the chart on after computing.
                 juranometria.context.ChartContextHolder chart =
                         new juranometria.context.ChartContextHolder(state.observer());
-                dialog[0] = SolarTableDialog.packedForStudy(owner[0], chart, service,
-                        said, SolarTable.moon());
+                juranometria.ui.solar.SolarTableSession session =
+                        new juranometria.ui.solar.SolarTableSession(chart::observer, service,
+                                SolarTable.moon());
+                session.followContext(chart);
+                if (state.stale()) {
+                    // Computed, then the chart moved on - before the dialog
+                    // packs, so it packs once, at its final size.
+                    session.apply(juranometria.ui.solar.SolarTableSession.Query.instant());
+                    chart.install(state.observer().at(
+                            state.observer().instant().plus(java.time.Duration.ofHours(6))));
+                }
+                dialog[0] = SolarTableDialog.packedForStudy(owner[0], session, said);
                 if (state.range()) {
                     dialog[0].content().rangeView.setSelected(true);
                     dialog[0].content().span.setSelectedIndex(state.span());
                     dialog[0].content().step.setSelectedIndex(state.step());
                     dialog[0].content().update();
-                }
-                if (state.stale()) {
-                    chart.install(state.observer().at(
-                            state.observer().instant().plus(java.time.Duration.ofHours(6))));
                 }
             });
             return capture(dialog[0], state, to);

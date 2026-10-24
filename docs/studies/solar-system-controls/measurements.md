@@ -20,22 +20,18 @@ query; a **result** is what the service answered; a **mode** is which view is sh
 | body | control | kind | state | shared today |
 |---|---|---|---|---|
 | sun | sunObserverNote | JLabel | observer | read from Place and Time when the dialog opens, comes to the front, or on Update |
-| sun | This instant / Over a range | JRadioButton | mode | no: each dialog's own |
-| sun | sunRangeStart | JTextField | draft | no: seeded from the observer once, then the dialog's own |
-| sun | sunRangeEnd | JTextField | draft | no: seeded from the observer once, then the dialog's own |
+| sun | At chart time / Over a time range | JRadioButton | mode | no: each dialog's own |
+| sun | sunRangeSpan | JComboBox | draft | no |
 | sun | sunRangeStep | JComboBox | draft | no |
 | sun | Compute | JButton | action: compute the draft | no |
-| sun | Update from Place and Time | JButton | action: re-read the observer, recompute | no |
 | sun | sunStatus | JLabel | result: rows or a refusal | no |
 | sun | sunTable | JTable, 8 columns | result | no: the dialog's own model |
 | sun | Close | JButton | furniture | the dialog's |
 | moon | moonObserverNote | JLabel | observer | read from Place and Time when the dialog opens, comes to the front, or on Update |
-| moon | This instant / Over a range | JRadioButton | mode | no: each dialog's own |
-| moon | moonRangeStart | JTextField | draft | no: seeded from the observer once, then the dialog's own |
-| moon | moonRangeEnd | JTextField | draft | no: seeded from the observer once, then the dialog's own |
+| moon | At chart time / Over a time range | JRadioButton | mode | no: each dialog's own |
+| moon | moonRangeSpan | JComboBox | draft | no |
 | moon | moonRangeStep | JComboBox | draft | no |
 | moon | Compute | JButton | action: compute the draft | no |
-| moon | Update from Place and Time | JButton | action: re-read the observer, recompute | no |
 | moon | moonStatus | JLabel | result: rows or a refusal | no |
 | moon | moonTable | JTable, 11 columns | result | no: the dialog's own model |
 | moon | Close | JButton | furniture | the dialog's |
@@ -97,21 +93,17 @@ declare, per language, and the Controller controls already using them:
 
 | language | letter | Sun and Moon both use it for | already used in the Controller by |
 |---|---|---|---|
-| `en` | T | This instant | Title block |
-| `en` | R | Over a range | Restore Defaults |
+| `en` | T | At chart time | Title block |
+| `en` | R | Over a time range | Restore Defaults |
 | `en` | C | Compute | Centre on zenith, Globular clusters |
-| `en` | U | Update from Place and Time | Nebulae |
 | `en` | L | Close | Deep-sky labels |
-| `en` | F | From (UTC) | Flamsteed numbers, Constellation figures |
-| `en` | O | To (UTC) | Open clusters |
+| `en` | S | Span | Star names |
 | `en` | V | Every | — |
-| `nb-NO` | D | Dette tidspunktet | Dyphimmelobjekter |
+| `nb-NO` | D | Ved karttid | Dyphimmelobjekter |
 | `nb-NO` | T | Over et tidsrom | Tittelfelt |
 | `nb-NO` | B | Beregn | Stjernebildegrenser, Svart himmel |
-| `nb-NO` | O | Oppdater fra Sted og tid | Åpne stjernehoper |
 | `nb-NO` | L | Lukk | Navn på dyphimmelobjekter |
-| `nb-NO` | F | Fra (UTC) | Flamsteed-numre, Stjernebildefigurer |
-| `nb-NO` | I | Til (UTC) | — |
+| `nb-NO` | O | Omfang | Åpne stjernehoper |
 | `nb-NO` | H | Hvert | Matematisk horisont |
 
 Two groups with the same letters in one window is itself a collision: Swing picks
@@ -122,18 +114,18 @@ of their own (the dialogs keep theirs), or distinct ones.
 
 | arrangement | headings | controls | stops |
 |---|---:|---:|---:|
-| the Sun dialog's content | 0 | 8 | 8 |
-| the Sun group, card | 1 | 7 | 8 |
-| Solar System, both open, card | 3 | 14 | 17 |
+| the Sun dialog's content | 0 | 7 | 7 |
+| the Sun group, card | 1 | 6 | 7 |
+| Solar System, both open, card | 3 | 12 | 15 |
 | Solar System, collapsed | 3 | 0 | 3 |
 
 ## Keyboard stops, `nb-NO`
 
 | arrangement | headings | controls | stops |
 |---|---:|---:|---:|
-| the Sun dialog's content | 0 | 8 | 8 |
-| the Sun group, card | 1 | 7 | 8 |
-| Solar System, both open, card | 3 | 14 | 17 |
+| the Sun dialog's content | 0 | 7 | 7 |
+| the Sun group, card | 1 | 6 | 7 |
+| Solar System, both open, card | 3 | 12 | 15 |
 | Solar System, collapsed | 3 | 0 | 3 |
 
 ## The images

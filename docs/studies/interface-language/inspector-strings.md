@@ -63,6 +63,7 @@ both languages rather than in one.
 | Click a star or a deep-sky symbol to see what it is. | — | Click a star or a deep-sky symbol to see what it is. | — |
 | — | — | Working set | Every object in the working selection, across pages, in the order they joined |
 | Centre here | Centre the chart on the selected object | Centre here | Moves the page so the object shown here sits at the centre; nothing about what the chart draws changes |
+| Set chart time to its next meridian transit | Move the chart time forward to the next upper culmination of the selected object | Set chart time to the next meridian transit of the selected object | Sets the chart time to the next instant, at or after the chart time now, when the selected object crosses the meridian above the pole, solved on its apparent right ascension of date and, for a moving body, iterated to the second. The altitude then is stated with it: on the meridian does not mean above the horizon. |
 
 ### A point with no catalogued object
 
@@ -79,6 +80,7 @@ both languages rather than in one.
 | No catalogued object within reach of that point. | — | No catalogued object within reach of that point. | — |
 | — | — | Working set | Every object in the working selection, across pages, in the order they joined |
 | Centre here | Centre the chart on the selected object | Centre here | Moves the page so the object shown here sits at the centre; nothing about what the chart draws changes |
+| Set chart time to its next meridian transit | Move the chart time forward to the next upper culmination of the selected object | Set chart time to the next meridian transit of the selected object | Sets the chart time to the next instant, at or after the chart time now, when the selected object crosses the meridian above the pole, solved on its apparent right ascension of date and, for a moving body, iterated to the second. The altitude then is stated with it: on the meridian does not mean above the horizon. |
 
 ### A named star
 
@@ -99,6 +101,7 @@ both languages rather than in one.
 | ICRS J2000 | — | ICRS J2000 | — |
 | — | — | Working set | Every object in the working selection, across pages, in the order they joined |
 | Centre here | Centre the chart on the selected object | Centre here | Moves the page so the object shown here sits at the centre; nothing about what the chart draws changes |
+| Set chart time to its next meridian transit | Move the chart time forward to the next upper culmination of the selected object | Set chart time to the next meridian transit of the selected object | Sets the chart time to the next instant, at or after the chart time now, when the selected object crosses the meridian above the pole, solved on its apparent right ascension of date and, for a moving body, iterated to the second. The altitude then is stated with it: on the meridian does not mean above the horizon. |
 
 ### A deep-sky object
 
@@ -116,6 +119,7 @@ both languages rather than in one.
 | Hidden by the current chart options. | — | Hidden by the current chart options. | — |
 | — | — | Working set | Every object in the working selection, across pages, in the order they joined |
 | Centre here | Centre the chart on the selected object | Centre here | Moves the page so the object shown here sits at the centre; nothing about what the chart draws changes |
+| Set chart time to its next meridian transit | Move the chart time forward to the next upper culmination of the selected object | Set chart time to the next meridian transit of the selected object | Sets the chart time to the next instant, at or after the chart time now, when the selected object crosses the meridian above the pole, solved on its apparent right ascension of date and, for a moving body, iterated to the second. The altitude then is stated with it: on the meridian does not mean above the horizon. |
 
 ### Several objects at one point
 
@@ -135,6 +139,7 @@ both languages rather than in one.
 | ICRS J2000 | — | ICRS J2000 | — |
 | — | — | Working set | Every object in the working selection, across pages, in the order they joined |
 | Centre here | Centre the chart on the selected object | Centre here | Moves the page so the object shown here sits at the centre; nothing about what the chart draws changes |
+| Set chart time to its next meridian transit | Move the chart time forward to the next upper culmination of the selected object | Set chart time to the next meridian transit of the selected object | Sets the chart time to the next instant, at or after the chart time now, when the selected object crosses the meridian above the pole, solved on its apparent right ascension of date and, for a moving body, iterated to the second. The altitude then is stated with it: on the meridian does not mean above the horizon. |
 
 ### The working set
 
@@ -157,6 +162,7 @@ both languages rather than in one.
 | ✕ | Remove NGC 7000 from the working selection | Remove NGC 7000 | Takes NGC 7000 out of the working selection. The rest stay, and the page does not move. |
 | Clear selection | Remove every working mark | Clear selection | Empties the whole working selection. The page and your place in it are left alone. |
 | Centre here | Centre the chart on the selected object | Centre here | Moves the page so the object shown here sits at the centre; nothing about what the chart draws changes |
+| Set chart time to its next meridian transit | Move the chart time forward to the next upper culmination of the selected object | Set chart time to the next meridian transit of the selected object | Sets the chart time to the next instant, at or after the chart time now, when the selected object crosses the meridian above the pole, solved on its apparent right ascension of date and, for a moving body, iterated to the second. The altitude then is stated with it: on the meridian does not mean above the horizon. |
 
 ### A Solar System body at the page's moment
 
@@ -168,7 +174,7 @@ both languages rather than in one.
 | On this page | Everything on the page you are looking at, drawn or not | On this page | Lists every object the atlas holds within this page, including the ones the chart is not drawing, and says why each is or is not drawn |
 | — | Several objects lie within reach of that point; choose one to inspect it | Objects at this point | A list of everything within reach of the point you clicked. Choosing one shows its facts here and does not move the chart. |
 | — | — | Details of the selected object | — |
-| Computed for 2026-06-21 21:55:00 UTC, the instant set in Place and Time | — | Computed for 2026-06-21 21:55:00 UTC, the instant set in Place and Time | — |
+| Computed for 2026-06-21 21:55:00 UTC, the chart time it was drawn at | — | Computed for 2026-06-21 21:55:00 UTC, the chart time it was drawn at | — |
 | For an observer at latitude 59.913, longitude 10.752 east | — | For an observer at latitude 59.913, longitude 10.752 east | — |
 | 11h 54.9m −3° 07′ | — | 11h 54.9m −3° 07′ | — |
 | ICRS J2000 | — | ICRS J2000 | — |
@@ -179,6 +185,7 @@ both languages rather than in one.
 | ✕ | Remove Moon from the working selection | Remove Moon | Takes Moon out of the working selection. The rest stay, and the page does not move. |
 | Clear selection | Remove every working mark | Clear selection | Empties the whole working selection. The page and your place in it are left alone. |
 | Centre here | Centre the chart on the selected object | Centre here | Moves the page so the object shown here sits at the centre; nothing about what the chart draws changes |
+| Set chart time to its next meridian transit | Move the chart time forward to the next upper culmination of the selected object | Set chart time to the next meridian transit of the selected object | Sets the chart time to the next instant, at or after the chart time now, when the selected object crosses the meridian above the pole, solved on its apparent right ascension of date and, for a moving body, iterated to the second. The altitude then is stated with it: on the meridian does not mean above the horizon. |
 
 ## Norsk bokmål (`nb-NO`)
 
@@ -195,6 +202,7 @@ both languages rather than in one.
 | Klikk på en stjerne eller et dyphimmelsymbol for å se hva det er. | — | Klikk på en stjerne eller et dyphimmelsymbol for å se hva det er. | — |
 | — | — | Arbeidsutvalg | Hvert objekt i arbeidsutvalget, på tvers av sider, i den rekkefølgen de kom til |
 | Sentrer her | Sentrer kartet på det valgte objektet | Sentrer her | Flytter siden slik at objektet som vises her havner i midten; ingenting ved det kartet tegner endres. |
+| Sett karttid til neste meridianpassasje | Flytt karttiden frem til det valgte objektets neste øvre kulminasjon | Sett karttiden til det valgte objektets neste meridianpassasje | Setter karttiden til neste tidspunkt, ved eller etter karttiden nå, da det valgte objektet passerer meridianen over polen, løst på dets tilsynelatende rektascensjon for datoen og, for et bevegelig legeme, iterert til sekundet. Høyden da oppgis sammen med det: på meridianen betyr ikke over horisonten. |
 
 ### A point with no catalogued object
 
@@ -211,6 +219,7 @@ both languages rather than in one.
 | Ingen katalogførte objekter innenfor rekkevidde av det punktet. | — | Ingen katalogførte objekter innenfor rekkevidde av det punktet. | — |
 | — | — | Arbeidsutvalg | Hvert objekt i arbeidsutvalget, på tvers av sider, i den rekkefølgen de kom til |
 | Sentrer her | Sentrer kartet på det valgte objektet | Sentrer her | Flytter siden slik at objektet som vises her havner i midten; ingenting ved det kartet tegner endres. |
+| Sett karttid til neste meridianpassasje | Flytt karttiden frem til det valgte objektets neste øvre kulminasjon | Sett karttiden til det valgte objektets neste meridianpassasje | Setter karttiden til neste tidspunkt, ved eller etter karttiden nå, da det valgte objektet passerer meridianen over polen, løst på dets tilsynelatende rektascensjon for datoen og, for et bevegelig legeme, iterert til sekundet. Høyden da oppgis sammen med det: på meridianen betyr ikke over horisonten. |
 
 ### A named star
 
@@ -231,6 +240,7 @@ both languages rather than in one.
 | ICRS J2000 | — | ICRS J2000 | — |
 | — | — | Arbeidsutvalg | Hvert objekt i arbeidsutvalget, på tvers av sider, i den rekkefølgen de kom til |
 | Sentrer her | Sentrer kartet på det valgte objektet | Sentrer her | Flytter siden slik at objektet som vises her havner i midten; ingenting ved det kartet tegner endres. |
+| Sett karttid til neste meridianpassasje | Flytt karttiden frem til det valgte objektets neste øvre kulminasjon | Sett karttiden til det valgte objektets neste meridianpassasje | Setter karttiden til neste tidspunkt, ved eller etter karttiden nå, da det valgte objektet passerer meridianen over polen, løst på dets tilsynelatende rektascensjon for datoen og, for et bevegelig legeme, iterert til sekundet. Høyden da oppgis sammen med det: på meridianen betyr ikke over horisonten. |
 
 ### A deep-sky object
 
@@ -248,6 +258,7 @@ both languages rather than in one.
 | Skjult av gjeldende kartvalg. | — | Skjult av gjeldende kartvalg. | — |
 | — | — | Arbeidsutvalg | Hvert objekt i arbeidsutvalget, på tvers av sider, i den rekkefølgen de kom til |
 | Sentrer her | Sentrer kartet på det valgte objektet | Sentrer her | Flytter siden slik at objektet som vises her havner i midten; ingenting ved det kartet tegner endres. |
+| Sett karttid til neste meridianpassasje | Flytt karttiden frem til det valgte objektets neste øvre kulminasjon | Sett karttiden til det valgte objektets neste meridianpassasje | Setter karttiden til neste tidspunkt, ved eller etter karttiden nå, da det valgte objektet passerer meridianen over polen, løst på dets tilsynelatende rektascensjon for datoen og, for et bevegelig legeme, iterert til sekundet. Høyden da oppgis sammen med det: på meridianen betyr ikke over horisonten. |
 
 ### Several objects at one point
 
@@ -267,6 +278,7 @@ both languages rather than in one.
 | ICRS J2000 | — | ICRS J2000 | — |
 | — | — | Arbeidsutvalg | Hvert objekt i arbeidsutvalget, på tvers av sider, i den rekkefølgen de kom til |
 | Sentrer her | Sentrer kartet på det valgte objektet | Sentrer her | Flytter siden slik at objektet som vises her havner i midten; ingenting ved det kartet tegner endres. |
+| Sett karttid til neste meridianpassasje | Flytt karttiden frem til det valgte objektets neste øvre kulminasjon | Sett karttiden til det valgte objektets neste meridianpassasje | Setter karttiden til neste tidspunkt, ved eller etter karttiden nå, da det valgte objektet passerer meridianen over polen, løst på dets tilsynelatende rektascensjon for datoen og, for et bevegelig legeme, iterert til sekundet. Høyden da oppgis sammen med det: på meridianen betyr ikke over horisonten. |
 
 ### The working set
 
@@ -289,6 +301,7 @@ both languages rather than in one.
 | ✕ | Fjern NGC 7000 fra arbeidsutvalget | Fjern NGC 7000 | Tar NGC 7000 ut av arbeidsutvalget. Resten blir stående, og siden flytter seg ikke. |
 | Tøm utvalget | Remove every working mark | Clear selection | Empties the whole working selection. The page and your place in it are left alone. |
 | Sentrer her | Sentrer kartet på det valgte objektet | Sentrer her | Flytter siden slik at objektet som vises her havner i midten; ingenting ved det kartet tegner endres. |
+| Sett karttid til neste meridianpassasje | Flytt karttiden frem til det valgte objektets neste øvre kulminasjon | Sett karttiden til det valgte objektets neste meridianpassasje | Setter karttiden til neste tidspunkt, ved eller etter karttiden nå, da det valgte objektet passerer meridianen over polen, løst på dets tilsynelatende rektascensjon for datoen og, for et bevegelig legeme, iterert til sekundet. Høyden da oppgis sammen med det: på meridianen betyr ikke over horisonten. |
 
 ### A Solar System body at the page's moment
 
@@ -300,7 +313,7 @@ both languages rather than in one.
 | On this page | Alt på siden du ser på, tegnet eller ikke | På denne siden | Lister opp hvert objekt atlaset har innenfor denne siden, også de kartet ikke tegner, og sier hvorfor hvert enkelt tegnes eller ikke. |
 | — | Flere objekter ligger innenfor rekkevidde av punktet; velg ett for å se på det | Objekter på dette punktet | En liste over alt innenfor rekkevidde av punktet du klikket på. Å velge ett viser opplysningene her og flytter ikke kartet. |
 | — | — | Opplysninger om det valgte objektet | — |
-| Beregnet for 2026-06-21 21:55:00 UTC, tidspunktet satt i Sted og tid | — | Beregnet for 2026-06-21 21:55:00 UTC, tidspunktet satt i Sted og tid | — |
+| Beregnet for 2026-06-21 21:55:00 UTC, karttiden den ble tegnet ved | — | Beregnet for 2026-06-21 21:55:00 UTC, karttiden den ble tegnet ved | — |
 | For en observatør på bredde 59.913, lengde 10.752 øst | — | For en observatør på bredde 59.913, lengde 10.752 øst | — |
 | 11h 54.9m −3° 07′ | — | 11h 54.9m −3° 07′ | — |
 | ICRS J2000 | — | ICRS J2000 | — |
@@ -311,4 +324,5 @@ both languages rather than in one.
 | ✕ | Fjern Månen fra arbeidsutvalget | Fjern Månen | Tar Månen ut av arbeidsutvalget. Resten blir stående, og siden flytter seg ikke. |
 | Tøm utvalget | Remove every working mark | Clear selection | Empties the whole working selection. The page and your place in it are left alone. |
 | Sentrer her | Sentrer kartet på det valgte objektet | Sentrer her | Flytter siden slik at objektet som vises her havner i midten; ingenting ved det kartet tegner endres. |
+| Sett karttid til neste meridianpassasje | Flytt karttiden frem til det valgte objektets neste øvre kulminasjon | Sett karttiden til det valgte objektets neste meridianpassasje | Setter karttiden til neste tidspunkt, ved eller etter karttiden nå, da det valgte objektet passerer meridianen over polen, løst på dets tilsynelatende rektascensjon for datoen og, for et bevegelig legeme, iterert til sekundet. Høyden da oppgis sammen med det: på meridianen betyr ikke over horisonten. |
 
