@@ -300,7 +300,8 @@ class SolarSystemCompanionJourneyTest {
                     // Compute computes for the chart's context now.
                     assertReachable(companion, content,
                             "Show the Sun at the chart time",
-                            "From (UTC)", "To (UTC)", "Step between rows", "Compute the range",
+                            "Span of the range from the chart time", "Step between rows",
+                            "Compute the range",
                             "Sun on the chart");
 
                     // Jupiter's group the same way, by its own spoken names;

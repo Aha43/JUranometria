@@ -35,13 +35,13 @@ import juranometria.solar.TimeRange;
  * (ruled on #400).
  *
  * <p>The refusals are the dialog's, moved here so both hosts refuse
- * the same thing: a range that cannot be read, runs backwards, asks
- * for more rows than the service answers, or leaves the years it
- * covers. They are data; a host phrases them in its language.
+ * the same thing: a range that asks for more rows than the service
+ * answers, or leaves the years it covers. They are data; a host
+ * phrases them in its language.
  */
 public final class SolarTableSession {
 
-    /** Which view a query asks for: the chart's one instant, or a range as typed. */
+    /** Which view a query asks for: the chart's one instant, or a time range from it. */
     public enum Mode {
         INSTANT, RANGE
     }
@@ -53,35 +53,49 @@ public final class SolarTableSession {
             Duration.ofHours(6), Duration.ofDays(1), Duration.ofDays(7),
             Duration.ofDays(30));
 
+    /** The spans a range offers from the chart time, in order, by key suffix and duration (#612, P2). */
+    public static final List<String> SPAN_KEYS = List.of("span.day", "span.week",
+            "span.month", "span.quarter", "span.year");
+    public static final List<Duration> SPANS = List.of(Duration.ofDays(1),
+            Duration.ofDays(7), Duration.ofDays(30), Duration.ofDays(90),
+            Duration.ofDays(365));
+
     /**
-     * A query as a host drafted it: the view, and for a range the start,
-     * end and step as typed. A range is the reader's labelled analysis
-     * (#612, ruling P2 as amended): seeded from the chart time, theirs
-     * from then on.
+     * A query as a host drafted it: the view, and for a range its span
+     * and step. A range always starts at the chart time (#612, ruling P2
+     * as the owner amended it twice on the candidates): the chart time
+     * is the one time base of everything drawn or tabled, so a range
+     * stores no instant and is read from the chart time whenever it is
+     * computed.
      */
-    public record Query(Mode mode, String start, String end, int step) {
+    public record Query(Mode mode, int span, int step) {
 
         public Query {
             if (mode == null) {
                 throw new IllegalArgumentException("a query asks for a view");
             }
-            start = start == null ? "" : start.strip();
-            end = end == null ? "" : end.strip();
+            if (span < 0 || span >= SPANS.size()) {
+                throw new IllegalArgumentException("no such span: " + span);
+            }
             if (step < 0 || step >= STEPS.size()) {
                 throw new IllegalArgumentException("no such step: " + step);
             }
         }
 
-        /** The single-instant query, which needs no range. */
+        /** The single-instant query, which needs no range: a week at a day, should one be asked. */
         public static Query instant() {
-            return new Query(Mode.INSTANT, "", "", 2);
+            return new Query(Mode.INSTANT, 1, 2);
+        }
+
+        /** A range from the chart time: this span, at this step. */
+        public static Query range(int span, int step) {
+            return new Query(Mode.RANGE, span, step);
         }
     }
 
     /** What a query answered: rows, or why none. */
     public enum Outcome {
-        ROWS, APPENDED, OBSERVER_ABSENT, REFUSED_INSTANT, REFUSED_BACKWARDS,
-        REFUSED_ROWS, REFUSED_INTERVAL
+        ROWS, OBSERVER_ABSENT, REFUSED_ROWS, REFUSED_INTERVAL
     }
 
     /**
@@ -321,16 +335,10 @@ public final class SolarTableSession {
     }
 
     private Result range(Query query, Observer now) {
-        Instant from = parse(query.start());
-        Instant to = parse(query.end());
-        if (from == null || to == null) {
-            return new Result(query, Outcome.REFUSED_INSTANT, List.of(), now,
-                    from == null ? query.start() : query.end(), 0);
-        }
         Duration by = STEPS.get(query.step());
-        if (to.isBefore(from)) {
-            return new Result(query, Outcome.REFUSED_BACKWARDS, List.of(), now, "", 0);
-        }
+        Instant[] edges = edges(query, now.instant());
+        Instant from = edges[0];
+        Instant to = edges[1];
         long rows = TimeRange.rowsOf(from, to, by);
         if (rows > TimeRange.MAX_ROWS) {
             return new Result(query, Outcome.REFUSED_ROWS, List.of(), now, "", rows);
@@ -348,9 +356,19 @@ public final class SolarTableSession {
                 service.get().observe(table.body(), now, new TimeRange(from, to, by));
         List<SolarTableModel.Row> shown = answered.stream()
                 .map(r -> new SolarTableModel.Row(r.sample(), r.observation())).toList();
-        boolean appended = answered.get(answered.size() - 1).sample().appendedEnd();
-        return new Result(query, appended ? Outcome.APPENDED : Outcome.ROWS, shown, now,
-                "", shown.size());
+        return new Result(query, Outcome.ROWS, shown, now, "", shown.size());
+    }
+
+    /**
+     * A range's edges from the chart time (#612, ruling P2): the chart
+     * time, and as many whole steps on as the span holds - so the chart
+     * time is the first row, every row is on the grid, and nothing is
+     * appended.
+     */
+    public static Instant[] edges(Query query, Instant chartTime) {
+        Duration by = STEPS.get(query.step());
+        long steps = SPANS.get(query.span()).toNanos() / by.toNanos();
+        return new Instant[] {chartTime, chartTime.plus(by.multipliedBy(steps))};
     }
 
     /** A typed instant, in either form the dialog accepts, or null. */

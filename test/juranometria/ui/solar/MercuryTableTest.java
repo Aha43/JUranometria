@@ -163,12 +163,13 @@ class MercuryTableTest {
 
     @Test
     void aRangeIsTheInstantAnswerAtEveryRowAndItsRefusalsSayMercury() throws Exception {
-        SolarTableSession session = new SolarTableSession(() -> oslo(ELONGATION), service,
+        Instant[] at = {Instant.parse("2026-03-03T11:00:00Z")};
+        SolarTableSession session = new SolarTableSession(() -> oslo(at[0]), service,
                 SolarTable.mercury());
-        session.apply(new SolarTableSession.Query(SolarTableSession.Mode.RANGE,
-                "2026-03-03 11:00", "2026-03-10 11:00", 2));
+        session.apply(SolarTableSession.Query.range(1, 2));
         assertEquals(SolarTableSession.Outcome.ROWS, session.result().outcome());
-        assertEquals(8, session.result().rows().size(), "every day, both ends included");
+        assertEquals(8, session.result().rows().size(), "a week of days from the chart time, both ends");
+        assertEquals(at[0], session.result().rows().get(0).sample().instant());
         StringBuilder sides = new StringBuilder();
         for (SolarTableModel.Row r : session.result().rows()) {
             sides.append(((MercuryObservation) r.observation()).side()
@@ -180,16 +181,16 @@ class MercuryTableTest {
             assertEquals(service.observe(Body.MERCURY, oslo(r.sample().instant())), r.observation(),
                     "each row is the instant answer at its own instant");
         }
-        session.apply(new SolarTableSession.Query(SolarTableSession.Mode.RANGE,
-                "2100-12-25 00:00", "2101-01-02 00:00", 2));
+        at[0] = Instant.parse("2100-12-28T00:00:00Z");
+        session.apply(SolarTableSession.Query.range(1, 2));
         assertEquals(SolarTableSession.Outcome.REFUSED_INTERVAL, session.result().outcome());
         SolarTableDialog.Content c = SolarTableDialog.content(session, EN);
         assertEquals("Mercury is computed for civil dates from 1900-01-01 to 2100-12-31;"
-                + " 2101-01-02 00:00:00 is outside that.", c.status());
-        session.apply(new SolarTableSession.Query(SolarTableSession.Mode.RANGE,
-                "2026-01-01 00:00", "2026-03-01 00:00", 0));
+                + " 2101-01-04 00:00:00 is outside that.", c.status());
+        at[0] = Instant.parse("2026-01-01T00:00:00Z");
+        session.apply(SolarTableSession.Query.range(4, 0));
         assertEquals(SolarTableSession.Outcome.REFUSED_ROWS, session.result().outcome(),
-                "an hourly two months asks for more than the 1 000 rows shown");
+                "an hourly year asks for more than the 1 000 rows shown");
     }
 
     @Test
@@ -211,14 +212,14 @@ class MercuryTableTest {
         SolarTableDialog.Content[] dialog = new SolarTableDialog.Content[1];
         SwingUtilities.invokeAndWait(() -> dialog[0] = SolarTableDialog.content(session, EN));
         SwingUtilities.invokeAndWait(() -> {
-            controller[0].start.setText("2026-03-03 11:00");
+            controller[0].span.setSelectedIndex(3);
             controller[0].rangeView.setSelected(true);
         });
         SwingUtilities.invokeAndWait(() -> dialog[0].controls().apply());
         assertEquals(SolarTableSession.Mode.INSTANT, session.result().query().mode(),
                 "the dialog applied its own draft");
-        assertEquals("2026-03-03 11:00", controller[0].start.getText(),
-                "and the Controller's unfinished draft was left alone");
+        assertEquals(3, controller[0].span.getSelectedIndex(),
+                "and the Controller's own draft was left alone");
         assertNotNull(named(group[0], "mercuryCard"), "the Controller shows the shared result");
         assertEquals(cell(dialog[0], 0, 8), String.valueOf(controller[0].model.getValueAt(0, 8)));
     }

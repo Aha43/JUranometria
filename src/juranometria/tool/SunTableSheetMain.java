@@ -53,14 +53,14 @@ public final class SunTableSheetMain {
 
     private static Path out = Path.of("docs/studies/interface-language");
 
+    /** @param span the range's span index, @param step its step index (a range from the chart time, #612) */
     private record State(String name, String title, Observer observer,
-                         boolean range, String end, String note,
+                         boolean range, int span, int step, String note,
                          boolean stale) {
 
-        /** The states as before #612: an instant, or an absolute range. */
-        State(String name, String title, Observer observer, boolean range,
-              String end, String note) {
-            this(name, title, observer, range, end, note, false);
+        /** An instant state: no range. */
+        State(String name, String title, Observer observer, String note) {
+            this(name, title, observer, false, 1, 2, note, false);
         }
     }
 
@@ -69,29 +69,27 @@ public final class SunTableSheetMain {
 
     private static final List<State> STATES = List.of(
             new State("instant", "One instant, Oslo at midsummer", OSLO,
-                    false, null,
                     "The fresh state: a single row at the instant Place"
                             + " and Time holds. The Sun stands 51° high"
                             + " to the south-east."),
-            new State("range", "A range with an appended end", OSLO,
-                    true, "2026-06-24 07:30",
-                    "Daily rows from the instant, and an end that is not"
-                            + " on the grid, added last and marked †."
-                            + " The status line says so."),
-            new State("refused", "A range that runs backwards", OSLO,
-                    true, "2026-06-21 09:00",
-                    "The end is before the start. The table is empty"
-                            + " and the status line says why; nothing is"
-                            + " guessed."),
+            new State("range", "A week of daily rows from the chart time", OSLO,
+                    true, 1, 2,
+                    "Daily rows from the chart time for a week, both ends:"
+                            + " the first row is the chart time itself (#612,"
+                            + " ruling P2). The status line counts them.", false),
+            new State("refused", "A range that asks for too many rows", OSLO,
+                    true, 4, 0,
+                    "A year of hourly rows asks for more than the 1 000"
+                            + " shown. The table is empty and the status line"
+                            + " says why; nothing is cut short silently.", false),
             new State("quito", "Quito at the December solstice",
                     new Observer(-0.18, -78.5,
                             Instant.parse("2026-12-21T20:50:09Z")),
-                    false, null,
                     "An equatorial observer at the IMCCE's solstice"
                             + " instant: the Sun is up, 32° high; the"
                             + " instant is shown to the minute, rounded."),
             new State("stale", "The chart moved on after computing", OSLO,
-                    false, null,
+                    false, 1, 2,
                     "The chart time moved six hours on after this instant was"
                             + " computed (#612, ruling P1): the rows stay, dimmed,"
                             + " under the stale message, until Compute; the note"
@@ -206,7 +204,8 @@ public final class SunTableSheetMain {
                         said, SolarTable.sun());
                 if (state.range()) {
                     dialog[0].content().rangeView.setSelected(true);
-                    dialog[0].content().end.setText(state.end());
+                    dialog[0].content().span.setSelectedIndex(state.span());
+                    dialog[0].content().step.setSelectedIndex(state.step());
                     dialog[0].content().update();
                 }
                 if (state.stale()) {
@@ -234,8 +233,8 @@ public final class SunTableSheetMain {
             return "the view is " + (content.rangeView.isSelected()
                     ? "the range" : "the instant") + ", not the state's";
         }
-        if (state.range() && !state.end().equals(content.end.getText())) {
-            return "the end field reads " + content.end.getText();
+        if (state.range() && content.span.getSelectedIndex() != state.span()) {
+            return "the span is " + content.span.getSelectedItem() + ", not the state's";
         }
         if (content.controls().stale() != state.stale()) {
             return "the table is " + (content.controls().stale() ? "stale" : "current")

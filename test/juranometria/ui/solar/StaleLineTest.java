@@ -40,6 +40,7 @@ class StaleLineTest {
     private static final InterfaceText EN = InterfaceText.forLanguage("en");
     private static final String MESSAGE =
             "Computed for the previous chart time and place — Compute again";
+    private static final Instant AUGUST = Instant.parse("2026-08-15T06:00:00Z");
     private static final Observer OSLO =
             new Observer(59.91, 10.75, Instant.parse("2026-08-15T06:00:00Z"));
     private static SolarSystemService service;
@@ -146,22 +147,26 @@ class StaleLineTest {
     }
 
     @Test
-    void aRangeIsStaleWhenTheChartMovesOnAndCurrentOnceComputedAgain() throws Exception {
+    void aRangeIsStaleWhenTheChartMovesOnAndStartsAtTheChartTimeOnceComputedAgain() throws Exception {
         ChartContextHolder chart = new ChartContextHolder(OSLO);
         SolarTableControls controls = venus(chart);
         controls.inController();
         controls.rangeView.setSelected(true);
-        controls.start.setText("2026-08-01 00:00:00");
-        controls.end.setText("2026-08-03 00:00:00");
+        controls.span.setSelectedIndex(0);
+        controls.step.setSelectedIndex(1);
         controls.apply();
         assertEquals("", controls.staleText(), "a range computed for the chart's context");
+        assertEquals(AUGUST, controls.model.rows().get(0).sample().instant());
         edt(() -> chart.install(OSLO.at(Instant.parse("2026-08-15T21:30:00Z"))));
         assertEquals(MESSAGE, controls.staleText());
-        assertEquals("2026-08-01 00:00:00", controls.start.getText(),
-                "the typed range survives the chart's change");
+        assertEquals(AUGUST, controls.model.rows().get(0).sample().instant(),
+                "the rows stand as computed until Compute");
         controls.apply();
         assertEquals("", controls.staleText());
-        assertEquals(3, controls.model.getRowCount());
+        assertEquals(5, controls.model.getRowCount());
+        assertEquals(Instant.parse("2026-08-15T21:30:00Z"),
+                controls.model.rows().get(0).sample().instant(),
+                "computed again, the range starts at the chart time now");
     }
 
     @Test

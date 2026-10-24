@@ -19,7 +19,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
@@ -33,7 +32,7 @@ import juranometria.ui.language.MnemonicText;
 /**
  * One body's table controls, whoever holds them (Sprint 42, issue
  * #458, ruled on #457): the observer note, the two views, the range's
- * start, end and step, Compute, the status line, the table, and - when
+ * span and step, Compute, the status line, the table, and - when
  * a host has a chart switch to offer - the body's <em>Show on
  * chart</em> box, and - when a host has the application's action -
  * <em>Centre on chart</em> (#483). The Sun and Moon dialogs each hold one set in their
@@ -73,11 +72,9 @@ public final class SolarTableControls {
     public final JLabel observerNote = new JLabel();
     public final JRadioButton instantView;
     public final JRadioButton rangeView;
-    public final JTextField start = new JTextField(19);
-    public final JTextField end = new JTextField(19);
+    /** The range's span from the chart time (#612, P2): a range starts at the chart time, always. */
+    public final JComboBox<String> span;
     public final JComboBox<String> step;
-    /** Start at chart time (#612, P2 as amended): re-seeds From and To from the chart time. */
-    public final JButton startAtChartTime;
     public final JButton compute;
     /** Set chart time to this instant (#612, P2), or null over a session that cannot install. */
     public final JButton setChartTime;
@@ -136,13 +133,6 @@ public final class SolarTableControls {
         views.add(instantView);
         views.add(rangeView);
 
-        start.setName(names + "RangeStart");
-        end.setName(names + "RangeEnd");
-        for (JTextField field : List.of(start, end)) {
-            String stem = field == start ? "range.start" : "range.end";
-            field.getAccessibleContext().setAccessibleName(said.say(stem + ".label"));
-            Explain.control(field, said.say(stem + ".hover"), said.say(stem + ".explain"));
-        }
         step = new JComboBox<>(SolarTableSession.STEP_KEYS.stream().map(said::say)
                 .toArray(String[]::new));
         step.setName(names + "RangeStep");
@@ -150,8 +140,14 @@ public final class SolarTableControls {
         step.setMaximumSize(step.getPreferredSize());
         step.getAccessibleContext().setAccessibleName(said.say("range.step.a11y"));
         Explain.control(step, said.say("range.step.hover"), said.say("range.step.explain"));
+        span = new JComboBox<>(SolarTableSession.SPAN_KEYS.stream().map(said::say)
+                .toArray(String[]::new));
+        span.setName(names + "RangeSpan");
+        span.setSelectedIndex(1);
+        span.setMaximumSize(span.getPreferredSize());
+        span.getAccessibleContext().setAccessibleName(said.say("span.a11y"));
+        Explain.control(span, said.say("span.hover"), said.say("span.explain"));
         compute = button("compute", names + "Compute", access);
-        startAtChartTime = button("startchart", names + "StartAtChartTime", access);
         // The row action, only over a session that can install (#612, P2).
         setChartTime = session.canSetChartTime()
                 ? button("setchart", names + "SetChartTime", access) : null;
@@ -207,24 +203,13 @@ public final class SolarTableControls {
         if (applied.applied()) {
             instantView.setSelected(applied.query().mode() == SolarTableSession.Mode.INSTANT);
             rangeView.setSelected(applied.query().mode() == SolarTableSession.Mode.RANGE);
-            if (!applied.query().start().isEmpty()) {
-                start.setText(applied.query().start());
-                end.setText(applied.query().end());
-                step.setSelectedIndex(applied.query().step());
-            }
-        }
-        if (start.getText().isEmpty()) {
-            seedFromChartTime();
+            span.setSelectedIndex(applied.query().span());
+            step.setSelectedIndex(applied.query().step());
         }
 
         instantView.addActionListener(e -> apply());
         rangeView.addActionListener(e -> apply());
-        // Start at chart time: re-seeds the typed range from the chart
-        // time read now - the fields only; nothing computes until asked.
-        startAtChartTime.addActionListener(e -> seedFromChartTime());
         compute.addActionListener(e -> apply());
-        start.addActionListener(e -> apply());
-        end.addActionListener(e -> apply());
         if (setChartTime != null) {
             setChartTime.addActionListener(e -> {
                 Instant at = selectedInstant();
@@ -261,8 +246,7 @@ public final class SolarTableControls {
         }
         SolarTableSession.Result result = shown;
         boolean rows = result != null && result.applied()
-                && (result.outcome() == SolarTableSession.Outcome.ROWS
-                        || result.outcome() == SolarTableSession.Outcome.APPENDED)
+                && (result.outcome() == SolarTableSession.Outcome.ROWS)
                 && !result.rows().isEmpty();
         boolean old = rows && session.stale();
         stale.show(old);
@@ -321,8 +305,7 @@ public final class SolarTableControls {
             public juranometria.chart.SkyPosition applyTypedAndLocate() {
                 apply();
                 SolarTableSession.Result result = session.result();
-                boolean answered = result.outcome() == SolarTableSession.Outcome.ROWS
-                        || result.outcome() == SolarTableSession.Outcome.APPENDED;
+                boolean answered = result.outcome() == SolarTableSession.Outcome.ROWS;
                 if (!answered || result.rows().isEmpty()) {
                     return null;
                 }
@@ -350,7 +333,7 @@ public final class SolarTableControls {
         return new SolarTableSession.Query(
                 instantView.isSelected() ? SolarTableSession.Mode.INSTANT
                         : SolarTableSession.Mode.RANGE,
-                start.getText(), end.getText(), step.getSelectedIndex());
+                span.getSelectedIndex(), step.getSelectedIndex());
     }
 
     /** Applies this host's draft to the session, which tells every host. */
@@ -384,8 +367,7 @@ public final class SolarTableControls {
         shown = result;
         Observer now = result.applied() ? result.observer() : session.observerNow();
         boolean present = now != null;
-        for (JComponent c : List.of(instantView, rangeView, start, end, step, compute,
-                startAtChartTime)) {
+        for (JComponent c : List.of(instantView, rangeView, span, step, compute)) {
             c.setEnabled(present);
         }
         if (!present) {
@@ -404,11 +386,7 @@ public final class SolarTableControls {
             case ROWS -> say(result.applied()
                     ? said.say("status.rows", Integer.toString(result.rows().size()))
                     : " ");
-            case APPENDED -> say(said.say("status.appended",
-                    Integer.toString(result.rows().size()), said.say("appended")));
             case OBSERVER_ABSENT -> say(" ");
-            case REFUSED_INSTANT -> say(said.say("refused.instant", result.detail()));
-            case REFUSED_BACKWARDS -> say(said.say("refused.backwards"));
             case REFUSED_ROWS -> say(said.say("refused.rows",
                     Long.toString(result.rowsAsked()),
                     Integer.toString(TimeRange.MAX_ROWS)));
@@ -440,20 +418,6 @@ public final class SolarTableControls {
                         observerNote.getFontMetrics(observerNote.getFont()))
                 : note);
         observerNote.getAccessibleContext().setAccessibleName(note);
-    }
-
-    /**
-     * Seeds From with the chart time and To with the default span from
-     * it (#612, ruling P2 as amended on the first candidate): what the
-     * fields hold at build, and what Start at chart time puts back.
-     * The fields only; nothing computes until the reader asks.
-     */
-    public void seedFromChartTime() {
-        Observer now = session.observerNow();
-        if (now != null) {
-            start.setText(SolarTableSession.shown(now.instant()));
-            end.setText(SolarTableSession.shown(now.instant().plus(Duration.ofDays(7))));
-        }
     }
 
     /**
@@ -496,8 +460,7 @@ public final class SolarTableControls {
     /**
      * These controls as the Controller's group holds them (ruled on
      * #457): the observer note wrapped; the two views on one row; the
-     * range's start and end on rows of their own, as wide as the
-     * group; the step and Compute; the status line; the result - the
+     * span on a row of its own; the step and Compute; the status line; the result - the
      * instant's one row as a card of heading-and-value lines, a range
      * as the complete table scrolling sideways; the body's Show on
      * chart box. No Close: a group is not a window.
@@ -528,8 +491,7 @@ public final class SolarTableControls {
         views.add(rangeView);
         column.add(leading(views));
 
-        column.add(labelled("range.start", start));
-        column.add(labelled("range.end", end));
+        column.add(leading(spanRow()));
         JPanel stepRow = new JPanel();
         stepRow.setLayout(new BoxLayout(stepRow, BoxLayout.X_AXIS));
         JLabel every = new JLabel(said.say("range.step.label"));
@@ -540,7 +502,6 @@ public final class SolarTableControls {
         stepRow.add(Box.createHorizontalStrut(10));
         stepRow.add(compute);
         column.add(leading(stepRow));
-        column.add(leading(startAtChartTime));
         column.add(Box.createVerticalStrut(4));
         column.add(leading(status));
         column.add(Box.createVerticalStrut(4));
@@ -630,17 +591,15 @@ public final class SolarTableControls {
         return scroll;
     }
 
-    private JComponent labelled(String stem, JTextField field) {
-        JPanel row = new JPanel(new BorderLayout(6, 0));
-        row.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
-        row.setAlignmentX(0f);
-        JLabel label = new JLabel(said.say(stem + ".label"));
-        label.setLabelFor(field);
-        row.add(label, BorderLayout.WEST);
-        field.setMaximumSize(new Dimension(Integer.MAX_VALUE,
-                field.getPreferredSize().height));
-        row.add(field, BorderLayout.CENTER);
-        row.setMaximumSize(new Dimension(Integer.MAX_VALUE, row.getPreferredSize().height));
+    /** The span from the chart time on one row (#612, P2). */
+    JComponent spanRow() {
+        JPanel row = new JPanel();
+        row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
+        JLabel over = new JLabel(said.say("span.label"));
+        over.setLabelFor(span);
+        row.add(over);
+        row.add(Box.createHorizontalStrut(6));
+        row.add(span);
         return row;
     }
 

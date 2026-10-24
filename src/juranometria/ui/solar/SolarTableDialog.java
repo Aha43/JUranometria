@@ -23,7 +23,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
 import juranometria.sky.Observer;
@@ -37,17 +36,17 @@ import juranometria.ui.language.MnemonicText;
  * A Solar System body's table (Sprint 35, issue #400 for the Sun; Sprint
  * 36, issue #408 for the Moon): where the body is, for the observing
  * place and instant Place and Time owns, as a table the reader can read
- * at that instant or over a range of instants. One shell, built over the
+ * at that instant or over a time range from it. One shell, built over the
  * {@link SolarTable} that says which body, which columns and which words.
  *
  * <p>The chart's context is the authority (#612). The dialog reads it -
  * never copies it, never stores it, never keeps a clock of its own -
  * when it opens on nothing computed yet, and when the reader asks;
  * when the chart moves on, the rows stay, dimmed under the stale line,
- * until the reader computes again (ruling P1). A range
- * is a specification the reader types here: start, end and a fixed
- * step, refused with a stated reason when it runs backwards, asks for
- * more rows than are shown, or leaves the years the ephemeris covers.
+ * until the reader computes again (ruling P1). A range starts at the
+ * chart time, always, for a span at a step, refused with a stated
+ * reason when it asks for more rows than are shown or leaves the years
+ * the ephemeris covers (P2 as amended).
  * Nothing is persisted: a fresh session opens on the single instant,
  * as {@code PlaceAndTimeSession} opens on the stored place and never
  * on a stored instant.
@@ -221,10 +220,8 @@ public final class SolarTableDialog extends JDialog {
         public final JLabel observerNote;
         public final JRadioButton instantView;
         public final JRadioButton rangeView;
-        public final JTextField start;
-        public final JTextField end;
+        public final JComboBox<String> span;
         public final JComboBox<String> step;
-        public final JButton startAtChartTime;
         public final JButton compute;
         /** Set chart time to this instant (#612, P2), or null over a session that cannot install. */
         public final JButton setChartTime;
@@ -249,10 +246,8 @@ public final class SolarTableDialog extends JDialog {
             observerNote = controls.observerNote;
             instantView = controls.instantView;
             rangeView = controls.rangeView;
-            start = controls.start;
-            end = controls.end;
+            span = controls.span;
             step = controls.step;
-            startAtChartTime = controls.startAtChartTime;
             compute = controls.compute;
             setChartTime = controls.setChartTime;
             status = controls.status;
@@ -287,9 +282,12 @@ public final class SolarTableDialog extends JDialog {
             JPanel rangeRow = new JPanel();
             rangeRow.setLayout(new BoxLayout(rangeRow, BoxLayout.X_AXIS));
             rangeRow.setAlignmentX(0.0f);
-            rangeRow.add(field(said, "range.start", start, letters));
-            rangeRow.add(Box.createHorizontalStrut(12));
-            rangeRow.add(field(said, "range.end", end, letters));
+            JLabel over = new JLabel(said.say("span.label"));
+            over.setLabelFor(span);
+            letters.apply(over, said.key("span.mnemonic"));
+            rangeRow.add(over);
+            rangeRow.add(Box.createHorizontalStrut(6));
+            rangeRow.add(span);
             rangeRow.add(Box.createHorizontalStrut(12));
             JLabel every = new JLabel(said.say("range.step.label"));
             every.setLabelFor(step);
@@ -299,8 +297,6 @@ public final class SolarTableDialog extends JDialog {
             rangeRow.add(step);
             rangeRow.add(Box.createHorizontalStrut(12));
             rangeRow.add(compute);
-            rangeRow.add(Box.createHorizontalStrut(12));
-            rangeRow.add(startAtChartTime);
             top.add(rangeRow);
             top.add(Box.createVerticalStrut(6));
             status.setAlignmentX(0.0f);
@@ -366,10 +362,6 @@ public final class SolarTableDialog extends JDialog {
             return controls.status();
         }
 
-        static Instant parse(String text) {
-            return SolarTableSession.parse(text);
-        }
-
         static String shown(Instant instant) {
             return SolarTableSession.shown(instant);
         }
@@ -385,21 +377,6 @@ public final class SolarTableDialog extends JDialog {
                 return Explain.control(button, hover, said.say(stem + ".explain"));
             }
             return Explain.selfExplanatory(button, said.say(stem + ".explain"));
-        }
-
-        private static JPanel field(SolarTableWords said, String stem, JTextField field,
-                                    MnemonicText letters) {
-            JPanel row = new JPanel();
-            row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
-            row.setAlignmentX(0.0f);
-            JLabel name = new JLabel(said.say(stem + ".label"));
-            name.setLabelFor(field);
-            letters.apply(name, said.key(stem + ".mnemonic"));
-            field.setMaximumSize(field.getPreferredSize());
-            row.add(name);
-            row.add(Box.createHorizontalStrut(6));
-            row.add(field);
-            return row;
         }
     }
 }

@@ -52,14 +52,14 @@ public final class VenusTableSheetMain {
 
     private static Path out = Path.of("docs/studies/interface-language");
 
+    /** @param span the range's span index, @param step its step index (a range from the chart time, #612) */
     private record State(String name, String title, Observer observer,
-                         boolean range, String end, String note,
+                         boolean range, int span, int step, String note,
                          boolean stale) {
 
-        /** The states as before #612: an instant, or an absolute range. */
-        State(String name, String title, Observer observer, boolean range,
-              String end, String note) {
-            this(name, title, observer, range, end, note, false);
+        /** An instant state: no range. */
+        State(String name, String title, Observer observer, String note) {
+            this(name, title, observer, false, 1, 2, note, false);
         }
     }
 
@@ -68,33 +68,32 @@ public final class VenusTableSheetMain {
 
     private static final List<State> STATES = List.of(
             new State("instant", "One instant: Oslo at the 2026 greatest eastern elongation",
-                    ELONGATION, false, null,
+                    ELONGATION,
                     "The fresh state: a single row at the instant Place and Time holds -"
                             + " Espenak's hour of the greatest eastern elongation. Venus is near"
                             + " half lit, east of the Sun in the evening sky, its lit side towards"
                             + " the Sun in the west."),
             new State("range", "A daily range through the 2026 inferior conjunction",
                     new Observer(59.91, 10.75, Instant.parse("2026-10-20T03:00:00Z")),
-                    true, "2026-10-27 09:30",
-                    "Daily rows from the instant, and an end that is not on the grid, added"
-                            + " last and marked †. The disc is at its largest and least lit, and"
+                    true, 1, 2,
+                    "A week of daily rows from the chart time, the first row the chart"
+                            + " time itself. The disc is at its largest and least lit, and"
                             + " the side of the Sun changes from E to W - by right ascension, so"
                             + " before the conjunction a reader may be told of; the table names"
-                            + " no conjunction."),
+                            + " no conjunction.", false),
             new State("refused", "A range that leaves the interval",
                     new Observer(59.91, 10.75, Instant.parse("2100-12-28T00:00:00Z")),
-                    true, "2101-01-02 00:00",
-                    "The end is after the last civil day Venus is computed for. The table is"
-                            + " empty and the status line says why, naming the interval; nothing"
-                            + " is extrapolated."),
+                    true, 1, 2,
+                    "A week from the chart time ends after the last civil day Venus is"
+                            + " computed for. The table is empty and the status line says why,"
+                            + " naming the interval; nothing is extrapolated.", false),
             new State("transit", "Oslo during the 2012 transit",
                     new Observer(59.91, 10.75, Instant.parse("2012-06-06T01:00:00Z")),
-                    false, null,
                     "Espenak's hour of the 2012 inferior conjunction, while Venus crossed the"
                             + " Sun's disc: the phase reads in front of the Sun, and the lit side"
                             + " is stated as not well-defined rather than as a false angle."),
             new State("stale", "The chart moved on after computing", ELONGATION,
-                    false, null,
+                    false, 1, 2,
                     "The chart time moved six hours on after this instant was"
                             + " computed (#612, ruling P1): the rows stay, dimmed,"
                             + " under the stale message, until Compute; the note"
@@ -213,7 +212,8 @@ public final class VenusTableSheetMain {
                         said, SolarTable.venus());
                 if (state.range()) {
                     dialog[0].content().rangeView.setSelected(true);
-                    dialog[0].content().end.setText(state.end());
+                    dialog[0].content().span.setSelectedIndex(state.span());
+                    dialog[0].content().step.setSelectedIndex(state.step());
                     dialog[0].content().update();
                 }
                 if (state.stale()) {
@@ -241,8 +241,8 @@ public final class VenusTableSheetMain {
             return "the view is " + (content.rangeView.isSelected()
                     ? "the range" : "the instant") + ", not the state's";
         }
-        if (state.range() && !state.end().equals(content.end.getText())) {
-            return "the end field reads " + content.end.getText();
+        if (state.range() && content.span.getSelectedIndex() != state.span()) {
+            return "the span is " + content.span.getSelectedItem() + ", not the state's";
         }
         if (content.controls().stale() != state.stale()) {
             return "the table is " + (content.controls().stale() ? "stale" : "current")

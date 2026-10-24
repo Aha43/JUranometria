@@ -71,10 +71,6 @@ class SunTableDialogTest {
                 + " longitude 10.75 east.",
                 rig.content.observerNote.getText());
         assertEquals("1 rows.", rig.content.status());
-        assertEquals("2026-06-21 10:00:00", rig.content.start.getText(),
-                "the range starts at Place and Time's instant");
-        assertEquals("2026-06-28 10:00:00", rig.content.end.getText(),
-                "and ends a week later");
         assertEquals(2, rig.content.step.getSelectedIndex(), "one day");
     }
 
@@ -121,42 +117,38 @@ class SunTableDialogTest {
     }
 
     @Test
-    void aRangeAnswersItsRowsAndMarksAnAppendedEnd() {
+    void aRangeIsAWeekOfDailyRowsFromTheChartTime() {
         Rig rig = new Rig("en");
         rig.content.rangeView.setSelected(true);
         rig.content.update();
         assertEquals(8, rig.content.model.getRowCount(), "a week, both ends");
         assertEquals("8 rows.", rig.content.status());
-        rig.content.end.setText("2026-06-24 07:30");
+        assertEquals("2026-06-21 10:00", rig.content.model.getValueAt(0, 0),
+                "the first row is the chart time (#612, P2)");
+        rig.content.span.setSelectedIndex(0);
+        rig.content.step.setSelectedIndex(1);
         rig.content.update();
-        assertEquals(4, rig.content.model.getRowCount());
-        assertEquals("2026-06-24 07:30 †", rig.content.model.getValueAt(3, 0));
-        assertEquals("4 rows; the end is not on the grid, so it is the last"
-                + " row, marked †.", rig.content.status());
+        assertEquals(5, rig.content.model.getRowCount(), "a day in 6-hour steps");
+        assertEquals("2026-06-22 10:00", rig.content.model.getValueAt(4, 0));
+        assertEquals("5 rows.", rig.content.status());
     }
 
     @Test
     void everyRefusalSaysWhyAndLeavesTheTableEmpty() {
         Rig rig = new Rig("en");
         rig.content.rangeView.setSelected(true);
-        rig.content.end.setText("2026-06-21 09:00");
+        rig.content.span.setSelectedIndex(4);
+        rig.content.step.setSelectedIndex(0);
         rig.content.update();
-        assertEquals("The range runs backwards: the end is before the start.",
-                rig.content.status());
-        assertEquals(0, rig.content.model.getRowCount());
-        rig.content.end.setText("2030-06-21 10:00");
-        rig.content.update();
-        assertEquals("That range asks for 1462 rows and at most 1000 are shown;"
+        assertEquals("That range asks for 8761 rows and at most 1000 are shown;"
                 + " shorten it or lengthen the step.", rig.content.status());
-        rig.content.end.setText("noon tomorrow");
-        rig.content.update();
-        assertEquals("noon tomorrow is not an instant this table can read; type"
-                + " yyyy-mm-dd hh:mm or hh:mm:ss, in UTC.", rig.content.status());
-        rig.content.start.setText("1899-12-31 12:00");
-        rig.content.end.setText("1900-01-02 12:00");
+        assertEquals(0, rig.content.model.getRowCount());
+        rig.content.span.setSelectedIndex(1);
+        rig.content.step.setSelectedIndex(2);
+        rig.observer = OSLO.at(Instant.parse("2100-12-28T00:00:00Z"));
         rig.content.update();
         assertEquals("The Sun is computed for civil dates from 1900-01-01 to"
-                + " 2100-12-31; 1899-12-31 12:00:00 is outside that.",
+                + " 2100-12-31; 2101-01-04 00:00:00 is outside that.",
                 rig.content.status());
         rig.content.instantView.setSelected(true);
         rig.observer = OSLO.at(Instant.parse("2101-01-01T00:00:00Z"));
@@ -185,7 +177,7 @@ class SunTableDialogTest {
                 + " to compute for.", rig.content.observerNote.getText());
         assertEquals(0, rig.content.model.getRowCount());
         assertFalse(rig.content.compute.isEnabled());
-        assertFalse(rig.content.start.isEnabled());
+        assertFalse(rig.content.span.isEnabled());
         rig.observer = OSLO;
         rig.content.update();
         assertTrue(rig.content.compute.isEnabled());
@@ -215,8 +207,6 @@ class SunTableDialogTest {
                             + " separator; the abbreviation point in"
                             + " \"mill. km\" is not a decimal and stays");
         }
-        assertEquals("2026-06-21 10:00:00", nb.content.start.getText(),
-                "the typed range keeps the machine form");
         assertTrue(nb.content.observerNote.getText().contains("59,91"),
                 "the observer note follows the language too");
         assertEquals("1 rader.", nb.content.status());
@@ -266,8 +256,8 @@ class SunTableDialogTest {
                     + " names itself to a screen reader");
             assertEquals(List.of(), shared, language + ": no two controls"
                     + " share an access letter");
-            // Seven since #612: Update from Place and Time is gone.
-            assertTrue(letters.size() >= 7, language + ": the seven controls"
+            // Six since #612: Update from Place and Time, From and To are gone; the span has one.
+            assertTrue(letters.size() >= 6, language + ": the six controls"
                     + " have letters: " + letters.size());
             String tableName = rig.content.table.getAccessibleContext()
                     .getAccessibleName();

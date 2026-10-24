@@ -52,8 +52,7 @@ public final class SaturnTableSession {
 
     /** What a query answered. */
     public enum Outcome {
-        ROWS, APPENDED, MOONS_OUTSIDE, OBSERVER_ABSENT, REFUSED_INSTANT,
-        REFUSED_BACKWARDS, REFUSED_ROWS, REFUSED_INTERVAL, REFUSED_MOONS_INTERVAL
+        ROWS, MOONS_OUTSIDE, OBSERVER_ABSENT, REFUSED_ROWS, REFUSED_INTERVAL, REFUSED_MOONS_INTERVAL
     }
 
     /**
@@ -296,16 +295,10 @@ public final class SaturnTableSession {
     }
 
     private Result range(Query query, Observer now) {
-        Instant from = SolarTableSession.parse(query.start());
-        Instant to = SolarTableSession.parse(query.end());
-        if (from == null || to == null) {
-            return new Result(query, Outcome.REFUSED_INSTANT, List.of(), now,
-                    from == null ? query.start() : query.end(), 0);
-        }
         Duration by = SolarTableSession.STEPS.get(query.step());
-        if (to.isBefore(from)) {
-            return new Result(query, Outcome.REFUSED_BACKWARDS, List.of(), now, "", 0);
-        }
+        Instant[] edges = SolarTableSession.edges(query, now.instant());
+        Instant from = edges[0];
+        Instant to = edges[1];
         long instants = TimeRange.rowsOf(from, to, by);
         if (instants > MAX_INSTANTS) {
             return new Result(query, Outcome.REFUSED_ROWS, List.of(), now, "", instants);
@@ -329,8 +322,7 @@ public final class SaturnTableSession {
             Configuration c = saturn.observeMoons(now.at(sample.instant()));
             entries.add(new Entry(sample, c.saturn(), c));
         }
-        boolean appended = entries.get(entries.size() - 1).sample().appendedEnd();
-        return new Result(query, appended ? Outcome.APPENDED : Outcome.ROWS,
-                List.copyOf(entries), now, "", entries.size());
+        return new Result(query, Outcome.ROWS, List.copyOf(entries), now, "", entries.size());
     }
+
 }

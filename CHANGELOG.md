@@ -16,11 +16,12 @@ after a table was computed the rows stay, readable but dimmed, under
 *Computed for the previous chart time and place — Compute again*,
 until the reader computes; nothing recomputes on its own, not even a
 dialog coming to the front. The two views are *At chart time* and
-*Over a time range*; the range is seeded from the chart time once -
-*From (UTC)* with the chart time, *To (UTC)* with the default span -
-and is the reader's labelled analysis from then on, with *Start at
-chart time* to put that seed back from the chart time now, computing
-nothing. A selected row offers *Set chart time to this instant*,
+*Over a time range*, and a range always starts at the chart time: a
+span from 1 day to 365 days at the chosen step, the chart time its
+first row, read again whenever it is computed, so every body's range
+shares one start by construction; *From (UTC)* and *To (UTC)* are
+gone with their refusals. A selected row offers *Set chart time to
+this instant*,
 which installs the row's instant through the path Place and Time uses
 and redraws every enabled body. Place and Time gains a *Local sidereal
 time* field (hh:mm) that resolves to the instant on the chart time's

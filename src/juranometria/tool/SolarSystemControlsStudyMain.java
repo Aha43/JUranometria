@@ -253,23 +253,21 @@ public final class SolarSystemControlsStudyMain {
         return content;
     }
 
-    /** A content put into its range view with the sheets' four-row range. */
+    /** A content put into its range view: a day from the chart time in 6-hour steps, five rows. */
     private static SolarTableDialog.Content ranged(SolarTable table,
                                                    InterfaceText said) {
         SolarTableDialog.Content content = content(table, said);
         content.rangeView.setSelected(true);
-        content.end.setText(content.start.getText().substring(0, 10)
-                .replaceAll("-(\\d\\d)$", "-" + String.format("%02d",
-                        Integer.parseInt(content.start.getText().substring(8, 10)) + 3))
-                + " 07:30");
+        content.span.setSelectedIndex(0);
+        content.step.setSelectedIndex(1);
         content.update();
         return content;
     }
 
     /**
      * A body's group as the Controller would hold it, narrow: the
-     * observer note wrapped, the two views on one row, the range
-     * fields on rows of their own, the step and Compute, the status
+     * observer note wrapped, the two views on one row, the span on a
+     * row of its own, the step and Compute, the status
      * line, the result, the proposed *Show on chart* box, and Update
      * from Place and Time. No Close: the group is not a window.
      *
@@ -301,8 +299,12 @@ public final class SolarSystemControlsStudyMain {
         views.add(content.rangeView);
         column.add(leading(views));
 
-        column.add(labelled(said, "solartable.range.start.label", content.start));
-        column.add(labelled(said, "solartable.range.end.label", content.end));
+        JPanel spanRow = new JPanel();
+        spanRow.setLayout(new BoxLayout(spanRow, BoxLayout.X_AXIS));
+        spanRow.add(new JLabel(said.say("solartable.span.label")));
+        spanRow.add(Box.createHorizontalStrut(6));
+        spanRow.add(content.span);
+        column.add(leading(spanRow));
         JPanel stepRow = new JPanel();
         stepRow.setLayout(new BoxLayout(stepRow, BoxLayout.X_AXIS));
         stepRow.add(new JLabel(said.say("solartable.range.step.label")));
@@ -495,11 +497,8 @@ public final class SolarSystemControlsStudyMain {
             out.append("| ").append(b).append(" | ").append(content.instantView.getText())
                     .append(" / ").append(content.rangeView.getText())
                     .append(" | JRadioButton | mode | no: each dialog's own |\n");
-            for (JTextField field : List.of(content.start, content.end)) {
-                out.append("| ").append(b).append(" | ").append(field.getName())
-                        .append(" | JTextField | draft | no: seeded from the observer"
-                                + " once, then the dialog's own |\n");
-            }
+            out.append("| ").append(b).append(" | ").append(content.span.getName())
+                    .append(" | JComboBox | draft | no |\n");
             out.append("| ").append(b).append(" | ").append(content.step.getName())
                     .append(" | JComboBox | draft | no |\n");
             out.append("| ").append(b).append(" | ").append(content.compute.getText())
@@ -610,14 +609,14 @@ public final class SolarSystemControlsStudyMain {
             Map<Character, String> table = new LinkedHashMap<>();
             SolarTableDialog.Content content = content(SolarTable.sun(), said);
             for (AbstractButton button : List.of(content.instantView, content.rangeView,
-                    content.compute, content.startAtChartTime, content.close)) {
+                    content.compute, content.close)) {
                 if (button.getMnemonic() != 0) {
                     table.put(Character.toUpperCase((char) button.getMnemonic()),
                             button.getText());
                 }
             }
-            for (String key : List.of("solartable.range.start.mnemonic",
-                    "solartable.range.end.mnemonic", "solartable.range.step.mnemonic")) {
+            for (String key : List.of("solartable.span.mnemonic",
+                    "solartable.range.step.mnemonic")) {
                 String letter = said.say(key);
                 if (!letter.isBlank()) {
                     table.put(Character.toUpperCase(letter.charAt(0)),

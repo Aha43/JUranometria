@@ -189,21 +189,21 @@ class CentreOnChartTest {
             SolarTableControls c = new SolarTableControls(session, EN, layer, false, action, layer);
             c.apply();
             SkyPosition shownEarlier = firstRow(session);
-            // Place and Time moves a day on, and the reader types a range
-            // that is not applied yet.
-            now[0] = WHEN.plusSeconds(86_400);
+            // The chart time moves four days on, and the reader chooses a
+            // range that is not applied yet.
+            now[0] = Instant.parse("2026-06-25T10:00:00Z");
             c.rangeView.setSelected(true);
-            c.start.setText("2026-06-25 10:00");
-            c.end.setText("2026-06-25 14:00");
+            c.span.setSelectedIndex(0);
             c.step.setSelectedIndex(0);
             press(c.centreOnChart);
             assertEquals(SolarTableSession.Mode.RANGE, session.result().query().mode(),
-                    "the typed range was applied");
-            assertEquals("2026-06-25 10:00", session.result().query().start());
+                    "the chosen range was applied");
+            assertEquals(0, session.result().query().span());
             assertEquals(firstRow(session), chart.centre, "centred on its first instant");
             assertNotEquals(shownEarlier, chart.centre, "not on what was shown before");
             assertEquals(Instant.parse("2026-06-25T10:00:00Z"),
-                    session.result().rows().get(0).observation().instant());
+                    session.result().rows().get(0).observation().instant(),
+                    "the chart time, the range's first row");
         });
     }
 

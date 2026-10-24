@@ -130,10 +130,10 @@ class SaturnTableTest {
             SaturnTableDialog.Content dialog = SaturnTableDialog.content(session, NB);
             SaturnTableControls d = dialog.controls();
             d.rangeView.setSelected(true);
-            d.start.setText("2026-10-05 0");
+            d.span.setSelectedIndex(3);
             controller.apply();
             assertSame(controller.shown(), d.shown(), "one applied result");
-            assertEquals("2026-10-05 0", d.start.getText(), "the dialog's draft is its own");
+            assertEquals(3, d.span.getSelectedIndex(), "the dialog's draft is its own");
             assertTrue(d.rangeView.isSelected());
             assertEquals(controller.cardValue("ra"), d.cardValue("ra").replace(',', '.'),
                     "the same answer in both hosts, each in its language");
@@ -353,50 +353,41 @@ class SaturnTableTest {
 
             at[0] = oslo(CARD);
             c.rangeView.setSelected(true);
-            c.start.setText("2026-10-01 00:00");
-            c.end.setText("2026-10-07 00:00");
+            c.span.setSelectedIndex(1); // a week of hours: 169 instants, over the cap
             c.step.setSelectedIndex(0);
             c.apply();
             assertEquals(SaturnTableSession.Outcome.REFUSED_ROWS, session.result().outcome());
             assertTrue(c.status().contains("at most 142 are shown, seven moon rows each"), c.status());
-            c.start.setText("1999-12-30 00:00");
-            c.end.setText("2000-01-02 00:00");
+            at[0] = oslo(Instant.parse("1999-12-30T00:00:00Z"));
+            c.span.setSelectedIndex(1);
             c.step.setSelectedIndex(2);
             c.apply();
             assertEquals(SaturnTableSession.Outcome.REFUSED_MOONS_INTERVAL, session.result().outcome());
             assertTrue(c.status().contains("1999-12-30"), c.status());
-            c.start.setText("2026-10-06 00:00");
-            c.end.setText("2026-10-05 00:00");
-            c.apply();
-            assertEquals(SaturnTableSession.Outcome.REFUSED_BACKWARDS, session.result().outcome());
-            c.start.setText("not a time");
-            c.apply();
-            assertEquals(SaturnTableSession.Outcome.REFUSED_INSTANT, session.result().outcome());
-            assertTrue(c.status().startsWith("not a time is not an instant"), c.status());
         });
     }
 
     @Test
-    void aRangeIsGroupedByInstantAndCappedAt142Instants() throws Exception {
+    void aRangeIsGroupedByInstantAndStaysUnderTheCapOf142Instants() throws Exception {
         SaturnTableSession session = new SaturnTableSession(() -> oslo(CARD), () -> service);
         onEdt(() -> {
             SaturnTableControls c = new SaturnTableControls(session, EN, false);
             c.rangeView.setSelected(true);
-            c.start.setText("2026-10-04 23:00");
-            c.end.setText("2026-10-05 00:30");
-            c.step.setSelectedIndex(0); // 1 hour: 23:00, 00:00, then the end appended
+            c.span.setSelectedIndex(0);
+            c.step.setSelectedIndex(0); // a day of hours from the chart time: 25 instants
             c.apply();
-            assertEquals(SaturnTableSession.Outcome.APPENDED, session.result().outcome());
-            assertEquals(3 * 11, c.model.getRowCount(),
-                    "three groups: a heading, three lines of Saturn, seven moons each");
-            assertEquals("2026-10-04 23:00 UTC", c.model.getValueAt(0, 0));
-            assertEquals("2026-10-05 00:30 UTC †", c.model.getValueAt(22, 0));
+            assertEquals(SaturnTableSession.Outcome.ROWS, session.result().outcome());
+            assertEquals(25 * 11, c.model.getRowCount(),
+                    "25 groups: a heading, three lines of Saturn, seven moons each");
+            assertEquals("2026-10-05 00:00 UTC", c.model.getValueAt(0, 0),
+                    "the first group is the chart time");
+            assertEquals("2026-10-05 01:00 UTC", c.model.getValueAt(11, 0));
             assertEquals(" ", c.cardTitle.getText(), "a range shows no Saturn card");
-            c.start.setText("2026-10-01 00:00");
-            c.end.setText("2026-10-06 21:00");
+            c.span.setSelectedIndex(2);
+            c.step.setSelectedIndex(1); // 30 days of 6-hour steps: 121 instants, under the cap
             c.apply();
-            assertEquals(142, session.result().entries().size(), "exactly the cap is answered");
-            assertEquals(142 * 7, c.model.moonRows());
+            assertEquals(121, session.result().entries().size(), "under the cap, answered");
+            assertEquals(121 * 7, c.model.moonRows());
         });
     }
 
@@ -408,21 +399,24 @@ class SaturnTableTest {
      */
     @Test
     void everyRangeGroupIsOneSaturnResultAndItsSevenMoonsInBothLanguages() throws Exception {
-        SaturnTableSession session = new SaturnTableSession(() -> oslo(CARD), () -> service);
+        // Five weeks ending at the card's instant, from the chart time
+        // four weeks before it (#612: a range starts at the chart time).
+        SaturnTableSession session = new SaturnTableSession(
+                () -> oslo(CARD.minus(java.time.Duration.ofDays(28))), () -> service);
         onEdt(() -> {
             SaturnTableControls en = new SaturnTableControls(session, EN, false);
             SaturnTableControls nb = new SaturnTableControls(session, NB, false);
             en.rangeView.setSelected(true);
-            en.start.setText("2026-08-24 00:00");
-            en.end.setText("2026-10-05 00:00");
+            en.span.setSelectedIndex(2);
             en.step.setSelectedIndex(3);
             en.apply();
             List<SaturnTableSession.Entry> entries = session.result().entries();
-            assertEquals(7, entries.size(), "seven weekly instants");
+            assertEquals(5, entries.size(), "five weekly instants");
+            assertEquals(CARD, entries.get(4).sample().instant(), "ending at the card's instant");
             for (SaturnTableControls c : List.of(en, nb)) {
                 SolarTableWords w = c.words();
-                assertEquals(7, c.model.groups());
-                assertEquals(7 * 11, c.model.getRowCount(), "eleven lines a group");
+                assertEquals(5, c.model.groups());
+                assertEquals(5 * 11, c.model.getRowCount(), "eleven lines a group");
                 List<String> rightAscensions = new ArrayList<>();
                 for (int g = 0; g < entries.size(); g++) {
                     SaturnTableSession.Entry entry = entries.get(g);
@@ -447,7 +441,7 @@ class SaturnTableTest {
                             c.model.getValueAt(at + 3, 0));
                     rightAscensions.add(v.get(0));
                 }
-                assertEquals(7, new java.util.HashSet<>(rightAscensions).size(),
+                assertEquals(5, new java.util.HashSet<>(rightAscensions).size(),
                         "Saturn's right ascension moves across the range: " + rightAscensions);
             }
             assertTrue(((String) en.model.getValueAt(3, 0)).startsWith("Rings: open "));

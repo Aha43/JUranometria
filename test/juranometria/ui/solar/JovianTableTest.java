@@ -103,12 +103,12 @@ class JovianTableTest {
             controller.inController();
             JovianTableDialog.Content dialog = JovianTableDialog.content(session, NB);
             JovianTableControls d = dialog.controls();
-            // an unfinished draft in the dialog
+            // the dialog's own draft: a range view and another span
             d.rangeView.setSelected(true);
-            d.start.setText("2026-12-11 22:3");
+            d.span.setSelectedIndex(3);
             controller.apply();
             assertSame(controller.shown(), d.shown(), "one applied result");
-            assertEquals("2026-12-11 22:3", d.start.getText(), "the dialog's draft is its own");
+            assertEquals(3, d.span.getSelectedIndex(), "the dialog's draft is its own");
             assertTrue(d.rangeView.isSelected());
             assertEquals(controller.cardValue("ra"), d.cardValue("ra").replace(',', '.'),
                     "the same answer in both hosts, each in its language");
@@ -267,54 +267,44 @@ class JovianTableTest {
 
             at[0] = oslo(TRIPLE);
             c.rangeView.setSelected(true);
-            c.start.setText("2026-12-11 00:00");
-            c.end.setText("2027-02-01 00:00");
+            c.span.setSelectedIndex(2); // 30 days of hours: 721 instants
             c.step.setSelectedIndex(0);
             c.apply();
             assertEquals(JovianTableSession.Outcome.REFUSED_ROWS, session.result().outcome());
             assertTrue(c.status().contains("at most 250 are shown, four moon rows each"),
                     c.status());
-            c.start.setText("1999-12-30 00:00");
-            c.end.setText("2000-01-02 00:00");
+            at[0] = oslo(Instant.parse("1999-12-30T00:00:00Z"));
+            c.span.setSelectedIndex(1);
             c.step.setSelectedIndex(2);
             c.apply();
             assertEquals(JovianTableSession.Outcome.REFUSED_MOONS_INTERVAL,
                     session.result().outcome());
             assertTrue(c.status().contains("1999-12-30"), c.status());
-            c.start.setText("2026-12-12 00:00");
-            c.end.setText("2026-12-11 00:00");
-            c.apply();
-            assertEquals(JovianTableSession.Outcome.REFUSED_BACKWARDS, session.result().outcome());
-            c.start.setText("not a time");
-            c.apply();
-            assertEquals(JovianTableSession.Outcome.REFUSED_INSTANT, session.result().outcome());
-            assertTrue(c.status().startsWith("not a time is not an instant"), c.status());
         });
     }
 
     @Test
-    void aRangeIsGroupedByInstantAndCappedAt250Instants() throws Exception {
+    void aRangeIsGroupedByInstantAndStaysUnderTheCapOf250Instants() throws Exception {
         JovianTableSession session = new JovianTableSession(() -> oslo(TRIPLE), () -> service);
         onEdt(() -> {
             JovianTableControls c = new JovianTableControls(session, EN, false);
             c.rangeView.setSelected(true);
-            c.start.setText("2026-12-11 22:30");
-            c.end.setText("2026-12-11 23:00");
-            c.step.setSelectedIndex(0); // 1 hour: 22:30, then the end appended
+            c.span.setSelectedIndex(0);
+            c.step.setSelectedIndex(0); // a day of hours from the chart time: 25 instants
             c.apply();
-            assertEquals(JovianTableSession.Outcome.APPENDED, session.result().outcome());
-            assertEquals(14, c.model.getRowCount(),
-                    "two groups: a heading, two lines of Jupiter, four moons each");
-            assertEquals("2026-12-11 22:30 UTC", c.model.getValueAt(0, 0));
-            assertEquals("2026-12-11 23:00 UTC †", c.model.getValueAt(7, 0));
-            assertEquals("clear of Jupiter", c.model.getValueAt(13, 6), "Callisto has left at 23:00");
+            assertEquals(JovianTableSession.Outcome.ROWS, session.result().outcome());
+            assertEquals(25 * 7, c.model.getRowCount(),
+                    "25 groups: a heading, two lines of Jupiter, four moons each");
+            assertEquals("2026-12-11 22:45 UTC", c.model.getValueAt(0, 0),
+                    "the first group is the chart time");
+            assertEquals("2026-12-11 23:45 UTC", c.model.getValueAt(7, 0));
+            assertEquals("clear of Jupiter", c.model.getValueAt(13, 6), "Callisto has left by 23:45");
             assertEquals(" ", c.cardTitle.getText(), "a range shows no Jupiter card");
-            // exactly 250 instants is answered
-            c.start.setText("2026-12-01 00:00");
-            c.end.setText("2026-12-11 09:00");
+            // a week of hours stays under the cap of 250 instants
+            c.span.setSelectedIndex(1);
             c.apply();
-            assertEquals(250, session.result().entries().size());
-            assertEquals(1000, c.model.moonRows());
+            assertEquals(169, session.result().entries().size());
+            assertEquals(169 * 4, c.model.moonRows());
         });
     }
 
@@ -328,25 +318,28 @@ class JovianTableTest {
      */
     @Test
     void everyRangeGroupIsOneJupiterResultAndItsFourMoonsInBothLanguages() throws Exception {
-        JovianTableSession session = new JovianTableSession(() -> oslo(TRIPLE), () -> service);
+        // Five weeks ending at the triple transit, from the chart time
+        // four weeks before it (#612: a range starts at the chart time).
+        JovianTableSession session = new JovianTableSession(
+                () -> oslo(TRIPLE.minus(java.time.Duration.ofDays(28))), () -> service);
         onEdt(() -> {
             JovianTableControls en = new JovianTableControls(session, EN, false);
             JovianTableControls nb = new JovianTableControls(session, NB, false);
             en.rangeView.setSelected(true);
-            // Seven weeks at a week's step: Jupiter is near its stationary
+            // Thirty days at a week's step: Jupiter is near its stationary
             // point in December 2026 (measured: about 0.05 s of right
             // ascension an hour on the 11th), so hourly positions repeat
             // at the table's rounding; weekly ones cannot.
-            en.start.setText("2026-10-30 22:45");
-            en.end.setText("2026-12-11 22:45");
+            en.span.setSelectedIndex(2);
             en.step.setSelectedIndex(3);
             en.apply();
             List<JovianTableSession.Entry> entries = session.result().entries();
-            assertEquals(7, entries.size(), "seven weekly instants");
+            assertEquals(5, entries.size(), "five weekly instants");
+            assertEquals(TRIPLE, entries.get(4).sample().instant(), "ending at the triple transit");
             for (JovianTableControls c : List.of(en, nb)) {
                 SolarTableWords w = c.words();
-                assertEquals(7, c.model.groups());
-                assertEquals(7 * 7, c.model.getRowCount(), "seven lines a group");
+                assertEquals(5, c.model.groups());
+                assertEquals(5 * 7, c.model.getRowCount(), "seven lines a group");
                 List<String> rightAscensions = new ArrayList<>();
                 List<String> declinations = new ArrayList<>();
                 for (int g = 0; g < entries.size(); g++) {
@@ -378,7 +371,7 @@ class JovianTableTest {
                     rightAscensions.add(v.get(0));
                     declinations.add(v.get(1));
                 }
-                assertEquals(7, new java.util.HashSet<>(rightAscensions).size(),
+                assertEquals(5, new java.util.HashSet<>(rightAscensions).size(),
                         "Jupiter's right ascension moves across the range: " + rightAscensions);
                 assertTrue(new java.util.HashSet<>(declinations).size() > 1,
                         "and its declination: " + declinations);

@@ -21,7 +21,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -79,11 +78,9 @@ public final class SaturnTableControls {
     public final JLabel observerNote = new JLabel();
     public final JRadioButton instantView;
     public final JRadioButton rangeView;
-    public final JTextField start = new JTextField(19);
-    public final JTextField end = new JTextField(19);
+    /** The range's span from the chart time (#612, P2): a range starts at the chart time, always. */
+    public final JComboBox<String> span;
     public final JComboBox<String> step;
-    /** Start at chart time (#612, P2 as amended): re-seeds From and To from the chart time. */
-    public final JButton startAtChartTime;
     public final JButton compute;
     /** Set chart time to this instant (#612, P2), or null over a session that cannot install. */
     public final JButton setChartTime;
@@ -137,13 +134,6 @@ public final class SaturnTableControls {
         ButtonGroup views = new ButtonGroup();
         views.add(instantView);
         views.add(rangeView);
-        start.setName("saturnRangeStart");
-        end.setName("saturnRangeEnd");
-        for (JTextField field : List.of(start, end)) {
-            String stem = field == start ? "range.start" : "range.end";
-            field.getAccessibleContext().setAccessibleName(said.say(stem + ".label"));
-            Explain.control(field, said.say(stem + ".hover"), said.say(stem + ".explain"));
-        }
         step = new JComboBox<>(SolarTableSession.STEP_KEYS.stream().map(said::say)
                 .toArray(String[]::new));
         step.setName("saturnRangeStep");
@@ -151,8 +141,14 @@ public final class SaturnTableControls {
         step.setMaximumSize(step.getPreferredSize());
         step.getAccessibleContext().setAccessibleName(said.say("range.step.a11y"));
         Explain.control(step, said.say("range.step.hover"), said.say("range.step.explain"));
+        span = new JComboBox<>(SolarTableSession.SPAN_KEYS.stream().map(said::say)
+                .toArray(String[]::new));
+        span.setName("saturnRangeSpan");
+        span.setSelectedIndex(1);
+        span.setMaximumSize(span.getPreferredSize());
+        span.getAccessibleContext().setAccessibleName(said.say("span.a11y"));
+        Explain.control(span, said.say("span.hover"), said.say("span.explain"));
         compute = button("compute", "saturnCompute", access);
-        startAtChartTime = button("startchart", "saturnStartAtChartTime", access);
         // The row action, only over a session that can install (#612, P2).
         setChartTime = session.canSetChartTime()
                 ? button("setchart", "saturnSetChartTime", access) : null;
@@ -297,24 +293,13 @@ public final class SaturnTableControls {
         if (applied.applied()) {
             instantView.setSelected(applied.query().mode() == Mode.INSTANT);
             rangeView.setSelected(applied.query().mode() == Mode.RANGE);
-            if (!applied.query().start().isEmpty()) {
-                start.setText(applied.query().start());
-                end.setText(applied.query().end());
-                step.setSelectedIndex(applied.query().step());
-            }
-        }
-        if (start.getText().isEmpty()) {
-            seedFromChartTime();
+            span.setSelectedIndex(applied.query().span());
+            step.setSelectedIndex(applied.query().step());
         }
 
         instantView.addActionListener(e -> apply());
         rangeView.addActionListener(e -> apply());
-        // Start at chart time: re-seeds the typed range from the chart
-        // time read now - the fields only; nothing computes until asked.
-        startAtChartTime.addActionListener(e -> seedFromChartTime());
         compute.addActionListener(e -> apply());
-        start.addActionListener(e -> apply());
-        end.addActionListener(e -> apply());
         if (setChartTime != null) {
             setChartTime.addActionListener(e -> {
                 Instant at = selectedInstant();
@@ -350,7 +335,6 @@ public final class SaturnTableControls {
                 apply();
                 SaturnTableSession.Result result = session.result();
                 boolean answered = result.outcome() == SaturnTableSession.Outcome.ROWS
-                        || result.outcome() == SaturnTableSession.Outcome.APPENDED
                         || result.outcome() == SaturnTableSession.Outcome.MOONS_OUTSIDE;
                 return answered && !result.entries().isEmpty()
                         ? result.entries().get(0).saturn().astrometricJ2000() : null;
@@ -366,7 +350,7 @@ public final class SaturnTableControls {
     /** This host's draft, as a query. */
     public Query draft() {
         return new Query(instantView.isSelected() ? Mode.INSTANT : Mode.RANGE,
-                start.getText(), end.getText(), step.getSelectedIndex());
+                span.getSelectedIndex(), step.getSelectedIndex());
     }
 
     /** Applies this host's draft to the session, which tells every host. */
@@ -417,7 +401,6 @@ public final class SaturnTableControls {
         SaturnTableSession.Result result = shown;
         boolean rows = result != null && result.applied()
                 && (result.outcome() == SaturnTableSession.Outcome.ROWS
-                        || result.outcome() == SaturnTableSession.Outcome.APPENDED
                         || result.outcome() == SaturnTableSession.Outcome.MOONS_OUTSIDE)
                 && !result.entries().isEmpty();
         boolean old = rows && session.stale();
@@ -456,8 +439,7 @@ public final class SaturnTableControls {
         shown = result;
         Observer now = result.applied() ? result.observer() : session.observerNow();
         boolean present = now != null;
-        for (JComponent c : List.of(instantView, rangeView, start, end, step, compute,
-                startAtChartTime)) {
+        for (JComponent c : List.of(instantView, rangeView, span, step, compute)) {
             c.setEnabled(present);
         }
         if (!present) {
@@ -489,14 +471,10 @@ public final class SaturnTableControls {
         String text = switch (result.outcome()) {
             case ROWS -> !result.applied() ? " " : single ? said.say("status.instant")
                     : said.say("status.rows", count, Integer.toString(model.moonRows()));
-            case APPENDED -> said.say("status.appended", count,
-                    Integer.toString(model.moonRows()), said.say("appended"));
             case MOONS_OUTSIDE -> said.say("refused.moons.instant",
                     session.moonsFirstDay().toString(), session.moonsLastDay().toString(),
                     result.detail());
             case OBSERVER_ABSENT -> " ";
-            case REFUSED_INSTANT -> said.say("refused.instant", result.detail());
-            case REFUSED_BACKWARDS -> said.say("refused.backwards");
             case REFUSED_ROWS -> said.say("refused.rows",
                     Long.toString(result.instantsAsked()),
                     Integer.toString(SaturnTableSession.MAX_INSTANTS),
@@ -509,7 +487,6 @@ public final class SaturnTableControls {
                     result.detail());
         };
         if (estimated && (result.outcome() == SaturnTableSession.Outcome.ROWS
-                || result.outcome() == SaturnTableSession.Outcome.APPENDED
                 || result.outcome() == SaturnTableSession.Outcome.MOONS_OUTSIDE)) {
             text = text + " " + said.say("status.estimated", said.say("estimated"));
         }
@@ -560,20 +537,6 @@ public final class SaturnTableControls {
                         observerNote.getFontMetrics(observerNote.getFont()))
                 : note);
         observerNote.getAccessibleContext().setAccessibleName(note);
-    }
-
-    /**
-     * Seeds From with the chart time and To with the default span from
-     * it (#612, ruling P2 as amended on the first candidate): what the
-     * fields hold at build, and what Start at chart time puts back.
-     * The fields only; nothing computes until the reader asks.
-     */
-    public void seedFromChartTime() {
-        Observer now = session.observerNow();
-        if (now != null) {
-            start.setText(SolarTableSession.shown(now.instant()));
-            end.setText(SolarTableSession.shown(now.instant().plus(Duration.ofDays(1))));
-        }
     }
 
     /**
@@ -642,9 +605,8 @@ public final class SaturnTableControls {
         JPanel rangeRow = new JPanel();
         rangeRow.setLayout(new BoxLayout(rangeRow, BoxLayout.X_AXIS));
         rangeRow.setAlignmentX(0f);
-        rangeRow.add(inline("range.start", start));
-        rangeRow.add(Box.createHorizontalStrut(12));
-        rangeRow.add(inline("range.end", end));
+        JComponent spanIn = spanRow();
+        rangeRow.add(spanIn);
         rangeRow.add(Box.createHorizontalStrut(12));
         JLabel every = new JLabel(said.say("range.step.label"));
         every.setLabelFor(step);
@@ -653,8 +615,6 @@ public final class SaturnTableControls {
         rangeRow.add(step);
         rangeRow.add(Box.createHorizontalStrut(12));
         rangeRow.add(compute);
-        rangeRow.add(Box.createHorizontalStrut(12));
-        rangeRow.add(startAtChartTime);
         top.add(rangeRow);
         top.add(Box.createVerticalStrut(6));
         status.setAlignmentX(0f);
@@ -667,17 +627,6 @@ public final class SaturnTableControls {
         return top;
     }
 
-    private JComponent inline(String stem, JTextField field) {
-        JPanel row = new JPanel();
-        row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
-        JLabel name = new JLabel(said.say(stem + ".label"));
-        name.setLabelFor(field);
-        field.setMaximumSize(field.getPreferredSize());
-        row.add(name);
-        row.add(Box.createHorizontalStrut(6));
-        row.add(field);
-        return row;
-    }
 
     // ---- the Controller's arrangement ----------------------------------
 
@@ -711,8 +660,7 @@ public final class SaturnTableControls {
         views.add(Box.createHorizontalStrut(10));
         views.add(rangeView);
         column.add(leading(views));
-        column.add(labelled("range.start", start));
-        column.add(labelled("range.end", end));
+        column.add(leading(spanRow()));
         JPanel stepRow = new JPanel();
         stepRow.setLayout(new BoxLayout(stepRow, BoxLayout.X_AXIS));
         JLabel every = new JLabel(said.say("range.step.label"));
@@ -723,7 +671,6 @@ public final class SaturnTableControls {
         stepRow.add(Box.createHorizontalStrut(10));
         stepRow.add(compute);
         column.add(leading(stepRow));
-        column.add(leading(startAtChartTime));
         column.add(Box.createVerticalStrut(4));
         column.add(leadingWide(status));
         column.add(Box.createVerticalStrut(4));
@@ -803,16 +750,15 @@ public final class SaturnTableControls {
         return scroll;
     }
 
-    private JComponent labelled(String stem, JTextField field) {
-        JPanel row = new JPanel(new BorderLayout(6, 0));
-        row.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
-        row.setAlignmentX(0f);
-        JLabel label = new JLabel(said.say(stem + ".label"));
-        label.setLabelFor(field);
-        row.add(label, BorderLayout.WEST);
-        field.setMaximumSize(new Dimension(Integer.MAX_VALUE, field.getPreferredSize().height));
-        row.add(field, BorderLayout.CENTER);
-        row.setMaximumSize(new Dimension(Integer.MAX_VALUE, row.getPreferredSize().height));
+    /** The span from the chart time on one row (#612, P2). */
+    JComponent spanRow() {
+        JPanel row = new JPanel();
+        row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
+        JLabel over = new JLabel(said.say("span.label"));
+        over.setLabelFor(span);
+        row.add(over);
+        row.add(Box.createHorizontalStrut(6));
+        row.add(span);
         return row;
     }
 
