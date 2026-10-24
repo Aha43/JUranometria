@@ -74,6 +74,11 @@ class StaleLineTest {
         return found;
     }
 
+    /** The note as a screen reader hears it: the whole sentence, never a layout's line breaks. */
+    private static String spokenNote(SolarTableControls controls) {
+        return controls.observerNote.getAccessibleContext().getAccessibleName();
+    }
+
     private static Component named(Component root, String name) {
         if (name.equals(root.getName())) {
             return root;
@@ -120,9 +125,11 @@ class StaleLineTest {
                 "showing the rows as computed: " + values);
         assertTrue(values.stream().anyMatch(l -> StaleLine.tone(true).equals(l.getForeground())),
                 "the card's values dimmed too");
-        assertTrue(controls.observerNote.getText().contains("2026-08-15 06:00:00"),
-                "the note states the context the rows are for: "
-                        + controls.observerNote.getText());
+        // The spoken sentence, not the shown one: the narrow host breaks the
+        // note against the platform's font metrics, between the date and
+        // the time on CI's.
+        assertTrue(spokenNote(controls).contains("2026-08-15 06:00:00"),
+                "the note states the context the rows are for: " + spokenNote(controls));
 
         controls.apply();
         assertEquals(computed + 1, controls.session().computations(),
@@ -130,8 +137,7 @@ class StaleLineTest {
         assertEquals("", controls.staleText(), "for the chart's context now");
         assertFalse(controls.stale());
         assertEquals(StaleLine.tone(false), controls.table.getForeground());
-        assertTrue(controls.observerNote.getText().contains("2026-08-15 21:30:00"),
-                controls.observerNote.getText());
+        assertTrue(spokenNote(controls).contains("2026-08-15 21:30:00"), spokenNote(controls));
     }
 
     @Test
@@ -178,9 +184,8 @@ class StaleLineTest {
         assertEquals("", controls.staleText());
         assertFalse(controls.stale());
         assertEquals(0, controls.session().computations());
-        assertTrue(controls.observerNote.getText().contains("2026-08-16 06:00:00"),
-                "the note follows the chart while nothing is computed: "
-                        + controls.observerNote.getText());
+        assertTrue(spokenNote(controls).contains("2026-08-16 06:00:00"),
+                "the note follows the chart while nothing is computed: " + spokenNote(controls));
     }
 
     @Test
