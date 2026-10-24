@@ -88,35 +88,33 @@ class SolarTableSessionTest {
         Observer observer = oslo();
         SolarTableSession session = new SolarTableSession(() -> observer, service,
                 SolarTable.moon());
-        String start = SolarTableSession.shown(observer.instant());
-        String end = SolarTableSession.shown(observer.instant().plus(Duration.ofDays(7)));
-        session.apply(new Query(Mode.RANGE, start, end, 2));
+        session.apply(Query.range(1, 2));
         assertEquals(Outcome.ROWS, session.result().outcome());
-        assertEquals(8, session.result().rows().size(), "a week of days, both ends");
+        assertEquals(8, session.result().rows().size(),
+                "a week of days from the chart time, both ends");
+        assertEquals(observer.instant(), session.result().rows().get(0).sample().instant(),
+                "the first row is the chart time (#612, P2)");
+        assertEquals(observer.instant().plus(Duration.ofDays(7)),
+                session.result().rows().get(7).sample().instant());
+        for (SolarTableModel.Row row : session.result().rows()) {
+            assertFalse(row.sample().appendedEnd(), "whole steps: nothing is appended");
+        }
 
-        session.apply(new Query(Mode.RANGE, start,
-                SolarTableSession.shown(observer.instant().plus(Duration.ofDays(2))
-                        .plus(Duration.ofHours(10))), 2));
-        assertEquals(Outcome.APPENDED, session.result().outcome());
-        assertEquals(4, session.result().rows().size());
-        assertTrue(session.result().rows().get(3).sample().appendedEnd());
+        session.apply(Query.range(1, 4));
+        assertEquals(1, session.result().rows().size(),
+                "no whole 30-day step fits in a week: the chart time alone");
 
-        session.apply(new Query(Mode.RANGE, end, start, 2));
-        assertEquals(Outcome.REFUSED_BACKWARDS, session.result().outcome());
-        assertTrue(session.result().rows().isEmpty(), "refused: no rows");
-
-        session.apply(new Query(Mode.RANGE, "yesterday", end, 2));
-        assertEquals(Outcome.REFUSED_INSTANT, session.result().outcome());
-        assertEquals("yesterday", session.result().detail(), "what could not be read");
-
-        session.apply(new Query(Mode.RANGE, start,
-                SolarTableSession.shown(observer.instant().plus(Duration.ofDays(60))), 0));
+        session.apply(Query.range(4, 0));
         assertEquals(Outcome.REFUSED_ROWS, session.result().outcome());
+        assertEquals(8761, session.result().rowsAsked(), "a year of hours");
         assertTrue(session.result().rowsAsked() > TimeRange.MAX_ROWS);
 
-        session.apply(new Query(Mode.RANGE, "1899-12-31 00:00", "1900-01-02 00:00", 2));
-        assertEquals(Outcome.REFUSED_INTERVAL, session.result().outcome());
-        assertEquals("1899-12-31 00:00:00", session.result().detail(),
+        SolarTableSession late = new SolarTableSession(
+                () -> observer.at(Instant.parse("2100-12-28T00:00:00Z")), service,
+                SolarTable.moon());
+        late.apply(Query.range(1, 2));
+        assertEquals(Outcome.REFUSED_INTERVAL, late.result().outcome());
+        assertEquals("2101-01-04 00:00:00", late.result().detail(),
                 "the edge that left the interval");
     }
 

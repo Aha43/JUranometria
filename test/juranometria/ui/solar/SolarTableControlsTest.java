@@ -146,14 +146,13 @@ class SolarTableControlsTest {
         assertNotNull(named(hosts.group, "sunCard"), "the instant as a card");
 
         // A range applied from the Controller: the dialog shows it.
-        String end = SolarTableSession.shown(hosts.observer[0].instant()
-                .plus(Duration.ofDays(2)).plus(Duration.ofHours(10)));
         SwingUtilities.invokeAndWait(() -> {
             hosts.controller.rangeView.setSelected(true);
-            hosts.controller.end.setText(end);
+            hosts.controller.span.setSelectedIndex(0);
+            hosts.controller.step.setSelectedIndex(1);
             hosts.controller.apply();
         });
-        assertEquals(4, hosts.dialog.model.getRowCount(), "the dialog shows the range");
+        assertEquals(5, hosts.dialog.model.getRowCount(), "the dialog shows the range");
         assertEquals(hosts.dialog.status(), hosts.controller.status(),
                 "and says the same: " + hosts.dialog.status());
         assertTrue(hosts.dialog.instantView.isSelected(),
@@ -173,22 +172,22 @@ class SolarTableControlsTest {
     }
 
     @Test
-    void aSharedResultNeverOverwritesAnUnfinishedDraft() throws Exception {
+    void aSharedResultNeverOverwritesTheOtherHostsDraft() throws Exception {
         Hosts hosts = new Hosts(SolarTable.moon());
         SwingUtilities.invokeAndWait(() -> {
             hosts.controller.rangeView.setSelected(true);
-            hosts.controller.start.setText("2026-06-2");
+            hosts.controller.span.setSelectedIndex(3);
             hosts.dialog.rangeView.setSelected(true);
             hosts.dialog.update();
         });
-        assertEquals("2026-06-2", hosts.controller.start.getText(),
-                "the Controller's unfinished text survives the dialog's result");
+        assertEquals(3, hosts.controller.span.getSelectedIndex(),
+                "the Controller's own span survives the dialog's result");
         assertTrue(hosts.controller.rangeView.isSelected());
         assertEquals(8, hosts.controller.model.getRowCount(), "while the rows are shared");
         SwingUtilities.invokeAndWait(hosts.controller::apply);
-        assertEquals(SolarTableSession.Outcome.REFUSED_INSTANT,
-                hosts.session.result().outcome(), "applied, the draft is refused as typed");
-        assertTrue(hosts.dialog.status().contains("2026-06-2"),
+        assertEquals(91, hosts.session.result().rows().size(),
+                "applied, the Controller's draft is the table: 90 days of daily rows");
+        assertEquals(hosts.controller.status(), hosts.dialog.status(),
                 "and the dialog says so too: " + hosts.dialog.status());
     }
 
@@ -204,10 +203,10 @@ class SolarTableControlsTest {
             }
         }
         assertTrue(hosts.dialog.instantView.getMnemonic() != 0, "the dialog's letters stay");
-        for (JTextField field : List.of(hosts.controller.start, hosts.controller.end)) {
+        for (JComponent field : List.of(hosts.controller.span, hosts.controller.step)) {
             assertNotNull(field.getAccessibleContext().getAccessibleName());
             assertTrue(all(hosts.group).stream().anyMatch(c -> c instanceof JLabel label
-                    && label.getLabelFor() == field), "each field has its label");
+                    && label.getLabelFor() == field), "each combo has its label");
         }
         assertNotNull(named(hosts.group, "sunOnChart"), "the body's Show on chart box");
     }

@@ -56,7 +56,7 @@ The released default: the equator at Greenwich. Neutral, and honest about being 
 
 ![](placeandtime-en-1-default.png)
 
-Packed 420 × 284 px, `en`.
+Packed 420 × 313 px, `en`.
 
 | channel | words |
 |---|---|
@@ -67,9 +67,12 @@ Packed 420 × 284 px, `en`.
 | shown or hovered | Degrees north of the equator, e.g. 59.913; south is negative, -90 to 90 |
 | shown or hovered | Longitude, east positive |
 | shown or hovered | Degrees east of Greenwich, e.g. 10.752; west is negative |
-| shown or hovered | Instant (UTC) |
+| shown or hovered | Chart time (UTC) |
 | shown or hovered | 2026-03-20 21:33:00 |
-| shown or hovered | The moment the lines are drawn for, as 2026-03-20 21:33:00 |
+| shown or hovered | The chart time: the one moment every line and body is drawn for, as 2026-03-20 21:33:00 |
+| shown or hovered | Local sidereal time |
+| shown or hovered | 09:26 |
+| shown or hovered | Hours:minutes of local apparent sidereal time, as 03:17; the chart time moves to it on the same UTC date |
 | shown or hovered | The chart is drawn for that instant and stays there. Nothing ticks. |
 | shown or hovered | Meridian |
 | shown or hovered | Draw the great circle through both celestial poles and your zenith (⌘K then R) |
@@ -87,8 +90,10 @@ Packed 420 × 284 px, `en`.
 | spoken | Degrees north of the equator, negative south, -90 to 90 |
 | spoken | Longitude, east positive |
 | spoken | Degrees east of Greenwich; west is negative |
-| spoken | Instant (UTC) |
-| spoken | The instant used to draw the reference lines. Time does not advance until you change it. |
+| spoken | Chart time (UTC) |
+| spoken | The chart time: the one instant the reference lines and every enabled body are drawn for. It does not advance until you change it. |
+| spoken | Local sidereal time |
+| spoken | Sets the chart time to the instant on the chart time's UTC date when this local apparent sidereal time stands on the meridian, the nearer one when the date holds it twice. The date is changed in the chart time field, never here. |
 | spoken | The chart is drawn for that instant and stays there. Nothing ticks. |
 | spoken | Show Meridian |
 | spoken | Draws the line that runs from due north, through the point overhead, to due south. It lasts as long as this session. |
@@ -102,7 +107,7 @@ Packed 420 × 284 px, `en`.
 | spoken | Freezes the chart at the present moment. The clock is read once; nothing moves afterwards. |
 | spoken | Centre on zenith |
 | spoken | Moves the page to the point directly above you. This is the only control in this window that moves the chart. |
-| access letters | L G U M H Z A N C |
+| access letters | L G U S M H Z A N C |
 
 
 ### Oslo — north and east
@@ -111,7 +116,7 @@ East longitude is positive. The number and its sign are notation and are identic
 
 ![](placeandtime-en-2-oslo.png)
 
-Packed 420 × 284 px, `en`.
+Packed 420 × 313 px, `en`.
 
 | channel | words |
 |---|---|
@@ -123,9 +128,12 @@ Packed 420 × 284 px, `en`.
 | shown or hovered | Longitude, east positive |
 | shown or hovered | 10.752 |
 | shown or hovered | Degrees east of Greenwich, e.g. 10.752; west is negative |
-| shown or hovered | Instant (UTC) |
+| shown or hovered | Chart time (UTC) |
 | shown or hovered | 2026-03-20 21:33:00 |
-| shown or hovered | The moment the lines are drawn for, as 2026-03-20 21:33:00 |
+| shown or hovered | The chart time: the one moment every line and body is drawn for, as 2026-03-20 21:33:00 |
+| shown or hovered | Local sidereal time |
+| shown or hovered | 10:09 |
+| shown or hovered | Hours:minutes of local apparent sidereal time, as 03:17; the chart time moves to it on the same UTC date |
 | shown or hovered | The chart is drawn for that instant and stays there. Nothing ticks. |
 | shown or hovered | Meridian |
 | shown or hovered | Draw the great circle through both celestial poles and your zenith (⌘K then R) |
@@ -143,8 +151,10 @@ Packed 420 × 284 px, `en`.
 | spoken | Degrees north of the equator, negative south, -90 to 90 |
 | spoken | Longitude, east positive |
 | spoken | Degrees east of Greenwich; west is negative |
-| spoken | Instant (UTC) |
-| spoken | The instant used to draw the reference lines. Time does not advance until you change it. |
+| spoken | Chart time (UTC) |
+| spoken | The chart time: the one instant the reference lines and every enabled body are drawn for. It does not advance until you change it. |
+| spoken | Local sidereal time |
+| spoken | Sets the chart time to the instant on the chart time's UTC date when this local apparent sidereal time stands on the meridian, the nearer one when the date holds it twice. The date is changed in the chart time field, never here. |
 | spoken | The chart is drawn for that instant and stays there. Nothing ticks. |
 | spoken | Show Meridian |
 | spoken | Draws the line that runs from due north, through the point overhead, to due south. It lasts as long as this session. |
@@ -158,7 +168,7 @@ Packed 420 × 284 px, `en`.
 | spoken | Freezes the chart at the present moment. The clock is read once; nothing moves afterwards. |
 | spoken | Centre on zenith |
 | spoken | Moves the page to the point directly above you. This is the only control in this window that moves the chart. |
-| access letters | L G U M H Z A N C |
+| access letters | L G U S M H Z A N C |
 
 
 ### Santiago — south and west
@@ -167,7 +177,7 @@ South latitude and west longitude are negative. A translation that rendered a mi
 
 ![](placeandtime-en-3-santiago.png)
 
-Packed 420 × 284 px, `en`.
+Packed 420 × 313 px, `en`.
 
 | channel | words |
 |---|---|
@@ -179,9 +189,12 @@ Packed 420 × 284 px, `en`.
 | shown or hovered | Longitude, east positive |
 | shown or hovered | -70.6693 |
 | shown or hovered | Degrees east of Greenwich, e.g. 10.752; west is negative |
-| shown or hovered | Instant (UTC) |
+| shown or hovered | Chart time (UTC) |
 | shown or hovered | 2026-03-20 21:33:00 |
-| shown or hovered | The moment the lines are drawn for, as 2026-03-20 21:33:00 |
+| shown or hovered | The chart time: the one moment every line and body is drawn for, as 2026-03-20 21:33:00 |
+| shown or hovered | Local sidereal time |
+| shown or hovered | 04:44 |
+| shown or hovered | Hours:minutes of local apparent sidereal time, as 03:17; the chart time moves to it on the same UTC date |
 | shown or hovered | The chart is drawn for that instant and stays there. Nothing ticks. |
 | shown or hovered | Meridian |
 | shown or hovered | Draw the great circle through both celestial poles and your zenith (⌘K then R) |
@@ -199,8 +212,10 @@ Packed 420 × 284 px, `en`.
 | spoken | Degrees north of the equator, negative south, -90 to 90 |
 | spoken | Longitude, east positive |
 | spoken | Degrees east of Greenwich; west is negative |
-| spoken | Instant (UTC) |
-| spoken | The instant used to draw the reference lines. Time does not advance until you change it. |
+| spoken | Chart time (UTC) |
+| spoken | The chart time: the one instant the reference lines and every enabled body are drawn for. It does not advance until you change it. |
+| spoken | Local sidereal time |
+| spoken | Sets the chart time to the instant on the chart time's UTC date when this local apparent sidereal time stands on the meridian, the nearer one when the date holds it twice. The date is changed in the chart time field, never here. |
 | spoken | The chart is drawn for that instant and stays there. Nothing ticks. |
 | spoken | Show Meridian |
 | spoken | Draws the line that runs from due north, through the point overhead, to due south. It lasts as long as this session. |
@@ -214,7 +229,7 @@ Packed 420 × 284 px, `en`.
 | spoken | Freezes the chart at the present moment. The clock is read once; nothing moves afterwards. |
 | spoken | Centre on zenith |
 | spoken | Moves the page to the point directly above you. This is the only control in this window that moves the chart. |
-| access letters | L G U M H Z A N C |
+| access letters | L G U S M H Z A N C |
 
 
 ### Every line off
@@ -223,7 +238,7 @@ All three switches clear. The words do not change with the switch - a checkbox s
 
 ![](placeandtime-en-4-lines-off.png)
 
-Packed 420 × 284 px, `en`.
+Packed 420 × 313 px, `en`.
 
 | channel | words |
 |---|---|
@@ -235,9 +250,12 @@ Packed 420 × 284 px, `en`.
 | shown or hovered | Longitude, east positive |
 | shown or hovered | 10.752 |
 | shown or hovered | Degrees east of Greenwich, e.g. 10.752; west is negative |
-| shown or hovered | Instant (UTC) |
+| shown or hovered | Chart time (UTC) |
 | shown or hovered | 2026-03-20 21:33:00 |
-| shown or hovered | The moment the lines are drawn for, as 2026-03-20 21:33:00 |
+| shown or hovered | The chart time: the one moment every line and body is drawn for, as 2026-03-20 21:33:00 |
+| shown or hovered | Local sidereal time |
+| shown or hovered | 10:09 |
+| shown or hovered | Hours:minutes of local apparent sidereal time, as 03:17; the chart time moves to it on the same UTC date |
 | shown or hovered | The chart is drawn for that instant and stays there. Nothing ticks. |
 | shown or hovered | Meridian |
 | shown or hovered | Draw the great circle through both celestial poles and your zenith (⌘K then R) |
@@ -255,8 +273,10 @@ Packed 420 × 284 px, `en`.
 | spoken | Degrees north of the equator, negative south, -90 to 90 |
 | spoken | Longitude, east positive |
 | spoken | Degrees east of Greenwich; west is negative |
-| spoken | Instant (UTC) |
-| spoken | The instant used to draw the reference lines. Time does not advance until you change it. |
+| spoken | Chart time (UTC) |
+| spoken | The chart time: the one instant the reference lines and every enabled body are drawn for. It does not advance until you change it. |
+| spoken | Local sidereal time |
+| spoken | Sets the chart time to the instant on the chart time's UTC date when this local apparent sidereal time stands on the meridian, the nearer one when the date holds it twice. The date is changed in the chart time field, never here. |
 | spoken | The chart is drawn for that instant and stays there. Nothing ticks. |
 | spoken | Show Meridian |
 | spoken | Draws the line that runs from due north, through the point overhead, to due south. It lasts as long as this session. |
@@ -270,7 +290,7 @@ Packed 420 × 284 px, `en`.
 | spoken | Freezes the chart at the present moment. The clock is read once; nothing moves afterwards. |
 | spoken | Centre on zenith |
 | spoken | Moves the page to the point directly above you. This is the only control in this window that moves the chart. |
-| access letters | L G U M H Z A N C |
+| access letters | L G U S M H Z A N C |
 
 
 ### Every line on
@@ -279,7 +299,7 @@ All three set, the zenith included. The zenith has no keystroke of its own and i
 
 ![](placeandtime-en-5-lines-on.png)
 
-Packed 420 × 284 px, `en`.
+Packed 420 × 313 px, `en`.
 
 | channel | words |
 |---|---|
@@ -291,9 +311,12 @@ Packed 420 × 284 px, `en`.
 | shown or hovered | Longitude, east positive |
 | shown or hovered | 10.752 |
 | shown or hovered | Degrees east of Greenwich, e.g. 10.752; west is negative |
-| shown or hovered | Instant (UTC) |
+| shown or hovered | Chart time (UTC) |
 | shown or hovered | 2026-03-20 21:33:00 |
-| shown or hovered | The moment the lines are drawn for, as 2026-03-20 21:33:00 |
+| shown or hovered | The chart time: the one moment every line and body is drawn for, as 2026-03-20 21:33:00 |
+| shown or hovered | Local sidereal time |
+| shown or hovered | 10:09 |
+| shown or hovered | Hours:minutes of local apparent sidereal time, as 03:17; the chart time moves to it on the same UTC date |
 | shown or hovered | The chart is drawn for that instant and stays there. Nothing ticks. |
 | shown or hovered | Meridian |
 | shown or hovered | Draw the great circle through both celestial poles and your zenith (⌘K then R) |
@@ -311,8 +334,10 @@ Packed 420 × 284 px, `en`.
 | spoken | Degrees north of the equator, negative south, -90 to 90 |
 | spoken | Longitude, east positive |
 | spoken | Degrees east of Greenwich; west is negative |
-| spoken | Instant (UTC) |
-| spoken | The instant used to draw the reference lines. Time does not advance until you change it. |
+| spoken | Chart time (UTC) |
+| spoken | The chart time: the one instant the reference lines and every enabled body are drawn for. It does not advance until you change it. |
+| spoken | Local sidereal time |
+| spoken | Sets the chart time to the instant on the chart time's UTC date when this local apparent sidereal time stands on the meridian, the nearer one when the date holds it twice. The date is changed in the chart time field, never here. |
 | spoken | The chart is drawn for that instant and stays there. Nothing ticks. |
 | spoken | Show Meridian |
 | spoken | Draws the line that runs from due north, through the point overhead, to due south. It lasts as long as this session. |
@@ -326,7 +351,7 @@ Packed 420 × 284 px, `en`.
 | spoken | Freezes the chart at the present moment. The clock is read once; nothing moves afterwards. |
 | spoken | Centre on zenith |
 | spoken | Moves the page to the point directly above you. This is the only control in this window that moves the chart. |
-| access letters | L G U M H Z A N C |
+| access letters | L G U S M H Z A N C |
 
 
 ### The frozen note, dark
@@ -346,7 +371,7 @@ easiest to get wrong.
 
 ![](placeandtime-en-6-dark.png)
 
-Packed 420 × 284 px, `en`.
+Packed 420 × 313 px, `en`.
 
 | channel | words |
 |---|---|
@@ -358,9 +383,12 @@ Packed 420 × 284 px, `en`.
 | shown or hovered | Longitude, east positive |
 | shown or hovered | 10.752 |
 | shown or hovered | Degrees east of Greenwich, e.g. 10.752; west is negative |
-| shown or hovered | Instant (UTC) |
+| shown or hovered | Chart time (UTC) |
 | shown or hovered | 2026-03-20 21:33:00 |
-| shown or hovered | The moment the lines are drawn for, as 2026-03-20 21:33:00 |
+| shown or hovered | The chart time: the one moment every line and body is drawn for, as 2026-03-20 21:33:00 |
+| shown or hovered | Local sidereal time |
+| shown or hovered | 10:09 |
+| shown or hovered | Hours:minutes of local apparent sidereal time, as 03:17; the chart time moves to it on the same UTC date |
 | shown or hovered | The chart is drawn for that instant and stays there. Nothing ticks. |
 | shown or hovered | Meridian |
 | shown or hovered | Draw the great circle through both celestial poles and your zenith (⌘K then R) |
@@ -378,8 +406,10 @@ Packed 420 × 284 px, `en`.
 | spoken | Degrees north of the equator, negative south, -90 to 90 |
 | spoken | Longitude, east positive |
 | spoken | Degrees east of Greenwich; west is negative |
-| spoken | Instant (UTC) |
-| spoken | The instant used to draw the reference lines. Time does not advance until you change it. |
+| spoken | Chart time (UTC) |
+| spoken | The chart time: the one instant the reference lines and every enabled body are drawn for. It does not advance until you change it. |
+| spoken | Local sidereal time |
+| spoken | Sets the chart time to the instant on the chart time's UTC date when this local apparent sidereal time stands on the meridian, the nearer one when the date holds it twice. The date is changed in the chart time field, never here. |
 | spoken | The chart is drawn for that instant and stays there. Nothing ticks. |
 | spoken | Show Meridian |
 | spoken | Draws the line that runs from due north, through the point overhead, to due south. It lasts as long as this session. |
@@ -393,7 +423,7 @@ Packed 420 × 284 px, `en`.
 | spoken | Freezes the chart at the present moment. The clock is read once; nothing moves afterwards. |
 | spoken | Centre on zenith |
 | spoken | Moves the page to the point directly above you. This is the only control in this window that moves the chart. |
-| access letters | L G U M H Z A N C |
+| access letters | L G U S M H Z A N C |
 
 
 #### The eight access letters
@@ -402,7 +432,7 @@ Packed 420 × 284 px, `en`.
 |---|---|---|
 | `placeandtime.latitude` | Latitude | L |
 | `placeandtime.longitude` | Longitude, east positive | G |
-| `placeandtime.instant` | Instant (UTC) | U |
+| `placeandtime.instant` | Chart time (UTC) | U |
 | `placeandtime.meridian` | Meridian | M |
 | `placeandtime.horizon` | Mathematical horizon | H |
 | `placeandtime.zenith` | Zenith | Z |
@@ -427,7 +457,7 @@ The released default: the equator at Greenwich. Neutral, and honest about being 
 
 ![](placeandtime-nb-NO-7-default.png)
 
-Packed 420 × 284 px, `nb-NO`.
+Packed 420 × 313 px, `nb-NO`.
 
 | channel | words |
 |---|---|
@@ -438,9 +468,12 @@ Packed 420 × 284 px, `nb-NO`.
 | shown or hovered | Grader nord for ekvator, f.eks. 59.913; sørlige breddegrader er negative, -90 til 90 |
 | shown or hovered | Lengdegrad, øst positiv |
 | shown or hovered | Grader øst for Greenwich, f.eks. 10.752; vestlige lengdegrader er negative |
-| shown or hovered | Tidspunkt (UTC) |
+| shown or hovered | Karttid (UTC) |
 | shown or hovered | 2026-03-20 21:33:00 |
-| shown or hovered | Tidspunktet linjene tegnes for, som 2026-03-20 21:33:00 |
+| shown or hovered | Karttiden: det ene tidspunktet hver linje og hvert himmellegeme tegnes for, som 2026-03-20 21:33:00 |
+| shown or hovered | Lokal stjernetid |
+| shown or hovered | 09:26 |
+| shown or hovered | Timer:minutter lokal tilsynelatende stjernetid, som 03:17; karttiden flyttes dit på samme UTC-dato |
 | shown or hovered | Kartet tegnes for dette tidspunktet. Tiden går ikke videre av seg selv. |
 | shown or hovered | Meridian |
 | shown or hovered | Tegn storsirkelen gjennom begge himmelpolene og senit (⌘K deretter R) |
@@ -458,8 +491,10 @@ Packed 420 × 284 px, `nb-NO`.
 | spoken | Grader nord for ekvator; sørlige breddegrader er negative, -90 til 90 |
 | spoken | Lengdegrad, øst positiv |
 | spoken | Grader øst for Greenwich; vestlige lengdegrader er negative |
-| spoken | Tidspunkt (UTC) |
-| spoken | Tidspunktet som brukes til å tegne referanselinjene. Tiden går ikke videre før du endrer tidspunktet. |
+| spoken | Karttid (UTC) |
+| spoken | Karttiden: det ene tidspunktet referanselinjene og hvert påslått himmellegeme tegnes for. Den går ikke videre før du endrer den. |
+| spoken | Lokal stjernetid |
+| spoken | Setter karttiden til tidspunktet på karttidens UTC-dato da denne lokale tilsynelatende stjernetiden står på meridianen, det nærmeste når datoen har den to ganger. Datoen endres i karttidsfeltet, aldri her. |
 | spoken | Kartet tegnes for dette tidspunktet. Tiden går ikke videre av seg selv. |
 | spoken | Vis meridianen |
 | spoken | Tegner linjen som går fra rett nord, gjennom punktet rett over deg, til rett sør. Valget gjelder ut denne økten. |
@@ -473,7 +508,7 @@ Packed 420 × 284 px, `nb-NO`.
 | spoken | Tegner kartet for tidspunktet nå. Klokken leses én gang; tiden går ikke videre etterpå. |
 | spoken | Sentrer på senit |
 | spoken | Flytter siden til punktet rett over deg. Dette er den eneste knappen i dette vinduet som flytter kartet. |
-| access letters | B L T M H S Y N R |
+| access letters | B L T K M H S Y N R |
 
 
 ### Oslo — north and east
@@ -482,7 +517,7 @@ East longitude is positive. The number and its sign are notation and are identic
 
 ![](placeandtime-nb-NO-8-oslo.png)
 
-Packed 420 × 284 px, `nb-NO`.
+Packed 420 × 313 px, `nb-NO`.
 
 | channel | words |
 |---|---|
@@ -494,9 +529,12 @@ Packed 420 × 284 px, `nb-NO`.
 | shown or hovered | Lengdegrad, øst positiv |
 | shown or hovered | 10.752 |
 | shown or hovered | Grader øst for Greenwich, f.eks. 10.752; vestlige lengdegrader er negative |
-| shown or hovered | Tidspunkt (UTC) |
+| shown or hovered | Karttid (UTC) |
 | shown or hovered | 2026-03-20 21:33:00 |
-| shown or hovered | Tidspunktet linjene tegnes for, som 2026-03-20 21:33:00 |
+| shown or hovered | Karttiden: det ene tidspunktet hver linje og hvert himmellegeme tegnes for, som 2026-03-20 21:33:00 |
+| shown or hovered | Lokal stjernetid |
+| shown or hovered | 10:09 |
+| shown or hovered | Timer:minutter lokal tilsynelatende stjernetid, som 03:17; karttiden flyttes dit på samme UTC-dato |
 | shown or hovered | Kartet tegnes for dette tidspunktet. Tiden går ikke videre av seg selv. |
 | shown or hovered | Meridian |
 | shown or hovered | Tegn storsirkelen gjennom begge himmelpolene og senit (⌘K deretter R) |
@@ -514,8 +552,10 @@ Packed 420 × 284 px, `nb-NO`.
 | spoken | Grader nord for ekvator; sørlige breddegrader er negative, -90 til 90 |
 | spoken | Lengdegrad, øst positiv |
 | spoken | Grader øst for Greenwich; vestlige lengdegrader er negative |
-| spoken | Tidspunkt (UTC) |
-| spoken | Tidspunktet som brukes til å tegne referanselinjene. Tiden går ikke videre før du endrer tidspunktet. |
+| spoken | Karttid (UTC) |
+| spoken | Karttiden: det ene tidspunktet referanselinjene og hvert påslått himmellegeme tegnes for. Den går ikke videre før du endrer den. |
+| spoken | Lokal stjernetid |
+| spoken | Setter karttiden til tidspunktet på karttidens UTC-dato da denne lokale tilsynelatende stjernetiden står på meridianen, det nærmeste når datoen har den to ganger. Datoen endres i karttidsfeltet, aldri her. |
 | spoken | Kartet tegnes for dette tidspunktet. Tiden går ikke videre av seg selv. |
 | spoken | Vis meridianen |
 | spoken | Tegner linjen som går fra rett nord, gjennom punktet rett over deg, til rett sør. Valget gjelder ut denne økten. |
@@ -529,7 +569,7 @@ Packed 420 × 284 px, `nb-NO`.
 | spoken | Tegner kartet for tidspunktet nå. Klokken leses én gang; tiden går ikke videre etterpå. |
 | spoken | Sentrer på senit |
 | spoken | Flytter siden til punktet rett over deg. Dette er den eneste knappen i dette vinduet som flytter kartet. |
-| access letters | B L T M H S Y N R |
+| access letters | B L T K M H S Y N R |
 
 
 ### Santiago — south and west
@@ -538,7 +578,7 @@ South latitude and west longitude are negative. A translation that rendered a mi
 
 ![](placeandtime-nb-NO-9-santiago.png)
 
-Packed 420 × 284 px, `nb-NO`.
+Packed 420 × 313 px, `nb-NO`.
 
 | channel | words |
 |---|---|
@@ -550,9 +590,12 @@ Packed 420 × 284 px, `nb-NO`.
 | shown or hovered | Lengdegrad, øst positiv |
 | shown or hovered | -70.6693 |
 | shown or hovered | Grader øst for Greenwich, f.eks. 10.752; vestlige lengdegrader er negative |
-| shown or hovered | Tidspunkt (UTC) |
+| shown or hovered | Karttid (UTC) |
 | shown or hovered | 2026-03-20 21:33:00 |
-| shown or hovered | Tidspunktet linjene tegnes for, som 2026-03-20 21:33:00 |
+| shown or hovered | Karttiden: det ene tidspunktet hver linje og hvert himmellegeme tegnes for, som 2026-03-20 21:33:00 |
+| shown or hovered | Lokal stjernetid |
+| shown or hovered | 04:44 |
+| shown or hovered | Timer:minutter lokal tilsynelatende stjernetid, som 03:17; karttiden flyttes dit på samme UTC-dato |
 | shown or hovered | Kartet tegnes for dette tidspunktet. Tiden går ikke videre av seg selv. |
 | shown or hovered | Meridian |
 | shown or hovered | Tegn storsirkelen gjennom begge himmelpolene og senit (⌘K deretter R) |
@@ -570,8 +613,10 @@ Packed 420 × 284 px, `nb-NO`.
 | spoken | Grader nord for ekvator; sørlige breddegrader er negative, -90 til 90 |
 | spoken | Lengdegrad, øst positiv |
 | spoken | Grader øst for Greenwich; vestlige lengdegrader er negative |
-| spoken | Tidspunkt (UTC) |
-| spoken | Tidspunktet som brukes til å tegne referanselinjene. Tiden går ikke videre før du endrer tidspunktet. |
+| spoken | Karttid (UTC) |
+| spoken | Karttiden: det ene tidspunktet referanselinjene og hvert påslått himmellegeme tegnes for. Den går ikke videre før du endrer den. |
+| spoken | Lokal stjernetid |
+| spoken | Setter karttiden til tidspunktet på karttidens UTC-dato da denne lokale tilsynelatende stjernetiden står på meridianen, det nærmeste når datoen har den to ganger. Datoen endres i karttidsfeltet, aldri her. |
 | spoken | Kartet tegnes for dette tidspunktet. Tiden går ikke videre av seg selv. |
 | spoken | Vis meridianen |
 | spoken | Tegner linjen som går fra rett nord, gjennom punktet rett over deg, til rett sør. Valget gjelder ut denne økten. |
@@ -585,7 +630,7 @@ Packed 420 × 284 px, `nb-NO`.
 | spoken | Tegner kartet for tidspunktet nå. Klokken leses én gang; tiden går ikke videre etterpå. |
 | spoken | Sentrer på senit |
 | spoken | Flytter siden til punktet rett over deg. Dette er den eneste knappen i dette vinduet som flytter kartet. |
-| access letters | B L T M H S Y N R |
+| access letters | B L T K M H S Y N R |
 
 
 ### Every line off
@@ -594,7 +639,7 @@ All three switches clear. The words do not change with the switch - a checkbox s
 
 ![](placeandtime-nb-NO-10-lines-off.png)
 
-Packed 420 × 284 px, `nb-NO`.
+Packed 420 × 313 px, `nb-NO`.
 
 | channel | words |
 |---|---|
@@ -606,9 +651,12 @@ Packed 420 × 284 px, `nb-NO`.
 | shown or hovered | Lengdegrad, øst positiv |
 | shown or hovered | 10.752 |
 | shown or hovered | Grader øst for Greenwich, f.eks. 10.752; vestlige lengdegrader er negative |
-| shown or hovered | Tidspunkt (UTC) |
+| shown or hovered | Karttid (UTC) |
 | shown or hovered | 2026-03-20 21:33:00 |
-| shown or hovered | Tidspunktet linjene tegnes for, som 2026-03-20 21:33:00 |
+| shown or hovered | Karttiden: det ene tidspunktet hver linje og hvert himmellegeme tegnes for, som 2026-03-20 21:33:00 |
+| shown or hovered | Lokal stjernetid |
+| shown or hovered | 10:09 |
+| shown or hovered | Timer:minutter lokal tilsynelatende stjernetid, som 03:17; karttiden flyttes dit på samme UTC-dato |
 | shown or hovered | Kartet tegnes for dette tidspunktet. Tiden går ikke videre av seg selv. |
 | shown or hovered | Meridian |
 | shown or hovered | Tegn storsirkelen gjennom begge himmelpolene og senit (⌘K deretter R) |
@@ -626,8 +674,10 @@ Packed 420 × 284 px, `nb-NO`.
 | spoken | Grader nord for ekvator; sørlige breddegrader er negative, -90 til 90 |
 | spoken | Lengdegrad, øst positiv |
 | spoken | Grader øst for Greenwich; vestlige lengdegrader er negative |
-| spoken | Tidspunkt (UTC) |
-| spoken | Tidspunktet som brukes til å tegne referanselinjene. Tiden går ikke videre før du endrer tidspunktet. |
+| spoken | Karttid (UTC) |
+| spoken | Karttiden: det ene tidspunktet referanselinjene og hvert påslått himmellegeme tegnes for. Den går ikke videre før du endrer den. |
+| spoken | Lokal stjernetid |
+| spoken | Setter karttiden til tidspunktet på karttidens UTC-dato da denne lokale tilsynelatende stjernetiden står på meridianen, det nærmeste når datoen har den to ganger. Datoen endres i karttidsfeltet, aldri her. |
 | spoken | Kartet tegnes for dette tidspunktet. Tiden går ikke videre av seg selv. |
 | spoken | Vis meridianen |
 | spoken | Tegner linjen som går fra rett nord, gjennom punktet rett over deg, til rett sør. Valget gjelder ut denne økten. |
@@ -641,7 +691,7 @@ Packed 420 × 284 px, `nb-NO`.
 | spoken | Tegner kartet for tidspunktet nå. Klokken leses én gang; tiden går ikke videre etterpå. |
 | spoken | Sentrer på senit |
 | spoken | Flytter siden til punktet rett over deg. Dette er den eneste knappen i dette vinduet som flytter kartet. |
-| access letters | B L T M H S Y N R |
+| access letters | B L T K M H S Y N R |
 
 
 ### Every line on
@@ -650,7 +700,7 @@ All three set, the zenith included. The zenith has no keystroke of its own and i
 
 ![](placeandtime-nb-NO-11-lines-on.png)
 
-Packed 420 × 284 px, `nb-NO`.
+Packed 420 × 313 px, `nb-NO`.
 
 | channel | words |
 |---|---|
@@ -662,9 +712,12 @@ Packed 420 × 284 px, `nb-NO`.
 | shown or hovered | Lengdegrad, øst positiv |
 | shown or hovered | 10.752 |
 | shown or hovered | Grader øst for Greenwich, f.eks. 10.752; vestlige lengdegrader er negative |
-| shown or hovered | Tidspunkt (UTC) |
+| shown or hovered | Karttid (UTC) |
 | shown or hovered | 2026-03-20 21:33:00 |
-| shown or hovered | Tidspunktet linjene tegnes for, som 2026-03-20 21:33:00 |
+| shown or hovered | Karttiden: det ene tidspunktet hver linje og hvert himmellegeme tegnes for, som 2026-03-20 21:33:00 |
+| shown or hovered | Lokal stjernetid |
+| shown or hovered | 10:09 |
+| shown or hovered | Timer:minutter lokal tilsynelatende stjernetid, som 03:17; karttiden flyttes dit på samme UTC-dato |
 | shown or hovered | Kartet tegnes for dette tidspunktet. Tiden går ikke videre av seg selv. |
 | shown or hovered | Meridian |
 | shown or hovered | Tegn storsirkelen gjennom begge himmelpolene og senit (⌘K deretter R) |
@@ -682,8 +735,10 @@ Packed 420 × 284 px, `nb-NO`.
 | spoken | Grader nord for ekvator; sørlige breddegrader er negative, -90 til 90 |
 | spoken | Lengdegrad, øst positiv |
 | spoken | Grader øst for Greenwich; vestlige lengdegrader er negative |
-| spoken | Tidspunkt (UTC) |
-| spoken | Tidspunktet som brukes til å tegne referanselinjene. Tiden går ikke videre før du endrer tidspunktet. |
+| spoken | Karttid (UTC) |
+| spoken | Karttiden: det ene tidspunktet referanselinjene og hvert påslått himmellegeme tegnes for. Den går ikke videre før du endrer den. |
+| spoken | Lokal stjernetid |
+| spoken | Setter karttiden til tidspunktet på karttidens UTC-dato da denne lokale tilsynelatende stjernetiden står på meridianen, det nærmeste når datoen har den to ganger. Datoen endres i karttidsfeltet, aldri her. |
 | spoken | Kartet tegnes for dette tidspunktet. Tiden går ikke videre av seg selv. |
 | spoken | Vis meridianen |
 | spoken | Tegner linjen som går fra rett nord, gjennom punktet rett over deg, til rett sør. Valget gjelder ut denne økten. |
@@ -697,7 +752,7 @@ Packed 420 × 284 px, `nb-NO`.
 | spoken | Tegner kartet for tidspunktet nå. Klokken leses én gang; tiden går ikke videre etterpå. |
 | spoken | Sentrer på senit |
 | spoken | Flytter siden til punktet rett over deg. Dette er den eneste knappen i dette vinduet som flytter kartet. |
-| access letters | B L T M H S Y N R |
+| access letters | B L T K M H S Y N R |
 
 
 ### The frozen note, dark
@@ -717,7 +772,7 @@ easiest to get wrong.
 
 ![](placeandtime-nb-NO-12-dark.png)
 
-Packed 420 × 284 px, `nb-NO`.
+Packed 420 × 313 px, `nb-NO`.
 
 | channel | words |
 |---|---|
@@ -729,9 +784,12 @@ Packed 420 × 284 px, `nb-NO`.
 | shown or hovered | Lengdegrad, øst positiv |
 | shown or hovered | 10.752 |
 | shown or hovered | Grader øst for Greenwich, f.eks. 10.752; vestlige lengdegrader er negative |
-| shown or hovered | Tidspunkt (UTC) |
+| shown or hovered | Karttid (UTC) |
 | shown or hovered | 2026-03-20 21:33:00 |
-| shown or hovered | Tidspunktet linjene tegnes for, som 2026-03-20 21:33:00 |
+| shown or hovered | Karttiden: det ene tidspunktet hver linje og hvert himmellegeme tegnes for, som 2026-03-20 21:33:00 |
+| shown or hovered | Lokal stjernetid |
+| shown or hovered | 10:09 |
+| shown or hovered | Timer:minutter lokal tilsynelatende stjernetid, som 03:17; karttiden flyttes dit på samme UTC-dato |
 | shown or hovered | Kartet tegnes for dette tidspunktet. Tiden går ikke videre av seg selv. |
 | shown or hovered | Meridian |
 | shown or hovered | Tegn storsirkelen gjennom begge himmelpolene og senit (⌘K deretter R) |
@@ -749,8 +807,10 @@ Packed 420 × 284 px, `nb-NO`.
 | spoken | Grader nord for ekvator; sørlige breddegrader er negative, -90 til 90 |
 | spoken | Lengdegrad, øst positiv |
 | spoken | Grader øst for Greenwich; vestlige lengdegrader er negative |
-| spoken | Tidspunkt (UTC) |
-| spoken | Tidspunktet som brukes til å tegne referanselinjene. Tiden går ikke videre før du endrer tidspunktet. |
+| spoken | Karttid (UTC) |
+| spoken | Karttiden: det ene tidspunktet referanselinjene og hvert påslått himmellegeme tegnes for. Den går ikke videre før du endrer den. |
+| spoken | Lokal stjernetid |
+| spoken | Setter karttiden til tidspunktet på karttidens UTC-dato da denne lokale tilsynelatende stjernetiden står på meridianen, det nærmeste når datoen har den to ganger. Datoen endres i karttidsfeltet, aldri her. |
 | spoken | Kartet tegnes for dette tidspunktet. Tiden går ikke videre av seg selv. |
 | spoken | Vis meridianen |
 | spoken | Tegner linjen som går fra rett nord, gjennom punktet rett over deg, til rett sør. Valget gjelder ut denne økten. |
@@ -764,7 +824,7 @@ Packed 420 × 284 px, `nb-NO`.
 | spoken | Tegner kartet for tidspunktet nå. Klokken leses én gang; tiden går ikke videre etterpå. |
 | spoken | Sentrer på senit |
 | spoken | Flytter siden til punktet rett over deg. Dette er den eneste knappen i dette vinduet som flytter kartet. |
-| access letters | B L T M H S Y N R |
+| access letters | B L T K M H S Y N R |
 
 
 #### The eight access letters
@@ -773,7 +833,7 @@ Packed 420 × 284 px, `nb-NO`.
 |---|---|---|
 | `placeandtime.latitude` | Breddegrad | B |
 | `placeandtime.longitude` | Lengdegrad, øst positiv | L |
-| `placeandtime.instant` | Tidspunkt (UTC) | T |
+| `placeandtime.instant` | Karttid (UTC) | T |
 | `placeandtime.meridian` | Meridian | M |
 | `placeandtime.horizon` | Matematisk horisont | H |
 | `placeandtime.zenith` | Senit | S |

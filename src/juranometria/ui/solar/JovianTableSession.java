@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import juranometria.context.ChartContext;
+import juranometria.context.ChartContextHolder;
 import juranometria.sky.Observer;
 import juranometria.solar.JovianSystemService;
 import juranometria.solar.JovianSystemService.Configuration;
@@ -29,7 +31,7 @@ import juranometria.ui.solar.SolarTableSession.Query;
  * the steps and the readings of a typed instant. What differs is the
  * answer: for each instant, Jupiter and the four Galilean moons in the
  * ruled order, from {@link JovianSystemService} and nowhere else.
- * Applying reads Place and Time's observer afresh, computes once, and
+ * Applying reads the chart's context once, computes once, and
  * tells every subscriber; nothing computes merely because a host was
  * built, opened or expanded.
  *
@@ -49,8 +51,7 @@ public final class JovianTableSession {
 
     /** What a query answered. */
     public enum Outcome {
-        ROWS, APPENDED, MOONS_OUTSIDE, OBSERVER_ABSENT, REFUSED_INSTANT,
-        REFUSED_BACKWARDS, REFUSED_ROWS, REFUSED_INTERVAL, REFUSED_MOONS_INTERVAL
+        ROWS, MOONS_OUTSIDE, OBSERVER_ABSENT, REFUSED_ROWS, REFUSED_INTERVAL, REFUSED_MOONS_INTERVAL
     }
 
     /**
@@ -63,7 +64,20 @@ public final class JovianTableSession {
 
     /** What the last application answered. */
     public record Result(Query query, Outcome outcome, List<Entry> entries,
-                         Observer observer, String detail, long instantsAsked) {
+                         Observer observer, String detail, long instantsAsked,
+                         long revision) {
+
+        /** A result before its stamp: revision 0, which a plain supplier never leaves. */
+        public Result(Query query, Outcome outcome, List<Entry> entries,
+                      Observer observer, String detail, long instantsAsked) {
+            this(query, outcome, entries, observer, detail, instantsAsked, 0);
+        }
+
+        /** This result stamped with the revision of the context it was computed at (#612). */
+        Result at(long revision) {
+            return new Result(query, outcome, entries, observer, detail, instantsAsked,
+                    revision);
+        }
 
         static Result none() {
             return new Result(null, Outcome.OBSERVER_ABSENT, List.of(), null, "", 0);
@@ -75,7 +89,10 @@ public final class JovianTableSession {
         }
     }
 
-    private final Supplier<Observer> observer;
+    /** The chart's context, read once per application: the observer and the revision it is at. */
+    private Supplier<ChartContext> context;
+    /** The holder a row may set the chart time through (#612, P2); null over a plain supplier. */
+    private ChartContextHolder installer;
     private final Supplier<JovianSystemService> service;
     private final List<Consumer<Result>> listeners = new ArrayList<>();
     private Result result = Result.none();
@@ -91,13 +108,19 @@ public final class JovianTableSession {
             throw new IllegalArgumentException(
                     "a session reads an observer and a service");
         }
-        this.observer = observer;
+        // A plain supplier of the observer (tests and photographers)
+        // stands at revision 0 for ever: nothing it answers is ever stale.
+        this.context = () -> {
+            Observer now = observer.get();
+            return now == null ? null : new ChartContext(now, 0);
+        };
         this.service = service;
     }
 
-    /** The observer Place and Time holds now, or null while it holds none. */
+    /** The observer the chart holds now, or null while it holds none. */
     public Observer observerNow() {
-        return observer.get();
+        ChartContext at = context.get();
+        return at == null ? null : at.observer();
     }
 
     /** How a host is told Place and Time changed; nothing until the atlas says. */
@@ -120,6 +143,59 @@ public final class JovianTableSession {
     /** Tells a host whenever Place and Time changes; returns its cancel. */
     public Runnable onObserverChange(Runnable listener) {
         return observerChanges.apply(listener);
+    }
+
+    /**
+     * Follows the chart's one context (#612): the observer and the
+     * revision it stands at are read together from the holder, and every
+     * host is told on the holder's own subscription - to say the table is
+     * stale (ruling P1), never to recompute.
+     */
+    public void followContext(ChartContextHolder holder) {
+        if (holder == null) {
+            throw new IllegalArgumentException("a holder to follow");
+        }
+        this.context = holder::current;
+        this.installer = holder;
+        this.observerChanges = listener -> holder.onChange(change -> listener.run())::cancel;
+    }
+
+    /** The revision the chart's context stands at now, or -1 while it holds none. */
+    public long revision() {
+        ChartContext at = context.get();
+        return at == null ? -1 : at.revision();
+    }
+
+    /**
+     * Whether the result was computed at an earlier revision of the
+     * chart's context than the chart holds now (ruling P1 on #612): the
+     * stamp decides, not a comparison of observers.
+     */
+    public boolean stale() {
+        return result.applied() && result.observer() != null
+                && result.revision() != revision();
+    }
+
+    /** Whether a host may set the chart time from a row: only over the chart's holder (#612, P2). */
+    public boolean canSetChartTime() {
+        return installer != null;
+    }
+
+    /**
+     * Sets the chart time to this instant at the chart's place - the
+     * row action <em>Set chart time to this instant</em> (#612, ruling
+     * P2) - through the holder Place and Time installs through, so
+     * every enabled body is redrawn for it. On the event thread, as
+     * every installation is; this table is then stale until computed.
+     */
+    public void setChartTime(Instant instant) {
+        if (instant == null) {
+            throw new IllegalArgumentException("an instant to set the chart time to");
+        }
+        if (installer == null) {
+            throw new IllegalStateException("this session follows no chart holder");
+        }
+        installer.install(installer.observer().at(instant));
     }
 
     /** The first civil day Jupiter answers for. */
@@ -177,10 +253,12 @@ public final class JovianTableSession {
         if (query == null) {
             throw new IllegalArgumentException("a query is required");
         }
-        Observer now = observer.get();
+        ChartContext at = context.get();
+        Observer now = at == null ? null : at.observer();
         Result answered = now == null
                 ? new Result(query, Outcome.OBSERVER_ABSENT, List.of(), null, "", 0)
-                : query.mode() == Mode.INSTANT ? instant(query, now) : range(query, now);
+                : (query.mode() == Mode.INSTANT ? instant(query, now) : range(query, now))
+                        .at(at.revision());
         result = answered;
         for (Consumer<Result> listener : List.copyOf(listeners)) {
             listener.accept(answered);
@@ -216,16 +294,10 @@ public final class JovianTableSession {
     }
 
     private Result range(Query query, Observer now) {
-        Instant from = SolarTableSession.parse(query.start());
-        Instant to = SolarTableSession.parse(query.end());
-        if (from == null || to == null) {
-            return new Result(query, Outcome.REFUSED_INSTANT, List.of(), now,
-                    from == null ? query.start() : query.end(), 0);
-        }
         Duration by = SolarTableSession.STEPS.get(query.step());
-        if (to.isBefore(from)) {
-            return new Result(query, Outcome.REFUSED_BACKWARDS, List.of(), now, "", 0);
-        }
+        Instant[] edges = SolarTableSession.edges(query, now.instant());
+        Instant from = edges[0];
+        Instant to = edges[1];
         long instants = TimeRange.rowsOf(from, to, by);
         if (instants > MAX_INSTANTS) {
             return new Result(query, Outcome.REFUSED_ROWS, List.of(), now, "", instants);
@@ -249,8 +321,7 @@ public final class JovianTableSession {
             Configuration c = jovian.observeMoons(now.at(sample.instant()));
             entries.add(new Entry(sample, c.jupiter(), c));
         }
-        boolean appended = entries.get(entries.size() - 1).sample().appendedEnd();
-        return new Result(query, appended ? Outcome.APPENDED : Outcome.ROWS,
-                List.copyOf(entries), now, "", entries.size());
+        return new Result(query, Outcome.ROWS, List.copyOf(entries), now, "", entries.size());
     }
+
 }

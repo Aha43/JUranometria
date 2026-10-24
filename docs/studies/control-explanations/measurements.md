@@ -53,10 +53,10 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Menu bar | JCheckBoxMenuItem | Inspector | &mdash; | Shows or hides the panel that describes the selected mark and what is on this page | self-explanatory |
 | Menu bar | JCheckBoxMenuItem | Ecliptic | &mdash; | Shows or hides the ecliptic and its equinox and solstice marks. The chart shortcut is <... | self-explanatory |
 | Menu bar | JMenu | Solar System | &mdash; | The Sun, Mercury, Venus, the Moon, Jupiter and Saturn: whether each is drawn on the cha... | self-explanatory |
-| Menu bar | JCheckBoxMenuItem | Sun on the chart | &mdash; | Shows or hides the Sun on the chart, drawn at its true size where it stands for the pla... | self-explanatory |
-| Menu bar | JCheckBoxMenuItem | Moon on the chart | &mdash; | Shows or hides the Moon on the chart, drawn at its true size where it stands for the pl... | self-explanatory |
-| Menu bar | JMenuItem | Sun... | Where the Sun is, for the place and instant set in Place and Time | Opens a table of the Sun's computed position, height above the horizon, distance and ap... | hovered |
-| Menu bar | JMenuItem | Moon... | Where the Moon is, for the place and instant set in Place and Time | Opens a table of the Moon's computed position, height above the horizon, distance, appa... | hovered |
+| Menu bar | JCheckBoxMenuItem | Sun on the chart | &mdash; | Shows or hides the Sun on the chart, drawn at its true size where it stands for the cha... | self-explanatory |
+| Menu bar | JCheckBoxMenuItem | Moon on the chart | &mdash; | Shows or hides the Moon on the chart, drawn at its true size where it stands for the ch... | self-explanatory |
+| Menu bar | JMenuItem | Sun... | Where the Sun is, for the chart time and place | Opens a table of the Sun's computed position, height above the horizon, distance and ap... | hovered |
+| Menu bar | JMenuItem | Moon... | Where the Moon is, for the chart time and place | Opens a table of the Moon's computed position, height above the horizon, distance, appa... | hovered |
 | Menu bar | JMenuItem | Zoom In | &mdash; | Shows a narrower field, with fainter stars on it | self-explanatory |
 | Menu bar | JMenuItem | Zoom Out | &mdash; | Shows a wider field, with fewer stars on it | self-explanatory |
 | Menu bar | JMenu | Help | &mdash; | Information about this application and what it is built on | self-explanatory |
@@ -88,7 +88,8 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Chart Options | JButton | Close | &mdash; | Closes this window. Every change made here is already on the chart and remembered. | self-explanatory |
 | Place and Time | CommitField | (a field) | Degrees north of the equator, e.g. 59.913; south is negative, -90 to 90 | Degrees north of the equator, negative south, -90 to 90 | hovered |
 | Place and Time | CommitField | (a field) | Degrees east of Greenwich, e.g. 10.752; west is negative | Degrees east of Greenwich; west is negative | hovered |
-| Place and Time | CommitField | (a field) | The moment the lines are drawn for, as 2026-03-20 21:33:00 | The instant used to draw the reference lines. Time does not advance until you change it. | hovered |
+| Place and Time | CommitField | (a field) | The chart time: the one moment every line and body is drawn for, as 2026-03-20 21:33:00 | The chart time: the one instant the reference lines and every enabled body are drawn fo... | hovered |
+| Place and Time | CommitField | (a field) | Hours:minutes of local apparent sidereal time, as 03:17; the chart time moves to it on ... | Sets the chart time to the instant on the chart time's UTC date when this local apparen... | hovered |
 | Place and Time | JCheckBox | Meridian | Draw the great circle through both celestial poles and your zenith (<prefix> then R) | Draws the line that runs from due north, through the point overhead, to due south. It l... | hovered |
 | Place and Time | JCheckBox | Mathematical horizon | Draw where the sky meets a perfectly flat, transparent Earth (<prefix> then H) | Draws the circle where the sky would meet a flat and transparent Earth; your own horizo... | hovered |
 | Place and Time | JCheckBox | Zenith | Mark the point overhead | Marks the point directly above you. It is drawn with the observer's lines and has no sh... | hovered |
@@ -97,39 +98,31 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Place and Time | JButton | Centre on zenith | Move the chart to the point overhead | Moves the page to the point directly above you. This is the only control in this window... | hovered |
 | Controls | JToggleButton | ▾ Place and Time | Show or hide this section | A hidden section keeps everything it is set to; whether it is hidden is remembered. | hovered |
 | Solar System | JToggleButton | ▾ Sun | Show or hide this section | A hidden section keeps everything it is set to; whether it is hidden is remembered. | hovered |
-| Solar System | JButton | Update from Place and Time | Read the place and instant from Place and Time again | Reads the observing place and instant from Place and Time again and recomputes. The tab... | hovered |
-| Solar System | JRadioButton | This instant | One row, at the instant set in Place and Time | Shows a single row: the Sun at the observing instant set in Place and Time. | hovered |
-| Solar System | JRadioButton | Over a range | A row for every step from a start to an end | Shows a row for every step from the start to the end, both included; an end that is not... | hovered |
-| Solar System | JTextField | (a field) | yyyy-mm-dd hh:mm or hh:mm:ss, in UTC | The first instant of the range, in UTC. Starts at the instant set in Place and Time. | hovered |
-| Solar System | JTextField | (a field) | yyyy-mm-dd hh:mm or hh:mm:ss, in UTC | The last instant of the range, in UTC, included; if it is not on the grid it is added a... | hovered |
+| Solar System | JRadioButton | At chart time | One row, at the chart time | Shows a single row: the Sun at the chart time. | hovered |
+| Solar System | JRadioButton | Over a time range | A row for every step from the chart time, over a span | Shows a row for every step from the chart time over the span chosen, as many whole step... | hovered |
+| Solar System | JComboBox | (Span of the range from the chart time) | How far the rows reach from the chart time | How far from the chart time the rows reach, in whole steps of the step beside it. | hovered |
 | Solar System | JComboBox | (Step between rows) | The elapsed time between rows | The elapsed time between rows, on the UTC timeline, so a daily range does not drift acr... | hovered |
-| Solar System | JButton | Compute | Fill the table for the range above | Computes a row for every step of the range above. | hovered |
-| Solar System | JCheckBox | Sun on the chart | &mdash; | Shows or hides the Sun on the chart, drawn at its true size where it stands for the pla... | self-explanatory |
+| Solar System | JButton | Compute | Fill the table for the span and step above, from the chart time | Computes a row for every step of the span above, from the chart time now. | hovered |
+| Solar System | JCheckBox | Sun on the chart | &mdash; | Shows or hides the Sun on the chart, drawn at its true size where it stands for the cha... | self-explanatory |
 | Solar System | JToggleButton | ▸ Moon | Show or hide this section | A hidden section keeps everything it is set to; whether it is hidden is remembered. | hovered |
-| Solar System | JButton | Update from Place and Time | Read the place and instant from Place and Time again | Reads the observing place and instant from Place and Time again and recomputes. The tab... | hovered |
-| Solar System | JRadioButton | This instant | One row, at the instant set in Place and Time | Shows a single row: the Moon at the observing instant set in Place and Time. | hovered |
-| Solar System | JRadioButton | Over a range | A row for every step from a start to an end | Shows a row for every step from the start to the end, both included; an end that is not... | hovered |
-| Solar System | JTextField | (a field) | yyyy-mm-dd hh:mm or hh:mm:ss, in UTC | The first instant of the range, in UTC. Starts at the instant set in Place and Time. | hovered |
-| Solar System | JTextField | (a field) | yyyy-mm-dd hh:mm or hh:mm:ss, in UTC | The last instant of the range, in UTC, included; if it is not on the grid it is added a... | hovered |
+| Solar System | JRadioButton | At chart time | One row, at the chart time | Shows a single row: the Moon at the chart time. | hovered |
+| Solar System | JRadioButton | Over a time range | A row for every step from the chart time, over a span | Shows a row for every step from the chart time over the span chosen, as many whole step... | hovered |
+| Solar System | JComboBox | (Span of the range from the chart time) | How far the rows reach from the chart time | How far from the chart time the rows reach, in whole steps of the step beside it. | hovered |
 | Solar System | JComboBox | (Step between rows) | The elapsed time between rows | The elapsed time between rows, on the UTC timeline, so a daily range does not drift acr... | hovered |
-| Solar System | JButton | Compute | Fill the table for the range above | Computes a row for every step of the range above. | hovered |
-| Solar System | JCheckBox | Moon on the chart | &mdash; | Shows or hides the Moon on the chart, drawn at its true size where it stands for the pl... | self-explanatory |
-| Sun table | JButton | Update from Place and Time | Read the place and instant from Place and Time again | Reads the observing place and instant from Place and Time again and recomputes. The tab... | hovered |
-| Sun table | JRadioButton | This instant | One row, at the instant set in Place and Time | Shows a single row: the Sun at the observing instant set in Place and Time. | hovered |
-| Sun table | JRadioButton | Over a range | A row for every step from a start to an end | Shows a row for every step from the start to the end, both included; an end that is not... | hovered |
-| Sun table | JTextField | (a field) | yyyy-mm-dd hh:mm or hh:mm:ss, in UTC | The first instant of the range, in UTC. Starts at the instant set in Place and Time. | hovered |
-| Sun table | JTextField | (a field) | yyyy-mm-dd hh:mm or hh:mm:ss, in UTC | The last instant of the range, in UTC, included; if it is not on the grid it is added a... | hovered |
+| Solar System | JButton | Compute | Fill the table for the span and step above, from the chart time | Computes a row for every step of the span above, from the chart time now. | hovered |
+| Solar System | JCheckBox | Moon on the chart | &mdash; | Shows or hides the Moon on the chart, drawn at its true size where it stands for the ch... | self-explanatory |
+| Sun table | JRadioButton | At chart time | One row, at the chart time | Shows a single row: the Sun at the chart time. | hovered |
+| Sun table | JRadioButton | Over a time range | A row for every step from the chart time, over a span | Shows a row for every step from the chart time over the span chosen, as many whole step... | hovered |
+| Sun table | JComboBox | (Span of the range from the chart time) | How far the rows reach from the chart time | How far from the chart time the rows reach, in whole steps of the step beside it. | hovered |
 | Sun table | JComboBox | (Step between rows) | The elapsed time between rows | The elapsed time between rows, on the UTC timeline, so a daily range does not drift acr... | hovered |
-| Sun table | JButton | Compute | Fill the table for the range above | Computes a row for every step of the range above. | hovered |
+| Sun table | JButton | Compute | Fill the table for the span and step above, from the chart time | Computes a row for every step of the span above, from the chart time now. | hovered |
 | Sun table | JTable | (The Sun's computed quantities) | &mdash; | Each row is one instant. The columns are the instant in UTC; right ascension and declin... | self-explanatory |
 | Sun table | JButton | Close | &mdash; | Closes the table. Nothing is changed or remembered; Place and Time keeps the place and ... | self-explanatory |
-| Moon table | JButton | Update from Place and Time | Read the place and instant from Place and Time again | Reads the observing place and instant from Place and Time again and recomputes. The tab... | hovered |
-| Moon table | JRadioButton | This instant | One row, at the instant set in Place and Time | Shows a single row: the Moon at the observing instant set in Place and Time. | hovered |
-| Moon table | JRadioButton | Over a range | A row for every step from a start to an end | Shows a row for every step from the start to the end, both included; an end that is not... | hovered |
-| Moon table | JTextField | (a field) | yyyy-mm-dd hh:mm or hh:mm:ss, in UTC | The first instant of the range, in UTC. Starts at the instant set in Place and Time. | hovered |
-| Moon table | JTextField | (a field) | yyyy-mm-dd hh:mm or hh:mm:ss, in UTC | The last instant of the range, in UTC, included; if it is not on the grid it is added a... | hovered |
+| Moon table | JRadioButton | At chart time | One row, at the chart time | Shows a single row: the Moon at the chart time. | hovered |
+| Moon table | JRadioButton | Over a time range | A row for every step from the chart time, over a span | Shows a row for every step from the chart time over the span chosen, as many whole step... | hovered |
+| Moon table | JComboBox | (Span of the range from the chart time) | How far the rows reach from the chart time | How far from the chart time the rows reach, in whole steps of the step beside it. | hovered |
 | Moon table | JComboBox | (Step between rows) | The elapsed time between rows | The elapsed time between rows, on the UTC timeline, so a daily range does not drift acr... | hovered |
-| Moon table | JButton | Compute | Fill the table for the range above | Computes a row for every step of the range above. | hovered |
+| Moon table | JButton | Compute | Fill the table for the span and step above, from the chart time | Computes a row for every step of the span above, from the chart time now. | hovered |
 | Moon table | JTable | (The Moon's computed quantities) | &mdash; | Each row is one instant. The columns are the instant in UTC; right ascension and declin... | self-explanatory |
 | Moon table | JButton | Close | &mdash; | Closes the table. Nothing is changed or remembered; Place and Time keeps the place and ... | self-explanatory |
 | Export Chart Sheet | JComboBox | (Format) | Choose SVG or PDF for a line drawing, or PNG for a picture | Chooses the file the sheet is written as. SVG and PDF keep the drawing as lines; PNG is... | hovered |
@@ -157,13 +150,14 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Inspector | JButton | ✕ | Remove M 31 from the working selection | Takes M 31 out of the working selection. The rest stay, and the page does not move. | hovered |
 | Inspector | JButton | Clear selection | Remove every working mark | Empties the whole working selection. The page and your place in it are left alone. | hovered |
 | Inspector | JButton | Centre here | Centre the chart on the selected object | Moves the page so the object shown here sits at the centre; nothing about what the char... | hovered |
+| Inspector | JButton | Set chart time to its next meridian transit | Move the chart time forward to the next upper culmination of the selected object | Sets the chart time to the next instant, at or after the chart time now, when the selec... | hovered |
 | On this page | JTable | (Objects on this page) | &mdash; | Choose rows to mark them on the chart. Marking does not move the page. | self-explanatory |
 | On this page | JButton | Centre here | Choose a row's mark first, and this centres the chart on it | Unavailable until a row is marked: mark one and this moves the page to it | dynamic |
 | On this page | JButton | Clear marks | Nothing is marked yet | Unavailable: there are no working marks to remove | dynamic |
 
 ## The audit
 
-**146 operable controls** across 17 surfaces: **90** hovered, **12** dynamic, **44** left to their own visible words, **0 undecided**.
+**140 operable controls** across 17 surfaces: **84** hovered, **12** dynamic, **44** left to their own visible words, **0 undecided**.
 
 **0** say the same words twice - a tooltip read back as a description. The seam refuses it, so this is zero or a finding.
 

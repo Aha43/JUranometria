@@ -91,6 +91,8 @@ public final class PlaceAndTimePanel extends JPanel {
                 degrees(module.observer().eastLongitudeDegrees()));
         CommitField instant = new CommitField("instantField",
                 SHOWN.format(module.observer().instant()));
+        CommitField sidereal = new CommitField("siderealField",
+                siderealShown(module.observer()));
 
         panel.add(row(said.say("placeandtime.latitude.label"),
                 "placeandtime.latitude.mnemonic", latitude,
@@ -110,6 +112,15 @@ public final class PlaceAndTimePanel extends JPanel {
                 "placeandtime.instant.mnemonic", instant,
                 said.say("placeandtime.instant.hover"),
                 said.say("placeandtime.instant.explain"), letters));
+        panel.add(strut(6));
+        // Local sidereal time (#612 absorbing #569, ruling P3): an entry
+        // resolves to an instant on the chart time's UTC date, and the
+        // field reads the box's minute back; the date is the instant
+        // field's to change.
+        panel.add(row(said.say("placeandtime.sidereal.label"),
+                "placeandtime.sidereal.mnemonic", sidereal,
+                said.say("placeandtime.sidereal.hover"),
+                said.say("placeandtime.sidereal.explain"), letters));
         panel.add(strut(10));
 
         // A stated width, so the HTML wraps instead of clipping: at
@@ -204,6 +215,7 @@ public final class PlaceAndTimePanel extends JPanel {
             latitude.refresh();
             longitude.refresh();
             instant.refresh();
+            sidereal.refresh();
             meridian.setSelected(module.meridianShowing());
             horizon.setSelected(module.horizonShowing());
             zenith.setSelected(module.zenithShowing());
@@ -234,6 +246,8 @@ public final class PlaceAndTimePanel extends JPanel {
                 this::accepted);
         instant.refusedBy("placeandtime.refused.instant", this::refused,
                 this::accepted);
+        sidereal.refusedBy("placeandtime.refused.sidereal", this::refused,
+                this::accepted);
         latitude.onCommit(text -> parseDegrees(text, 90.0, value -> {
             module.observer(module.observer().from(value,
                     module.observer().eastLongitudeDegrees()));
@@ -252,6 +266,23 @@ public final class PlaceAndTimePanel extends JPanel {
             module.observer(module.observer().at(typed));
             return true;
         }, () -> SHOWN.format(module.observer().instant()));
+        sidereal.onCommit(text -> {
+            Integer minutes = parseSidereal(text);
+            if (minutes == null) {
+                return false;
+            }
+            // The instant on the chart time's UTC date at which this local
+            // apparent sidereal time stands on the meridian - the nearer
+            // when the date holds it twice - installed through the module
+            // as the instant field's own entry is (#612, ruling P3).
+            juranometria.sky.Observer now = module.observer();
+            Instant resolved = juranometria.sky.SiderealSolver.whenLocalSiderealTimeIs(
+                    minutes * (360.0 / (24 * 60)),
+                    now.instant().atOffset(ZoneOffset.UTC).toLocalDate(),
+                    now.eastLongitudeDegrees(), now.instant());
+            module.observer(now.at(resolved));
+            return true;
+        }, () -> siderealShown(module.observer()));
 
         // The two deliberate actions, and no others. The first is
         // Update to now - called Now until #259, renamed so the one
@@ -458,6 +489,37 @@ public final class PlaceAndTimePanel extends JPanel {
         } catch (NumberFormatException e) {
             return false;
         }
+    }
+
+    /** The local sidereal time as the box writes it: hours and minutes, truncated. */
+    private static String siderealShown(juranometria.sky.Observer at) {
+        int minutes = PlaceAndTimeFurniture.siderealMinutes(at);
+        return String.format(Locale.ROOT, "%02d:%02d", minutes / 60, minutes % 60);
+    }
+
+    /**
+     * Hours:minutes of sidereal time, 00:00 to 23:59, as minutes; null
+     * otherwise. Read without a pattern literal: a string the sky-language
+     * scanner cannot classify would otherwise need a ledger row.
+     */
+    private static Integer parseSidereal(String text) {
+        String typed = text.trim();
+        int colon = typed.indexOf(':');
+        if (colon < 1 || colon > 2 || typed.length() != colon + 3) {
+            return null;
+        }
+        int hours;
+        int minutes;
+        try {
+            hours = Integer.parseInt(typed.substring(0, colon));
+            minutes = Integer.parseInt(typed.substring(colon + 1));
+        } catch (NumberFormatException e) {
+            return null;
+        }
+        if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
+            return null;
+        }
+        return hours * 60 + minutes;
     }
 
     /** The stated format, with or without seconds; null otherwise. */

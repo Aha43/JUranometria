@@ -39,45 +39,41 @@ The fresh state: a single row at the instant Place and Time holds. A waxing cres
 
 ![](moontable-en-1-instant.png)
 
-Packed 1489 × 479 px.
+Packed 1489 × 433 px.
 
 | shown, hovered or spoken |
 |---|
 | The Moon |
-| Where the Moon is, computed from the bundled ephemeris for the observing place and instant set in Place and Time: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
-| Agreement with the chart |
-| Same place and instant as the chart: 59.91° N · 10.75° E, 2026-06-21 10:00:00 UTC |
-| Update from Place and Time |
-| Read the place and instant from Place and Time again |
-| Read the observer and instant from Place and Time again |
-| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
-| Observer at latitude 59.91, longitude 10.75 east; instant 2026-06-21 10:00:00 UTC, from Place and Time. |
-| This instant |
-| One row, at the instant set in Place and Time |
-| Show the Moon at the instant set in Place and Time |
-| Shows a single row: the Moon at the observing instant set in Place and Time. |
-| Over a range |
-| A row for every step from a start to an end |
+| Where the Moon is, computed from the bundled ephemeris for the chart time and place: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
+| Whether the table is for the chart time and place now |
+| Computed for chart time 2026-06-21 10:00:00 UTC at latitude 59.91, longitude 10.75 east. |
+| At chart time |
+| One row, at the chart time |
+| Show the Moon at the chart time |
+| Shows a single row: the Moon at the chart time. |
+| Over a time range |
+| A row for every step from the chart time, over a span |
 | Show the Moon over a range of instants |
-| Shows a row for every step from the start to the end, both included; an end that is not on the grid is added as the last row and marked. |
-| From (UTC) |
-| yyyy-mm-dd hh:mm or hh:mm:ss, in UTC |
-| The first instant of the range, in UTC. Starts at the instant set in Place and Time. |
-| To (UTC) |
-| The last instant of the range, in UTC, included; if it is not on the grid it is added as the last row and marked. |
-| Every |
-| 1 hour |
-| 6 hours |
+| Shows a row for every step from the chart time over the span chosen, as many whole steps as the span holds; the first row is the chart time, read again whenever you compute. To range from another instant, set the chart time. |
+| Span |
 | 1 day |
 | 7 days |
 | 30 days |
+| 90 days |
+| 365 days |
+| How far the rows reach from the chart time |
+| Span of the range from the chart time |
+| How far from the chart time the rows reach, in whole steps of the step beside it. |
+| Every |
+| 1 hour |
+| 6 hours |
 | The elapsed time between rows |
 | Step between rows |
 | The elapsed time between rows, on the UTC timeline, so a daily range does not drift across a change of civil clock. |
 | Compute |
-| Fill the table for the range above |
+| Fill the table for the span and step above, from the chart time |
 | Compute the range |
-| Computes a row for every step of the range above. |
+| Computes a row for every step of the span above, from the chart time now. |
 | 1 rows. |
 | Instant (UTC) |
 | Right ascension (J2000) |
@@ -94,57 +90,56 @@ Packed 1489 × 479 px.
 | The Moon's computed quantities |
 | Each row is one instant. The columns are the instant in UTC; right ascension and declination in the J2000 frame the chart is drawn in; altitude and azimuth without refraction; distance; apparent diameter; the illuminated fraction; the phase; the elongation from the Sun with the side of the Sun the Moon is on; and the lit side, the direction the light falls from. |
 | Dates before 1972-01-01 and after 2027-06-28 use an estimated clock correction. After 2026, uncertainty in local horizon coordinates cannot yet be stated precisely. The effect on the J2000 chart position remains below 90″ through 2100 under the adopted model. |
+| Set chart time to this instant |
+| Make the selected row's instant the chart time and redraw every body for it |
+| Set the chart time to the selected row's instant |
+| Sets the chart time to the instant of the selected row, as Place and Time would, so every enabled body is redrawn for it. This table is then for an earlier chart time until you compute again. |
 | Close |
 | Close the Moon table |
 | Closes the table. Nothing is changed or remembered; Place and Time keeps the place and instant. |
 
-### A range with an appended end
+### A week of daily rows from the chart time
 
-Daily rows from the instant, and an end that is not on the grid, added last and marked †. The status line says so.
+Daily rows from the chart time for a week, both ends: the first row is the chart time itself (#612, ruling P2). The status line counts them.
 
 ![](moontable-en-2-range.png)
 
-Packed 1489 × 479 px.
+Packed 1489 × 433 px.
 
 | shown, hovered or spoken |
 |---|
 | The Moon |
-| Where the Moon is, computed from the bundled ephemeris for the observing place and instant set in Place and Time: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
-| Agreement with the chart |
-| This range: 59.91° N · 10.75° E, from 2026-06-21 10:00:00 to 2026-06-24 07:30:00 UTCChart: 59.91° N · 10.75° E, 2026-06-21 10:00:00 UTC |
-| This range: 59.91° N · 10.75° E, from 2026-06-21 10:00:00 to 2026-06-24 07:30:00 UTC Chart: 59.91° N · 10.75° E, 2026-06-21 10:00:00 UTC |
-| Update from Place and Time |
-| Read the place and instant from Place and Time again |
-| Read the observer and instant from Place and Time again |
-| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
-| Observer at latitude 59.91, longitude 10.75 east; instant 2026-06-21 10:00:00 UTC, from Place and Time. |
-| This instant |
-| One row, at the instant set in Place and Time |
-| Show the Moon at the instant set in Place and Time |
-| Shows a single row: the Moon at the observing instant set in Place and Time. |
-| Over a range |
-| A row for every step from a start to an end |
+| Where the Moon is, computed from the bundled ephemeris for the chart time and place: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
+| Whether the table is for the chart time and place now |
+| Computed for chart time 2026-06-21 10:00:00 UTC at latitude 59.91, longitude 10.75 east. |
+| At chart time |
+| One row, at the chart time |
+| Show the Moon at the chart time |
+| Shows a single row: the Moon at the chart time. |
+| Over a time range |
+| A row for every step from the chart time, over a span |
 | Show the Moon over a range of instants |
-| Shows a row for every step from the start to the end, both included; an end that is not on the grid is added as the last row and marked. |
-| From (UTC) |
-| yyyy-mm-dd hh:mm or hh:mm:ss, in UTC |
-| The first instant of the range, in UTC. Starts at the instant set in Place and Time. |
-| To (UTC) |
-| The last instant of the range, in UTC, included; if it is not on the grid it is added as the last row and marked. |
-| Every |
-| 1 hour |
-| 6 hours |
+| Shows a row for every step from the chart time over the span chosen, as many whole steps as the span holds; the first row is the chart time, read again whenever you compute. To range from another instant, set the chart time. |
+| Span |
 | 1 day |
 | 7 days |
 | 30 days |
+| 90 days |
+| 365 days |
+| How far the rows reach from the chart time |
+| Span of the range from the chart time |
+| How far from the chart time the rows reach, in whole steps of the step beside it. |
+| Every |
+| 1 hour |
+| 6 hours |
 | The elapsed time between rows |
 | Step between rows |
 | The elapsed time between rows, on the UTC timeline, so a daily range does not drift across a change of civil clock. |
 | Compute |
-| Fill the table for the range above |
+| Fill the table for the span and step above, from the chart time |
 | Compute the range |
-| Computes a row for every step of the range above. |
-| 4 rows; the end is not on the grid, so it is the last row, marked †. |
+| Computes a row for every step of the span above, from the chart time now. |
+| 8 rows. |
 | Instant (UTC) |
 | Right ascension (J2000) |
 | Declination (J2000) |
@@ -159,60 +154,64 @@ Packed 1489 × 479 px.
 | 2026-06-21 10:00 · 11h 35m 54.3s · −0° 06′ 40″ · −7.17° (below the horizon) · 78.00° · 386 363 km · 30′ 55.1″ · 45.6 % · waxing crescent · 84.8° E · 294° (west-northwest) |
 | 2026-06-22 10:00 · 12h 21m 10.0s · −6° 04′ 07″ · −17.38° (below the horizon) · 71.72° · 393 033 km · 30′ 23.6″ · 55.9 % · waxing gibbous · 96.6° E · 293° (west-northwest) |
 | 2026-06-23 10:00 · 13h 06m 02.9s · −11° 39′ 10″ · −27.07° (below the horizon) · 64.92° · 398 854 km · 29′ 57.0″ · 65.6 % · waxing gibbous · 108.0° E · 291° (west-northwest) |
-| 2026-06-24 07:30 † · 13h 45m 41.5s · −16° 09′ 47″ · −45.90° (below the horizon) · 12.37° · 404 108 km · 29′ 33.6″ · 73.4 % · waxing gibbous · 117.7° E · 288° (west-northwest) |
+| 2026-06-24 10:00 · 13h 51m 34.1s · −16° 41′ 49″ · −36.12° (below the horizon) · 57.02° · 403 640 km · 29′ 35.7″ · 74.5 % · waxing gibbous · 119.2° E · 288° (west-northwest) |
+| 2026-06-25 10:00 · 14h 38m 31.1s · −21° 02′ 25″ · −44.31° (below the horizon) · 47.26° · 407 302 km · 29′ 19.7″ · 82.3 % · waxing gibbous · 130.1° E · 283° (west-northwest) |
+| 2026-06-26 10:00 · 15h 27m 23.1s · −24° 31′ 09″ · −51.24° (below the horizon) · 34.65° · 409 830 km · 29′ 08.8″ · 88.8 % · waxing gibbous · 140.8° E · 277° (west) |
+| 2026-06-27 10:00 · 16h 18m 14.5s · −26° 58′ 23″ · −56.23° (below the horizon) · 18.31° · 411 268 km · 29′ 02.7″ · 94.0 % · waxing gibbous · 151.5° E · 269° (west) |
+| 2026-06-28 10:00 · 17h 10m 40.4s · −28° 15′ 49″ · −58.38° (below the horizon) · 358.61° · 411 686 km · 29′ 01.0″ · 97.6 % · waxing gibbous · 162.0° E · 258° (west-southwest) |
 | The Moon's computed quantities |
 | Each row is one instant. The columns are the instant in UTC; right ascension and declination in the J2000 frame the chart is drawn in; altitude and azimuth without refraction; distance; apparent diameter; the illuminated fraction; the phase; the elongation from the Sun with the side of the Sun the Moon is on; and the lit side, the direction the light falls from. |
 | Dates before 1972-01-01 and after 2027-06-28 use an estimated clock correction. After 2026, uncertainty in local horizon coordinates cannot yet be stated precisely. The effect on the J2000 chart position remains below 90″ through 2100 under the adopted model. |
+| Set chart time to this instant [unavailable] |
+| Make the selected row's instant the chart time and redraw every body for it [unavailable] |
+| Set the chart time to the selected row's instant [unavailable] |
+| Sets the chart time to the instant of the selected row, as Place and Time would, so every enabled body is redrawn for it. This table is then for an earlier chart time until you compute again. [unavailable] |
 | Close |
 | Close the Moon table |
 | Closes the table. Nothing is changed or remembered; Place and Time keeps the place and instant. |
 
-### A range that runs backwards
+### A range that asks for too many rows
 
-The end is before the start. The table is empty and the status line says why; nothing is guessed.
+A year of hourly rows asks for more than the 1 000 shown. The table is empty and the status line says why; nothing is cut short silently.
 
 ![](moontable-en-3-refused.png)
 
-Packed 1489 × 479 px.
+Packed 1489 × 433 px.
 
 | shown, hovered or spoken |
 |---|
 | The Moon |
-| Where the Moon is, computed from the bundled ephemeris for the observing place and instant set in Place and Time: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
-| Agreement with the chart |
-| Chart: 59.91° N · 10.75° E, 2026-06-21 10:00:00 UTC |
-| Update from Place and Time |
-| Read the place and instant from Place and Time again |
-| Read the observer and instant from Place and Time again |
-| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
-| Observer at latitude 59.91, longitude 10.75 east; instant 2026-06-21 10:00:00 UTC, from Place and Time. |
-| This instant |
-| One row, at the instant set in Place and Time |
-| Show the Moon at the instant set in Place and Time |
-| Shows a single row: the Moon at the observing instant set in Place and Time. |
-| Over a range |
-| A row for every step from a start to an end |
+| Where the Moon is, computed from the bundled ephemeris for the chart time and place: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
+| Whether the table is for the chart time and place now |
+| Computed for chart time 2026-06-21 10:00:00 UTC at latitude 59.91, longitude 10.75 east. |
+| At chart time |
+| One row, at the chart time |
+| Show the Moon at the chart time |
+| Shows a single row: the Moon at the chart time. |
+| Over a time range |
+| A row for every step from the chart time, over a span |
 | Show the Moon over a range of instants |
-| Shows a row for every step from the start to the end, both included; an end that is not on the grid is added as the last row and marked. |
-| From (UTC) |
-| yyyy-mm-dd hh:mm or hh:mm:ss, in UTC |
-| The first instant of the range, in UTC. Starts at the instant set in Place and Time. |
-| To (UTC) |
-| The last instant of the range, in UTC, included; if it is not on the grid it is added as the last row and marked. |
-| Every |
-| 1 hour |
-| 6 hours |
+| Shows a row for every step from the chart time over the span chosen, as many whole steps as the span holds; the first row is the chart time, read again whenever you compute. To range from another instant, set the chart time. |
+| Span |
 | 1 day |
 | 7 days |
 | 30 days |
+| 90 days |
+| 365 days |
+| How far the rows reach from the chart time |
+| Span of the range from the chart time |
+| How far from the chart time the rows reach, in whole steps of the step beside it. |
+| Every |
+| 1 hour |
+| 6 hours |
 | The elapsed time between rows |
 | Step between rows |
 | The elapsed time between rows, on the UTC timeline, so a daily range does not drift across a change of civil clock. |
 | Compute |
-| Fill the table for the range above |
+| Fill the table for the span and step above, from the chart time |
 | Compute the range |
-| Computes a row for every step of the range above. |
-| The range runs backwards: the end is before the start. |
+| Computes a row for every step of the span above, from the chart time now. |
+| That range asks for 8761 rows and at most 1000 are shown; shorten it or lengthen the step. |
 | Instant (UTC) |
 | Right ascension (J2000) |
 | Declination (J2000) |
@@ -227,6 +226,10 @@ Packed 1489 × 479 px.
 | The Moon's computed quantities |
 | Each row is one instant. The columns are the instant in UTC; right ascension and declination in the J2000 frame the chart is drawn in; altitude and azimuth without refraction; distance; apparent diameter; the illuminated fraction; the phase; the elongation from the Sun with the side of the Sun the Moon is on; and the lit side, the direction the light falls from. |
 | Dates before 1972-01-01 and after 2027-06-28 use an estimated clock correction. After 2026, uncertainty in local horizon coordinates cannot yet be stated precisely. The effect on the J2000 chart position remains below 90″ through 2100 under the adopted model. |
+| Set chart time to this instant [unavailable] |
+| Make the selected row's instant the chart time and redraw every body for it [unavailable] |
+| Set the chart time to the selected row's instant [unavailable] |
+| Sets the chart time to the instant of the selected row, as Place and Time would, so every enabled body is redrawn for it. This table is then for an earlier chart time until you compute again. [unavailable] |
 | Close |
 | Close the Moon table |
 | Closes the table. Nothing is changed or remembered; Place and Time keeps the place and instant. |
@@ -237,45 +240,41 @@ A southern observer at Espenak's full-Moon instant: the Moon 74° high, 99.9 % l
 
 ![](moontable-en-4-capetown.png)
 
-Packed 1489 × 479 px.
+Packed 1489 × 433 px.
 
 | shown, hovered or spoken |
 |---|
 | The Moon |
-| Where the Moon is, computed from the bundled ephemeris for the observing place and instant set in Place and Time: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
-| Agreement with the chart |
-| Same place and instant as the chart: 33.93° S · 18.42° E, 2026-06-29 23:57:00 UTC |
-| Update from Place and Time |
-| Read the place and instant from Place and Time again |
-| Read the observer and instant from Place and Time again |
-| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
-| Observer at latitude -33.93, longitude 18.42 east; instant 2026-06-29 23:57:00 UTC, from Place and Time. |
-| This instant |
-| One row, at the instant set in Place and Time |
-| Show the Moon at the instant set in Place and Time |
-| Shows a single row: the Moon at the observing instant set in Place and Time. |
-| Over a range |
-| A row for every step from a start to an end |
+| Where the Moon is, computed from the bundled ephemeris for the chart time and place: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
+| Whether the table is for the chart time and place now |
+| Computed for chart time 2026-06-29 23:57:00 UTC at latitude -33.93, longitude 18.42 east. |
+| At chart time |
+| One row, at the chart time |
+| Show the Moon at the chart time |
+| Shows a single row: the Moon at the chart time. |
+| Over a time range |
+| A row for every step from the chart time, over a span |
 | Show the Moon over a range of instants |
-| Shows a row for every step from the start to the end, both included; an end that is not on the grid is added as the last row and marked. |
-| From (UTC) |
-| yyyy-mm-dd hh:mm or hh:mm:ss, in UTC |
-| The first instant of the range, in UTC. Starts at the instant set in Place and Time. |
-| To (UTC) |
-| The last instant of the range, in UTC, included; if it is not on the grid it is added as the last row and marked. |
-| Every |
-| 1 hour |
-| 6 hours |
+| Shows a row for every step from the chart time over the span chosen, as many whole steps as the span holds; the first row is the chart time, read again whenever you compute. To range from another instant, set the chart time. |
+| Span |
 | 1 day |
 | 7 days |
 | 30 days |
+| 90 days |
+| 365 days |
+| How far the rows reach from the chart time |
+| Span of the range from the chart time |
+| How far from the chart time the rows reach, in whole steps of the step beside it. |
+| Every |
+| 1 hour |
+| 6 hours |
 | The elapsed time between rows |
 | Step between rows |
 | The elapsed time between rows, on the UTC timeline, so a daily range does not drift across a change of civil clock. |
 | Compute |
-| Fill the table for the range above |
+| Fill the table for the span and step above, from the chart time |
 | Compute the range |
-| Computes a row for every step of the range above. |
+| Computes a row for every step of the span above, from the chart time now. |
 | 1 rows. |
 | Instant (UTC) |
 | Right ascension (J2000) |
@@ -292,53 +291,56 @@ Packed 1489 × 479 px.
 | The Moon's computed quantities |
 | Each row is one instant. The columns are the instant in UTC; right ascension and declination in the J2000 frame the chart is drawn in; altitude and azimuth without refraction; distance; apparent diameter; the illuminated fraction; the phase; the elongation from the Sun with the side of the Sun the Moon is on; and the lit side, the direction the light falls from. |
 | Dates before 1972-01-01 and after 2027-06-28 use an estimated clock correction. After 2026, uncertainty in local horizon coordinates cannot yet be stated precisely. The effect on the J2000 chart position remains below 90″ through 2100 under the adopted model. |
+| Set chart time to this instant |
+| Make the selected row's instant the chart time and redraw every body for it |
+| Set the chart time to the selected row's instant |
+| Sets the chart time to the instant of the selected row, as Place and Time would, so every enabled body is redrawn for it. This table is then for an earlier chart time until you compute again. |
 | Close |
 | Close the Moon table |
 | Closes the table. Nothing is changed or remembered; Place and Time keeps the place and instant. |
 
-### The instant, in the dark appearance
+### The chart moved on after computing
 
-![](moontable-en-5-instant-dark.png)
+The chart time moved six hours on after this instant was computed (#612, ruling P1): the rows stay, dimmed, under the stale message, until Compute; the note states the chart time and place the rows are for.
+
+![](moontable-en-5-stale.png)
 
 Packed 1489 × 479 px.
 
 | shown, hovered or spoken |
 |---|
 | The Moon |
-| Where the Moon is, computed from the bundled ephemeris for the observing place and instant set in Place and Time: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
-| Agreement with the chart |
-| Same place and instant as the chart: 59.91° N · 10.75° E, 2026-06-21 10:00:00 UTC |
-| Update from Place and Time |
-| Read the place and instant from Place and Time again |
-| Read the observer and instant from Place and Time again |
-| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
-| Observer at latitude 59.91, longitude 10.75 east; instant 2026-06-21 10:00:00 UTC, from Place and Time. |
-| This instant |
-| One row, at the instant set in Place and Time |
-| Show the Moon at the instant set in Place and Time |
-| Shows a single row: the Moon at the observing instant set in Place and Time. |
-| Over a range |
-| A row for every step from a start to an end |
+| Where the Moon is, computed from the bundled ephemeris for the chart time and place: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
+| Whether the table is for the chart time and place now |
+| Computed for the previous chart time and place — Compute again |
+| Computed for chart time 2026-06-21 10:00:00 UTC at latitude 59.91, longitude 10.75 east. |
+| At chart time |
+| One row, at the chart time |
+| Show the Moon at the chart time |
+| Shows a single row: the Moon at the chart time. |
+| Over a time range |
+| A row for every step from the chart time, over a span |
 | Show the Moon over a range of instants |
-| Shows a row for every step from the start to the end, both included; an end that is not on the grid is added as the last row and marked. |
-| From (UTC) |
-| yyyy-mm-dd hh:mm or hh:mm:ss, in UTC |
-| The first instant of the range, in UTC. Starts at the instant set in Place and Time. |
-| To (UTC) |
-| The last instant of the range, in UTC, included; if it is not on the grid it is added as the last row and marked. |
-| Every |
-| 1 hour |
-| 6 hours |
+| Shows a row for every step from the chart time over the span chosen, as many whole steps as the span holds; the first row is the chart time, read again whenever you compute. To range from another instant, set the chart time. |
+| Span |
 | 1 day |
 | 7 days |
 | 30 days |
+| 90 days |
+| 365 days |
+| How far the rows reach from the chart time |
+| Span of the range from the chart time |
+| How far from the chart time the rows reach, in whole steps of the step beside it. |
+| Every |
+| 1 hour |
+| 6 hours |
 | The elapsed time between rows |
 | Step between rows |
 | The elapsed time between rows, on the UTC timeline, so a daily range does not drift across a change of civil clock. |
 | Compute |
-| Fill the table for the range above |
+| Fill the table for the span and step above, from the chart time |
 | Compute the range |
-| Computes a row for every step of the range above. |
+| Computes a row for every step of the span above, from the chart time now. |
 | 1 rows. |
 | Instant (UTC) |
 | Right ascension (J2000) |
@@ -355,6 +357,73 @@ Packed 1489 × 479 px.
 | The Moon's computed quantities |
 | Each row is one instant. The columns are the instant in UTC; right ascension and declination in the J2000 frame the chart is drawn in; altitude and azimuth without refraction; distance; apparent diameter; the illuminated fraction; the phase; the elongation from the Sun with the side of the Sun the Moon is on; and the lit side, the direction the light falls from. |
 | Dates before 1972-01-01 and after 2027-06-28 use an estimated clock correction. After 2026, uncertainty in local horizon coordinates cannot yet be stated precisely. The effect on the J2000 chart position remains below 90″ through 2100 under the adopted model. |
+| Set chart time to this instant |
+| Make the selected row's instant the chart time and redraw every body for it |
+| Set the chart time to the selected row's instant |
+| Sets the chart time to the instant of the selected row, as Place and Time would, so every enabled body is redrawn for it. This table is then for an earlier chart time until you compute again. |
+| Close |
+| Close the Moon table |
+| Closes the table. Nothing is changed or remembered; Place and Time keeps the place and instant. |
+
+### The instant, in the dark appearance
+
+![](moontable-en-6-instant-dark.png)
+
+Packed 1489 × 433 px.
+
+| shown, hovered or spoken |
+|---|
+| The Moon |
+| Where the Moon is, computed from the bundled ephemeris for the chart time and place: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
+| Whether the table is for the chart time and place now |
+| Computed for chart time 2026-06-21 10:00:00 UTC at latitude 59.91, longitude 10.75 east. |
+| At chart time |
+| One row, at the chart time |
+| Show the Moon at the chart time |
+| Shows a single row: the Moon at the chart time. |
+| Over a time range |
+| A row for every step from the chart time, over a span |
+| Show the Moon over a range of instants |
+| Shows a row for every step from the chart time over the span chosen, as many whole steps as the span holds; the first row is the chart time, read again whenever you compute. To range from another instant, set the chart time. |
+| Span |
+| 1 day |
+| 7 days |
+| 30 days |
+| 90 days |
+| 365 days |
+| How far the rows reach from the chart time |
+| Span of the range from the chart time |
+| How far from the chart time the rows reach, in whole steps of the step beside it. |
+| Every |
+| 1 hour |
+| 6 hours |
+| The elapsed time between rows |
+| Step between rows |
+| The elapsed time between rows, on the UTC timeline, so a daily range does not drift across a change of civil clock. |
+| Compute |
+| Fill the table for the span and step above, from the chart time |
+| Compute the range |
+| Computes a row for every step of the span above, from the chart time now. |
+| 1 rows. |
+| Instant (UTC) |
+| Right ascension (J2000) |
+| Declination (J2000) |
+| Altitude (no refraction) |
+| Azimuth (from north through east) |
+| Distance |
+| Apparent diameter |
+| Illuminated |
+| Phase |
+| Elongation from the Sun |
+| Lit side |
+| 2026-06-21 10:00 · 11h 35m 54.3s · −0° 06′ 40″ · −7.17° (below the horizon) · 78.00° · 386 363 km · 30′ 55.1″ · 45.6 % · waxing crescent · 84.8° E · 294° (west-northwest) |
+| The Moon's computed quantities |
+| Each row is one instant. The columns are the instant in UTC; right ascension and declination in the J2000 frame the chart is drawn in; altitude and azimuth without refraction; distance; apparent diameter; the illuminated fraction; the phase; the elongation from the Sun with the side of the Sun the Moon is on; and the lit side, the direction the light falls from. |
+| Dates before 1972-01-01 and after 2027-06-28 use an estimated clock correction. After 2026, uncertainty in local horizon coordinates cannot yet be stated precisely. The effect on the J2000 chart position remains below 90″ through 2100 under the adopted model. |
+| Set chart time to this instant |
+| Make the selected row's instant the chart time and redraw every body for it |
+| Set the chart time to the selected row's instant |
+| Sets the chart time to the instant of the selected row, as Place and Time would, so every enabled body is redrawn for it. This table is then for an earlier chart time until you compute again. |
 | Close |
 | Close the Moon table |
 | Closes the table. Nothing is changed or remembered; Place and Time keeps the place and instant. |
@@ -381,47 +450,43 @@ Packed 1489 × 479 px.
 
 The fresh state: a single row at the instant Place and Time holds. A waxing crescent, 46 % lit, 85° east of the Sun, its lit side to the west-northwest.
 
-![](moontable-nb-NO-6-instant.png)
+![](moontable-nb-NO-7-instant.png)
 
-Packed 1489 × 479 px.
+Packed 1489 × 433 px.
 
 | shown, hovered or spoken |
 |---|
 | Månen |
-| Hvor Månen er, beregnet fra den medfølgende efemeriden for observasjonsstedet og tidspunktet satt i Sted og tid: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
-| Samsvar med kartet |
-| Samme sted og tidspunkt som kartet: 59.91° N · 10.75° Ø, 2026-06-21 10:00:00 UTC |
-| Oppdater fra Sted og tid |
-| Les sted og tidspunkt fra Sted og tid på nytt |
-| Les observatør og tidspunkt fra Sted og tid på nytt |
-| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
-| Observatør på bredde 59,91, lengde 10,75 øst; tidspunkt 2026-06-21 10:00:00 UTC, fra Sted og tid. |
-| Dette tidspunktet |
-| Én rad, ved tidspunktet satt i Sted og tid |
-| Vis Månen ved tidspunktet satt i Sted og tid |
-| Viser én rad: Månen ved observasjonstidspunktet satt i Sted og tid. |
+| Hvor Månen er, beregnet fra den medfølgende efemeriden for karttiden og observasjonsstedet: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
+| Om tabellen gjelder karttiden og stedet nå |
+| Beregnet for karttid 2026-06-21 10:00:00 UTC på bredde 59,91, lengde 10,75 øst. |
+| Ved karttid |
+| Én rad, ved karttiden |
+| Vis Månen ved karttiden |
+| Viser én rad: Månen ved karttiden. |
 | Over et tidsrom |
-| Én rad for hvert steg fra en start til en slutt |
+| Én rad for hvert steg fra karttiden, over et omfang |
 | Vis Månen over et tidsrom |
-| Viser én rad for hvert steg fra starten til slutten, begge medregnet; en slutt som ikke ligger på rutenettet, legges til som siste rad og merkes. |
-| Fra (UTC) |
-| åååå-mm-dd tt:mm eller tt:mm:ss, i UTC |
-| Første tidspunkt i tidsrommet, i UTC. Starter ved tidspunktet satt i Sted og tid. |
-| Til (UTC) |
-| Siste tidspunkt i tidsrommet, i UTC, medregnet; ligger det ikke på rutenettet, legges det til som siste rad og merkes. |
-| Hvert |
-| 1 time |
-| 6 timer |
+| Viser én rad for hvert steg fra karttiden over omfanget valgt, så mange hele steg som omfanget rommer; første rad er karttiden, lest på nytt hver gang du beregner. Sett karttiden for å regne fra et annet tidspunkt. |
+| Omfang |
 | 1 døgn |
 | 7 døgn |
 | 30 døgn |
+| 90 døgn |
+| 365 døgn |
+| Hvor langt radene rekker fra karttiden |
+| Tidsrommets omfang fra karttiden |
+| Hvor langt fra karttiden radene rekker, i hele steg av steget ved siden av. |
+| Hvert |
+| 1 time |
+| 6 timer |
 | Tiden som går mellom radene |
 | Steg mellom radene |
 | Tiden som går mellom radene, på UTC-tidslinjen, så et daglig tidsrom ikke forskyver seg ved skifte av sivil klokke. |
 | Beregn |
-| Fyll tabellen for tidsrommet over |
+| Fyll tabellen for omfanget og steget over, fra karttiden |
 | Beregn tidsrommet |
-| Beregner én rad for hvert steg i tidsrommet over. |
+| Beregner én rad for hvert steg i omfanget over, fra karttiden nå. |
 | 1 rader. |
 | Tidspunkt (UTC) |
 | Rektascensjon (J2000) |
@@ -438,57 +503,56 @@ Packed 1489 × 479 px.
 | Månens beregnede størrelser |
 | Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; høyde og asimut uten refraksjon; avstand; tilsynelatende diameter; belyst andel; fase; elongasjon fra Solen med hvilken side av Solen Månen står på; og belyst side, retningen lyset faller fra. |
 | Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 90″ fram til 2100 med den valgte modellen. |
+| Sett karttid til dette tidspunktet |
+| Gjør den valgte radens tidspunkt til karttid og tegn hvert himmellegeme på nytt for det |
+| Sett karttiden til den valgte radens tidspunkt |
+| Setter karttiden til tidspunktet i den valgte raden, slik Sted og tid ville gjort, så hvert påslått himmellegeme tegnes på nytt for det. Denne tabellen gjelder så en tidligere karttid til du beregner på nytt. |
 | Lukk |
 | Lukk månetabellen |
 | Lukker tabellen. Ingenting endres eller huskes; Sted og tid beholder stedet og tidspunktet. |
 
-### A range with an appended end
+### A week of daily rows from the chart time
 
-Daily rows from the instant, and an end that is not on the grid, added last and marked †. The status line says so.
+Daily rows from the chart time for a week, both ends: the first row is the chart time itself (#612, ruling P2). The status line counts them.
 
-![](moontable-nb-NO-7-range.png)
+![](moontable-nb-NO-8-range.png)
 
-Packed 1489 × 479 px.
+Packed 1489 × 433 px.
 
 | shown, hovered or spoken |
 |---|
 | Månen |
-| Hvor Månen er, beregnet fra den medfølgende efemeriden for observasjonsstedet og tidspunktet satt i Sted og tid: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
-| Samsvar med kartet |
-| Dette tidsrommet: 59.91° N · 10.75° Ø, fra 2026-06-21 10:00:00 til 2026-06-24 07:30:00 UTCKartet: 59.91° N · 10.75° Ø, 2026-06-21 10:00:00 UTC |
-| Dette tidsrommet: 59.91° N · 10.75° Ø, fra 2026-06-21 10:00:00 til 2026-06-24 07:30:00 UTC Kartet: 59.91° N · 10.75° Ø, 2026-06-21 10:00:00 UTC |
-| Oppdater fra Sted og tid |
-| Les sted og tidspunkt fra Sted og tid på nytt |
-| Les observatør og tidspunkt fra Sted og tid på nytt |
-| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
-| Observatør på bredde 59,91, lengde 10,75 øst; tidspunkt 2026-06-21 10:00:00 UTC, fra Sted og tid. |
-| Dette tidspunktet |
-| Én rad, ved tidspunktet satt i Sted og tid |
-| Vis Månen ved tidspunktet satt i Sted og tid |
-| Viser én rad: Månen ved observasjonstidspunktet satt i Sted og tid. |
+| Hvor Månen er, beregnet fra den medfølgende efemeriden for karttiden og observasjonsstedet: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
+| Om tabellen gjelder karttiden og stedet nå |
+| Beregnet for karttid 2026-06-21 10:00:00 UTC på bredde 59,91, lengde 10,75 øst. |
+| Ved karttid |
+| Én rad, ved karttiden |
+| Vis Månen ved karttiden |
+| Viser én rad: Månen ved karttiden. |
 | Over et tidsrom |
-| Én rad for hvert steg fra en start til en slutt |
+| Én rad for hvert steg fra karttiden, over et omfang |
 | Vis Månen over et tidsrom |
-| Viser én rad for hvert steg fra starten til slutten, begge medregnet; en slutt som ikke ligger på rutenettet, legges til som siste rad og merkes. |
-| Fra (UTC) |
-| åååå-mm-dd tt:mm eller tt:mm:ss, i UTC |
-| Første tidspunkt i tidsrommet, i UTC. Starter ved tidspunktet satt i Sted og tid. |
-| Til (UTC) |
-| Siste tidspunkt i tidsrommet, i UTC, medregnet; ligger det ikke på rutenettet, legges det til som siste rad og merkes. |
-| Hvert |
-| 1 time |
-| 6 timer |
+| Viser én rad for hvert steg fra karttiden over omfanget valgt, så mange hele steg som omfanget rommer; første rad er karttiden, lest på nytt hver gang du beregner. Sett karttiden for å regne fra et annet tidspunkt. |
+| Omfang |
 | 1 døgn |
 | 7 døgn |
 | 30 døgn |
+| 90 døgn |
+| 365 døgn |
+| Hvor langt radene rekker fra karttiden |
+| Tidsrommets omfang fra karttiden |
+| Hvor langt fra karttiden radene rekker, i hele steg av steget ved siden av. |
+| Hvert |
+| 1 time |
+| 6 timer |
 | Tiden som går mellom radene |
 | Steg mellom radene |
 | Tiden som går mellom radene, på UTC-tidslinjen, så et daglig tidsrom ikke forskyver seg ved skifte av sivil klokke. |
 | Beregn |
-| Fyll tabellen for tidsrommet over |
+| Fyll tabellen for omfanget og steget over, fra karttiden |
 | Beregn tidsrommet |
-| Beregner én rad for hvert steg i tidsrommet over. |
-| 4 rader; slutten ligger ikke på rutenettet, så den er siste rad, merket †. |
+| Beregner én rad for hvert steg i omfanget over, fra karttiden nå. |
+| 8 rader. |
 | Tidspunkt (UTC) |
 | Rektascensjon (J2000) |
 | Deklinasjon (J2000) |
@@ -503,60 +567,64 @@ Packed 1489 × 479 px.
 | 2026-06-21 10:00 · 11h 35m 54,3s · −0° 06′ 40″ · −7,17° (under horisonten) · 78,00° · 386 363 km · 30′ 55,1″ · 45,6 % · tiltagende månesigd · 84,8° Ø · 294° (vest-nordvest) |
 | 2026-06-22 10:00 · 12h 21m 10,0s · −6° 04′ 07″ · −17,38° (under horisonten) · 71,72° · 393 033 km · 30′ 23,6″ · 55,9 % · tiltagende måne, mer enn halv · 96,6° Ø · 293° (vest-nordvest) |
 | 2026-06-23 10:00 · 13h 06m 02,9s · −11° 39′ 10″ · −27,07° (under horisonten) · 64,92° · 398 854 km · 29′ 57,0″ · 65,6 % · tiltagende måne, mer enn halv · 108,0° Ø · 291° (vest-nordvest) |
-| 2026-06-24 07:30 † · 13h 45m 41,5s · −16° 09′ 47″ · −45,90° (under horisonten) · 12,37° · 404 108 km · 29′ 33,6″ · 73,4 % · tiltagende måne, mer enn halv · 117,7° Ø · 288° (vest-nordvest) |
+| 2026-06-24 10:00 · 13h 51m 34,1s · −16° 41′ 49″ · −36,12° (under horisonten) · 57,02° · 403 640 km · 29′ 35,7″ · 74,5 % · tiltagende måne, mer enn halv · 119,2° Ø · 288° (vest-nordvest) |
+| 2026-06-25 10:00 · 14h 38m 31,1s · −21° 02′ 25″ · −44,31° (under horisonten) · 47,26° · 407 302 km · 29′ 19,7″ · 82,3 % · tiltagende måne, mer enn halv · 130,1° Ø · 283° (vest-nordvest) |
+| 2026-06-26 10:00 · 15h 27m 23,1s · −24° 31′ 09″ · −51,24° (under horisonten) · 34,65° · 409 830 km · 29′ 08,8″ · 88,8 % · tiltagende måne, mer enn halv · 140,8° Ø · 277° (vest) |
+| 2026-06-27 10:00 · 16h 18m 14,5s · −26° 58′ 23″ · −56,23° (under horisonten) · 18,31° · 411 268 km · 29′ 02,7″ · 94,0 % · tiltagende måne, mer enn halv · 151,5° Ø · 269° (vest) |
+| 2026-06-28 10:00 · 17h 10m 40,4s · −28° 15′ 49″ · −58,38° (under horisonten) · 358,61° · 411 686 km · 29′ 01,0″ · 97,6 % · tiltagende måne, mer enn halv · 162,0° Ø · 258° (vest-sørvest) |
 | Månens beregnede størrelser |
 | Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; høyde og asimut uten refraksjon; avstand; tilsynelatende diameter; belyst andel; fase; elongasjon fra Solen med hvilken side av Solen Månen står på; og belyst side, retningen lyset faller fra. |
 | Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 90″ fram til 2100 med den valgte modellen. |
+| Sett karttid til dette tidspunktet [unavailable] |
+| Gjør den valgte radens tidspunkt til karttid og tegn hvert himmellegeme på nytt for det [unavailable] |
+| Sett karttiden til den valgte radens tidspunkt [unavailable] |
+| Setter karttiden til tidspunktet i den valgte raden, slik Sted og tid ville gjort, så hvert påslått himmellegeme tegnes på nytt for det. Denne tabellen gjelder så en tidligere karttid til du beregner på nytt. [unavailable] |
 | Lukk |
 | Lukk månetabellen |
 | Lukker tabellen. Ingenting endres eller huskes; Sted og tid beholder stedet og tidspunktet. |
 
-### A range that runs backwards
+### A range that asks for too many rows
 
-The end is before the start. The table is empty and the status line says why; nothing is guessed.
+A year of hourly rows asks for more than the 1 000 shown. The table is empty and the status line says why; nothing is cut short silently.
 
-![](moontable-nb-NO-8-refused.png)
+![](moontable-nb-NO-9-refused.png)
 
-Packed 1489 × 479 px.
+Packed 1489 × 433 px.
 
 | shown, hovered or spoken |
 |---|
 | Månen |
-| Hvor Månen er, beregnet fra den medfølgende efemeriden for observasjonsstedet og tidspunktet satt i Sted og tid: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
-| Samsvar med kartet |
-| Kartet: 59.91° N · 10.75° Ø, 2026-06-21 10:00:00 UTC |
-| Oppdater fra Sted og tid |
-| Les sted og tidspunkt fra Sted og tid på nytt |
-| Les observatør og tidspunkt fra Sted og tid på nytt |
-| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
-| Observatør på bredde 59,91, lengde 10,75 øst; tidspunkt 2026-06-21 10:00:00 UTC, fra Sted og tid. |
-| Dette tidspunktet |
-| Én rad, ved tidspunktet satt i Sted og tid |
-| Vis Månen ved tidspunktet satt i Sted og tid |
-| Viser én rad: Månen ved observasjonstidspunktet satt i Sted og tid. |
+| Hvor Månen er, beregnet fra den medfølgende efemeriden for karttiden og observasjonsstedet: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
+| Om tabellen gjelder karttiden og stedet nå |
+| Beregnet for karttid 2026-06-21 10:00:00 UTC på bredde 59,91, lengde 10,75 øst. |
+| Ved karttid |
+| Én rad, ved karttiden |
+| Vis Månen ved karttiden |
+| Viser én rad: Månen ved karttiden. |
 | Over et tidsrom |
-| Én rad for hvert steg fra en start til en slutt |
+| Én rad for hvert steg fra karttiden, over et omfang |
 | Vis Månen over et tidsrom |
-| Viser én rad for hvert steg fra starten til slutten, begge medregnet; en slutt som ikke ligger på rutenettet, legges til som siste rad og merkes. |
-| Fra (UTC) |
-| åååå-mm-dd tt:mm eller tt:mm:ss, i UTC |
-| Første tidspunkt i tidsrommet, i UTC. Starter ved tidspunktet satt i Sted og tid. |
-| Til (UTC) |
-| Siste tidspunkt i tidsrommet, i UTC, medregnet; ligger det ikke på rutenettet, legges det til som siste rad og merkes. |
-| Hvert |
-| 1 time |
-| 6 timer |
+| Viser én rad for hvert steg fra karttiden over omfanget valgt, så mange hele steg som omfanget rommer; første rad er karttiden, lest på nytt hver gang du beregner. Sett karttiden for å regne fra et annet tidspunkt. |
+| Omfang |
 | 1 døgn |
 | 7 døgn |
 | 30 døgn |
+| 90 døgn |
+| 365 døgn |
+| Hvor langt radene rekker fra karttiden |
+| Tidsrommets omfang fra karttiden |
+| Hvor langt fra karttiden radene rekker, i hele steg av steget ved siden av. |
+| Hvert |
+| 1 time |
+| 6 timer |
 | Tiden som går mellom radene |
 | Steg mellom radene |
 | Tiden som går mellom radene, på UTC-tidslinjen, så et daglig tidsrom ikke forskyver seg ved skifte av sivil klokke. |
 | Beregn |
-| Fyll tabellen for tidsrommet over |
+| Fyll tabellen for omfanget og steget over, fra karttiden |
 | Beregn tidsrommet |
-| Beregner én rad for hvert steg i tidsrommet over. |
-| Tidsrommet går baklengs: slutten er før starten. |
+| Beregner én rad for hvert steg i omfanget over, fra karttiden nå. |
+| Det tidsrommet ber om 8761 rader, og høyst 1000 vises; kort det ned eller gjør steget lengre. |
 | Tidspunkt (UTC) |
 | Rektascensjon (J2000) |
 | Deklinasjon (J2000) |
@@ -571,6 +639,10 @@ Packed 1489 × 479 px.
 | Månens beregnede størrelser |
 | Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; høyde og asimut uten refraksjon; avstand; tilsynelatende diameter; belyst andel; fase; elongasjon fra Solen med hvilken side av Solen Månen står på; og belyst side, retningen lyset faller fra. |
 | Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 90″ fram til 2100 med den valgte modellen. |
+| Sett karttid til dette tidspunktet [unavailable] |
+| Gjør den valgte radens tidspunkt til karttid og tegn hvert himmellegeme på nytt for det [unavailable] |
+| Sett karttiden til den valgte radens tidspunkt [unavailable] |
+| Setter karttiden til tidspunktet i den valgte raden, slik Sted og tid ville gjort, så hvert påslått himmellegeme tegnes på nytt for det. Denne tabellen gjelder så en tidligere karttid til du beregner på nytt. [unavailable] |
 | Lukk |
 | Lukk månetabellen |
 | Lukker tabellen. Ingenting endres eller huskes; Sted og tid beholder stedet og tidspunktet. |
@@ -579,47 +651,43 @@ Packed 1489 × 479 px.
 
 A southern observer at Espenak's full-Moon instant: the Moon 74° high, 99.9 % lit, near full, and the lit side stated as not well-defined rather than as a false angle.
 
-![](moontable-nb-NO-9-capetown.png)
+![](moontable-nb-NO-10-capetown.png)
 
-Packed 1489 × 479 px.
+Packed 1489 × 433 px.
 
 | shown, hovered or spoken |
 |---|
 | Månen |
-| Hvor Månen er, beregnet fra den medfølgende efemeriden for observasjonsstedet og tidspunktet satt i Sted og tid: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
-| Samsvar med kartet |
-| Samme sted og tidspunkt som kartet: 33.93° S · 18.42° Ø, 2026-06-29 23:57:00 UTC |
-| Oppdater fra Sted og tid |
-| Les sted og tidspunkt fra Sted og tid på nytt |
-| Les observatør og tidspunkt fra Sted og tid på nytt |
-| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
-| Observatør på bredde -33,93, lengde 18,42 øst; tidspunkt 2026-06-29 23:57:00 UTC, fra Sted og tid. |
-| Dette tidspunktet |
-| Én rad, ved tidspunktet satt i Sted og tid |
-| Vis Månen ved tidspunktet satt i Sted og tid |
-| Viser én rad: Månen ved observasjonstidspunktet satt i Sted og tid. |
+| Hvor Månen er, beregnet fra den medfølgende efemeriden for karttiden og observasjonsstedet: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
+| Om tabellen gjelder karttiden og stedet nå |
+| Beregnet for karttid 2026-06-29 23:57:00 UTC på bredde -33,93, lengde 18,42 øst. |
+| Ved karttid |
+| Én rad, ved karttiden |
+| Vis Månen ved karttiden |
+| Viser én rad: Månen ved karttiden. |
 | Over et tidsrom |
-| Én rad for hvert steg fra en start til en slutt |
+| Én rad for hvert steg fra karttiden, over et omfang |
 | Vis Månen over et tidsrom |
-| Viser én rad for hvert steg fra starten til slutten, begge medregnet; en slutt som ikke ligger på rutenettet, legges til som siste rad og merkes. |
-| Fra (UTC) |
-| åååå-mm-dd tt:mm eller tt:mm:ss, i UTC |
-| Første tidspunkt i tidsrommet, i UTC. Starter ved tidspunktet satt i Sted og tid. |
-| Til (UTC) |
-| Siste tidspunkt i tidsrommet, i UTC, medregnet; ligger det ikke på rutenettet, legges det til som siste rad og merkes. |
-| Hvert |
-| 1 time |
-| 6 timer |
+| Viser én rad for hvert steg fra karttiden over omfanget valgt, så mange hele steg som omfanget rommer; første rad er karttiden, lest på nytt hver gang du beregner. Sett karttiden for å regne fra et annet tidspunkt. |
+| Omfang |
 | 1 døgn |
 | 7 døgn |
 | 30 døgn |
+| 90 døgn |
+| 365 døgn |
+| Hvor langt radene rekker fra karttiden |
+| Tidsrommets omfang fra karttiden |
+| Hvor langt fra karttiden radene rekker, i hele steg av steget ved siden av. |
+| Hvert |
+| 1 time |
+| 6 timer |
 | Tiden som går mellom radene |
 | Steg mellom radene |
 | Tiden som går mellom radene, på UTC-tidslinjen, så et daglig tidsrom ikke forskyver seg ved skifte av sivil klokke. |
 | Beregn |
-| Fyll tabellen for tidsrommet over |
+| Fyll tabellen for omfanget og steget over, fra karttiden |
 | Beregn tidsrommet |
-| Beregner én rad for hvert steg i tidsrommet over. |
+| Beregner én rad for hvert steg i omfanget over, fra karttiden nå. |
 | 1 rader. |
 | Tidspunkt (UTC) |
 | Rektascensjon (J2000) |
@@ -636,53 +704,56 @@ Packed 1489 × 479 px.
 | Månens beregnede størrelser |
 | Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; høyde og asimut uten refraksjon; avstand; tilsynelatende diameter; belyst andel; fase; elongasjon fra Solen med hvilken side av Solen Månen står på; og belyst side, retningen lyset faller fra. |
 | Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 90″ fram til 2100 med den valgte modellen. |
+| Sett karttid til dette tidspunktet |
+| Gjør den valgte radens tidspunkt til karttid og tegn hvert himmellegeme på nytt for det |
+| Sett karttiden til den valgte radens tidspunkt |
+| Setter karttiden til tidspunktet i den valgte raden, slik Sted og tid ville gjort, så hvert påslått himmellegeme tegnes på nytt for det. Denne tabellen gjelder så en tidligere karttid til du beregner på nytt. |
 | Lukk |
 | Lukk månetabellen |
 | Lukker tabellen. Ingenting endres eller huskes; Sted og tid beholder stedet og tidspunktet. |
 
-### The instant, in the dark appearance
+### The chart moved on after computing
 
-![](moontable-nb-NO-10-instant-dark.png)
+The chart time moved six hours on after this instant was computed (#612, ruling P1): the rows stay, dimmed, under the stale message, until Compute; the note states the chart time and place the rows are for.
+
+![](moontable-nb-NO-11-stale.png)
 
 Packed 1489 × 479 px.
 
 | shown, hovered or spoken |
 |---|
 | Månen |
-| Hvor Månen er, beregnet fra den medfølgende efemeriden for observasjonsstedet og tidspunktet satt i Sted og tid: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
-| Samsvar med kartet |
-| Samme sted og tidspunkt som kartet: 59.91° N · 10.75° Ø, 2026-06-21 10:00:00 UTC |
-| Oppdater fra Sted og tid |
-| Les sted og tidspunkt fra Sted og tid på nytt |
-| Les observatør og tidspunkt fra Sted og tid på nytt |
-| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
-| Observatør på bredde 59,91, lengde 10,75 øst; tidspunkt 2026-06-21 10:00:00 UTC, fra Sted og tid. |
-| Dette tidspunktet |
-| Én rad, ved tidspunktet satt i Sted og tid |
-| Vis Månen ved tidspunktet satt i Sted og tid |
-| Viser én rad: Månen ved observasjonstidspunktet satt i Sted og tid. |
+| Hvor Månen er, beregnet fra den medfølgende efemeriden for karttiden og observasjonsstedet: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
+| Om tabellen gjelder karttiden og stedet nå |
+| Beregnet for forrige karttid og sted — Beregn på nytt |
+| Beregnet for karttid 2026-06-21 10:00:00 UTC på bredde 59,91, lengde 10,75 øst. |
+| Ved karttid |
+| Én rad, ved karttiden |
+| Vis Månen ved karttiden |
+| Viser én rad: Månen ved karttiden. |
 | Over et tidsrom |
-| Én rad for hvert steg fra en start til en slutt |
+| Én rad for hvert steg fra karttiden, over et omfang |
 | Vis Månen over et tidsrom |
-| Viser én rad for hvert steg fra starten til slutten, begge medregnet; en slutt som ikke ligger på rutenettet, legges til som siste rad og merkes. |
-| Fra (UTC) |
-| åååå-mm-dd tt:mm eller tt:mm:ss, i UTC |
-| Første tidspunkt i tidsrommet, i UTC. Starter ved tidspunktet satt i Sted og tid. |
-| Til (UTC) |
-| Siste tidspunkt i tidsrommet, i UTC, medregnet; ligger det ikke på rutenettet, legges det til som siste rad og merkes. |
-| Hvert |
-| 1 time |
-| 6 timer |
+| Viser én rad for hvert steg fra karttiden over omfanget valgt, så mange hele steg som omfanget rommer; første rad er karttiden, lest på nytt hver gang du beregner. Sett karttiden for å regne fra et annet tidspunkt. |
+| Omfang |
 | 1 døgn |
 | 7 døgn |
 | 30 døgn |
+| 90 døgn |
+| 365 døgn |
+| Hvor langt radene rekker fra karttiden |
+| Tidsrommets omfang fra karttiden |
+| Hvor langt fra karttiden radene rekker, i hele steg av steget ved siden av. |
+| Hvert |
+| 1 time |
+| 6 timer |
 | Tiden som går mellom radene |
 | Steg mellom radene |
 | Tiden som går mellom radene, på UTC-tidslinjen, så et daglig tidsrom ikke forskyver seg ved skifte av sivil klokke. |
 | Beregn |
-| Fyll tabellen for tidsrommet over |
+| Fyll tabellen for omfanget og steget over, fra karttiden |
 | Beregn tidsrommet |
-| Beregner én rad for hvert steg i tidsrommet over. |
+| Beregner én rad for hvert steg i omfanget over, fra karttiden nå. |
 | 1 rader. |
 | Tidspunkt (UTC) |
 | Rektascensjon (J2000) |
@@ -699,6 +770,73 @@ Packed 1489 × 479 px.
 | Månens beregnede størrelser |
 | Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; høyde og asimut uten refraksjon; avstand; tilsynelatende diameter; belyst andel; fase; elongasjon fra Solen med hvilken side av Solen Månen står på; og belyst side, retningen lyset faller fra. |
 | Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 90″ fram til 2100 med den valgte modellen. |
+| Sett karttid til dette tidspunktet |
+| Gjør den valgte radens tidspunkt til karttid og tegn hvert himmellegeme på nytt for det |
+| Sett karttiden til den valgte radens tidspunkt |
+| Setter karttiden til tidspunktet i den valgte raden, slik Sted og tid ville gjort, så hvert påslått himmellegeme tegnes på nytt for det. Denne tabellen gjelder så en tidligere karttid til du beregner på nytt. |
+| Lukk |
+| Lukk månetabellen |
+| Lukker tabellen. Ingenting endres eller huskes; Sted og tid beholder stedet og tidspunktet. |
+
+### The instant, in the dark appearance
+
+![](moontable-nb-NO-12-instant-dark.png)
+
+Packed 1489 × 433 px.
+
+| shown, hovered or spoken |
+|---|
+| Månen |
+| Hvor Månen er, beregnet fra den medfølgende efemeriden for karttiden og observasjonsstedet: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
+| Om tabellen gjelder karttiden og stedet nå |
+| Beregnet for karttid 2026-06-21 10:00:00 UTC på bredde 59,91, lengde 10,75 øst. |
+| Ved karttid |
+| Én rad, ved karttiden |
+| Vis Månen ved karttiden |
+| Viser én rad: Månen ved karttiden. |
+| Over et tidsrom |
+| Én rad for hvert steg fra karttiden, over et omfang |
+| Vis Månen over et tidsrom |
+| Viser én rad for hvert steg fra karttiden over omfanget valgt, så mange hele steg som omfanget rommer; første rad er karttiden, lest på nytt hver gang du beregner. Sett karttiden for å regne fra et annet tidspunkt. |
+| Omfang |
+| 1 døgn |
+| 7 døgn |
+| 30 døgn |
+| 90 døgn |
+| 365 døgn |
+| Hvor langt radene rekker fra karttiden |
+| Tidsrommets omfang fra karttiden |
+| Hvor langt fra karttiden radene rekker, i hele steg av steget ved siden av. |
+| Hvert |
+| 1 time |
+| 6 timer |
+| Tiden som går mellom radene |
+| Steg mellom radene |
+| Tiden som går mellom radene, på UTC-tidslinjen, så et daglig tidsrom ikke forskyver seg ved skifte av sivil klokke. |
+| Beregn |
+| Fyll tabellen for omfanget og steget over, fra karttiden |
+| Beregn tidsrommet |
+| Beregner én rad for hvert steg i omfanget over, fra karttiden nå. |
+| 1 rader. |
+| Tidspunkt (UTC) |
+| Rektascensjon (J2000) |
+| Deklinasjon (J2000) |
+| Høyde (uten refraksjon) |
+| Asimut (fra nord via øst) |
+| Avstand |
+| Tilsynelatende diameter |
+| Belyst |
+| Fase |
+| Elongasjon fra Solen |
+| Belyst side |
+| 2026-06-21 10:00 · 11h 35m 54,3s · −0° 06′ 40″ · −7,17° (under horisonten) · 78,00° · 386 363 km · 30′ 55,1″ · 45,6 % · tiltagende månesigd · 84,8° Ø · 294° (vest-nordvest) |
+| Månens beregnede størrelser |
+| Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; høyde og asimut uten refraksjon; avstand; tilsynelatende diameter; belyst andel; fase; elongasjon fra Solen med hvilken side av Solen Månen står på; og belyst side, retningen lyset faller fra. |
+| Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 90″ fram til 2100 med den valgte modellen. |
+| Sett karttid til dette tidspunktet |
+| Gjør den valgte radens tidspunkt til karttid og tegn hvert himmellegeme på nytt for det |
+| Sett karttiden til den valgte radens tidspunkt |
+| Setter karttiden til tidspunktet i den valgte raden, slik Sted og tid ville gjort, så hvert påslått himmellegeme tegnes på nytt for det. Denne tabellen gjelder så en tidligere karttid til du beregner på nytt. |
 | Lukk |
 | Lukk månetabellen |
 | Lukker tabellen. Ingenting endres eller huskes; Sted og tid beholder stedet og tidspunktet. |

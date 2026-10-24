@@ -48,8 +48,10 @@ arrangement at its frozen instant.
 | 59.913 | Degrees north of the equator, e.g. 59.913; south is negative, -90 to 90 | Latitude | Degrees north of the equator, negative south, -90 to 90 |
 | Longitude, east positive | — | Longitude, east positive | — |
 | 10.752 | Degrees east of Greenwich, e.g. 10.752; west is negative | Longitude, east positive | Degrees east of Greenwich; west is negative |
-| Instant (UTC) | — | Instant (UTC) | — |
-| 2026-03-20 21:33:00 | The moment the lines are drawn for, as 2026-03-20 21:33:00 | Instant (UTC) | The instant used to draw the reference lines. Time does not advance until you change it. |
+| Chart time (UTC) | — | Chart time (UTC) | — |
+| 2026-03-20 21:33:00 | The chart time: the one moment every line and body is drawn for, as 2026-03-20 21:33:00 | Chart time (UTC) | The chart time: the one instant the reference lines and every enabled body are drawn for. It does not advance until you change it. |
+| Local sidereal time | — | Local sidereal time | — |
+| 10:09 | Hours:minutes of local apparent sidereal time, as 03:17; the chart time moves to it on the same UTC date | Local sidereal time | Sets the chart time to the instant on the chart time's UTC date when this local apparent sidereal time stands on the meridian, the nearer one when the date holds it twice. The date is changed in the chart time field, never here. |
 | The chart is drawn for that instant and stays there. Nothing ticks. | — | The chart is drawn for that instant and stays there. Nothing ticks. | — |
 | Meridian | Draw the great circle through both celestial poles and your zenith (⌘K then R) | Show Meridian | Draws the line that runs from due north, through the point overhead, to due south. It lasts as long as this session. |
 | Mathematical horizon | Draw where the sky meets a perfectly flat, transparent Earth (⌘K then H) | Show Mathematical horizon | Draws the circle where the sky would meet a flat and transparent Earth; your own horizon has hills and air in it. It lasts as long as this session. |
@@ -103,8 +105,10 @@ arrangement at its frozen instant.
 | 59.913 | Degrees north of the equator, e.g. 59.913; south is negative, -90 to 90 | Latitude | Degrees north of the equator, negative south, -90 to 90 |
 | Longitude, east positive | — | Longitude, east positive | — |
 | 10.752 | Degrees east of Greenwich, e.g. 10.752; west is negative | Longitude, east positive | Degrees east of Greenwich; west is negative |
-| Instant (UTC) | — | Instant (UTC) | — |
-| 2026-03-20 21:33:00 | The moment the lines are drawn for, as 2026-03-20 21:33:00 | Instant (UTC) | The instant used to draw the reference lines. Time does not advance until you change it. |
+| Chart time (UTC) | — | Chart time (UTC) | — |
+| 2026-03-20 21:33:00 | The chart time: the one moment every line and body is drawn for, as 2026-03-20 21:33:00 | Chart time (UTC) | The chart time: the one instant the reference lines and every enabled body are drawn for. It does not advance until you change it. |
+| Local sidereal time | — | Local sidereal time | — |
+| 10:09 | Hours:minutes of local apparent sidereal time, as 03:17; the chart time moves to it on the same UTC date | Local sidereal time | Sets the chart time to the instant on the chart time's UTC date when this local apparent sidereal time stands on the meridian, the nearer one when the date holds it twice. The date is changed in the chart time field, never here. |
 | The chart is drawn for that instant and stays there. Nothing ticks. | — | The chart is drawn for that instant and stays there. Nothing ticks. | — |
 | Meridian | Draw the great circle through both celestial poles and your zenith (⌘K then R) | Show Meridian | Draws the line that runs from due north, through the point overhead, to due south. It lasts as long as this session. |
 | Mathematical horizon | Draw where the sky meets a perfectly flat, transparent Earth (⌘K then H) | Show Mathematical horizon | Draws the circle where the sky would meet a flat and transparent Earth; your own horizon has hills and air in it. It lasts as long as this session. |
@@ -200,8 +204,10 @@ arrangement at its frozen instant.
 | 59.913 | Degrees north of the equator, e.g. 59.913; south is negative, -90 to 90 | Latitude | Latitude must be between −90° and 90°. Kept 59.913. |
 | Longitude, east positive | — | Longitude, east positive | — |
 | 10.752 | Degrees east of Greenwich, e.g. 10.752; west is negative | Longitude, east positive | Degrees east of Greenwich; west is negative |
-| Instant (UTC) | — | Instant (UTC) | — |
-| 2026-03-20 21:33:00 | The moment the lines are drawn for, as 2026-03-20 21:33:00 | Instant (UTC) | The instant used to draw the reference lines. Time does not advance until you change it. |
+| Chart time (UTC) | — | Chart time (UTC) | — |
+| 2026-03-20 21:33:00 | The chart time: the one moment every line and body is drawn for, as 2026-03-20 21:33:00 | Chart time (UTC) | The chart time: the one instant the reference lines and every enabled body are drawn for. It does not advance until you change it. |
+| Local sidereal time | — | Local sidereal time | — |
+| 10:09 | Hours:minutes of local apparent sidereal time, as 03:17; the chart time moves to it on the same UTC date | Local sidereal time | Sets the chart time to the instant on the chart time's UTC date when this local apparent sidereal time stands on the meridian, the nearer one when the date holds it twice. The date is changed in the chart time field, never here. |
 | The chart is drawn for that instant and stays there. Nothing ticks. | — | The chart is drawn for that instant and stays there. Nothing ticks. | — |
 | Meridian | Draw the great circle through both celestial poles and your zenith (⌘K then R) | Show Meridian | Draws the line that runs from due north, through the point overhead, to due south. It lasts as long as this session. |
 | Mathematical horizon | Draw where the sky meets a perfectly flat, transparent Earth (⌘K then H) | Show Mathematical horizon | Draws the circle where the sky would meet a flat and transparent Earth; your own horizon has hills and air in it. It lasts as long as this session. |
@@ -297,22 +303,19 @@ arrangement at its frozen instant.
 | — | — | Controller tabs | Two tabs: the chart's controls, and the Solar System's bodies. Choosing a tab computes nothing; the tab last chosen is remembered. |
 | Chart | — | Chart | — |
 | ▾ Solar System | — | Solar System | — |
-| Chart: 2026-03-20 21:33:00 UTC | — | Chart: 2026-03-20 21:33:00 UTC | — |
+| Chart time: 2026-03-20 21:33:00 UTC | — | Chart time: 2026-03-20 21:33:00 UTC | — |
 | Update to now | Reads the clock once and freezes the chart at that instant | Update to now | Freezes the chart at the present moment. The clock is read once; nothing moves afterwards. |
 | ▾ Sun | Show or hide this section | Sun, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
-| — | — | Agreement with the chart | — |
-| Same place and instant as the chart: 59.91° N · 10.75° E, 2026-03-20 21:33:00 UTC | — | Same place and instant as the chart: 59.91° N · 10.75° E, 2026-03-20 21:33:00 UTC | — |
-| Observer at latitude 59.913, longitude 10.752 east; instant 2026-03-20 21:33:00 UTC, from Place and Time. | — | Observer at latitude 59.913, longitude 10.752 east; instant 2026-03-20 21:33:00 UTC, from Place and Time. | — |
-| This instant | One row, at the instant set in Place and Time | Show the Sun at the instant set in Place and Time | Shows a single row: the Sun at the observing instant set in Place and Time. |
-| Over a range | A row for every step from a start to an end | Show the Sun over a range of instants | Shows a row for every step from the start to the end, both included; an end that is not on the grid is added as the last row and marked. |
-| From (UTC) | — | From (UTC) | — |
-| 2026-03-20 21:33:00 | yyyy-mm-dd hh:mm or hh:mm:ss, in UTC | From (UTC) | The first instant of the range, in UTC. Starts at the instant set in Place and Time. |
-| To (UTC) | — | To (UTC) | — |
-| 2026-03-27 21:33:00 | yyyy-mm-dd hh:mm or hh:mm:ss, in UTC | To (UTC) | The last instant of the range, in UTC, included; if it is not on the grid it is added as the last row and marked. |
+| Computed for chart time 2026-03-20 21:33:00 UTC at latitude 59.913, longitude 10.752 east. | — | Computed for chart time 2026-03-20 21:33:00 UTC at latitude 59.913, longitude 10.752 east. | — |
+| At chart time | One row, at the chart time | Show the Sun at the chart time | Shows a single row: the Sun at the chart time. |
+| Over a time range | A row for every step from the chart time, over a span | Show the Sun over a range of instants | Shows a row for every step from the chart time over the span chosen, as many whole steps as the span holds; the first row is the chart time, read again whenever you compute. To range from another instant, set the chart time. |
+| Span | — | Span | — |
+| — | How far the rows reach from the chart time | Span of the range from the chart time | How far from the chart time the rows reach, in whole steps of the step beside it. |
+| — | How far the rows reach from the chart time | — | How far the rows reach from the chart time |
 | Every | — | Every | — |
 | — | The elapsed time between rows | Step between rows | The elapsed time between rows, on the UTC timeline, so a daily range does not drift across a change of civil clock. |
 | — | The elapsed time between rows | — | The elapsed time between rows |
-| Compute | Fill the table for the range above | Compute the range | Computes a row for every step of the range above. |
+| Compute | Fill the table for the span and step above, from the chart time | Compute the range | Computes a row for every step of the span above, from the chart time now. |
 | 1 rows. | — | 1 rows. | — |
 | — | — | The Sun's computed quantities | — |
 | Instant (UTC) | The instant in UTC, to the minute. "est." marks an instant whose clock correction is estimated; † marks a range end that was not on the grid. | Instant (UTC) | The instant in UTC, to the minute. "est." marks an instant whose clock correction is estimated; † marks a range end that was not on the grid. |
@@ -331,7 +334,7 @@ arrangement at its frozen instant.
 | 0.996015 AU (149.002 mill. km) | — | Distance: 0.996015 AU (149.002 mill. km) | — |
 | Apparent diameter | How large the Sun's disc looks, in minutes and seconds of arc. | Apparent diameter | How large the Sun's disc looks, in minutes and seconds of arc. |
 | 32′ 06.1″ | — | Apparent diameter: 32′ 06.1″ | — |
-| Sun on the chart | — | Sun on the chart | Shows or hides the Sun on the chart, drawn at its true size where it stands for the place and instant set in Place and Time; the same choice as View's. |
+| Sun on the chart | — | Sun on the chart | Shows or hides the Sun on the chart, drawn at its true size where it stands for the chart time and place; the same choice as View's. |
 | ▸ Mercury | Show or hide this section | Mercury, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Venus | Show or hide this section | Venus, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Moon | Show or hide this section | Moon, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
@@ -348,27 +351,24 @@ arrangement at its frozen instant.
 | — | — | Controller tabs | Two tabs: the chart's controls, and the Solar System's bodies. Choosing a tab computes nothing; the tab last chosen is remembered. |
 | Chart | — | Chart | — |
 | ▾ Solar System | — | Solar System | — |
-| Chart: 2026-03-20 21:33:00 UTC | — | Chart: 2026-03-20 21:33:00 UTC | — |
+| Chart time: 2026-03-20 21:33:00 UTC | — | Chart time: 2026-03-20 21:33:00 UTC | — |
 | Update to now | Reads the clock once and freezes the chart at that instant | Update to now | Freezes the chart at the present moment. The clock is read once; nothing moves afterwards. |
 | ▸ Sun | Show or hide this section | Sun, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Mercury | Show or hide this section | Mercury, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Venus | Show or hide this section | Venus, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Moon | Show or hide this section | Moon, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▾ Jupiter | Show or hide this section | Jupiter, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
-| — | — | Agreement with the chart | — |
-| Chart: 59.91° N · 10.75° E, 2026-03-20 21:33:00 UTC | — | Chart: 59.91° N · 10.75° E, 2026-03-20 21:33:00 UTC | — |
-| Observer at latitude 59.913, longitude 10.752 east; instant 2026-03-20 21:33:00 UTC, from Place and Time. | — | Observer at latitude 59.913, longitude 10.752 east; instant 2026-03-20 21:33:00 UTC, from Place and Time. | — |
-| This instant | One row, at the instant set in Place and Time | Show Jupiter and its moons at the instant set in Place and Time | Shows Jupiter at the observing instant set in Place and Time, and below it the four moons in a fixed order. |
-| Over a range | A row for every step from a start to an end | Show the four moons over a range of instants | Shows the four moons for every step from the start to the end, both included, grouped under each instant; an end that is not on the grid is added as the last group and marked. This samples the range; it does not search for the moment a moon enters or leaves Jupiter's disc. |
-| From (UTC) | — | From (UTC) | — |
-| 2026-03-20 21:33:00 | yyyy-mm-dd hh:mm or hh:mm:ss, in UTC | From (UTC) | The first instant of the range, in UTC. Starts at the instant set in Place and Time. |
-| To (UTC) | — | To (UTC) | — |
-| 2026-03-21 21:33:00 | yyyy-mm-dd hh:mm or hh:mm:ss, in UTC | To (UTC) | The last instant of the range, in UTC, included; if it is not on the grid it is added as the last row and marked. |
+| Chart time 2026-03-20 21:33:00 UTC at latitude 59.913, longitude 10.752 east, from Place and Time. | — | Chart time 2026-03-20 21:33:00 UTC at latitude 59.913, longitude 10.752 east, from Place and Time. | — |
+| At chart time | One row, at the chart time | Show Jupiter and its moons at the chart time | Shows Jupiter at the chart time, and below it the four moons in a fixed order. |
+| Over a time range | A row for every step from the chart time, over a span | Show the four moons over a range of instants | Shows the four moons for every step from the start to the end, both included, grouped under each instant; an end that is not on the grid is added as the last group and marked. This samples the range; it does not search for the moment a moon enters or leaves Jupiter's disc. |
+| Span | — | Span | — |
+| — | How far the rows reach from the chart time | Span of the range from the chart time | How far from the chart time the rows reach, in whole steps of the step beside it. |
+| — | How far the rows reach from the chart time | — | How far the rows reach from the chart time |
 | Every | — | Every | — |
 | — | The elapsed time between rows | Step between rows | The elapsed time between rows, on the UTC timeline, so a daily range does not drift across a change of civil clock. |
 | — | The elapsed time between rows | — | The elapsed time between rows |
-| Compute | Fill the table for the range above | Compute the range | Computes a row for every step of the range above. |
-| Jupiter and moons on the chart | — | Jupiter and moons on the chart | Shows or hides Jupiter on the chart where it stands for the place and instant set in Place and Time, at its true size or as a 6-pixel cartographic symbol, whichever is larger; the same choice as View's. Io, Europa, Ganymede and Callisto are drawn as 3-pixel symbols at their own places: a filled dot clear of Jupiter, a dot ringed in the page's ground in front of it, a hollow ring in its shadow, and nothing behind it; at wider fields only the moons whose marks can be told apart are drawn. |
+| Compute | Fill the table for the span and step above, from the chart time | Compute the range | Computes a row for every step of the span above, from the chart time now. |
+| Jupiter and moons on the chart | — | Jupiter and moons on the chart | Shows or hides Jupiter on the chart where it stands for the chart time and place, at its true size or as a 6-pixel cartographic symbol, whichever is larger; the same choice as View's. Io, Europa, Ganymede and Callisto are drawn as 3-pixel symbols at their own places: a filled dot clear of Jupiter, a dot ringed in the page's ground in front of it, a hollow ring in its shadow, and nothing behind it; at wider fields only the moons whose marks can be told apart are drawn. |
 | ▸ Saturn | Show or hide this section | Saturn, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 
 ### emphasis-open
@@ -451,8 +451,10 @@ arrangement at its frozen instant.
 | 59.913 | Grader nord for ekvator, f.eks. 59.913; sørlige breddegrader er negative, -90 til 90 | Breddegrad | Grader nord for ekvator; sørlige breddegrader er negative, -90 til 90 |
 | Lengdegrad, øst positiv | — | Lengdegrad, øst positiv | — |
 | 10.752 | Grader øst for Greenwich, f.eks. 10.752; vestlige lengdegrader er negative | Lengdegrad, øst positiv | Grader øst for Greenwich; vestlige lengdegrader er negative |
-| Tidspunkt (UTC) | — | Tidspunkt (UTC) | — |
-| 2026-03-20 21:33:00 | Tidspunktet linjene tegnes for, som 2026-03-20 21:33:00 | Tidspunkt (UTC) | Tidspunktet som brukes til å tegne referanselinjene. Tiden går ikke videre før du endrer tidspunktet. |
+| Karttid (UTC) | — | Karttid (UTC) | — |
+| 2026-03-20 21:33:00 | Karttiden: det ene tidspunktet hver linje og hvert himmellegeme tegnes for, som 2026-03-20 21:33:00 | Karttid (UTC) | Karttiden: det ene tidspunktet referanselinjene og hvert påslått himmellegeme tegnes for. Den går ikke videre før du endrer den. |
+| Lokal stjernetid | — | Lokal stjernetid | — |
+| 10:09 | Timer:minutter lokal tilsynelatende stjernetid, som 03:17; karttiden flyttes dit på samme UTC-dato | Lokal stjernetid | Setter karttiden til tidspunktet på karttidens UTC-dato da denne lokale tilsynelatende stjernetiden står på meridianen, det nærmeste når datoen har den to ganger. Datoen endres i karttidsfeltet, aldri her. |
 | Kartet tegnes for dette tidspunktet. Tiden går ikke videre av seg selv. | — | Kartet tegnes for dette tidspunktet. Tiden går ikke videre av seg selv. | — |
 | Meridian | Tegn storsirkelen gjennom begge himmelpolene og senit (⌘K deretter R) | Vis meridianen | Tegner linjen som går fra rett nord, gjennom punktet rett over deg, til rett sør. Valget gjelder ut denne økten. |
 | Matematisk horisont | Tegn der himmelen møter en helt flat og gjennomsiktig jord (⌘K deretter H) | Vis matematisk horisont | Tegner sirkelen der himmelen ville ha møtt en flat og gjennomsiktig jord; din egen horisont har åser og luft i seg. Valget gjelder ut denne økten. |
@@ -506,8 +508,10 @@ arrangement at its frozen instant.
 | 59.913 | Grader nord for ekvator, f.eks. 59.913; sørlige breddegrader er negative, -90 til 90 | Breddegrad | Grader nord for ekvator; sørlige breddegrader er negative, -90 til 90 |
 | Lengdegrad, øst positiv | — | Lengdegrad, øst positiv | — |
 | 10.752 | Grader øst for Greenwich, f.eks. 10.752; vestlige lengdegrader er negative | Lengdegrad, øst positiv | Grader øst for Greenwich; vestlige lengdegrader er negative |
-| Tidspunkt (UTC) | — | Tidspunkt (UTC) | — |
-| 2026-03-20 21:33:00 | Tidspunktet linjene tegnes for, som 2026-03-20 21:33:00 | Tidspunkt (UTC) | Tidspunktet som brukes til å tegne referanselinjene. Tiden går ikke videre før du endrer tidspunktet. |
+| Karttid (UTC) | — | Karttid (UTC) | — |
+| 2026-03-20 21:33:00 | Karttiden: det ene tidspunktet hver linje og hvert himmellegeme tegnes for, som 2026-03-20 21:33:00 | Karttid (UTC) | Karttiden: det ene tidspunktet referanselinjene og hvert påslått himmellegeme tegnes for. Den går ikke videre før du endrer den. |
+| Lokal stjernetid | — | Lokal stjernetid | — |
+| 10:09 | Timer:minutter lokal tilsynelatende stjernetid, som 03:17; karttiden flyttes dit på samme UTC-dato | Lokal stjernetid | Setter karttiden til tidspunktet på karttidens UTC-dato da denne lokale tilsynelatende stjernetiden står på meridianen, det nærmeste når datoen har den to ganger. Datoen endres i karttidsfeltet, aldri her. |
 | Kartet tegnes for dette tidspunktet. Tiden går ikke videre av seg selv. | — | Kartet tegnes for dette tidspunktet. Tiden går ikke videre av seg selv. | — |
 | Meridian | Tegn storsirkelen gjennom begge himmelpolene og senit (⌘K deretter R) | Vis meridianen | Tegner linjen som går fra rett nord, gjennom punktet rett over deg, til rett sør. Valget gjelder ut denne økten. |
 | Matematisk horisont | Tegn der himmelen møter en helt flat og gjennomsiktig jord (⌘K deretter H) | Vis matematisk horisont | Tegner sirkelen der himmelen ville ha møtt en flat og gjennomsiktig jord; din egen horisont har åser og luft i seg. Valget gjelder ut denne økten. |
@@ -603,8 +607,10 @@ arrangement at its frozen instant.
 | 59.913 | Grader nord for ekvator, f.eks. 59.913; sørlige breddegrader er negative, -90 til 90 | Breddegrad | Breddegraden må ligge mellom −90° og 90°. Beholdt 59.913. |
 | Lengdegrad, øst positiv | — | Lengdegrad, øst positiv | — |
 | 10.752 | Grader øst for Greenwich, f.eks. 10.752; vestlige lengdegrader er negative | Lengdegrad, øst positiv | Grader øst for Greenwich; vestlige lengdegrader er negative |
-| Tidspunkt (UTC) | — | Tidspunkt (UTC) | — |
-| 2026-03-20 21:33:00 | Tidspunktet linjene tegnes for, som 2026-03-20 21:33:00 | Tidspunkt (UTC) | Tidspunktet som brukes til å tegne referanselinjene. Tiden går ikke videre før du endrer tidspunktet. |
+| Karttid (UTC) | — | Karttid (UTC) | — |
+| 2026-03-20 21:33:00 | Karttiden: det ene tidspunktet hver linje og hvert himmellegeme tegnes for, som 2026-03-20 21:33:00 | Karttid (UTC) | Karttiden: det ene tidspunktet referanselinjene og hvert påslått himmellegeme tegnes for. Den går ikke videre før du endrer den. |
+| Lokal stjernetid | — | Lokal stjernetid | — |
+| 10:09 | Timer:minutter lokal tilsynelatende stjernetid, som 03:17; karttiden flyttes dit på samme UTC-dato | Lokal stjernetid | Setter karttiden til tidspunktet på karttidens UTC-dato da denne lokale tilsynelatende stjernetiden står på meridianen, det nærmeste når datoen har den to ganger. Datoen endres i karttidsfeltet, aldri her. |
 | Kartet tegnes for dette tidspunktet. Tiden går ikke videre av seg selv. | — | Kartet tegnes for dette tidspunktet. Tiden går ikke videre av seg selv. | — |
 | Meridian | Tegn storsirkelen gjennom begge himmelpolene og senit (⌘K deretter R) | Vis meridianen | Tegner linjen som går fra rett nord, gjennom punktet rett over deg, til rett sør. Valget gjelder ut denne økten. |
 | Matematisk horisont | Tegn der himmelen møter en helt flat og gjennomsiktig jord (⌘K deretter H) | Vis matematisk horisont | Tegner sirkelen der himmelen ville ha møtt en flat og gjennomsiktig jord; din egen horisont har åser og luft i seg. Valget gjelder ut denne økten. |
@@ -700,22 +706,19 @@ arrangement at its frozen instant.
 | — | — | Kontrollerens faner | To faner: kartets kontroller, og solsystemets himmellegemer. Å velge en fane beregner ingenting; fanen som sist ble valgt, huskes. |
 | Kart | — | Kart | — |
 | ▾ Solsystemet | — | Solsystemet | — |
-| Kartet: 2026-03-20 21:33:00 UTC | — | Kartet: 2026-03-20 21:33:00 UTC | — |
+| Karttid: 2026-03-20 21:33:00 UTC | — | Karttid: 2026-03-20 21:33:00 UTC | — |
 | Oppdater til nå | Les klokken én gang og sett kartets tidspunkt til nå | Oppdater til nå | Tegner kartet for tidspunktet nå. Klokken leses én gang; tiden går ikke videre etterpå. |
 | ▾ Solen | Vis eller skjul denne delen | Solen, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
-| — | — | Samsvar med kartet | — |
-| Samme sted og tidspunkt som kartet: 59.91° N · 10.75° Ø, 2026-03-20 21:33:00 UTC | — | Samme sted og tidspunkt som kartet: 59.91° N · 10.75° Ø, 2026-03-20 21:33:00 UTC | — |
-| Observatør på bredde 59,913, lengde 10,752 øst; tidspunkt 2026-03-20 21:33:00 UTC, fra Sted og tid. | — | Observatør på bredde 59,913, lengde 10,752 øst; tidspunkt 2026-03-20 21:33:00 UTC, fra Sted og tid. | — |
-| Dette tidspunktet | Én rad, ved tidspunktet satt i Sted og tid | Vis Solen ved tidspunktet satt i Sted og tid | Viser én rad: Solen ved observasjonstidspunktet satt i Sted og tid. |
-| Over et tidsrom | Én rad for hvert steg fra en start til en slutt | Vis Solen over et tidsrom | Viser én rad for hvert steg fra starten til slutten, begge medregnet; en slutt som ikke ligger på rutenettet, legges til som siste rad og merkes. |
-| Fra (UTC) | — | Fra (UTC) | — |
-| 2026-03-20 21:33:00 | åååå-mm-dd tt:mm eller tt:mm:ss, i UTC | Fra (UTC) | Første tidspunkt i tidsrommet, i UTC. Starter ved tidspunktet satt i Sted og tid. |
-| Til (UTC) | — | Til (UTC) | — |
-| 2026-03-27 21:33:00 | åååå-mm-dd tt:mm eller tt:mm:ss, i UTC | Til (UTC) | Siste tidspunkt i tidsrommet, i UTC, medregnet; ligger det ikke på rutenettet, legges det til som siste rad og merkes. |
+| Beregnet for karttid 2026-03-20 21:33:00 UTC på bredde 59,913, lengde 10,752 øst. | — | Beregnet for karttid 2026-03-20 21:33:00 UTC på bredde 59,913, lengde 10,752 øst. | — |
+| Ved karttid | Én rad, ved karttiden | Vis Solen ved karttiden | Viser én rad: Solen ved karttiden. |
+| Over et tidsrom | Én rad for hvert steg fra karttiden, over et omfang | Vis Solen over et tidsrom | Viser én rad for hvert steg fra karttiden over omfanget valgt, så mange hele steg som omfanget rommer; første rad er karttiden, lest på nytt hver gang du beregner. Sett karttiden for å regne fra et annet tidspunkt. |
+| Omfang | — | Omfang | — |
+| — | Hvor langt radene rekker fra karttiden | Tidsrommets omfang fra karttiden | Hvor langt fra karttiden radene rekker, i hele steg av steget ved siden av. |
+| — | Hvor langt radene rekker fra karttiden | — | Hvor langt radene rekker fra karttiden |
 | Hvert | — | Hvert | — |
 | — | Tiden som går mellom radene | Steg mellom radene | Tiden som går mellom radene, på UTC-tidslinjen, så et daglig tidsrom ikke forskyver seg ved skifte av sivil klokke. |
 | — | Tiden som går mellom radene | — | Tiden som går mellom radene |
-| Beregn | Fyll tabellen for tidsrommet over | Beregn tidsrommet | Beregner én rad for hvert steg i tidsrommet over. |
+| Beregn | Fyll tabellen for omfanget og steget over, fra karttiden | Beregn tidsrommet | Beregner én rad for hvert steg i omfanget over, fra karttiden nå. |
 | 1 rader. | — | 1 rader. | — |
 | — | — | Solens beregnede størrelser | — |
 | Tidspunkt (UTC) | Tidspunktet i UTC, til nærmeste minutt. «est.» merker et tidspunkt med beregnet klokkekorreksjon; † merker en slutt på tidsrommet som ikke lå på rutenettet. | Tidspunkt (UTC) | Tidspunktet i UTC, til nærmeste minutt. «est.» merker et tidspunkt med beregnet klokkekorreksjon; † merker en slutt på tidsrommet som ikke lå på rutenettet. |
@@ -734,7 +737,7 @@ arrangement at its frozen instant.
 | 0,996015 AU (149,002 mill. km) | — | Avstand: 0,996015 AU (149,002 mill. km) | — |
 | Tilsynelatende diameter | Hvor stor solskiven ser ut, i bueminutter og buesekunder. | Tilsynelatende diameter | Hvor stor solskiven ser ut, i bueminutter og buesekunder. |
 | 32′ 06,1″ | — | Tilsynelatende diameter: 32′ 06,1″ | — |
-| Solen på kartet | — | Solen på kartet | Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for stedet og tidspunktet satt i Sted og tid; samme valg som i Vis-menyen. |
+| Solen på kartet | — | Solen på kartet | Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for karttiden og stedet; samme valg som i Vis-menyen. |
 | ▸ Merkur | Vis eller skjul denne delen | Merkur, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Venus | Vis eller skjul denne delen | Venus, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Månen | Vis eller skjul denne delen | Månen, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
@@ -751,27 +754,24 @@ arrangement at its frozen instant.
 | — | — | Kontrollerens faner | To faner: kartets kontroller, og solsystemets himmellegemer. Å velge en fane beregner ingenting; fanen som sist ble valgt, huskes. |
 | Kart | — | Kart | — |
 | ▾ Solsystemet | — | Solsystemet | — |
-| Kartet: 2026-03-20 21:33:00 UTC | — | Kartet: 2026-03-20 21:33:00 UTC | — |
+| Karttid: 2026-03-20 21:33:00 UTC | — | Karttid: 2026-03-20 21:33:00 UTC | — |
 | Oppdater til nå | Les klokken én gang og sett kartets tidspunkt til nå | Oppdater til nå | Tegner kartet for tidspunktet nå. Klokken leses én gang; tiden går ikke videre etterpå. |
 | ▸ Solen | Vis eller skjul denne delen | Solen, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Merkur | Vis eller skjul denne delen | Merkur, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Venus | Vis eller skjul denne delen | Venus, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Månen | Vis eller skjul denne delen | Månen, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▾ Jupiter | Vis eller skjul denne delen | Jupiter, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
-| — | — | Samsvar med kartet | — |
-| Kartet: 59.91° N · 10.75° Ø, 2026-03-20 21:33:00 UTC | — | Kartet: 59.91° N · 10.75° Ø, 2026-03-20 21:33:00 UTC | — |
-| Observatør på bredde 59,913, lengde 10,752 øst; tidspunkt 2026-03-20 21:33:00 UTC, fra Sted og tid. | — | Observatør på bredde 59,913, lengde 10,752 øst; tidspunkt 2026-03-20 21:33:00 UTC, fra Sted og tid. | — |
-| Dette tidspunktet | Én rad, ved tidspunktet satt i Sted og tid | Vis Jupiter og månene ved tidspunktet satt i Sted og tid | Viser Jupiter ved observasjonstidspunktet satt i Sted og tid, og under den de fire månene i fast rekkefølge. |
-| Over et tidsrom | Én rad for hvert steg fra en start til en slutt | Vis de fire månene over et tidsrom | Viser de fire månene for hvert steg fra starten til slutten, begge medregnet, gruppert under hvert tidspunkt; en slutt som ikke ligger på rutenettet, legges til som siste gruppe og merkes. Dette er utvalgte tidspunkter; tabellen leter ikke etter øyeblikket en måne går inn på eller ut av Jupiterskiven. |
-| Fra (UTC) | — | Fra (UTC) | — |
-| 2026-03-20 21:33:00 | åååå-mm-dd tt:mm eller tt:mm:ss, i UTC | Fra (UTC) | Første tidspunkt i tidsrommet, i UTC. Starter ved tidspunktet satt i Sted og tid. |
-| Til (UTC) | — | Til (UTC) | — |
-| 2026-03-21 21:33:00 | åååå-mm-dd tt:mm eller tt:mm:ss, i UTC | Til (UTC) | Siste tidspunkt i tidsrommet, i UTC, medregnet; ligger det ikke på rutenettet, legges det til som siste rad og merkes. |
+| Karttid 2026-03-20 21:33:00 UTC på bredde 59,913, lengde 10,752 øst, fra Sted og tid. | — | Karttid 2026-03-20 21:33:00 UTC på bredde 59,913, lengde 10,752 øst, fra Sted og tid. | — |
+| Ved karttid | Én rad, ved karttiden | Vis Jupiter og månene ved karttiden | Viser Jupiter ved karttiden, og under den de fire månene i fast rekkefølge. |
+| Over et tidsrom | Én rad for hvert steg fra karttiden, over et omfang | Vis de fire månene over et tidsrom | Viser de fire månene for hvert steg fra starten til slutten, begge medregnet, gruppert under hvert tidspunkt; en slutt som ikke ligger på rutenettet, legges til som siste gruppe og merkes. Dette er utvalgte tidspunkter; tabellen leter ikke etter øyeblikket en måne går inn på eller ut av Jupiterskiven. |
+| Omfang | — | Omfang | — |
+| — | Hvor langt radene rekker fra karttiden | Tidsrommets omfang fra karttiden | Hvor langt fra karttiden radene rekker, i hele steg av steget ved siden av. |
+| — | Hvor langt radene rekker fra karttiden | — | Hvor langt radene rekker fra karttiden |
 | Hvert | — | Hvert | — |
 | — | Tiden som går mellom radene | Steg mellom radene | Tiden som går mellom radene, på UTC-tidslinjen, så et daglig tidsrom ikke forskyver seg ved skifte av sivil klokke. |
 | — | Tiden som går mellom radene | — | Tiden som går mellom radene |
-| Beregn | Fyll tabellen for tidsrommet over | Beregn tidsrommet | Beregner én rad for hvert steg i tidsrommet over. |
-| Jupiter og månene på kartet | — | Jupiter og månene på kartet | Viser eller skjuler Jupiter på kartet der den står for stedet og tidspunktet satt i Sted og tid, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst; samme valg som i Vis-menyen. Io, Europa, Ganymedes og Callisto tegnes som symboler på 3 piksler der de står: en fylt prikk klar av Jupiter, en prikk med en ring i sidens bunnfarge foran den, en hul ring i skyggen, og ingenting bak den; i videre felt tegnes bare de månene som kan skilles fra hverandre. |
+| Beregn | Fyll tabellen for omfanget og steget over, fra karttiden | Beregn tidsrommet | Beregner én rad for hvert steg i omfanget over, fra karttiden nå. |
+| Jupiter og månene på kartet | — | Jupiter og månene på kartet | Viser eller skjuler Jupiter på kartet der den står for karttiden og stedet, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst; samme valg som i Vis-menyen. Io, Europa, Ganymedes og Callisto tegnes som symboler på 3 piksler der de står: en fylt prikk klar av Jupiter, en prikk med en ring i sidens bunnfarge foran den, en hul ring i skyggen, og ingenting bak den; i videre felt tegnes bare de månene som kan skilles fra hverandre. |
 | ▸ Saturn | Vis eller skjul denne delen | Saturn, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 
 ### emphasis-open

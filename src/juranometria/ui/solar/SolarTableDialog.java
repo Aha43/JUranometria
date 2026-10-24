@@ -23,7 +23,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
 import juranometria.sky.Observer;
@@ -37,16 +36,17 @@ import juranometria.ui.language.MnemonicText;
  * A Solar System body's table (Sprint 35, issue #400 for the Sun; Sprint
  * 36, issue #408 for the Moon): where the body is, for the observing
  * place and instant Place and Time owns, as a table the reader can read
- * at that instant or over a range of instants. One shell, built over the
+ * at that instant or over a time range from it. One shell, built over the
  * {@link SolarTable} that says which body, which columns and which words.
  *
- * <p>Place and Time is the authority. The dialog is handed a supplier
- * of the module's current observer and reads it - never copies it,
- * never stores it, never keeps a clock of its own - when it opens,
- * whenever it comes to the front, and when the reader asks. A range
- * is a specification the reader types here: start, end and a fixed
- * step, refused with a stated reason when it runs backwards, asks for
- * more rows than are shown, or leaves the years the ephemeris covers.
+ * <p>The chart's context is the authority (#612). The dialog reads it -
+ * never copies it, never stores it, never keeps a clock of its own -
+ * when it opens on nothing computed yet, and when the reader asks;
+ * when the chart moves on, the rows stay, dimmed under the stale line,
+ * until the reader computes again (ruling P1). A range starts at the
+ * chart time, always, for a span at a step, refused with a stated
+ * reason when it asks for more rows than are shown or leaves the years
+ * the ephemeris covers (P2 as amended).
  * Nothing is persisted: a fresh session opens on the single instant,
  * as {@code PlaceAndTimeSession} opens on the stored place and never
  * on a stored instant.
@@ -62,8 +62,7 @@ import juranometria.ui.language.MnemonicText;
  * {@link SolarTableSession}: the controls, their words and their
  * following of the session live there, and the JUranometria
  * Controller holds a second set of the same class. What is the
- * dialog's own is this layout, the time note, Close, and its coming to
- * the front being an Update.
+ * dialog's own is this layout, the time note and Close.
  */
 public final class SolarTableDialog extends JDialog {
 
@@ -101,12 +100,8 @@ public final class SolarTableDialog extends JDialog {
         getRootPane().registerKeyboardAction(e -> dispose(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
-        addWindowFocusListener(new WindowAdapter() {
-            @Override
-            public void windowGainedFocus(WindowEvent e) {
-                content.update();
-            }
-        });
+        // Coming to the front computes nothing (#612, ruling 3): a table
+        // the chart moved on from says it is stale until Compute.
         pack();
         setLocationRelativeTo(owner);
     }
@@ -164,6 +159,32 @@ public final class SolarTableDialog extends JDialog {
                 new SolarTableSession(observer, service, table), said);
     }
 
+    /**
+     * A packed dialog for a photographer over the chart's holder (#612):
+     * its session follows the holder, so a sheet can show the table
+     * stale after the chart moved on, and the row action is offered.
+     */
+    public static SolarTableDialog packedForStudy(Frame owner,
+                                                  juranometria.context.ChartContextHolder chart,
+                                                  SolarSystemService service,
+                                                  InterfaceText said,
+                                                  SolarTable table) {
+        SolarTableSession session = new SolarTableSession(chart::observer, service, table);
+        session.followContext(chart);
+        return new SolarTableDialog(owner, session, said);
+    }
+
+    /**
+     * A packed dialog for a photographer over a session prepared first -
+     * computed, and the chart moved on, before the dialog packs once at
+     * its final size (#612): a window packed at two sizes in quick
+     * succession is what a late native reply refuses.
+     */
+    public static SolarTableDialog packedForStudy(Frame owner, SolarTableSession session,
+                                                  InterfaceText said) {
+        return new SolarTableDialog(owner, session, said);
+    }
+
     /** The content over a session of its own, headless-constructible, for tests and studies. */
     public static Content content(Supplier<Observer> observer,
                                   SolarSystemService service,
@@ -210,11 +231,11 @@ public final class SolarTableDialog extends JDialog {
         public final JLabel observerNote;
         public final JRadioButton instantView;
         public final JRadioButton rangeView;
-        public final JTextField start;
-        public final JTextField end;
+        public final JComboBox<String> span;
         public final JComboBox<String> step;
         public final JButton compute;
-        public final JButton update;
+        /** Set chart time to this instant (#612, P2), or null over a session that cannot install. */
+        public final JButton setChartTime;
         public final JButton close;
         public final JLabel status;
         public final JLabel timeNote = new JLabel();
@@ -236,11 +257,10 @@ public final class SolarTableDialog extends JDialog {
             observerNote = controls.observerNote;
             instantView = controls.instantView;
             rangeView = controls.rangeView;
-            start = controls.start;
-            end = controls.end;
+            span = controls.span;
             step = controls.step;
             compute = controls.compute;
-            update = controls.update;
+            setChartTime = controls.setChartTime;
             status = controls.status;
             SolarTableWords said = controls.words();
             MnemonicText letters = MnemonicText.in(language);
@@ -250,14 +270,13 @@ public final class SolarTableDialog extends JDialog {
 
             JPanel top = new JPanel();
             top.setLayout(new BoxLayout(top, BoxLayout.Y_AXIS));
-            // The agreement line opens the dialog as it opens the
-            // Controller's group (#259, ruling 5 on #556), Update from
-            // Place and Time in it when the table differs.
-            JComponent agreement = controls.agreementLineInDialog();
-            agreement.setAlignmentX(0.0f);
-            agreement.setMaximumSize(new Dimension(Integer.MAX_VALUE,
+            // The stale line opens the dialog as it opens the
+            // Controller's group (#612, ruling P1).
+            JComponent stale = controls.staleLine();
+            stale.setAlignmentX(0.0f);
+            stale.setMaximumSize(new Dimension(Integer.MAX_VALUE,
                     Integer.MAX_VALUE));
-            top.add(agreement);
+            top.add(stale);
             top.add(Box.createVerticalStrut(8));
             observerNote.setAlignmentX(0.0f);
             top.add(observerNote);
@@ -271,13 +290,15 @@ public final class SolarTableDialog extends JDialog {
             viewRow.add(rangeView);
             top.add(viewRow);
             top.add(Box.createVerticalStrut(8));
-
             JPanel rangeRow = new JPanel();
             rangeRow.setLayout(new BoxLayout(rangeRow, BoxLayout.X_AXIS));
             rangeRow.setAlignmentX(0.0f);
-            rangeRow.add(field(said, "range.start", start, letters));
-            rangeRow.add(Box.createHorizontalStrut(12));
-            rangeRow.add(field(said, "range.end", end, letters));
+            JLabel over = new JLabel(said.say("span.label"));
+            over.setLabelFor(span);
+            letters.apply(over, said.key("span.mnemonic"));
+            rangeRow.add(over);
+            rangeRow.add(Box.createHorizontalStrut(6));
+            rangeRow.add(span);
             rangeRow.add(Box.createHorizontalStrut(12));
             JLabel every = new JLabel(said.say("range.step.label"));
             every.setLabelFor(step);
@@ -315,6 +336,10 @@ public final class SolarTableDialog extends JDialog {
             JPanel buttons = new JPanel();
             buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
             buttons.setAlignmentX(0.0f);
+            if (controls.setChartTime != null) {
+                buttons.add(controls.setChartTime);
+                buttons.add(Box.createHorizontalStrut(8));
+            }
             if (controls.centreOnChart != null) {
                 buttons.add(controls.centreOnChart);
             }
@@ -325,12 +350,15 @@ public final class SolarTableDialog extends JDialog {
 
             close.addActionListener(e -> closeAction.run());
 
-            // The dialog computes when it is built (ruled on #400, kept
-            // on #457): an Update, which every host of the session shows.
-            update();
+            // A fresh session opens on the single instant (ruled on #400,
+            // kept on #457); a session another host has computed is shown
+            // as it stands - opening recomputes nothing (#612, ruling 3).
+            if (!session.result().applied()) {
+                update();
+            }
         }
 
-        /** Reads the observer again and computes this content's view, for every host to see. */
+        /** Applies this content's draft at the chart's context now, for every host to see. */
         public void update() {
             controls.apply();
         }
@@ -343,10 +371,6 @@ public final class SolarTableDialog extends JDialog {
         /** What the status line says now. */
         public String status() {
             return controls.status();
-        }
-
-        static Instant parse(String text) {
-            return SolarTableSession.parse(text);
         }
 
         static String shown(Instant instant) {
@@ -364,21 +388,6 @@ public final class SolarTableDialog extends JDialog {
                 return Explain.control(button, hover, said.say(stem + ".explain"));
             }
             return Explain.selfExplanatory(button, said.say(stem + ".explain"));
-        }
-
-        private static JPanel field(SolarTableWords said, String stem, JTextField field,
-                                    MnemonicText letters) {
-            JPanel row = new JPanel();
-            row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
-            row.setAlignmentX(0.0f);
-            JLabel name = new JLabel(said.say(stem + ".label"));
-            name.setLabelFor(field);
-            letters.apply(name, said.key(stem + ".mnemonic"));
-            field.setMaximumSize(field.getPreferredSize());
-            row.add(name);
-            row.add(Box.createHorizontalStrut(6));
-            row.add(field);
-            return row;
         }
     }
 }

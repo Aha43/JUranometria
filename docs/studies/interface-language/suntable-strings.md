@@ -37,45 +37,41 @@ The fresh state: a single row at the instant Place and Time holds. The Sun stand
 
 ![](suntable-en-1-instant.png)
 
-Packed 959 × 479 px.
+Packed 959 × 433 px.
 
 | shown, hovered or spoken |
 |---|
 | The Sun |
-| Where the Sun is, computed from the bundled ephemeris for the observing place and instant set in Place and Time: its position among the fixed stars, its height and direction above the mathematical horizon, its distance and how large it looks. One row for that instant, or a row for every step of a range. Nothing is drawn on the chart. |
-| Agreement with the chart |
-| Same place and instant as the chart: 59.91° N · 10.75° E, 2026-06-21 10:00:00 UTC |
-| Update from Place and Time |
-| Read the place and instant from Place and Time again |
-| Read the observer and instant from Place and Time again |
-| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
-| Observer at latitude 59.91, longitude 10.75 east; instant 2026-06-21 10:00:00 UTC, from Place and Time. |
-| This instant |
-| One row, at the instant set in Place and Time |
-| Show the Sun at the instant set in Place and Time |
-| Shows a single row: the Sun at the observing instant set in Place and Time. |
-| Over a range |
-| A row for every step from a start to an end |
+| Where the Sun is, computed from the bundled ephemeris for the chart time and place: its position among the fixed stars, its height and direction above the mathematical horizon, its distance and how large it looks. One row for that instant, or a row for every step of a range. Nothing is drawn on the chart. |
+| Whether the table is for the chart time and place now |
+| Computed for chart time 2026-06-21 10:00:00 UTC at latitude 59.91, longitude 10.75 east. |
+| At chart time |
+| One row, at the chart time |
+| Show the Sun at the chart time |
+| Shows a single row: the Sun at the chart time. |
+| Over a time range |
+| A row for every step from the chart time, over a span |
 | Show the Sun over a range of instants |
-| Shows a row for every step from the start to the end, both included; an end that is not on the grid is added as the last row and marked. |
-| From (UTC) |
-| yyyy-mm-dd hh:mm or hh:mm:ss, in UTC |
-| The first instant of the range, in UTC. Starts at the instant set in Place and Time. |
-| To (UTC) |
-| The last instant of the range, in UTC, included; if it is not on the grid it is added as the last row and marked. |
-| Every |
-| 1 hour |
-| 6 hours |
+| Shows a row for every step from the chart time over the span chosen, as many whole steps as the span holds; the first row is the chart time, read again whenever you compute. To range from another instant, set the chart time. |
+| Span |
 | 1 day |
 | 7 days |
 | 30 days |
+| 90 days |
+| 365 days |
+| How far the rows reach from the chart time |
+| Span of the range from the chart time |
+| How far from the chart time the rows reach, in whole steps of the step beside it. |
+| Every |
+| 1 hour |
+| 6 hours |
 | The elapsed time between rows |
 | Step between rows |
 | The elapsed time between rows, on the UTC timeline, so a daily range does not drift across a change of civil clock. |
 | Compute |
-| Fill the table for the range above |
+| Fill the table for the span and step above, from the chart time |
 | Compute the range |
-| Computes a row for every step of the range above. |
+| Computes a row for every step of the span above, from the chart time now. |
 | 1 rows. |
 | Instant (UTC) |
 | Right ascension (J2000) |
@@ -89,57 +85,56 @@ Packed 959 × 479 px.
 | The Sun's computed quantities |
 | Each row is one instant. The columns are the instant in UTC; right ascension and declination in the J2000 frame the chart is drawn in; ecliptic longitude on the J2000 ecliptic; altitude above the mathematical horizon and azimuth from north through east, without refraction; distance from the observer; and the apparent diameter of the disc. |
 | Dates before 1972-01-01 and after 2027-06-28 use an estimated clock correction. After 2026, uncertainty in local horizon coordinates cannot yet be stated precisely. The effect on the J2000 chart position remains below 6″ through 2100 under the adopted model. |
+| Set chart time to this instant |
+| Make the selected row's instant the chart time and redraw every body for it |
+| Set the chart time to the selected row's instant |
+| Sets the chart time to the instant of the selected row, as Place and Time would, so every enabled body is redrawn for it. This table is then for an earlier chart time until you compute again. |
 | Close |
 | Close the Sun table |
 | Closes the table. Nothing is changed or remembered; Place and Time keeps the place and instant. |
 
-### A range with an appended end
+### A week of daily rows from the chart time
 
-Daily rows from the instant, and an end that is not on the grid, added last and marked †. The status line says so.
+Daily rows from the chart time for a week, both ends: the first row is the chart time itself (#612, ruling P2). The status line counts them.
 
 ![](suntable-en-2-range.png)
 
-Packed 959 × 479 px.
+Packed 959 × 433 px.
 
 | shown, hovered or spoken |
 |---|
 | The Sun |
-| Where the Sun is, computed from the bundled ephemeris for the observing place and instant set in Place and Time: its position among the fixed stars, its height and direction above the mathematical horizon, its distance and how large it looks. One row for that instant, or a row for every step of a range. Nothing is drawn on the chart. |
-| Agreement with the chart |
-| This range: 59.91° N · 10.75° E, from 2026-06-21 10:00:00 to 2026-06-24 07:30:00 UTCChart: 59.91° N · 10.75° E, 2026-06-21 10:00:00 UTC |
-| This range: 59.91° N · 10.75° E, from 2026-06-21 10:00:00 to 2026-06-24 07:30:00 UTC Chart: 59.91° N · 10.75° E, 2026-06-21 10:00:00 UTC |
-| Update from Place and Time |
-| Read the place and instant from Place and Time again |
-| Read the observer and instant from Place and Time again |
-| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
-| Observer at latitude 59.91, longitude 10.75 east; instant 2026-06-21 10:00:00 UTC, from Place and Time. |
-| This instant |
-| One row, at the instant set in Place and Time |
-| Show the Sun at the instant set in Place and Time |
-| Shows a single row: the Sun at the observing instant set in Place and Time. |
-| Over a range |
-| A row for every step from a start to an end |
+| Where the Sun is, computed from the bundled ephemeris for the chart time and place: its position among the fixed stars, its height and direction above the mathematical horizon, its distance and how large it looks. One row for that instant, or a row for every step of a range. Nothing is drawn on the chart. |
+| Whether the table is for the chart time and place now |
+| Computed for chart time 2026-06-21 10:00:00 UTC at latitude 59.91, longitude 10.75 east. |
+| At chart time |
+| One row, at the chart time |
+| Show the Sun at the chart time |
+| Shows a single row: the Sun at the chart time. |
+| Over a time range |
+| A row for every step from the chart time, over a span |
 | Show the Sun over a range of instants |
-| Shows a row for every step from the start to the end, both included; an end that is not on the grid is added as the last row and marked. |
-| From (UTC) |
-| yyyy-mm-dd hh:mm or hh:mm:ss, in UTC |
-| The first instant of the range, in UTC. Starts at the instant set in Place and Time. |
-| To (UTC) |
-| The last instant of the range, in UTC, included; if it is not on the grid it is added as the last row and marked. |
-| Every |
-| 1 hour |
-| 6 hours |
+| Shows a row for every step from the chart time over the span chosen, as many whole steps as the span holds; the first row is the chart time, read again whenever you compute. To range from another instant, set the chart time. |
+| Span |
 | 1 day |
 | 7 days |
 | 30 days |
+| 90 days |
+| 365 days |
+| How far the rows reach from the chart time |
+| Span of the range from the chart time |
+| How far from the chart time the rows reach, in whole steps of the step beside it. |
+| Every |
+| 1 hour |
+| 6 hours |
 | The elapsed time between rows |
 | Step between rows |
 | The elapsed time between rows, on the UTC timeline, so a daily range does not drift across a change of civil clock. |
 | Compute |
-| Fill the table for the range above |
+| Fill the table for the span and step above, from the chart time |
 | Compute the range |
-| Computes a row for every step of the range above. |
-| 4 rows; the end is not on the grid, so it is the last row, marked †. |
+| Computes a row for every step of the span above, from the chart time now. |
+| 8 rows. |
 | Instant (UTC) |
 | Right ascension (J2000) |
 | Declination (J2000) |
@@ -151,60 +146,64 @@ Packed 959 × 479 px.
 | 2026-06-21 10:00 · 05h 58m 40.8s · +23° 26′ 02″ · 89.70° · 51.01° · 150.56° · 1.016165 AU (152.016 mill. km) · 31′ 27.9″ |
 | 2026-06-22 10:00 · 06h 02m 50.5s · +23° 25′ 58″ · 90.65° · 50.99° · 150.48° · 1.016222 AU (152.025 mill. km) · 31′ 27.8″ |
 | 2026-06-23 10:00 · 06h 07m 00.0s · +23° 25′ 28″ · 91.61° · 50.96° · 150.41° · 1.016274 AU (152.032 mill. km) · 31′ 27.7″ |
-| 2026-06-24 07:30 † · 06h 10m 43.6s · +23° 24′ 40″ · 92.46° · 36.29° · 106.52° · 1.016326 AU (152.040 mill. km) · 31′ 27.6″ |
+| 2026-06-24 10:00 · 06h 11m 09.5s · +23° 24′ 34″ · 92.56° · 50.93° · 150.35° · 1.016323 AU (152.040 mill. km) · 31′ 27.7″ |
+| 2026-06-25 10:00 · 06h 15m 18.8s · +23° 23′ 15″ · 93.51° · 50.90° · 150.28° · 1.016367 AU (152.046 mill. km) · 31′ 27.6″ |
+| 2026-06-26 10:00 · 06h 19m 28.0s · +23° 21′ 32″ · 94.47° · 50.85° · 150.22° · 1.016407 AU (152.052 mill. km) · 31′ 27.5″ |
+| 2026-06-27 10:00 · 06h 23m 37.1s · +23° 19′ 24″ · 95.42° · 50.80° · 150.16° · 1.016444 AU (152.058 mill. km) · 31′ 27.4″ |
+| 2026-06-28 10:00 · 06h 27m 46.0s · +23° 16′ 51″ · 96.37° · 50.75° · 150.11° · 1.016477 AU (152.063 mill. km) · 31′ 27.4″ |
 | The Sun's computed quantities |
 | Each row is one instant. The columns are the instant in UTC; right ascension and declination in the J2000 frame the chart is drawn in; ecliptic longitude on the J2000 ecliptic; altitude above the mathematical horizon and azimuth from north through east, without refraction; distance from the observer; and the apparent diameter of the disc. |
 | Dates before 1972-01-01 and after 2027-06-28 use an estimated clock correction. After 2026, uncertainty in local horizon coordinates cannot yet be stated precisely. The effect on the J2000 chart position remains below 6″ through 2100 under the adopted model. |
+| Set chart time to this instant [unavailable] |
+| Make the selected row's instant the chart time and redraw every body for it [unavailable] |
+| Set the chart time to the selected row's instant [unavailable] |
+| Sets the chart time to the instant of the selected row, as Place and Time would, so every enabled body is redrawn for it. This table is then for an earlier chart time until you compute again. [unavailable] |
 | Close |
 | Close the Sun table |
 | Closes the table. Nothing is changed or remembered; Place and Time keeps the place and instant. |
 
-### A range that runs backwards
+### A range that asks for too many rows
 
-The end is before the start. The table is empty and the status line says why; nothing is guessed.
+A year of hourly rows asks for more than the 1 000 shown. The table is empty and the status line says why; nothing is cut short silently.
 
 ![](suntable-en-3-refused.png)
 
-Packed 959 × 479 px.
+Packed 959 × 433 px.
 
 | shown, hovered or spoken |
 |---|
 | The Sun |
-| Where the Sun is, computed from the bundled ephemeris for the observing place and instant set in Place and Time: its position among the fixed stars, its height and direction above the mathematical horizon, its distance and how large it looks. One row for that instant, or a row for every step of a range. Nothing is drawn on the chart. |
-| Agreement with the chart |
-| Chart: 59.91° N · 10.75° E, 2026-06-21 10:00:00 UTC |
-| Update from Place and Time |
-| Read the place and instant from Place and Time again |
-| Read the observer and instant from Place and Time again |
-| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
-| Observer at latitude 59.91, longitude 10.75 east; instant 2026-06-21 10:00:00 UTC, from Place and Time. |
-| This instant |
-| One row, at the instant set in Place and Time |
-| Show the Sun at the instant set in Place and Time |
-| Shows a single row: the Sun at the observing instant set in Place and Time. |
-| Over a range |
-| A row for every step from a start to an end |
+| Where the Sun is, computed from the bundled ephemeris for the chart time and place: its position among the fixed stars, its height and direction above the mathematical horizon, its distance and how large it looks. One row for that instant, or a row for every step of a range. Nothing is drawn on the chart. |
+| Whether the table is for the chart time and place now |
+| Computed for chart time 2026-06-21 10:00:00 UTC at latitude 59.91, longitude 10.75 east. |
+| At chart time |
+| One row, at the chart time |
+| Show the Sun at the chart time |
+| Shows a single row: the Sun at the chart time. |
+| Over a time range |
+| A row for every step from the chart time, over a span |
 | Show the Sun over a range of instants |
-| Shows a row for every step from the start to the end, both included; an end that is not on the grid is added as the last row and marked. |
-| From (UTC) |
-| yyyy-mm-dd hh:mm or hh:mm:ss, in UTC |
-| The first instant of the range, in UTC. Starts at the instant set in Place and Time. |
-| To (UTC) |
-| The last instant of the range, in UTC, included; if it is not on the grid it is added as the last row and marked. |
-| Every |
-| 1 hour |
-| 6 hours |
+| Shows a row for every step from the chart time over the span chosen, as many whole steps as the span holds; the first row is the chart time, read again whenever you compute. To range from another instant, set the chart time. |
+| Span |
 | 1 day |
 | 7 days |
 | 30 days |
+| 90 days |
+| 365 days |
+| How far the rows reach from the chart time |
+| Span of the range from the chart time |
+| How far from the chart time the rows reach, in whole steps of the step beside it. |
+| Every |
+| 1 hour |
+| 6 hours |
 | The elapsed time between rows |
 | Step between rows |
 | The elapsed time between rows, on the UTC timeline, so a daily range does not drift across a change of civil clock. |
 | Compute |
-| Fill the table for the range above |
+| Fill the table for the span and step above, from the chart time |
 | Compute the range |
-| Computes a row for every step of the range above. |
-| The range runs backwards: the end is before the start. |
+| Computes a row for every step of the span above, from the chart time now. |
+| That range asks for 8761 rows and at most 1000 are shown; shorten it or lengthen the step. |
 | Instant (UTC) |
 | Right ascension (J2000) |
 | Declination (J2000) |
@@ -216,6 +215,10 @@ Packed 959 × 479 px.
 | The Sun's computed quantities |
 | Each row is one instant. The columns are the instant in UTC; right ascension and declination in the J2000 frame the chart is drawn in; ecliptic longitude on the J2000 ecliptic; altitude above the mathematical horizon and azimuth from north through east, without refraction; distance from the observer; and the apparent diameter of the disc. |
 | Dates before 1972-01-01 and after 2027-06-28 use an estimated clock correction. After 2026, uncertainty in local horizon coordinates cannot yet be stated precisely. The effect on the J2000 chart position remains below 6″ through 2100 under the adopted model. |
+| Set chart time to this instant [unavailable] |
+| Make the selected row's instant the chart time and redraw every body for it [unavailable] |
+| Set the chart time to the selected row's instant [unavailable] |
+| Sets the chart time to the instant of the selected row, as Place and Time would, so every enabled body is redrawn for it. This table is then for an earlier chart time until you compute again. [unavailable] |
 | Close |
 | Close the Sun table |
 | Closes the table. Nothing is changed or remembered; Place and Time keeps the place and instant. |
@@ -226,45 +229,41 @@ An equatorial observer at the IMCCE's solstice instant: the Sun is up, 32° high
 
 ![](suntable-en-4-quito.png)
 
-Packed 959 × 479 px.
+Packed 959 × 433 px.
 
 | shown, hovered or spoken |
 |---|
 | The Sun |
-| Where the Sun is, computed from the bundled ephemeris for the observing place and instant set in Place and Time: its position among the fixed stars, its height and direction above the mathematical horizon, its distance and how large it looks. One row for that instant, or a row for every step of a range. Nothing is drawn on the chart. |
-| Agreement with the chart |
-| Same place and instant as the chart: 0.18° S · 78.50° W, 2026-12-21 20:50:09 UTC |
-| Update from Place and Time |
-| Read the place and instant from Place and Time again |
-| Read the observer and instant from Place and Time again |
-| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
-| Observer at latitude -0.18, longitude -78.5 east; instant 2026-12-21 20:50:09 UTC, from Place and Time. |
-| This instant |
-| One row, at the instant set in Place and Time |
-| Show the Sun at the instant set in Place and Time |
-| Shows a single row: the Sun at the observing instant set in Place and Time. |
-| Over a range |
-| A row for every step from a start to an end |
+| Where the Sun is, computed from the bundled ephemeris for the chart time and place: its position among the fixed stars, its height and direction above the mathematical horizon, its distance and how large it looks. One row for that instant, or a row for every step of a range. Nothing is drawn on the chart. |
+| Whether the table is for the chart time and place now |
+| Computed for chart time 2026-12-21 20:50:09 UTC at latitude -0.18, longitude -78.5 east. |
+| At chart time |
+| One row, at the chart time |
+| Show the Sun at the chart time |
+| Shows a single row: the Sun at the chart time. |
+| Over a time range |
+| A row for every step from the chart time, over a span |
 | Show the Sun over a range of instants |
-| Shows a row for every step from the start to the end, both included; an end that is not on the grid is added as the last row and marked. |
-| From (UTC) |
-| yyyy-mm-dd hh:mm or hh:mm:ss, in UTC |
-| The first instant of the range, in UTC. Starts at the instant set in Place and Time. |
-| To (UTC) |
-| The last instant of the range, in UTC, included; if it is not on the grid it is added as the last row and marked. |
-| Every |
-| 1 hour |
-| 6 hours |
+| Shows a row for every step from the chart time over the span chosen, as many whole steps as the span holds; the first row is the chart time, read again whenever you compute. To range from another instant, set the chart time. |
+| Span |
 | 1 day |
 | 7 days |
 | 30 days |
+| 90 days |
+| 365 days |
+| How far the rows reach from the chart time |
+| Span of the range from the chart time |
+| How far from the chart time the rows reach, in whole steps of the step beside it. |
+| Every |
+| 1 hour |
+| 6 hours |
 | The elapsed time between rows |
 | Step between rows |
 | The elapsed time between rows, on the UTC timeline, so a daily range does not drift across a change of civil clock. |
 | Compute |
-| Fill the table for the range above |
+| Fill the table for the span and step above, from the chart time |
 | Compute the range |
-| Computes a row for every step of the range above. |
+| Computes a row for every step of the span above, from the chart time now. |
 | 1 rows. |
 | Instant (UTC) |
 | Right ascension (J2000) |
@@ -278,53 +277,56 @@ Packed 959 × 479 px.
 | The Sun's computed quantities |
 | Each row is one instant. The columns are the instant in UTC; right ascension and declination in the J2000 frame the chart is drawn in; ecliptic longitude on the J2000 ecliptic; altitude above the mathematical horizon and azimuth from north through east, without refraction; distance from the observer; and the apparent diameter of the disc. |
 | Dates before 1972-01-01 and after 2027-06-28 use an estimated clock correction. After 2026, uncertainty in local horizon coordinates cannot yet be stated precisely. The effect on the J2000 chart position remains below 6″ through 2100 under the adopted model. |
+| Set chart time to this instant |
+| Make the selected row's instant the chart time and redraw every body for it |
+| Set the chart time to the selected row's instant |
+| Sets the chart time to the instant of the selected row, as Place and Time would, so every enabled body is redrawn for it. This table is then for an earlier chart time until you compute again. |
 | Close |
 | Close the Sun table |
 | Closes the table. Nothing is changed or remembered; Place and Time keeps the place and instant. |
 
-### The instant, in the dark appearance
+### The chart moved on after computing
 
-![](suntable-en-5-instant-dark.png)
+The chart time moved six hours on after this instant was computed (#612, ruling P1): the rows stay, dimmed, under the stale message, until Compute; the note states the chart time and place the rows are for.
+
+![](suntable-en-5-stale.png)
 
 Packed 959 × 479 px.
 
 | shown, hovered or spoken |
 |---|
 | The Sun |
-| Where the Sun is, computed from the bundled ephemeris for the observing place and instant set in Place and Time: its position among the fixed stars, its height and direction above the mathematical horizon, its distance and how large it looks. One row for that instant, or a row for every step of a range. Nothing is drawn on the chart. |
-| Agreement with the chart |
-| Same place and instant as the chart: 59.91° N · 10.75° E, 2026-06-21 10:00:00 UTC |
-| Update from Place and Time |
-| Read the place and instant from Place and Time again |
-| Read the observer and instant from Place and Time again |
-| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
-| Observer at latitude 59.91, longitude 10.75 east; instant 2026-06-21 10:00:00 UTC, from Place and Time. |
-| This instant |
-| One row, at the instant set in Place and Time |
-| Show the Sun at the instant set in Place and Time |
-| Shows a single row: the Sun at the observing instant set in Place and Time. |
-| Over a range |
-| A row for every step from a start to an end |
+| Where the Sun is, computed from the bundled ephemeris for the chart time and place: its position among the fixed stars, its height and direction above the mathematical horizon, its distance and how large it looks. One row for that instant, or a row for every step of a range. Nothing is drawn on the chart. |
+| Whether the table is for the chart time and place now |
+| Computed for the previous chart time and place — Compute again |
+| Computed for chart time 2026-06-21 10:00:00 UTC at latitude 59.91, longitude 10.75 east. |
+| At chart time |
+| One row, at the chart time |
+| Show the Sun at the chart time |
+| Shows a single row: the Sun at the chart time. |
+| Over a time range |
+| A row for every step from the chart time, over a span |
 | Show the Sun over a range of instants |
-| Shows a row for every step from the start to the end, both included; an end that is not on the grid is added as the last row and marked. |
-| From (UTC) |
-| yyyy-mm-dd hh:mm or hh:mm:ss, in UTC |
-| The first instant of the range, in UTC. Starts at the instant set in Place and Time. |
-| To (UTC) |
-| The last instant of the range, in UTC, included; if it is not on the grid it is added as the last row and marked. |
-| Every |
-| 1 hour |
-| 6 hours |
+| Shows a row for every step from the chart time over the span chosen, as many whole steps as the span holds; the first row is the chart time, read again whenever you compute. To range from another instant, set the chart time. |
+| Span |
 | 1 day |
 | 7 days |
 | 30 days |
+| 90 days |
+| 365 days |
+| How far the rows reach from the chart time |
+| Span of the range from the chart time |
+| How far from the chart time the rows reach, in whole steps of the step beside it. |
+| Every |
+| 1 hour |
+| 6 hours |
 | The elapsed time between rows |
 | Step between rows |
 | The elapsed time between rows, on the UTC timeline, so a daily range does not drift across a change of civil clock. |
 | Compute |
-| Fill the table for the range above |
+| Fill the table for the span and step above, from the chart time |
 | Compute the range |
-| Computes a row for every step of the range above. |
+| Computes a row for every step of the span above, from the chart time now. |
 | 1 rows. |
 | Instant (UTC) |
 | Right ascension (J2000) |
@@ -338,6 +340,70 @@ Packed 959 × 479 px.
 | The Sun's computed quantities |
 | Each row is one instant. The columns are the instant in UTC; right ascension and declination in the J2000 frame the chart is drawn in; ecliptic longitude on the J2000 ecliptic; altitude above the mathematical horizon and azimuth from north through east, without refraction; distance from the observer; and the apparent diameter of the disc. |
 | Dates before 1972-01-01 and after 2027-06-28 use an estimated clock correction. After 2026, uncertainty in local horizon coordinates cannot yet be stated precisely. The effect on the J2000 chart position remains below 6″ through 2100 under the adopted model. |
+| Set chart time to this instant |
+| Make the selected row's instant the chart time and redraw every body for it |
+| Set the chart time to the selected row's instant |
+| Sets the chart time to the instant of the selected row, as Place and Time would, so every enabled body is redrawn for it. This table is then for an earlier chart time until you compute again. |
+| Close |
+| Close the Sun table |
+| Closes the table. Nothing is changed or remembered; Place and Time keeps the place and instant. |
+
+### The instant, in the dark appearance
+
+![](suntable-en-6-instant-dark.png)
+
+Packed 959 × 433 px.
+
+| shown, hovered or spoken |
+|---|
+| The Sun |
+| Where the Sun is, computed from the bundled ephemeris for the chart time and place: its position among the fixed stars, its height and direction above the mathematical horizon, its distance and how large it looks. One row for that instant, or a row for every step of a range. Nothing is drawn on the chart. |
+| Whether the table is for the chart time and place now |
+| Computed for chart time 2026-06-21 10:00:00 UTC at latitude 59.91, longitude 10.75 east. |
+| At chart time |
+| One row, at the chart time |
+| Show the Sun at the chart time |
+| Shows a single row: the Sun at the chart time. |
+| Over a time range |
+| A row for every step from the chart time, over a span |
+| Show the Sun over a range of instants |
+| Shows a row for every step from the chart time over the span chosen, as many whole steps as the span holds; the first row is the chart time, read again whenever you compute. To range from another instant, set the chart time. |
+| Span |
+| 1 day |
+| 7 days |
+| 30 days |
+| 90 days |
+| 365 days |
+| How far the rows reach from the chart time |
+| Span of the range from the chart time |
+| How far from the chart time the rows reach, in whole steps of the step beside it. |
+| Every |
+| 1 hour |
+| 6 hours |
+| The elapsed time between rows |
+| Step between rows |
+| The elapsed time between rows, on the UTC timeline, so a daily range does not drift across a change of civil clock. |
+| Compute |
+| Fill the table for the span and step above, from the chart time |
+| Compute the range |
+| Computes a row for every step of the span above, from the chart time now. |
+| 1 rows. |
+| Instant (UTC) |
+| Right ascension (J2000) |
+| Declination (J2000) |
+| Ecliptic longitude (J2000) |
+| Altitude (no refraction) |
+| Azimuth (from north through east) |
+| Distance |
+| Apparent diameter |
+| 2026-06-21 10:00 · 05h 58m 40.8s · +23° 26′ 02″ · 89.70° · 51.01° · 150.56° · 1.016165 AU (152.016 mill. km) · 31′ 27.9″ |
+| The Sun's computed quantities |
+| Each row is one instant. The columns are the instant in UTC; right ascension and declination in the J2000 frame the chart is drawn in; ecliptic longitude on the J2000 ecliptic; altitude above the mathematical horizon and azimuth from north through east, without refraction; distance from the observer; and the apparent diameter of the disc. |
+| Dates before 1972-01-01 and after 2027-06-28 use an estimated clock correction. After 2026, uncertainty in local horizon coordinates cannot yet be stated precisely. The effect on the J2000 chart position remains below 6″ through 2100 under the adopted model. |
+| Set chart time to this instant |
+| Make the selected row's instant the chart time and redraw every body for it |
+| Set the chart time to the selected row's instant |
+| Sets the chart time to the instant of the selected row, as Place and Time would, so every enabled body is redrawn for it. This table is then for an earlier chart time until you compute again. |
 | Close |
 | Close the Sun table |
 | Closes the table. Nothing is changed or remembered; Place and Time keeps the place and instant. |
@@ -361,47 +427,43 @@ Packed 959 × 479 px.
 
 The fresh state: a single row at the instant Place and Time holds. The Sun stands 51° high to the south-east.
 
-![](suntable-nb-NO-6-instant.png)
+![](suntable-nb-NO-7-instant.png)
 
-Packed 959 × 479 px.
+Packed 959 × 433 px.
 
 | shown, hovered or spoken |
 |---|
 | Solen |
-| Hvor Solen er, beregnet fra den medfølgende efemeriden for observasjonsstedet og tidspunktet satt i Sted og tid: posisjonen blant fiksstjernene, høyden og retningen over den matematiske horisonten, avstanden og hvor stor den ser ut. Én rad for det tidspunktet, eller én rad for hvert steg i et tidsrom. Ingenting tegnes på kartet. |
-| Samsvar med kartet |
-| Samme sted og tidspunkt som kartet: 59.91° N · 10.75° Ø, 2026-06-21 10:00:00 UTC |
-| Oppdater fra Sted og tid |
-| Les sted og tidspunkt fra Sted og tid på nytt |
-| Les observatør og tidspunkt fra Sted og tid på nytt |
-| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
-| Observatør på bredde 59,91, lengde 10,75 øst; tidspunkt 2026-06-21 10:00:00 UTC, fra Sted og tid. |
-| Dette tidspunktet |
-| Én rad, ved tidspunktet satt i Sted og tid |
-| Vis Solen ved tidspunktet satt i Sted og tid |
-| Viser én rad: Solen ved observasjonstidspunktet satt i Sted og tid. |
+| Hvor Solen er, beregnet fra den medfølgende efemeriden for karttiden og observasjonsstedet: posisjonen blant fiksstjernene, høyden og retningen over den matematiske horisonten, avstanden og hvor stor den ser ut. Én rad for det tidspunktet, eller én rad for hvert steg i et tidsrom. Ingenting tegnes på kartet. |
+| Om tabellen gjelder karttiden og stedet nå |
+| Beregnet for karttid 2026-06-21 10:00:00 UTC på bredde 59,91, lengde 10,75 øst. |
+| Ved karttid |
+| Én rad, ved karttiden |
+| Vis Solen ved karttiden |
+| Viser én rad: Solen ved karttiden. |
 | Over et tidsrom |
-| Én rad for hvert steg fra en start til en slutt |
+| Én rad for hvert steg fra karttiden, over et omfang |
 | Vis Solen over et tidsrom |
-| Viser én rad for hvert steg fra starten til slutten, begge medregnet; en slutt som ikke ligger på rutenettet, legges til som siste rad og merkes. |
-| Fra (UTC) |
-| åååå-mm-dd tt:mm eller tt:mm:ss, i UTC |
-| Første tidspunkt i tidsrommet, i UTC. Starter ved tidspunktet satt i Sted og tid. |
-| Til (UTC) |
-| Siste tidspunkt i tidsrommet, i UTC, medregnet; ligger det ikke på rutenettet, legges det til som siste rad og merkes. |
-| Hvert |
-| 1 time |
-| 6 timer |
+| Viser én rad for hvert steg fra karttiden over omfanget valgt, så mange hele steg som omfanget rommer; første rad er karttiden, lest på nytt hver gang du beregner. Sett karttiden for å regne fra et annet tidspunkt. |
+| Omfang |
 | 1 døgn |
 | 7 døgn |
 | 30 døgn |
+| 90 døgn |
+| 365 døgn |
+| Hvor langt radene rekker fra karttiden |
+| Tidsrommets omfang fra karttiden |
+| Hvor langt fra karttiden radene rekker, i hele steg av steget ved siden av. |
+| Hvert |
+| 1 time |
+| 6 timer |
 | Tiden som går mellom radene |
 | Steg mellom radene |
 | Tiden som går mellom radene, på UTC-tidslinjen, så et daglig tidsrom ikke forskyver seg ved skifte av sivil klokke. |
 | Beregn |
-| Fyll tabellen for tidsrommet over |
+| Fyll tabellen for omfanget og steget over, fra karttiden |
 | Beregn tidsrommet |
-| Beregner én rad for hvert steg i tidsrommet over. |
+| Beregner én rad for hvert steg i omfanget over, fra karttiden nå. |
 | 1 rader. |
 | Tidspunkt (UTC) |
 | Rektascensjon (J2000) |
@@ -415,57 +477,56 @@ Packed 959 × 479 px.
 | Solens beregnede størrelser |
 | Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; ekliptisk lengde på J2000-ekliptikken; høyde over den matematiske horisonten og asimut fra nord via øst, uten refraksjon; avstand fra observatøren; og skivens tilsynelatende diameter. |
 | Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 6″ fram til 2100 med den valgte modellen. |
+| Sett karttid til dette tidspunktet |
+| Gjør den valgte radens tidspunkt til karttid og tegn hvert himmellegeme på nytt for det |
+| Sett karttiden til den valgte radens tidspunkt |
+| Setter karttiden til tidspunktet i den valgte raden, slik Sted og tid ville gjort, så hvert påslått himmellegeme tegnes på nytt for det. Denne tabellen gjelder så en tidligere karttid til du beregner på nytt. |
 | Lukk |
 | Lukk soltabellen |
 | Lukker tabellen. Ingenting endres eller huskes; Sted og tid beholder stedet og tidspunktet. |
 
-### A range with an appended end
+### A week of daily rows from the chart time
 
-Daily rows from the instant, and an end that is not on the grid, added last and marked †. The status line says so.
+Daily rows from the chart time for a week, both ends: the first row is the chart time itself (#612, ruling P2). The status line counts them.
 
-![](suntable-nb-NO-7-range.png)
+![](suntable-nb-NO-8-range.png)
 
-Packed 959 × 479 px.
+Packed 959 × 433 px.
 
 | shown, hovered or spoken |
 |---|
 | Solen |
-| Hvor Solen er, beregnet fra den medfølgende efemeriden for observasjonsstedet og tidspunktet satt i Sted og tid: posisjonen blant fiksstjernene, høyden og retningen over den matematiske horisonten, avstanden og hvor stor den ser ut. Én rad for det tidspunktet, eller én rad for hvert steg i et tidsrom. Ingenting tegnes på kartet. |
-| Samsvar med kartet |
-| Dette tidsrommet: 59.91° N · 10.75° Ø, fra 2026-06-21 10:00:00 til 2026-06-24 07:30:00 UTCKartet: 59.91° N · 10.75° Ø, 2026-06-21 10:00:00 UTC |
-| Dette tidsrommet: 59.91° N · 10.75° Ø, fra 2026-06-21 10:00:00 til 2026-06-24 07:30:00 UTC Kartet: 59.91° N · 10.75° Ø, 2026-06-21 10:00:00 UTC |
-| Oppdater fra Sted og tid |
-| Les sted og tidspunkt fra Sted og tid på nytt |
-| Les observatør og tidspunkt fra Sted og tid på nytt |
-| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
-| Observatør på bredde 59,91, lengde 10,75 øst; tidspunkt 2026-06-21 10:00:00 UTC, fra Sted og tid. |
-| Dette tidspunktet |
-| Én rad, ved tidspunktet satt i Sted og tid |
-| Vis Solen ved tidspunktet satt i Sted og tid |
-| Viser én rad: Solen ved observasjonstidspunktet satt i Sted og tid. |
+| Hvor Solen er, beregnet fra den medfølgende efemeriden for karttiden og observasjonsstedet: posisjonen blant fiksstjernene, høyden og retningen over den matematiske horisonten, avstanden og hvor stor den ser ut. Én rad for det tidspunktet, eller én rad for hvert steg i et tidsrom. Ingenting tegnes på kartet. |
+| Om tabellen gjelder karttiden og stedet nå |
+| Beregnet for karttid 2026-06-21 10:00:00 UTC på bredde 59,91, lengde 10,75 øst. |
+| Ved karttid |
+| Én rad, ved karttiden |
+| Vis Solen ved karttiden |
+| Viser én rad: Solen ved karttiden. |
 | Over et tidsrom |
-| Én rad for hvert steg fra en start til en slutt |
+| Én rad for hvert steg fra karttiden, over et omfang |
 | Vis Solen over et tidsrom |
-| Viser én rad for hvert steg fra starten til slutten, begge medregnet; en slutt som ikke ligger på rutenettet, legges til som siste rad og merkes. |
-| Fra (UTC) |
-| åååå-mm-dd tt:mm eller tt:mm:ss, i UTC |
-| Første tidspunkt i tidsrommet, i UTC. Starter ved tidspunktet satt i Sted og tid. |
-| Til (UTC) |
-| Siste tidspunkt i tidsrommet, i UTC, medregnet; ligger det ikke på rutenettet, legges det til som siste rad og merkes. |
-| Hvert |
-| 1 time |
-| 6 timer |
+| Viser én rad for hvert steg fra karttiden over omfanget valgt, så mange hele steg som omfanget rommer; første rad er karttiden, lest på nytt hver gang du beregner. Sett karttiden for å regne fra et annet tidspunkt. |
+| Omfang |
 | 1 døgn |
 | 7 døgn |
 | 30 døgn |
+| 90 døgn |
+| 365 døgn |
+| Hvor langt radene rekker fra karttiden |
+| Tidsrommets omfang fra karttiden |
+| Hvor langt fra karttiden radene rekker, i hele steg av steget ved siden av. |
+| Hvert |
+| 1 time |
+| 6 timer |
 | Tiden som går mellom radene |
 | Steg mellom radene |
 | Tiden som går mellom radene, på UTC-tidslinjen, så et daglig tidsrom ikke forskyver seg ved skifte av sivil klokke. |
 | Beregn |
-| Fyll tabellen for tidsrommet over |
+| Fyll tabellen for omfanget og steget over, fra karttiden |
 | Beregn tidsrommet |
-| Beregner én rad for hvert steg i tidsrommet over. |
-| 4 rader; slutten ligger ikke på rutenettet, så den er siste rad, merket †. |
+| Beregner én rad for hvert steg i omfanget over, fra karttiden nå. |
+| 8 rader. |
 | Tidspunkt (UTC) |
 | Rektascensjon (J2000) |
 | Deklinasjon (J2000) |
@@ -477,60 +538,64 @@ Packed 959 × 479 px.
 | 2026-06-21 10:00 · 05h 58m 40,8s · +23° 26′ 02″ · 89,70° · 51,01° · 150,56° · 1,016165 AU (152,016 mill. km) · 31′ 27,9″ |
 | 2026-06-22 10:00 · 06h 02m 50,5s · +23° 25′ 58″ · 90,65° · 50,99° · 150,48° · 1,016222 AU (152,025 mill. km) · 31′ 27,8″ |
 | 2026-06-23 10:00 · 06h 07m 00,0s · +23° 25′ 28″ · 91,61° · 50,96° · 150,41° · 1,016274 AU (152,032 mill. km) · 31′ 27,7″ |
-| 2026-06-24 07:30 † · 06h 10m 43,6s · +23° 24′ 40″ · 92,46° · 36,29° · 106,52° · 1,016326 AU (152,040 mill. km) · 31′ 27,6″ |
+| 2026-06-24 10:00 · 06h 11m 09,5s · +23° 24′ 34″ · 92,56° · 50,93° · 150,35° · 1,016323 AU (152,040 mill. km) · 31′ 27,7″ |
+| 2026-06-25 10:00 · 06h 15m 18,8s · +23° 23′ 15″ · 93,51° · 50,90° · 150,28° · 1,016367 AU (152,046 mill. km) · 31′ 27,6″ |
+| 2026-06-26 10:00 · 06h 19m 28,0s · +23° 21′ 32″ · 94,47° · 50,85° · 150,22° · 1,016407 AU (152,052 mill. km) · 31′ 27,5″ |
+| 2026-06-27 10:00 · 06h 23m 37,1s · +23° 19′ 24″ · 95,42° · 50,80° · 150,16° · 1,016444 AU (152,058 mill. km) · 31′ 27,4″ |
+| 2026-06-28 10:00 · 06h 27m 46,0s · +23° 16′ 51″ · 96,37° · 50,75° · 150,11° · 1,016477 AU (152,063 mill. km) · 31′ 27,4″ |
 | Solens beregnede størrelser |
 | Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; ekliptisk lengde på J2000-ekliptikken; høyde over den matematiske horisonten og asimut fra nord via øst, uten refraksjon; avstand fra observatøren; og skivens tilsynelatende diameter. |
 | Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 6″ fram til 2100 med den valgte modellen. |
+| Sett karttid til dette tidspunktet [unavailable] |
+| Gjør den valgte radens tidspunkt til karttid og tegn hvert himmellegeme på nytt for det [unavailable] |
+| Sett karttiden til den valgte radens tidspunkt [unavailable] |
+| Setter karttiden til tidspunktet i den valgte raden, slik Sted og tid ville gjort, så hvert påslått himmellegeme tegnes på nytt for det. Denne tabellen gjelder så en tidligere karttid til du beregner på nytt. [unavailable] |
 | Lukk |
 | Lukk soltabellen |
 | Lukker tabellen. Ingenting endres eller huskes; Sted og tid beholder stedet og tidspunktet. |
 
-### A range that runs backwards
+### A range that asks for too many rows
 
-The end is before the start. The table is empty and the status line says why; nothing is guessed.
+A year of hourly rows asks for more than the 1 000 shown. The table is empty and the status line says why; nothing is cut short silently.
 
-![](suntable-nb-NO-8-refused.png)
+![](suntable-nb-NO-9-refused.png)
 
-Packed 959 × 479 px.
+Packed 959 × 433 px.
 
 | shown, hovered or spoken |
 |---|
 | Solen |
-| Hvor Solen er, beregnet fra den medfølgende efemeriden for observasjonsstedet og tidspunktet satt i Sted og tid: posisjonen blant fiksstjernene, høyden og retningen over den matematiske horisonten, avstanden og hvor stor den ser ut. Én rad for det tidspunktet, eller én rad for hvert steg i et tidsrom. Ingenting tegnes på kartet. |
-| Samsvar med kartet |
-| Kartet: 59.91° N · 10.75° Ø, 2026-06-21 10:00:00 UTC |
-| Oppdater fra Sted og tid |
-| Les sted og tidspunkt fra Sted og tid på nytt |
-| Les observatør og tidspunkt fra Sted og tid på nytt |
-| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
-| Observatør på bredde 59,91, lengde 10,75 øst; tidspunkt 2026-06-21 10:00:00 UTC, fra Sted og tid. |
-| Dette tidspunktet |
-| Én rad, ved tidspunktet satt i Sted og tid |
-| Vis Solen ved tidspunktet satt i Sted og tid |
-| Viser én rad: Solen ved observasjonstidspunktet satt i Sted og tid. |
+| Hvor Solen er, beregnet fra den medfølgende efemeriden for karttiden og observasjonsstedet: posisjonen blant fiksstjernene, høyden og retningen over den matematiske horisonten, avstanden og hvor stor den ser ut. Én rad for det tidspunktet, eller én rad for hvert steg i et tidsrom. Ingenting tegnes på kartet. |
+| Om tabellen gjelder karttiden og stedet nå |
+| Beregnet for karttid 2026-06-21 10:00:00 UTC på bredde 59,91, lengde 10,75 øst. |
+| Ved karttid |
+| Én rad, ved karttiden |
+| Vis Solen ved karttiden |
+| Viser én rad: Solen ved karttiden. |
 | Over et tidsrom |
-| Én rad for hvert steg fra en start til en slutt |
+| Én rad for hvert steg fra karttiden, over et omfang |
 | Vis Solen over et tidsrom |
-| Viser én rad for hvert steg fra starten til slutten, begge medregnet; en slutt som ikke ligger på rutenettet, legges til som siste rad og merkes. |
-| Fra (UTC) |
-| åååå-mm-dd tt:mm eller tt:mm:ss, i UTC |
-| Første tidspunkt i tidsrommet, i UTC. Starter ved tidspunktet satt i Sted og tid. |
-| Til (UTC) |
-| Siste tidspunkt i tidsrommet, i UTC, medregnet; ligger det ikke på rutenettet, legges det til som siste rad og merkes. |
-| Hvert |
-| 1 time |
-| 6 timer |
+| Viser én rad for hvert steg fra karttiden over omfanget valgt, så mange hele steg som omfanget rommer; første rad er karttiden, lest på nytt hver gang du beregner. Sett karttiden for å regne fra et annet tidspunkt. |
+| Omfang |
 | 1 døgn |
 | 7 døgn |
 | 30 døgn |
+| 90 døgn |
+| 365 døgn |
+| Hvor langt radene rekker fra karttiden |
+| Tidsrommets omfang fra karttiden |
+| Hvor langt fra karttiden radene rekker, i hele steg av steget ved siden av. |
+| Hvert |
+| 1 time |
+| 6 timer |
 | Tiden som går mellom radene |
 | Steg mellom radene |
 | Tiden som går mellom radene, på UTC-tidslinjen, så et daglig tidsrom ikke forskyver seg ved skifte av sivil klokke. |
 | Beregn |
-| Fyll tabellen for tidsrommet over |
+| Fyll tabellen for omfanget og steget over, fra karttiden |
 | Beregn tidsrommet |
-| Beregner én rad for hvert steg i tidsrommet over. |
-| Tidsrommet går baklengs: slutten er før starten. |
+| Beregner én rad for hvert steg i omfanget over, fra karttiden nå. |
+| Det tidsrommet ber om 8761 rader, og høyst 1000 vises; kort det ned eller gjør steget lengre. |
 | Tidspunkt (UTC) |
 | Rektascensjon (J2000) |
 | Deklinasjon (J2000) |
@@ -542,6 +607,10 @@ Packed 959 × 479 px.
 | Solens beregnede størrelser |
 | Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; ekliptisk lengde på J2000-ekliptikken; høyde over den matematiske horisonten og asimut fra nord via øst, uten refraksjon; avstand fra observatøren; og skivens tilsynelatende diameter. |
 | Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 6″ fram til 2100 med den valgte modellen. |
+| Sett karttid til dette tidspunktet [unavailable] |
+| Gjør den valgte radens tidspunkt til karttid og tegn hvert himmellegeme på nytt for det [unavailable] |
+| Sett karttiden til den valgte radens tidspunkt [unavailable] |
+| Setter karttiden til tidspunktet i den valgte raden, slik Sted og tid ville gjort, så hvert påslått himmellegeme tegnes på nytt for det. Denne tabellen gjelder så en tidligere karttid til du beregner på nytt. [unavailable] |
 | Lukk |
 | Lukk soltabellen |
 | Lukker tabellen. Ingenting endres eller huskes; Sted og tid beholder stedet og tidspunktet. |
@@ -550,47 +619,43 @@ Packed 959 × 479 px.
 
 An equatorial observer at the IMCCE's solstice instant: the Sun is up, 32° high; the instant is shown to the minute, rounded.
 
-![](suntable-nb-NO-9-quito.png)
+![](suntable-nb-NO-10-quito.png)
 
-Packed 959 × 479 px.
+Packed 959 × 433 px.
 
 | shown, hovered or spoken |
 |---|
 | Solen |
-| Hvor Solen er, beregnet fra den medfølgende efemeriden for observasjonsstedet og tidspunktet satt i Sted og tid: posisjonen blant fiksstjernene, høyden og retningen over den matematiske horisonten, avstanden og hvor stor den ser ut. Én rad for det tidspunktet, eller én rad for hvert steg i et tidsrom. Ingenting tegnes på kartet. |
-| Samsvar med kartet |
-| Samme sted og tidspunkt som kartet: 0.18° S · 78.50° V, 2026-12-21 20:50:09 UTC |
-| Oppdater fra Sted og tid |
-| Les sted og tidspunkt fra Sted og tid på nytt |
-| Les observatør og tidspunkt fra Sted og tid på nytt |
-| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
-| Observatør på bredde -0,18, lengde -78,5 øst; tidspunkt 2026-12-21 20:50:09 UTC, fra Sted og tid. |
-| Dette tidspunktet |
-| Én rad, ved tidspunktet satt i Sted og tid |
-| Vis Solen ved tidspunktet satt i Sted og tid |
-| Viser én rad: Solen ved observasjonstidspunktet satt i Sted og tid. |
+| Hvor Solen er, beregnet fra den medfølgende efemeriden for karttiden og observasjonsstedet: posisjonen blant fiksstjernene, høyden og retningen over den matematiske horisonten, avstanden og hvor stor den ser ut. Én rad for det tidspunktet, eller én rad for hvert steg i et tidsrom. Ingenting tegnes på kartet. |
+| Om tabellen gjelder karttiden og stedet nå |
+| Beregnet for karttid 2026-12-21 20:50:09 UTC på bredde -0,18, lengde -78,5 øst. |
+| Ved karttid |
+| Én rad, ved karttiden |
+| Vis Solen ved karttiden |
+| Viser én rad: Solen ved karttiden. |
 | Over et tidsrom |
-| Én rad for hvert steg fra en start til en slutt |
+| Én rad for hvert steg fra karttiden, over et omfang |
 | Vis Solen over et tidsrom |
-| Viser én rad for hvert steg fra starten til slutten, begge medregnet; en slutt som ikke ligger på rutenettet, legges til som siste rad og merkes. |
-| Fra (UTC) |
-| åååå-mm-dd tt:mm eller tt:mm:ss, i UTC |
-| Første tidspunkt i tidsrommet, i UTC. Starter ved tidspunktet satt i Sted og tid. |
-| Til (UTC) |
-| Siste tidspunkt i tidsrommet, i UTC, medregnet; ligger det ikke på rutenettet, legges det til som siste rad og merkes. |
-| Hvert |
-| 1 time |
-| 6 timer |
+| Viser én rad for hvert steg fra karttiden over omfanget valgt, så mange hele steg som omfanget rommer; første rad er karttiden, lest på nytt hver gang du beregner. Sett karttiden for å regne fra et annet tidspunkt. |
+| Omfang |
 | 1 døgn |
 | 7 døgn |
 | 30 døgn |
+| 90 døgn |
+| 365 døgn |
+| Hvor langt radene rekker fra karttiden |
+| Tidsrommets omfang fra karttiden |
+| Hvor langt fra karttiden radene rekker, i hele steg av steget ved siden av. |
+| Hvert |
+| 1 time |
+| 6 timer |
 | Tiden som går mellom radene |
 | Steg mellom radene |
 | Tiden som går mellom radene, på UTC-tidslinjen, så et daglig tidsrom ikke forskyver seg ved skifte av sivil klokke. |
 | Beregn |
-| Fyll tabellen for tidsrommet over |
+| Fyll tabellen for omfanget og steget over, fra karttiden |
 | Beregn tidsrommet |
-| Beregner én rad for hvert steg i tidsrommet over. |
+| Beregner én rad for hvert steg i omfanget over, fra karttiden nå. |
 | 1 rader. |
 | Tidspunkt (UTC) |
 | Rektascensjon (J2000) |
@@ -604,53 +669,56 @@ Packed 959 × 479 px.
 | Solens beregnede størrelser |
 | Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; ekliptisk lengde på J2000-ekliptikken; høyde over den matematiske horisonten og asimut fra nord via øst, uten refraksjon; avstand fra observatøren; og skivens tilsynelatende diameter. |
 | Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 6″ fram til 2100 med den valgte modellen. |
+| Sett karttid til dette tidspunktet |
+| Gjør den valgte radens tidspunkt til karttid og tegn hvert himmellegeme på nytt for det |
+| Sett karttiden til den valgte radens tidspunkt |
+| Setter karttiden til tidspunktet i den valgte raden, slik Sted og tid ville gjort, så hvert påslått himmellegeme tegnes på nytt for det. Denne tabellen gjelder så en tidligere karttid til du beregner på nytt. |
 | Lukk |
 | Lukk soltabellen |
 | Lukker tabellen. Ingenting endres eller huskes; Sted og tid beholder stedet og tidspunktet. |
 
-### The instant, in the dark appearance
+### The chart moved on after computing
 
-![](suntable-nb-NO-10-instant-dark.png)
+The chart time moved six hours on after this instant was computed (#612, ruling P1): the rows stay, dimmed, under the stale message, until Compute; the note states the chart time and place the rows are for.
+
+![](suntable-nb-NO-11-stale.png)
 
 Packed 959 × 479 px.
 
 | shown, hovered or spoken |
 |---|
 | Solen |
-| Hvor Solen er, beregnet fra den medfølgende efemeriden for observasjonsstedet og tidspunktet satt i Sted og tid: posisjonen blant fiksstjernene, høyden og retningen over den matematiske horisonten, avstanden og hvor stor den ser ut. Én rad for det tidspunktet, eller én rad for hvert steg i et tidsrom. Ingenting tegnes på kartet. |
-| Samsvar med kartet |
-| Samme sted og tidspunkt som kartet: 59.91° N · 10.75° Ø, 2026-06-21 10:00:00 UTC |
-| Oppdater fra Sted og tid |
-| Les sted og tidspunkt fra Sted og tid på nytt |
-| Les observatør og tidspunkt fra Sted og tid på nytt |
-| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
-| Observatør på bredde 59,91, lengde 10,75 øst; tidspunkt 2026-06-21 10:00:00 UTC, fra Sted og tid. |
-| Dette tidspunktet |
-| Én rad, ved tidspunktet satt i Sted og tid |
-| Vis Solen ved tidspunktet satt i Sted og tid |
-| Viser én rad: Solen ved observasjonstidspunktet satt i Sted og tid. |
+| Hvor Solen er, beregnet fra den medfølgende efemeriden for karttiden og observasjonsstedet: posisjonen blant fiksstjernene, høyden og retningen over den matematiske horisonten, avstanden og hvor stor den ser ut. Én rad for det tidspunktet, eller én rad for hvert steg i et tidsrom. Ingenting tegnes på kartet. |
+| Om tabellen gjelder karttiden og stedet nå |
+| Beregnet for forrige karttid og sted — Beregn på nytt |
+| Beregnet for karttid 2026-06-21 10:00:00 UTC på bredde 59,91, lengde 10,75 øst. |
+| Ved karttid |
+| Én rad, ved karttiden |
+| Vis Solen ved karttiden |
+| Viser én rad: Solen ved karttiden. |
 | Over et tidsrom |
-| Én rad for hvert steg fra en start til en slutt |
+| Én rad for hvert steg fra karttiden, over et omfang |
 | Vis Solen over et tidsrom |
-| Viser én rad for hvert steg fra starten til slutten, begge medregnet; en slutt som ikke ligger på rutenettet, legges til som siste rad og merkes. |
-| Fra (UTC) |
-| åååå-mm-dd tt:mm eller tt:mm:ss, i UTC |
-| Første tidspunkt i tidsrommet, i UTC. Starter ved tidspunktet satt i Sted og tid. |
-| Til (UTC) |
-| Siste tidspunkt i tidsrommet, i UTC, medregnet; ligger det ikke på rutenettet, legges det til som siste rad og merkes. |
-| Hvert |
-| 1 time |
-| 6 timer |
+| Viser én rad for hvert steg fra karttiden over omfanget valgt, så mange hele steg som omfanget rommer; første rad er karttiden, lest på nytt hver gang du beregner. Sett karttiden for å regne fra et annet tidspunkt. |
+| Omfang |
 | 1 døgn |
 | 7 døgn |
 | 30 døgn |
+| 90 døgn |
+| 365 døgn |
+| Hvor langt radene rekker fra karttiden |
+| Tidsrommets omfang fra karttiden |
+| Hvor langt fra karttiden radene rekker, i hele steg av steget ved siden av. |
+| Hvert |
+| 1 time |
+| 6 timer |
 | Tiden som går mellom radene |
 | Steg mellom radene |
 | Tiden som går mellom radene, på UTC-tidslinjen, så et daglig tidsrom ikke forskyver seg ved skifte av sivil klokke. |
 | Beregn |
-| Fyll tabellen for tidsrommet over |
+| Fyll tabellen for omfanget og steget over, fra karttiden |
 | Beregn tidsrommet |
-| Beregner én rad for hvert steg i tidsrommet over. |
+| Beregner én rad for hvert steg i omfanget over, fra karttiden nå. |
 | 1 rader. |
 | Tidspunkt (UTC) |
 | Rektascensjon (J2000) |
@@ -664,6 +732,70 @@ Packed 959 × 479 px.
 | Solens beregnede størrelser |
 | Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; ekliptisk lengde på J2000-ekliptikken; høyde over den matematiske horisonten og asimut fra nord via øst, uten refraksjon; avstand fra observatøren; og skivens tilsynelatende diameter. |
 | Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 6″ fram til 2100 med den valgte modellen. |
+| Sett karttid til dette tidspunktet |
+| Gjør den valgte radens tidspunkt til karttid og tegn hvert himmellegeme på nytt for det |
+| Sett karttiden til den valgte radens tidspunkt |
+| Setter karttiden til tidspunktet i den valgte raden, slik Sted og tid ville gjort, så hvert påslått himmellegeme tegnes på nytt for det. Denne tabellen gjelder så en tidligere karttid til du beregner på nytt. |
+| Lukk |
+| Lukk soltabellen |
+| Lukker tabellen. Ingenting endres eller huskes; Sted og tid beholder stedet og tidspunktet. |
+
+### The instant, in the dark appearance
+
+![](suntable-nb-NO-12-instant-dark.png)
+
+Packed 959 × 433 px.
+
+| shown, hovered or spoken |
+|---|
+| Solen |
+| Hvor Solen er, beregnet fra den medfølgende efemeriden for karttiden og observasjonsstedet: posisjonen blant fiksstjernene, høyden og retningen over den matematiske horisonten, avstanden og hvor stor den ser ut. Én rad for det tidspunktet, eller én rad for hvert steg i et tidsrom. Ingenting tegnes på kartet. |
+| Om tabellen gjelder karttiden og stedet nå |
+| Beregnet for karttid 2026-06-21 10:00:00 UTC på bredde 59,91, lengde 10,75 øst. |
+| Ved karttid |
+| Én rad, ved karttiden |
+| Vis Solen ved karttiden |
+| Viser én rad: Solen ved karttiden. |
+| Over et tidsrom |
+| Én rad for hvert steg fra karttiden, over et omfang |
+| Vis Solen over et tidsrom |
+| Viser én rad for hvert steg fra karttiden over omfanget valgt, så mange hele steg som omfanget rommer; første rad er karttiden, lest på nytt hver gang du beregner. Sett karttiden for å regne fra et annet tidspunkt. |
+| Omfang |
+| 1 døgn |
+| 7 døgn |
+| 30 døgn |
+| 90 døgn |
+| 365 døgn |
+| Hvor langt radene rekker fra karttiden |
+| Tidsrommets omfang fra karttiden |
+| Hvor langt fra karttiden radene rekker, i hele steg av steget ved siden av. |
+| Hvert |
+| 1 time |
+| 6 timer |
+| Tiden som går mellom radene |
+| Steg mellom radene |
+| Tiden som går mellom radene, på UTC-tidslinjen, så et daglig tidsrom ikke forskyver seg ved skifte av sivil klokke. |
+| Beregn |
+| Fyll tabellen for omfanget og steget over, fra karttiden |
+| Beregn tidsrommet |
+| Beregner én rad for hvert steg i omfanget over, fra karttiden nå. |
+| 1 rader. |
+| Tidspunkt (UTC) |
+| Rektascensjon (J2000) |
+| Deklinasjon (J2000) |
+| Ekliptisk lengde (J2000) |
+| Høyde (uten refraksjon) |
+| Asimut (fra nord via øst) |
+| Avstand |
+| Tilsynelatende diameter |
+| 2026-06-21 10:00 · 05h 58m 40,8s · +23° 26′ 02″ · 89,70° · 51,01° · 150,56° · 1,016165 AU (152,016 mill. km) · 31′ 27,9″ |
+| Solens beregnede størrelser |
+| Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; ekliptisk lengde på J2000-ekliptikken; høyde over den matematiske horisonten og asimut fra nord via øst, uten refraksjon; avstand fra observatøren; og skivens tilsynelatende diameter. |
+| Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 6″ fram til 2100 med den valgte modellen. |
+| Sett karttid til dette tidspunktet |
+| Gjør den valgte radens tidspunkt til karttid og tegn hvert himmellegeme på nytt for det |
+| Sett karttiden til den valgte radens tidspunkt |
+| Setter karttiden til tidspunktet i den valgte raden, slik Sted og tid ville gjort, så hvert påslått himmellegeme tegnes på nytt for det. Denne tabellen gjelder så en tidligere karttid til du beregner på nytt. |
 | Lukk |
 | Lukk soltabellen |
 | Lukker tabellen. Ingenting endres eller huskes; Sted og tid beholder stedet og tidspunktet. |

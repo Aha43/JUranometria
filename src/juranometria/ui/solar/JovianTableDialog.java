@@ -136,6 +136,10 @@ public final class JovianTableDialog extends JDialog {
             JPanel buttons = new JPanel();
             buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
             buttons.setAlignmentX(0f);
+            if (controls.setChartTime != null) {
+                buttons.add(controls.setChartTime);
+                buttons.add(Box.createHorizontalStrut(8));
+            }
             if (controls.centreOnChart != null) {
                 buttons.add(controls.centreOnChart);
             }
@@ -145,7 +149,7 @@ public final class JovianTableDialog extends JDialog {
             add(bottom, BorderLayout.SOUTH);
         }
 
-        /** Reads the observer again and computes this content's view. */
+        /** Applies this content's draft at the chart's context now. */
         public void update() {
             controls.apply();
         }

@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +21,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -77,11 +77,12 @@ public final class JovianTableControls {
     public final JLabel observerNote = new JLabel();
     public final JRadioButton instantView;
     public final JRadioButton rangeView;
-    public final JTextField start = new JTextField(19);
-    public final JTextField end = new JTextField(19);
+    /** The range's span from the chart time (#612, P2): a range starts at the chart time, always. */
+    public final JComboBox<String> span;
     public final JComboBox<String> step;
     public final JButton compute;
-    public final JButton update;
+    /** Set chart time to this instant (#612, P2), or null over a session that cannot install. */
+    public final JButton setChartTime;
     /** The Controller's Show on chart box (#484), or null where the host has none. */
     public final javax.swing.JCheckBox onChart;
     /** Centre on chart (#484, through #483's seam), or null where the host has none. */
@@ -96,9 +97,9 @@ public final class JovianTableControls {
     private final JPanel card = new JPanel();
     private final SolarTableSession.Subscription following;
     private JovianTableSession.Result shown;
-    /** The agreement line (#259), opening every arrangement. */
-    AgreementLine agreement;
-    /** Following Place and Time, to say the agreement again; never to recompute. */
+    /** The stale line (#612, ruling P1), opening every arrangement. */
+    StaleLine stale;
+    /** Following the chart's context, to say the table is stale; never to recompute. */
     private Runnable followingChart = () -> { };
     private JPanel resultHolder;
     private boolean narrow;
@@ -132,13 +133,6 @@ public final class JovianTableControls {
         ButtonGroup views = new ButtonGroup();
         views.add(instantView);
         views.add(rangeView);
-        start.setName("jupiterRangeStart");
-        end.setName("jupiterRangeEnd");
-        for (JTextField field : List.of(start, end)) {
-            String stem = field == start ? "range.start" : "range.end";
-            field.getAccessibleContext().setAccessibleName(said.say(stem + ".label"));
-            Explain.control(field, said.say(stem + ".hover"), said.say(stem + ".explain"));
-        }
         step = new JComboBox<>(SolarTableSession.STEP_KEYS.stream().map(said::say)
                 .toArray(String[]::new));
         step.setName("jupiterRangeStep");
@@ -146,8 +140,17 @@ public final class JovianTableControls {
         step.setMaximumSize(step.getPreferredSize());
         step.getAccessibleContext().setAccessibleName(said.say("range.step.a11y"));
         Explain.control(step, said.say("range.step.hover"), said.say("range.step.explain"));
+        span = new JComboBox<>(SolarTableSession.SPAN_KEYS.stream().map(said::say)
+                .toArray(String[]::new));
+        span.setName("jupiterRangeSpan");
+        span.setSelectedIndex(1);
+        span.setMaximumSize(span.getPreferredSize());
+        span.getAccessibleContext().setAccessibleName(said.say("span.a11y"));
+        Explain.control(span, said.say("span.hover"), said.say("span.explain"));
         compute = button("compute", "jupiterCompute", access);
-        update = button("update", "jupiterUpdate", access);
+        // The row action, only over a session that can install (#612, P2).
+        setChartTime = session.canSetChartTime()
+                ? button("setchart", "jupiterSetChartTime", access) : null;
         status.setName("jupiterStatus");
 
         // The card: a title, then one heading-and-value line per quantity.
@@ -268,26 +271,23 @@ public final class JovianTableControls {
         if (applied.applied()) {
             instantView.setSelected(applied.query().mode() == Mode.INSTANT);
             rangeView.setSelected(applied.query().mode() == Mode.RANGE);
-            if (!applied.query().start().isEmpty()) {
-                start.setText(applied.query().start());
-                end.setText(applied.query().end());
-                step.setSelectedIndex(applied.query().step());
-            }
-        }
-        if (start.getText().isEmpty()) {
-            Observer now = session.observerNow();
-            if (now != null) {
-                start.setText(SolarTableSession.shown(now.instant()));
-                end.setText(SolarTableSession.shown(now.instant().plus(Duration.ofDays(1))));
-            }
+            span.setSelectedIndex(applied.query().span());
+            step.setSelectedIndex(applied.query().step());
         }
 
         instantView.addActionListener(e -> apply());
         rangeView.addActionListener(e -> apply());
         compute.addActionListener(e -> apply());
-        update.addActionListener(e -> apply());
-        start.addActionListener(e -> apply());
-        end.addActionListener(e -> apply());
+        if (setChartTime != null) {
+            setChartTime.addActionListener(e -> {
+                Instant at = selectedInstant();
+                if (at != null) {
+                    session.setChartTime(at);
+                }
+            });
+            table.getSelectionModel().addListSelectionListener(e -> offerSetChartTime());
+            offerSetChartTime();
+        }
 
         if (onChart != null) {
             String stem = "solarsystem.jupiter.onChart";
@@ -311,15 +311,15 @@ public final class JovianTableControls {
         } else {
             centreOnChart = null;
         }
-        agreement = new AgreementLine(said, update, "jupiter");
+        stale = new StaleLine(said, "jupiter");
         following = session.onChange(this::show);
-        followingChart = session.onObserverChange(this::sayAgreement);
+        followingChart = session.onObserverChange(this::sayStale);
     }
 
     /** This host's draft, as a query. */
     public Query draft() {
         return new Query(instantView.isSelected() ? Mode.INSTANT : Mode.RANGE,
-                start.getText(), end.getText(), step.getSelectedIndex());
+                span.getSelectedIndex(), step.getSelectedIndex());
     }
 
     /** Applies this host's draft to the session, which tells every host. */
@@ -359,34 +359,49 @@ public final class JovianTableControls {
     }
 
     /**
-     * Says again whether the table shown is for the chart's place and
-     * instant (#259, ruling 5 on #556). Reads, never computes.
+     * Says whether the rows shown were computed for the chart's context
+     * now, and dims them - the table, the card - while they were not
+     * (#612, ruling P1). Reads the revision, never computes.
      */
-    private void sayAgreement() {
-        if (agreement == null) {
+    private void sayStale() {
+        if (stale == null) {
             return;
         }
         JovianTableSession.Result result = shown;
         boolean rows = result != null && result.applied()
                 && (result.outcome() == JovianTableSession.Outcome.ROWS
-                        || result.outcome() == JovianTableSession.Outcome.APPENDED
                         || result.outcome() == JovianTableSession.Outcome.MOONS_OUTSIDE)
                 && !result.entries().isEmpty();
-        boolean range = rows && result.query().mode() == Mode.RANGE;
-        agreement.show(session.observerNow(), rows ? result.observer() : null,
-                range ? result.entries().get(0).sample().instant() : null,
-                range ? result.entries().get(result.entries().size() - 1).sample().instant()
-                        : null);
+        boolean old = rows && session.stale();
+        stale.show(old);
+        java.awt.Color tone = StaleLine.tone(old);
+        if (result != null && !result.applied()) {
+            // Nothing computed: the note follows the chart.
+            Observer now = session.observerNow();
+            if (now != null) {
+                sayNote(now, false);
+            }
+        }
+        table.setForeground(tone);
+        cardTitle.setForeground(tone);
+        for (JLabel value : cardValues) {
+            value.setForeground(tone);
+        }
     }
 
-    /** What the agreement line says now, a line per sentence. */
-    public String agreementText() {
-        return agreement.text();
+    /** What the stale line says now; empty while the table is current or never computed. */
+    public String staleText() {
+        return stale.text();
     }
 
-    /** The agreement line, for a host laying these controls out. */
-    public JComponent agreementLine() {
-        return agreement.panel();
+    /** Whether the rows shown are stale: computed at an earlier chart context. */
+    public boolean stale() {
+        return stale.stale();
+    }
+
+    /** The stale line, for a host laying these controls out. */
+    public JComponent staleLine() {
+        return stale.panel();
     }
 
     /**
@@ -411,7 +426,6 @@ public final class JovianTableControls {
                 apply();
                 JovianTableSession.Result result = session.result();
                 boolean answered = result.outcome() == JovianTableSession.Outcome.ROWS
-                        || result.outcome() == JovianTableSession.Outcome.APPENDED
                         || result.outcome() == JovianTableSession.Outcome.MOONS_OUTSIDE;
                 return answered && !result.entries().isEmpty()
                         ? result.entries().get(0).jupiter().astrometricJ2000() : null;
@@ -433,7 +447,7 @@ public final class JovianTableControls {
         shown = result;
         Observer now = result.applied() ? result.observer() : session.observerNow();
         boolean present = now != null;
-        for (JComponent c : List.of(instantView, rangeView, start, end, step, compute)) {
+        for (JComponent c : List.of(instantView, rangeView, span, step, compute)) {
             c.setEnabled(present);
         }
         if (!present) {
@@ -443,17 +457,11 @@ public final class JovianTableControls {
             showCard(null);
             say(" ");
             refreshResult();
-            sayAgreement();
+            sayStale();
+            offerSetChartTime();
             return;
         }
-        String note = said.say("observer.note", said.n(degrees(now.latitudeDegrees())),
-                said.n(degrees(now.eastLongitudeFolded())),
-                SolarTableSession.shown(now.instant()));
-        observerNote.setText(narrow
-                ? juranometria.ui.WrappedText.html(note, NARROW,
-                        observerNote.getFontMetrics(observerNote.getFont()))
-                : note);
-        observerNote.getAccessibleContext().setAccessibleName(note);
+        sayNote(now, result.applied());
         model.show(result.entries());
         boolean single = result.entries().size() == 1
                 && result.query().mode() == Mode.INSTANT;
@@ -471,14 +479,10 @@ public final class JovianTableControls {
         String text = switch (result.outcome()) {
             case ROWS -> !result.applied() ? " " : single ? said.say("status.instant")
                     : said.say("status.rows", count, Integer.toString(model.moonRows()));
-            case APPENDED -> said.say("status.appended", count,
-                    Integer.toString(model.moonRows()), said.say("appended"));
             case MOONS_OUTSIDE -> said.say("refused.moons.instant",
                     session.moonsFirstDay().toString(), session.moonsLastDay().toString(),
                     result.detail());
             case OBSERVER_ABSENT -> " ";
-            case REFUSED_INSTANT -> said.say("refused.instant", result.detail());
-            case REFUSED_BACKWARDS -> said.say("refused.backwards");
             case REFUSED_ROWS -> said.say("refused.rows",
                     Long.toString(result.instantsAsked()),
                     Integer.toString(JovianTableSession.MAX_INSTANTS),
@@ -491,13 +495,13 @@ public final class JovianTableControls {
                     result.detail());
         };
         if (estimated && (result.outcome() == JovianTableSession.Outcome.ROWS
-                || result.outcome() == JovianTableSession.Outcome.APPENDED
                 || result.outcome() == JovianTableSession.Outcome.MOONS_OUTSIDE)) {
             text = text + " " + said.say("status.estimated", said.say("estimated"));
         }
         say(text);
         refreshResult();
-        sayAgreement();
+        sayStale();
+        offerSetChartTime();
     }
 
     /** The card for one instant, or blank. */
@@ -527,6 +531,45 @@ public final class JovianTableControls {
         }
     }
 
+    /**
+     * The note under the controls: the context the rows were computed
+     * for, or - while nothing is computed - the chart's now (#612, P1).
+     */
+    private void sayNote(Observer now, boolean computed) {
+        String note = said.say(computed ? "observer.computed" : "observer.note",
+                said.n(degrees(now.latitudeDegrees())),
+                said.n(degrees(now.eastLongitudeFolded())),
+                SolarTableSession.shown(now.instant()));
+        observerNote.setText(narrow
+                ? juranometria.ui.WrappedText.html(note, NARROW,
+                        observerNote.getFontMetrics(observerNote.getFont()))
+                : note);
+        observerNote.getAccessibleContext().setAccessibleName(note);
+    }
+
+    /**
+     * The instant of the selected row - or of the one row an instant
+     * view shows - for Set chart time to this instant (#612, P2); null
+     * while no row is chosen.
+     */
+    public Instant selectedInstant() {
+        int row = table.getSelectedRow();
+        if (row >= 0 && row < model.getRowCount()) {
+            return model.lines().get(row).jupiter().instant();
+        }
+        if (shown != null && shown.applied() && shown.entries().size() == 1) {
+            return shown.entries().get(0).sample().instant();
+        }
+        return null;
+    }
+
+    /** Offers the row action while a row is chosen. */
+    private void offerSetChartTime() {
+        if (setChartTime != null) {
+            setChartTime.setEnabled(selectedInstant() != null);
+        }
+    }
+
     private void say(String text) {
         status.setText(narrow && text.length() > 1
                 ? juranometria.ui.WrappedText.html(text, NARROW,
@@ -551,9 +594,8 @@ public final class JovianTableControls {
         JPanel top = new JPanel();
         top.setLayout(new BoxLayout(top, BoxLayout.Y_AXIS));
         top.putClientProperty(MARK, Boolean.TRUE);
-        // The agreement line opens the dialog too (#259, ruling 5 on #556).
-        agreement.besideTheWords();
-        JComponent line = agreement.panel();
+        // The stale line opens the dialog too (#612, ruling P1).
+        JComponent line = stale.panel();
         line.setAlignmentX(0f);
         top.add(line);
         top.add(Box.createVerticalStrut(8));
@@ -571,9 +613,8 @@ public final class JovianTableControls {
         JPanel rangeRow = new JPanel();
         rangeRow.setLayout(new BoxLayout(rangeRow, BoxLayout.X_AXIS));
         rangeRow.setAlignmentX(0f);
-        rangeRow.add(inline("range.start", start));
-        rangeRow.add(Box.createHorizontalStrut(12));
-        rangeRow.add(inline("range.end", end));
+        JComponent spanIn = spanRow();
+        rangeRow.add(spanIn);
         rangeRow.add(Box.createHorizontalStrut(12));
         JLabel every = new JLabel(said.say("range.step.label"));
         every.setLabelFor(step);
@@ -594,17 +635,6 @@ public final class JovianTableControls {
         return top;
     }
 
-    private JComponent inline(String stem, JTextField field) {
-        JPanel row = new JPanel();
-        row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
-        JLabel name = new JLabel(said.say(stem + ".label"));
-        name.setLabelFor(field);
-        field.setMaximumSize(field.getPreferredSize());
-        row.add(name);
-        row.add(Box.createHorizontalStrut(6));
-        row.add(field);
-        return row;
-    }
 
     // ---- the Controller's arrangement ----------------------------------
 
@@ -612,8 +642,7 @@ public final class JovianTableControls {
      * These controls as the Controller's Jupiter group holds them: the
      * note wrapped; the views; start and end on rows of their own; the
      * step and Compute; the status; the card and the four moons, or the
-     * grouped moons for a range, the table scrolling sideways; Update
-     * from Place and Time. No Show on chart box, and no Close.
+     * grouped moons for a range, the table scrolling sideways. No Show on chart box, and no Close.
      */
     public JComponent inController() {
         JPanel column = new JPanel();
@@ -624,11 +653,10 @@ public final class JovianTableControls {
         if (shown != null) {
             show(shown);
         }
-        // The agreement line opens the group (#259, ruling 5 on #556),
-        // with Update from Place and Time in it when the table differs.
-        agreement.wrapTo(NARROW - 20);
-        sayAgreement();
-        column.add(agreement.panel());
+        // The stale line opens the group (#612, ruling P1).
+        stale.wrapTo(NARROW - 20);
+        sayStale();
+        column.add(stale.panel());
         column.add(Box.createVerticalStrut(6));
         observerNote.putClientProperty("FlatLaf.styleClass", "small");
         column.add(leadingWide(observerNote));
@@ -639,8 +667,7 @@ public final class JovianTableControls {
         views.add(Box.createHorizontalStrut(10));
         views.add(rangeView);
         column.add(leading(views));
-        column.add(labelled("range.start", start));
-        column.add(labelled("range.end", end));
+        column.add(leading(spanRow()));
         JPanel stepRow = new JPanel();
         stepRow.setLayout(new BoxLayout(stepRow, BoxLayout.X_AXIS));
         JLabel every = new JLabel(said.say("range.step.label"));
@@ -664,6 +691,10 @@ public final class JovianTableControls {
         }
         if (centreOnChart != null) {
             column.add(leading(centreOnChart));
+            column.add(Box.createVerticalStrut(4));
+        }
+        if (setChartTime != null) {
+            column.add(leading(setChartTime));
             column.add(Box.createVerticalStrut(4));
         }
         refreshResult();
@@ -726,16 +757,15 @@ public final class JovianTableControls {
         return scroll;
     }
 
-    private JComponent labelled(String stem, JTextField field) {
-        JPanel row = new JPanel(new BorderLayout(6, 0));
-        row.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
-        row.setAlignmentX(0f);
-        JLabel label = new JLabel(said.say(stem + ".label"));
-        label.setLabelFor(field);
-        row.add(label, BorderLayout.WEST);
-        field.setMaximumSize(new Dimension(Integer.MAX_VALUE, field.getPreferredSize().height));
-        row.add(field, BorderLayout.CENTER);
-        row.setMaximumSize(new Dimension(Integer.MAX_VALUE, row.getPreferredSize().height));
+    /** The span from the chart time on one row (#612, P2). */
+    JComponent spanRow() {
+        JPanel row = new JPanel();
+        row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
+        JLabel over = new JLabel(said.say("span.label"));
+        over.setLabelFor(span);
+        row.add(over);
+        row.add(Box.createHorizontalStrut(6));
+        row.add(span);
         return row;
     }
 

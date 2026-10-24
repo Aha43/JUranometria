@@ -89,6 +89,11 @@ public final class InspectorPanel extends JPanel {
 
     private final juranometria.ui.language.InterfaceText said;
     private final JButton centreHere;
+    /** Set chart time to its next meridian transit (#612, P4); shown once the application offers it. */
+    private final JButton transitHere;
+    private final JLabel transitSaid = new JLabel();
+    private final JPanel transitBox = new JPanel();
+    private java.util.function.Function<Selection, String> transit;
     /**
      * The pane's own dismissal (issue #197). The toolbar toggle
      * remains the obvious way back, and this is where a reader looks
@@ -160,6 +165,7 @@ public final class InspectorPanel extends JPanel {
         // resource cannot be one (#350).
         this.centreHere = new JButton(said.say("inspector.centre.label"));
         this.clearSelection = new JButton(said.say("inspector.clear.label"));
+        this.transitHere = new JButton(said.say("inspector.transit.label"));
         if (selection == null || currentScene == null || options == null
                 || centreOn == null) {
             throw new IllegalArgumentException(
@@ -227,6 +233,29 @@ public final class InspectorPanel extends JPanel {
         centreHere.setAlignmentX(0.0f);
         centreHere.addActionListener(event -> centreOn.accept(
                 selection.selection()));
+        transitHere.setName("inspectorTransit");
+        transitHere.getAccessibleContext().setAccessibleName(
+                said.say("inspector.transit.a11y"));
+        juranometria.ui.Explain.control(transitHere,
+                said.say("inspector.transit.hover"),
+                said.say("inspector.transit.explain"));
+        transitHere.setAlignmentX(0.0f);
+        transitHere.addActionListener(event -> {
+            if (transit != null) {
+                sayTransit(transit.apply(selection.selection()));
+            }
+        });
+        transitSaid.setName("inspectorTransitSaid");
+        transitSaid.setAlignmentX(0.0f);
+        transitSaid.setFocusable(false);
+        transitSaid.setVisible(false);
+        transitBox.setLayout(new BoxLayout(transitBox, BoxLayout.Y_AXIS));
+        transitBox.setAlignmentX(0.0f);
+        transitBox.add(gap(6));
+        transitBox.add(transitHere);
+        transitBox.add(gap(4));
+        transitBox.add(transitSaid);
+        transitBox.setVisible(false);
 
         close.getAccessibleContext().setAccessibleName(
                 said.say("inspector.close.a11y"));
@@ -283,6 +312,7 @@ public final class InspectorPanel extends JPanel {
         selectedMode.add(workingSet);
         selectedMode.add(stretch());
         selectedMode.add(centreHere);
+        selectedMode.add(transitBox);
         modes.add(selectedMode, SELECTED_MODE);
 
         // Two equal halves of whatever room there is, rather than
@@ -766,6 +796,48 @@ said.say("inspector.tab.page.explain"));
      * how the mode chooser came to be 171 px wide inside a 288 px
      * panel, and why its second button read "O" (#217 review).
      */
+    /**
+     * Offers <em>Set chart time to its next meridian transit</em> (#612
+     * absorbing #569, ruling P4): the application's action over the
+     * selection, answering in words - what was set and the altitude
+     * then, or why the chart time is unchanged - said under the button.
+     */
+    public void offerMeridianTransit(java.util.function.Function<Selection, String> action) {
+        if (action == null) {
+            throw new IllegalArgumentException("an action that answers in words");
+        }
+        this.transit = action;
+        transitBox.setVisible(true);
+        revalidate();
+    }
+
+    /** What the transit action last said; empty while it said nothing. */
+    public String transitText() {
+        return transitSaid.isVisible()
+                ? transitSaid.getAccessibleContext().getAccessibleName() : "";
+    }
+
+    /** The transit button, for a test that presses it. */
+    public JButton transitButton() {
+        return transitHere;
+    }
+
+    private void sayTransit(String text) {
+        if (text == null || text.isEmpty()) {
+            transitSaid.setVisible(false);
+            transitSaid.setText("");
+            transitSaid.getAccessibleContext().setAccessibleName("");
+            return;
+        }
+        int width = getWidth() > 0 ? getWidth() - 32 : PREFERRED_PANEL_WIDTH - 32;
+        transitSaid.setText(juranometria.ui.WrappedText.html(text, width,
+                transitSaid.getFontMetrics(transitSaid.getFont())));
+        transitSaid.getAccessibleContext().setAccessibleName(text);
+        transitSaid.setVisible(true);
+        revalidate();
+        repaint();
+    }
+
     private static java.awt.Component gap(int height) {
         java.awt.Component strut = Box.createVerticalStrut(height);
         ((JComponent) strut).setAlignmentX(0.0f);
@@ -882,6 +954,13 @@ said.say("inspector.tab.page.explain"));
 
         Selection current = change.selection();
         centreHere.setEnabled(!(current instanceof Selection.None));
+        // Offered for what has a place of date: an object or a drawn
+        // body; what the action last said stays until nothing is selected.
+        transitHere.setEnabled(current instanceof Selection.Object
+                || current instanceof Selection.Occurrence);
+        if (current instanceof Selection.None) {
+            sayTransit(null);
+        }
         if (current instanceof Selection.None) {
             setSelectedHeading(said.say("inspector.none.heading"));
             fact(said.say("inspector.none.hint"));

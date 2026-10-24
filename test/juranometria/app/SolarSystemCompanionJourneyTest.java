@@ -295,19 +295,20 @@ class SolarSystemCompanionJourneyTest {
                     // The window's own focus traversal reaches the group: the
                     // chosen view (its sibling is reached by the arrow keys,
                     // as in every Swing button group), the fields, Compute,
-                    // the box. Update from Place and Time stands in the
-                    // agreement line since #259, offered only while the table
-                    // differs from the chart - and this one agrees.
+                    // the box. No Update from Place and Time since #612: a
+                    // table the chart moved on from says it is stale, and
+                    // Compute computes for the chart's context now.
                     assertReachable(companion, content,
-                            "Show the Sun at the instant set in Place and Time",
-                            "From (UTC)", "To (UTC)", "Step between rows", "Compute the range",
+                            "Show the Sun at the chart time",
+                            "Span of the range from the chart time", "Step between rows",
+                            "Compute the range",
                             "Sun on the chart");
 
                     // Jupiter's group the same way, by its own spoken names;
                     // then Compute, pressed for real: the card and the four
                     // moons appear, and the table is reached too (#474).
                     assertReachable(companion, content,
-                            "Show Jupiter and its moons at the instant set in Place and Time",
+                            "Show Jupiter and its moons at the chart time",
                             "Jupiter and moons on the chart", "Centre the chart on Jupiter");
                     reveal((JComponent) named(content, "jupiterCompute"));
                     ReaderInput.click((JComponent) named(content, "jupiterCompute"));

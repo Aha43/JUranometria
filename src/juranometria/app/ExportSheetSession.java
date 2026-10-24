@@ -178,7 +178,9 @@ public final class ExportSheetSession {
         java.util.Set<juranometria.render.ChartStructure> emphasized =
                 request.includeEmphasis() ? chart.emphasizedSet()
                         : java.util.Set.of();
-        return ExportSheet.write(
+        // One export, one snapshot of the chart's time and place (#612):
+        // an installation while the sheet is drawn is refused.
+        return chart.holdingContext(() -> ExportSheet.write(
                 // The chart's own assembler, not the application's.
                 // They were the same object until a reader could
                 // choose a sky language; asking the chart is what
@@ -201,7 +203,7 @@ public final class ExportSheetSession {
                 // The modules' furniture, as paper carries it (#259,
                 // ruling 6 on #556): no control, the frozen-instant
                 // sentence in its place, and a sentence for the file.
-                chart.paperFurniture());
+                chart.paperFurniture()));
     }
 
     /**

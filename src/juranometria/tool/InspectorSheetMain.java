@@ -192,6 +192,9 @@ public final class InspectorSheetMain {
                 panel[0] = new InspectorPanel(selection, () -> scene,
                         () -> ChartOptions.DEFAULTS, chosen -> { },
                         InterfaceText.forLanguage(language));
+                // Offered as the application offers it (#612, P4); a sheet
+                // photographs the surface, and no sheet presses it.
+                panel[0].offerMeridianTransit(chosen -> "");
                 owner[0].setContentPane(panel[0]);
                 arrange(state, scene, selection, working, panel[0],
                         InterfaceText.forLanguage(language));

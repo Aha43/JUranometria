@@ -37,6 +37,36 @@ class MeridianModuleTest {
     private static final Observer OSLO =
             new Observer(59.913, 10.752, WHEN);
 
+    /** Chart time and place are installed on the event thread (#612). */
+    private static void onEventThread(Runnable work) {
+        try {
+            javax.swing.SwingUtilities.invokeAndWait(work);
+        } catch (Exception e) {
+            throw new AssertionError(e);
+        }
+    }
+
+    @org.junit.jupiter.api.Test
+    void theObserverIsTheHoldersAndAnInstallationRedrawsAndAnnounces() {
+        TestChartServices services = new TestChartServices();
+        juranometria.context.ChartContextHolder holder =
+                new juranometria.context.ChartContextHolder(OSLO);
+        MeridianModule module = new MeridianModule(holder);
+        module.attach(services);
+        int[] heard = new int[1];
+        module.onChange(() -> heard[0]++);
+        int redraws = services.redraws;
+        assertEquals(OSLO, module.observer(), "read from the holder");
+        onEventThread(() -> holder.install(OSLO.from(-33.87, 151.21)));
+        assertEquals(1, heard[0], "an installation through the holder is announced");
+        assertEquals(redraws + 1, services.redraws, "and redraws the lines");
+        assertEquals(-33.87, module.observer().latitudeDegrees(), "the module sees it at once");
+        assertEquals(1, holder.current().revision());
+        assertThrows(IllegalStateException.class,
+                () -> module.observer(OSLO.from(0.0, 0.0)),
+                "off the event thread the setter is refused, as the holder is");
+    }
+
     private static MeridianModule attached(TestChartServices services) {
         MeridianModule module = new MeridianModule(OSLO);
         module.attach(services);
@@ -150,8 +180,8 @@ class MeridianModuleTest {
         int redrawsBefore = services.redraws;
         int inventoryBefore = services.inventoryReads;
 
-        module.observer(OSLO.from(-33.87, 151.21));
-        module.observer(module.observer().at(WHEN.plusSeconds(7200)));
+        onEventThread(() -> module.observer(OSLO.from(-33.87, 151.21)));
+        onEventThread(() -> module.observer(module.observer().at(WHEN.plusSeconds(7200))));
         module.showing(true, false, true);
 
         assertEquals(List.of(), services.requested,
@@ -175,8 +205,8 @@ class MeridianModuleTest {
                 module.onChange(() -> heard[0]++);
         assertEquals(1, module.subscribers());
 
-        module.observer(OSLO.from(-33.87, 151.21));
-        module.observer(module.observer().at(WHEN.plusSeconds(7200)));
+        onEventThread(() -> module.observer(OSLO.from(-33.87, 151.21)));
+        onEventThread(() -> module.observer(module.observer().at(WHEN.plusSeconds(7200))));
         module.showing(true, false, true);
         assertEquals(3, heard[0], "the place, the instant and the lines,"
                 + " each told once");
@@ -290,7 +320,7 @@ class MeridianModuleTest {
     @Test
     void aModuleIsAlwaysSomewhereAtSomeMoment() {
         assertThrows(IllegalArgumentException.class,
-                () -> new MeridianModule(null));
+                () -> new MeridianModule((Observer) null));
         assertThrows(IllegalArgumentException.class,
                 () -> new MeridianModule(OSLO).observer(null));
     }

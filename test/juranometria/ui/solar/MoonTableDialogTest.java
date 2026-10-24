@@ -73,12 +73,10 @@ class MoonTableDialogTest {
         Rig rig = new Rig("en");
         assertTrue(rig.content.instantView.isSelected());
         assertEquals(1, rig.content.model.getRowCount());
-        assertEquals("Observer at latitude 59.91, longitude 10.75 east; instant"
-                + " 2026-06-21 10:00:00 UTC, from Place and Time.",
+        assertEquals("Computed for chart time 2026-06-21 10:00:00 UTC at latitude 59.91,"
+                + " longitude 10.75 east.",
                 rig.content.observerNote.getText());
         assertEquals("1 rows.", rig.content.status());
-        assertEquals("2026-06-21 10:00:00", rig.content.start.getText());
-        assertEquals("2026-06-28 10:00:00", rig.content.end.getText());
         assertEquals(List.of("Instant (UTC)", "Right ascension (J2000)",
                 "Declination (J2000)", "Altitude (no refraction)",
                 "Azimuth (from north through east)", "Distance",
@@ -166,8 +164,8 @@ class MoonTableDialogTest {
         rig.observer = new Observer(-0.18, -78.5, MIDSUMMER);
         assertEquals(altitude, rig.cell(0, 3), "nothing moves until the table reads");
         rig.content.update();
-        // One read computes; since #259 the agreement line reads Place and
-        // Time once more, to compare against the chart - never to compute.
+        // One read computes; the stale line reads the chart's revision once
+        // more, to compare against the stamp - never to compute (#612).
         assertEquals(reads + 2, rig.reads, "one read per update, and one to compare");
         assertNotEquals(altitude, rig.cell(0, 3), "a different sky");
         assertNotEquals(distance, rig.cell(0, 5), "a different topocentric distance");
@@ -183,26 +181,24 @@ class MoonTableDialogTest {
         moon.content.update();
         assertEquals(8, moon.content.model.getRowCount());
         assertEquals("8 rows.", moon.content.status());
-        moon.content.end.setText("2026-06-24 07:30");
+        assertEquals("2026-06-21 10:00", moon.cell(0, 0), "the first row is the chart time");
+        moon.content.span.setSelectedIndex(0);
+        moon.content.step.setSelectedIndex(1);
         moon.content.update();
-        assertEquals(4, moon.content.model.getRowCount());
-        assertEquals("2026-06-24 07:30 †", moon.cell(3, 0));
-        assertEquals("4 rows; the end is not on the grid, so it is the last"
-                + " row, marked †.", moon.content.status());
-        moon.content.end.setText("2026-06-21 09:00");
+        assertEquals(5, moon.content.model.getRowCount());
+        assertEquals("2026-06-22 10:00", moon.cell(4, 0));
+        moon.content.span.setSelectedIndex(4);
+        moon.content.step.setSelectedIndex(0);
         moon.content.update();
-        assertEquals("The range runs backwards: the end is before the start.",
-                moon.content.status());
-        assertEquals(0, moon.content.model.getRowCount());
-        moon.content.end.setText("2030-06-21 10:00");
-        moon.content.update();
-        assertEquals("That range asks for 1462 rows and at most 1000 are shown;"
+        assertEquals("That range asks for 8761 rows and at most 1000 are shown;"
                 + " shorten it or lengthen the step.", moon.content.status());
-        moon.content.start.setText("1899-12-31 12:00");
-        moon.content.end.setText("1900-01-02 12:00");
+        assertEquals(0, moon.content.model.getRowCount());
+        moon.content.span.setSelectedIndex(1);
+        moon.content.step.setSelectedIndex(2);
+        moon.observer = OSLO.at(Instant.parse("2100-12-28T00:00:00Z"));
         moon.content.update();
         assertEquals("The Moon is computed for civil dates from 1900-01-01 to"
-                + " 2100-12-31; 1899-12-31 12:00:00 is outside that.",
+                + " 2100-12-31; 2101-01-04 00:00:00 is outside that.",
                 moon.content.status());
         moon.content.instantView.setSelected(true);
         moon.observer = OSLO.at(Instant.parse("1950-06-21T12:00:00Z"));
@@ -251,10 +247,11 @@ class MoonTableDialogTest {
         assertTrue(nb.cell(0, 10).endsWith("(øst-nordøst)"));
         assertTrue(nb.cell(0, 3).endsWith("° (under horisonten)"));
         nb.content.rangeView.setSelected(true);
-        nb.content.end.setText("2026-06-21 09:00");
+        nb.content.span.setSelectedIndex(4);
+        nb.content.step.setSelectedIndex(0);
         nb.content.update();
-        assertEquals("Tidsrommet går baklengs: slutten er før starten.",
-                nb.content.status());
+        assertEquals("Det tidsrommet ber om 8761 rader, og høyst 1000 vises; kort det ned"
+                + " eller gjør steget lengre.", nb.content.status());
     }
 
     @Test
@@ -307,10 +304,10 @@ class MoonTableDialogTest {
             }
             assertEquals(List.of(), nameless, language);
             assertEquals(List.of(), shared, language);
-            assertTrue(letters.size() >= 8, language + ": " + letters.size());
-            assertEquals(language.equals("en") ? "Show the Moon at the instant"
-                    + " set in Place and Time" : "Vis Månen ved tidspunktet satt"
-                    + " i Sted og tid", rig.content.instantView
+            // Six since #612: Update from Place and Time, From and To are gone; the span has one.
+            assertTrue(letters.size() >= 6, language + ": " + letters.size());
+            assertEquals(language.equals("en") ? "Show the Moon at the chart time"
+                    : "Vis Månen ved karttiden", rig.content.instantView
                     .getAccessibleContext().getAccessibleName(),
                     "the body's own a11y word overrides the shared one");
         }

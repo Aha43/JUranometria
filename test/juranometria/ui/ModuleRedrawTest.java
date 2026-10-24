@@ -115,7 +115,7 @@ class ModuleRedrawTest {
             // A real change, through the module's own surface: the
             // reader is now somewhere else, and the lines are wrong
             // until the chart paints again.
-            module.observer(module.observer().from(-33.87, 151.21));
+            javax.swing.SwingUtilities.invokeAndWait(() -> module.observer(module.observer().from(-33.87, 151.21)));
 
             assertTrue(repaints.asked.contains(rig.chart),
                     "the chart was asked to repaint: a redraw() that"

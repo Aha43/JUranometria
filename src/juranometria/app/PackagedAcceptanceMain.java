@@ -537,21 +537,20 @@ public final class PackagedAcceptanceMain {
                         + ", " + table[0].model.getValueAt(0, 6));
         javax.swing.SwingUtilities.invokeAndWait(() -> {
             table[0].rangeView.setSelected(true);
-            table[0].end.setText("2026-06-24 07:30");
             table[0].update();
         });
-        require(table[0].model.getRowCount() == 4
-                        && String.valueOf(table[0].model.getValueAt(3, 0))
-                                .endsWith("\u2020"),
-                "a range of four rows with the appended end marked: "
-                        + table[0].status());
+        require(table[0].model.getRowCount() == 8
+                        && "2026-06-21 10:00".equals(table[0].model.getValueAt(0, 0)),
+                "a week of daily rows from the chart time, the first row the chart"
+                        + " time: " + table[0].status());
         javax.swing.SwingUtilities.invokeAndWait(() -> {
-            table[0].end.setText("2026-06-21 09:00");
+            table[0].span.setSelectedIndex(4);
+            table[0].step.setSelectedIndex(0);
             table[0].update();
         });
         require(table[0].model.getRowCount() == 0
-                        && table[0].status().contains("backwards"),
-                "a backwards range is refused with its reason: "
+                        && table[0].status().contains("8761"),
+                "a year of hourly rows is refused with its reason: "
                         + table[0].status());
         juranometria.ui.solar.SolarTableDialog.Content[] norsk =
                 new juranometria.ui.solar.SolarTableDialog.Content[1];
@@ -564,7 +563,7 @@ public final class PackagedAcceptanceMain {
                         juranometria.ui.solar.SolarTable.sun()));
         require("Tidspunkt (UTC)".equals(norsk[0].model.getColumnName(0))
                         && "1 rader.".equals(norsk[0].status())
-                        && norsk[0].observerNote.getText().startsWith("Observat")
+                        && norsk[0].observerNote.getText().startsWith("Beregnet for karttid")
                         && String.valueOf(norsk[0].model.getValueAt(0, 4))
                                 .contains(",")
                         && !String.valueOf(norsk[0].model.getValueAt(0, 4))
@@ -606,14 +605,12 @@ public final class PackagedAcceptanceMain {
                         + table[0].model.getValueAt(0, 9) + ", " + litSide);
         javax.swing.SwingUtilities.invokeAndWait(() -> {
             table[0].rangeView.setSelected(true);
-            table[0].end.setText("2026-06-24 07:30");
             table[0].update();
         });
-        require(table[0].model.getRowCount() == 4
-                        && String.valueOf(table[0].model.getValueAt(3, 0))
-                                .endsWith("\u2020"),
-                "the Moon's range behaves as the Sun's: four rows, appended"
-                        + " end marked: " + table[0].status());
+        require(table[0].model.getRowCount() == 8
+                        && "2026-06-21 10:00".equals(table[0].model.getValueAt(0, 0)),
+                "the Moon's range behaves as the Sun's: a week of daily rows from"
+                        + " the chart time: " + table[0].status());
         juranometria.ui.solar.SolarTableDialog.Content[] norsk =
                 new juranometria.ui.solar.SolarTableDialog.Content[1];
         javax.swing.SwingUtilities.invokeAndWait(() -> norsk[0] =
@@ -734,8 +731,6 @@ public final class PackagedAcceptanceMain {
                 java.time.Instant.parse("2026-10-20T03:00:00Z"));
         javax.swing.SwingUtilities.invokeAndWait(() -> {
             table[0].rangeView.setSelected(true);
-            table[0].start.setText("2026-10-20 03:00:00");
-            table[0].end.setText("2026-10-27 09:30");
             table[0].update();
         });
         StringBuilder sides = new StringBuilder();
@@ -743,8 +738,7 @@ public final class PackagedAcceptanceMain {
             String e = String.valueOf(table[0].model.getValueAt(r, 9));
             sides.append(e.substring(e.length() - 1));
         }
-        require(table[0].model.getRowCount() == 9
-                        && String.valueOf(table[0].model.getValueAt(8, 0)).endsWith("\u2020")
+        require(table[0].model.getRowCount() == 8
                         && sides.toString().matches("E+W+")
                         && "near inferior conjunction".equals(table[0].model.getValueAt(4, 8)),
                 "the range through the 2026 inferior conjunction: nine rows, the appended end"
@@ -872,8 +866,6 @@ public final class PackagedAcceptanceMain {
                 java.time.Instant.parse("2026-03-03T11:00:00Z"));
         javax.swing.SwingUtilities.invokeAndWait(() -> {
             table[0].rangeView.setSelected(true);
-            table[0].start.setText("2026-03-03 11:00:00");
-            table[0].end.setText("2026-03-10 17:30");
             table[0].update();
         });
         StringBuilder sides = new StringBuilder();
@@ -881,8 +873,7 @@ public final class PackagedAcceptanceMain {
             String e = String.valueOf(table[0].model.getValueAt(r, 9));
             sides.append(e.substring(e.length() - 1));
         }
-        require(table[0].model.getRowCount() == 9
-                        && String.valueOf(table[0].model.getValueAt(8, 0)).endsWith("\u2020")
+        require(table[0].model.getRowCount() == 8
                         && sides.toString().matches("E+W+")
                         && "near inferior conjunction".equals(table[0].model.getValueAt(4, 8)),
                 "the range through the 2026 inferior conjunction: nine rows, the appended end"
@@ -1960,12 +1951,11 @@ public final class PackagedAcceptanceMain {
             });
             require(!module.moonShowing() && !module.sunShowing(), "both layers start off");
 
-            // The Moon from the dialog, its layer off, a typed range not yet applied.
+            // The Moon from the dialog, its layer off, a chosen range not yet applied.
             javax.swing.SwingUtilities.invokeAndWait(() -> {
                 juranometria.ui.solar.SolarTableControls d = moonDialog[0].controls();
                 d.rangeView.setSelected(true);
-                d.start.setText("2026-06-22 21:00");
-                d.end.setText("2026-06-23 03:00");
+                d.span.setSelectedIndex(0);
                 d.step.setSelectedIndex(0);
                 d.centreOnChart.doClick();
             });
@@ -1975,9 +1965,8 @@ public final class PackagedAcceptanceMain {
             require(module.moonShowing(), "Centre on chart turned the Moon's layer on");
             require(navigation.state().centre().equals(first.astrometricJ2000())
                             && navigation.state().fieldWidthDegrees() == 1.0
-                            && java.time.Instant.parse("2026-06-22T21:00:00Z")
-                                    .equals(first.instant()),
-                    "the chart is on the typed range's first Moon, at 1°: "
+                            && at[0].instant().equals(first.instant()),
+                    "the chart is on the range's first Moon, the chart time's, at 1°: "
                             + navigation.state());
             require(section[0].moon().model.getRowCount() == moon.result().rows().size(),
                     "and the Controller's group shows what the dialog computed");
@@ -2093,12 +2082,12 @@ public final class PackagedAcceptanceMain {
             require(jupiter.computations() == 0,
                     "building the Jupiter group and opening the dialog compute nothing");
 
-            javax.swing.SwingUtilities.invokeAndWait(() -> section[0].jupiter().update.doClick());
+            javax.swing.SwingUtilities.invokeAndWait(() -> section[0].jupiter().compute.doClick());
             juranometria.ui.solar.JovianTableControls group = section[0].jupiter();
             juranometria.ui.solar.JovianTableControls shown = dialog[0].controls();
             require(jupiter.computations() == 1 && group.shown() == shown.shown()
                             && shown.model.getRowCount() == 4,
-                    "one Update in the Controller is the dialog's result too");
+                    "one Compute in the Controller is the dialog's result too");
             java.util.List<String> states = new java.util.ArrayList<>();
             java.util.List<String> tilstand = new java.util.ArrayList<>();
             for (int row = 0; row < 4; row++) {
@@ -2116,20 +2105,19 @@ public final class PackagedAcceptanceMain {
             require(shown.cardTitle.getText().equals("Jupiter · 2026-12-11 22:45:00 UTC"),
                     "the Jupiter card names its instant: " + shown.cardTitle.getText());
 
-            // A range applied in the dialog, with unfinished text in the Controller.
+            // A range applied in the dialog, with another span chosen in the Controller.
             javax.swing.SwingUtilities.invokeAndWait(() -> {
-                group.start.setText("2026-12-11 22:3");
+                group.span.setSelectedIndex(3);
                 shown.rangeView.setSelected(true);
-                shown.start.setText("2026-12-11 22:30");
-                shown.end.setText("2026-12-11 23:00");
+                shown.span.setSelectedIndex(0);
                 shown.step.setSelectedIndex(0);
                 shown.apply();
             });
-            require(group.model.getRowCount() == 14 && group.model.moonRows() == 8
-                            && group.model.groups() == 2
-                            && "2026-12-11 22:3".equals(group.start.getText()),
+            require(group.model.getRowCount() == 25 * 7 && group.model.moonRows() == 100
+                            && group.model.groups() == 25
+                            && group.span.getSelectedIndex() == 3,
                     "a range from the dialog is the Controller's, grouped by instant,"
-                            + " its unfinished text untouched");
+                            + " its own draft untouched");
             for (int g = 0; g < 2; g++) {
                 juranometria.ui.solar.JovianTableSession.Entry entry =
                         jupiter.result().entries().get(g);
@@ -2265,13 +2253,12 @@ public final class PackagedAcceptanceMain {
 
             javax.swing.SwingUtilities.invokeAndWait(() -> {
                 group.rangeView.setSelected(true);
-                group.start.setText("2026-10-04 23:00");
-                group.end.setText("2026-10-05 00:30");
+                group.span.setSelectedIndex(0);
                 group.step.setSelectedIndex(0);
                 group.apply();
             });
-            require(group.model.groups() == 3 && group.model.moonRows() == 21
-                            && group.model.getRowCount() == 33,
+            require(group.model.groups() == 25 && group.model.moonRows() == 175
+                            && group.model.getRowCount() == 25 * 11,
                     "a range grouped by instant: a heading, Saturn's three lines and seven moons each");
             juranometria.ui.solar.SaturnTableSession.Entry first = saturn.result().entries().get(0);
             java.util.List<String> values = juranometria.ui.solar.SaturnMoonsModel
@@ -2386,19 +2373,18 @@ public final class PackagedAcceptanceMain {
                     "and the Controller's group shows that result: "
                             + section[0].sun().status());
 
-            // A range applied from the Controller, with unfinished text in the dialog.
+            // A range applied from the Controller, with another span chosen in the dialog.
             javax.swing.SwingUtilities.invokeAndWait(() -> {
-                dialog[0].end.setText("2026-06-3");
+                dialog[0].span.setSelectedIndex(3);
                 section[0].sun().rangeView.setSelected(true);
-                section[0].sun().end.setText("2026-06-24 07:30");
                 section[0].sun().apply();
             });
-            require(dialog[0].model.getRowCount() == 4
+            require(dialog[0].model.getRowCount() == 8
                             && dialog[0].status().equals(section[0].sun().status()),
                     "a range applied in the Controller is the dialog's table too: "
                             + dialog[0].status());
-            require("2026-06-3".equals(dialog[0].end.getText()),
-                    "while the dialog's unfinished text is untouched");
+            require(dialog[0].span.getSelectedIndex() == 3,
+                    "while the dialog's own draft is untouched");
             require(moon.computations() == 0, "the Sun's range computed nothing for the Moon");
 
             // One switch per body: the box, the View item and the chart agree.
@@ -4202,7 +4188,9 @@ public final class PackagedAcceptanceMain {
         // Setting a place or an instant redraws and does not move the
         // page; only a reader asking does that.
         juranometria.chart.ChartViewState where = chart.viewState();
-        module.observer(module.observer().from(-33.87, 151.21));
+        // Installed on the event thread, as every chart-context change is (#612).
+        javax.swing.SwingUtilities.invokeAndWait(() ->
+                module.observer(module.observer().from(-33.87, 151.21)));
         require(chart.viewState().equals(where)
                         && asked.isEmpty(),
                 "changing the place redraws the lines and leaves the"

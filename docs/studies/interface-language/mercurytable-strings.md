@@ -42,45 +42,41 @@ The fresh state: a single row at the instant Place and Time holds - Espenak's ho
 
 ![](mercurytable-en-1-instant.png)
 
-Packed 1854 × 479 px.
+Packed 1854 × 433 px.
 
 | shown, hovered or spoken |
 |---|
 | Mercury |
-| Where Mercury is, computed from the bundled ephemeris for the observing place and instant set in Place and Time: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
-| Agreement with the chart |
-| Same place and instant as the chart: 59.91° N · 10.75° E, 2026-02-19 18:00:00 UTC |
-| Update from Place and Time |
-| Read the place and instant from Place and Time again |
-| Read the observer and instant from Place and Time again |
-| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
-| Observer at latitude 59.91, longitude 10.75 east; instant 2026-02-19 18:00:00 UTC, from Place and Time. |
-| This instant |
-| One row, at the instant set in Place and Time |
-| Show Mercury at the instant set in Place and Time |
-| Shows a single row: Mercury at the observing instant set in Place and Time. |
-| Over a range |
-| A row for every step from a start to an end |
+| Where Mercury is, computed from the bundled ephemeris for the chart time and place: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
+| Whether the table is for the chart time and place now |
+| Computed for chart time 2026-02-19 18:00:00 UTC at latitude 59.91, longitude 10.75 east. |
+| At chart time |
+| One row, at the chart time |
+| Show Mercury at the chart time |
+| Shows a single row: Mercury at the chart time. |
+| Over a time range |
+| A row for every step from the chart time, over a span |
 | Show Mercury over a range of instants |
-| Shows a row for every step from the start to the end, both included; an end that is not on the grid is added as the last row and marked. |
-| From (UTC) |
-| yyyy-mm-dd hh:mm or hh:mm:ss, in UTC |
-| The first instant of the range, in UTC. Starts at the instant set in Place and Time. |
-| To (UTC) |
-| The last instant of the range, in UTC, included; if it is not on the grid it is added as the last row and marked. |
-| Every |
-| 1 hour |
-| 6 hours |
+| Shows a row for every step from the chart time over the span chosen, as many whole steps as the span holds; the first row is the chart time, read again whenever you compute. To range from another instant, set the chart time. |
+| Span |
 | 1 day |
 | 7 days |
 | 30 days |
+| 90 days |
+| 365 days |
+| How far the rows reach from the chart time |
+| Span of the range from the chart time |
+| How far from the chart time the rows reach, in whole steps of the step beside it. |
+| Every |
+| 1 hour |
+| 6 hours |
 | The elapsed time between rows |
 | Step between rows |
 | The elapsed time between rows, on the UTC timeline, so a daily range does not drift across a change of civil clock. |
 | Compute |
-| Fill the table for the range above |
+| Fill the table for the span and step above, from the chart time |
 | Compute the range |
-| Computes a row for every step of the range above. |
+| Computes a row for every step of the span above, from the chart time now. |
 | 1 rows. |
 | Instant (UTC) |
 | Right ascension (J2000) |
@@ -97,57 +93,56 @@ Packed 1854 × 479 px.
 | Mercury's computed quantities |
 | Each row is one instant. The columns are the instant in UTC; right ascension and declination in the J2000 frame the chart is drawn in; altitude and azimuth without refraction; distance; the solid body's apparent diameter; the illuminated fraction; the phase; the elongation from the Sun with the side of the Sun Mercury is on; and the lit side, the direction the light falls from. |
 | Dates before 1972-01-01 and after 2027-06-28 use an estimated clock correction. After 2026, uncertainty in local horizon coordinates cannot yet be stated precisely. The effect on the J2000 chart position remains below 15″ through 2100 under the adopted model. |
+| Set chart time to this instant |
+| Make the selected row's instant the chart time and redraw every body for it |
+| Set the chart time to the selected row's instant |
+| Sets the chart time to the instant of the selected row, as Place and Time would, so every enabled body is redrawn for it. This table is then for an earlier chart time until you compute again. |
 | Close |
 | Close the Mercury table |
 | Closes the table. Nothing is changed or remembered; Place and Time keeps the place and instant. |
 
 ### A daily range through the 2026 inferior conjunction
 
-Daily rows from the instant, and an end that is not on the grid, added last and marked †. The disc is at its largest and least lit, and the side of the Sun changes from E to W - by right ascension, so before the conjunction a reader may be told of; the table names no conjunction. Mercury's apparition turns in days where Venus's takes weeks.
+A week of daily rows from the chart time, the first row the chart time itself. The disc is at its largest and least lit, and the side of the Sun changes from E to W - by right ascension, so before the conjunction a reader may be told of; the table names no conjunction. Mercury's apparition turns in days where Venus's takes weeks.
 
 ![](mercurytable-en-2-range.png)
 
-Packed 1854 × 479 px.
+Packed 1854 × 433 px.
 
 | shown, hovered or spoken |
 |---|
 | Mercury |
-| Where Mercury is, computed from the bundled ephemeris for the observing place and instant set in Place and Time: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
-| Agreement with the chart |
-| This range: 59.91° N · 10.75° E, from 2026-03-03 11:00:00 to 2026-03-10 17:30:00 UTCChart: 59.91° N · 10.75° E, 2026-03-03 11:00:00 UTC |
-| This range: 59.91° N · 10.75° E, from 2026-03-03 11:00:00 to 2026-03-10 17:30:00 UTC Chart: 59.91° N · 10.75° E, 2026-03-03 11:00:00 UTC |
-| Update from Place and Time |
-| Read the place and instant from Place and Time again |
-| Read the observer and instant from Place and Time again |
-| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
-| Observer at latitude 59.91, longitude 10.75 east; instant 2026-03-03 11:00:00 UTC, from Place and Time. |
-| This instant |
-| One row, at the instant set in Place and Time |
-| Show Mercury at the instant set in Place and Time |
-| Shows a single row: Mercury at the observing instant set in Place and Time. |
-| Over a range |
-| A row for every step from a start to an end |
+| Where Mercury is, computed from the bundled ephemeris for the chart time and place: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
+| Whether the table is for the chart time and place now |
+| Computed for chart time 2026-03-03 11:00:00 UTC at latitude 59.91, longitude 10.75 east. |
+| At chart time |
+| One row, at the chart time |
+| Show Mercury at the chart time |
+| Shows a single row: Mercury at the chart time. |
+| Over a time range |
+| A row for every step from the chart time, over a span |
 | Show Mercury over a range of instants |
-| Shows a row for every step from the start to the end, both included; an end that is not on the grid is added as the last row and marked. |
-| From (UTC) |
-| yyyy-mm-dd hh:mm or hh:mm:ss, in UTC |
-| The first instant of the range, in UTC. Starts at the instant set in Place and Time. |
-| To (UTC) |
-| The last instant of the range, in UTC, included; if it is not on the grid it is added as the last row and marked. |
-| Every |
-| 1 hour |
-| 6 hours |
+| Shows a row for every step from the chart time over the span chosen, as many whole steps as the span holds; the first row is the chart time, read again whenever you compute. To range from another instant, set the chart time. |
+| Span |
 | 1 day |
 | 7 days |
 | 30 days |
+| 90 days |
+| 365 days |
+| How far the rows reach from the chart time |
+| Span of the range from the chart time |
+| How far from the chart time the rows reach, in whole steps of the step beside it. |
+| Every |
+| 1 hour |
+| 6 hours |
 | The elapsed time between rows |
 | Step between rows |
 | The elapsed time between rows, on the UTC timeline, so a daily range does not drift across a change of civil clock. |
 | Compute |
-| Fill the table for the range above |
+| Fill the table for the span and step above, from the chart time |
 | Compute the range |
-| Computes a row for every step of the range above. |
-| 9 rows; the end is not on the grid, so it is the last row, marked †. |
+| Computes a row for every step of the span above, from the chart time now. |
+| 8 rows. |
 | Instant (UTC) |
 | Right ascension (J2000) |
 | Declination (J2000) |
@@ -167,60 +162,59 @@ Packed 1854 × 479 px.
 | 2026-03-08 11:00 · 23h 01m 06.8s · −2° 25′ 56″ · 27.73° · 175.83° · 0.621790 AU (93.018 mill. km) · 0′ 10.8″ · 0.9 % · near inferior conjunction · 4.1° W · not well-defined (near inferior conjunction) |
 | 2026-03-09 11:00 · 22h 57m 33.7s · −2° 55′ 07″ · 27.29° · 177.95° · 0.619013 AU (92.603 mill. km) · 0′ 10.9″ · 1.5 % · near inferior conjunction · 5.3° W · not well-defined (near inferior conjunction) |
 | 2026-03-10 11:00 · 22h 54m 08.9s · −3° 25′ 13″ · 26.81° · 180.02° · 0.618108 AU (92.468 mill. km) · 0′ 10.9″ · 2.4 % · crescent · 6.9° W · 96° (east) |
-| 2026-03-10 17:30 † · 22h 53m 15.0s · −3° 33′ 26″ · −6.97° (below the horizon) · 275.23° · 0.618196 AU (92.481 mill. km) · 0′ 10.9″ · 2.7 % · crescent · 7.3° W · 94° (east) |
 | Mercury's computed quantities |
 | Each row is one instant. The columns are the instant in UTC; right ascension and declination in the J2000 frame the chart is drawn in; altitude and azimuth without refraction; distance; the solid body's apparent diameter; the illuminated fraction; the phase; the elongation from the Sun with the side of the Sun Mercury is on; and the lit side, the direction the light falls from. |
 | Dates before 1972-01-01 and after 2027-06-28 use an estimated clock correction. After 2026, uncertainty in local horizon coordinates cannot yet be stated precisely. The effect on the J2000 chart position remains below 15″ through 2100 under the adopted model. |
+| Set chart time to this instant [unavailable] |
+| Make the selected row's instant the chart time and redraw every body for it [unavailable] |
+| Set the chart time to the selected row's instant [unavailable] |
+| Sets the chart time to the instant of the selected row, as Place and Time would, so every enabled body is redrawn for it. This table is then for an earlier chart time until you compute again. [unavailable] |
 | Close |
 | Close the Mercury table |
 | Closes the table. Nothing is changed or remembered; Place and Time keeps the place and instant. |
 
 ### A range that leaves the interval
 
-The end is after the last civil day Mercury is computed for. The table is empty and the status line says why, naming the interval; nothing is extrapolated.
+A week from the chart time ends after the last civil day Mercury is computed for. The table is empty and the status line says why, naming the interval; nothing is extrapolated.
 
 ![](mercurytable-en-3-refused.png)
 
-Packed 1854 × 479 px.
+Packed 1854 × 433 px.
 
 | shown, hovered or spoken |
 |---|
 | Mercury |
-| Where Mercury is, computed from the bundled ephemeris for the observing place and instant set in Place and Time: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
-| Agreement with the chart |
-| Chart: 59.91° N · 10.75° E, 2100-12-28 00:00:00 UTC |
-| Update from Place and Time |
-| Read the place and instant from Place and Time again |
-| Read the observer and instant from Place and Time again |
-| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
-| Observer at latitude 59.91, longitude 10.75 east; instant 2100-12-28 00:00:00 UTC, from Place and Time. |
-| This instant |
-| One row, at the instant set in Place and Time |
-| Show Mercury at the instant set in Place and Time |
-| Shows a single row: Mercury at the observing instant set in Place and Time. |
-| Over a range |
-| A row for every step from a start to an end |
+| Where Mercury is, computed from the bundled ephemeris for the chart time and place: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
+| Whether the table is for the chart time and place now |
+| Computed for chart time 2100-12-28 00:00:00 UTC at latitude 59.91, longitude 10.75 east. |
+| At chart time |
+| One row, at the chart time |
+| Show Mercury at the chart time |
+| Shows a single row: Mercury at the chart time. |
+| Over a time range |
+| A row for every step from the chart time, over a span |
 | Show Mercury over a range of instants |
-| Shows a row for every step from the start to the end, both included; an end that is not on the grid is added as the last row and marked. |
-| From (UTC) |
-| yyyy-mm-dd hh:mm or hh:mm:ss, in UTC |
-| The first instant of the range, in UTC. Starts at the instant set in Place and Time. |
-| To (UTC) |
-| The last instant of the range, in UTC, included; if it is not on the grid it is added as the last row and marked. |
-| Every |
-| 1 hour |
-| 6 hours |
+| Shows a row for every step from the chart time over the span chosen, as many whole steps as the span holds; the first row is the chart time, read again whenever you compute. To range from another instant, set the chart time. |
+| Span |
 | 1 day |
 | 7 days |
 | 30 days |
+| 90 days |
+| 365 days |
+| How far the rows reach from the chart time |
+| Span of the range from the chart time |
+| How far from the chart time the rows reach, in whole steps of the step beside it. |
+| Every |
+| 1 hour |
+| 6 hours |
 | The elapsed time between rows |
 | Step between rows |
 | The elapsed time between rows, on the UTC timeline, so a daily range does not drift across a change of civil clock. |
 | Compute |
-| Fill the table for the range above |
+| Fill the table for the span and step above, from the chart time |
 | Compute the range |
-| Computes a row for every step of the range above. |
-| Mercury is computed for civil dates from 1900-01-01 to 2100-12-31; 2101-01-02 00:00:00 is outside that. |
+| Computes a row for every step of the span above, from the chart time now. |
+| Mercury is computed for civil dates from 1900-01-01 to 2100-12-31; 2101-01-04 00:00:00 is outside that. |
 | Instant (UTC) |
 | Right ascension (J2000) |
 | Declination (J2000) |
@@ -235,6 +229,10 @@ Packed 1854 × 479 px.
 | Mercury's computed quantities |
 | Each row is one instant. The columns are the instant in UTC; right ascension and declination in the J2000 frame the chart is drawn in; altitude and azimuth without refraction; distance; the solid body's apparent diameter; the illuminated fraction; the phase; the elongation from the Sun with the side of the Sun Mercury is on; and the lit side, the direction the light falls from. |
 | Dates before 1972-01-01 and after 2027-06-28 use an estimated clock correction. After 2026, uncertainty in local horizon coordinates cannot yet be stated precisely. The effect on the J2000 chart position remains below 15″ through 2100 under the adopted model. |
+| Set chart time to this instant [unavailable] |
+| Make the selected row's instant the chart time and redraw every body for it [unavailable] |
+| Set the chart time to the selected row's instant [unavailable] |
+| Sets the chart time to the instant of the selected row, as Place and Time would, so every enabled body is redrawn for it. This table is then for an earlier chart time until you compute again. [unavailable] |
 | Close |
 | Close the Mercury table |
 | Closes the table. Nothing is changed or remembered; Place and Time keeps the place and instant. |
@@ -245,45 +243,41 @@ The NASA/GSFC catalogue's minute of greatest transit, while Mercury crossed the 
 
 ![](mercurytable-en-4-transit.png)
 
-Packed 1854 × 479 px.
+Packed 1854 × 433 px.
 
 | shown, hovered or spoken |
 |---|
 | Mercury |
-| Where Mercury is, computed from the bundled ephemeris for the observing place and instant set in Place and Time: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
-| Agreement with the chart |
-| Same place and instant as the chart: 59.91° N · 10.75° E, 2019-11-11 15:20:00 UTC |
-| Update from Place and Time |
-| Read the place and instant from Place and Time again |
-| Read the observer and instant from Place and Time again |
-| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
-| Observer at latitude 59.91, longitude 10.75 east; instant 2019-11-11 15:20:00 UTC, from Place and Time. |
-| This instant |
-| One row, at the instant set in Place and Time |
-| Show Mercury at the instant set in Place and Time |
-| Shows a single row: Mercury at the observing instant set in Place and Time. |
-| Over a range |
-| A row for every step from a start to an end |
+| Where Mercury is, computed from the bundled ephemeris for the chart time and place: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
+| Whether the table is for the chart time and place now |
+| Computed for chart time 2019-11-11 15:20:00 UTC at latitude 59.91, longitude 10.75 east. |
+| At chart time |
+| One row, at the chart time |
+| Show Mercury at the chart time |
+| Shows a single row: Mercury at the chart time. |
+| Over a time range |
+| A row for every step from the chart time, over a span |
 | Show Mercury over a range of instants |
-| Shows a row for every step from the start to the end, both included; an end that is not on the grid is added as the last row and marked. |
-| From (UTC) |
-| yyyy-mm-dd hh:mm or hh:mm:ss, in UTC |
-| The first instant of the range, in UTC. Starts at the instant set in Place and Time. |
-| To (UTC) |
-| The last instant of the range, in UTC, included; if it is not on the grid it is added as the last row and marked. |
-| Every |
-| 1 hour |
-| 6 hours |
+| Shows a row for every step from the chart time over the span chosen, as many whole steps as the span holds; the first row is the chart time, read again whenever you compute. To range from another instant, set the chart time. |
+| Span |
 | 1 day |
 | 7 days |
 | 30 days |
+| 90 days |
+| 365 days |
+| How far the rows reach from the chart time |
+| Span of the range from the chart time |
+| How far from the chart time the rows reach, in whole steps of the step beside it. |
+| Every |
+| 1 hour |
+| 6 hours |
 | The elapsed time between rows |
 | Step between rows |
 | The elapsed time between rows, on the UTC timeline, so a daily range does not drift across a change of civil clock. |
 | Compute |
-| Fill the table for the range above |
+| Fill the table for the span and step above, from the chart time |
 | Compute the range |
-| Computes a row for every step of the range above. |
+| Computes a row for every step of the span above, from the chart time now. |
 | 1 rows. |
 | Instant (UTC) |
 | Right ascension (J2000) |
@@ -300,53 +294,56 @@ Packed 1854 × 479 px.
 | Mercury's computed quantities |
 | Each row is one instant. The columns are the instant in UTC; right ascension and declination in the J2000 frame the chart is drawn in; altitude and azimuth without refraction; distance; the solid body's apparent diameter; the illuminated fraction; the phase; the elongation from the Sun with the side of the Sun Mercury is on; and the lit side, the direction the light falls from. |
 | Dates before 1972-01-01 and after 2027-06-28 use an estimated clock correction. After 2026, uncertainty in local horizon coordinates cannot yet be stated precisely. The effect on the J2000 chart position remains below 15″ through 2100 under the adopted model. |
+| Set chart time to this instant |
+| Make the selected row's instant the chart time and redraw every body for it |
+| Set the chart time to the selected row's instant |
+| Sets the chart time to the instant of the selected row, as Place and Time would, so every enabled body is redrawn for it. This table is then for an earlier chart time until you compute again. |
 | Close |
 | Close the Mercury table |
 | Closes the table. Nothing is changed or remembered; Place and Time keeps the place and instant. |
 
-### The instant, in the dark appearance
+### The chart moved on after computing
 
-![](mercurytable-en-5-instant-dark.png)
+The chart time moved six hours on after this instant was computed (#612, ruling P1): the rows stay, dimmed, under the stale message, until Compute; the note states the chart time and place the rows are for.
+
+![](mercurytable-en-5-stale.png)
 
 Packed 1854 × 479 px.
 
 | shown, hovered or spoken |
 |---|
 | Mercury |
-| Where Mercury is, computed from the bundled ephemeris for the observing place and instant set in Place and Time: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
-| Agreement with the chart |
-| Same place and instant as the chart: 59.91° N · 10.75° E, 2026-02-19 18:00:00 UTC |
-| Update from Place and Time |
-| Read the place and instant from Place and Time again |
-| Read the observer and instant from Place and Time again |
-| Reads the observing place and instant from Place and Time again and recomputes. The table also does this when it opens and whenever it comes to the front. |
-| Observer at latitude 59.91, longitude 10.75 east; instant 2026-02-19 18:00:00 UTC, from Place and Time. |
-| This instant |
-| One row, at the instant set in Place and Time |
-| Show Mercury at the instant set in Place and Time |
-| Shows a single row: Mercury at the observing instant set in Place and Time. |
-| Over a range |
-| A row for every step from a start to an end |
+| Where Mercury is, computed from the bundled ephemeris for the chart time and place: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
+| Whether the table is for the chart time and place now |
+| Computed for the previous chart time and place — Compute again |
+| Computed for chart time 2026-02-19 18:00:00 UTC at latitude 59.91, longitude 10.75 east. |
+| At chart time |
+| One row, at the chart time |
+| Show Mercury at the chart time |
+| Shows a single row: Mercury at the chart time. |
+| Over a time range |
+| A row for every step from the chart time, over a span |
 | Show Mercury over a range of instants |
-| Shows a row for every step from the start to the end, both included; an end that is not on the grid is added as the last row and marked. |
-| From (UTC) |
-| yyyy-mm-dd hh:mm or hh:mm:ss, in UTC |
-| The first instant of the range, in UTC. Starts at the instant set in Place and Time. |
-| To (UTC) |
-| The last instant of the range, in UTC, included; if it is not on the grid it is added as the last row and marked. |
-| Every |
-| 1 hour |
-| 6 hours |
+| Shows a row for every step from the chart time over the span chosen, as many whole steps as the span holds; the first row is the chart time, read again whenever you compute. To range from another instant, set the chart time. |
+| Span |
 | 1 day |
 | 7 days |
 | 30 days |
+| 90 days |
+| 365 days |
+| How far the rows reach from the chart time |
+| Span of the range from the chart time |
+| How far from the chart time the rows reach, in whole steps of the step beside it. |
+| Every |
+| 1 hour |
+| 6 hours |
 | The elapsed time between rows |
 | Step between rows |
 | The elapsed time between rows, on the UTC timeline, so a daily range does not drift across a change of civil clock. |
 | Compute |
-| Fill the table for the range above |
+| Fill the table for the span and step above, from the chart time |
 | Compute the range |
-| Computes a row for every step of the range above. |
+| Computes a row for every step of the span above, from the chart time now. |
 | 1 rows. |
 | Instant (UTC) |
 | Right ascension (J2000) |
@@ -363,6 +360,73 @@ Packed 1854 × 479 px.
 | Mercury's computed quantities |
 | Each row is one instant. The columns are the instant in UTC; right ascension and declination in the J2000 frame the chart is drawn in; altitude and azimuth without refraction; distance; the solid body's apparent diameter; the illuminated fraction; the phase; the elongation from the Sun with the side of the Sun Mercury is on; and the lit side, the direction the light falls from. |
 | Dates before 1972-01-01 and after 2027-06-28 use an estimated clock correction. After 2026, uncertainty in local horizon coordinates cannot yet be stated precisely. The effect on the J2000 chart position remains below 15″ through 2100 under the adopted model. |
+| Set chart time to this instant |
+| Make the selected row's instant the chart time and redraw every body for it |
+| Set the chart time to the selected row's instant |
+| Sets the chart time to the instant of the selected row, as Place and Time would, so every enabled body is redrawn for it. This table is then for an earlier chart time until you compute again. |
+| Close |
+| Close the Mercury table |
+| Closes the table. Nothing is changed or remembered; Place and Time keeps the place and instant. |
+
+### The instant, in the dark appearance
+
+![](mercurytable-en-6-instant-dark.png)
+
+Packed 1854 × 433 px.
+
+| shown, hovered or spoken |
+|---|
+| Mercury |
+| Where Mercury is, computed from the bundled ephemeris for the chart time and place: its position among the fixed stars, its height and direction above the horizon, its distance and apparent size, how much of it is lit and which way the light falls, at that instant or over a range of instants. |
+| Whether the table is for the chart time and place now |
+| Computed for chart time 2026-02-19 18:00:00 UTC at latitude 59.91, longitude 10.75 east. |
+| At chart time |
+| One row, at the chart time |
+| Show Mercury at the chart time |
+| Shows a single row: Mercury at the chart time. |
+| Over a time range |
+| A row for every step from the chart time, over a span |
+| Show Mercury over a range of instants |
+| Shows a row for every step from the chart time over the span chosen, as many whole steps as the span holds; the first row is the chart time, read again whenever you compute. To range from another instant, set the chart time. |
+| Span |
+| 1 day |
+| 7 days |
+| 30 days |
+| 90 days |
+| 365 days |
+| How far the rows reach from the chart time |
+| Span of the range from the chart time |
+| How far from the chart time the rows reach, in whole steps of the step beside it. |
+| Every |
+| 1 hour |
+| 6 hours |
+| The elapsed time between rows |
+| Step between rows |
+| The elapsed time between rows, on the UTC timeline, so a daily range does not drift across a change of civil clock. |
+| Compute |
+| Fill the table for the span and step above, from the chart time |
+| Compute the range |
+| Computes a row for every step of the span above, from the chart time now. |
+| 1 rows. |
+| Instant (UTC) |
+| Right ascension (J2000) |
+| Declination (J2000) |
+| Altitude (no refraction) |
+| Azimuth (from north through east) |
+| Distance |
+| Apparent diameter (solid body) |
+| Illuminated |
+| Phase |
+| Elongation from the Sun |
+| Lit side |
+| 2026-02-19 18:00 · 23h 17m 02.0s · −3° 20′ 04″ · 1.80° · 260.49° · 0.937962 AU (140.317 mill. km) · 0′ 07.2″ · 49.7 % · near half lit · 18.1° E · 243° (west-southwest) |
+| Mercury's computed quantities |
+| Each row is one instant. The columns are the instant in UTC; right ascension and declination in the J2000 frame the chart is drawn in; altitude and azimuth without refraction; distance; the solid body's apparent diameter; the illuminated fraction; the phase; the elongation from the Sun with the side of the Sun Mercury is on; and the lit side, the direction the light falls from. |
+| Dates before 1972-01-01 and after 2027-06-28 use an estimated clock correction. After 2026, uncertainty in local horizon coordinates cannot yet be stated precisely. The effect on the J2000 chart position remains below 15″ through 2100 under the adopted model. |
+| Set chart time to this instant |
+| Make the selected row's instant the chart time and redraw every body for it |
+| Set the chart time to the selected row's instant |
+| Sets the chart time to the instant of the selected row, as Place and Time would, so every enabled body is redrawn for it. This table is then for an earlier chart time until you compute again. |
 | Close |
 | Close the Mercury table |
 | Closes the table. Nothing is changed or remembered; Place and Time keeps the place and instant. |
@@ -389,47 +453,43 @@ Packed 1854 × 479 px.
 
 The fresh state: a single row at the instant Place and Time holds - Espenak's hour of the greatest eastern elongation. Mercury is near half lit, east of the Sun in the evening sky, its lit side towards the Sun in the west-southwest.
 
-![](mercurytable-nb-NO-6-instant.png)
+![](mercurytable-nb-NO-7-instant.png)
 
-Packed 1854 × 479 px.
+Packed 1854 × 433 px.
 
 | shown, hovered or spoken |
 |---|
 | Merkur |
-| Hvor Merkur er, beregnet fra den medfølgende efemeriden for observasjonsstedet og tidspunktet satt i Sted og tid: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
-| Samsvar med kartet |
-| Samme sted og tidspunkt som kartet: 59.91° N · 10.75° Ø, 2026-02-19 18:00:00 UTC |
-| Oppdater fra Sted og tid |
-| Les sted og tidspunkt fra Sted og tid på nytt |
-| Les observatør og tidspunkt fra Sted og tid på nytt |
-| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
-| Observatør på bredde 59,91, lengde 10,75 øst; tidspunkt 2026-02-19 18:00:00 UTC, fra Sted og tid. |
-| Dette tidspunktet |
-| Én rad, ved tidspunktet satt i Sted og tid |
-| Vis Merkur ved tidspunktet satt i Sted og tid |
-| Viser én rad: Merkur ved observasjonstidspunktet satt i Sted og tid. |
+| Hvor Merkur er, beregnet fra den medfølgende efemeriden for karttiden og observasjonsstedet: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
+| Om tabellen gjelder karttiden og stedet nå |
+| Beregnet for karttid 2026-02-19 18:00:00 UTC på bredde 59,91, lengde 10,75 øst. |
+| Ved karttid |
+| Én rad, ved karttiden |
+| Vis Merkur ved karttiden |
+| Viser én rad: Merkur ved karttiden. |
 | Over et tidsrom |
-| Én rad for hvert steg fra en start til en slutt |
+| Én rad for hvert steg fra karttiden, over et omfang |
 | Vis Merkur over et tidsrom |
-| Viser én rad for hvert steg fra starten til slutten, begge medregnet; en slutt som ikke ligger på rutenettet, legges til som siste rad og merkes. |
-| Fra (UTC) |
-| åååå-mm-dd tt:mm eller tt:mm:ss, i UTC |
-| Første tidspunkt i tidsrommet, i UTC. Starter ved tidspunktet satt i Sted og tid. |
-| Til (UTC) |
-| Siste tidspunkt i tidsrommet, i UTC, medregnet; ligger det ikke på rutenettet, legges det til som siste rad og merkes. |
-| Hvert |
-| 1 time |
-| 6 timer |
+| Viser én rad for hvert steg fra karttiden over omfanget valgt, så mange hele steg som omfanget rommer; første rad er karttiden, lest på nytt hver gang du beregner. Sett karttiden for å regne fra et annet tidspunkt. |
+| Omfang |
 | 1 døgn |
 | 7 døgn |
 | 30 døgn |
+| 90 døgn |
+| 365 døgn |
+| Hvor langt radene rekker fra karttiden |
+| Tidsrommets omfang fra karttiden |
+| Hvor langt fra karttiden radene rekker, i hele steg av steget ved siden av. |
+| Hvert |
+| 1 time |
+| 6 timer |
 | Tiden som går mellom radene |
 | Steg mellom radene |
 | Tiden som går mellom radene, på UTC-tidslinjen, så et daglig tidsrom ikke forskyver seg ved skifte av sivil klokke. |
 | Beregn |
-| Fyll tabellen for tidsrommet over |
+| Fyll tabellen for omfanget og steget over, fra karttiden |
 | Beregn tidsrommet |
-| Beregner én rad for hvert steg i tidsrommet over. |
+| Beregner én rad for hvert steg i omfanget over, fra karttiden nå. |
 | 1 rader. |
 | Tidspunkt (UTC) |
 | Rektascensjon (J2000) |
@@ -446,57 +506,56 @@ Packed 1854 × 479 px.
 | Merkurs beregnede størrelser |
 | Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; høyde og asimut uten refraksjon; avstand; den faste kroppens tilsynelatende diameter; belyst andel; fase; elongasjon fra Solen med hvilken side av Solen Merkur står på; og belyst side, retningen lyset faller fra. |
 | Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 15″ fram til 2100 med den valgte modellen. |
+| Sett karttid til dette tidspunktet |
+| Gjør den valgte radens tidspunkt til karttid og tegn hvert himmellegeme på nytt for det |
+| Sett karttiden til den valgte radens tidspunkt |
+| Setter karttiden til tidspunktet i den valgte raden, slik Sted og tid ville gjort, så hvert påslått himmellegeme tegnes på nytt for det. Denne tabellen gjelder så en tidligere karttid til du beregner på nytt. |
 | Lukk |
 | Lukk merkurtabellen |
 | Lukker tabellen. Ingenting endres eller huskes; Sted og tid beholder stedet og tidspunktet. |
 
 ### A daily range through the 2026 inferior conjunction
 
-Daily rows from the instant, and an end that is not on the grid, added last and marked †. The disc is at its largest and least lit, and the side of the Sun changes from E to W - by right ascension, so before the conjunction a reader may be told of; the table names no conjunction. Mercury's apparition turns in days where Venus's takes weeks.
+A week of daily rows from the chart time, the first row the chart time itself. The disc is at its largest and least lit, and the side of the Sun changes from E to W - by right ascension, so before the conjunction a reader may be told of; the table names no conjunction. Mercury's apparition turns in days where Venus's takes weeks.
 
-![](mercurytable-nb-NO-7-range.png)
+![](mercurytable-nb-NO-8-range.png)
 
-Packed 1854 × 479 px.
+Packed 1854 × 433 px.
 
 | shown, hovered or spoken |
 |---|
 | Merkur |
-| Hvor Merkur er, beregnet fra den medfølgende efemeriden for observasjonsstedet og tidspunktet satt i Sted og tid: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
-| Samsvar med kartet |
-| Dette tidsrommet: 59.91° N · 10.75° Ø, fra 2026-03-03 11:00:00 til 2026-03-10 17:30:00 UTCKartet: 59.91° N · 10.75° Ø, 2026-03-03 11:00:00 UTC |
-| Dette tidsrommet: 59.91° N · 10.75° Ø, fra 2026-03-03 11:00:00 til 2026-03-10 17:30:00 UTC Kartet: 59.91° N · 10.75° Ø, 2026-03-03 11:00:00 UTC |
-| Oppdater fra Sted og tid |
-| Les sted og tidspunkt fra Sted og tid på nytt |
-| Les observatør og tidspunkt fra Sted og tid på nytt |
-| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
-| Observatør på bredde 59,91, lengde 10,75 øst; tidspunkt 2026-03-03 11:00:00 UTC, fra Sted og tid. |
-| Dette tidspunktet |
-| Én rad, ved tidspunktet satt i Sted og tid |
-| Vis Merkur ved tidspunktet satt i Sted og tid |
-| Viser én rad: Merkur ved observasjonstidspunktet satt i Sted og tid. |
+| Hvor Merkur er, beregnet fra den medfølgende efemeriden for karttiden og observasjonsstedet: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
+| Om tabellen gjelder karttiden og stedet nå |
+| Beregnet for karttid 2026-03-03 11:00:00 UTC på bredde 59,91, lengde 10,75 øst. |
+| Ved karttid |
+| Én rad, ved karttiden |
+| Vis Merkur ved karttiden |
+| Viser én rad: Merkur ved karttiden. |
 | Over et tidsrom |
-| Én rad for hvert steg fra en start til en slutt |
+| Én rad for hvert steg fra karttiden, over et omfang |
 | Vis Merkur over et tidsrom |
-| Viser én rad for hvert steg fra starten til slutten, begge medregnet; en slutt som ikke ligger på rutenettet, legges til som siste rad og merkes. |
-| Fra (UTC) |
-| åååå-mm-dd tt:mm eller tt:mm:ss, i UTC |
-| Første tidspunkt i tidsrommet, i UTC. Starter ved tidspunktet satt i Sted og tid. |
-| Til (UTC) |
-| Siste tidspunkt i tidsrommet, i UTC, medregnet; ligger det ikke på rutenettet, legges det til som siste rad og merkes. |
-| Hvert |
-| 1 time |
-| 6 timer |
+| Viser én rad for hvert steg fra karttiden over omfanget valgt, så mange hele steg som omfanget rommer; første rad er karttiden, lest på nytt hver gang du beregner. Sett karttiden for å regne fra et annet tidspunkt. |
+| Omfang |
 | 1 døgn |
 | 7 døgn |
 | 30 døgn |
+| 90 døgn |
+| 365 døgn |
+| Hvor langt radene rekker fra karttiden |
+| Tidsrommets omfang fra karttiden |
+| Hvor langt fra karttiden radene rekker, i hele steg av steget ved siden av. |
+| Hvert |
+| 1 time |
+| 6 timer |
 | Tiden som går mellom radene |
 | Steg mellom radene |
 | Tiden som går mellom radene, på UTC-tidslinjen, så et daglig tidsrom ikke forskyver seg ved skifte av sivil klokke. |
 | Beregn |
-| Fyll tabellen for tidsrommet over |
+| Fyll tabellen for omfanget og steget over, fra karttiden |
 | Beregn tidsrommet |
-| Beregner én rad for hvert steg i tidsrommet over. |
-| 9 rader; slutten ligger ikke på rutenettet, så den er siste rad, merket †. |
+| Beregner én rad for hvert steg i omfanget over, fra karttiden nå. |
+| 8 rader. |
 | Tidspunkt (UTC) |
 | Rektascensjon (J2000) |
 | Deklinasjon (J2000) |
@@ -516,60 +575,59 @@ Packed 1854 × 479 px.
 | 2026-03-08 11:00 · 23h 01m 06,8s · −2° 25′ 56″ · 27,73° · 175,83° · 0,621790 AU (93,018 mill. km) · 0′ 10,8″ · 0,9 % · nær nedre konjunksjon · 4,1° V · ikke veldefinert (nær nedre konjunksjon) |
 | 2026-03-09 11:00 · 22h 57m 33,7s · −2° 55′ 07″ · 27,29° · 177,95° · 0,619013 AU (92,603 mill. km) · 0′ 10,9″ · 1,5 % · nær nedre konjunksjon · 5,3° V · ikke veldefinert (nær nedre konjunksjon) |
 | 2026-03-10 11:00 · 22h 54m 08,9s · −3° 25′ 13″ · 26,81° · 180,02° · 0,618108 AU (92,468 mill. km) · 0′ 10,9″ · 2,4 % · sigd · 6,9° V · 96° (øst) |
-| 2026-03-10 17:30 † · 22h 53m 15,0s · −3° 33′ 26″ · −6,97° (under horisonten) · 275,23° · 0,618196 AU (92,481 mill. km) · 0′ 10,9″ · 2,7 % · sigd · 7,3° V · 94° (øst) |
 | Merkurs beregnede størrelser |
 | Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; høyde og asimut uten refraksjon; avstand; den faste kroppens tilsynelatende diameter; belyst andel; fase; elongasjon fra Solen med hvilken side av Solen Merkur står på; og belyst side, retningen lyset faller fra. |
 | Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 15″ fram til 2100 med den valgte modellen. |
+| Sett karttid til dette tidspunktet [unavailable] |
+| Gjør den valgte radens tidspunkt til karttid og tegn hvert himmellegeme på nytt for det [unavailable] |
+| Sett karttiden til den valgte radens tidspunkt [unavailable] |
+| Setter karttiden til tidspunktet i den valgte raden, slik Sted og tid ville gjort, så hvert påslått himmellegeme tegnes på nytt for det. Denne tabellen gjelder så en tidligere karttid til du beregner på nytt. [unavailable] |
 | Lukk |
 | Lukk merkurtabellen |
 | Lukker tabellen. Ingenting endres eller huskes; Sted og tid beholder stedet og tidspunktet. |
 
 ### A range that leaves the interval
 
-The end is after the last civil day Mercury is computed for. The table is empty and the status line says why, naming the interval; nothing is extrapolated.
+A week from the chart time ends after the last civil day Mercury is computed for. The table is empty and the status line says why, naming the interval; nothing is extrapolated.
 
-![](mercurytable-nb-NO-8-refused.png)
+![](mercurytable-nb-NO-9-refused.png)
 
-Packed 1854 × 479 px.
+Packed 1854 × 433 px.
 
 | shown, hovered or spoken |
 |---|
 | Merkur |
-| Hvor Merkur er, beregnet fra den medfølgende efemeriden for observasjonsstedet og tidspunktet satt i Sted og tid: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
-| Samsvar med kartet |
-| Kartet: 59.91° N · 10.75° Ø, 2100-12-28 00:00:00 UTC |
-| Oppdater fra Sted og tid |
-| Les sted og tidspunkt fra Sted og tid på nytt |
-| Les observatør og tidspunkt fra Sted og tid på nytt |
-| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
-| Observatør på bredde 59,91, lengde 10,75 øst; tidspunkt 2100-12-28 00:00:00 UTC, fra Sted og tid. |
-| Dette tidspunktet |
-| Én rad, ved tidspunktet satt i Sted og tid |
-| Vis Merkur ved tidspunktet satt i Sted og tid |
-| Viser én rad: Merkur ved observasjonstidspunktet satt i Sted og tid. |
+| Hvor Merkur er, beregnet fra den medfølgende efemeriden for karttiden og observasjonsstedet: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
+| Om tabellen gjelder karttiden og stedet nå |
+| Beregnet for karttid 2100-12-28 00:00:00 UTC på bredde 59,91, lengde 10,75 øst. |
+| Ved karttid |
+| Én rad, ved karttiden |
+| Vis Merkur ved karttiden |
+| Viser én rad: Merkur ved karttiden. |
 | Over et tidsrom |
-| Én rad for hvert steg fra en start til en slutt |
+| Én rad for hvert steg fra karttiden, over et omfang |
 | Vis Merkur over et tidsrom |
-| Viser én rad for hvert steg fra starten til slutten, begge medregnet; en slutt som ikke ligger på rutenettet, legges til som siste rad og merkes. |
-| Fra (UTC) |
-| åååå-mm-dd tt:mm eller tt:mm:ss, i UTC |
-| Første tidspunkt i tidsrommet, i UTC. Starter ved tidspunktet satt i Sted og tid. |
-| Til (UTC) |
-| Siste tidspunkt i tidsrommet, i UTC, medregnet; ligger det ikke på rutenettet, legges det til som siste rad og merkes. |
-| Hvert |
-| 1 time |
-| 6 timer |
+| Viser én rad for hvert steg fra karttiden over omfanget valgt, så mange hele steg som omfanget rommer; første rad er karttiden, lest på nytt hver gang du beregner. Sett karttiden for å regne fra et annet tidspunkt. |
+| Omfang |
 | 1 døgn |
 | 7 døgn |
 | 30 døgn |
+| 90 døgn |
+| 365 døgn |
+| Hvor langt radene rekker fra karttiden |
+| Tidsrommets omfang fra karttiden |
+| Hvor langt fra karttiden radene rekker, i hele steg av steget ved siden av. |
+| Hvert |
+| 1 time |
+| 6 timer |
 | Tiden som går mellom radene |
 | Steg mellom radene |
 | Tiden som går mellom radene, på UTC-tidslinjen, så et daglig tidsrom ikke forskyver seg ved skifte av sivil klokke. |
 | Beregn |
-| Fyll tabellen for tidsrommet over |
+| Fyll tabellen for omfanget og steget over, fra karttiden |
 | Beregn tidsrommet |
-| Beregner én rad for hvert steg i tidsrommet over. |
-| Merkur beregnes for sivile datoer fra 1900-01-01 til 2100-12-31; 2101-01-02 00:00:00 er utenfor det. |
+| Beregner én rad for hvert steg i omfanget over, fra karttiden nå. |
+| Merkur beregnes for sivile datoer fra 1900-01-01 til 2100-12-31; 2101-01-04 00:00:00 er utenfor det. |
 | Tidspunkt (UTC) |
 | Rektascensjon (J2000) |
 | Deklinasjon (J2000) |
@@ -584,6 +642,10 @@ Packed 1854 × 479 px.
 | Merkurs beregnede størrelser |
 | Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; høyde og asimut uten refraksjon; avstand; den faste kroppens tilsynelatende diameter; belyst andel; fase; elongasjon fra Solen med hvilken side av Solen Merkur står på; og belyst side, retningen lyset faller fra. |
 | Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 15″ fram til 2100 med den valgte modellen. |
+| Sett karttid til dette tidspunktet [unavailable] |
+| Gjør den valgte radens tidspunkt til karttid og tegn hvert himmellegeme på nytt for det [unavailable] |
+| Sett karttiden til den valgte radens tidspunkt [unavailable] |
+| Setter karttiden til tidspunktet i den valgte raden, slik Sted og tid ville gjort, så hvert påslått himmellegeme tegnes på nytt for det. Denne tabellen gjelder så en tidligere karttid til du beregner på nytt. [unavailable] |
 | Lukk |
 | Lukk merkurtabellen |
 | Lukker tabellen. Ingenting endres eller huskes; Sted og tid beholder stedet og tidspunktet. |
@@ -592,47 +654,43 @@ Packed 1854 × 479 px.
 
 The NASA/GSFC catalogue's minute of greatest transit, while Mercury crossed the Sun's disc: the phase reads in front of the Sun, and the lit side is stated as not well-defined rather than as a false angle; from Oslo the Sun had just set.
 
-![](mercurytable-nb-NO-9-transit.png)
+![](mercurytable-nb-NO-10-transit.png)
 
-Packed 1854 × 479 px.
+Packed 1854 × 433 px.
 
 | shown, hovered or spoken |
 |---|
 | Merkur |
-| Hvor Merkur er, beregnet fra den medfølgende efemeriden for observasjonsstedet og tidspunktet satt i Sted og tid: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
-| Samsvar med kartet |
-| Samme sted og tidspunkt som kartet: 59.91° N · 10.75° Ø, 2019-11-11 15:20:00 UTC |
-| Oppdater fra Sted og tid |
-| Les sted og tidspunkt fra Sted og tid på nytt |
-| Les observatør og tidspunkt fra Sted og tid på nytt |
-| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
-| Observatør på bredde 59,91, lengde 10,75 øst; tidspunkt 2019-11-11 15:20:00 UTC, fra Sted og tid. |
-| Dette tidspunktet |
-| Én rad, ved tidspunktet satt i Sted og tid |
-| Vis Merkur ved tidspunktet satt i Sted og tid |
-| Viser én rad: Merkur ved observasjonstidspunktet satt i Sted og tid. |
+| Hvor Merkur er, beregnet fra den medfølgende efemeriden for karttiden og observasjonsstedet: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
+| Om tabellen gjelder karttiden og stedet nå |
+| Beregnet for karttid 2019-11-11 15:20:00 UTC på bredde 59,91, lengde 10,75 øst. |
+| Ved karttid |
+| Én rad, ved karttiden |
+| Vis Merkur ved karttiden |
+| Viser én rad: Merkur ved karttiden. |
 | Over et tidsrom |
-| Én rad for hvert steg fra en start til en slutt |
+| Én rad for hvert steg fra karttiden, over et omfang |
 | Vis Merkur over et tidsrom |
-| Viser én rad for hvert steg fra starten til slutten, begge medregnet; en slutt som ikke ligger på rutenettet, legges til som siste rad og merkes. |
-| Fra (UTC) |
-| åååå-mm-dd tt:mm eller tt:mm:ss, i UTC |
-| Første tidspunkt i tidsrommet, i UTC. Starter ved tidspunktet satt i Sted og tid. |
-| Til (UTC) |
-| Siste tidspunkt i tidsrommet, i UTC, medregnet; ligger det ikke på rutenettet, legges det til som siste rad og merkes. |
-| Hvert |
-| 1 time |
-| 6 timer |
+| Viser én rad for hvert steg fra karttiden over omfanget valgt, så mange hele steg som omfanget rommer; første rad er karttiden, lest på nytt hver gang du beregner. Sett karttiden for å regne fra et annet tidspunkt. |
+| Omfang |
 | 1 døgn |
 | 7 døgn |
 | 30 døgn |
+| 90 døgn |
+| 365 døgn |
+| Hvor langt radene rekker fra karttiden |
+| Tidsrommets omfang fra karttiden |
+| Hvor langt fra karttiden radene rekker, i hele steg av steget ved siden av. |
+| Hvert |
+| 1 time |
+| 6 timer |
 | Tiden som går mellom radene |
 | Steg mellom radene |
 | Tiden som går mellom radene, på UTC-tidslinjen, så et daglig tidsrom ikke forskyver seg ved skifte av sivil klokke. |
 | Beregn |
-| Fyll tabellen for tidsrommet over |
+| Fyll tabellen for omfanget og steget over, fra karttiden |
 | Beregn tidsrommet |
-| Beregner én rad for hvert steg i tidsrommet over. |
+| Beregner én rad for hvert steg i omfanget over, fra karttiden nå. |
 | 1 rader. |
 | Tidspunkt (UTC) |
 | Rektascensjon (J2000) |
@@ -649,53 +707,56 @@ Packed 1854 × 479 px.
 | Merkurs beregnede størrelser |
 | Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; høyde og asimut uten refraksjon; avstand; den faste kroppens tilsynelatende diameter; belyst andel; fase; elongasjon fra Solen med hvilken side av Solen Merkur står på; og belyst side, retningen lyset faller fra. |
 | Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 15″ fram til 2100 med den valgte modellen. |
+| Sett karttid til dette tidspunktet |
+| Gjør den valgte radens tidspunkt til karttid og tegn hvert himmellegeme på nytt for det |
+| Sett karttiden til den valgte radens tidspunkt |
+| Setter karttiden til tidspunktet i den valgte raden, slik Sted og tid ville gjort, så hvert påslått himmellegeme tegnes på nytt for det. Denne tabellen gjelder så en tidligere karttid til du beregner på nytt. |
 | Lukk |
 | Lukk merkurtabellen |
 | Lukker tabellen. Ingenting endres eller huskes; Sted og tid beholder stedet og tidspunktet. |
 
-### The instant, in the dark appearance
+### The chart moved on after computing
 
-![](mercurytable-nb-NO-10-instant-dark.png)
+The chart time moved six hours on after this instant was computed (#612, ruling P1): the rows stay, dimmed, under the stale message, until Compute; the note states the chart time and place the rows are for.
+
+![](mercurytable-nb-NO-11-stale.png)
 
 Packed 1854 × 479 px.
 
 | shown, hovered or spoken |
 |---|
 | Merkur |
-| Hvor Merkur er, beregnet fra den medfølgende efemeriden for observasjonsstedet og tidspunktet satt i Sted og tid: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
-| Samsvar med kartet |
-| Samme sted og tidspunkt som kartet: 59.91° N · 10.75° Ø, 2026-02-19 18:00:00 UTC |
-| Oppdater fra Sted og tid |
-| Les sted og tidspunkt fra Sted og tid på nytt |
-| Les observatør og tidspunkt fra Sted og tid på nytt |
-| Leser observasjonsstedet og tidspunktet fra Sted og tid på nytt og beregner om igjen. Tabellen gjør også dette når den åpnes og hver gang den kommer fremst. |
-| Observatør på bredde 59,91, lengde 10,75 øst; tidspunkt 2026-02-19 18:00:00 UTC, fra Sted og tid. |
-| Dette tidspunktet |
-| Én rad, ved tidspunktet satt i Sted og tid |
-| Vis Merkur ved tidspunktet satt i Sted og tid |
-| Viser én rad: Merkur ved observasjonstidspunktet satt i Sted og tid. |
+| Hvor Merkur er, beregnet fra den medfølgende efemeriden for karttiden og observasjonsstedet: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
+| Om tabellen gjelder karttiden og stedet nå |
+| Beregnet for forrige karttid og sted — Beregn på nytt |
+| Beregnet for karttid 2026-02-19 18:00:00 UTC på bredde 59,91, lengde 10,75 øst. |
+| Ved karttid |
+| Én rad, ved karttiden |
+| Vis Merkur ved karttiden |
+| Viser én rad: Merkur ved karttiden. |
 | Over et tidsrom |
-| Én rad for hvert steg fra en start til en slutt |
+| Én rad for hvert steg fra karttiden, over et omfang |
 | Vis Merkur over et tidsrom |
-| Viser én rad for hvert steg fra starten til slutten, begge medregnet; en slutt som ikke ligger på rutenettet, legges til som siste rad og merkes. |
-| Fra (UTC) |
-| åååå-mm-dd tt:mm eller tt:mm:ss, i UTC |
-| Første tidspunkt i tidsrommet, i UTC. Starter ved tidspunktet satt i Sted og tid. |
-| Til (UTC) |
-| Siste tidspunkt i tidsrommet, i UTC, medregnet; ligger det ikke på rutenettet, legges det til som siste rad og merkes. |
-| Hvert |
-| 1 time |
-| 6 timer |
+| Viser én rad for hvert steg fra karttiden over omfanget valgt, så mange hele steg som omfanget rommer; første rad er karttiden, lest på nytt hver gang du beregner. Sett karttiden for å regne fra et annet tidspunkt. |
+| Omfang |
 | 1 døgn |
 | 7 døgn |
 | 30 døgn |
+| 90 døgn |
+| 365 døgn |
+| Hvor langt radene rekker fra karttiden |
+| Tidsrommets omfang fra karttiden |
+| Hvor langt fra karttiden radene rekker, i hele steg av steget ved siden av. |
+| Hvert |
+| 1 time |
+| 6 timer |
 | Tiden som går mellom radene |
 | Steg mellom radene |
 | Tiden som går mellom radene, på UTC-tidslinjen, så et daglig tidsrom ikke forskyver seg ved skifte av sivil klokke. |
 | Beregn |
-| Fyll tabellen for tidsrommet over |
+| Fyll tabellen for omfanget og steget over, fra karttiden |
 | Beregn tidsrommet |
-| Beregner én rad for hvert steg i tidsrommet over. |
+| Beregner én rad for hvert steg i omfanget over, fra karttiden nå. |
 | 1 rader. |
 | Tidspunkt (UTC) |
 | Rektascensjon (J2000) |
@@ -712,6 +773,73 @@ Packed 1854 × 479 px.
 | Merkurs beregnede størrelser |
 | Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; høyde og asimut uten refraksjon; avstand; den faste kroppens tilsynelatende diameter; belyst andel; fase; elongasjon fra Solen med hvilken side av Solen Merkur står på; og belyst side, retningen lyset faller fra. |
 | Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 15″ fram til 2100 med den valgte modellen. |
+| Sett karttid til dette tidspunktet |
+| Gjør den valgte radens tidspunkt til karttid og tegn hvert himmellegeme på nytt for det |
+| Sett karttiden til den valgte radens tidspunkt |
+| Setter karttiden til tidspunktet i den valgte raden, slik Sted og tid ville gjort, så hvert påslått himmellegeme tegnes på nytt for det. Denne tabellen gjelder så en tidligere karttid til du beregner på nytt. |
+| Lukk |
+| Lukk merkurtabellen |
+| Lukker tabellen. Ingenting endres eller huskes; Sted og tid beholder stedet og tidspunktet. |
+
+### The instant, in the dark appearance
+
+![](mercurytable-nb-NO-12-instant-dark.png)
+
+Packed 1854 × 433 px.
+
+| shown, hovered or spoken |
+|---|
+| Merkur |
+| Hvor Merkur er, beregnet fra den medfølgende efemeriden for karttiden og observasjonsstedet: posisjonen blant fiksstjernene, høyden og retningen over horisonten, avstanden og den tilsynelatende størrelsen, hvor mye av den som er belyst og hvilken vei lyset faller, ved det tidspunktet eller over et tidsrom. |
+| Om tabellen gjelder karttiden og stedet nå |
+| Beregnet for karttid 2026-02-19 18:00:00 UTC på bredde 59,91, lengde 10,75 øst. |
+| Ved karttid |
+| Én rad, ved karttiden |
+| Vis Merkur ved karttiden |
+| Viser én rad: Merkur ved karttiden. |
+| Over et tidsrom |
+| Én rad for hvert steg fra karttiden, over et omfang |
+| Vis Merkur over et tidsrom |
+| Viser én rad for hvert steg fra karttiden over omfanget valgt, så mange hele steg som omfanget rommer; første rad er karttiden, lest på nytt hver gang du beregner. Sett karttiden for å regne fra et annet tidspunkt. |
+| Omfang |
+| 1 døgn |
+| 7 døgn |
+| 30 døgn |
+| 90 døgn |
+| 365 døgn |
+| Hvor langt radene rekker fra karttiden |
+| Tidsrommets omfang fra karttiden |
+| Hvor langt fra karttiden radene rekker, i hele steg av steget ved siden av. |
+| Hvert |
+| 1 time |
+| 6 timer |
+| Tiden som går mellom radene |
+| Steg mellom radene |
+| Tiden som går mellom radene, på UTC-tidslinjen, så et daglig tidsrom ikke forskyver seg ved skifte av sivil klokke. |
+| Beregn |
+| Fyll tabellen for omfanget og steget over, fra karttiden |
+| Beregn tidsrommet |
+| Beregner én rad for hvert steg i omfanget over, fra karttiden nå. |
+| 1 rader. |
+| Tidspunkt (UTC) |
+| Rektascensjon (J2000) |
+| Deklinasjon (J2000) |
+| Høyde (uten refraksjon) |
+| Asimut (fra nord via øst) |
+| Avstand |
+| Tilsynelatende diameter (fast kropp) |
+| Belyst |
+| Fase |
+| Elongasjon fra Solen |
+| Belyst side |
+| 2026-02-19 18:00 · 23h 17m 02,0s · −3° 20′ 04″ · 1,80° · 260,49° · 0,937962 AU (140,317 mill. km) · 0′ 07,2″ · 49,7 % · nær halvt belyst · 18,1° Ø · 243° (vest-sørvest) |
+| Merkurs beregnede størrelser |
+| Hver rad er ett tidspunkt. Kolonnene er tidspunktet i UTC; rektascensjon og deklinasjon i J2000-rammen kartet tegnes i; høyde og asimut uten refraksjon; avstand; den faste kroppens tilsynelatende diameter; belyst andel; fase; elongasjon fra Solen med hvilken side av Solen Merkur står på; og belyst side, retningen lyset faller fra. |
+| Datoer før 1972-01-01 og etter 2027-06-28 bruker en beregnet klokkekorreksjon. Etter 2026 kan usikkerheten i lokale horisontkoordinater ennå ikke angis presist. Virkningen på J2000-posisjonen på kartet holder seg under 15″ fram til 2100 med den valgte modellen. |
+| Sett karttid til dette tidspunktet |
+| Gjør den valgte radens tidspunkt til karttid og tegn hvert himmellegeme på nytt for det |
+| Sett karttiden til den valgte radens tidspunkt |
+| Setter karttiden til tidspunktet i den valgte raden, slik Sted og tid ville gjort, så hvert påslått himmellegeme tegnes på nytt for det. Denne tabellen gjelder så en tidligere karttid til du beregner på nytt. |
 | Lukk |
 | Lukk merkurtabellen |
 | Lukker tabellen. Ingenting endres eller huskes; Sted og tid beholder stedet og tidspunktet. |
