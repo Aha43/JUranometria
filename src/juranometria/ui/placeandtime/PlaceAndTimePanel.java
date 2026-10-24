@@ -497,16 +497,26 @@ public final class PlaceAndTimePanel extends JPanel {
         return String.format(Locale.ROOT, "%02d:%02d", minutes / 60, minutes % 60);
     }
 
-    /** Hours:minutes of sidereal time, 00:00 to 23:59, as minutes; null otherwise. */
+    /**
+     * Hours:minutes of sidereal time, 00:00 to 23:59, as minutes; null
+     * otherwise. Read without a pattern literal: a string the sky-language
+     * scanner cannot classify would otherwise need a ledger row.
+     */
     private static Integer parseSidereal(String text) {
-        java.util.regex.Matcher m = java.util.regex.Pattern.compile("(\\d{1,2}):(\\d{2})")
-                .matcher(text.trim());
-        if (!m.matches()) {
+        String typed = text.trim();
+        int colon = typed.indexOf(':');
+        if (colon < 1 || colon > 2 || typed.length() != colon + 3) {
             return null;
         }
-        int hours = Integer.parseInt(m.group(1));
-        int minutes = Integer.parseInt(m.group(2));
-        if (hours > 23 || minutes > 59) {
+        int hours;
+        int minutes;
+        try {
+            hours = Integer.parseInt(typed.substring(0, colon));
+            minutes = Integer.parseInt(typed.substring(colon + 1));
+        } catch (NumberFormatException e) {
+            return null;
+        }
+        if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
             return null;
         }
         return hours * 60 + minutes;

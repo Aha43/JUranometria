@@ -72,28 +72,35 @@ final class MeridianTransitAction implements Function<Selection, String> {
         return null;
     }
 
-    /** A body's apparent place of date for an observer, by its identity on the page. */
+    /**
+     * A body's apparent place of date for an observer, by its identity on
+     * the page - the modules' own identity constants, never a spelling of
+     * a body's name here (the sky-language ledger routes identities, not
+     * literals).
+     */
     private Function<Observer, SkyPosition> placeOf(String identity) {
-        switch (identity) {
-            case juranometria.solarchart.SolarSystemModule.SUN:
-                return o -> ((SolarSystemService.SunObservation) solarSystem.get()
-                        .observe(SolarSystemService.Body.SUN, o)).apparentOfDate();
-            case juranometria.solarchart.SolarSystemModule.MOON:
-                // Topocentric, as the Moon's service computes it (#408).
-                return o -> ((SolarSystemService.MoonObservation) solarSystem.get()
-                        .observe(SolarSystemService.Body.MOON, o)).apparentOfDate();
-            case "venus":
-                return o -> ((juranometria.solar.VenusService.VenusObservation) solarSystem.get()
-                        .observe(SolarSystemService.Body.VENUS, o)).apparentOfDate();
-            case "mercury":
-                return o -> ((juranometria.solar.MercuryService.MercuryObservation) solarSystem
-                        .get().observe(SolarSystemService.Body.MERCURY, o)).apparentOfDate();
-            case juranometria.jovianchart.JovianModule.JUPITER:
-                return o -> jovianSystem.get().observeJupiter(o).apparentOfDate();
-            case juranometria.saturnchart.SaturnModule.SATURN:
-                return o -> saturnSystem.get().observeSaturn(o).apparentOfDate();
-            default:
-                break;
+        if (juranometria.solarchart.SolarSystemModule.SUN.equals(identity)) {
+            return o -> ((SolarSystemService.SunObservation) solarSystem.get()
+                    .observe(SolarSystemService.Body.SUN, o)).apparentOfDate();
+        }
+        if (juranometria.solarchart.SolarSystemModule.MOON.equals(identity)) {
+            // Topocentric, as the Moon's service computes it (#408).
+            return o -> ((SolarSystemService.MoonObservation) solarSystem.get()
+                    .observe(SolarSystemService.Body.MOON, o)).apparentOfDate();
+        }
+        if (juranometria.solarchart.SolarSystemModule.VENUS.equals(identity)) {
+            return o -> ((juranometria.solar.VenusService.VenusObservation) solarSystem.get()
+                    .observe(SolarSystemService.Body.VENUS, o)).apparentOfDate();
+        }
+        if (juranometria.solarchart.SolarSystemModule.MERCURY.equals(identity)) {
+            return o -> ((juranometria.solar.MercuryService.MercuryObservation) solarSystem
+                    .get().observe(SolarSystemService.Body.MERCURY, o)).apparentOfDate();
+        }
+        if (juranometria.jovianchart.JovianModule.JUPITER.equals(identity)) {
+            return o -> jovianSystem.get().observeJupiter(o).apparentOfDate();
+        }
+        if (juranometria.saturnchart.SaturnModule.SATURN.equals(identity)) {
+            return o -> saturnSystem.get().observeSaturn(o).apparentOfDate();
         }
         for (JovianSystemService.Moon moon : JovianSystemService.Moon.values()) {
             if (juranometria.jovianchart.JovianModule.identityOf(moon).equals(identity)) {
