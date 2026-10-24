@@ -221,6 +221,31 @@ subdued and the title block alone is bright.
   observatørens matematiske horisont* (to be checked against the
   language's usage in the study after the ruling).
 
+## The rulings (owner, 2026-10-24)
+
+Given on the study, accepting all eight proposals as written:
+
+1. **P-C.** Below the horizon an ink keeps **40 %** of its distance
+   from the ground: enough separation to make the horizon legible
+   without making the lower sky disappear.
+2. **P-D.** On by default.
+3. **P-I.** Independent of the *Horizon* line switch. When enabled, the
+   treatment applies whether or not the line is drawn; a body below
+   the horizon is subdued by the common rule, line or no line.
+4. **P-L.** Each label is subdued as a whole according to its anchor's
+   altitude.
+5. **P-X.** Crossing celestial curves are split at the mathematical
+   horizon plane; only the portion below it is subdued.
+6. **P-E.** Emphasis keeps its accent colour and receives the same
+   below-horizon reduction.
+7. **P-S.** Selection and the reader's working marks are not subdued.
+8. **P-P.** Screen and paper use the same rule and strength through the
+   shared rendering path.
+
+The words (P-W) were ruled on the issue. This study and its pages are
+the measured basis for the rendering change: the study head is
+qualified and merged before production implementation begins.
+
 ## 6. The mutation cases the implementation must prove
 
 | mutation | what must catch it |
