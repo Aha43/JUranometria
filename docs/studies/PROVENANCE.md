@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**782 promoted artifacts.**
+**814 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -97,6 +97,38 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/bayer-notation/pleiades-08.png` | `2ea388d39e222d777cfc58ed6fad807a695fa40c49b07fa481df98430b577f86` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | BayerStudyMain |
 | `docs/studies/bayer-notation/polaris-36.png` | `caed8071b91cd85ec6090fe09bf970998e3471dbd4bbb873e271959099decb6a` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | BayerStudyMain |
 | `docs/studies/bayer-notation/ursa-major-36.png` | `ed1d7908cdb8fc17d968afbdbf6fd6d766622bb10b97f2151497bf3fd6004e63` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | BayerStudyMain |
+| `docs/studies/below-horizon/east-8-kept-25.png` | `7ebe6ff1e6c96e112ff5d6dd82b8f23f43c58b25ee060b5dc40183919e9a84c5` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/east-8-kept-40.png` | `3206effc6d3e5d1a0e062d5115e56aed3392436241b318c21358d0b008dd184f` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/east-8-kept-55.png` | `64f00dabdae41ba2fdbd612cf153dd73384104c6106115d5ff847803c62d5b47` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/east-8.png` | `b37d6235a472a47f5aaa9093878c09280201d530cb5b30d922924c8af66f7204` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/globe-180-kept-25.png` | `1e184e2b85b710b2c81cc9d220e4c7e77bb9168db954a8951982a6f6f293cb1c` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/globe-180-kept-40.png` | `ee57081101631ddf5f09c294a495feb44b52a6f13abda289e2c56c52483c6ce7` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/globe-180-kept-55.png` | `ea31c71e2fede1575804d17b45dfeabb10cc983cfdf119523856447287c573c2` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/globe-180.png` | `45b25d44da2dc47d4bdad434376163141a5a60e35418a225722f39cecafa60f9` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/south-24-emphasis-kept-25.png` | `c497794b26630d0421401e08692d5e86429370af3f7de5fc50b6f40ffa9965dd` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/south-24-emphasis-kept-40.png` | `6cb41cdaf40e05aaf990e04e4e11c8a04fa406ebf92177fa52d8e4f1a15584d8` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/south-24-emphasis-kept-55.png` | `f738c5f7ba393edd096c6c197369ed9386031d8b0dc2712207b460d8523680fa` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/south-24-emphasis.png` | `193b54b02562b93a5319da252ede5139d11ab24573186b856eafe4a1de321b4f` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/south-24-kept-25.png` | `85116eebff127844f52cbf1981fd1d16136eb4452a2dad0f64d7033b941849e0` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/south-24-kept-40.png` | `1f93ea1de8852a5a35678d395a66a9099ef01585108a6267bd1616908837b421` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/south-24-kept-55.png` | `48634a1c5e2bbab5269e7d6337cddb95ec615a59154e181d4129878d394851d8` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/south-24-nb-kept-25.png` | `1aee9b7d0caf31ab30247b58935e49ba9ac1008308ba9f64b7ec85826f7683b4` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/south-24-nb-kept-40.png` | `462431e493578eee16bdb5ed290ebf5ecfbd86de97f3defe853844f29abe024c` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/south-24-nb-kept-55.png` | `3d2e7af488e720c74121611e7c468ac75711e09d9978cc83a8970effe8258de2` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/south-24-nb.png` | `de96ad05da546619ce3cc773667d9005651fd7c608fe6b505479882cef7224da` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/south-24-no-line-kept-25.png` | `75dfbb711bf5349e49172adaa473831006790749dcddc6c2a8b5495cc5b7f638` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/south-24-no-line-kept-40.png` | `e97c1d2b75f175d9284781d85a387b113f4451bd5d00055a5beebe618f078abd` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/south-24-no-line-kept-55.png` | `17c3999d875d27299743239f7f0ccda79cdfe6dfde6d4b78e09ae45e800d7481` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/south-24-no-line.png` | `1b07fb918550430529923e0fb59bbf2ec5dda2d273ccc09815a5597f1de6802b` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/south-24-paper-kept-25.png` | `48f3cd952d8854acbc611447a2d092a602e8c1a5d3403bea0fd75cccf7482d7e` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/south-24-paper-kept-40.png` | `58d10d1738432f850aad87633085782665ae2e10a332d61b007572a8f599b659` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/south-24-paper-kept-55.png` | `7632f817ebb4b881057c9abdb0a83777250a7edd5e4dab9dc2e4b7fa65520a5a` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/south-24-paper.png` | `95a7c704a0a990b4a0a6a6320ce61221a9118de54337b0463977f316cf943a63` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/south-24.png` | `8d6ff90cd1e10803717eae9f4255b9c2af256c8c77b5b690d6af3c7c06b7e8f5` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/sun-3-kept-25.png` | `e9bfb6ffb9e4f11832872bbea3346640cccb805e8f09029fa1407a3af3117003` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/sun-3-kept-40.png` | `ab6419d1dfc67bf8415439b07467570d4c314c638a5850245537bb230d022089` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/sun-3-kept-55.png` | `dd25df31d6c023574560e7ab52b4764ca7ce65598febd2e983f574901bfc24bf` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/below-horizon/sun-3.png` | `2be8955055daafa6680049c7dfa58968c9afa0f870ad3f36a8d18736dee22db3` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/black-sky/m31-08-black.png` | `cbfc2f7bc078d37a0487481650e0a860e68c8accbc2abfe96258b7c20ef3c509` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/black-sky/m31-08-key-black.png` | `be0f0cfd9b2ac5a21be2ebe03f5e952227b45ad4bd7b916382456189d11e9049` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/black-sky/m31-08-key-paper.png` | `c02159a20cc921b5a972b6b3d6ee422d282a58890e16683ba7b3e5d52b4f986f` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |

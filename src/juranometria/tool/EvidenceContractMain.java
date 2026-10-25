@@ -180,6 +180,10 @@ public final class EvidenceContractMain {
         // mock-ups are held through IMAGE_MAINS.
         REPORT_MAINS.put("juranometria.tool.VenusCartographyStudyMain",
                 "docs/studies/venus-cartography/measurements.md");
+        // Subdue below horizon (#615): the report is deterministic; its
+        // production pages and pixel mock-ups are held through IMAGE_MAINS.
+        REPORT_MAINS.put("juranometria.tool.BelowHorizonStudyMain",
+                "docs/studies/below-horizon/measurements.md");
         // The Sun on production pages (#415): the report is
         // deterministic; its pages are held through IMAGE_MAINS.
         REPORT_MAINS.put("juranometria.tool.SunOnTheChartStudyMain",
@@ -440,6 +444,10 @@ public final class EvidenceContractMain {
                 "docs/studies/all-star-identities/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.CloserFieldsStudyMain",
                 "docs/studies/closer-fields/platform.md");
+        // Subdue below horizon (#615): the mock-ups' changed-pixel counts
+        // follow the desktop's text rendering; CI drew different counts.
+        PLATFORM_REPORTS.put("juranometria.tool.BelowHorizonStudyMain",
+                "docs/studies/below-horizon/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.JovianCartographyStudyMain",
                 "docs/studies/jovian-cartography/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.VenusContractStudyMain",
@@ -585,6 +593,9 @@ public final class EvidenceContractMain {
             // widget-rendered inspection, the controls- prefix.
             "juranometria.tool.SolarSystemControlsStudyMain",
             "juranometria.tool.JovianContractStudyMain",
+            // Subdue below horizon (issue #615): production pages composed
+            // by the component, and the pixel mock-ups beside them.
+            "juranometria.tool.BelowHorizonStudyMain",
             // The Sun on the chart (issue #415): production pages
             // composed by the component with the module attached.
             "juranometria.tool.SunOnTheChartStudyMain",
