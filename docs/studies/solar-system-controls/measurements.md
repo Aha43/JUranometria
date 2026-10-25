@@ -99,7 +99,7 @@ declare, per language, and the Controller controls already using them:
 | `en` | L | Close | Deep-sky labels |
 | `en` | S | Span | Star names |
 | `en` | V | Every | — |
-| `nb-NO` | D | Ved karttid | Dyphimmelobjekter |
+| `nb-NO` | D | Ved karttid | Demp under horisonten, Dyphimmelobjekter |
 | `nb-NO` | T | Over et tidsrom | Tittelfelt |
 | `nb-NO` | B | Beregn | Stjernebildegrenser, Svart himmel |
 | `nb-NO` | L | Lukk | Navn på dyphimmelobjekter |

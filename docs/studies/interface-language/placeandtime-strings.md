@@ -56,7 +56,7 @@ The released default: the equator at Greenwich. Neutral, and honest about being 
 
 ![](placeandtime-en-1-default.png)
 
-Packed 420 × 313 px, `en`.
+Packed 420 × 334 px, `en`.
 
 | channel | words |
 |---|---|
@@ -82,6 +82,8 @@ Packed 420 × 313 px, `en`.
 | shown or hovered | Mark the point overhead |
 | shown or hovered | Altitude ticks |
 | shown or hovered | Graduate the meridian every 10° of altitude above the horizon |
+| shown or hovered | Subdue below horizon |
+| shown or hovered | Draw the sky below the mathematical horizon at reduced contrast |
 | shown or hovered | Update to now |
 | shown or hovered | Reads the clock once and freezes the chart at that instant |
 | shown or hovered | Centre on zenith |
@@ -103,11 +105,13 @@ Packed 420 × 313 px, `en`.
 | spoken | Marks the point directly above you. It is drawn with the observer's lines and has no shortcut of its own. |
 | spoken | Show Altitude ticks |
 | spoken | Marks the meridian every 10° of altitude from the horizon to the zenith, with the figure beside each tick. It is drawn with the meridian and has no shortcut of its own. |
+| spoken | Subdue below horizon |
+| spoken | Reduces the contrast of celestial content below the observer’s mathematical horizon. |
 | spoken | Update to now |
 | spoken | Freezes the chart at the present moment. The clock is read once; nothing moves afterwards. |
 | spoken | Centre on zenith |
 | spoken | Moves the page to the point directly above you. This is the only control in this window that moves the chart. |
-| access letters | L G U S M H Z A N C |
+| access letters | L G U S M H Z A B N C |
 
 
 ### Oslo — north and east
@@ -116,7 +120,7 @@ East longitude is positive. The number and its sign are notation and are identic
 
 ![](placeandtime-en-2-oslo.png)
 
-Packed 420 × 313 px, `en`.
+Packed 420 × 334 px, `en`.
 
 | channel | words |
 |---|---|
@@ -143,6 +147,8 @@ Packed 420 × 313 px, `en`.
 | shown or hovered | Mark the point overhead |
 | shown or hovered | Altitude ticks |
 | shown or hovered | Graduate the meridian every 10° of altitude above the horizon |
+| shown or hovered | Subdue below horizon |
+| shown or hovered | Draw the sky below the mathematical horizon at reduced contrast |
 | shown or hovered | Update to now |
 | shown or hovered | Reads the clock once and freezes the chart at that instant |
 | shown or hovered | Centre on zenith |
@@ -164,11 +170,13 @@ Packed 420 × 313 px, `en`.
 | spoken | Marks the point directly above you. It is drawn with the observer's lines and has no shortcut of its own. |
 | spoken | Show Altitude ticks |
 | spoken | Marks the meridian every 10° of altitude from the horizon to the zenith, with the figure beside each tick. It is drawn with the meridian and has no shortcut of its own. |
+| spoken | Subdue below horizon |
+| spoken | Reduces the contrast of celestial content below the observer’s mathematical horizon. |
 | spoken | Update to now |
 | spoken | Freezes the chart at the present moment. The clock is read once; nothing moves afterwards. |
 | spoken | Centre on zenith |
 | spoken | Moves the page to the point directly above you. This is the only control in this window that moves the chart. |
-| access letters | L G U S M H Z A N C |
+| access letters | L G U S M H Z A B N C |
 
 
 ### Santiago — south and west
@@ -177,7 +185,7 @@ South latitude and west longitude are negative. A translation that rendered a mi
 
 ![](placeandtime-en-3-santiago.png)
 
-Packed 420 × 313 px, `en`.
+Packed 420 × 334 px, `en`.
 
 | channel | words |
 |---|---|
@@ -204,6 +212,8 @@ Packed 420 × 313 px, `en`.
 | shown or hovered | Mark the point overhead |
 | shown or hovered | Altitude ticks |
 | shown or hovered | Graduate the meridian every 10° of altitude above the horizon |
+| shown or hovered | Subdue below horizon |
+| shown or hovered | Draw the sky below the mathematical horizon at reduced contrast |
 | shown or hovered | Update to now |
 | shown or hovered | Reads the clock once and freezes the chart at that instant |
 | shown or hovered | Centre on zenith |
@@ -225,11 +235,13 @@ Packed 420 × 313 px, `en`.
 | spoken | Marks the point directly above you. It is drawn with the observer's lines and has no shortcut of its own. |
 | spoken | Show Altitude ticks |
 | spoken | Marks the meridian every 10° of altitude from the horizon to the zenith, with the figure beside each tick. It is drawn with the meridian and has no shortcut of its own. |
+| spoken | Subdue below horizon |
+| spoken | Reduces the contrast of celestial content below the observer’s mathematical horizon. |
 | spoken | Update to now |
 | spoken | Freezes the chart at the present moment. The clock is read once; nothing moves afterwards. |
 | spoken | Centre on zenith |
 | spoken | Moves the page to the point directly above you. This is the only control in this window that moves the chart. |
-| access letters | L G U S M H Z A N C |
+| access letters | L G U S M H Z A B N C |
 
 
 ### Every line off
@@ -238,7 +250,7 @@ All three switches clear. The words do not change with the switch - a checkbox s
 
 ![](placeandtime-en-4-lines-off.png)
 
-Packed 420 × 313 px, `en`.
+Packed 420 × 334 px, `en`.
 
 | channel | words |
 |---|---|
@@ -265,6 +277,8 @@ Packed 420 × 313 px, `en`.
 | shown or hovered | Mark the point overhead |
 | shown or hovered | Altitude ticks |
 | shown or hovered | Graduate the meridian every 10° of altitude above the horizon |
+| shown or hovered | Subdue below horizon |
+| shown or hovered | Draw the sky below the mathematical horizon at reduced contrast |
 | shown or hovered | Update to now |
 | shown or hovered | Reads the clock once and freezes the chart at that instant |
 | shown or hovered | Centre on zenith |
@@ -286,11 +300,13 @@ Packed 420 × 313 px, `en`.
 | spoken | Marks the point directly above you. It is drawn with the observer's lines and has no shortcut of its own. |
 | spoken | Show Altitude ticks |
 | spoken | Marks the meridian every 10° of altitude from the horizon to the zenith, with the figure beside each tick. It is drawn with the meridian and has no shortcut of its own. |
+| spoken | Subdue below horizon |
+| spoken | Reduces the contrast of celestial content below the observer’s mathematical horizon. |
 | spoken | Update to now |
 | spoken | Freezes the chart at the present moment. The clock is read once; nothing moves afterwards. |
 | spoken | Centre on zenith |
 | spoken | Moves the page to the point directly above you. This is the only control in this window that moves the chart. |
-| access letters | L G U S M H Z A N C |
+| access letters | L G U S M H Z A B N C |
 
 
 ### Every line on
@@ -299,7 +315,7 @@ All three set, the zenith included. The zenith has no keystroke of its own and i
 
 ![](placeandtime-en-5-lines-on.png)
 
-Packed 420 × 313 px, `en`.
+Packed 420 × 334 px, `en`.
 
 | channel | words |
 |---|---|
@@ -326,6 +342,8 @@ Packed 420 × 313 px, `en`.
 | shown or hovered | Mark the point overhead |
 | shown or hovered | Altitude ticks |
 | shown or hovered | Graduate the meridian every 10° of altitude above the horizon |
+| shown or hovered | Subdue below horizon |
+| shown or hovered | Draw the sky below the mathematical horizon at reduced contrast |
 | shown or hovered | Update to now |
 | shown or hovered | Reads the clock once and freezes the chart at that instant |
 | shown or hovered | Centre on zenith |
@@ -347,11 +365,13 @@ Packed 420 × 313 px, `en`.
 | spoken | Marks the point directly above you. It is drawn with the observer's lines and has no shortcut of its own. |
 | spoken | Show Altitude ticks |
 | spoken | Marks the meridian every 10° of altitude from the horizon to the zenith, with the figure beside each tick. It is drawn with the meridian and has no shortcut of its own. |
+| spoken | Subdue below horizon |
+| spoken | Reduces the contrast of celestial content below the observer’s mathematical horizon. |
 | spoken | Update to now |
 | spoken | Freezes the chart at the present moment. The clock is read once; nothing moves afterwards. |
 | spoken | Centre on zenith |
 | spoken | Moves the page to the point directly above you. This is the only control in this window that moves the chart. |
-| access letters | L G U S M H Z A N C |
+| access letters | L G U S M H Z A B N C |
 
 
 ### The frozen note, dark
@@ -371,7 +391,7 @@ easiest to get wrong.
 
 ![](placeandtime-en-6-dark.png)
 
-Packed 420 × 313 px, `en`.
+Packed 420 × 334 px, `en`.
 
 | channel | words |
 |---|---|
@@ -398,6 +418,8 @@ Packed 420 × 313 px, `en`.
 | shown or hovered | Mark the point overhead |
 | shown or hovered | Altitude ticks |
 | shown or hovered | Graduate the meridian every 10° of altitude above the horizon |
+| shown or hovered | Subdue below horizon |
+| shown or hovered | Draw the sky below the mathematical horizon at reduced contrast |
 | shown or hovered | Update to now |
 | shown or hovered | Reads the clock once and freezes the chart at that instant |
 | shown or hovered | Centre on zenith |
@@ -419,11 +441,13 @@ Packed 420 × 313 px, `en`.
 | spoken | Marks the point directly above you. It is drawn with the observer's lines and has no shortcut of its own. |
 | spoken | Show Altitude ticks |
 | spoken | Marks the meridian every 10° of altitude from the horizon to the zenith, with the figure beside each tick. It is drawn with the meridian and has no shortcut of its own. |
+| spoken | Subdue below horizon |
+| spoken | Reduces the contrast of celestial content below the observer’s mathematical horizon. |
 | spoken | Update to now |
 | spoken | Freezes the chart at the present moment. The clock is read once; nothing moves afterwards. |
 | spoken | Centre on zenith |
 | spoken | Moves the page to the point directly above you. This is the only control in this window that moves the chart. |
-| access letters | L G U S M H Z A N C |
+| access letters | L G U S M H Z A B N C |
 
 
 #### The eight access letters
@@ -457,7 +481,7 @@ The released default: the equator at Greenwich. Neutral, and honest about being 
 
 ![](placeandtime-nb-NO-7-default.png)
 
-Packed 420 × 313 px, `nb-NO`.
+Packed 420 × 334 px, `nb-NO`.
 
 | channel | words |
 |---|---|
@@ -483,6 +507,8 @@ Packed 420 × 313 px, `nb-NO`.
 | shown or hovered | Marker punktet rett over deg |
 | shown or hovered | Høydemerker |
 | shown or hovered | Gradér meridianen for hver 10° høyde over horisonten |
+| shown or hovered | Demp under horisonten |
+| shown or hovered | Tegn himmelen under den matematiske horisonten med redusert kontrast |
 | shown or hovered | Oppdater til nå |
 | shown or hovered | Les klokken én gang og sett kartets tidspunkt til nå |
 | shown or hovered | Sentrer på senit |
@@ -504,11 +530,13 @@ Packed 420 × 313 px, `nb-NO`.
 | spoken | Markerer punktet rett over deg. Det tegnes sammen med observatørens linjer og har ingen egen hurtigtast. |
 | spoken | Vis høydemerker |
 | spoken | Merker meridianen for hver 10° høyde fra horisonten til senit, med tallet ved hvert merke. Det tegnes sammen med meridianen og har ingen egen hurtigtast. |
+| spoken | Demp under horisonten |
+| spoken | Reduserer kontrasten til himmelinnhold under observatørens matematiske horisont. |
 | spoken | Oppdater til nå |
 | spoken | Tegner kartet for tidspunktet nå. Klokken leses én gang; tiden går ikke videre etterpå. |
 | spoken | Sentrer på senit |
 | spoken | Flytter siden til punktet rett over deg. Dette er den eneste knappen i dette vinduet som flytter kartet. |
-| access letters | B L T K M H S Y N R |
+| access letters | B L T K M H S Y D N R |
 
 
 ### Oslo — north and east
@@ -517,7 +545,7 @@ East longitude is positive. The number and its sign are notation and are identic
 
 ![](placeandtime-nb-NO-8-oslo.png)
 
-Packed 420 × 313 px, `nb-NO`.
+Packed 420 × 334 px, `nb-NO`.
 
 | channel | words |
 |---|---|
@@ -544,6 +572,8 @@ Packed 420 × 313 px, `nb-NO`.
 | shown or hovered | Marker punktet rett over deg |
 | shown or hovered | Høydemerker |
 | shown or hovered | Gradér meridianen for hver 10° høyde over horisonten |
+| shown or hovered | Demp under horisonten |
+| shown or hovered | Tegn himmelen under den matematiske horisonten med redusert kontrast |
 | shown or hovered | Oppdater til nå |
 | shown or hovered | Les klokken én gang og sett kartets tidspunkt til nå |
 | shown or hovered | Sentrer på senit |
@@ -565,11 +595,13 @@ Packed 420 × 313 px, `nb-NO`.
 | spoken | Markerer punktet rett over deg. Det tegnes sammen med observatørens linjer og har ingen egen hurtigtast. |
 | spoken | Vis høydemerker |
 | spoken | Merker meridianen for hver 10° høyde fra horisonten til senit, med tallet ved hvert merke. Det tegnes sammen med meridianen og har ingen egen hurtigtast. |
+| spoken | Demp under horisonten |
+| spoken | Reduserer kontrasten til himmelinnhold under observatørens matematiske horisont. |
 | spoken | Oppdater til nå |
 | spoken | Tegner kartet for tidspunktet nå. Klokken leses én gang; tiden går ikke videre etterpå. |
 | spoken | Sentrer på senit |
 | spoken | Flytter siden til punktet rett over deg. Dette er den eneste knappen i dette vinduet som flytter kartet. |
-| access letters | B L T K M H S Y N R |
+| access letters | B L T K M H S Y D N R |
 
 
 ### Santiago — south and west
@@ -578,7 +610,7 @@ South latitude and west longitude are negative. A translation that rendered a mi
 
 ![](placeandtime-nb-NO-9-santiago.png)
 
-Packed 420 × 313 px, `nb-NO`.
+Packed 420 × 334 px, `nb-NO`.
 
 | channel | words |
 |---|---|
@@ -605,6 +637,8 @@ Packed 420 × 313 px, `nb-NO`.
 | shown or hovered | Marker punktet rett over deg |
 | shown or hovered | Høydemerker |
 | shown or hovered | Gradér meridianen for hver 10° høyde over horisonten |
+| shown or hovered | Demp under horisonten |
+| shown or hovered | Tegn himmelen under den matematiske horisonten med redusert kontrast |
 | shown or hovered | Oppdater til nå |
 | shown or hovered | Les klokken én gang og sett kartets tidspunkt til nå |
 | shown or hovered | Sentrer på senit |
@@ -626,11 +660,13 @@ Packed 420 × 313 px, `nb-NO`.
 | spoken | Markerer punktet rett over deg. Det tegnes sammen med observatørens linjer og har ingen egen hurtigtast. |
 | spoken | Vis høydemerker |
 | spoken | Merker meridianen for hver 10° høyde fra horisonten til senit, med tallet ved hvert merke. Det tegnes sammen med meridianen og har ingen egen hurtigtast. |
+| spoken | Demp under horisonten |
+| spoken | Reduserer kontrasten til himmelinnhold under observatørens matematiske horisont. |
 | spoken | Oppdater til nå |
 | spoken | Tegner kartet for tidspunktet nå. Klokken leses én gang; tiden går ikke videre etterpå. |
 | spoken | Sentrer på senit |
 | spoken | Flytter siden til punktet rett over deg. Dette er den eneste knappen i dette vinduet som flytter kartet. |
-| access letters | B L T K M H S Y N R |
+| access letters | B L T K M H S Y D N R |
 
 
 ### Every line off
@@ -639,7 +675,7 @@ All three switches clear. The words do not change with the switch - a checkbox s
 
 ![](placeandtime-nb-NO-10-lines-off.png)
 
-Packed 420 × 313 px, `nb-NO`.
+Packed 420 × 334 px, `nb-NO`.
 
 | channel | words |
 |---|---|
@@ -666,6 +702,8 @@ Packed 420 × 313 px, `nb-NO`.
 | shown or hovered | Marker punktet rett over deg |
 | shown or hovered | Høydemerker |
 | shown or hovered | Gradér meridianen for hver 10° høyde over horisonten |
+| shown or hovered | Demp under horisonten |
+| shown or hovered | Tegn himmelen under den matematiske horisonten med redusert kontrast |
 | shown or hovered | Oppdater til nå |
 | shown or hovered | Les klokken én gang og sett kartets tidspunkt til nå |
 | shown or hovered | Sentrer på senit |
@@ -687,11 +725,13 @@ Packed 420 × 313 px, `nb-NO`.
 | spoken | Markerer punktet rett over deg. Det tegnes sammen med observatørens linjer og har ingen egen hurtigtast. |
 | spoken | Vis høydemerker |
 | spoken | Merker meridianen for hver 10° høyde fra horisonten til senit, med tallet ved hvert merke. Det tegnes sammen med meridianen og har ingen egen hurtigtast. |
+| spoken | Demp under horisonten |
+| spoken | Reduserer kontrasten til himmelinnhold under observatørens matematiske horisont. |
 | spoken | Oppdater til nå |
 | spoken | Tegner kartet for tidspunktet nå. Klokken leses én gang; tiden går ikke videre etterpå. |
 | spoken | Sentrer på senit |
 | spoken | Flytter siden til punktet rett over deg. Dette er den eneste knappen i dette vinduet som flytter kartet. |
-| access letters | B L T K M H S Y N R |
+| access letters | B L T K M H S Y D N R |
 
 
 ### Every line on
@@ -700,7 +740,7 @@ All three set, the zenith included. The zenith has no keystroke of its own and i
 
 ![](placeandtime-nb-NO-11-lines-on.png)
 
-Packed 420 × 313 px, `nb-NO`.
+Packed 420 × 334 px, `nb-NO`.
 
 | channel | words |
 |---|---|
@@ -727,6 +767,8 @@ Packed 420 × 313 px, `nb-NO`.
 | shown or hovered | Marker punktet rett over deg |
 | shown or hovered | Høydemerker |
 | shown or hovered | Gradér meridianen for hver 10° høyde over horisonten |
+| shown or hovered | Demp under horisonten |
+| shown or hovered | Tegn himmelen under den matematiske horisonten med redusert kontrast |
 | shown or hovered | Oppdater til nå |
 | shown or hovered | Les klokken én gang og sett kartets tidspunkt til nå |
 | shown or hovered | Sentrer på senit |
@@ -748,11 +790,13 @@ Packed 420 × 313 px, `nb-NO`.
 | spoken | Markerer punktet rett over deg. Det tegnes sammen med observatørens linjer og har ingen egen hurtigtast. |
 | spoken | Vis høydemerker |
 | spoken | Merker meridianen for hver 10° høyde fra horisonten til senit, med tallet ved hvert merke. Det tegnes sammen med meridianen og har ingen egen hurtigtast. |
+| spoken | Demp under horisonten |
+| spoken | Reduserer kontrasten til himmelinnhold under observatørens matematiske horisont. |
 | spoken | Oppdater til nå |
 | spoken | Tegner kartet for tidspunktet nå. Klokken leses én gang; tiden går ikke videre etterpå. |
 | spoken | Sentrer på senit |
 | spoken | Flytter siden til punktet rett over deg. Dette er den eneste knappen i dette vinduet som flytter kartet. |
-| access letters | B L T K M H S Y N R |
+| access letters | B L T K M H S Y D N R |
 
 
 ### The frozen note, dark
@@ -772,7 +816,7 @@ easiest to get wrong.
 
 ![](placeandtime-nb-NO-12-dark.png)
 
-Packed 420 × 313 px, `nb-NO`.
+Packed 420 × 334 px, `nb-NO`.
 
 | channel | words |
 |---|---|
@@ -799,6 +843,8 @@ Packed 420 × 313 px, `nb-NO`.
 | shown or hovered | Marker punktet rett over deg |
 | shown or hovered | Høydemerker |
 | shown or hovered | Gradér meridianen for hver 10° høyde over horisonten |
+| shown or hovered | Demp under horisonten |
+| shown or hovered | Tegn himmelen under den matematiske horisonten med redusert kontrast |
 | shown or hovered | Oppdater til nå |
 | shown or hovered | Les klokken én gang og sett kartets tidspunkt til nå |
 | shown or hovered | Sentrer på senit |
@@ -820,11 +866,13 @@ Packed 420 × 313 px, `nb-NO`.
 | spoken | Markerer punktet rett over deg. Det tegnes sammen med observatørens linjer og har ingen egen hurtigtast. |
 | spoken | Vis høydemerker |
 | spoken | Merker meridianen for hver 10° høyde fra horisonten til senit, med tallet ved hvert merke. Det tegnes sammen med meridianen og har ingen egen hurtigtast. |
+| spoken | Demp under horisonten |
+| spoken | Reduserer kontrasten til himmelinnhold under observatørens matematiske horisont. |
 | spoken | Oppdater til nå |
 | spoken | Tegner kartet for tidspunktet nå. Klokken leses én gang; tiden går ikke videre etterpå. |
 | spoken | Sentrer på senit |
 | spoken | Flytter siden til punktet rett over deg. Dette er den eneste knappen i dette vinduet som flytter kartet. |
-| access letters | B L T K M H S Y N R |
+| access letters | B L T K M H S Y D N R |
 
 
 #### The eight access letters
