@@ -16,8 +16,9 @@ this archive.
 | Star-identity data (d3-celestial) | BSD-3-Clause | [`licenses/NOTICE-star-identities.md`](licenses/NOTICE-star-identities.md), [full text](licenses/LICENSE-BSD-3-Clause.txt) |
 | Solar System ephemeris (a JUranometria-modified excerpt of NASA/JPL DE440; IERS leap seconds) | NAIF rules for modified SPICE kernels (no fee or licence); IERS public data | [`licenses/NOTICE-solar-system.md`](licenses/NOTICE-solar-system.md) |
 | Jovian System ephemeris (two JUranometria-modified excerpts of NASA/JPL JUP365 with DE440; IAU 2015 constants copied from NAIF's PCK) | NAIF rules for modified SPICE kernels (no fee or licence) | [`licenses/NOTICE-jovian-system.md`](licenses/NOTICE-jovian-system.md) |
-| Planets ephemeris (JUranometria-modified excerpts of NASA/JPL DE440, one per planet; IAU 2015 constants copied from NAIF's PCK) | NAIF rules for modified SPICE kernels (no fee or licence) | [`licenses/NOTICE-planets.md`](licenses/NOTICE-planets.md) |
+| Planets ephemeris (JUranometria-modified excerpts of NASA/JPL DE440, one per planet; IAU 2015 constants, with Mars's pole model, copied from NAIF's PCK) | NAIF rules for modified SPICE kernels (no fee or licence) | [`licenses/NOTICE-planets.md`](licenses/NOTICE-planets.md) |
 | Saturn System ephemeris (two JUranometria-modified excerpts of NASA/JPL SAT441 with DE440; IAU 2015 constants copied from NAIF's PCK; four ring radii quoted from the PDS Ring-Moon Systems Node) | NAIF rules for modified SPICE kernels (no fee or licence); PDS values quoted with their source | [`licenses/NOTICE-saturn-system.md`](licenses/NOTICE-saturn-system.md) |
+| Mars System ephemeris (one JUranometria-modified excerpt of NASA/JPL MAR099 for Phobos and Deimos; IAU 2015 radii copied from NAIF's PCK) | NAIF rules for modified SPICE kernels (no fee or licence) | [`licenses/NOTICE-mars-system.md`](licenses/NOTICE-mars-system.md) |
 | Toolbar icons (Tabler) | MIT | [`licenses/LICENSE-Tabler-MIT.txt`](licenses/LICENSE-Tabler-MIT.txt) |
 | Application mark | MIT (JUranometria's own) | this repository's `LICENSE` |
 

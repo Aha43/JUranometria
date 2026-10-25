@@ -33,9 +33,15 @@ import juranometria.solar.spk.SpkKernel;
  * Mercury is the second (Sprint 49, issue #529, as ruled on #528):
  * segments 0 → 1 and 1 → 199, the same way, in a file of its own that
  * carries the version it was added in; Venus's file keeps its own.
- * A planet whose centre is not in de440s (Mars and the outer planets)
- * will carry that relationship in its own file from its own authority,
- * ruled in its own study; a barycentre is never drawn as the planet.
+ * Mars is the third (issue #602, as ruled on #601, M-1): de440s carries
+ * the Mars barycentre (0 → 4) but not Mars's centre, and the ruling
+ * takes the barycentre as the planet because NAIF's {@code mar099s.bsp}
+ * puts the centre within 0.210 m of it. This builder measures that
+ * offset again from the pinned {@code mar099s.bsp} before writing, and
+ * refuses above {@link #MARS_CENTRE_OFFSET_LIMIT_M}; the Mars file keeps
+ * the single segment 0 → 4. Any other planet whose centre de440s lacks
+ * (the outer planets) carries that relationship from its own authority,
+ * ruled in its own study.
  *
  * <p>Deterministic by construction, as the released packs' builders:
  * no timestamps other than the literal audit date, {@code Locale.ROOT}
@@ -52,8 +58,8 @@ import juranometria.solar.spk.SpkKernel;
 public final class PlanetsPackMain {
 
     static final String PACK_NAME = "planets";
-    static final int PACK_VERSION = 2;
-    static final String AUDIT_DATE = "2026-10-13";
+    static final int PACK_VERSION = 3;
+    static final String AUDIT_DATE = "2026-10-25";
 
     static final String NOTICE_NAME = "NOTICE-planets.md";
     static final String PROVENANCE_NAME = "PROVENANCE.md";
@@ -77,7 +83,23 @@ public final class PlanetsPackMain {
      * the file is released.
      */
     record Planet(String key, String label, String kernelName, List<SpkExcerpt.Pick> picks,
-                  String radiusKeyword, int version) {
+                  String radiusKeyword, int version, int figureBody, List<String> constants) {
+
+        Planet(String key, String label, String kernelName, List<SpkExcerpt.Pick> picks,
+               String radiusKeyword, int version) {
+            this(key, label, kernelName, picks, radiusKeyword, version,
+                    picks.get(picks.size() - 1).target(), List.of());
+        }
+
+        /** Whether the file carries the figure's body itself, or only its barycentre. */
+        boolean carriesItsCentre() {
+            for (SpkExcerpt.Pick pick : picks) {
+                if (pick.target() == figureBody) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     /** The planets, in the order they were added; a release appends. */
@@ -87,7 +109,31 @@ public final class PlanetsPackMain {
                     "BODY299_RADII", 1),
             new Planet("mercury", "Mercury", "juranometria-de440-mercury-1900-2100.bsp",
                     List.of(new SpkExcerpt.Pick(0, 1), new SpkExcerpt.Pick(1, 199)),
-                    "BODY199_RADII", 2));
+                    "BODY199_RADII", 2),
+            new Planet("mars", "Mars", "juranometria-de440-mars-1900-2100.bsp",
+                    List.of(new SpkExcerpt.Pick(0, 4)),
+                    "BODY499_RADII", 3, 499,
+                    List.of("BODY499_POLE_RA", "BODY499_POLE_DEC", "BODY499_NUT_PREC_RA",
+                            "BODY499_NUT_PREC_DEC", "BODY4_NUT_PREC_ANGLES")));
+
+    /** Mars's centre about its barycentre in mar099s (#601, M-1): the source, pinned. */
+    static final String MAR099S_SHA256 =
+            "997dc93ba640e476da7a494d2237dcdeb145e528db37be8ccee588c615e4e1ff";
+    /**
+     * The builder refuses when mar099s puts Mars's centre farther than this
+     * from its barycentre: a bound above the 0.210 m #601 measured and M-1
+     * ruled on, so the ruling's premise is re-measured, never assumed.
+     */
+    static final double MARS_CENTRE_OFFSET_LIMIT_M = 0.25;
+    /** The PCK's phase-angle polynomial degree for the Mars system (BODY4_MAX_PHASE_DEGREE). */
+    static final int MARS_MAX_PHASE_DEGREE = 2;
+
+    /** The released Saturn System kernels, whose digests must not move. */
+    static final Map<String, String> RELEASED_SATURN_KERNELS = Map.of(
+            "juranometria-sat441-saturn-1900-2100.bsp",
+            "28438fff5d8cf7c401390f6e109be4733398e591902c2ff5f471ee257374758d",
+            "juranometria-sat441-moons-2000-2100.bsp",
+            "8844bf082d391006c4b73c98c325bea8fb22ce0c31b3c61371a872bbeb6c297b");
 
     /** The released interval and margin (SolarSystemPackMain), and its civil days. */
     static final double START_JD = SolarSystemPackMain.COVERAGE_START_JD;
@@ -103,6 +149,7 @@ public final class PlanetsPackMain {
         Path solarRawDir = Path.of(args.length > 0 ? args[0] : "imports/raw/solar-system");
         Path jovianRawDir = Path.of(args.length > 1 ? args[1] : "imports/raw/jovian-system");
         Path outDir = Path.of(args.length > 2 ? args[2] : "src/resources/planets");
+        Path marsRawDir = Path.of(args.length > 3 ? args[3] : "imports/raw/mars-system");
 
         Path de440s = solarRawDir.resolve("de440s.bsp");
         Path pckFile = jovianRawDir.resolve("pck00011.tpc");
@@ -110,6 +157,9 @@ public final class PlanetsPackMain {
                 "scripts/download-solar-system-sources.sh");
         verifyPinned(pckFile, JovianPackMain.PINNED.get("pck00011.tpc"),
                 "scripts/download-jovian-sources.sh");
+
+        Path mar099s = marsRawDir.resolve("mar099s.bsp");
+        verifyPinned(mar099s, MAR099S_SHA256, "scripts/download-mars-sources.sh");
 
         // The released packs, untouched.
         String solarSha = resourceSha("/resources/solar-system/"
@@ -125,6 +175,13 @@ public final class PlanetsPackMain {
                         + k.getKey() + " has moved: " + sha + "; nothing was written");
             }
         }
+        for (Map.Entry<String, String> k : new TreeMap<>(RELEASED_SATURN_KERNELS).entrySet()) {
+            String sha = resourceSha("/resources/saturn-system/" + k.getKey());
+            if (!k.getValue().equals(sha)) {
+                throw new IllegalStateException("the released Saturn System kernel "
+                        + k.getKey() + " has moved: " + sha + "; nothing was written");
+            }
+        }
 
         byte[] source = Files.readAllBytes(de440s);
         SpkKernel full = SpkKernel.read(source);
@@ -132,7 +189,9 @@ public final class PlanetsPackMain {
         Map<String, String> constants = new LinkedHashMap<>();
         for (Planet p : PLANETS) {
             constants.putAll(PinnedPck.values(pck, List.of(p.radiusKeyword)));
+            constants.putAll(PinnedPck.values(pck, p.constants));
         }
+        requireMarsPhaseDegree(pck, constants);
         constants.putAll(PinnedPck.values(pck, List.of("BODY10_RADII")));
 
         double startEt = (START_JD - MARGIN_DAYS - 2451545.0) * 86400.0;
@@ -155,6 +214,7 @@ public final class PlanetsPackMain {
                 }
             }
         }
+        String marsCentre = marsCentreOffset(SpkKernel.read(Files.readAllBytes(mar099s)));
 
         // A released planet's file never moves: if the pack is already
         // here, each planet's file must come out as it went in.
@@ -177,10 +237,10 @@ public final class PlanetsPackMain {
         write(outDir.resolve(PROVENANCE_NAME), provenance(
                 PinnedInputs.sha256Hex(source),
                 PinnedInputs.sha256Hex(pck.getBytes(StandardCharsets.US_ASCII)),
-                checksums, kernels, validations, zeros, constants)
+                checksums, kernels, validations, zeros, marsCentre, constants)
                 .getBytes(StandardCharsets.UTF_8), checksums);
         Files.writeString(outDir.resolve("manifest.properties"),
-                manifest(checksums, constants, kernels), StandardCharsets.UTF_8);
+                manifest(checksums, constants, kernels, marsCentreMetres), StandardCharsets.UTF_8);
 
         PlanetsPack loaded = PlanetsPack.load(name -> {
             try {
@@ -196,9 +256,12 @@ public final class PlanetsPackMain {
             System.out.println("  " + validations.get(p.key));
         }
         for (Planet p : PLANETS) {
-            System.out.println("  " + aboutItsBarycentre(p) + ": " + zeros.get(p.key));
+            if (p.carriesItsCentre()) {
+                System.out.println("  " + aboutItsBarycentre(p) + ": " + zeros.get(p.key));
+            }
         }
-        System.out.println("  released Solar System and Jovian kernels untouched");
+        System.out.println("  Mars about its barycentre (mar099s 4 -> 499): " + marsCentre);
+        System.out.println("  released Solar System, Jovian and Saturn System kernels untouched");
         System.out.println("  reloaded and verified: " + loaded.manifest().get("pack.name")
                 + " v" + loaded.manifest().get("pack.version") + ", planets "
                 + loaded.planets());
@@ -265,6 +328,55 @@ public final class PlanetsPackMain {
                 + " zero: the planet is its barycentre", states);
     }
 
+    /** The largest Mars-centre offset found, metres, for the manifest; set by marsCentreOffset. */
+    private static double marsCentreMetres = Double.NaN;
+
+    /**
+     * Mars's centre about its barycentre (4 -> 499) in mar099s, hourly
+     * over the whole segment: #601's measurement, repeated, held to
+     * {@link #MARS_CENTRE_OFFSET_LIMIT_M}.
+     */
+    static String marsCentreOffset(SpkKernel mar099s) {
+        SpkKernel.Segment segment = mar099s.segment(4, 499);
+        double worst = 0.0;
+        int states = 0;
+        for (double et = segment.startEt(); et <= segment.endEt(); et += 3600.0) {
+            worst = Math.max(worst, mar099s.state(4, 499, et).position().length());
+            states++;
+        }
+        double metres = worst * 1000.0;
+        if (!(metres <= MARS_CENTRE_OFFSET_LIMIT_M)) {
+            throw new IllegalStateException(String.format(Locale.ROOT, "mar099s puts Mars's"
+                    + " centre %.3f m from its barycentre, beyond the %.2f m the ruling M-1"
+                    + " rests on; nothing was written", metres, MARS_CENTRE_OFFSET_LIMIT_M));
+        }
+        marsCentreMetres = metres;
+        return String.format(Locale.ROOT, "%d hourly states over mar099s's span, the centre"
+                + " at most %.3f m from the barycentre (limit %.2f m): the planet is drawn"
+                + " from its barycentre, as ruled", states, metres, MARS_CENTRE_OFFSET_LIMIT_M);
+    }
+
+    /** The PCK's Mars-system angles are a + bT + cT², three values each; refuse anything else. */
+    static void requireMarsPhaseDegree(String pck, Map<String, String> constants) {
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile(
+                "^\\s*BODY4_MAX_PHASE_DEGREE\\s*=\\s*(\\d+)", java.util.regex.Pattern.MULTILINE)
+                .matcher(pck);
+        String degree = null;
+        while (m.find()) {
+            degree = m.group(1);
+        }
+        if (degree == null || Integer.parseInt(degree) != MARS_MAX_PHASE_DEGREE) {
+            throw new IllegalStateException("pck00011.tpc gives BODY4_MAX_PHASE_DEGREE "
+                    + degree + ", not the " + MARS_MAX_PHASE_DEGREE + " the Mars pole model reads");
+        }
+        int angles = constants.get("BODY4_NUT_PREC_ANGLES").split(",").length;
+        if (angles % (MARS_MAX_PHASE_DEGREE + 1) != 0) {
+            throw new IllegalStateException("BODY4_NUT_PREC_ANGLES carries " + angles
+                    + " values, not whole triples");
+        }
+        constants.put("BODY4_MAX_PHASE_DEGREE", degree);
+    }
+
     /** The planet-about-its-barycentre pick, as "2 -> 299". */
     static String aboutItsBarycentre(Planet p) {
         for (SpkExcerpt.Pick pick : p.picks) {
@@ -291,6 +403,12 @@ public final class PlanetsPackMain {
                 .append("by keeping only these SPK Type 2 segments\n");
         for (SpkExcerpt.Pick pick : p.picks) {
             text.append(String.format(Locale.ROOT, "  %d -> %d%n", pick.center(), pick.target()));
+        }
+        if (!p.carriesItsCentre()) {
+            text.append("de440s carries the ").append(p.label).append(" barycentre but not the\n")
+                    .append("planet's centre (").append(p.figureBody).append("); as ruled on issue #601\n")
+                    .append("(M-1), the barycentre is taken as the planet, NAIF's mar099s.bsp\n")
+                    .append("putting the centre within 0.210 m of it.\n");
         }
         text.append("over the interval 1900-01-01 to 2101-01-01 (TDB) with a margin\n")
                 .append("of 31 days at each end. Every Chebyshev coefficient kept is the\n")
@@ -357,6 +475,17 @@ public final class PlanetsPackMain {
             too is a modified kernel, named, annotated and attributed as such.
             Venus's file was not rewritten when Mercury's was added.
 
+            `juranometria-de440-mars-1900-2100.bsp` was produced the same way
+            from the same kernel, in pack version 3: it keeps one segment, the
+            Mars barycentre relative to the solar-system barycentre, over the
+            same years with every coefficient unchanged. That kernel carries
+            no segment for Mars's centre. NAIF's Mars satellite ephemeris
+            `mar099s.bsp` puts the centre within 0.210 m of the barycentre, so
+            the atlas takes the barycentre as the planet, as ruled on #601;
+            the builder measures that bound again before it writes. It too is
+            a modified kernel, named, annotated and attributed as such.
+            Neither Venus's nor Mercury's file was rewritten.
+
             NAIF's rules, quoted: "Redistribution of SPICE kernels distributed
             by NAIF is permitted as long as they have not been modified." "If
             a kernel distributed by NAIF has been modified in any way, any
@@ -382,8 +511,11 @@ public final class PlanetsPackMain {
             that difference. Mercury's radii are its triaxial figure,
             2440.53 km, 2440.53 km and 2438.26 km; the atlas uses the
             equatorial 2440.53 km, as JPL Horizons does, and never substitutes
-            the mean. The PCK file itself is not redistributed; its digest is
-            recorded.
+            the mean. Mars's radii are 3396.19 km at the equator and 3376.20 km
+            at the poles, the mean of the north and south polar radii, as the
+            PCK states; the atlas also copies Mars's pole and rotation model
+            in full, with its periodic terms. The PCK file itself is
+            not redistributed; its digest is recorded.
 
             ## Provenance
 
@@ -398,6 +530,7 @@ public final class PlanetsPackMain {
                                      Map<String, String> checksums,
                                      Map<String, byte[]> kernels,
                                      Map<String, String> validations, Map<String, String> zeros,
+                                     String marsCentre,
                                      Map<String, String> constants) throws IOException {
         StringBuilder md = new StringBuilder();
         md.append("# Planets pack provenance\n\n")
@@ -415,7 +548,10 @@ public final class PlanetsPackMain {
                 .append(" | `").append(sourceSha).append("` |\n")
                 .append("| `pck00011.tpc` (NASA/JPL NAIF, IAU 2015 constants; values copied, file not redistributed) | ")
                 .append(PCK_URL).append(" | ").append(JovianPackMain.RETRIEVED).append(" | `")
-                .append(pckSha).append("` |\n\n")
+                .append(pckSha).append("` |\n")
+                .append("| `mar099s.bsp` (NASA/JPL NAIF, Mars satellite ephemeris; read to measure Mars's centre about its barycentre, not redistributed by this pack) | ")
+                .append(MarsSystemPackMain.MAR099S_URL).append(" | ").append(MarsSystemPackMain.RETRIEVED)
+                .append(" | `").append(MAR099S_SHA256).append("` |\n\n")
                 .append("## Extraction\n\n")
                 .append("Tool: `juranometria.tool.PlanetsPackMain` (this repository),")
                 .append(" using `juranometria.solar.spk.SpkExcerpt`. One file per planet;")
@@ -443,14 +579,23 @@ public final class PlanetsPackMain {
             md.append("- ").append(validations.get(p.key)).append(".\n");
         }
         for (Planet p : PLANETS) {
-            md.append("- ").append(p.label).append(" about its barycentre (")
-                    .append(aboutItsBarycentre(p)).append("): ").append(zeros.get(p.key))
-                    .append(".\n");
+            if (p.carriesItsCentre()) {
+                md.append("- ").append(p.label).append(" about its barycentre (")
+                        .append(aboutItsBarycentre(p)).append("): ").append(zeros.get(p.key))
+                        .append(".\n");
+            }
         }
+        md.append("- Mars about its barycentre (`mar099s.bsp`, 4 -> 499): ").append(marsCentre)
+                .append(" (#601, M-1).\n");
         md.append("- The released Solar System kernel is untouched: sha256 `")
                 .append(RELEASED_SOLAR_KERNEL_SHA256).append("`, verified before writing.\n");
         for (Map.Entry<String, String> k : new TreeMap<>(RELEASED_JOVIAN_KERNELS).entrySet()) {
             md.append("- The released Jovian kernel `").append(k.getKey())
+                    .append("` is untouched: sha256 `").append(k.getValue())
+                    .append("`, verified before writing.\n");
+        }
+        for (Map.Entry<String, String> k : new TreeMap<>(RELEASED_SATURN_KERNELS).entrySet()) {
+            md.append("- The released Saturn System kernel `").append(k.getKey())
                     .append("` is untouched: sha256 `").append(k.getValue())
                     .append("`, verified before writing.\n");
         }
@@ -474,7 +619,8 @@ public final class PlanetsPackMain {
 
     private static String manifest(Map<String, String> checksums,
                                    Map<String, String> constants,
-                                   Map<String, byte[]> kernels) throws IOException {
+                                   Map<String, byte[]> kernels,
+                                   double marsCentreMetres) throws IOException {
         Map<String, String> m = new TreeMap<>();
         m.put("format.version", "1");
         m.put("pack.name", PACK_NAME);
@@ -498,7 +644,11 @@ public final class PlanetsPackMain {
             m.put(prefix + "first.day", FIRST_DAY);
             m.put(prefix + "last.day", LAST_DAY);
             m.put(prefix + "added.in.version", Integer.toString(p.version));
+            m.put(prefix + "figure.body", Integer.toString(p.figureBody));
         }
+        m.put("ephemeris.mars.centre.offset.max.m",
+                String.format(Locale.ROOT, "%.3f", marsCentreMetres));
+        m.put("source.mar099s.sha256", MAR099S_SHA256);
         m.put("pack.planets", planets.toString());
         m.put("source.de440s.url", DE440S_URL);
         m.put("source.de440s.sha256", SolarSystemPackMain.PINNED.get("de440s.bsp"));
