@@ -1,5 +1,7 @@
 # Mars: the read-only inventory (#601, first action)
 
+**Since then (2026-10-25):** the owner approved requests 1–4 below ('approve 1–4'). Every file was retrieved at the size asked about, and is recorded in `SOURCES.md` and `horizons/README.md`. Request 5, `mar099.bsp`, was not made. The measured findings are in `docs/decisions/mars-system.md`. This inventory stands as written before any download.
+
 *Issue #601 on the Mars road #600, from clean main `eed9ccce`
 (2026-10-25). Nothing was downloaded. NAIF's and astropixels.com's
 directory listings were read, and sizes were taken from `HEAD`

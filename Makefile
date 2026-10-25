@@ -76,6 +76,7 @@ help:
 	@echo "  solar-system-controls-study  Measure the Sun and Moon tables in the Controller, with mockups (issue #457)"
 	@echo "  jovian-system-study  Propose the Jupiter and Galilean-moons table from the kept Horizons fixtures, with mockups and diagrams (issue #472)"
 	@echo "  jovian-pack-study    Cut and measure the Jovian excerpt of jup365.bsp against its source (issue #472)"
+	@echo "  mars-pack-study      Cut and prove every candidate Mars kernel from mar099s.bsp and de440s.bsp, and measure Mars's centre against its barycentre (issue #601)"
 	@echo "  saturn-system-study  Propose the Saturn table, moons and ring geometry from the kept fixtures, with mockups and diagrams (issue #574)"
 	@echo "  venus-system-study   Propose the Venus table and the cartography handoff from the kept Horizons fixtures, with mockups and diagrams (issue #500)"
 	@echo "  venus-pack-study venus-system-study     Cut and measure the Venus excerpt of de440s.bsp in both layouts, with the released packs held (issue #500)"
@@ -676,7 +677,7 @@ black-sky-study: classes
 		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BlackSkyStudyMain \
 		> docs/studies/black-sky/measurements.md
 
-.PHONY: spk-boundary-fixture import-saturn-system saturn-accuracy-report saturn-table-study import-jovian-system import-planets venus-accuracy-report venus-table-study mercury-accuracy-report mercury-table-study jovian-accuracy-report jovian-cartography-study venus-cartography-study evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study venus-pack-study sun-on-the-chart-study moon-on-the-chart-study venus-on-the-chart-study mercury-on-the-chart-study jupiter-on-the-chart-study mercury-cartography-study solar-system-labels-study printable-chart-study meridian-ticks-study mercury-pack-study mercury-system-study closer-fields-study chart-instant-study chart-instant-furniture star-identity-density-study all-star-identities saturn-pack-study saturn-system-study saturn-cartography-study saturn-on-the-chart-study
+.PHONY: spk-boundary-fixture import-saturn-system saturn-accuracy-report saturn-table-study import-jovian-system import-planets venus-accuracy-report venus-table-study mercury-accuracy-report mercury-table-study jovian-accuracy-report jovian-cartography-study venus-cartography-study evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study venus-pack-study sun-on-the-chart-study moon-on-the-chart-study venus-on-the-chart-study mercury-on-the-chart-study jupiter-on-the-chart-study mercury-cartography-study solar-system-labels-study printable-chart-study meridian-ticks-study mercury-pack-study mercury-system-study closer-fields-study chart-instant-study chart-instant-furniture star-identity-density-study all-star-identities saturn-pack-study saturn-system-study saturn-cartography-study saturn-on-the-chart-study mars-pack-study
 # The heap is stated rather than inherited from whatever a machine's
 # ergonomics chose for it: the CI runner's default quarter-of-RAM is
 # not the same number as a developer's.
@@ -849,6 +850,15 @@ saturn-system-study: classes
 saturn-pack-study: classes
 	$(JAVA) -Xmx6g -Djava.awt.headless=true -cp "$(CLASSES_DIR):$(LIB_DIR)/*" \
 		juranometria.tool.SaturnPackStudyMain
+
+# The #601 pack study: Mars's centre against its barycentre, mar099s's
+# barycentre against DE440, and every candidate Mars kernel cut and proved.
+mars-pack-study: classes
+	mkdir -p docs/studies/mars-system/contract
+	$(JAVA) -Xmx3g -Djava.awt.headless=true -cp "$(CLASSES_DIR):$(LIB_DIR)/*" \
+		juranometria.tool.MarsPackStudyMain \
+		> docs/studies/mars-system/contract/pack-measurements.md
+	@echo "written to docs/studies/mars-system/contract/pack-measurements.md"
 
 venus-system-study: classes
 	mkdir -p docs/studies/venus
