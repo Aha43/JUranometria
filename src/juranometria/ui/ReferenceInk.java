@@ -207,6 +207,38 @@ public final class ReferenceInk {
                       java.util.function.Predicate<
                               juranometria.render.ChartStructure>
                               emphasized) {
+        return paint(g, page, contributions, palette, words, reserved, emphasized,
+                juranometria.render.BelowHorizon.NONE);
+    }
+
+    /**
+     * The reference layer under Subdue below horizon (#615): great
+     * circles split at the horizon plane, the horizon itself never;
+     * their names and the points whole, by anchor and by position;
+     * ticks and cardinal marks never.
+     */
+    public static List<DirectionPlacement> paint(Graphics2D g,
+                      ChartScene scene,
+                      List<OverlayRegistry.Owned> contributions,
+                      juranometria.render.ChartPalette palette,
+                      juranometria.project.PageWords words,
+                      List<java.awt.Shape> reserved,
+                      java.util.Set<juranometria.render.ChartStructure> emphasized,
+                      juranometria.render.BelowHorizon below) {
+        return paint(g, DrawnPage.of(scene), contributions, palette, words, reserved,
+                juranometria.render.ChartStructure.membersOf(emphasized), below);
+    }
+
+    private static List<DirectionPlacement> paint(Graphics2D g,
+                      DrawnPage page,
+                      List<OverlayRegistry.Owned> contributions,
+                      juranometria.render.ChartPalette palette,
+                      juranometria.project.PageWords words,
+                      List<java.awt.Shape> reserved,
+                      java.util.function.Predicate<
+                              juranometria.render.ChartStructure>
+                              emphasized,
+                      juranometria.render.BelowHorizon below) {
         ChartScene scene = page.scene();
         if (contributions.isEmpty()) {
             return List.of();
@@ -271,8 +303,14 @@ public final class ReferenceInk {
             for (OverlayRegistry.Owned owned : reference) {
                 if (owned.geometry()
                         instanceof OverlayContribution.GreatCircle circle) {
-                    drawCircle(g2, projection, mapping, region, circle,
-                            palette, emphasized);
+                    if (isHorizon(circle.identity())) {
+                        drawCircle(g2, projection, mapping, region, circle,
+                                palette, emphasized);
+                    } else {
+                        below.split(g2, palette.ground(), tone -> drawCircle(g2,
+                                projection, mapping, region, circle, palette,
+                                emphasized, tone));
+                    }
                 }
             }
             // The names are the published decision, written rather
@@ -301,6 +339,10 @@ public final class ReferenceInk {
                     metrics);
             List<Rectangle2D> taken = laid.taken();
             for (NamePlacement placed : laid.names()) {
+                boolean underneath = !isHorizon(placed.identity())
+                        && placed.anchor() != null
+                        && below.belowAt(placed.anchor().x(), placed.anchor().y());
+                g2.setColor(below.ink(palette.gridLabelInk(), palette.ground(), underneath));
                 g2.drawString(placed.name(),
                         (float) placed.box().getMinX(),
                         (float) (placed.box().getMaxY()
@@ -312,9 +354,9 @@ public final class ReferenceInk {
             for (OverlayRegistry.Owned owned : reference) {
                 if (owned.geometry()
                         instanceof OverlayContribution.Point point) {
-                    drawPoint(g2, projection, mapping, paper, sky,
-                            bounded, point, taken, reserved, discs,
-                            palette, emphasized);
+                    drawPoint(g2, projection, mapping, paper, sky, bounded, point, taken,
+                            reserved, discs, palette, emphasized,
+                            below.toneFor(below.below(point.at()), palette.ground()));
                 }
             }
             // The cardinal ink itself, still under the sky clip: the
@@ -568,7 +610,7 @@ public final class ReferenceInk {
                 if (anchor != null) {
                     CurveRun on = runCarrying(runs, anchor);
                     names.add(new Named(anchor,
-                            circle.accessibleName(), owned.moduleId(),
+                            circle.accessibleName(), circle.identity(), owned.moduleId(),
                             on, startsAt(on, anchor), runs,
                             everyOtherCurve(reference, owned,
                                     projection, mapping, region)));
@@ -582,7 +624,7 @@ public final class ReferenceInk {
             if (box != null) {
                 taken.add(box);
                 placedNames.add(new NamePlacement(named.moduleId(),
-                        named.name(), box));
+                        named.name(), box, named.anchor(), named.identity()));
             }
         }
         return new Laid(List.copyOf(directions),
@@ -788,14 +830,14 @@ public final class ReferenceInk {
      * it names and, on a page carrying four reference lines, onto a
      * neighbour's (review of #331).
      */
-    private record Named(PixelPoint anchor, String name,
+    private record Named(PixelPoint anchor, String name, String identity,
                          String moduleId, CurveRun run,
                          boolean fromTheStart, List<CurveRun> own,
                          List<CurveRun> others) {
 
         /** A name with no curve to walk: a point's own. */
         Named(PixelPoint anchor, String name, String moduleId) {
-            this(anchor, name, moduleId, null, false, List.of(),
+            this(anchor, name, null, moduleId, null, false, List.of(),
                     List.of());
         }
     }
@@ -809,6 +851,20 @@ public final class ReferenceInk {
                                    java.util.function.Predicate<
                                            juranometria.render.ChartStructure>
                                            emphasized) {
+        drawCircle(g, projection, mapping, region, circle, palette, emphasized,
+                java.util.function.UnaryOperator.identity());
+    }
+
+    private static void drawCircle(Graphics2D g,
+                                   Projection projection,
+                                   ViewportMapping mapping,
+                                   PageRegion region,
+                                   OverlayContribution.GreatCircle circle,
+                                   juranometria.render.ChartPalette palette,
+                                   java.util.function.Predicate<
+                                           juranometria.render.ChartStructure>
+                                           emphasized,
+                                   java.util.function.UnaryOperator<java.awt.Color> tone) {
         List<CurveRun> runs = GreatCirclePage.clip(projection, mapping,
                 region, circle.pole());
         if (runs.isEmpty()) {
@@ -833,7 +889,7 @@ public final class ReferenceInk {
                                 new juranometria.render.StructureStyle
                                         .Style(palette.figureInk(),
                                         strokeFor(circle.reference())));
-        g.setColor(style.color());
+        g.setColor(tone.apply(style.color()));
         g.setStroke(style.stroke());
         for (CurveRun run : runs) {
             g.draw(shapeOf(run));
@@ -842,7 +898,18 @@ public final class ReferenceInk {
 
     /** One reference name, and the box it is written in. */
     public record NamePlacement(String moduleId, String name,
-                                Rectangle2D box) {
+                                Rectangle2D box, PixelPoint anchor, String identity) {
+
+        /** A name placed without an anchor of its own: a point's, whose position decides. */
+        public NamePlacement(String moduleId, String name, Rectangle2D box) {
+            this(moduleId, name, box, null, null);
+        }
+    }
+
+    /** Whether a reference curve is the mathematical horizon, which is never subdued (#615). */
+    private static boolean isHorizon(String identity) {
+        return identity != null && juranometria.render.ChartStructure.ofIdentity(identity)
+                .filter(s -> s == juranometria.render.ChartStructure.HORIZON).isPresent();
     }
 
     /**
@@ -924,7 +991,19 @@ public final class ReferenceInk {
                               List<java.awt.Shape> reserved,
                               List<Shape> discs,
                               juranometria.render.ChartPalette palette) {
-        g.setColor(palette.gridLabelInk());
+        return write(g, paper, sky, anchor, name, taken, reserved, discs, palette,
+                java.util.function.UnaryOperator.identity());
+    }
+
+    private static Rectangle2D write(Graphics2D g, Rectangle2D paper,
+                              java.awt.Shape sky,
+                              PixelPoint anchor, String name,
+                              List<Rectangle2D> taken,
+                              List<java.awt.Shape> reserved,
+                              List<Shape> discs,
+                              juranometria.render.ChartPalette palette,
+                              java.util.function.UnaryOperator<java.awt.Color> tone) {
+        g.setColor(tone.apply(palette.gridLabelInk()));
         g.setFont(EquatorialGrid.GRID_LABEL_FONT);
         FontMetrics metrics = g.getFontMetrics();
         Rectangle2D box = pointWordBox(paper, sky, anchor, name, metrics,
@@ -1310,6 +1389,27 @@ public final class ReferenceInk {
                                   java.util.function.Predicate<
                                            juranometria.render.ChartStructure>
                                            emphasized) {
+        return drawPoint(g, projection, mapping, paper, sky, bounded, point, taken,
+                reserved, discs, palette, emphasized,
+                java.util.function.UnaryOperator.identity());
+    }
+
+    /** A point drawn whole, mark and name, in the colours the tone gives (#615). */
+    private static Rectangle2D drawPoint(Graphics2D g,
+                                  Projection projection,
+                                  ViewportMapping mapping,
+                                  Rectangle2D paper,
+                                  java.awt.Shape sky,
+                                  boolean bounded,
+                                  OverlayContribution.Point point,
+                                  List<Rectangle2D> taken,
+                                  List<java.awt.Shape> reserved,
+                                  List<Shape> discs,
+                                  juranometria.render.ChartPalette palette,
+                                  java.util.function.Predicate<
+                                           juranometria.render.ChartStructure>
+                                           emphasized,
+                                  java.util.function.UnaryOperator<java.awt.Color> tone) {
         PixelPoint at = projection.project(point.at())
                 .map(mapping::toPixel).orElse(null);
         if (at == null || !sky.contains(at.x(), at.y())) {
@@ -1329,7 +1429,7 @@ public final class ReferenceInk {
                         .orElseGet(() ->
                                 new juranometria.render.StructureStyle
                                         .Style(palette.figureInk(), SOLID));
-        g.setColor(style.color());
+        g.setColor(tone.apply(style.color()));
         g.setStroke(style.stroke());
         switch (point.mark()) {
             case PLACE -> {
@@ -1359,13 +1459,13 @@ public final class ReferenceInk {
         // whole step exists to prevent.
         if (!bounded) {
             return write(g, paper, sky, at, point.accessibleName(), taken,
-                    reserved, discs, palette);
+                    reserved, discs, palette, tone);
         }
         Shape marksClip = g.getClip();
         g.setClip(paper);
         try {
             return write(g, paper, sky, at, point.accessibleName(), taken,
-                    reserved, discs, palette);
+                    reserved, discs, palette, tone);
         } finally {
             g.setClip(marksClip);
         }
@@ -1697,7 +1797,7 @@ public final class ReferenceInk {
         Color ink = palette.starInk();
         Color ground = palette.ground();
         if (m.satellite().belowHorizon()) {
-            ink = ChartRenderer.quiet(ink, ground);
+            ink = juranometria.render.BelowHorizon.subdued(ink, ground);
         }
         Ellipse2D dot = m.mark();
         if (m.satellite().relation() == OverlayContribution.Satellite.Relation.IN_FRONT) {
@@ -1765,8 +1865,8 @@ public final class ReferenceInk {
                 ? palette.ground() : palette.starInk();
         Color limb = palette.starInk();
         if (belowHorizon) {
-            face = ChartRenderer.quiet(face, palette.ground());
-            limb = ChartRenderer.quiet(limb, palette.ground());
+            face = juranometria.render.BelowHorizon.subdued(face, palette.ground());
+            limb = juranometria.render.BelowHorizon.subdued(limb, palette.ground());
         }
         g2.setColor(face);
         g2.fill(mark.outline());
@@ -1937,10 +2037,10 @@ public final class ReferenceInk {
         Color farInk = between(palette.starInk(), palette.ground(),
                 body.unlitFaceSeen() ? 0.18 : 0.32);
         if (body.belowHorizon()) {
-            face = ChartRenderer.quiet(face, palette.ground());
-            limb = ChartRenderer.quiet(limb, palette.ground());
-            near = ChartRenderer.quiet(near, palette.ground());
-            farInk = ChartRenderer.quiet(farInk, palette.ground());
+            face = juranometria.render.BelowHorizon.subdued(face, palette.ground());
+            limb = juranometria.render.BelowHorizon.subdued(limb, palette.ground());
+            near = juranometria.render.BelowHorizon.subdued(near, palette.ground());
+            farInk = juranometria.render.BelowHorizon.subdued(farInk, palette.ground());
         }
         if (mark.symbol()) {
             g2.setColor(face);
@@ -2303,7 +2403,7 @@ public final class ReferenceInk {
                     taken.add(box);
                     boxes[i] = box;
                     g2.setColor(below
-                            ? ChartRenderer.quiet(nameInk, palette.ground())
+                            ? juranometria.render.BelowHorizon.subdued(nameInk, palette.ground())
                             : nameInk);
                     g2.drawString(name, (float) box.getMinX(),
                             (float) (box.getMaxY() - metrics.getDescent()));
@@ -2326,7 +2426,7 @@ public final class ReferenceInk {
                     taken.add(box);
                     moonBoxes.put(m, box);
                     g2.setColor(m.satellite().belowHorizon()
-                            ? ChartRenderer.quiet(nameInk, palette.ground())
+                            ? juranometria.render.BelowHorizon.subdued(nameInk, palette.ground())
                             : nameInk);
                     g2.drawString(name, (float) box.getMinX(),
                             (float) (box.getMaxY() - metrics.getDescent()));
@@ -2400,7 +2500,7 @@ public final class ReferenceInk {
             double radius, juranometria.render.ChartPalette palette,
             boolean belowHorizon) {
         Color ink = belowHorizon
-                ? ChartRenderer.quiet(palette.starInk(), palette.ground())
+                ? juranometria.render.BelowHorizon.subdued(palette.starInk(), palette.ground())
                 : palette.starInk();
         // The ground first: whatever the disc covers is covered.
         g2.setColor(palette.ground());
@@ -2440,9 +2540,9 @@ public final class ReferenceInk {
         Color dark = mix(darker, lighter, DARK_SIDE);
         Color limb = palette.starInk();
         if (belowHorizon) {
-            lighter = ChartRenderer.quiet(lighter, palette.ground());
-            dark = ChartRenderer.quiet(dark, palette.ground());
-            limb = ChartRenderer.quiet(limb, palette.ground());
+            lighter = juranometria.render.BelowHorizon.subdued(lighter, palette.ground());
+            dark = juranometria.render.BelowHorizon.subdued(dark, palette.ground());
+            limb = juranometria.render.BelowHorizon.subdued(limb, palette.ground());
         }
         g2.setColor(dark);
         g2.fill(disc);

@@ -204,6 +204,17 @@ public final class PlaceAndTimePanel extends JPanel {
         }
         ticks.addActionListener(event -> module.ticksShowing(ticks.isSelected()));
         panel.add(ticks);
+        // Subdue below horizon (#615): persistent, and independent of
+        // the Horizon line above it (rulings on the issue and P-I).
+        JCheckBox subdue = show("placeandtime.subdue", module.subduing(),
+                said.say("placeandtime.subdue.hover"),
+                said.say("placeandtime.subdue.explain"),
+                said, letters, "subdueBelowHorizon");
+        subdue.addActionListener(event -> {
+            module.subduing(subdue.isSelected());
+            store.saveSubdueBelowHorizon(subdue.isSelected());
+        });
+        panel.add(subdue);
 
         // The content shows what the module holds, whoever changed it
         // (#434): the chart keyboard toggles a line while this is
@@ -220,6 +231,7 @@ public final class PlaceAndTimePanel extends JPanel {
             horizon.setSelected(module.horizonShowing());
             zenith.setSelected(module.zenithShowing());
             ticks.setSelected(module.ticksShowing());
+            subdue.setSelected(module.subduing());
         });
         // Released when the window holding it is disposed - the only
         // way the dialog closes - so reopening adds no listener.

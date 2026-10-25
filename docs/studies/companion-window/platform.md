@@ -24,7 +24,7 @@ no label, button, box or field is drawn narrower than it asks.
 
 | language | appearance | content preferred | narrowest untruncated companion |
 |---|---|---:|---:|
-| `en` | light | 326 × 313 | 342 px |
-| `en` | dark | 326 × 313 | 342 px |
-| `nb-NO` | light | 324 × 313 | 340 px |
-| `nb-NO` | dark | 324 × 313 | 340 px |
+| `en` | light | 326 × 334 | 342 px |
+| `en` | dark | 326 × 334 | 342 px |
+| `nb-NO` | light | 324 × 334 | 340 px |
+| `nb-NO` | dark | 324 × 334 | 340 px |

@@ -28,9 +28,9 @@ and Time and Chart Options (Deep sky collapsed) above it, as the companion holds
 
 | language | arrangement | alone | with both | with both, Chart Options collapsed | narrowest | fits 900 with both |
 |---|---|---:|---:|---:|---:|---|
-| `en` | 1. the toolbar, wrapped | 149 | 1002 | 522 | 200 | scrolls |
-| `en` | 2. one Chart controls section, rows | 147 | 1000 | 520 | 240 | scrolls |
-| `en` | 3. Find, Navigate, Stars, Work with the chart | 259 | 1112 | 632 | 204 | scrolls |
-| `nb-NO` | 1. the toolbar, wrapped | 149 | 1002 | 522 | 200 | scrolls |
-| `nb-NO` | 2. one Chart controls section, rows | 147 | 1000 | 520 | 232 | scrolls |
-| `nb-NO` | 3. Find, Navigate, Stars, Work with the chart | 259 | 1112 | 632 | 208 | scrolls |
+| `en` | 1. the toolbar, wrapped | 149 | 1023 | 543 | 200 | scrolls |
+| `en` | 2. one Chart controls section, rows | 147 | 1021 | 541 | 240 | scrolls |
+| `en` | 3. Find, Navigate, Stars, Work with the chart | 259 | 1133 | 653 | 204 | scrolls |
+| `nb-NO` | 1. the toolbar, wrapped | 149 | 1023 | 543 | 200 | scrolls |
+| `nb-NO` | 2. one Chart controls section, rows | 147 | 1021 | 541 | 232 | scrolls |
+| `nb-NO` | 3. Find, Navigate, Stars, Work with the chart | 259 | 1133 | 653 | 208 | scrolls |

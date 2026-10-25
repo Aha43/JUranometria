@@ -495,6 +495,33 @@ public final class ChartRenderer {
         ReferenceLayer NONE = (g, scene, reserved) -> { };
 
         /**
+         * Where this page's sky lies below the mathematical horizon,
+         * when Subdue below horizon is on (#615); NONE otherwise. The
+         * reference layer answers because the horizon is its geometry:
+         * the renderer asks once per page and subdues its own passes.
+         */
+        default BelowHorizon belowHorizon(ChartScene scene) {
+            return BelowHorizon.NONE;
+        }
+
+        /** A layer that paints as given and answers the page's horizon by the given rule. */
+        static ReferenceLayer subduing(ReferenceLayer paint,
+                java.util.function.Function<ChartScene, BelowHorizon> below) {
+            return new ReferenceLayer() {
+                @Override
+                public void paint(Graphics2D g, ChartScene scene,
+                                  java.util.List<java.awt.Shape> reserved) {
+                    paint.paint(g, scene, reserved);
+                }
+
+                @Override
+                public BelowHorizon belowHorizon(ChartScene scene) {
+                    return below.apply(scene);
+                }
+            };
+        }
+
+        /**
          * @param reserved the page's own ink and text - every drawn
          *     mark's outline, the furniture that will draw, the
          *     grid's notation, and every placed label box - so
@@ -613,7 +640,9 @@ public final class ChartRenderer {
         int width = scene.viewport().widthPx();
         int height = scene.viewport().heightPx();
         ChartPalette palette = options.palette();
-
+        // Subdue below horizon (#615): one rule for the page, asked once.
+        BelowHorizon below = reference == null ? BelowHorizon.NONE
+                : reference.belowHorizon(scene);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
         g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
@@ -658,10 +687,10 @@ public final class ChartRenderer {
             // here would hide a regression rather than prevent one.
             EquatorialGrid.draw(g, gridFor(g.getFontMetrics(LABEL_FONT),
                     scene, options), palette,
-                    emphasized.test(ChartStructure.EQUATORIAL_GRID));
+                    emphasized.test(ChartStructure.EQUATORIAL_GRID), below);
         }
         drawGeography(g, scene, options, projection, mapping,
-                constellationNamesIn(placedText), sky, paper, emphasized);
+                constellationNamesIn(placedText), sky, paper, emphasized, below);
         // Above the grid and the figures, below every mark: a
         // reference line is read across the chart and must not hide
         // an object (docs/decisions/place-and-time.md).
@@ -703,16 +732,20 @@ public final class ChartRenderer {
         // mark that carries no map - every ordinary page's, and a
         // bounded page's minimum glyph - reaches paintSymbol by the
         // call it always did.
+        // A mark by its own position, whole (#615).
         for (DrawnMark mark : marks) {
             if (mark.kind() == DrawnMark.Kind.DEEP_SKY) {
-                drawSymbol(g, mark, palette);
+                drawSymbol(g, mark, palette, below.toneFor(
+                        below.below(mark.deepSky().position()), palette.ground()));
             }
         }
-        g.setColor(palette.starInk());
+        java.awt.Color starBelow = BelowHorizon.subdued(palette.starInk(), palette.ground());
         for (DrawnMark mark : marks) {
             // The scene's stated limit governs what is drawn; the size
             // policy only decides mark sizes (Codex review, issue #13).
             if (mark.kind() == DrawnMark.Kind.STAR) {
+                g.setColor(below.below(mark.star().position()) ? starBelow
+                        : palette.starInk());
                 g.fill(mark.outline());
             }
         }
@@ -743,9 +776,11 @@ public final class ChartRenderer {
         // Star labels, then deep-sky labels, which is the order the
         // page has always drawn them in.
         drawText(g, LABEL_FONT, palette.textInk(), placedText,
-                placement -> !isDeepSkyText(placement.request(), scene));
+                placement -> !isDeepSkyText(placement.request(), scene), below,
+                palette.ground());
         drawText(g, LABEL_FONT, palette.textInk(), placedText,
-                placement -> isDeepSkyText(placement.request(), scene));
+                placement -> isDeepSkyText(placement.request(), scene), below,
+                palette.ground());
         // The Solar System bodies (#415): above every mark and label
         // the catalogue drew, below the furniture. Within the sky, so
         // a disc at a bounded page's limb is cut where the sky is.
@@ -861,7 +896,8 @@ public final class ChartRenderer {
                                       java.awt.Shape sky,
                                       java.awt.Shape paper,
                                       java.util.function.Predicate<
-                                              ChartStructure> emphasized) {
+                                              ChartStructure> emphasized,
+                                      BelowHorizon below) {
         GeographyDetailPolicy policy = new GeographyDetailPolicy(
                 scene.viewport().fieldWidthDegrees());
         ChartPalette palette = options.palette();
@@ -875,9 +911,13 @@ public final class ChartRenderer {
             g.setColor(boundaries.color());
             g.setStroke(boundaries.stroke());
             g.setClip(sky);
-            for (GeoSegment segment : scene.geography().boundarySegments()) {
-                drawGeographySegment(g, segment, scene, projection, mapping, null);
-            }
+            // Split at the horizon plane (#615, ruling P-X).
+            below.split(g, palette.ground(), tone -> {
+                g.setColor(tone.apply(boundaries.color()));
+                for (GeoSegment segment : scene.geography().boundarySegments()) {
+                    drawGeographySegment(g, segment, scene, projection, mapping, null);
+                }
+            });
             g.setClip(paper);
         }
         if (options.constellationFigures() && policy.figuresDrawn()) {
@@ -892,10 +932,17 @@ public final class ChartRenderer {
             java.util.Map<String, double[]> visibleInk =
                     new java.util.LinkedHashMap<>();
             g.setClip(sky);
-            for (GeoSegment segment : scene.geography().figureSegments()) {
-                drawGeographySegment(g, segment, scene, projection, mapping,
-                        visibleInk);
-            }
+            // Split at the horizon plane (#615, ruling P-X); the anchors
+            // are gathered once, by the first of the two passes.
+            boolean[] gathered = {false};
+            below.split(g, palette.ground(), tone -> {
+                g.setColor(tone.apply(figures.color()));
+                for (GeoSegment segment : scene.geography().figureSegments()) {
+                    drawGeographySegment(g, segment, scene, projection, mapping,
+                            gathered[0] ? null : visibleInk);
+                }
+                gathered[0] = true;
+            });
             // And the names outside it: a clipped word is a false
             // name, so text is governed by where it is placed rather
             // than by where it is cut (#301).
@@ -905,7 +952,7 @@ public final class ChartRenderer {
             // and since #314 the placement decides which of those
             // anchors a name actually sits on, or whether it sits on
             // the page at all.
-            drawConstellationNames(g, names, palette);
+            drawConstellationNames(g, names, palette, below);
         }
     }
 
@@ -1048,11 +1095,14 @@ public final class ChartRenderer {
     private static void drawConstellationNames(
             Graphics2D g,
             java.util.List<ConstellationNamePlacement> names,
-            ChartPalette palette) {
+            ChartPalette palette, BelowHorizon below) {
         g.setFont(CONSTELLATION_NAME_FONT);
         g.setColor(palette.constellationNameInk());
         FontMetrics metrics = g.getFontMetrics();
         for (ConstellationNamePlacement name : names) {
+            // Whole, by the name's anchor (#615, ruling P-L).
+            g.setColor(below.ink(palette.constellationNameInk(), palette.ground(),
+                    below.belowAt(name.anchorX(), name.anchorY())));
             drawAt(g, name.text(), name.box(), metrics);
         }
     }
@@ -1067,7 +1117,8 @@ public final class ChartRenderer {
                     == LabelPlacement.Family.CONSTELLATION) {
                 names.add(new ConstellationNamePlacement(
                         placement.request().id(),
-                        placement.request().text(), placement.at()));
+                        placement.request().text(), placement.at(),
+                        placement.request().anchorX(), placement.request().anchorY()));
             }
         }
         return names;
@@ -1462,7 +1513,8 @@ public final class ChartRenderer {
     /** One placed constellation name: the constellation and its box. */
     public record ConstellationNamePlacement(String constellationId,
                                              String text,
-                                             Rectangle2D box) {
+                                             Rectangle2D box,
+                                             double anchorX, double anchorY) {
     }
 
     /** The constellation names this page draws, at their placed boxes. */
@@ -1480,7 +1532,8 @@ public final class ChartRenderer {
             }
             names.add(new ConstellationNamePlacement(
                     placement.request().id(), placement.request().text(),
-                    placement.at()));
+                    placement.at(), placement.request().anchorX(),
+                    placement.request().anchorY()));
         }
         return java.util.List.copyOf(names);
     }
@@ -1497,7 +1550,8 @@ public final class ChartRenderer {
                                  java.util.List<LabelPlacement.Placement>
                                          placed,
                                  java.util.function.Predicate<
-                                         LabelPlacement.Placement> which) {
+                                         LabelPlacement.Placement> which,
+                                 BelowHorizon below, Color ground) {
         g.setFont(font);
         g.setColor(ink);
         FontMetrics metrics = g.getFontMetrics();
@@ -1508,6 +1562,9 @@ public final class ChartRenderer {
                     || !which.test(placement)) {
                 continue;
             }
+            // Whole, by the label's anchor (#615, ruling P-L).
+            g.setColor(below.ink(ink, ground, below.belowAt(placement.request().anchorX(),
+                    placement.request().anchorY())));
             drawAt(g, placement.request().text(), placement.at(), metrics);
         }
     }
@@ -1915,14 +1972,15 @@ public final class ChartRenderer {
     }
 
     private static void drawSymbol(Graphics2D g, DrawnMark mark,
-                                   ChartPalette palette) {
+                                   ChartPalette palette,
+                                   java.util.function.UnaryOperator<Color> tone) {
         DeepSkyObject dso = mark.deepSky();
         DrawnMark.Painted painted = mark.painted();
         PixelPoint centre = mark.centre();
         if (painted.carried() == null) {
             paintSymbol(g, symbolFor(dso), centre.x(), centre.y(),
                     painted.majorPx(), painted.minorPx(),
-                    dso.positionAngleDegrees(), palette);
+                    dso.positionAngleDegrees(), palette, tone);
             return;
         }
         Graphics2D g2 = (Graphics2D) g.create();
@@ -1935,7 +1993,7 @@ public final class ChartRenderer {
                     centre.x() - painted.carried().dx(),
                     centre.y() - painted.carried().dy(),
                     painted.majorPx(), painted.minorPx(),
-                    dso.positionAngleDegrees(), palette);
+                    dso.positionAngleDegrees(), palette, tone);
         } finally {
             g2.dispose();
         }
@@ -2099,6 +2157,16 @@ public final class ChartRenderer {
                                     double majorPx, double minorPx,
                                     double positionAngleDegrees,
                                     ChartPalette palette) {
+        paintSymbol(g, symbol, centreX, centreY, majorPx, minorPx,
+                positionAngleDegrees, palette, java.util.function.UnaryOperator.identity());
+    }
+
+    private static void paintSymbol(Graphics2D g, Symbol symbol,
+                                    double centreX, double centreY,
+                                    double majorPx, double minorPx,
+                                    double positionAngleDegrees,
+                                    ChartPalette palette,
+                                    java.util.function.UnaryOperator<Color> tone) {
         Graphics2D g2 = (Graphics2D) g.create();
         try {
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -2107,11 +2175,11 @@ public final class ChartRenderer {
                     positionAngleDegrees));
             for (SymbolPiece piece
                     : symbolPieces(symbol, majorPx, minorPx)) {
-                g2.setColor(switch (piece.ink()) {
+                g2.setColor(tone.apply(switch (piece.ink()) {
                     case GALAXY_FILL -> palette.galaxyFill();
                     case DEEP_SKY_OUTLINE -> palette.deepSkyOutline();
                     case NEBULA_OUTLINE -> palette.nebulaOutline();
-                });
+                }));
                 if (piece.filled()) {
                     g2.fill(piece.shape());
                 } else {

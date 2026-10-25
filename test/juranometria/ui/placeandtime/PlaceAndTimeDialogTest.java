@@ -185,14 +185,14 @@ class PlaceAndTimeDialogTest {
     // ---- the surface is the gate's ----------------------------------
 
     @Test
-    void fourFieldsThreeSwitchesAndExactlyTwoActions() {
+    void fourFieldsFiveSwitchesAndExactlyTwoActions() {
         Rig rig = new Rig(node);
 
         assertEquals(4, all(rig.content, JTextField.class).size(),
                 "latitude, longitude, instant, local sidereal time (#612) - and no fifth field");
         List<Component> switches = all(rig.content, JCheckBox.class);
-        assertEquals(4, switches.size(),
-                "meridian, mathematical horizon, zenith, altitude ticks (#515)");
+        assertEquals(5, switches.size(),
+                "meridian, mathematical horizon, zenith, altitude ticks (#515), Subdue below horizon (#615)");
         assertEquals(2, all(rig.content, JButton.class).size(),
                 "two deliberate actions, and no others: no Apply, no"
                         + " Cancel, no OK");

@@ -281,8 +281,8 @@ class StartupJourneyTest {
         assertTrue(said.spoken().size() >= 3,
                 "the premise: it spoke some too - "
                         + said.spoken().size());
-        assertEquals(10, said.letters().size(),
-                "the premise: all ten access letters were set (#515 added the ticks', #612 the sidereal field's) - "
+        assertEquals(11, said.letters().size(),
+                "the premise: all eleven access letters were set (#515 added the ticks', #612 the sidereal field's, #615 Subdue below horizon's) - "
                         + said.letters());
 
         // The window itself, which is a channel an inventory that

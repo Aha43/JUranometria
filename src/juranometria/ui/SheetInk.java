@@ -46,9 +46,13 @@ public final class SheetInk {
         }
         // Paper, always: the sheet has already replaced the ground,
         // and the ink has to match the ground it is on.
-        return (g, scene, reserved) -> ReferenceInk.paint(g, scene,
-                chart.overlays().collect(), ChartPalette.WHITE_PAPER,
-                chart.words(), reserved, emphasized);
+        // Subdue below horizon on paper as on the screen (#615, P-P).
+        return ChartRenderer.ReferenceLayer.subduing(
+                (g, scene, reserved) -> ReferenceInk.paint(g, scene,
+                        chart.overlays().collect(), ChartPalette.WHITE_PAPER,
+                        chart.words(), reserved, emphasized,
+                        chart.belowHorizon(scene)),
+                chart::belowHorizon);
     }
 
     /**

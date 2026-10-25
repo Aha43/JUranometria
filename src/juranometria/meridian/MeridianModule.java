@@ -65,6 +65,8 @@ public final class MeridianModule implements ChartModule {
     private boolean horizonShowing = true;
     private boolean zenithShowing = true;
     private boolean ticksShowing = false;
+    /** Subdue below horizon (#615): on by default (ruling P-D), independent of the line (P-I). */
+    private boolean subduing = true;
     private Ticks ticks = Ticks.PROPOSED;
 
     private final List<Runnable> listeners = new ArrayList<>();
@@ -341,6 +343,22 @@ public final class MeridianModule implements ChartModule {
 
     public Ticks ticks() {
         return ticks;
+    }
+
+    /** Whether celestial ink below the mathematical horizon is subdued (#615). */
+    public boolean subduing() {
+        return subduing;
+    }
+
+    /**
+     * Subdue below horizon, or stop (#615). Independent of the horizon
+     * line (ruling P-I): either may be on without the other. Redraws
+     * and tells the hosts, as every switch here does.
+     */
+    public void subduing(boolean on) {
+        this.subduing = on;
+        redraw();
+        changed();
     }
 
     /** The graduation to draw - the study's way of comparing densities. */

@@ -22,9 +22,9 @@ Every changed pixel lies inside a drawn name's box (widened by one pixel for ant
 
 | page | names placed | names refused | changed px inside boxes | outside |
 |---|---|---|---|---|
-| wide-120-paper | 3 | 0 | 1779 | 0 |
-| wide-120-black | 3 | 0 | 1753 | 0 |
-| wide-120-paper-nb | 3 | 0 | 1799 | 0 |
+| wide-120-paper | 3 | 0 | 1805 | 0 |
+| wide-120-black | 3 | 0 | 1781 | 0 |
+| wide-120-paper-nb | 3 | 0 | 1828 | 0 |
 | close-1-paper | 5 | 0 | 890 | 0 |
 | close-1-black | 5 | 0 | 890 | 0 |
 | transit-2-paper | 1 | 1 | 92 | 0 |

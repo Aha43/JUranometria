@@ -24,10 +24,11 @@ nothing - is one machine's answer, in `platform.md` beside this.
 | JCheckBox | Mathematical horizon | Show Mathematical horizon |
 | JCheckBox | Zenith | Show Zenith |
 | JCheckBox | Altitude ticks | Show Altitude ticks |
+| JCheckBox | Subdue below horizon | Subdue below horizon |
 | JButton | Update to now | Update to now |
 | JButton | Centre on zenith | Centre on zenith |
 
-**10 operable controls.** A companion that hosts this content offers
+**11 operable controls.** A companion that hosts this content offers
 exactly these; it adds only its own shell.
 
 ## The content in `nb-NO`
@@ -42,10 +43,11 @@ exactly these; it adds only its own shell.
 | JCheckBox | Matematisk horisont | Vis matematisk horisont |
 | JCheckBox | Senit | Vis senit |
 | JCheckBox | Høydemerker | Vis høydemerker |
+| JCheckBox | Demp under horisonten | Demp under horisonten |
 | JButton | Oppdater til nå | Oppdater til nå |
 | JButton | Sentrer på senit | Sentrer på senit |
 
-**10 operable controls.** A companion that hosts this content offers
+**11 operable controls.** A companion that hosts this content offers
 exactly these; it adds only its own shell.
 
 ## Placement at four screen sizes

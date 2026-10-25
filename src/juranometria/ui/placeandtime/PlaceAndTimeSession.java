@@ -48,6 +48,8 @@ public final class PlaceAndTimeSession {
         MeridianModule module = modules.attach(
                 new MeridianModule(store.load(sessionMoment)));
         module.showing(false, false, false);
+        // Remembered, and on for a reader who never chose (#615, P-D).
+        module.subduing(store.subdueBelowHorizon().orElse(true));
         return module;
     }
 }

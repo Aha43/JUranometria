@@ -883,21 +883,28 @@ public final class EquatorialGrid {
      */
     public static void draw(Graphics2D g, Grid grid, ChartPalette palette,
                             boolean emphasized) {
+        draw(g, grid, palette, emphasized, BelowHorizon.NONE);
+    }
+
+    /** The same, subdued below the horizon (#615): lines split at the plane, figures whole by anchor. */
+    public static void draw(Graphics2D g, Grid grid, ChartPalette palette,
+                            boolean emphasized, BelowHorizon below) {
         g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
                 java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
         g.setRenderingHint(java.awt.RenderingHints.KEY_TEXT_ANTIALIASING,
                 java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        drawCurves(g, grid, palette, emphasized);
-        drawNotation(g, grid, palette, emphasized);
+        below.split(g, palette.ground(), tone -> drawCurves(g, grid, palette, emphasized, tone));
+        drawNotation(g, grid, palette, emphasized, below);
     }
 
     private static void drawCurves(Graphics2D g, Grid grid,
                                    ChartPalette palette,
-                                   boolean emphasized) {
+                                   boolean emphasized,
+                                   java.util.function.UnaryOperator<java.awt.Color> tone) {
         StructureStyle.Style style = StructureStyle.resolve(palette,
                 ChartStructure.EQUATORIAL_GRID, emphasized,
                 palette.gridInk(), new BasicStroke(1.0f));
-        g.setColor(style.color());
+        g.setColor(tone.apply(style.color()));
         g.setStroke(style.stroke());
         for (List<List<PixelPoint>> family
                 : List.of(grid.meridians(), grid.parallels())) {
@@ -913,12 +920,13 @@ public final class EquatorialGrid {
 
     private static void drawNotation(Graphics2D g, Grid grid,
                                      ChartPalette palette,
-                                     boolean emphasized) {
-        g.setColor(StructureStyle.resolve(palette,
+                                     boolean emphasized, BelowHorizon below) {
+        java.awt.Color ink = StructureStyle.resolve(palette,
                 ChartStructure.EQUATORIAL_GRID, emphasized,
-                palette.gridLabelInk(), new BasicStroke(1.0f)).color());
+                palette.gridLabelInk(), new BasicStroke(1.0f)).color();
         g.setFont(GRID_LABEL_FONT);
         for (Label label : grid.labels()) {
+            g.setColor(below.ink(ink, palette.ground(), below.belowAt(label.x(), label.y())));
             g.drawString(label.text(), (float) label.x(), (float) label.y());
         }
     }

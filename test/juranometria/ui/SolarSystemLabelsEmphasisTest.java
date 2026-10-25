@@ -226,7 +226,7 @@ class SolarSystemLabelsEmphasisTest {
         // accent, as quieting leaves it.
         java.awt.Color accent = StructureStyle.labelInk(ChartPalette.WHITE_PAPER, true,
                 ChartPalette.WHITE_PAPER.textInk());
-        java.awt.Color quietAccent = ChartRenderer.quiet(accent, ChartPalette.WHITE_PAPER.ground());
+        java.awt.Color quietAccent = juranometria.render.BelowHorizon.subdued(accent, ChartPalette.WHITE_PAPER.ground());
         int inBox = 0;
         boolean quietAccentSeen = false;
         boolean fullAccentSeen = false;

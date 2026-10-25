@@ -51,6 +51,15 @@ public interface PlaceStore {
      */
     void flush();
 
+    /** The reader's Subdue below horizon, if ever chosen (#615); empty on a fresh profile. */
+    default java.util.Optional<Boolean> subdueBelowHorizon() {
+        return java.util.Optional.empty();
+    }
+
+    /** Remembers Subdue below horizon (#615). */
+    default void saveSubdueBelowHorizon(boolean on) {
+    }
+
     /** The store the running application uses. */
     static PlaceStore user() {
         return forNode(Preferences.userRoot().node("juranometria"));
@@ -73,6 +82,18 @@ public interface PlaceStore {
                              double eastLongitudeDegrees) {
                 node.putDouble("place.latitude", latitudeDegrees);
                 node.putDouble("place.eastLongitude", eastLongitudeDegrees);
+            }
+
+            @Override
+            public java.util.Optional<Boolean> subdueBelowHorizon() {
+                String stored = node.get("placeandtime.subdueBelowHorizon", null);
+                return stored == null ? java.util.Optional.empty()
+                        : java.util.Optional.of(Boolean.parseBoolean(stored));
+            }
+
+            @Override
+            public void saveSubdueBelowHorizon(boolean on) {
+                node.putBoolean("placeandtime.subdueBelowHorizon", on);
             }
 
             @Override

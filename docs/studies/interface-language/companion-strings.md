@@ -57,6 +57,7 @@ arrangement at its frozen instant.
 | Mathematical horizon | Draw where the sky meets a perfectly flat, transparent Earth (⌘K then H) | Show Mathematical horizon | Draws the circle where the sky would meet a flat and transparent Earth; your own horizon has hills and air in it. It lasts as long as this session. |
 | Zenith | Mark the point overhead | Show Zenith | Marks the point directly above you. It is drawn with the observer's lines and has no shortcut of its own. |
 | Altitude ticks | Graduate the meridian every 10° of altitude above the horizon | Show Altitude ticks | Marks the meridian every 10° of altitude from the horizon to the zenith, with the figure beside each tick. It is drawn with the meridian and has no shortcut of its own. |
+| Subdue below horizon | Draw the sky below the mathematical horizon at reduced contrast | Subdue below horizon | Reduces the contrast of celestial content below the observer’s mathematical horizon. |
 | Update to now | Reads the clock once and freezes the chart at that instant | Update to now | Freezes the chart at the present moment. The clock is read once; nothing moves afterwards. |
 | Centre on zenith | Move the chart to the point overhead | Centre on zenith | Moves the page to the point directly above you. This is the only control in this window that moves the chart. |
 | ▾ Chart Options | Show or hide this section | Chart Options, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
@@ -114,6 +115,7 @@ arrangement at its frozen instant.
 | Mathematical horizon | Draw where the sky meets a perfectly flat, transparent Earth (⌘K then H) | Show Mathematical horizon | Draws the circle where the sky would meet a flat and transparent Earth; your own horizon has hills and air in it. It lasts as long as this session. |
 | Zenith | Mark the point overhead | Show Zenith | Marks the point directly above you. It is drawn with the observer's lines and has no shortcut of its own. |
 | Altitude ticks | Graduate the meridian every 10° of altitude above the horizon | Show Altitude ticks | Marks the meridian every 10° of altitude from the horizon to the zenith, with the figure beside each tick. It is drawn with the meridian and has no shortcut of its own. |
+| Subdue below horizon | Draw the sky below the mathematical horizon at reduced contrast | Subdue below horizon | Reduces the contrast of celestial content below the observer’s mathematical horizon. |
 | Update to now | Reads the clock once and freezes the chart at that instant | Update to now | Freezes the chart at the present moment. The clock is read once; nothing moves afterwards. |
 | Centre on zenith | Move the chart to the point overhead | Centre on zenith | Moves the page to the point directly above you. This is the only control in this window that moves the chart. |
 | ▾ Chart Options | Show or hide this section | Chart Options, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
@@ -213,6 +215,7 @@ arrangement at its frozen instant.
 | Mathematical horizon | Draw where the sky meets a perfectly flat, transparent Earth (⌘K then H) | Show Mathematical horizon | Draws the circle where the sky would meet a flat and transparent Earth; your own horizon has hills and air in it. It lasts as long as this session. |
 | Zenith | Mark the point overhead | Show Zenith | Marks the point directly above you. It is drawn with the observer's lines and has no shortcut of its own. |
 | Altitude ticks | Graduate the meridian every 10° of altitude above the horizon | Show Altitude ticks | Marks the meridian every 10° of altitude from the horizon to the zenith, with the figure beside each tick. It is drawn with the meridian and has no shortcut of its own. |
+| Subdue below horizon | Draw the sky below the mathematical horizon at reduced contrast | Subdue below horizon | Reduces the contrast of celestial content below the observer’s mathematical horizon. |
 | Update to now | Reads the clock once and freezes the chart at that instant | Update to now | Freezes the chart at the present moment. The clock is read once; nothing moves afterwards. |
 | Centre on zenith | Move the chart to the point overhead | Centre on zenith | Moves the page to the point directly above you. This is the only control in this window that moves the chart. |
 | Latitude must be between −90° and 90°. Kept 59.913. | — | Latitude must be between −90° and 90°. Kept 59.913. | — |
@@ -460,6 +463,7 @@ arrangement at its frozen instant.
 | Matematisk horisont | Tegn der himmelen møter en helt flat og gjennomsiktig jord (⌘K deretter H) | Vis matematisk horisont | Tegner sirkelen der himmelen ville ha møtt en flat og gjennomsiktig jord; din egen horisont har åser og luft i seg. Valget gjelder ut denne økten. |
 | Senit | Marker punktet rett over deg | Vis senit | Markerer punktet rett over deg. Det tegnes sammen med observatørens linjer og har ingen egen hurtigtast. |
 | Høydemerker | Gradér meridianen for hver 10° høyde over horisonten | Vis høydemerker | Merker meridianen for hver 10° høyde fra horisonten til senit, med tallet ved hvert merke. Det tegnes sammen med meridianen og har ingen egen hurtigtast. |
+| Demp under horisonten | Tegn himmelen under den matematiske horisonten med redusert kontrast | Demp under horisonten | Reduserer kontrasten til himmelinnhold under observatørens matematiske horisont. |
 | Oppdater til nå | Les klokken én gang og sett kartets tidspunkt til nå | Oppdater til nå | Tegner kartet for tidspunktet nå. Klokken leses én gang; tiden går ikke videre etterpå. |
 | Sentrer på senit | Flytt kartet til punktet rett over deg | Sentrer på senit | Flytter siden til punktet rett over deg. Dette er den eneste knappen i dette vinduet som flytter kartet. |
 | ▾ Kartvalg | Vis eller skjul denne delen | Kartvalg, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
@@ -517,6 +521,7 @@ arrangement at its frozen instant.
 | Matematisk horisont | Tegn der himmelen møter en helt flat og gjennomsiktig jord (⌘K deretter H) | Vis matematisk horisont | Tegner sirkelen der himmelen ville ha møtt en flat og gjennomsiktig jord; din egen horisont har åser og luft i seg. Valget gjelder ut denne økten. |
 | Senit | Marker punktet rett over deg | Vis senit | Markerer punktet rett over deg. Det tegnes sammen med observatørens linjer og har ingen egen hurtigtast. |
 | Høydemerker | Gradér meridianen for hver 10° høyde over horisonten | Vis høydemerker | Merker meridianen for hver 10° høyde fra horisonten til senit, med tallet ved hvert merke. Det tegnes sammen med meridianen og har ingen egen hurtigtast. |
+| Demp under horisonten | Tegn himmelen under den matematiske horisonten med redusert kontrast | Demp under horisonten | Reduserer kontrasten til himmelinnhold under observatørens matematiske horisont. |
 | Oppdater til nå | Les klokken én gang og sett kartets tidspunkt til nå | Oppdater til nå | Tegner kartet for tidspunktet nå. Klokken leses én gang; tiden går ikke videre etterpå. |
 | Sentrer på senit | Flytt kartet til punktet rett over deg | Sentrer på senit | Flytter siden til punktet rett over deg. Dette er den eneste knappen i dette vinduet som flytter kartet. |
 | ▾ Kartvalg | Vis eller skjul denne delen | Kartvalg, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
@@ -616,6 +621,7 @@ arrangement at its frozen instant.
 | Matematisk horisont | Tegn der himmelen møter en helt flat og gjennomsiktig jord (⌘K deretter H) | Vis matematisk horisont | Tegner sirkelen der himmelen ville ha møtt en flat og gjennomsiktig jord; din egen horisont har åser og luft i seg. Valget gjelder ut denne økten. |
 | Senit | Marker punktet rett over deg | Vis senit | Markerer punktet rett over deg. Det tegnes sammen med observatørens linjer og har ingen egen hurtigtast. |
 | Høydemerker | Gradér meridianen for hver 10° høyde over horisonten | Vis høydemerker | Merker meridianen for hver 10° høyde fra horisonten til senit, med tallet ved hvert merke. Det tegnes sammen med meridianen og har ingen egen hurtigtast. |
+| Demp under horisonten | Tegn himmelen under den matematiske horisonten med redusert kontrast | Demp under horisonten | Reduserer kontrasten til himmelinnhold under observatørens matematiske horisont. |
 | Oppdater til nå | Les klokken én gang og sett kartets tidspunkt til nå | Oppdater til nå | Tegner kartet for tidspunktet nå. Klokken leses én gang; tiden går ikke videre etterpå. |
 | Sentrer på senit | Flytt kartet til punktet rett over deg | Sentrer på senit | Flytter siden til punktet rett over deg. Dette er den eneste knappen i dette vinduet som flytter kartet. |
 | Breddegraden må ligge mellom −90° og 90°. Beholdt 59.913. | — | Breddegraden må ligge mellom −90° og 90°. Beholdt 59.913. | — |
