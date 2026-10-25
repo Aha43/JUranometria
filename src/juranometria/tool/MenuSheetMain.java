@@ -227,6 +227,11 @@ public final class MenuSheetMain {
                     venusOnChart.setSelected(state.checked());
                 }
 
+                // Centre on coordinates... (#623), which the application adds
+                // after the bar is built, after the Controller item.
+                AppMenuBar.addCentreOnCoordinates(bar[0],
+                        juranometria.ui.language.InterfaceText.forLanguage(language), () -> { });
+
                 JCheckBoxMenuItem inspector = AppMenuBar.inspectorItem(bar[0]);
                 if (inspector != null) {
                     inspector.setSelected(state.checked());

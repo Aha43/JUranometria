@@ -141,7 +141,7 @@ class CentreOnCoordinatesTest {
                 content[0].degrees.setText(Integer.toString((int) c[3]));
                 content[0].arcminutes.setText(Integer.toString((int) c[4]));
                 content[0].arcseconds.setText(Integer.toString((int) c[5]));
-                content[0].seconds.postActionEvent(); // Enter does what Centre does
+                content[0].centre(); // what Enter and the button both run
             });
             double ra = 15.0 * (c[0] + c[1] / 60.0 + c[2] / 3600.0);
             double dec = (c[6] == 1 ? -1 : 1) * (c[3] + c[4] / 60.0 + c[5] / 3600.0);

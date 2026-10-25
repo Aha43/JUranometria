@@ -27,6 +27,7 @@ Every one of them from the registry that binds it, so a tooltip cannot promise a
 | Zoom in | `⌃=` |
 | Zoom out | `⌃-` |
 | Chart toolbar | `⌃+⇧T` |
+| Centre on coordinates | `⌃L` |
 | the chart's own keyboard | `⌃K` then a letter |
 
 ## Every explanation that names a key
