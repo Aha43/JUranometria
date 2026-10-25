@@ -1111,6 +1111,7 @@ dist: app
 	   $(CLASSES_DIR)/resources/jovian-system/NOTICE-jovian-system.md \
 	   $(CLASSES_DIR)/resources/planets/NOTICE-planets.md \
 	   $(CLASSES_DIR)/resources/saturn-system/NOTICE-saturn-system.md \
+	   $(CLASSES_DIR)/resources/mars-system/NOTICE-mars-system.md \
 	   $(DIST_STAGE)/licenses/
 	cp $(CLASSES_DIR)/resources/icons/LICENSE \
 	   $(DIST_STAGE)/licenses/LICENSE-Tabler-MIT.txt
