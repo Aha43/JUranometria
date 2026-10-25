@@ -482,6 +482,38 @@ public final class ChartComponent extends JComponent {
      * paint holds it, so an installation during a paint is refused and
      * one paint reads one snapshot throughout.
      */
+    /** The observer's zenith while Subdue below horizon is on, else null (#615). */
+    private java.util.function.Supplier<juranometria.chart.SkyPosition> subdueZenith = () -> null;
+    private juranometria.render.BelowHorizon subdueCached;
+    private ChartScene subdueScene;
+    private juranometria.chart.SkyPosition subdueAt;
+
+    /**
+     * Where Subdue below horizon reads the observer's zenith (#615):
+     * null while the switch is off. Read once per page, from the
+     * snapshot the paint or export holds.
+     */
+    public void setSubdueBelowHorizon(
+            java.util.function.Supplier<juranometria.chart.SkyPosition> zenith) {
+        this.subdueZenith = zenith == null ? () -> null : zenith;
+        subdueCached = null;
+        repaint();
+    }
+
+    /** The rule for this page: one instance per page and zenith, shared by screen and paper's layers. */
+    public juranometria.render.BelowHorizon belowHorizon(ChartScene page) {
+        juranometria.chart.SkyPosition zenith = subdueZenith.get();
+        if (zenith == null || page == null) {
+            return juranometria.render.BelowHorizon.NONE;
+        }
+        if (subdueCached == null || subdueScene != page || !zenith.equals(subdueAt)) {
+            subdueCached = juranometria.render.BelowHorizon.of(zenith, page);
+            subdueScene = page;
+            subdueAt = zenith;
+        }
+        return subdueCached;
+    }
+
     public void setContext(juranometria.context.ChartContextHolder context) {
         this.context = context;
     }
@@ -1175,12 +1207,14 @@ public final class ChartComponent extends JComponent {
             // released page.
             juranometria.render.ChartOptions drawn = drawnOptions();
             renderer.render(g2, scene, drawn,
-                    (layerG, layerScene, reserved) ->
-                            spokenDirections = ReferenceInk.paint(
-                                    layerG, layerScene,
-                                    overlays.collect(),
-                                    drawn.palette(), words, reserved,
-                                    emphasized),
+                    ChartRenderer.ReferenceLayer.subduing(
+                            (layerG, layerScene, reserved) ->
+                                    spokenDirections = ReferenceInk.paint(
+                                            layerG, layerScene,
+                                            overlays.collect(),
+                                            drawn.palette(), words, reserved,
+                                            emphasized, belowHorizon(layerScene)),
+                            this::belowHorizon),
                     // The Solar System bodies (#415), above every
                     // catalogue mark and label: opaque, at true scale.
                     (layerG, layerScene, reserved) -> {

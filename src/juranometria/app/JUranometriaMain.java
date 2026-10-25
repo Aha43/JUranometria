@@ -272,6 +272,12 @@ public final class JUranometriaMain {
         // the application's; every paint holds it, so one paint reads
         // one snapshot and an installation during a paint is refused.
         chart.setContext(meridian.context());
+        // Subdue below horizon (#615): the zenith of the chart's one
+        // observer while the switch is on; the bodies above follow the
+        // same switch, so a body is subdued once, by the common rule.
+        chart.setSubdueBelowHorizon(() -> meridian.attached() && meridian.subduing()
+                ? new juranometria.sky.LocalSky(meridian.observer()).zenith() : null);
+        meridian.onChange(chart::repaint);
         // Update to now (#259, rulings 4 and 7 on #556): one action, one
         // clock read per activation, and every route below runs this
         // same instance - the chart's Place and Time box, the chart
@@ -454,7 +460,7 @@ public final class JUranometriaMain {
         juranometria.solarchart.SolarSystemModule sunOnChart =
                 juranometria.ui.solar.SunChartSession.begin(modules,
                         () -> meridian.attached() ? meridian.observer() : null,
-                        solarSystem, meridian::horizonShowing);
+                        solarSystem, meridian::subduing);
         // The Sun's and the Moon's applied query and result (#458,
         // ruled on #457): one session per body, shared by its dialog
         // and the Controller's group, over Place and Time's observer
@@ -543,7 +549,7 @@ public final class JUranometriaMain {
         juranometria.ui.solar.JovianChartStore jovianChartStore = stores.jovianChart();
         juranometria.jovianchart.JovianModule jovianOnChart = modules.attach(
                 new juranometria.jovianchart.JovianModule(observerNow, jovianSystem,
-                        meridian::horizonShowing));
+                        meridian::subduing));
         // Centre on chart (#483): one action for every body and host.
         // It centres through the chart's own controller - the centre and
         // the field in one notification - at the chart's normal minimum
@@ -591,7 +597,7 @@ public final class JUranometriaMain {
         juranometria.ui.solar.SaturnChartStore saturnChartStore = stores.saturnChart();
         juranometria.saturnchart.SaturnModule saturnOnChart = modules.attach(
                 new juranometria.saturnchart.SaturnModule(observerNow, saturnSystem,
-                        meridian::horizonShowing));
+                        meridian::subduing));
         juranometria.ui.solar.BodyOnChart saturnLayer =
                 juranometria.ui.solar.SaturnChartSession.switchOf(saturnOnChart,
                         saturnChartStore);
