@@ -1,6 +1,6 @@
 # Knowing where Mars, Phobos and Deimos are
 
-**Issue #601, the first issue of the Mars road #600.** This is the numerical contract for Mars and its two moons. It is proposed from measurement, before any production data or code exists. **Not yet ruled.** The owner's ruling, when given, governs wherever it differs from this proposal. The record inherits the Sun's, the Moon's, Jupiter's and Saturn's contracts (`sun-computation.md`, `moon-computation.md`, `jovian-system.md`, `saturn-system.md`) wherever it does not say otherwise.
+**Issue #601, the first issue of the Mars road #600.** This is the numerical contract for Mars and its two moons. It is proposed from measurement, before any production data or code exists. **Ruled by the owner on 2026-10-25.** [The ruling](#the-ruling), at the end, governs wherever it differs from the proposal. The record inherits the Sun's, the Moon's, Jupiter's and Saturn's contracts (`sun-computation.md`, `moon-computation.md`, `jovian-system.md`, `saturn-system.md`) wherever it does not say otherwise.
 
 The study is `docs/studies/mars-system/`:
 - `inventory.md` is the read-only inventory made before any download.
@@ -304,3 +304,19 @@ No production chart ink is in Part I.
 - **M-10, the targets.** The table above.
 - **M-11, the fixtures.** Committed and retained as above.
 - **M-12, the published-event limitation.** State plainly that oppositions and conjunctions are checked against Espenak's almanacs, to the hour, and moon states against Horizons only.
+
+## The ruling
+
+The owner's ruling of 2026-10-25, as given: "Rule M-1 to M-12 as proposed, M-7a, with the amendment".
+
+- **M-1 to M-12 are ruled as proposed above.**
+- **M-7a is the moon set.** Phobos and Deimos ship in their own pack, cut from `mar099s.bsp` over 2000–2050, as measured: 43,910,144 bytes, 37,752,323 gzipped.
+- **M-7b, M-7c and "none" are not chosen.** `mar099.bsp` is not downloaded.
+
+**The amendment: the moons' upper boundary is exclusive.**
+- **Supported interval.** Phobos and Deimos are supported from the ruled 2000 start up to, but not including, the satellite kernel's final instant, 2050-01-01 00:00 TDB.
+- **The check.** A requested civil instant is converted to TDB with the atlas's own time scales before it is compared with the boundary. A UTC request shortly before midnight on 2049-12-31 can therefore already fall at or past it. The tests pin both sides of the converted instant.
+- **The reader's wording.** A refusal states the moons' coverage as 2000–2049, in both languages.
+- **The endpoint is never evaluated.** Production never evaluates the kernel's final instant. The 6.81 × 10⁻¹² km endpoint difference of `contract/pack-measurements.md` stays a study observation. Nothing relies on it.
+
+**Where the ruling departs from the proposal.** Only in the amendment. M-7a as proposed refused a moon instant "after 2050-01-01". The boundary is now exclusive, and the refusal names 2000–2049.
