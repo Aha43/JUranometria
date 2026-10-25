@@ -1,0 +1,39 @@
+# Mars's named events, quoted from Fred Espenak's Sky Event Almanacs
+# (GMT; astropixels.com), with attribution. Read by
+# scripts/horizons-mars-fetch.py, which verifies each page against the
+# digest below before parsing it. The pages are kept outside Git.
+#
+#   https://astropixels.com/almanac/almanac01/almanac2003gmt.html  sha256 50811f3be0f29b6de42cd4f3ad2bdbc3c296b9ced7c3807d8e08cff8c5fd4cc3  36381 B
+#   https://astropixels.com/almanac/almanac01/almanac2012gmt.html  sha256 251a85e49504212df9391af58daec07b72f4fee86c77fe22b443e44c1018b307  36080 B
+#   https://astropixels.com/almanac/almanac01/almanac2018gmt.html  sha256 8f0d441a2b224cef1af9ce0544274d3f97d1d758a1a3525ccab50a95f2b830be  35949 B
+#   https://astropixels.com/almanac/almanac21/almanac2026gmt.html  sha256 4236c51d23297c270a42a3cb7a17c82881c1e5020de06b890594a1f40d80ce17  37476 B
+#   https://astropixels.com/almanac/almanac21/almanac2027gmt.html  sha256 af77389f672434ed752163a351533ce68ba31b51a030663795e76ed8388f9540  36654 B
+#   https://astropixels.com/almanac/almanac21/almanac2035gmt.html  sha256 0af51c5ed77b28875654ebd91f97c9ee086857ebca3eaabb847545fb3f397fdd  35946 B
+#   https://astropixels.com/almanac/almanac81/almanac2100gmt.html  sha256 1178bd6d049593e5a3f40a94e6dbdf4210637587b09a25c3972b4d79b81aecd6  37241 B
+#
+# year  month day hour(GMT)  event
+2003 Jan 27 15:12 Mars 0.4°N of Moon: Occn.
+2003 Jul 17 08:12 Mars 0.3°S of Moon: Occn.
+2003 Aug 28 16 Mars at Opposition 
+2003 Aug 30 11 Mars at Perihelion: 1.38115 AU
+2003 Oct 06 14:50 Mars 1.1°N of Moon: Occn.
+2012 Feb 15 21 Mars at Aphelion: 1.66598 AU
+2012 Mar 03 19 Mars at Opposition 
+2012 Sep 19 20:36 Mars 0.2°N of Moon: Occn.
+2018 Jul 27 06 Mars at Opposition 
+2018 Sep 16 13 Mars at Perihelion: 1.38144 AU
+2018 Nov 16 04:16 Mars 1.0°N of Moon: Occn.
+2026 Jan 09 10 Mars in Conjunction with Sun 
+2026 Mar 26 07 Mars at Perihelion: 1.38126 AU
+2026 Oct 05 05:30 Mars 1.2°S of Moon: Occn.
+2026 Nov 02 14:23 Mars 1.1°N of Moon: Occn.
+2027 Feb 19 15 Mars at Opposition 
+2027 Mar 04 23 Mars at Aphelion: 1.66610 AU
+2027 Dec 29 12:10 Mars 0.5°S of Moon: Occn.
+2035 Aug 21 12 Mars at Perihelion: 1.38141 AU
+2035 Sep 15 17 Mars at Opposition 
+2035 Nov 11 04:23 Mars 0.1°N of Moon: Occn.
+2100 Jul 09 23:44 Mars 0.7°S of Moon: Occn.
+2100 Jul 12 19 Mars at Aphelion: 1.66621 AU
+2100 Aug 07 15:15 Mars 1.0°N of Moon: Occn.
+2100 Oct 11 07 Mars in Conjunction with Sun 
