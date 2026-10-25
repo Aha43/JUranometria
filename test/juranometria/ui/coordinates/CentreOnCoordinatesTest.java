@@ -175,7 +175,7 @@ class CentreOnCoordinatesTest {
                 c.hours.setText("1");
                 c.degrees.setText("90");
                 c.arcminutes.setText("1");
-                c.centre.doClick();
+                c.centre(); // what the button's action runs
             }
         });
         assertEquals(before, controller.state(), "the chart was not moved");

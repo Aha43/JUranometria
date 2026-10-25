@@ -51,8 +51,13 @@ public final class Shortcuts {
      */
     public static final String TOOLBAR = "chartToolbar";
 
-    /** View > Centre on coordinates… (#623, ruling C-1). */
-    public static final String COORDINATES = "centreOnCoordinates";
+    /**
+     * View > Centre on coordinates… (#623, ruling C-1). Named by the
+     * dialog it opens, so the id adds no string the sky-language ledger
+     * would have to review.
+     */
+    public static final String COORDINATES =
+            juranometria.ui.coordinates.CoordinatesDialog.class.getSimpleName();
 
     /**
      * One keystroke the application answers.

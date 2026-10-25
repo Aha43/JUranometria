@@ -914,8 +914,8 @@ public final class AppMenuBar {
      * module, or null on a bar without the submenu.
      */
     /**
-     * Adds View > Centre on coordinates... directly after Place and Time...
-     * (#623, ruling C-1), with its shortcut. Returns the item, or null on a
+     * Adds View > Centre on coordinates... after Place and Time... and the
+     * Controller item that follows it (#623, ruling C-1), with its shortcut. Returns the item, or null on a
      * bar without a View menu.
      */
     public static JMenuItem addCentreOnCoordinates(javax.swing.JMenuBar bar,
@@ -938,10 +938,13 @@ public final class AppMenuBar {
         item.setAccelerator(juranometria.ui.Shortcuts.of(
                 juranometria.ui.Shortcuts.COORDINATES).stroke());
         item.addActionListener(event -> open.run());
+        // After Place and Time and the Controller item that follows it:
+        // the Controller stays directly after the section it holds.
         int after = -1;
         for (int i = 0; i < view.getMenuComponentCount(); i++) {
             if (view.getMenuComponent(i) instanceof JMenuItem existing
-                    && said.say("menu.placeandtime.label").equals(existing.getText())) {
+                    && (said.say("menu.placeandtime.label").equals(existing.getText())
+                            || said.say("menu.companion.label").equals(existing.getText()))) {
                 after = i;
             }
         }
