@@ -804,6 +804,43 @@ public final class JUranometriaMain {
                         language.interfaceLanguage()),
                 juranometria.ui.solar.JovianChartSession.toggle(jovianOnChart,
                         jovianChartStore));
+        // View > Centre on coordinates... (#623, rulings C-1 to C-3): J2000
+        // coordinates centred through Search's coordinate contract, the
+        // selection cleared as Search clears it, and the requested-position
+        // cross left at the place until a search, a selection or Clear
+        // selection ends it.
+        AppMenuBar.addCentreOnCoordinates(frame.getJMenuBar(),
+                juranometria.ui.language.InterfaceText.forLanguage(
+                        language.interfaceLanguage()),
+                () -> juranometria.ui.coordinates.CoordinatesDialog.open(frame,
+                        juranometria.ui.language.InterfaceText.forLanguage(
+                                language.interfaceLanguage()),
+                        position -> {
+                            String shown = juranometria.chart.SkyFormat.formatRa(
+                                    position.raDegrees()) + ", "
+                                    + juranometria.chart.SkyFormat.formatDec(
+                                            position.decDegrees());
+                            juranometria.ui.SearchNavigation.Outcome moved =
+                                    juranometria.ui.SearchNavigation.apply(
+                                            new juranometria.search.SearchResult(shown,
+                                                    shown,
+                                                    juranometria.search.SearchResult.Kind
+                                                            .COORDINATES,
+                                                    position, shown),
+                                            chart.assembler(), controller, selection);
+                            chart.setRequestedPosition(moved
+                                    == juranometria.ui.SearchNavigation.Outcome.NO_FIT
+                                    ? chart.requestedPosition() : position);
+                            return moved;
+                        }));
+        searchField.onSearch(() -> chart.setRequestedPosition(null));
+        chartControls.search().onSearch(() -> chart.setRequestedPosition(null));
+        selection.onChange(change -> {
+            if (!(change.selection() instanceof juranometria.chart.Selection.None)) {
+                chart.setRequestedPosition(null);
+            }
+        });
+        modules.workingSelection().onChange(change -> chart.setRequestedPosition(null));
         // View > Solar System > Saturn on the chart (#579), directly after
         // Jupiter and moons on the chart: the Saturn module's switch.
         javax.swing.JCheckBoxMenuItem saturnOnChartItem = AppMenuBar.addSaturnOnChart(

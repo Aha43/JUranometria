@@ -514,6 +514,24 @@ public final class ChartComponent extends JComponent {
         return subdueCached;
     }
 
+    /** The requested position (#623, ruling C-3), or null: the screen's only, never paper's. */
+    private juranometria.chart.SkyPosition requestedPosition;
+
+    /**
+     * Marks an entered J2000 position with the requested-position cross,
+     * or clears it (null). Not a selection, not a member of the working
+     * selection, not exported: the reader's place to come back to.
+     */
+    public void setRequestedPosition(juranometria.chart.SkyPosition position) {
+        this.requestedPosition = position;
+        repaint();
+    }
+
+    /** The requested position now, or null. */
+    public juranometria.chart.SkyPosition requestedPosition() {
+        return requestedPosition;
+    }
+
     public void setContext(juranometria.context.ChartContextHolder context) {
         this.context = context;
     }
@@ -1296,6 +1314,8 @@ public final class ChartComponent extends JComponent {
             // module with nothing to say contributes nothing.
             WorkingCrossInk.paint(g2, juranometria.project.DrawnPage.of(scene), overlays.collect(), highlighted,
                     chartOptions.palette());
+            WorkingCrossInk.paintRequested(g2, juranometria.project.DrawnPage.of(scene),
+                    requestedPosition, chartOptions.palette());
         } finally {
             g2.dispose();
         }

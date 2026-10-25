@@ -108,6 +108,35 @@ final class WorkingCrossInk {
     }
 
     /** Four strokes around a gap, never through the position. */
+    /**
+     * The requested-position cross (#623, ruling C-3): the cross
+     * vocabulary at an entered J2000 position - no ring, no label, no
+     * identity - painted after the chart on the screen only.
+     */
+    static void paintRequested(Graphics2D g, DrawnPage page,
+                               juranometria.chart.SkyPosition position,
+                               juranometria.render.ChartPalette palette) {
+        if (position == null) {
+            return;
+        }
+        PixelPoint at = page.projection().project(position)
+                .map(new ViewportMapping(page)::toPixel).orElse(null);
+        if (at == null || !juranometria.render.ChartRenderer.paperOf(page.scene())
+                .contains(at.x(), at.y())) {
+            return;
+        }
+        Graphics2D g2 = (Graphics2D) g.create();
+        try {
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(palette.interactionInk());
+            g2.setStroke(STROKE);
+            cross(g2, at.x(), at.y());
+        } finally {
+            g2.dispose();
+        }
+    }
+
     private static void cross(Graphics2D g, double x, double y) {
         g.draw(new Line2D.Double(x - ARM, y, x - GAP, y));
         g.draw(new Line2D.Double(x + GAP, y, x + ARM, y));

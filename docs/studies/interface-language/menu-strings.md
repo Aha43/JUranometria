@@ -40,7 +40,7 @@ open menu would cover the thing it explains.
 
 ![](menu-en-1-menus.png)
 
-Bar packed 843 × 287 px; widest popup 232 px.
+Bar packed 892 × 287 px; widest popup 232 px.
 
 | channel | words |
 |---|---|
@@ -70,6 +70,11 @@ Bar packed 843 × 287 px; widest popup 232 px.
 | item spoken name \| Controls |
 | item spoken description \| Shows or hides the JUranometria Controller window, which keeps the chart's controls beside the chart; it opens again where you left it, and starts closed. |
 | item access letter (language) \| R |
+| item label \| Centre on coordinates... |
+| item spoken name \| Centre on coordinates |
+| item spoken description \| Opens a window where you type a J2000 right ascension and declination and centre the chart there |
+| item accelerator (platform notation) \| ⌘L |
+| item access letter (language) \| O |
 | item label \| Chart Toolbar |
 | item spoken name \| Chart Toolbar |
 | item spoken description \| Shows or hides the chart window's toolbar. Its controls remain in the JUranometria Controller window; the chart keeps its centre, field and everything it draws. |
@@ -100,7 +105,6 @@ Bar packed 843 × 287 px; widest popup 232 px.
 | item label \| Moon on the chart |
 | item spoken name \| Moon on the chart |
 | item spoken description \| Shows or hides the Moon on the chart, drawn at its true size where it stands for the chart time and place, lit on the side the Moon table states; below a drawn horizon it is dimmed and says so. |
-| item access letter (language) \| O |
 | item label \| Jupiter and moons on the chart |
 | item spoken name \| Jupiter and moons on the chart |
 | item spoken description \| Shows or hides Jupiter on the chart where it stands for the chart time and place: at its true size once that is at least 6 pixels across, otherwise as a 6-pixel cartographic symbol, not its apparent diameter; below a drawn horizon it is dimmed and says so. Io, Europa, Ganymede and Callisto are drawn as 3-pixel symbols at their own places: a filled dot clear of Jupiter, a dot ringed in the page's ground in front of it, a hollow ring in its shadow, and nothing behind it; at wider fields only the moons whose marks can be told apart are drawn. |
@@ -151,7 +155,7 @@ Bar packed 843 × 287 px; widest popup 232 px.
 
 ![](menu-en-2-checked.png)
 
-Bar packed 843 × 287 px; widest popup 232 px.
+Bar packed 892 × 287 px; widest popup 232 px.
 
 | channel | words |
 |---|---|
@@ -181,6 +185,11 @@ Bar packed 843 × 287 px; widest popup 232 px.
 | item spoken name \| Controls |
 | item spoken description \| Shows or hides the JUranometria Controller window, which keeps the chart's controls beside the chart; it opens again where you left it, and starts closed. |
 | item access letter (language) \| R |
+| item label \| Centre on coordinates... |
+| item spoken name \| Centre on coordinates |
+| item spoken description \| Opens a window where you type a J2000 right ascension and declination and centre the chart there |
+| item accelerator (platform notation) \| ⌘L |
+| item access letter (language) \| O |
 | item label [checked] \| Chart Toolbar |
 | item spoken name \| Chart Toolbar |
 | item spoken description \| Shows or hides the chart window's toolbar. Its controls remain in the JUranometria Controller window; the chart keeps its centre, field and everything it draws. |
@@ -211,7 +220,6 @@ Bar packed 843 × 287 px; widest popup 232 px.
 | item label [checked] \| Moon on the chart |
 | item spoken name \| Moon on the chart |
 | item spoken description \| Shows or hides the Moon on the chart, drawn at its true size where it stands for the chart time and place, lit on the side the Moon table states; below a drawn horizon it is dimmed and says so. |
-| item access letter (language) \| O |
 | item label [checked] \| Jupiter and moons on the chart |
 | item spoken name \| Jupiter and moons on the chart |
 | item spoken description \| Shows or hides Jupiter on the chart where it stands for the chart time and place: at its true size once that is at least 6 pixels across, otherwise as a 6-pixel cartographic symbol, not its apparent diameter; below a drawn horizon it is dimmed and says so. Io, Europa, Ganymede and Callisto are drawn as 3-pixel symbols at their own places: a filled dot clear of Jupiter, a dot ringed in the page's ground in front of it, a hollow ring in its shadow, and nothing behind it; at wider fields only the moons whose marks can be told apart are drawn. |
@@ -262,7 +270,7 @@ Bar packed 843 × 287 px; widest popup 232 px.
 
 ![](menu-en-3-widest.png)
 
-Bar packed 843 × 287 px; widest popup 232 px.
+Bar packed 892 × 287 px; widest popup 232 px.
 
 | channel | words |
 |---|---|
@@ -292,6 +300,11 @@ Bar packed 843 × 287 px; widest popup 232 px.
 | item spoken name \| Controls |
 | item spoken description \| Shows or hides the JUranometria Controller window, which keeps the chart's controls beside the chart; it opens again where you left it, and starts closed. |
 | item access letter (language) \| R |
+| item label \| Centre on coordinates... |
+| item spoken name \| Centre on coordinates |
+| item spoken description \| Opens a window where you type a J2000 right ascension and declination and centre the chart there |
+| item accelerator (platform notation) \| ⌘L |
+| item access letter (language) \| O |
 | item label \| Chart Toolbar |
 | item spoken name \| Chart Toolbar |
 | item spoken description \| Shows or hides the chart window's toolbar. Its controls remain in the JUranometria Controller window; the chart keeps its centre, field and everything it draws. |
@@ -322,7 +335,6 @@ Bar packed 843 × 287 px; widest popup 232 px.
 | item label \| Moon on the chart |
 | item spoken name \| Moon on the chart |
 | item spoken description \| Shows or hides the Moon on the chart, drawn at its true size where it stands for the chart time and place, lit on the side the Moon table states; below a drawn horizon it is dimmed and says so. |
-| item access letter (language) \| O |
 | item label \| Jupiter and moons on the chart |
 | item spoken name \| Jupiter and moons on the chart |
 | item spoken description \| Shows or hides Jupiter on the chart where it stands for the chart time and place: at its true size once that is at least 6 pixels across, otherwise as a 6-pixel cartographic symbol, not its apparent diameter; below a drawn horizon it is dimmed and says so. Io, Europa, Ganymede and Callisto are drawn as 3-pixel symbols at their own places: a filled dot clear of Jupiter, a dot ringed in the page's ground in front of it, a hollow ring in its shadow, and nothing behind it; at wider fields only the moons whose marks can be told apart are drawn. |
@@ -373,7 +385,7 @@ Bar packed 843 × 287 px; widest popup 232 px.
 
 ![](menu-en-4-narrowest.png)
 
-Bar packed 843 × 287 px; widest popup 232 px.
+Bar packed 892 × 287 px; widest popup 232 px.
 
 | channel | words |
 |---|---|
@@ -403,6 +415,11 @@ Bar packed 843 × 287 px; widest popup 232 px.
 | item spoken name \| Controls |
 | item spoken description \| Shows or hides the JUranometria Controller window, which keeps the chart's controls beside the chart; it opens again where you left it, and starts closed. |
 | item access letter (language) \| R |
+| item label \| Centre on coordinates... |
+| item spoken name \| Centre on coordinates |
+| item spoken description \| Opens a window where you type a J2000 right ascension and declination and centre the chart there |
+| item accelerator (platform notation) \| ⌘L |
+| item access letter (language) \| O |
 | item label \| Chart Toolbar |
 | item spoken name \| Chart Toolbar |
 | item spoken description \| Shows or hides the chart window's toolbar. Its controls remain in the JUranometria Controller window; the chart keeps its centre, field and everything it draws. |
@@ -433,7 +450,6 @@ Bar packed 843 × 287 px; widest popup 232 px.
 | item label \| Moon on the chart |
 | item spoken name \| Moon on the chart |
 | item spoken description \| Shows or hides the Moon on the chart, drawn at its true size where it stands for the chart time and place, lit on the side the Moon table states; below a drawn horizon it is dimmed and says so. |
-| item access letter (language) \| O |
 | item label \| Jupiter and moons on the chart |
 | item spoken name \| Jupiter and moons on the chart |
 | item spoken description \| Shows or hides Jupiter on the chart where it stands for the chart time and place: at its true size once that is at least 6 pixels across, otherwise as a 6-pixel cartographic symbol, not its apparent diameter; below a drawn horizon it is dimmed and says so. Io, Europa, Ganymede and Callisto are drawn as 3-pixel symbols at their own places: a filled dot clear of Jupiter, a dot ringed in the page's ground in front of it, a hollow ring in its shadow, and nothing behind it; at wider fields only the moons whose marks can be told apart are drawn. |
@@ -486,7 +502,7 @@ Bar packed 843 × 287 px; widest popup 232 px.
 
 ![](menu-nb-NO-5-menus.png)
 
-Bar packed 844 × 287 px; widest popup 214 px.
+Bar packed 882 × 287 px; widest popup 229 px.
 
 | channel | words |
 |---|---|
@@ -516,6 +532,11 @@ Bar packed 844 × 287 px; widest popup 214 px.
 | item spoken name \| Kontroller |
 | item spoken description \| Viser eller skjuler vinduet JUranometria Kontroller, som har kartets kontroller ved siden av kartet; det åpnes igjen der du forlot det, og starter lukket. |
 | item access letter (language) \| R |
+| item label \| Sentrer på koordinater... |
+| item spoken name \| Sentrer på koordinater |
+| item spoken description \| Åpner et vindu der du skriver en J2000-rektascensjon og -deklinasjon og sentrerer kartet der |
+| item accelerator (platform notation) \| ⌘L |
+| item access letter (language) \| O |
 | item label \| Kartverktøylinje |
 | item spoken name \| Kartverktøylinje |
 | item spoken description \| Viser eller skjuler verktøylinjen i kartvinduet. Kontrollene finnes fortsatt i vinduet JUranometria Kontroller; kartet beholder sentrum, synsfelt og alt det tegner. |
@@ -555,7 +576,6 @@ Bar packed 844 × 287 px; widest popup 214 px.
 | item hover \| Hvor Solen er, for karttiden og stedet |
 | item spoken name \| Soltabell |
 | item spoken description \| Åpner en tabell over Solens beregnede posisjon, høyde over horisonten, avstand og tilsynelatende størrelse for karttiden og observasjonsstedet, ved det tidspunktet eller over et tidsrom. Ingenting tegnes på kartet. |
-| item access letter (language) \| O |
 | item label \| Merkur... |
 | item hover \| Hvor Merkur er, for karttiden og stedet |
 | item spoken name \| Merkurtabell |
@@ -597,7 +617,7 @@ Bar packed 844 × 287 px; widest popup 214 px.
 
 ![](menu-nb-NO-6-checked.png)
 
-Bar packed 844 × 287 px; widest popup 214 px.
+Bar packed 882 × 287 px; widest popup 229 px.
 
 | channel | words |
 |---|---|
@@ -627,6 +647,11 @@ Bar packed 844 × 287 px; widest popup 214 px.
 | item spoken name \| Kontroller |
 | item spoken description \| Viser eller skjuler vinduet JUranometria Kontroller, som har kartets kontroller ved siden av kartet; det åpnes igjen der du forlot det, og starter lukket. |
 | item access letter (language) \| R |
+| item label \| Sentrer på koordinater... |
+| item spoken name \| Sentrer på koordinater |
+| item spoken description \| Åpner et vindu der du skriver en J2000-rektascensjon og -deklinasjon og sentrerer kartet der |
+| item accelerator (platform notation) \| ⌘L |
+| item access letter (language) \| O |
 | item label [checked] \| Kartverktøylinje |
 | item spoken name \| Kartverktøylinje |
 | item spoken description \| Viser eller skjuler verktøylinjen i kartvinduet. Kontrollene finnes fortsatt i vinduet JUranometria Kontroller; kartet beholder sentrum, synsfelt og alt det tegner. |
@@ -666,7 +691,6 @@ Bar packed 844 × 287 px; widest popup 214 px.
 | item hover \| Hvor Solen er, for karttiden og stedet |
 | item spoken name \| Soltabell |
 | item spoken description \| Åpner en tabell over Solens beregnede posisjon, høyde over horisonten, avstand og tilsynelatende størrelse for karttiden og observasjonsstedet, ved det tidspunktet eller over et tidsrom. Ingenting tegnes på kartet. |
-| item access letter (language) \| O |
 | item label \| Merkur... |
 | item hover \| Hvor Merkur er, for karttiden og stedet |
 | item spoken name \| Merkurtabell |
@@ -708,7 +732,7 @@ Bar packed 844 × 287 px; widest popup 214 px.
 
 ![](menu-nb-NO-7-widest.png)
 
-Bar packed 844 × 287 px; widest popup 214 px.
+Bar packed 882 × 287 px; widest popup 229 px.
 
 | channel | words |
 |---|---|
@@ -738,6 +762,11 @@ Bar packed 844 × 287 px; widest popup 214 px.
 | item spoken name \| Kontroller |
 | item spoken description \| Viser eller skjuler vinduet JUranometria Kontroller, som har kartets kontroller ved siden av kartet; det åpnes igjen der du forlot det, og starter lukket. |
 | item access letter (language) \| R |
+| item label \| Sentrer på koordinater... |
+| item spoken name \| Sentrer på koordinater |
+| item spoken description \| Åpner et vindu der du skriver en J2000-rektascensjon og -deklinasjon og sentrerer kartet der |
+| item accelerator (platform notation) \| ⌘L |
+| item access letter (language) \| O |
 | item label \| Kartverktøylinje |
 | item spoken name \| Kartverktøylinje |
 | item spoken description \| Viser eller skjuler verktøylinjen i kartvinduet. Kontrollene finnes fortsatt i vinduet JUranometria Kontroller; kartet beholder sentrum, synsfelt og alt det tegner. |
@@ -777,7 +806,6 @@ Bar packed 844 × 287 px; widest popup 214 px.
 | item hover \| Hvor Solen er, for karttiden og stedet |
 | item spoken name \| Soltabell |
 | item spoken description \| Åpner en tabell over Solens beregnede posisjon, høyde over horisonten, avstand og tilsynelatende størrelse for karttiden og observasjonsstedet, ved det tidspunktet eller over et tidsrom. Ingenting tegnes på kartet. |
-| item access letter (language) \| O |
 | item label \| Merkur... |
 | item hover \| Hvor Merkur er, for karttiden og stedet |
 | item spoken name \| Merkurtabell |
@@ -819,7 +847,7 @@ Bar packed 844 × 287 px; widest popup 214 px.
 
 ![](menu-nb-NO-8-narrowest.png)
 
-Bar packed 844 × 287 px; widest popup 214 px.
+Bar packed 882 × 287 px; widest popup 229 px.
 
 | channel | words |
 |---|---|
@@ -849,6 +877,11 @@ Bar packed 844 × 287 px; widest popup 214 px.
 | item spoken name \| Kontroller |
 | item spoken description \| Viser eller skjuler vinduet JUranometria Kontroller, som har kartets kontroller ved siden av kartet; det åpnes igjen der du forlot det, og starter lukket. |
 | item access letter (language) \| R |
+| item label \| Sentrer på koordinater... |
+| item spoken name \| Sentrer på koordinater |
+| item spoken description \| Åpner et vindu der du skriver en J2000-rektascensjon og -deklinasjon og sentrerer kartet der |
+| item accelerator (platform notation) \| ⌘L |
+| item access letter (language) \| O |
 | item label \| Kartverktøylinje |
 | item spoken name \| Kartverktøylinje |
 | item spoken description \| Viser eller skjuler verktøylinjen i kartvinduet. Kontrollene finnes fortsatt i vinduet JUranometria Kontroller; kartet beholder sentrum, synsfelt og alt det tegner. |
@@ -888,7 +921,6 @@ Bar packed 844 × 287 px; widest popup 214 px.
 | item hover \| Hvor Solen er, for karttiden og stedet |
 | item spoken name \| Soltabell |
 | item spoken description \| Åpner en tabell over Solens beregnede posisjon, høyde over horisonten, avstand og tilsynelatende størrelse for karttiden og observasjonsstedet, ved det tidspunktet eller over et tidsrom. Ingenting tegnes på kartet. |
-| item access letter (language) \| O |
 | item label \| Merkur... |
 | item hover \| Hvor Merkur er, for karttiden og stedet |
 | item spoken name \| Merkurtabell |

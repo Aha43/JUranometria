@@ -69,9 +69,9 @@ The shipped catalogue, nothing typed.
 | Accumulate selection |
 | Off, each object you choose replaces the working selection; on, it is added to it, and choosing it again takes it out. Holding the platform's add-to-selection modifier does the same whether this is on or off. |
 | Search |
-| Find an object or coordinates, e.g. M 31, NGC 224, TYC 2801-2090-1, or 0:42:44 +41:16:09 |
+| Find an object or J2000 coordinates, e.g. M 31, NGC 224, TYC 2801-2090-1, or 0:42:44 +41:16:09 |
 | Search the atlas |
-| Type a Messier or NGC number, a star's catalogue identity, or a right ascension and declination, then press Enter; the chart goes there and marks it |
+| Type a Messier or NGC number, a star's catalogue identity, or a J2000 right ascension and declination, then press Enter; the chart goes there and marks an object it finds |
 | Field 8° · Stars to V 8.0 |
 | v2.0.0 |
 | JUranometria version 2.0.0 |
@@ -112,9 +112,9 @@ The shipped catalogue. Every row is a catalogue identity pair and is not transla
 | Accumulate selection |
 | Off, each object you choose replaces the working selection; on, it is added to it, and choosing it again takes it out. Holding the platform's add-to-selection modifier does the same whether this is on or off. |
 | Search |
-| Find an object or coordinates, e.g. M 31, NGC 224, TYC 2801-2090-1, or 0:42:44 +41:16:09 |
+| Find an object or J2000 coordinates, e.g. M 31, NGC 224, TYC 2801-2090-1, or 0:42:44 +41:16:09 |
 | Search the atlas |
-| Type a Messier or NGC number, a star's catalogue identity, or a right ascension and declination, then press Enter; the chart goes there and marks it |
+| Type a Messier or NGC number, a star's catalogue identity, or a J2000 right ascension and declination, then press Enter; the chart goes there and marks an object it finds |
 | Field 8° · Stars to V 8.0 |
 | v2.0.0 |
 | JUranometria version 2.0.0 |
@@ -171,9 +171,9 @@ The shipped catalogue. The item is disabled because there really is nothing to c
 | Accumulate selection |
 | Off, each object you choose replaces the working selection; on, it is added to it, and choosing it again takes it out. Holding the platform's add-to-selection modifier does the same whether this is on or off. |
 | Search |
-| Find an object or coordinates, e.g. M 31, NGC 224, TYC 2801-2090-1, or 0:42:44 +41:16:09 |
+| Find an object or J2000 coordinates, e.g. M 31, NGC 224, TYC 2801-2090-1, or 0:42:44 +41:16:09 |
 | Search the atlas |
-| Type a Messier or NGC number, a star's catalogue identity, or a right ascension and declination, then press Enter; the chart goes there and marks it |
+| Type a Messier or NGC number, a star's catalogue identity, or a J2000 right ascension and declination, then press Enter; the chart goes there and marks an object it finds |
 | Field 8° · Stars to V 8.0 |
 | v2.0.0 |
 | JUranometria version 2.0.0 |
@@ -216,9 +216,9 @@ The shipped catalogue. The item is disabled because there really is nothing to c
 | Accumulate selection |
 | Off, each object you choose replaces the working selection; on, it is added to it, and choosing it again takes it out. Holding the platform's add-to-selection modifier does the same whether this is on or off. |
 | Search |
-| Find an object or coordinates, e.g. M 31, NGC 224, TYC 2801-2090-1, or 0:42:44 +41:16:09 |
+| Find an object or J2000 coordinates, e.g. M 31, NGC 224, TYC 2801-2090-1, or 0:42:44 +41:16:09 |
 | Search the atlas |
-| Type a Messier or NGC number, a star's catalogue identity, or a right ascension and declination, then press Enter; the chart goes there and marks it |
+| Type a Messier or NGC number, a star's catalogue identity, or a J2000 right ascension and declination, then press Enter; the chart goes there and marks an object it finds |
 | Field 8° · Stars to V 8.0 |
 | v2.0.0 |
 | JUranometria version 2.0.0 |
@@ -263,9 +263,9 @@ The shipped catalogue, nothing typed.
 | Samle opp valgte objekter |
 | Når denne er av, erstatter hvert nytt objekt arbeidsutvalget. Når den er på, legges objektet til; velger du det på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker i begge tilfeller. |
 | Søk |
-| Finn et objekt eller koordinater, f.eks. M 31, NGC 224, TYC 2801-2090-1 eller 0:42:44 +41:16:09 |
+| Finn et objekt eller J2000-koordinater, f.eks. M 31, NGC 224, TYC 2801-2090-1 eller 0:42:44 +41:16:09 |
 | Søk i atlaset |
-| Skriv et Messier- eller NGC-nummer, en stjernes katalogidentitet eller en rektascensjon og deklinasjon, og trykk Enter. Kartet flyttes dit og objektet markeres. |
+| Skriv et Messier- eller NGC-nummer, en stjernes katalogidentitet eller en J2000-rektascensjon og -deklinasjon, og trykk Enter. Kartet flyttes dit, og et objekt det finner, markeres. |
 | Synsfelt 8° · Stjerner til V 8.0 |
 | v2.0.0 |
 | JUranometria versjon 2.0.0 |
@@ -306,9 +306,9 @@ The shipped catalogue. Every row is a catalogue identity pair and is not transla
 | Samle opp valgte objekter |
 | Når denne er av, erstatter hvert nytt objekt arbeidsutvalget. Når den er på, legges objektet til; velger du det på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker i begge tilfeller. |
 | Søk |
-| Finn et objekt eller koordinater, f.eks. M 31, NGC 224, TYC 2801-2090-1 eller 0:42:44 +41:16:09 |
+| Finn et objekt eller J2000-koordinater, f.eks. M 31, NGC 224, TYC 2801-2090-1 eller 0:42:44 +41:16:09 |
 | Søk i atlaset |
-| Skriv et Messier- eller NGC-nummer, en stjernes katalogidentitet eller en rektascensjon og deklinasjon, og trykk Enter. Kartet flyttes dit og objektet markeres. |
+| Skriv et Messier- eller NGC-nummer, en stjernes katalogidentitet eller en J2000-rektascensjon og -deklinasjon, og trykk Enter. Kartet flyttes dit, og et objekt det finner, markeres. |
 | Synsfelt 8° · Stjerner til V 8.0 |
 | v2.0.0 |
 | JUranometria versjon 2.0.0 |
@@ -365,9 +365,9 @@ The shipped catalogue. The item is disabled because there really is nothing to c
 | Samle opp valgte objekter |
 | Når denne er av, erstatter hvert nytt objekt arbeidsutvalget. Når den er på, legges objektet til; velger du det på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker i begge tilfeller. |
 | Søk |
-| Finn et objekt eller koordinater, f.eks. M 31, NGC 224, TYC 2801-2090-1 eller 0:42:44 +41:16:09 |
+| Finn et objekt eller J2000-koordinater, f.eks. M 31, NGC 224, TYC 2801-2090-1 eller 0:42:44 +41:16:09 |
 | Søk i atlaset |
-| Skriv et Messier- eller NGC-nummer, en stjernes katalogidentitet eller en rektascensjon og deklinasjon, og trykk Enter. Kartet flyttes dit og objektet markeres. |
+| Skriv et Messier- eller NGC-nummer, en stjernes katalogidentitet eller en J2000-rektascensjon og -deklinasjon, og trykk Enter. Kartet flyttes dit, og et objekt det finner, markeres. |
 | Synsfelt 8° · Stjerner til V 8.0 |
 | v2.0.0 |
 | JUranometria versjon 2.0.0 |
@@ -410,9 +410,9 @@ The shipped catalogue. The item is disabled because there really is nothing to c
 | Samle opp valgte objekter |
 | Når denne er av, erstatter hvert nytt objekt arbeidsutvalget. Når den er på, legges objektet til; velger du det på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker i begge tilfeller. |
 | Søk |
-| Finn et objekt eller koordinater, f.eks. M 31, NGC 224, TYC 2801-2090-1 eller 0:42:44 +41:16:09 |
+| Finn et objekt eller J2000-koordinater, f.eks. M 31, NGC 224, TYC 2801-2090-1 eller 0:42:44 +41:16:09 |
 | Søk i atlaset |
-| Skriv et Messier- eller NGC-nummer, en stjernes katalogidentitet eller en rektascensjon og deklinasjon, og trykk Enter. Kartet flyttes dit og objektet markeres. |
+| Skriv et Messier- eller NGC-nummer, en stjernes katalogidentitet eller en J2000-rektascensjon og -deklinasjon, og trykk Enter. Kartet flyttes dit, og et objekt det finner, markeres. |
 | Synsfelt 8° · Stjerner til V 8.0 |
 | v2.0.0 |
 | JUranometria versjon 2.0.0 |

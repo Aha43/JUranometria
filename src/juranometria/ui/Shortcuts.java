@@ -52,6 +52,14 @@ public final class Shortcuts {
     public static final String TOOLBAR = "chartToolbar";
 
     /**
+     * View > Centre on coordinates… (#623, ruling C-1). Named by the
+     * dialog it opens, so the id adds no string the sky-language ledger
+     * would have to review.
+     */
+    public static final String COORDINATES =
+            juranometria.ui.coordinates.CoordinatesDialog.class.getSimpleName();
+
+    /**
      * One keystroke the application answers.
      *
      * @param id what the application calls it
@@ -92,7 +100,9 @@ public final class Shortcuts {
             // a keystroke a tooltip names must work where it is named.
             new Shortcut(TOOLBAR, "Chart toolbar",
                     KeyStroke.getKeyStroke(KeyEvent.VK_T,
-                            menuMask() | InputEvent.SHIFT_DOWN_MASK)));
+                            menuMask() | InputEvent.SHIFT_DOWN_MASK)),
+            new Shortcut(COORDINATES, "Centre on coordinates",
+                    KeyStroke.getKeyStroke(KeyEvent.VK_L, menuMask())));
 
     /** Every keystroke the application binds, in menu order. */
     public static List<Shortcut> all() {
