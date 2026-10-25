@@ -86,7 +86,7 @@ class MarsSystemPackTest {
     void theFileIsTheOneTheManifestNames() throws IOException {
         Map<String, String> m = MarsSystemPack.load().manifest();
         try (InputStream in = MarsSystemPack.class.getResourceAsStream(
-                MarsSystemPack.RESOURCE_ROOT + MOONS_KERNEL)) {
+                MarsSystemPack.root() + MOONS_KERNEL)) {
             byte[] bytes = in.readAllBytes();
             assertEquals(m.get("checksum." + MOONS_KERNEL), Sha256.hex(bytes));
             assertEquals(43951104, bytes.length,
@@ -108,7 +108,7 @@ class MarsSystemPackTest {
     void aCorruptKernelIsRefusedBeforeUse() throws IOException {
         byte[] bytes;
         try (InputStream in = MarsSystemPack.class.getResourceAsStream(
-                MarsSystemPack.RESOURCE_ROOT + MOONS_KERNEL)) {
+                MarsSystemPack.root() + MOONS_KERNEL)) {
             bytes = in.readAllBytes();
         }
         bytes[bytes.length / 2] ^= 0x01;
@@ -116,7 +116,7 @@ class MarsSystemPackTest {
         PackIntegrityException refused = assertThrows(PackIntegrityException.class,
                 () -> MarsSystemPack.load(name -> name.equals(MOONS_KERNEL)
                         ? new ByteArrayInputStream(tampered)
-                        : MarsSystemPack.class.getResourceAsStream(MarsSystemPack.RESOURCE_ROOT + name)));
+                        : MarsSystemPack.class.getResourceAsStream(MarsSystemPack.root() + name)));
         assertTrue(refused.getMessage().contains("fails its checksum"), refused.getMessage());
     }
 
@@ -125,6 +125,6 @@ class MarsSystemPackTest {
         PackIntegrityException wrong = assertThrows(PackIntegrityException.class,
                 () -> MarsSystemPack.load(name -> SaturnPack.class.getResourceAsStream(
                         SaturnPack.RESOURCE_ROOT + name)));
-        assertTrue(wrong.getMessage().contains("expected pack mars-system"), wrong.getMessage());
+        assertTrue(wrong.getMessage().contains("expected the mars-system pack"), wrong.getMessage());
     }
 }

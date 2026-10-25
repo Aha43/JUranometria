@@ -51,9 +51,10 @@ public final class PlanetsPack {
      * @param firstDay the first civil day it answers for, inclusive
      * @param lastDay the last, inclusive
      * @param radiusKm its equatorial radius, as the PCK states it first
-     * @param figureBody the NAIF id whose figure is the planet's: the
-     *        file's last body, or, where the file carries only the
-     *        barycentre (Mars, #601 M-1), the body the manifest names
+     * @param figureBody the NAIF id whose figure is the planet's, as the
+     *        manifest names it: the file's last body for Venus and
+     *        Mercury, 499 for Mars, whose file carries only the
+     *        barycentre (#601, M-1)
      */
     public record Planet(String name, SpkKernel kernel, List<Integer> bodies,
                          LocalDate firstDay, LocalDate lastDay, double radiusKm,
@@ -109,10 +110,8 @@ public final class PlanetsPack {
                         String.format(Locale.ROOT, "ephemeris.%s.bodies", key)).split(",")) {
                     bodies.add(Integer.parseInt(id.strip()));
                 }
-                String figure = manifest.get(String.format(Locale.ROOT,
-                        "ephemeris.%s.figure.body", key));
-                int centre = figure == null ? bodies.get(bodies.size() - 1)
-                        : Integer.parseInt(figure.strip());
+                int centre = Integer.parseInt(required(manifest, String.format(Locale.ROOT,
+                        "ephemeris.%s.figure.body", key)).strip());
                 planets.put(key, new Planet(key, kernel,
                         Collections.unmodifiableList(bodies),
                         LocalDate.parse(required(manifest,
@@ -156,7 +155,7 @@ public final class PlanetsPack {
      * planet whose model needs more than its radii (Mars's pole, #601 M-3).
      */
     public double[] constant(String keyword) {
-        String value = required(manifest, "pck." + keyword);
+        String value = required(manifest, String.format(Locale.ROOT, "pck.%s", keyword));
         String[] fields = value.split(",");
         double[] out = new double[fields.length];
         for (int i = 0; i < fields.length; i++) {

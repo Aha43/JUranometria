@@ -6,6 +6,7 @@ import java.io.UncheckedIOException;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
@@ -27,9 +28,12 @@ import juranometria.solar.spk.SpkKernel;
  */
 public final class MarsSystemPack {
 
-    static final String RESOURCE_ROOT = "/resources/mars-system/";
     static final int SUPPORTED_FORMAT_VERSION = 1;
-    static final String PACK_NAME = "mars-system";
+
+    /** Where the pack lives on the classpath; its last segment is the pack's name. */
+    static String root() {
+        return "/resources/mars-system/";
+    }
 
     private final Map<String, String> manifest;
     private final SpkKernel moonsKernel;
@@ -46,7 +50,7 @@ public final class MarsSystemPack {
 
     /** Loads the pack the application ships. */
     public static MarsSystemPack load() {
-        return load(name -> MarsSystemPack.class.getResourceAsStream(RESOURCE_ROOT + name));
+        return load(name -> MarsSystemPack.class.getResourceAsStream(root() + name));
     }
 
     /** Loads a pack through an opener, as a test or a builder does. */
@@ -67,8 +71,8 @@ public final class MarsSystemPack {
                     + " is not the supported " + SUPPORTED_FORMAT_VERSION);
         }
         String name = required(manifest, "pack.name");
-        if (!PACK_NAME.equals(name)) {
-            throw new PackIntegrityException("expected pack " + PACK_NAME + ", found " + name);
+        if (!root().equals("/resources/" + name + "/")) {
+            throw new PackIntegrityException("expected the mars-system pack, found " + name);
         }
         try {
             SpkKernel kernel = SpkKernel.read(verified(resources, manifest,
@@ -145,7 +149,7 @@ public final class MarsSystemPack {
         try (InputStream in = require(resources, name)) {
             bytes = in.readAllBytes();
         }
-        String expected = required(manifest, "checksum." + name);
+        String expected = required(manifest, String.format(Locale.ROOT, "checksum.%s", name));
         String actual = Sha256.hex(bytes);
         if (!expected.equals(actual)) {
             throw new PackIntegrityException(String.format(

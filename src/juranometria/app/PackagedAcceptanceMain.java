@@ -64,6 +64,22 @@ public final class PackagedAcceptanceMain {
             java.time.Instant.parse("2026-06-21T10:00:00Z");
     static final double SATURN_SAMPLE_RA = 13.179527229;
     static final double SATURN_SAMPLE_DEC = 3.104845694;
+
+    /**
+     * The packaged Mars journey's samples (#602), restated once from the
+     * committed Horizons responses and held equal to them by
+     * {@code PackagedMarsSampleTest}: Mars for Oslo at the study's "today"
+     * row (docs/studies/mars-system/horizons/named-mars-oslo.txt), and
+     * Phobos from the Earth's centre in a row Horizons codes U, behind
+     * Mars and totally eclipsed
+     * (docs/studies/mars-system/horizons/opposition-2018-phobos-geocentric-10m.txt).
+     */
+    static final java.time.Instant MARS_SAMPLE_INSTANT =
+            java.time.Instant.parse("2026-10-25T12:00:00Z");
+    static final double MARS_SAMPLE_RA = 137.820963691;
+    static final double MARS_SAMPLE_DEC = 17.762945775;
+    static final java.time.Instant PHOBOS_ECLIPSE_INSTANT =
+            java.time.Instant.parse("2018-07-26T12:30:00Z");
     static final java.time.Instant SATURN_CARD_INSTANT =
             java.time.Instant.parse("2026-10-05T00:00:00Z");
 
@@ -6425,7 +6441,7 @@ public final class PackagedAcceptanceMain {
                         && PackagedAcceptanceMain.class.getResourceAsStream(
                                 "/resources/planets/PROVENANCE.md") != null,
                 "the planets pack's notice and provenance travel with it");
-        System.out.println("planets pack OK (DE440 Venus and Mercury excerpts v"
+        System.out.println("planets pack OK (DE440 Venus, Mercury and Mars excerpts v"
                 + juranometria.solar.PlanetsPack.load().manifest().get("pack.version")
                 + ", Venus at Oslo within "
                 + String.format(java.util.Locale.ROOT, "%.4f", venusOff)
@@ -6474,6 +6490,38 @@ public final class PackagedAcceptanceMain {
                 + " arcsecond of Horizons; on 2026-10-05 the rings open "
                 + String.format(java.util.Locale.ROOT, "%.2f", -saturnCard.saturn().ringOpeningDegrees())
                 + " degrees to the lit south face, Tethys behind Saturn in its shadow, six moons clear)");
+        // Mars and its moons (issue #602), inside the packaged image: the
+        // planets pack's third kernel and the Mars System pack load through
+        // the image's own classpath and verify their checksums; Mars for Oslo
+        // at the study's "today" agrees with Horizons' astrometric row to the
+        // ruled 0.01 arcsecond; Phobos is behind Mars and in its shadow where
+        // Horizons codes it U; and the moons' exclusive end refuses the last
+        // civil seconds of 2049 by name (#601, M-7a with the amendment).
+        juranometria.solar.MarsService marsService = juranometria.solar.MarsService.load();
+        double marsOff = marsService.observe(new juranometria.sky.Observer(59.91, 10.75,
+                        MARS_SAMPLE_INSTANT)).astrometricJ2000().separationDegrees(
+                new juranometria.chart.SkyPosition(MARS_SAMPLE_RA, MARS_SAMPLE_DEC)) * 3600.0;
+        require(marsOff < 0.01, "the packaged Mars agrees with Horizons for Oslo,"
+                + " 2026-10-25 12:00 UTC, within 0.01 arcsecond: " + marsOff);
+        juranometria.solar.MarsService.VisibilityState phobosState = marsService
+                .observeMoonsGeocentric(PHOBOS_ECLIPSE_INSTANT)
+                .moon(juranometria.solar.MarsService.Moon.PHOBOS).state();
+        require(phobosState == juranometria.solar.MarsService.VisibilityState.BEHIND_MARS_IN_ITS_SHADOW,
+                "on 2018-07-26 12:30 UTC Phobos is behind Mars in its shadow: " + phobosState);
+        require(marsService.moonsAnswerAt(java.time.Instant.parse("2049-12-31T23:58:00Z"))
+                        && !marsService.moonsAnswerAt(java.time.Instant.parse("2049-12-31T23:59:30Z")),
+                "the moons answer to the exclusive 2050-01-01 TDB boundary and not past it");
+        require(PackagedAcceptanceMain.class.getResourceAsStream(
+                        "/resources/mars-system/NOTICE-mars-system.md") != null
+                        && PackagedAcceptanceMain.class.getResourceAsStream(
+                                "/resources/mars-system/PROVENANCE.md") != null,
+                "the Mars System pack's notice and provenance travel with it");
+        System.out.println("mars system pack OK (MAR099 excerpt v"
+                + juranometria.solar.MarsSystemPack.load().manifest().get("pack.version")
+                + ", Mars at Oslo within "
+                + String.format(java.util.Locale.ROOT, "%.4f", marsOff)
+                + " arcsecond of Horizons; Phobos behind Mars in its shadow on 2018-07-26;"
+                + " the moons refused from the TDB boundary on 2049-12-31)");
         System.out.println("jovian system pack OK (JUP365 excerpts v"
                 + jovian.pack().manifest().get("pack.version") + ", Jupiter at Oslo within "
                 + String.format(java.util.Locale.ROOT, "%.4f", jupiterOff)

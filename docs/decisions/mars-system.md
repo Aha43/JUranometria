@@ -320,3 +320,113 @@ The owner's ruling of 2026-10-25, as given: "Rule M-1 to M-12 as proposed, M-7a,
 - **The endpoint is never evaluated.** Production never evaluates the kernel's final instant. The 6.81 × 10⁻¹² km endpoint difference of `contract/pack-measurements.md` stays a study observation. Nothing relies on it.
 
 **Where the ruling departs from the proposal.** Only in the amendment. M-7a as proposed refused a moon instant "after 2050-01-01". The boundary is now exclusive, and the refusal names 2000–2049.
+
+## #602, measured: the numerical checkpoint
+
+**Not yet qualified.** These are the measurements #602 returns for the owner's ruling. Some cells miss targets ruled on #601, for reasons the time model and the atlas's of-date model explain. Each miss is named below; none is widened. The report is `docs/studies/mars-system/service-accuracy.md` (`make mars-accuracy-report`). `MarsReferenceVectorTest` and `MarsNamedEventsTest` hold it: every met cell to its target, and the missed cells exactly as named here.
+
+### The packs, as built
+
+`make import-planets` writes the planets pack as version 3, and `make import-mars-system` writes the new Mars System pack. A rebuild of either is byte-identical.
+
+| file | bytes | the #601 cut | SHA-256 |
+|---|---:|---:|---|
+| `planets/juranometria-de440-mars-1900-2100.bsp` (0 → 4) | 709,632 | 648,192 | `c59b91b0188dc540906916c067238c8d311fd718f65b909825720e54e22e7ffb` |
+| `mars-system/juranometria-mar099-moons-2000-2050.bsp` (4 → 401, 402) | 43,951,104 | 43,910,144 | `cd84a9bfd574ebaeec63893d30735129de030e7e361af6c0f465f634629bc208` |
+
+- **Larger than the cut.** Each file differs from the #601 cut by its comment area only, which carries NAIF's modification notice and the source kernel's own comments as attribution, as Saturn's did. No ephemeris byte differs. Both are proved state for state against their sources.
+- **The ruling's premise, re-measured.** The planets builder re-measures Mars's centre against `mar099s.bsp` before writing: at most 0.210 m from the barycentre over 482,137 hourly states. It refuses above 0.25 m.
+- **The pole, copied in full.** The manifest carries Mars's radii and its IAU 2015 pole with the periodic terms and all 26 angle triples. The builder refuses a PCK whose Mars phase degree is not 2.
+- **The exclusive end.** The moons' kernel ends at `mar099s`'s own end, 2050-01-01 00:00 TDB. Its proof stops short of that instant, which nothing evaluates.
+
+### Invariance
+
+- **Released kernels untouched.** Venus's and Mercury's files keep their released digests. Both builders also prove the Solar System, Jovian and Saturn System kernels untouched before writing. `PlanetsPackTest` and `MarsSystemPackTest` hold every released digest.
+- **Released services untouched.** No released service changed. `MarsService` stands alone, as Mercury's did on #529: no `Observation` permit and no interface switch until #603.
+- **The planets loader.** It reads a planet's figure body from a new manifest key, defaulting to the old rule, so Venus and Mercury load as before.
+
+### Worst errors against Horizons, by era
+
+The table is from `service-accuracy.md`. A **bold** cell misses its ruled target.
+
+| quantity | target (M-10) | 1900–1961 | 1962–1971 | 1972 to 2027-06 | after 2027-06 |
+|---|---|---:|---:|---:|---:|
+| Mars astrometric | 0.01 / 0.05 / 0.01 / 0.05″ | **0.0372″** | 0.0120″ | 0.0004″ | **4.0278″** |
+| Mars apparent, > 1° from the Sun | 0.3 / 0.1 / 0.1 / 0.5″ | 0.1155″ | 0.0847″ | **0.1348″** | **4.1389″** |
+| Mars distance | 1 / 20 / 1 / 20 km | **19.951 km** | 2.624 km | 0.179 km | **2,281.646 km** |
+| Mars horizontal | 20″, not asserted after | 0.90″ | 2.11″ | 11.68″ | 3.22″ |
+| equatorial diameter | 0.001 / 0.01″ | 0.00001″ | 0.00001″ | 0.00001″ | 0.00029″ |
+| illuminated | 0.001 / 0.01 points | 0.00001 | 0.00001 | 0.00001 | 0.00039 |
+| phase angle against `phi` | 0.5 / 10″ | 0.206″ | 0.180″ | 0.180″ | 4.949″ |
+| pole position angle | 0.5″ | 0.223″ | 0.207″ | 0.222″ | **2.670″** |
+| moons X, Y, separation, > 1° from the Sun | 0.05 / 0.5″ | – | – | 0.0006″ | 0.1169″ |
+| moons position angle, > 20″ from Mars | 0.01° | – | – | 0.0060° | **0.1584°** |
+
+**Why the cells miss.**
+- **Before 1962, the ΔT model.** The accepted model sits about a second from Horizons' clock there. Mars moves up to about 20 km and 0.037″ in that time. Jupiter measured 32.6 km and Saturn 33.43 km for the same cause. The study's targets came from Skyfield on Skyfield's own clock, which follows Horizons' more closely there, so they did not carry this cost.
+- **After the leap-second record's expiry, the predicted ΔT.** The atlas and Horizons predict ΔT differently and name instants up to about two minutes apart. Mars moves fast enough in that time to account for every after-era miss: 4.0″, 2,282 km, the pole's position angle through its changing sky basis, and the moons' position angle.
+- **Through the exact interval, the of-date model.** The apparent place is 0.1348″ from Horizons' while the astrometric place agrees to 0.0004″. So the difference is the atlas's own precession and nutation to the true equator of date, not the ephemeris. Saturn measured 0.1364″ for the same cause and was ruled 0.2″. The study's 0.1″ was set from Skyfield's of-date model.
+
+**The Sun's deflection bites.** Without it the apparent place misses by 0.346″ in the exact interval, and with it 0.130″. `MarsMutationTest` holds that rival to failing.
+
+### The moons' states
+
+On Horizons' definition, every row of the exact interval agrees: 3,777 of 3,780 Phobos rows in all, and 3,780 of 3,780 Deimos rows. The three Phobos disagreements all fall after 2027-06, where M-10 prints states and does not assert them:
+- 2036-03-30: ours `u`, Horizons `U`;
+- 2040-01-15: ours `u`, Horizons `U`;
+- 2043-07-05: ours `O`, Horizons `P`.
+
+The two umbra-boundary instants named on #601, 2028-12-10 and 2034-01-08, now agree with Horizons through the service.
+
+### Named events (M-12)
+
+The service finds each of Espenak's seven oppositions and conjunctions within three days. Its instants fall these distances from his listed hours:
+
+| row | from the listed hour |
+|---|---:|
+| 2003 Aug 28 16, opposition | +118 min |
+| 2012 Mar 03 19, opposition | +70 min |
+| 2018 Jul 27 06, opposition | −46 min |
+| 2026 Jan 09 10, conjunction | +101 min |
+| 2027 Feb 19 15, opposition | +50 min |
+| 2035 Sep 15 17, opposition | +158 min |
+| 2100 Oct 11 07, conjunction | −4 min |
+
+Four rows fall outside M-12's hour. Near opposition Mars's longitude difference from the Sun changes only 1.23° to 1.41° a day, measured through the service at the five oppositions, so a small error in the almanac's theory shows as hours. Mercury's faster motion against the Sun hid the same coarseness on #529. The almanac's Mars hours cannot check the service to an hour. The service's instants come from the same DE440 positions that agree with Horizons to 0.0004″.
+
+### For the ruling: proposed amendments
+
+These follow the Jupiter and Saturn amendments. Each widened number bounds a measured, explained cause.
+
+| quantity | ruled on #601 | proposed | measured |
+|---|---|---|---:|
+| Mars astrometric, 1900–1961 | 0.01″ | **0.05″** | 0.0372″ |
+| Mars distance, 1900–1961 | 1 km | **40 km**, as Jupiter's and Saturn's | 19.951 km |
+| Mars apparent, 1972 to 2027-06 | 0.1″ | **0.2″**, as Jupiter's and Saturn's | 0.1348″ |
+| Mars astrometric, after 2027-06 | 0.05″ | **5″** | 4.0278″ |
+| Mars apparent, after 2027-06 | 0.5″ | **5″** | 4.1389″ |
+| Mars distance, after 2027-06 | 20 km | **7,000 km**, as Jupiter's and Saturn's | 2,281.646 km |
+| pole position angle, after 2027-06 | 0.5″ | **3″** | 2.670″ |
+| moons position angle, after 2027-06 | 0.01° | **printed by conditioning, not asserted**, as Saturn's | 0.1584° |
+| Espenak's opposition and conjunction hours (M-12) | within 1 hour | **within 3 hours, stated as the almanac's precision**, the instants checked against Horizons through the astrometric targets | up to 158 min |
+
+The 5″ after-era bounds are wider than Jupiter's and Saturn's 3″. Mars moves faster on the sky than either, so the same clock difference costs more.
+
+### The first table
+
+`docs/studies/mars-system/table-measurements.md` (`make mars-table-study`) is deterministic over the bundled packs and the cited instants, and the evidence contract holds it. It contains:
+- Mars for the five established observers at the boundary instants and Espenak's oppositions and conjunctions;
+- Oslo every 14 days through the 2027 opposition;
+- both moons at each opposition hour inside their years;
+- Phobos every 40 minutes through one orbit at the 2018 opposition, behind Mars in its shadow and in front of it;
+- the moons' last minutes: 23:58 UTC on 2049-12-31 answers, and 23:59:30 is refused by name.
+
+### Packaged
+
+The packaged acceptance checks these inside the image, restating the rows it uses, held to the committed rows by `PackagedMarsSampleTest`:
+- Mars at Oslo against the "today" Horizons row, to 0.01″;
+- Phobos behind Mars and in its shadow where Horizons codes `U`;
+- the exclusive end;
+- the Mars System notice.
+
+The About dialog and the licensing inventory name the new pack.
