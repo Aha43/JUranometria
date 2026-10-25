@@ -65,31 +65,65 @@ public final class MarsComparison {
 
     /** Printed beside the targets and never asserted: no ruled target names them. */
     public static final List<String> PRINTED = List.of(
-            "tilt, read planetodetic, against ObsSub-LAT", "pole right ascension", "pole declination",
+            "tilt, read planetodetic, against ObsSub-LAT",
             "moons position angle, within 20″ of Mars", "moons apparent, within 1° of the Sun");
 
     /**
-     * The targets the owner ruled on #601 (M-10), by quantity and era;
-     * {@code NaN} is measured and printed, never asserted.
+     * The targets in force, by quantity and era: those the owner ruled on
+     * #601 (M-10), as amended on the #602 checkpoint; {@code NaN} is
+     * measured and printed, never asserted.
      */
     public static final Map<String, double[]> TARGETS = new LinkedHashMap<>();
 
+    /**
+     * The #601 targets the #602 amendments replaced, for the amended cells
+     * only, keyed "era | quantity". Those study targets were derived through
+     * Skyfield's clock and of-date machinery; the amended bounds describe the
+     * atlas's own time and of-date models, the accepted accuracy Jupiter and
+     * Saturn were ruled on. Each amended cell must still exceed its former
+     * target: one that comes inside it means the record is out of date.
+     */
+    public static final Map<String, Double> FORMER = new LinkedHashMap<>();
+
     static {
-        // docs/decisions/mars-system.md, "Accuracy targets, proposed", ruled as
-        // proposed (M-10): the complete table, without widening.
+        // docs/decisions/mars-system.md: M-10 as ruled on #601, and "The
+        // ruling on the #602 checkpoint" (2026-10-25), which amends it.
         double nan = Double.NaN;
-        TARGETS.put("Mars astrometric", new double[] {0.01, 0.05, 0.01, 0.05});
-        TARGETS.put("Mars apparent, > 1° from the Sun", new double[] {0.3, 0.1, 0.1, 0.5});
+        TARGETS.put("Mars astrometric", new double[] {0.05, 0.05, 0.01, 5.0});
+        TARGETS.put("Mars apparent, > 1° from the Sun", new double[] {0.3, 0.1, 0.2, 5.0});
         TARGETS.put("Mars horizontal", new double[] {20.0, 20.0, 20.0, nan});
-        TARGETS.put("Mars distance km", new double[] {1.0, 20.0, 1.0, 20.0});
+        TARGETS.put("Mars distance km", new double[] {40.0, 20.0, 1.0, 7000.0});
         TARGETS.put("equatorial diameter", new double[] {0.001, 0.001, 0.001, 0.01});
         TARGETS.put("illuminated points", new double[] {0.001, 0.001, 0.001, 0.01});
         TARGETS.put("phase angle, against phi", new double[] {0.5, 0.5, 0.5, 10.0});
-        TARGETS.put("pole position angle", new double[] {0.5, 0.5, 0.5, 0.5});
+        TARGETS.put("pole position angle", new double[] {0.5, 0.5, 0.5, 3.0});
         TARGETS.put("moons X, Y, separation, > 1° from the Sun", new double[] {nan, nan, 0.05, 0.5});
-        TARGETS.put("moons position angle, > 20″ from Mars", new double[] {nan, nan, 0.01, 0.01});
+        TARGETS.put("moons position angle, > 20″ from Mars", new double[] {nan, nan, 0.01, nan});
         TARGETS.put("moons horizontal", new double[] {nan, nan, 20.0, nan});
+        FORMER.put("1900-1961 | Mars astrometric", 0.01);
+        FORMER.put("1900-1961 | Mars distance km", 1.0);
+        FORMER.put("1972-exact | Mars apparent, > 1° from the Sun", 0.1);
+        FORMER.put("after | Mars astrometric", 0.05);
+        FORMER.put("after | Mars apparent, > 1° from the Sun", 0.5);
+        FORMER.put("after | Mars distance km", 20.0);
+        FORMER.put("after | pole position angle", 0.5);
+        FORMER.put("after | moons position angle, > 20″ from Mars", 0.01);
     }
+
+    /**
+     * Espenak's hours (#601, M-12, as amended on #602): the service's instant
+     * within three hours of the listed hour - the almanac's own precision for
+     * Mars, never a claim of computed event-search accuracy. The rows the
+     * former one-hour rule did not hold are named; each must still lie beyond
+     * the hour, or the record is out of date.
+     */
+    public static final long EVENT_MINUTES = 180;
+    public static final long FORMER_EVENT_MINUTES = 60;
+    public static final java.util.Set<String> BEYOND_THE_FORMER_HOUR = java.util.Set.of(
+            "2003 Aug 28 16 Mars at Opposition",
+            "2012 Mar 03 19 Mars at Opposition",
+            "2026 Jan 09 10 Mars in Conjunction with Sun",
+            "2035 Sep 15 17 Mars at Opposition");
 
     /**
      * The named Phobos boundary rows (#601, M-8): instants where Mars's
@@ -470,8 +504,11 @@ public final class MarsComparison {
                 }
                 double v = w.of(q);
                 boolean miss = !Double.isNaN(t) && v > t;
+                Double former = FORMER.get(ERAS.get(i) + " | " + q);
+                String was = former == null ? "" : "; #601: " + value(q, former);
                 out.append(String.format(Locale.ROOT, " %s%s %s%s |", miss ? "**" : "", value(q, v),
-                        Double.isNaN(t) ? "(not asserted)" : "(≤ " + value(q, t) + ")", miss ? "**" : ""));
+                        Double.isNaN(t) ? "(not asserted" + was + ")" : "(≤ " + value(q, t) + was + ")",
+                        miss ? "**" : ""));
             }
             out.append('\n');
         }
@@ -483,7 +520,8 @@ public final class MarsComparison {
             }
             out.append('\n');
         }
-        out.append(String.format(Locale.ROOT, "%nA bold cell misses its ruled target. The exact-time"
+        out.append(String.format(Locale.ROOT, "%nA bold cell misses its target. Where the #602 checkpoint"
+                + " amended a #601 target, the former one is shown beside it. The exact-time"
                 + " interval ends %s. Arcseconds unless named; illuminated in percentage points.%n%n",
                 r.exactUntil));
         out.append("Where the worst rows are:\n\n");
@@ -539,8 +577,10 @@ public final class MarsComparison {
         out.append("\n## Espenak's oppositions and conjunctions against DE440, through the service\n\n"
                 + "An opposition is where the geocentric apparent ecliptic longitudes of date differ by"
                 + " 180°, a conjunction where they are equal, each found within three days of the"
-                + " listed hour. Espenak's rows give the hour (#601, M-12): the service's instant is"
-                + " asserted within ±1 hour of it. Perihelia, aphelia and lunar occultations are named"
+                + " listed hour. Espenak's rows give the hour; as amended on #602, the service's instant"
+                + " is asserted within three hours of it - the almanac's own precision for Mars, not a"
+                + " claim of computed event-search accuracy, the instants resting on the astrometric"
+                + " targets against Horizons. Perihelia, aphelia and lunar occultations are named"
                 + " rows, not asserted.\n\n| published row | DE440 (UT) | from the listed hour |\n|---|---|---|\n");
         for (Event e : r.events) {
             out.append(String.format(Locale.ROOT, "| %s | %s | %+d min |%n", e.row(),

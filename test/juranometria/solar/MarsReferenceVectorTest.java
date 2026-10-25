@@ -16,31 +16,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * The Mars service against every committed Horizons row (issue #602),
- * held to the targets the owner ruled on #601 (M-10), without widening.
+ * held to the targets the owner ruled on #601 (M-10) as amended on the
+ * #602 checkpoint (2026-10-25), and to nothing wider.
  *
- * <p>The first measurement (2026-10-25) misses some ruled cells, every
- * one where the atlas's time model or its of-date model differs from
- * Horizons' - before 1962 (ΔT), after the leap-second record's expiry
- * (the predicted ΔT), and the apparent place's of-date model through the
- * exact interval, the causes Jupiter's and Saturn's checkpoints met.
- * Those cells are named here, exactly, as pending the owner's ruling on
- * the #602 checkpoint: a new miss, or a pending cell that comes inside
- * its target, fails this test, so neither can pass unseen.
+ * <p>The amendments correct study targets derived through Skyfield's clock
+ * and of-date machinery; the amended bounds describe the atlas's own time
+ * model and the accepted accuracy of its existing of-date model, the same
+ * Jupiter and Saturn were ruled on. This test fails on a value beyond its
+ * bound in force, and on an amended cell that comes inside its former #601
+ * target without the record being updated: neither can pass unseen.
  */
 class MarsReferenceVectorTest {
 
     private static MarsComparison.Result result;
-
-    /** era | quantity: the cells returned to the owner (#602 checkpoint), none widened here. */
-    static final Set<String> PENDING = Set.of(
-            "1900-1961 | Mars astrometric",
-            "1900-1961 | Mars distance km",
-            "1972-exact | Mars apparent, > 1° from the Sun",
-            "after | Mars astrometric",
-            "after | Mars apparent, > 1° from the Sun",
-            "after | Mars distance km",
-            "after | pole position angle",
-            "after | moons position angle, > 20″ from Mars");
 
     @BeforeAll
     static void compareEverything() throws IOException {
@@ -48,8 +36,7 @@ class MarsReferenceVectorTest {
     }
 
     @Test
-    void everyRuledTargetIsMetExceptTheNamedPendingCells() {
-        Set<String> misses = new TreeSet<>();
+    void everyTargetInForceIsMet() {
         int held = 0;
         for (Map.Entry<String, double[]> e : MarsComparison.TARGETS.entrySet()) {
             for (int i = 0; i < MarsComparison.ERAS.size(); i++) {
@@ -62,16 +49,27 @@ class MarsReferenceVectorTest {
                 double worst = w.of(e.getKey());
                 assertTrue(worst > 0.0, era + " " + e.getKey()
                         + ": two implementations, not one compared with itself");
-                if (worst > target) {
-                    misses.add(era + " | " + e.getKey());
-                } else {
-                    held++;
-                }
+                assertTrue(worst <= target, String.format(Locale.ROOT, "%s, %s: %s within %s",
+                        era, e.getKey(), worst, target));
+                held++;
             }
         }
-        assertEquals(new TreeSet<>(PENDING), misses,
-                "the missed cells are exactly those returned to the owner");
-        assertEquals(28, held, "the 36 asserted cells less the 8 pending are held");
+        assertEquals(35, held, "every asserted cell is held");
+    }
+
+    @Test
+    void everyAmendedCellStillNeedsItsAmendment() {
+        Set<String> amended = new TreeSet<>();
+        for (Map.Entry<String, Double> e : MarsComparison.FORMER.entrySet()) {
+            String[] cell = e.getKey().split(" \\| ");
+            MarsComparison.Worst w = result.worst.get(cell[0]);
+            assertTrue(w != null && w.has(cell[1]), e.getKey() + " is measured");
+            assertTrue(w.of(cell[1]) > e.getValue(), String.format(Locale.ROOT,
+                    "%s: %s is now inside its former #601 target %s - update the record",
+                    e.getKey(), w.of(cell[1]), e.getValue()));
+            amended.add(e.getKey());
+        }
+        assertEquals(8, amended.size(), "the eight cells the #602 checkpoint amended");
     }
 
     @Test

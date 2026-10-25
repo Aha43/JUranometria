@@ -430,3 +430,25 @@ The packaged acceptance checks these inside the image, restating the rows it use
 - the Mars System notice.
 
 The About dialog and the licensing inventory name the new pack.
+
+### The ruling on the #602 checkpoint
+
+The owner's ruling of 2026-10-25, as given: "Rule the #602 amendments as proposed, with the wording notes".
+
+**The amendments, ruled as proposed.**
+- **Before 1962:** Mars's direction within 0.05″ and its distance within 40 km.
+- **From 1972 to the leap-second record's expiry:** the apparent place within 0.2″.
+- **After the expiry:** direction and apparent place within 5″, distance within 7,000 km, and the pole's position angle within 3″.
+- **The moons' position angle after the expiry** is printed, not asserted.
+- **Espenak's oppositions and conjunctions:** the service's instant within three hours of the listed hour.
+
+The era boundaries are the shared time model's. Every cell the amendments do not name keeps its #601 target.
+
+**The wording notes, ruled with them.**
+- **The amendments correct the study's targets; they do not weaken a production failure.** The #601 targets were derived through Skyfield's clock and of-date machinery. Production correctly uses the atlas's existing time model and of-date model, and the amended bounds describe those. The 1972–2027 apparent-place bound is the accepted accuracy of the atlas's existing of-date model, about 0.13″ from Horizons', the same accuracy Jupiter and Saturn were ruled on. It is not a claim that the model is exact.
+- **The three hours is the almanac's precision for Mars.** It is a consistency check against Espenak's published hours, never a claim of computed event-search accuracy. The service's event instants rest on the astrometric targets against Horizons; the road makes no event-search claim.
+
+**How the tests hold it.** `MarsComparison.TARGETS` carries the bounds in force and `MarsComparison.FORMER` the eight #601 targets they replaced.
+- **`MarsReferenceVectorTest` fails on any value beyond its bound in force.** It holds all 35 asserted cells.
+- **It also fails on any amended cell that comes inside its former target.** The record must then be updated.
+- **`MarsNamedEventsTest` holds every event within three hours.** The four rows the former hour did not hold are named, and each must still lie beyond the hour.
