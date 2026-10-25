@@ -51,6 +51,9 @@ public final class Shortcuts {
      */
     public static final String TOOLBAR = "chartToolbar";
 
+    /** View > Centre on coordinates… (#623, ruling C-1). */
+    public static final String COORDINATES = "centreOnCoordinates";
+
     /**
      * One keystroke the application answers.
      *
@@ -92,7 +95,9 @@ public final class Shortcuts {
             // a keystroke a tooltip names must work where it is named.
             new Shortcut(TOOLBAR, "Chart toolbar",
                     KeyStroke.getKeyStroke(KeyEvent.VK_T,
-                            menuMask() | InputEvent.SHIFT_DOWN_MASK)));
+                            menuMask() | InputEvent.SHIFT_DOWN_MASK)),
+            new Shortcut(COORDINATES, "Centre on coordinates",
+                    KeyStroke.getKeyStroke(KeyEvent.VK_L, menuMask())));
 
     /** Every keystroke the application binds, in menu order. */
     public static List<Shortcut> all() {

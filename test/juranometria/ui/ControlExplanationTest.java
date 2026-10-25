@@ -267,6 +267,9 @@ class ControlExplanationTest {
                 () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
                 () -> { }, () -> { }, () -> { }, () -> { },
                 juranometria.ui.language.InterfaceText.forLanguage("en"));
+        // And what the application adds to it after composing it (#623).
+        AppMenuBar.addCentreOnCoordinates(bar,
+                juranometria.ui.language.InterfaceText.forLanguage("en"), () -> { });
         for (Shortcuts.Shortcut shortcut : Shortcuts.all()) {
             assertTrue(accelerators(bar).contains(shortcut.stroke()),
                     shortcut.label() + " is named by the registry, so"

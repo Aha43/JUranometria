@@ -185,7 +185,15 @@ public final class SearchField extends JTextField {
      * path a reader's Enter takes rather than reconstructing where
      * the chart ought to have gone (Sprint 21 review, P1).
      */
+    /** Told whenever a search moves the chart (#623: it ends a requested position). */
+    private Runnable searched = () -> { };
+
+    public void onSearch(Runnable listener) {
+        this.searched = listener == null ? () -> { } : listener;
+    }
+
     Outcome apply(SearchResult result) {
+        searched.run();
         return switch (SearchNavigation.apply(result, assembler,
                 controller, selection, working, mode)) {
             case RECENTERED -> Outcome.RECENTERED;

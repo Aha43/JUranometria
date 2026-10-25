@@ -94,6 +94,15 @@ an existing contract applied.
   stays as it is apart from its words, and the free-text forms of
   published notes stay later work, as the issue rules).
 
+## The rulings (owner, 2026-10-25)
+
+C-1 to C-4 accepted as proposed: the modeless *Centre on coordinates…*
+dialog in the View menu with its shortcut; navigation through Search's
+coordinate contract with the selection cleared; the requested-position
+cross with its lifetime, never selectable, inspected or exported; and
+Search's words corrected to say J2000 and to promise a mark only for an
+object it finds.
+
 ## 3. Evidence planned
 
 The issue's list, with C-3's own: exact centring of northern,

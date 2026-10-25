@@ -913,6 +913,42 @@ public final class AppMenuBar {
      * Returns the item, which the session then keeps in step with the
      * module, or null on a bar without the submenu.
      */
+    /**
+     * Adds View > Centre on coordinates... directly after Place and Time...
+     * (#623, ruling C-1), with its shortcut. Returns the item, or null on a
+     * bar without a View menu.
+     */
+    public static JMenuItem addCentreOnCoordinates(javax.swing.JMenuBar bar,
+            juranometria.ui.language.InterfaceText said, Runnable open) {
+        JMenu view = null;
+        for (int i = 0; i < bar.getMenuCount(); i++) {
+            JMenu menu = bar.getMenu(i);
+            if (menu != null && said.say("menu.view.label").equals(menu.getText())) {
+                view = menu;
+            }
+        }
+        if (view == null || open == null) {
+            return null;
+        }
+        JMenuItem item = new JMenuItem(said.say("menu.coordinates.label"));
+        item.setName("centreOnCoordinatesItem");
+        juranometria.ui.language.MnemonicText.in(said).apply(item, "menu.coordinates.mnemonic");
+        item.getAccessibleContext().setAccessibleName(said.say("menu.coordinates.a11y"));
+        juranometria.ui.Explain.selfExplanatory(item, said.say("menu.coordinates.explain"));
+        item.setAccelerator(juranometria.ui.Shortcuts.of(
+                juranometria.ui.Shortcuts.COORDINATES).stroke());
+        item.addActionListener(event -> open.run());
+        int after = -1;
+        for (int i = 0; i < view.getMenuComponentCount(); i++) {
+            if (view.getMenuComponent(i) instanceof JMenuItem existing
+                    && said.say("menu.placeandtime.label").equals(existing.getText())) {
+                after = i;
+            }
+        }
+        view.insert(item, after + 1);
+        return item;
+    }
+
     public static javax.swing.JCheckBoxMenuItem addSaturnOnChart(javax.swing.JMenuBar bar,
             juranometria.ui.language.InterfaceText said, Runnable toggleSaturnOnChart) {
         JMenu solar = solarSystemMenu(bar);
