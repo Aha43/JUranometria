@@ -455,7 +455,7 @@ The era boundaries are the shared time model's. Every cell the amendments do not
 
 ## #603, the table, as built: a packaged checkpoint
 
-**Not yet accepted.** Issue #603 adds Mars and its ruled moons to the Solar System tables, for the owner's numerical and layout journey in the packaged build. The table follows the card and columns ruled in M-9.
+**Accepted by the owner on 2026-10-26**, as given: "accept the candidate, Mars shown outside moon years as proposed, really good decision it seem to me". The candidate was `1020fdc7`; the head since then adds only the record of the mnemonic ruling. Issue #603 adds Mars and its ruled moons to the Solar System tables, for the owner's numerical and layout journey in the packaged build. The table follows the card and columns ruled in M-9.
 
 **Hosts and order.**
 - **Where it lives.** View > Solar System gains *Mars...* between *Moon...* and *Jupiter...*. The Controller's Solar System tab gains a Mars group in the same place, introduced collapsed.
@@ -472,6 +472,7 @@ The era boundaries are the shared time model's. Every cell the amendments do not
 - **Saturn refuses a whole range** that leaves the moons' years.
 - **Mars answers to 2100, but its moons stop in 2049.** Refusing whole would hide Mars's own rows for half a century, which the issue forbids.
 - **So the Mars table shows Mars at every instant, always.** A single instant outside the moons' years shows Mars and says the moons are refused, naming their years. A range shows the moons wherever they answer, and in place of them a line saying they are not computed there. The status counts those instants.
+- **Ruled as proposed** on 2026-10-26, with the candidate's acceptance.
 - **The boundary is the service's.** Whether the moons answer at an instant is decided by `MarsService.moonsAnswerAt`, the exclusive TDB boundary of the #601 amendment.
 
 **No access letter for *Mars...*.** Every letter of "Mars" is already claimed on View > Solar System: in English by the Moon (M), Saturn on the chart (A), Mercury (R) and the Sun (S); in Norwegian by the Moon (M), Saturn on the chart (A), Mercury (R) and Saturn (S). Two items never share a letter. The item is reachable by the menu's arrow keys and by its spoken name, as other unlettered items are. Re-lettering a released item to free one is an owner decision, and is not done here.
