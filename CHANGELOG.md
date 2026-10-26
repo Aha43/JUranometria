@@ -7,6 +7,19 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Phobos and Deimos on the chart (#606, part 2, ruled on #605).** With
+*Mars on the chart* on, Mars's two moons are drawn from 2000 to 2049
+as 3-pixel symbols at their own places, each only where its mark
+stands clear of Mars and of the other moon, on every field: a filled
+dot clear of Mars, a dot ringed in the page's ground in front of a
+drawn disc at least 12 pixels across, a hollow ring in Mars's shadow.
+On the ordinary fields they almost always stand on Mars's mark and are
+not drawn; the closer fields show them. A moon behind Mars, or too
+close to tell apart at the field, is not drawn, and the page's spoken
+description says so. The moons are not selectable. Outside 2000-2049
+Mars is drawn alone. The pages are in
+`docs/studies/mars-on-the-chart/`.
+
 **Mars on the chart (#606, part 1, ruled on #605).** View > Solar
 System gains *Mars on the chart*, directly after *Moon on the chart*,
 off until you ask and remembered across sessions, and the Mars group

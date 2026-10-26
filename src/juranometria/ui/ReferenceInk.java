@@ -1628,15 +1628,59 @@ public final class ReferenceInk {
             }
             systems.add(new RingedSystem(primary, mark, satellitesOn(page, mark.centre(),
                     mark.onPage(), mark.symbol(), mark.outline(), mark.inFrontRoomPx(),
-                    mark::extentToward, SatelliteMarks.of(primary.identity(), offered))));
+                    mark::extentToward, SatelliteMarks.of(primary.identity(), offered), true)));
         }
         return systems;
     }
 
-    /** Every satellite this page draws, of every oblate and ringed system. */
+    /**
+     * Every round body's system on this page - Mars with Phobos and
+     * Deimos (#606 part 2) - each satellite decided on its own against the
+     * drawn disc or mark, with no floor (R-3 on #605): a moon is drawn
+     * only where its symbol stands clear of the primary's drawn mark and
+     * of the other moon, on every field; in front only on a drawn disc
+     * that can hold it.
+     */
+    static List<RoundSystem> roundSystemsOn(DrawnPage page,
+            List<OverlayRegistry.Owned> contributions) {
+        List<OverlayContribution> offered = new ArrayList<>();
+        for (OverlayRegistry.Owned owned : contributions) {
+            offered.add(owned.geometry());
+        }
+        List<RoundSystem> systems = new ArrayList<>();
+        Projection projection = page.projection();
+        ViewportMapping mapping = new ViewportMapping(page);
+        Rectangle2D paper = ChartRenderer.paperOf(page.scene());
+        PageRegion region = mapping.regionFor(page.scene().viewport(), projection);
+        Shape sky = skyOf(region, paper);
+        for (OverlayContribution c : offered) {
+            if (!(c instanceof OverlayContribution.Body primary)) {
+                continue;
+            }
+            List<OverlayContribution.Satellite> moons = SatelliteMarks.of(primary.identity(),
+                    offered);
+            if (moons.isEmpty()) {
+                continue;
+            }
+            BodyMark mark = bodyOn(page, projection, mapping, paper, sky, region.bounded(),
+                    primary);
+            if (mark == null) {
+                continue;
+            }
+            double width = mark.disc().getWidth();
+            systems.add(new RoundSystem(primary, mark, satellitesOn(page, mark.centre(), true,
+                    mark.symbol(), mark.disc(), width, offset -> width / 2.0, moons, false)));
+        }
+        return systems;
+    }
+
+    /** Every satellite this page draws, of every oblate, ringed and round system. */
     private static List<SatelliteMark> satellitesOn(DrawnPage page,
             List<OverlayRegistry.Owned> contributions) {
         List<SatelliteMark> out = new ArrayList<>();
+        for (RoundSystem system : roundSystemsOn(page, contributions)) {
+            out.addAll(system.satellites());
+        }
         for (JovianSystem system : systemsOn(page, contributions)) {
             out.addAll(system.satellites());
         }
@@ -1664,7 +1708,8 @@ public final class ReferenceInk {
             }
             systems.add(new JovianSystem(primary, mark, satellitesOn(page, mark.centre(),
                     mark.onPage(), mark.symbol(), mark.outline(), 2.0 * mark.radius(),
-                    offset -> mark.radius(), SatelliteMarks.of(primary.identity(), offered))));
+                    offset -> mark.radius(), SatelliteMarks.of(primary.identity(), offered),
+                    true)));
         }
         return systems;
     }
@@ -1690,16 +1735,22 @@ public final class ReferenceInk {
                 if (mark != null) {
                     decisionsOf(page, mark.centre(), mark.onPage(), mark.symbol(), mark.outline(),
                             2.0 * mark.radius(), offset -> mark.radius(),
-                            SatelliteMarks.of(primary.identity(), offered), out);
+                            SatelliteMarks.of(primary.identity(), offered), out, true);
                 }
             } else if (c instanceof OverlayContribution.RingedBody primary) {
                 RingedMark mark = ringedOn(page, primary);
                 if (mark != null) {
                     decisionsOf(page, mark.centre(), mark.onPage(), mark.symbol(), mark.outline(),
                             mark.inFrontRoomPx(), mark::extentToward,
-                            SatelliteMarks.of(primary.identity(), offered), out);
+                            SatelliteMarks.of(primary.identity(), offered), out, true);
                 }
             }
+        }
+        for (RoundSystem system : roundSystemsOn(page, contributions)) {
+            double width = system.mark().disc().getWidth();
+            decisionsOf(page, system.mark().centre(), true, system.mark().symbol(),
+                    system.mark().disc(), width, offset -> width / 2.0,
+                    SatelliteMarks.of(system.primary().identity(), offered), out, false);
         }
         return out;
     }
@@ -1707,7 +1758,8 @@ public final class ReferenceInk {
     private static void decisionsOf(DrawnPage page, PixelPoint centre, boolean onPage,
             boolean symbol, Shape outline, double inFrontRoomPx,
             java.util.function.ToDoubleFunction<double[]> extentToward,
-            List<OverlayContribution.Satellite> satellites, java.util.Map<String, String> out) {
+            List<OverlayContribution.Satellite> satellites, java.util.Map<String, String> out,
+            boolean floorApplies) {
         List<double[]> offsets = new ArrayList<>();
         List<OverlayContribution.Satellite> placed = new ArrayList<>();
         ViewportMapping mapping = new ViewportMapping(page);
@@ -1718,13 +1770,13 @@ public final class ReferenceInk {
                 offsets.add(new double[] {at.x() - centre.x(), at.y() - centre.y()});
             });
         }
-        boolean atFloor = page.scene().viewport().fieldWidthDegrees()
+        boolean atFloor = floorApplies && page.scene().viewport().fieldWidthDegrees()
                 <= juranometria.chart.ChartViewState.normalMinimumFieldDegrees() + 1e-9;
         List<SatelliteMarks.Decision> decisions = SatelliteMarks.decide(atFloor,
                 inFrontRoomPx, extentToward, placed, offsets);
         java.util.Set<String> drawn = new java.util.HashSet<>();
         for (SatelliteMark m : satellitesOn(page, centre, onPage, symbol, outline,
-                inFrontRoomPx, extentToward, satellites)) {
+                inFrontRoomPx, extentToward, satellites, floorApplies)) {
             drawn.add(m.satellite().identity());
         }
         for (int i = 0; i < placed.size(); i++) {
@@ -1737,7 +1789,7 @@ public final class ReferenceInk {
     private static List<SatelliteMark> satellitesOn(DrawnPage page, PixelPoint primaryCentre,
             boolean primaryOnPage, boolean primarySymbol, Shape primaryOutline,
             double inFrontRoomPx, java.util.function.ToDoubleFunction<double[]> extentToward,
-            List<OverlayContribution.Satellite> satellites) {
+            List<OverlayContribution.Satellite> satellites, boolean floorApplies) {
         if (satellites.isEmpty()) {
             return List.of();
         }
@@ -1760,8 +1812,8 @@ public final class ReferenceInk {
             offsets.add(new double[] {c.x() - primaryCentre.x(), c.y() - primaryCentre.y()});
         }
         // The chart's normal minimum field is read, never assumed to be
-        // 1° (ruling 9 on #482).
-        boolean atFloor = page.scene().viewport().fieldWidthDegrees()
+        // 1° (ruling 9 on #482). Mars's moons have no floor (R-3 on #605).
+        boolean atFloor = floorApplies && page.scene().viewport().fieldWidthDegrees()
                 <= juranometria.chart.ChartViewState.normalMinimumFieldDegrees() + 1e-9;
         List<SatelliteMarks.Decision> decisions = SatelliteMarks.decide(atFloor,
                 inFrontRoomPx, extentToward, placed, offsets);
@@ -2098,13 +2150,16 @@ public final class ReferenceInk {
         // the mark beneath the stars, as Jupiter's, with its moons' marks
         // not painted with the opaque figure.
         List<RingedSystem> ringedSystems = ringedSystemsOn(page, contributions);
+        // Mars's moons (#606) not painted with an opaque disc, beneath the stars.
+        List<RoundSystem> roundSystems = roundSystemsOn(page, contributions);
         for (OverlayRegistry.Owned owned : contributions) {
             if (owned.geometry() instanceof OverlayContribution.Body body
                     && body.minimumMarkPx() > 0.0) {
                 rounds.add(body);
             }
         }
-        if (systems.isEmpty() && rounds.isEmpty() && ringedSystems.isEmpty()) {
+        if (systems.isEmpty() && rounds.isEmpty() && ringedSystems.isEmpty()
+                && roundSystems.isEmpty()) {
             return;
         }
         Graphics2D g2 = (Graphics2D) g.create();
@@ -2151,6 +2206,13 @@ public final class ReferenceInk {
                 if (system.mark().symbol() && system.mark().onPage()) {
                     paintRinged(g2, system.mark(), system.primary(), palette);
                 }
+                for (SatelliteMark m : system.satellites()) {
+                    if (!m.withPrimary()) {
+                        paintSatellite(g2, m, palette);
+                    }
+                }
+            }
+            for (RoundSystem system : roundSystems) {
                 for (SatelliteMark m : system.satellites()) {
                     if (!m.withPrimary()) {
                         paintSatellite(g2, m, palette);
@@ -2300,8 +2362,12 @@ public final class ReferenceInk {
         // keep words and names clear of them.
         List<JovianSystem> systems = systemsOn(page, contributions);
         List<RingedSystem> ringedSystems = ringedSystemsOn(page, contributions);
+        List<RoundSystem> roundSystems = roundSystemsOn(page, contributions);
         List<SatelliteMark> moons = new ArrayList<>();
         for (JovianSystem system : systems) {
+            moons.addAll(system.satellites());
+        }
+        for (RoundSystem system : roundSystems) {
             moons.addAll(system.satellites());
         }
         for (RingedSystem system : ringedSystems) {
@@ -2377,6 +2443,17 @@ public final class ReferenceInk {
                     PageBasis basis = PageBasis.at(page, body.at()).orElse(null);
                     paintMoon(g2, disc, centres.get(i), radius, basis,
                             body.lit(), palette, body.belowHorizon());
+                }
+                // A moon of Mars in front of its drawn disc, or touching it,
+                // is painted with it, over it (R-4 on #605, as ruling 4 on #482).
+                for (RoundSystem system : roundSystems) {
+                    if (system.primary() == body) {
+                        for (SatelliteMark m : system.satellites()) {
+                            if (m.withPrimary()) {
+                                paintSatellite(g2, m, palette);
+                            }
+                        }
+                    }
                 }
             }
             // Pass three: the names, nearest first. A name with no clean
@@ -2779,6 +2856,11 @@ public final class ReferenceInk {
                 discs.add(inkOf(m));
             }
         }
+        for (RoundSystem system : roundSystemsOn(page, contributions)) {
+            for (SatelliteMark m : system.satellites()) {
+                discs.add(inkOf(m));
+            }
+        }
         return List.copyOf(discs);
     }
 
@@ -2915,5 +2997,72 @@ public final class ReferenceInk {
             }
         }
         return null;
+    }
+
+    /**
+     * The moons of a round primary this page does not draw though the
+     * primary is drawn (#606 part 2, R-3 and R-4 on #605): behind it, or
+     * too close to it or to the other moon to tell apart at the field.
+     * Each with the page's state key for it, so the description still
+     * gives the moon the ink leaves out; a moon off the paper is not
+     * spoken, as no off-page body is.
+     */
+    public record UnseenMoon(String identity, String state) {
+    }
+
+    /** Every round primary's undrawn moon on this page, in offered order. */
+    public static List<UnseenMoon> unseenMoons(DrawnPage page,
+            List<OverlayRegistry.Owned> contributions) {
+        java.util.Map<String, String> decided = new java.util.LinkedHashMap<>();
+        List<OverlayContribution> offered = new ArrayList<>();
+        for (OverlayRegistry.Owned owned : contributions) {
+            offered.add(owned.geometry());
+        }
+        List<UnseenMoon> out = new ArrayList<>();
+        for (RoundSystem system : roundSystemsOn(page, contributions)) {
+            double width = system.mark().disc().getWidth();
+            decided.clear();
+            decisionsOf(page, system.mark().centre(), true, system.mark().symbol(),
+                    system.mark().disc(), width, offset -> width / 2.0,
+                    SatelliteMarks.of(system.primary().identity(), offered), decided, false);
+            for (java.util.Map.Entry<String, String> e : decided.entrySet()) {
+                String why = e.getValue();
+                if (!isDecision(why) || why.equals(SatelliteMarks.Decision.DRAWN.name())) {
+                    continue;
+                }
+                out.add(new UnseenMoon(e.getKey(), String.format(java.util.Locale.ROOT,
+                        UNSEEN_STATE, system.primary().identity(),
+                        why.equals(SatelliteMarks.Decision.BEHIND.name())
+                                ? UNSEEN_BEHIND : UNSEEN_UNRESOLVED)));
+            }
+        }
+        return out;
+    }
+
+    /** The state key of an undrawn moon: {@code mars.moonBehind}, {@code mars.moonUnresolved}. */
+    private static final String UNSEEN_STATE = "%s.moon%s";
+    /** The two reasons, read from the decisions' own names: Behind, Unresolved. */
+    private static final String UNSEEN_BEHIND = wordOf(SatelliteMarks.Decision.BEHIND);
+    private static final String UNSEEN_UNRESOLVED =
+            wordOf(SatelliteMarks.Decision.IN_FRONT_UNRESOLVED);
+
+    private static String wordOf(SatelliteMarks.Decision decision) {
+        String last = decision.name().substring(decision.name().lastIndexOf('_') + 1);
+        return last.charAt(0) + last.substring(1).toLowerCase(java.util.Locale.ROOT);
+    }
+
+    /** Whether a decision is the page's (not OFF_PAGE, which no description speaks). */
+    private static boolean isDecision(String why) {
+        for (SatelliteMarks.Decision d : SatelliteMarks.Decision.values()) {
+            if (d.name().equals(why)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** A round body, its mark, and the satellites this page draws with it (#606). */
+    record RoundSystem(OverlayContribution.Body primary, BodyMark mark,
+                       List<SatelliteMark> satellites) {
     }
 }

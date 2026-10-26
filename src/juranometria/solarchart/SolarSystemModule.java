@@ -74,6 +74,13 @@ public final class SolarSystemModule implements ChartModule {
     public static final double MARS_MINIMUM_MARK_PX = VENUS_MINIMUM_MARK_PX;
     /** The page's state key for Mars behind the Sun's disc; an outer planet is never in front. */
     public static final String MARS_BEHIND = MARS + VENUS_BEHIND.substring(VENUS.length());
+    /** R-3 on #605: each of Mars's moons is Jupiter's 3 px symbol, never its apparent diameter. */
+    public static final double MARS_MOON_MARK_PX = MARS_MINIMUM_MARK_PX / 2.0;
+
+    /** A moon of Mars's identity on the page, {@code mars.phobos} and {@code mars.deimos}. */
+    public static String identityOf(juranometria.solar.MarsService.Moon moon) {
+        return MARS + "." + moon.name().toLowerCase(java.util.Locale.ROOT);
+    }
 
     private final Supplier<Observer> observer;
     private final Supplier<SolarSystemService> service;
@@ -414,6 +421,8 @@ public final class SolarSystemModule implements ChartModule {
                         OverlayContribution.Moment.of(now), true, MARS_MINIMUM_MARK_PX,
                         planet.phase() == juranometria.solar.MarsService.Phase.BEHIND_SUN
                                 ? MARS_BEHIND : null));
+                offered.addAll(marsMoons(now, horizon
+                        && planet.horizontal().altitudeDegrees() < 0.0));
             } catch (IllegalArgumentException outsideTheYears) {
                 // Nothing for this instant.
             }
@@ -429,5 +438,38 @@ public final class SolarSystemModule implements ChartModule {
                     OverlayContribution.Moment.of(now), true));
         }
         return List.copyOf(offered);
+    }
+
+    /**
+     * Phobos and Deimos (#606 part 2, R-3 and R-4 on #605), where they have
+     * numbers (2000-2049): each at its own astrometric J2000 place with its
+     * disc and shadow states, Phobos first, for the page to decide on its
+     * own - drawn only where it stands clear of Mars's drawn mark and of
+     * the other moon, on every field. Not selectable (R-5). Outside the
+     * moons' years Mars is drawn alone, as the table shows it.
+     */
+    private List<OverlayContribution> marsMoons(Observer now, boolean below) {
+        juranometria.solar.MarsService service = mars.get();
+        if (!service.moonsAnswerAt(now.instant())) {
+            return List.of();
+        }
+        List<OverlayContribution> out = new ArrayList<>();
+        for (juranometria.solar.MarsService.MoonPlace moon : service.observeMoons(now).moons()) {
+            OverlayContribution.Satellite.Relation relation = switch (moon.discRelation()) {
+                case CLEAR -> OverlayContribution.Satellite.Relation.CLEAR;
+                case IN_FRONT -> OverlayContribution.Satellite.Relation.IN_FRONT;
+                case BEHIND -> OverlayContribution.Satellite.Relation.BEHIND;
+            };
+            out.add(new OverlayContribution.Satellite(identityOf(moon.moon()),
+                    moon.moon().name().charAt(0)
+                            + moon.moon().name().substring(1).toLowerCase(java.util.Locale.ROOT),
+                    moon.astrometricJ2000(), MARS, relation,
+                    moon.shadowRelation() != juranometria.solar.MarsService.ShadowRelation.SUNLIT,
+                    moon.shadowRelation()
+                            == juranometria.solar.MarsService.ShadowRelation.PARTLY_IN_SHADOW,
+                    moon.moon().ordinal(), MARS_MOON_MARK_PX, below, InkRole.BODY,
+                    OverlayContribution.Moment.of(now), false));
+        }
+        return out;
     }
 }
