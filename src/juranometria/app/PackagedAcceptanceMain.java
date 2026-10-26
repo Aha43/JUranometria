@@ -2272,10 +2272,13 @@ public final class PackagedAcceptanceMain {
             at[0] = new juranometria.sky.Observer(59.91, 10.75,
                     java.time.Instant.parse("2049-12-31T23:59:30Z"));
             javax.swing.SwingUtilities.invokeAndWait(group::apply);
+            // The status as spoken, unwrapped: the Controller's narrow layout
+            // wraps the shown text where the platform's fonts break it.
+            String refusal = group.status.getAccessibleContext().getAccessibleName();
             require(group.cardTitle.getText().startsWith("Mars · 2049-12-31")
                             && group.model.getRowCount() == 0
-                            && group.status().contains("end of 2049"),
-                    "Mars answers past the TDB boundary, the moons refuse: " + group.status());
+                            && refusal.contains("end of 2049"),
+                    "Mars answers past the TDB boundary, the moons refuse: " + refusal);
 
             at[0] = new juranometria.sky.Observer(59.91, 10.75,
                     java.time.Instant.parse("2049-12-10T00:00:00Z"));
@@ -2285,11 +2288,12 @@ public final class PackagedAcceptanceMain {
                 group.step.setSelectedIndex(3);
                 group.apply();
             });
+            String partly = group.status.getAccessibleContext().getAccessibleName();
             require(mars.result().outcome()
                             == juranometria.ui.solar.MarsTableSession.Outcome.ROWS_MOONS_IN_PART
                             && group.model.groups() == mars.result().entries().size()
-                            && group.status().contains("Phobos and Deimos are not shown"),
-                    "a range across the boundary keeps Mars at every instant: " + group.status());
+                            && partly.contains("Phobos and Deimos are not shown"),
+                    "a range across the boundary keeps Mars at every instant: " + partly);
 
             javax.swing.SwingUtilities.invokeAndWait(() -> {
                 bar[0] = AppMenuBar.create(new ChartViewController(), () -> { },
