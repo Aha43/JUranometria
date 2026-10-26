@@ -46,6 +46,7 @@ record StartupStores(AppearanceStore appearance,
                      juranometria.ui.solar.MoonChartStore moonChart,
                      juranometria.ui.solar.JovianChartStore jovianChart,
                      juranometria.ui.solar.SaturnChartStore saturnChart,
+                     juranometria.ui.solar.MarsChartStore marsChart,
                      juranometria.ui.ZoomLockStore zoomLock,
                      juranometria.ui.companion.CompanionStore companion,
                      juranometria.ui.ChartChromeStore chartChrome,
@@ -63,6 +64,7 @@ record StartupStores(AppearanceStore appearance,
         require(moonChart, "moon on the chart");
         require(jovianChart, "jupiter and moons on the chart");
         require(saturnChart, "saturn on the chart");
+        require(marsChart, "mars on the chart");
         require(zoomLock, "zoom lock");
         require(companion, "companion window");
         require(chartChrome, "chart chrome");
@@ -85,6 +87,7 @@ record StartupStores(AppearanceStore appearance,
                 juranometria.ui.solar.MoonChartStore.user(),
                 juranometria.ui.solar.JovianChartStore.user(),
                 juranometria.ui.solar.SaturnChartStore.user(),
+                juranometria.ui.solar.MarsChartStore.user(),
                 juranometria.ui.ZoomLockStore.user(),
                 juranometria.ui.companion.CompanionStore.user(),
                 juranometria.ui.ChartChromeStore.user(),

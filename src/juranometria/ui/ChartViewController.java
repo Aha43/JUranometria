@@ -26,7 +26,7 @@ public final class ChartViewController {
 
     /**
      * Whether a closer field (#481) may be offered at a candidate page:
-     * the chart's answer to "does Mercury, Venus, Jupiter or Saturn lie on the page this
+     * the chart's answer to "does Mercury, Venus, Mars, Jupiter or Saturn lie on the page this
      * step would display" (ruled on #539, ruling 5). Nothing is offered
      * until a chart says so, which is the atlas without the closer
      * fields.

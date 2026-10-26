@@ -227,13 +227,24 @@ public final class SolarSystemSection {
      * is built; building them computes nothing and reads no pack.
      */
     public void withMars(MarsTableSession session, InterfaceText said) {
+        withMars(session, said, null, null);
+    }
+
+    /**
+     * The same, with the Solar System module's Mars switch (#606, R-5 on
+     * #605): Show on chart over {@code onChart}, and Centre on chart through
+     * {@code centre} where both are given.
+     */
+    public void withMars(MarsTableSession session, InterfaceText said,
+                         BodyOnChart onChart, CentreOnChart centre) {
         if (session == null || said == null) {
             throw new IllegalArgumentException("Mars's session, in a language");
         }
         if (mars != null) {
             mars.release();
         }
-        mars = new MarsTableControls(session, said, false);
+        mars = new MarsTableControls(session, said, false, onChart,
+                onChart == null ? null : centre, onChart);
     }
 
     /** Mars's controls, or null for a host built without Mars. */

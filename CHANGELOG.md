@@ -7,6 +7,23 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Mars on the chart (#606, part 1, ruled on #605).** View > Solar
+System gains *Mars on the chart*, directly after *Moon on the chart*,
+off until you ask and remembered across sessions, and the Mars group
+and dialog gain *Show on chart* and *Centre on chart*. Mars is drawn as
+Venus and Mercury are: the larger of its true disc and a 6-pixel
+cartographic symbol, phased by the lit side the table states, in the
+page's own ink with no colour; at the ordinary fields it is the symbol,
+spoken as one, and near a close opposition its true disc from 1°. A
+click on it selects Mars's occurrence. Zoom in at 1° now offers 0.5°
+and 0.25° where Mars stands on the page. Behind the Sun it is covered
+and the page says so; below a drawn horizon it is dimmed. Outside
+1900-2100 nothing is drawn. The closer-field explanations name Mars, in
+both languages. Phobos and Deimos are not drawn yet (part 2). The
+production pages are in `docs/studies/mars-on-the-chart/`. *Mars on
+the chart* has no access letter in either language, as *Mars...* has
+none.
+
 **Mars, Phobos and Deimos in the Solar System tables (#603, ruled on
 #601).** View > Solar System gains *Mars...* between *Moon...* and
 *Jupiter...*, and the Controller's Solar System tab a Mars group in the

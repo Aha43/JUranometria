@@ -180,12 +180,14 @@ public final class JUranometriaMain {
         controller.onChange(chart::setViewState);
         // The closer fields (#544, ruled on #539, rulings 5 and 6; Jupiter
         // added by the owner at the #544 checkpoint; Saturn by ruling 6 on
-        // #578): offered where Mercury, Venus, Jupiter or Saturn, as their
+        // #578; Mars by R-6 on #605): offered where Mercury, Venus, Mars,
+        // Jupiter or Saturn, as their
         // modules draw them, lies on the page the step would display - not
         // the Sun and not the Moon.
         chart.setCloserFieldBodies(java.util.Set.of(
                 juranometria.solarchart.SolarSystemModule.MERCURY,
                 juranometria.solarchart.SolarSystemModule.VENUS,
+                juranometria.solarchart.SolarSystemModule.MARS,
                 juranometria.jovianchart.JovianModule.JUPITER,
                 juranometria.saturnchart.SaturnModule.SATURN));
         controller.offerCloserFields(chart::offersCloserField);
@@ -622,6 +624,13 @@ public final class JUranometriaMain {
         juranometria.ui.solar.BodyOnChart saturnLayer =
                 juranometria.ui.solar.SaturnChartSession.switchOf(saturnOnChart,
                         saturnChartStore);
+        // Mars on the chart (#606, the rulings on #605): a switch on the Solar
+        // System module over Mars's own lazy service, remembered like the
+        // others; the packs load only when the switch is on and a page asks.
+        sunOnChart.withMars(marsSystem);
+        juranometria.ui.solar.MarsChartStore marsChartStore = stores.marsChart();
+        juranometria.ui.solar.BodyOnChart marsLayer =
+                juranometria.ui.solar.MarsChartSession.switchOf(sunOnChart, marsChartStore);
         // Place and Time's box on the chart (#259, the rulings on #556):
         // drawn whenever a layer drawn for the instant is on - Place and
         // Time's own lines, or a Solar System body, whose switches are
@@ -630,7 +639,8 @@ public final class JUranometriaMain {
         juranometria.ui.placeandtime.PlaceAndTimeFurniture.offer(meridian,
                 () -> sunLayer.showing() || mercuryLayer.showing()
                         || venusLayer.showing() || moonLayer.showing()
-                        || jupiterLayer.showing() || saturnLayer.showing(),
+                        || jupiterLayer.showing() || saturnLayer.showing()
+                        || marsLayer.showing(),
                 updateToNow,
                 juranometria.ui.language.InterfaceText.forLanguage(
                         language.interfaceLanguage()));
@@ -649,8 +659,8 @@ public final class JUranometriaMain {
         // Centre on chart since #579.
         solarSection.withSaturn(saturnTable, companionWords, saturnLayer, centreOnChart);
         // Mars's group between the Moon's and Jupiter's (#603), outward from
-        // the Sun; no chart switch and no Centre on chart yet.
-        solarSection.withMars(marsTable, companionWords);
+        // the Sun, with its Show on chart and Centre on chart since #606.
+        solarSection.withMars(marsTable, companionWords, marsLayer, centreOnChart);
         // The tab opens with the instant the chart is frozen at and Update
         // to now (#259, ruling 9 on #556).
         solarSection.showChartInstant(observerNow, placeAndTimeChanges, updateToNow);
@@ -819,7 +829,7 @@ public final class JUranometriaMain {
                         language.interfaceLanguage()),
                 () -> juranometria.ui.solar.MarsTableDialog.open(frame, marsTable,
                         juranometria.ui.language.InterfaceText.forLanguage(
-                                language.interfaceLanguage())));
+                                language.interfaceLanguage()), centreOnChart, marsLayer));
         // View > Solar System > Saturn... (#576), directly after Jupiter...:
         // the dialog host of the same Saturn session the Controller holds.
         AppMenuBar.addSaturnTable(frame.getJMenuBar(),
@@ -901,6 +911,15 @@ public final class JUranometriaMain {
                 jovianChartStore, jupiterOnChartItem);
         juranometria.ui.solar.SaturnChartSession.restore(saturnOnChart,
                 saturnChartStore, saturnOnChartItem);
+        // View > Solar System > Mars on the chart (#606), directly after Moon
+        // on the chart: the switch, remembered, its item following the module.
+        javax.swing.JCheckBoxMenuItem marsOnChartItem = AppMenuBar.addMarsOnChart(
+                frame.getJMenuBar(),
+                juranometria.ui.language.InterfaceText.forLanguage(
+                        language.interfaceLanguage()),
+                juranometria.ui.solar.MarsChartSession.toggle(sunOnChart, marsChartStore));
+        juranometria.ui.solar.MarsChartSession.restore(sunOnChart, marsChartStore,
+                marsOnChartItem);
         // The tick follows the window, however it was closed.
         javax.swing.JCheckBoxMenuItem companionItem =
                 AppMenuBar.companionItem(frame.getJMenuBar());

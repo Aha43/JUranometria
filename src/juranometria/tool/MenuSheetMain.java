@@ -226,6 +226,23 @@ public final class MenuSheetMain {
                 if (venusOnChart != null) {
                     venusOnChart.setSelected(state.checked());
                 }
+                // Mars... and Saturn... (#603, #575), Saturn on the chart (#579)
+                // and Mars on the chart (#606), added in the application's own
+                // order - the first three absent from this photograph until #606.
+                AppMenuBar.addMarsTable(bar[0],
+                        juranometria.ui.language.InterfaceText.forLanguage(language), () -> { });
+                AppMenuBar.addSaturnTable(bar[0],
+                        juranometria.ui.language.InterfaceText.forLanguage(language), () -> { });
+                JCheckBoxMenuItem saturnOnChart = AppMenuBar.addSaturnOnChart(bar[0],
+                        juranometria.ui.language.InterfaceText.forLanguage(language), () -> { });
+                if (saturnOnChart != null) {
+                    saturnOnChart.setSelected(state.checked());
+                }
+                JCheckBoxMenuItem marsOnChart = AppMenuBar.addMarsOnChart(bar[0],
+                        juranometria.ui.language.InterfaceText.forLanguage(language), () -> { });
+                if (marsOnChart != null) {
+                    marsOnChart.setSelected(state.checked());
+                }
 
                 // Centre on coordinates... (#623), which the application adds
                 // after the bar is built, after the Controller item.

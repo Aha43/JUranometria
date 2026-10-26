@@ -229,6 +229,7 @@ class StartupJourneyTest {
                             juranometria.ui.solar.MoonChartStore.forNode(node),
                             juranometria.ui.solar.JovianChartStore.forNode(node),
                             juranometria.ui.solar.SaturnChartStore.forNode(node),
+                            juranometria.ui.solar.MarsChartStore.forNode(node),
                             juranometria.ui.ZoomLockStore.forNode(node),
                             juranometria.ui.companion.CompanionStore.forNode(node),
                             juranometria.ui.ChartChromeStore.forNode(node),

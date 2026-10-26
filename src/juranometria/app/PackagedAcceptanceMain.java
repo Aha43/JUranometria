@@ -503,6 +503,7 @@ public final class PackagedAcceptanceMain {
         sunOnTheChartJourney();
         venusOnTheChartJourney();
         mercuryOnTheChartJourney();
+        marsOnTheChartJourney();
         closerFieldsJourney();
         moonOnTheChartJourney();
         solarSystemSheetJourney();
@@ -3048,6 +3049,98 @@ public final class PackagedAcceptanceMain {
     }
 
     /**
+     * Mars on the chart (#606), inside the image: Mercury's journey over the
+     * Mars sample, with the planets pack's Mars service attached as the
+     * application attaches it - the phased 6 px symbol at 8° and at the
+     * minimum field, spoken as one; a click on the mark selects Mars's
+     * occurrence (R-5); and at 1° the closer fields offered with Mars on
+     * the page (R-6), zoom in reaching 0.25° with Mars still drawn.
+     */
+    private static void marsOnTheChartJourney() throws Exception {
+        juranometria.solar.SolarSystemService solar =
+                juranometria.solar.SolarSystemService.load();
+        juranometria.solar.MarsService marsService = juranometria.solar.MarsService.load();
+        juranometria.sky.Observer oslo = new juranometria.sky.Observer(59.91, 10.75,
+                MARS_SAMPLE_INSTANT);
+        juranometria.solar.MarsService.MarsObservation mars = marsService.observe(oslo);
+        String identity = juranometria.solarchart.SolarSystemModule.MARS;
+        for (double field : new double[] {8.0,
+                juranometria.chart.ChartViewState.normalMinimumFieldDegrees()}) {
+            juranometria.ui.ChartComponent[] chart = new juranometria.ui.ChartComponent[1];
+            juranometria.chart.SelectionModel selection = new juranometria.chart.SelectionModel();
+            juranometria.ui.ChartModuleHost[] host = new juranometria.ui.ChartModuleHost[1];
+            juranometria.ui.ChartViewController controller =
+                    new juranometria.ui.ChartViewController();
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                chart[0] = new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
+                chart[0].setSize(900, 700);
+                controller.onChange(chart[0]::setViewState);
+                chart[0].setCloserFieldBodies(CLOSER_FIELD_BODIES);
+                controller.offerCloserFields(chart[0]::offersCloserField);
+                chart[0].onPageContentsChange(controller::closerOfferChanged);
+                controller.recenter(mars.astrometricJ2000(), field);
+                host[0] = new juranometria.ui.ChartModuleHost(chart[0], selection, r -> { });
+                juranometria.ui.SelectInteraction.install(chart[0], selection,
+                        host[0].workingSelection(), new juranometria.chart.SelectionMode());
+                juranometria.solarchart.SolarSystemModule module =
+                        juranometria.ui.solar.SunChartSession.begin(host[0], () -> oslo,
+                                () -> solar, () -> false);
+                module.withMars(() -> marsService);
+                module.sunShowing(false);
+                module.marsShowing(true);
+            });
+            try {
+                paintHeadless(chart[0]);
+                java.util.List<juranometria.ui.ReferenceInk.BodyPlacement> drawn =
+                        chart[0].renderedBodies();
+                require(drawn.size() == 1 && identity.equals(drawn.get(0).identity()),
+                        "the packaged chart drew Mars at " + field + "°: " + drawn);
+                juranometria.project.DrawnPage page =
+                        juranometria.project.DrawnPage.of(chart[0].currentScene());
+                juranometria.project.PixelPoint expected =
+                        new juranometria.project.ViewportMapping(page).toPixel(
+                                page.projection().project(mars.astrometricJ2000()).orElseThrow());
+                juranometria.project.PixelPoint centre = drawn.get(0).centre();
+                require(Math.hypot(centre.x() - expected.x(), centre.y() - expected.y()) < 0.01,
+                        "at the service's J2000 place at " + field + "°");
+                require(drawn.get(0).symbol() && Math.abs(drawn.get(0).disc().getBounds2D()
+                                .getWidth() - juranometria.solarchart.SolarSystemModule
+                                .MARS_MINIMUM_MARK_PX) < 0.05,
+                        "rule M: the phased 6 px symbol on the ordinary ladder at " + field + "°");
+                String said = chart[0].getAccessibleContext().getAccessibleDescription();
+                require(said.contains(" Mars (a cartographic symbol, not Mars's apparent"
+                        + " diameter)."), "spoken as a symbol: " + said);
+                if (field == juranometria.chart.ChartViewState.normalMinimumFieldDegrees()) {
+                    clickOn(chart[0], centre);
+                    require(selection.selection() instanceof juranometria.chart.Selection
+                            .Occurrence chosen && identity.equals(chosen.identity())
+                            && MARS_SAMPLE_INSTANT.equals(chosen.instant()),
+                            "a click on Mars's mark is Mars's occurrence (R-5): "
+                                    + selection.selection());
+                    javax.swing.SwingUtilities.invokeAndWait(() -> { });
+                    require(controller.canZoomIn(), "at 1° with Mars on the page, the closer"
+                            + " step is offered (R-6)");
+                    javax.swing.SwingUtilities.invokeAndWait(controller::zoomIn);
+                    javax.swing.SwingUtilities.invokeAndWait(() -> { });
+                    javax.swing.SwingUtilities.invokeAndWait(controller::zoomIn);
+                    require(controller.state().fieldWidthDegrees() == 0.25,
+                            "zoom in reaches 0.25° on Mars");
+                    paintHeadless(chart[0]);
+                    require(chart[0].renderedBodies().stream()
+                                    .anyMatch(b -> identity.equals(b.identity())),
+                            "Mars still drawn at 0.25°");
+                }
+            } finally {
+                javax.swing.SwingUtilities.invokeAndWait(host[0]::detachAll);
+            }
+        }
+        System.out.println("mars on the chart OK (the packaged component draws Mars where the"
+                + " planets pack puts it at the Mars sample - the phased 6 px symbol at 8° and at"
+                + " the minimum field, spoken as one - a click on the mark selects Mars's"
+                + " occurrence, and the closer fields reach 0.25° on Mars)");
+    }
+
+    /**
      * The closer fields inside the packaged image (#544, closing #481,
      * rulings 4-6 on #539): wired as the application wires them, zoom in
      * at 1° is the closer step where Mercury stands on the page it would
@@ -3160,6 +3253,7 @@ public final class PackagedAcceptanceMain {
     private static final java.util.Set<String> CLOSER_FIELD_BODIES = java.util.Set.of(
             juranometria.solarchart.SolarSystemModule.MERCURY,
             juranometria.solarchart.SolarSystemModule.VENUS,
+            juranometria.solarchart.SolarSystemModule.MARS,
             juranometria.jovianchart.JovianModule.JUPITER);
 
     /** Jupiter's half of the closer-fields journey, at the Jovian sheet's moment. */

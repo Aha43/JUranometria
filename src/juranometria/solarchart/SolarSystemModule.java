@@ -63,6 +63,17 @@ public final class SolarSystemModule implements ChartModule {
     /** The page's state keys for Mercury meeting the Sun's disc (ruling 2 on #539). */
     public static final String MERCURY_IN_FRONT = MERCURY + VENUS_IN_FRONT.substring(VENUS.length());
     public static final String MERCURY_BEHIND = MERCURY + VENUS_BEHIND.substring(VENUS.length());
+    /**
+     * Mars's identity on the page (#606), derived from its service's name as
+     * Venus's and Mercury's are from theirs: Mars has its own service (#602),
+     * not a Solar System body entry.
+     */
+    public static final String MARS = juranometria.solar.MarsService.class.getSimpleName()
+            .substring(0, 4).toLowerCase(java.util.Locale.ROOT);
+    /** Rule M for Mars (R-1 on #605): Venus's and Mercury's mark, the same size. */
+    public static final double MARS_MINIMUM_MARK_PX = VENUS_MINIMUM_MARK_PX;
+    /** The page's state key for Mars behind the Sun's disc; an outer planet is never in front. */
+    public static final String MARS_BEHIND = MARS + VENUS_BEHIND.substring(VENUS.length());
 
     private final Supplier<Observer> observer;
     private final Supplier<SolarSystemService> service;
@@ -153,6 +164,46 @@ public final class SolarSystemModule implements ChartModule {
     private boolean venusShowing;
     private final java.util.List<java.util.function.Consumer<Boolean>> venusListeners =
             new java.util.ArrayList<>();
+    private boolean marsShowing;
+    private final java.util.List<java.util.function.Consumer<Boolean>> marsListeners =
+            new java.util.ArrayList<>();
+    /** Mars's service, read only when Mars is shown (#606); null until a host gives it. */
+    private Supplier<juranometria.solar.MarsService> mars;
+
+    /** Gives the module Mars's service, read lazily the first time Mars is drawn (#606). */
+    public void withMars(Supplier<juranometria.solar.MarsService> service) {
+        if (service == null) {
+            throw new IllegalArgumentException("Mars's service is required");
+        }
+        this.mars = service;
+    }
+
+    public boolean marsShowing() {
+        return marsShowing;
+    }
+
+    /** Mars on the chart (#606): its own switch, independent of every other body's. */
+    public void marsShowing(boolean showing) {
+        boolean changed = this.marsShowing != showing;
+        this.marsShowing = showing;
+        if (services != null) {
+            services.redraw();
+        }
+        if (changed) {
+            for (java.util.function.Consumer<Boolean> listener : java.util.List.copyOf(marsListeners)) {
+                listener.accept(showing);
+            }
+        }
+    }
+
+    public void onMarsChange(java.util.function.Consumer<Boolean> listener) {
+        if (listener == null) {
+            throw new IllegalArgumentException("a listener is required");
+        }
+        marsListeners.add(listener);
+        listener.accept(marsShowing);
+    }
+
     private boolean mercuryShowing;
     private final java.util.List<java.util.function.Consumer<Boolean>> mercuryListeners =
             new java.util.ArrayList<>();
@@ -273,7 +324,8 @@ public final class SolarSystemModule implements ChartModule {
      */
     public List<OverlayContribution> contributedGeometry() {
         contributions++;
-        if (!sunShowing && !moonShowing && !venusShowing && !mercuryShowing) {
+        if (!sunShowing && !moonShowing && !venusShowing && !mercuryShowing
+                && !(marsShowing && mars != null)) {
             return List.of();
         }
         Observer now = observer.get();
@@ -341,6 +393,27 @@ public final class SolarSystemModule implements ChartModule {
                         venus.distanceKm(), InkRole.BODY,
                         OverlayContribution.Moment.of(now), true, VENUS_MINIMUM_MARK_PX,
                         state));
+            } catch (IllegalArgumentException outsideTheYears) {
+                // Nothing for this instant.
+            }
+        }
+        if (marsShowing && mars != null) {
+            // Mars (#606, the rulings on #605): rule M phased, Venus's and
+            // Mercury's form - the equatorial disc over the 6 px mark,
+            // phased as the Mars table states it, no colour (R-2),
+            // selectable as an occurrence (R-5), spoken behind the Sun when
+            // its disc meets the Sun's. Outside its years nothing is drawn.
+            try {
+                juranometria.solar.MarsService.MarsObservation planet = mars.get().observe(now);
+                offered.add(new OverlayContribution.Body(MARS, "Mars",
+                        planet.astrometricJ2000(), planet.equatorialDiameterArcseconds(),
+                        new OverlayContribution.Lit(planet.illuminatedFraction(),
+                                planet.brightLimbAngleDegrees(), planet.phaseAngleDegrees()),
+                        horizon && planet.horizontal().altitudeDegrees() < 0.0,
+                        planet.distanceKm(), InkRole.BODY,
+                        OverlayContribution.Moment.of(now), true, MARS_MINIMUM_MARK_PX,
+                        planet.phase() == juranometria.solar.MarsService.Phase.BEHIND_SUN
+                                ? MARS_BEHIND : null));
             } catch (IllegalArgumentException outsideTheYears) {
                 // Nothing for this instant.
             }

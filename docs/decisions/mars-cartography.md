@@ -107,3 +107,44 @@ The owner's ruling of 2026-10-26, as given: "Agree".
 **R-1 to R-8 are ruled as proposed above.** For R-3 that is the proposal itself, not its alternative:
 - **The moons are drawn only where they stand clear.** Each moon's 3 px symbol is drawn only where it stands clear of Mars's drawn mark and of the other moon, on every field including 1° and the closer fields.
 - **Jupiter's floor rule does not apply to Mars.**
+
+## Mars on the chart, as built (#606, part 1)
+
+R-8's first part: Mars itself. The moons follow in part 2.
+
+- **The switch.** *Mars on the chart* in View > Solar System, directly
+  after *Moon on the chart*, off by default and remembered
+  (`MarsChartStore`, as Mercury's); the Mars group and dialog carry
+  *Show on chart* and *Centre on chart* over the same switch (R-5). No
+  access letter in either language: as for *Mars...*, no letter of
+  "Mars på kartet" is free in Norwegian, and every existing mnemonic is
+  kept.
+- **Rule M phased (R-1).** The Solar System module contributes Mars as
+  it does Venus and Mercury: the larger of the true equatorial disc and
+  the 6 px mark, lit by the service's k and χ turned through the page's
+  north and east. The ordinary ladder draws the symbol; the true disc
+  passes 6 px at 1° only near the closest oppositions (6.3 px in 2003);
+  at 0.25° the true disc is some 3.5 to 25 px, so near conjunction the
+  mark still stands in there.
+- **No colour (R-2)**; the page's ink in both palettes.
+- **Selection and Centre on chart (R-5).** A click on Mars is its
+  occurrence (#513); Centre on chart centres on the table's J2000 place
+  at 1° and turns the switch on.
+- **The closer fields (R-6).** Mars joins Mercury, Venus, Jupiter and
+  Saturn in the set that offers 0.5° and 0.25°; the five closer-field
+  explanations name it, in both languages.
+- **Behind the Sun (R-7).** The mark lies beneath the stars and the
+  Sun's ground-filled disc covers it; the page says *Mars, behind the
+  Sun* / *Mars, bak Solen*. Below a drawn horizon Mars is dimmed (#615).
+- **Outside the years.** Before 1900 and after 2100 the service refuses
+  and the module draws nothing.
+- **Evidence.** `MarsInkTest` (the symbol, the 2003 true disc, behind
+  the Sun in 1912, nothing outside the years); `docs/studies/mars-on-the-chart/`
+  (`make mars-on-the-chart-study`): production pages at the 2003
+  opposition from 8° to 0.25°, the 2026 conjunction, behind the Sun in
+  1912, and the widest dark side of 2018 at 0.25°, its drawn lit side
+  measured from the pixels within 1° of the service's χ; the packaged
+  journey *mars on the chart OK*; the menu sheets retaken, now also
+  showing *Mars...*, *Saturn...* and *Saturn on the chart*, which they
+  had lacked since #575, #579 and #603.
+
