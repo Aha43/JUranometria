@@ -1,6 +1,6 @@
 # Drawing Mars, Phobos and Deimos
 
-**Issue #605, the first issue of Part II of the Mars road (#600).** This is the cartography contract for Mars and its two ruled moons, proposed from measurement before any production Mars ink exists. **Not yet ruled.** The owner's ruling, when given, governs wherever it differs from this proposal.
+**Issue #605, the first issue of Part II of the Mars road (#600).** This is the cartography contract for Mars and its two ruled moons, proposed from measurement before any production Mars ink exists. **Ruled by the owner on 2026-10-26.** [The ruling](#the-ruling), at the end, governs.
 
 It inherits:
 - the Sun's and the Moon's cartography (`solar-cartography.md`);
@@ -99,3 +99,11 @@ The conjunction page shows Mars 0.94° from the Sun at Espenak's hour. The conju
    - each with its packaged owner checkpoint.
 
 The Saturn article (#607) and the release boundary (#608) follow, as the road orders them.
+
+## The ruling
+
+The owner's ruling of 2026-10-26, as given: "Agree".
+
+**R-1 to R-8 are ruled as proposed above.** For R-3 that is the proposal itself, not its alternative:
+- **The moons are drawn only where they stand clear.** Each moon's 3 px symbol is drawn only where it stands clear of Mars's drawn mark and of the other moon, on every field including 1° and the closer fields.
+- **Jupiter's floor rule does not apply to Mars.**
