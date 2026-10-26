@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**814 promoted artifacts.**
+**831 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -494,6 +494,23 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/label-placement/orion-90-today.png` | `23589defba2b50018f3e4d7ae0656d5d004632970fbdcaa9b0eda666b49de4f4` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/label-placement/sagittarius-120-candidate.png` | `cb4d9661a353dcc4d277925840456d7209686ea592ba1d70713bed00b588db80` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/label-placement/sagittarius-120-today.png` | `63590ac511146e5223de2c853315c8e96ab1216fd9cbc99c40d27cf6ec440fe5` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mars-cartography/below-horizon-8.png` | `3dd522173d9ad6fe99dd5d1866bcb3c8e28984a965c0ad83690fd0e8416ae9e8` | 2026-10-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mars-cartography/conjunction-2026-3.png` | `28a12f79a23559e403e871d08861f2f8a4c1776074474d28199faca583dbbcbb` | 2026-10-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mars-cartography/deimos-widest-0.25.png` | `57071ca91968649c4a8906f58b4bf0b3088f5bb0e56eca32c5cfaf98182bc9f7` | 2026-10-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mars-cartography/greatest-phase-0.25.png` | `8f1bbaf370b7834befbbb6a56edca9e0ec0fcc44f1c434caeabd8d57623b122b` | 2026-10-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mars-cartography/greatest-phase-1.png` | `9636c1b92defc382979b9cc846bce82f7d640a3f00d18433d2569027b622bf8f` | 2026-10-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mars-cartography/opposition-2003-0.25.png` | `47d3e9bd80612775ea8b8207d867f8b5c27d2547c2ee5a09098cf616e0a134a1` | 2026-10-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mars-cartography/opposition-2003-0.5.png` | `665075b789c45fff377cf8aff2446fb838dd2944baf20f31c4e8421ee9e44dbf` | 2026-10-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mars-cartography/opposition-2003-1.png` | `ec57891b197841409f3c064a19fd66cba23346fd898a144155f9052fadf12655` | 2026-10-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mars-cartography/opposition-2003-3.png` | `738414626e33787cdf939d4c9d2cb911c7bc11b0613f0786dc7a0dd6f1252f9c` | 2026-10-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mars-cartography/opposition-2003-8.png` | `0aebff6dcee63c9fc833a12513748f47c075dfd81cbb6da3d01b72950c0bc1dd` | 2026-10-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mars-cartography/opposition-2027-0.25.png` | `6a0cf0fb9f9035caa289586506863c6c570d3fe599108f250b65d39ab380ff3b` | 2026-10-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mars-cartography/opposition-2027-1.png` | `99f12f9693fdc94a9e3a4c12de50cfaaf9d21fde47dfce81ba84533b30e6a604` | 2026-10-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mars-cartography/phobos-behind-in-shadow-0.25.png` | `5b1a02b214b523e4d4d66c30885a922f19962c3a48148599c1a8b3f9b4be8a75` | 2026-10-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mars-cartography/phobos-in-front-0.25.png` | `b567e6276d0119dc7d92f4f9037c181723f58cd056bafc30ba52843db4cfba7e` | 2026-10-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mars-cartography/phobos-in-shadow-0.25.png` | `89b501d2d7adb11450770c64976170f707f93a4236ba17dad91da093d8e75021` | 2026-10-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mars-cartography/pleiades-2100-8.png` | `45d8a997b43d64490a1f51a34807f5a8a3027a5403f8e087a7dfd145f991653f` | 2026-10-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/mars-cartography/printable-a4-1.png` | `9fd8dca7a6f49df539d9ee0f35df2643ffceef3a9d3f7c8e0486550a822b0201` | 2026-10-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/mercury-cartography/appearance-crescent-evening-1.png` | `867981e2a36efffcca503719bd0b8d2b764454729f2efe974406625c22add811` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/mercury-cartography/appearance-crescent-morning-1.png` | `fafcb2f554016d3801aee6266991458fc3e645d77c057445cbdc63ea7722f9ac` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/mercury-cartography/appearance-gibbous-evening-1.png` | `6934c08e7687d68c33e9d71dd77a008f67b2dcdd7f50e8680fc4e59a10ea7416` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |

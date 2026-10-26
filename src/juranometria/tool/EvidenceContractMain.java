@@ -228,6 +228,10 @@ public final class EvidenceContractMain {
         // deterministic; its mock-ups are held through IMAGE_MAINS.
         REPORT_MAINS.put("juranometria.tool.SaturnCartographyStudyMain",
                 "docs/studies/saturn-cartography/measurements.md");
+        // Mars, Phobos and Deimos on the page (#605): the report is deterministic;
+        // its mock-ups are held through IMAGE_MAINS, its labels in the platform record.
+        REPORT_MAINS.put("juranometria.tool.MarsCartographyStudyMain",
+                "docs/studies/mars-cartography/measurements.md");
         // Saturn on the chart (#579): production pages through the component
         // with the Saturn module attached; its pages are held through IMAGE_MAINS.
         REPORT_MAINS.put("juranometria.tool.SaturnOnTheChartStudyMain",
@@ -438,6 +442,8 @@ public final class EvidenceContractMain {
                 "docs/studies/mercury-cartography/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.SaturnCartographyStudyMain",
                 "docs/studies/saturn-cartography/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.MarsCartographyStudyMain",
+                "docs/studies/mars-cartography/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.SaturnOnTheChartStudyMain",
                 "docs/studies/saturn-on-the-chart/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.ChartInstantStudyMain",
@@ -636,6 +642,9 @@ public final class EvidenceContractMain {
             // pages painted by the renderer, the study's candidate figure and marks
             // drawn over them; renderer-drawn contract, as #482's.
             "juranometria.tool.SaturnCartographyStudyMain",
+            // Mars, Phobos and Deimos on the page (issue #605): production pages
+            // painted by the renderer, the study's candidate marks drawn over them.
+            "juranometria.tool.MarsCartographyStudyMain",
             // Saturn on the chart (issue #579): production pages composed by the
             // component with the Saturn module attached, and the exported sheet.
             "juranometria.tool.SaturnOnTheChartStudyMain",
