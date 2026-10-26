@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * chart box ticks View's item and is remembered under the key it always
  * had; the window's own focus traversal reaches the group's controls;
  * and View holds the Solar System submenu with its entries in the
- * ruled order - Jupiter... after Moon... since #474 and Saturn... last
+ * ruled order - Mars... after Moon... since #603, Jupiter... after it since #474 and Saturn... last
  * since #576, whose groups follow the Moon's, introduced collapsed, and
  * opened compute nothing.
  */
@@ -115,6 +115,7 @@ class SolarSystemCompanionJourneyTest {
                     }
                     assertEquals(List.of("heading.solarsystem.sun", "heading.solarsystem.mercury",
                             "heading.solarsystem.venus", "heading.solarsystem.moon",
+                            "heading.solarsystem.mars",
                             "heading.solarsystem.jupiter", "heading.solarsystem.saturn"), headings,
                             "outward from the Sun, the bodies the atlas has");
                     // Mercury (#530): between the Sun and Venus, introduced
@@ -164,6 +165,22 @@ class SolarSystemCompanionJourneyTest {
                             "Jupiter and moons on the chart, in Jupiter's group (#484)");
                     assertFalse(((javax.swing.JCheckBox) find(content, "jupiterOnChart"))
                             .isSelected(), "off by default: opening draws nothing");
+
+                    // Mars (#603): between the Moon and Jupiter, introduced
+                    // collapsed; opened, it has computed nothing, and offers no
+                    // chart switch and no Centre on chart - no Mars is drawn.
+                    AbstractButton marsHeading = (AbstractButton) named(content,
+                            "heading.solarsystem.mars");
+                    assertFalse(marsHeading.isSelected(), "Mars introduced collapsed");
+                    reveal(marsHeading);
+                    ReaderInput.click(marsHeading);
+                    drain();
+                    assertTrue(marsHeading.isSelected(), "Mars opened");
+                    assertNull(find(content, "marsCard"), "Mars, opened, has computed nothing: no card");
+                    assertNull(find(content, "marsTable"), "and no moons");
+                    assertNotNull(find(content, "marsCompute"), "but its controls are there");
+                    assertNull(find(content, "marsOnChart"), "no Show on chart for Mars");
+                    assertNull(find(content, "marsCentreOnChart"), "and no Centre on chart");
 
                     // Saturn (#576): after Jupiter, introduced collapsed;
                     // opened, it has computed nothing; since #579 it offers
@@ -288,7 +305,8 @@ class SolarSystemCompanionJourneyTest {
                     assertEquals(List.of("Sun on the chart", "Mercury on the chart",
                             "Venus on the chart", "Moon on the chart",
                             "Jupiter and moons on the chart", "Saturn on the chart", "—",
-                            "Sun...", "Mercury...", "Venus...", "Moon...", "Jupiter...", "Saturn..."),
+                            "Sun...", "Mercury...", "Venus...", "Moon...", "Mars...", "Jupiter...",
+                            "Saturn..."),
                             order, "outward from the Sun, the switches and the tables (#530, #542,"
                                     + " #576, #579)");
 

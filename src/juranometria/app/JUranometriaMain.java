@@ -536,6 +536,27 @@ public final class JUranometriaMain {
         juranometria.ui.solar.SaturnTableSession saturnTable =
                 new juranometria.ui.solar.SaturnTableSession(observerNow, saturnSystem);
         saturnTable.followContext(meridian.context());
+        // The Mars table (#603), over the same chart context: the 44 MB Mars
+        // System pack is read once, when a host first computes - never at
+        // startup, never on opening.
+        java.util.function.Supplier<juranometria.solar.MarsService> marsSystem =
+                new java.util.function.Supplier<>() {
+                    private juranometria.solar.MarsService loaded;
+
+                    @Override
+                    public synchronized juranometria.solar.MarsService get() {
+                        if (loaded == null) {
+                            loaded = new juranometria.solar.MarsService(
+                                    juranometria.solar.SolarSystemPack.load(),
+                                    juranometria.solar.PlanetsPack.load(),
+                                    juranometria.solar.MarsSystemPack.load());
+                        }
+                        return loaded;
+                    }
+                };
+        juranometria.ui.solar.MarsTableSession marsTable =
+                new juranometria.ui.solar.MarsTableSession(observerNow, marsSystem);
+        marsTable.followContext(meridian.context());
         // Set chart time to its next meridian transit (#612 absorbing #569,
         // ruling P4): the Inspector's action over the selected object,
         // installing through the meridian module as Place and Time does.
@@ -627,6 +648,9 @@ public final class JUranometriaMain {
         // Saturn's group after Jupiter's (#576), with its Show on chart and
         // Centre on chart since #579.
         solarSection.withSaturn(saturnTable, companionWords, saturnLayer, centreOnChart);
+        // Mars's group between the Moon's and Jupiter's (#603), outward from
+        // the Sun; no chart switch and no Centre on chart yet.
+        solarSection.withMars(marsTable, companionWords);
         // The tab opens with the instant the chart is frozen at and Update
         // to now (#259, ruling 9 on #556).
         solarSection.showChartInstant(observerNow, placeAndTimeChanges, updateToNow);
@@ -788,6 +812,14 @@ public final class JUranometriaMain {
                 () -> juranometria.ui.solar.JovianTableDialog.open(frame, jupiterTable,
                         juranometria.ui.language.InterfaceText.forLanguage(
                                 language.interfaceLanguage()), centreOnChart, jupiterLayer));
+        // View > Solar System > Mars... (#603), between Moon... and Jupiter...:
+        // the dialog host of the same Mars session the Controller holds.
+        AppMenuBar.addMarsTable(frame.getJMenuBar(),
+                juranometria.ui.language.InterfaceText.forLanguage(
+                        language.interfaceLanguage()),
+                () -> juranometria.ui.solar.MarsTableDialog.open(frame, marsTable,
+                        juranometria.ui.language.InterfaceText.forLanguage(
+                                language.interfaceLanguage())));
         // View > Solar System > Saturn... (#576), directly after Jupiter...:
         // the dialog host of the same Saturn session the Controller holds.
         AppMenuBar.addSaturnTable(frame.getJMenuBar(),

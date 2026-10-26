@@ -7,6 +7,22 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Mars, Phobos and Deimos in the Solar System tables (#603, ruled on
+#601).** View > Solar System gains *Mars...* between *Moon...* and
+*Jupiter...*, and the Controller's Solar System tab a Mars group in the
+same place, introduced collapsed; both hosts share one session, and
+opening, expanding or building either computes nothing. The Mars card
+gives the position, height, distance, apparent diameter across the
+equator and from pole to pole, the illuminated fraction and phase, the
+elongation from the Sun and the lit side, the north pole's position
+angle and how far that pole is tipped towards you; Phobos and Deimos
+follow in Jupiter's and Saturn's columns, with their states - clear of
+Mars, in front of it, behind it or in its shadow. The moons are computed
+for 2000 to 2049: at an instant outside those years Mars is shown alone
+and the table says why, and a range across them keeps Mars at every
+instant and says where the moons are not computed. In English and
+Norwegian. Mars is not drawn on the chart yet.
+
 **Mars, computed offline (#602, ruled on #601).** The planets pack
 gains a third kernel, DE440's Mars barycentre over 1900-2100 (709,632
 bytes): NAIF's MAR099 puts Mars's centre within 0.210 m of it, which

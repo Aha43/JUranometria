@@ -341,6 +341,7 @@ arrangement at its frozen instant.
 | ▸ Mercury | Show or hide this section | Mercury, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Venus | Show or hide this section | Venus, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Moon | Show or hide this section | Moon, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
+| ▸ Mars | Show or hide this section | Mars, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Jupiter | Show or hide this section | Jupiter, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Saturn | Show or hide this section | Saturn, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 
@@ -360,6 +361,7 @@ arrangement at its frozen instant.
 | ▸ Mercury | Show or hide this section | Mercury, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Venus | Show or hide this section | Venus, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Moon | Show or hide this section | Moon, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
+| ▸ Mars | Show or hide this section | Mars, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▾ Jupiter | Show or hide this section | Jupiter, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | Chart time 2026-03-20 21:33:00 UTC at latitude 59.913, longitude 10.752 east, from Place and Time. | — | Chart time 2026-03-20 21:33:00 UTC at latitude 59.913, longitude 10.752 east, from Place and Time. | — |
 | At chart time | One row, at the chart time | Show Jupiter and its moons at the chart time | Shows Jupiter at the chart time, and below it the four moons in a fixed order. |
@@ -747,6 +749,7 @@ arrangement at its frozen instant.
 | ▸ Merkur | Vis eller skjul denne delen | Merkur, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Venus | Vis eller skjul denne delen | Venus, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Månen | Vis eller skjul denne delen | Månen, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
+| ▸ Mars | Vis eller skjul denne delen | Mars, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Jupiter | Vis eller skjul denne delen | Jupiter, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Saturn | Vis eller skjul denne delen | Saturn, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 
@@ -766,6 +769,7 @@ arrangement at its frozen instant.
 | ▸ Merkur | Vis eller skjul denne delen | Merkur, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Venus | Vis eller skjul denne delen | Venus, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Månen | Vis eller skjul denne delen | Månen, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
+| ▸ Mars | Vis eller skjul denne delen | Mars, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▾ Jupiter | Vis eller skjul denne delen | Jupiter, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | Karttid 2026-03-20 21:33:00 UTC på bredde 59,913, lengde 10,752 øst, fra Sted og tid. | — | Karttid 2026-03-20 21:33:00 UTC på bredde 59,913, lengde 10,752 øst, fra Sted og tid. | — |
 | Ved karttid | Én rad, ved karttiden | Vis Jupiter og månene ved karttiden | Viser Jupiter ved karttiden, og under den de fire månene i fast rekkefølge. |

@@ -452,3 +452,28 @@ The era boundaries are the shared time model's. Every cell the amendments do not
 - **`MarsReferenceVectorTest` fails on any value beyond its bound in force.** It holds all 35 asserted cells.
 - **It also fails on any amended cell that comes inside its former target.** The record must then be updated.
 - **`MarsNamedEventsTest` holds every event within three hours.** The four rows the former hour did not hold are named, and each must still lie beyond the hour.
+
+## #603, the table, as built: a packaged checkpoint
+
+**Not yet accepted.** Issue #603 adds Mars and its ruled moons to the Solar System tables, for the owner's numerical and layout journey in the packaged build. The table follows the card and columns ruled in M-9.
+
+**Hosts and order.**
+- **Where it lives.** View > Solar System gains *Mars...* between *Moon...* and *Jupiter...*. The Controller's Solar System tab gains a Mars group in the same place, introduced collapsed.
+- **One session.** Both hosts share one `MarsTableSession`. Drafts are each host's own. Building, opening, expanding and choosing a tab compute nothing, and read no pack.
+- **No chart surface.** There is no Show on chart and no Centre on chart: no Mars is drawn yet.
+
+**The card,** twelve lines: right ascension and declination (J2000), altitude, azimuth, distance, apparent diameter across the equator and from pole to pole, illuminated fraction, phase, elongation with its side, lit side, the north pole's position angle, and the tilt with the pole tipped towards the observer.
+
+**The moons.** Phobos then Deimos, in Jupiter's and Saturn's columns: side, east–west, north–south, separation, separation in Mars radii, and state.
+
+**Ranges.** These are grouped by instant. Each group is one Mars result: a heading, then three summary lines (position; figure and pole; light and tilt). The moons follow beneath it. A range is capped at 500 instants, two moon rows each, within the released 1,000-row cap.
+
+**Outside the moons' years.** This is the one departure from Saturn's table, offered for the owner's acceptance.
+- **Saturn refuses a whole range** that leaves the moons' years.
+- **Mars answers to 2100, but its moons stop in 2049.** Refusing whole would hide Mars's own rows for half a century, which the issue forbids.
+- **So the Mars table shows Mars at every instant, always.** A single instant outside the moons' years shows Mars and says the moons are refused, naming their years. A range shows the moons wherever they answer, and in place of them a line saying they are not computed there. The status counts those instants.
+- **The boundary is the service's.** Whether the moons answer at an instant is decided by `MarsService.moonsAnswerAt`, the exclusive TDB boundary of the #601 amendment.
+
+**No access letter for *Mars...*.** Every letter of "Mars" is already claimed on View > Solar System: in English by the Moon (M), Saturn on the chart (A), Mercury (R) and the Sun (S); in Norwegian by the Moon (M), Saturn on the chart (A), Mercury (R) and Saturn (S). Two items never share a letter. The item is reachable by the menu's arrow keys and by its spoken name, as other unlettered items are. Re-lettering a released item to free one is an owner decision, and is not done here.
+
+**Evidence.** The companion photographs of the open Solar System tab and of Jupiter's group were regenerated, with the strings sheet. They now show the collapsed Mars group between the Moon and Jupiter.

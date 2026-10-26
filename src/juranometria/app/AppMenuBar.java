@@ -1154,6 +1154,36 @@ public final class AppMenuBar {
     }
 
     /**
+     * Adds View > Solar System > Mars... between Moon... and Jupiter...
+     * (#603), outward from the Sun: the Mars table's dialog, kept beside the
+     * Controller's Mars group for dogfooding as Saturn's is. Opening it
+     * computes nothing. No Mars on the chart item: no Mars is drawn yet.
+     */
+    public static void addMarsTable(javax.swing.JMenuBar bar,
+                                    juranometria.ui.language.InterfaceText said,
+                                    Runnable openMarsTable) {
+        JMenu solar = solarSystemMenu(bar);
+        if (solar == null || openMarsTable == null) {
+            return;
+        }
+        JMenuItem mars = new JMenuItem(said.say("menu.mars.label"));
+        mars.setName("marsTableItem");
+        // No access letter: every letter of "Mars" is already claimed on this
+        // menu, in English and in Norwegian, and two items never share one.
+        mars.getAccessibleContext().setAccessibleName(said.say("menu.mars.a11y"));
+        juranometria.ui.Explain.control(mars, said.say("menu.mars.hover"),
+                said.say("menu.mars.explain"));
+        mars.addActionListener(event -> openMarsTable.run());
+        int at = solar.getMenuComponentCount();
+        for (int i = 0; i < solar.getMenuComponentCount(); i++) {
+            if (MOON_ITEM.equals(solar.getMenuComponent(i).getName())) {
+                at = i + 1;
+            }
+        }
+        solar.insert(mars, at);
+    }
+
+    /**
      * Adds View > Solar System > Saturn... directly after Jupiter... (#576):
      * the Saturn table's dialog, kept beside the Controller's Saturn group
      * for dogfooding as Jupiter's is. Opening it computes nothing. No

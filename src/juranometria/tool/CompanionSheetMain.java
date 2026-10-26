@@ -302,6 +302,11 @@ public final class CompanionSheetMain {
                 // Saturn's group (#576) after Jupiter's, as the application's
                 // Controller holds it: introduced collapsed, it computes
                 // nothing, so the pack is never read.
+                // Mars's group (#603) between the Moon's and Jupiter's, as the
+                // application's Controller holds it: introduced collapsed, it
+                // computes nothing, so the packs are never read.
+                solarSection.withMars(new juranometria.ui.solar.MarsTableSession(
+                        () -> observer, juranometria.solar.MarsService::load), words);
                 solarSection.withSaturn(new juranometria.ui.solar.SaturnTableSession(
                         () -> observer, juranometria.solar.SaturnSystemService::load), words);
                 // The tab opens with the chart's instant and Update to now
