@@ -7,6 +7,23 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Mars, computed offline (#602, ruled on #601).** The planets pack
+gains a third kernel, DE440's Mars barycentre over 1900-2100 (709,632
+bytes): NAIF's MAR099 puts Mars's centre within 0.210 m of it, which
+the builder re-measures before it writes. Venus's and Mercury's files
+are unchanged. A fifth pack, Mars System, holds Phobos and Deimos from
+MAR099 (43,951,104 bytes), from 2000 up to, not including, the first
+instant of 2050 (TDB): a reader is told 2000-2049, and the last civil
+seconds of 2049 already lie past it. The Mars service gives the chart
+place, the apparent and horizontal place, the distance, the equatorial
+and polar diameter at the tilt, the phase and lit side, the north
+pole from the IAU 2015 model with its periodic terms, the
+planetocentric tilt, and each moon's offsets and state - clear, in
+front of, behind, or in Mars's shadow. Its notice is in About, in both
+languages. No table or chart shows Mars yet; the first numbers are in
+`docs/studies/mars-system/`. The released Sun, Moon, Mercury, Venus,
+Jupiter and Saturn answers are unchanged.
+
 **One chart, one time and place (#612, absorbing #569; Sprint 54).**
 The chart's time and place are one shared context, installed together
 on the event thread and read once per paint and export. Every Solar

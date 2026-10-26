@@ -205,11 +205,11 @@ class AboutTextTest {
     @Test
     void theNoticesViewIsExactlyHeadingsAndUntouchedDocuments()
             throws Exception {
-        assertEquals(11, AboutDialog.NOTICES.size(),
-                "the premise: eleven documents are bundled (the Solar"
+        assertEquals(12, AboutDialog.NOTICES.size(),
+                "the premise: twelve documents are bundled (the Solar"
                         + " System pack's notice joined in #399, the Jovian"
                         + " System pack's in #473, the planets pack's in #501,"
-                        + " the Saturn System pack's in #575)");
+                        + " the Saturn System pack's in #575, the Mars System pack's in #602)");
         String rule = "================================================\n";
         for (String tag : List.of("en", "nb-NO")) {
             InterfaceText words = InterfaceText.forLanguage(tag);
@@ -255,8 +255,8 @@ class AboutTextTest {
         for (AboutDialog.Notice notice : AboutDialog.NOTICES) {
             everything.add(SAID.heading(notice));
         }
-        assertEquals(23, everything.size(),
-                "the premise: twelve UI strings and eleven headings");
+        assertEquals(24, everything.size(),
+                "the premise: twelve UI strings and twelve headings");
 
         for (String said : everything) {
             for (AboutDialog.Notice notice : AboutDialog.NOTICES) {

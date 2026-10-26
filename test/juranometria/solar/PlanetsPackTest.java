@@ -21,7 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * The bundled planets pack (issue #501, layout C as ruled on #500): one
  * logical, versioned pack with one kernel file per planet behind one
  * manifest and one validation boundary, Venus first and Mercury second
- * (#529, version 2); the radii carried verbatim from NAIF's PCK; refused
+ * (#529, version 2), Mars third (#602, version 3: DE440's Mars
+ * barycentre as the planet, as ruled on #601 M-1); the radii and Mars's
+ * pole carried verbatim from NAIF's PCK; refused
  * whole when any file is missing or corrupt - and the released Solar
  * System and Jovian packs beside it byte-identical to what they shipped,
  * Venus's own released file among them.
@@ -39,6 +41,7 @@ class PlanetsPackTest {
 
     static final String VENUS_KERNEL = "juranometria-de440-venus-1900-2100.bsp";
     static final String MERCURY_KERNEL = "juranometria-de440-mercury-1900-2100.bsp";
+    static final String MARS_KERNEL = "juranometria-de440-mars-1900-2100.bsp";
 
     /**
      * Venus's file as 5.2.0 shipped it (docs/decisions/venus-system.md,
@@ -56,10 +59,10 @@ class PlanetsPackTest {
         PlanetsPack pack = PlanetsPack.load();
         Map<String, String> m = pack.manifest();
         assertEquals("planets", m.get("pack.name"));
-        assertEquals("2", m.get("pack.version"), "Mercury joined in version 2 (#529)");
+        assertEquals("3", m.get("pack.version"), "Mars joined in version 3 (#602)");
         assertEquals("DE440", m.get("ephemeris"));
-        assertEquals(List.of("venus", "mercury"), pack.planets(),
-                "Venus first, Mercury appended; a release appends");
+        assertEquals(List.of("venus", "mercury", "mars"), pack.planets(),
+                "Venus first, Mercury, then Mars appended; a release appends");
         PlanetsPack.Planet venus = pack.planet("venus");
         assertEquals(VENUS_KERNEL, m.get("ephemeris.venus.kernel"),
                 "one file per planet, named for it");
@@ -79,13 +82,22 @@ class PlanetsPackTest {
         assertEquals(1, mercury.kernel().segments(0, 1).size());
         assertEquals(1, mercury.kernel().segments(1, 199).size());
         assertEquals("2", m.get("ephemeris.mercury.added.in.version"));
+        PlanetsPack.Planet mars = pack.planet("mars");
+        assertEquals(MARS_KERNEL, m.get("ephemeris.mars.kernel"));
+        assertEquals(List.of(4), mars.bodies(), "the barycentre alone (#601, M-1)");
+        assertEquals(499, mars.figureBody(), "Mars's figure, though the file holds its barycentre");
+        assertEquals(1, mars.kernel().segments().size());
+        assertEquals(1, mars.kernel().segments(0, 4).size());
+        assertEquals("3", m.get("ephemeris.mars.added.in.version"));
+        assertEquals("0.210", m.get("ephemeris.mars.centre.offset.max.m"),
+                "the builder re-measured the ruling's premise from mar099s");
         PackIntegrityException absent = assertThrows(PackIntegrityException.class,
-                () -> pack.planet("mars"));
-        assertTrue(absent.getMessage().contains("[venus, mercury]"), absent.getMessage());
+                () -> pack.planet("jupiter"));
+        assertTrue(absent.getMessage().contains("[venus, mercury, mars]"), absent.getMessage());
     }
 
     @Test
-    void venussReleasedFileWasNotRewrittenWhenMercurysWasAdded() throws IOException {
+    void theReleasedPlanetFilesWereNotRewrittenWhenLaterPlanetsWereAdded() throws IOException {
         Map<String, String> m = PlanetsPack.load().manifest();
         assertEquals(VENUS_KERNEL_SHA256, m.get("checksum." + VENUS_KERNEL),
                 "the manifest still names the 5.2.0 file");
@@ -111,6 +123,16 @@ class PlanetsPackTest {
         // docs/decisions/mercury-system.md, "The ruling", 4: the equatorial
         // 2440.53 km of the triaxial figure, the mean never substituted.
         assertEquals(2440.53, pack.planet("mercury").radiusKm());
+        // docs/decisions/mars-system.md, M-2: the equatorial 3396.19 km;
+        // M-3: the pole in full, its periodic terms carried verbatim.
+        assertEquals(3396.19, pack.planet("mars").radiusKm());
+        assertEquals("3396.19,3396.19,3376.20", pack.manifest().get("pck.BODY499_RADII"));
+        assertEquals(317.269202, pack.constant("BODY499_POLE_RA")[0]);
+        assertEquals(54.432516, pack.constant("BODY499_POLE_DEC")[0]);
+        assertEquals(0.419057, pack.constant("BODY499_NUT_PREC_RA")[14]);
+        assertEquals(1.591274, pack.constant("BODY499_NUT_PREC_DEC")[19]);
+        assertEquals(0, pack.constant("BODY4_NUT_PREC_ANGLES").length % 3, "whole triples");
+        assertEquals("2", pack.manifest().get("pck.BODY4_MAX_PHASE_DEGREE"));
         assertEquals(695700.0, pack.sunRadiusKm());
         assertEquals(SolarSystemService.SOLAR_RADIUS_KM, pack.sunRadiusKm(),
                 "the Sun's radius the Sun's contract already uses");

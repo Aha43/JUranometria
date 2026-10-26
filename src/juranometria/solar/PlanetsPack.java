@@ -50,10 +50,15 @@ public final class PlanetsPack {
      * @param bodies the NAIF ids the file carries, barycentre first
      * @param firstDay the first civil day it answers for, inclusive
      * @param lastDay the last, inclusive
-     * @param radiusKm its mean radius, as the PCK states it
+     * @param radiusKm its equatorial radius, as the PCK states it first
+     * @param figureBody the NAIF id whose figure is the planet's, as the
+     *        manifest names it: the file's last body for Venus and
+     *        Mercury, 499 for Mars, whose file carries only the
+     *        barycentre (#601, M-1)
      */
     public record Planet(String name, SpkKernel kernel, List<Integer> bodies,
-                         LocalDate firstDay, LocalDate lastDay, double radiusKm) {
+                         LocalDate firstDay, LocalDate lastDay, double radiusKm,
+                         int figureBody) {
     }
 
     private final Map<String, String> manifest;
@@ -105,14 +110,16 @@ public final class PlanetsPack {
                         String.format(Locale.ROOT, "ephemeris.%s.bodies", key)).split(",")) {
                     bodies.add(Integer.parseInt(id.strip()));
                 }
-                int centre = bodies.get(bodies.size() - 1);
+                int centre = Integer.parseInt(required(manifest, String.format(Locale.ROOT,
+                        "ephemeris.%s.figure.body", key)).strip());
                 planets.put(key, new Planet(key, kernel,
                         Collections.unmodifiableList(bodies),
                         LocalDate.parse(required(manifest,
                                 String.format(Locale.ROOT, "ephemeris.%s.first.day", key))),
                         LocalDate.parse(required(manifest,
                                 String.format(Locale.ROOT, "ephemeris.%s.last.day", key))),
-                        values(manifest, String.format(Locale.ROOT, "pck.BODY%d_RADII", centre), 3)[0]));
+                        values(manifest, String.format(Locale.ROOT, "pck.BODY%d_RADII", centre), 3)[0],
+                        centre));
             }
         } catch (IOException e) {
             throw new PackIntegrityException("the planets pack cannot be read: "
@@ -141,6 +148,20 @@ public final class PlanetsPack {
                     + planets.keySet() + ", not " + name);
         }
         return planet;
+    }
+
+    /**
+     * A PCK constant the manifest copied verbatim, as numbers: for a
+     * planet whose model needs more than its radii (Mars's pole, #601 M-3).
+     */
+    public double[] constant(String keyword) {
+        String value = required(manifest, String.format(Locale.ROOT, "pck.%s", keyword));
+        String[] fields = value.split(",");
+        double[] out = new double[fields.length];
+        for (int i = 0; i < fields.length; i++) {
+            out[i] = Double.parseDouble(fields[i].strip().replace('D', 'E'));
+        }
+        return out;
     }
 
     /** The Sun's radius, as the PCK states it: the in-front and behind states. */

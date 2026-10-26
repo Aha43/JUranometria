@@ -178,10 +178,17 @@ class BundledNoticesTest {
         assertTrue(notice.contains("2440.53 km") && notice.contains("2438.26 km")
                         && notice.contains("never substitutes"),
                 "Mercury's triaxial figure is stated once, the equatorial radius used");
+        assertTrue(notice.contains("juranometria-de440-mars-1900-2100.bsp")
+                        && notice.contains("pack version 3")
+                        && notice.contains("0.210 m")
+                        && notice.contains("Neither Venus's nor Mercury's file was rewritten"),
+                "Mars's file is named with its version and the ruled barycentre premise (#601, M-1)");
+        assertTrue(notice.contains("periodic terms"),
+                "Mars's pole is copied in full (#601, M-3)");
         String provenance = resourceText("/resources/planets/PROVENANCE.md");
         for (String required : new String[] {"naif.jpl.nasa.gov", "SHA-256", "SpkExcerpt",
                 "Validation", "identical to the source", "identically zero", "untouched",
-                "never rewritten", "pck00011.tpc"}) {
+                "never rewritten", "pck00011.tpc", "mar099s.bsp", "0.210 m", "BODY4_NUT_PREC_ANGLES"}) {
             assertTrue(provenance.contains(required), "the provenance records " + required);
         }
     }
@@ -191,6 +198,7 @@ class BundledNoticesTest {
         for (String resource : new String[] {
                 "manifest.properties", "juranometria-de440-venus-1900-2100.bsp",
                 "juranometria-de440-mercury-1900-2100.bsp",
+                "juranometria-de440-mars-1900-2100.bsp",
                 "NOTICE-planets.md", "PROVENANCE.md"}) {
             assertNotNull(BundledNoticesTest.class.getResource("/resources/planets/" + resource),
                     resource + " must ship as a resource");
@@ -221,6 +229,39 @@ class BundledNoticesTest {
                 "identical to the source", "untouched", "pck00011.tpc", "pds-rings.seti.org",
                 "BODY699_NUT_PREC"}) {
             assertTrue(provenance.contains(required), "the provenance records " + required);
+        }
+    }
+
+    @Test
+    void theMarsSystemPackShipsWithItsNoticeAndProvenance() {
+        String notice = resourceText("/resources/mars-system/NOTICE-mars-system.md");
+        assertTrue(notice.contains("modified") && notice.contains("kernel"),
+                "the excerpt is called what NAIF's rules call it");
+        assertTrue(notice.contains("not an original JPL file") && notice.contains("JPL did not produce"),
+                "and never presented as JPL's own");
+        assertTrue(notice.contains("NAIF") && notice.contains("MAR099") && notice.contains("DE440"));
+        assertTrue(notice.contains("doi:10.3847/1538-3881/abd414"),
+                "the ephemeris authors are acknowledged");
+        assertTrue(notice.contains("pck00011.tpc") && notice.contains("not redistributed"),
+                "the constants' source is named and the file is not shipped");
+        assertTrue(notice.contains("2000 to 2049") && notice.contains("not including"),
+                "the moons' years and the exclusive boundary (#601, M-7a amendment)");
+        assertTrue(notice.contains("does not change"),
+                "the packs beside it are untouched");
+        String provenance = resourceText("/resources/mars-system/PROVENANCE.md");
+        for (String required : new String[] {"naif.jpl.nasa.gov", "SHA-256", "SpkExcerpt", "Validation",
+                "identical to the source", "untouched", "pck00011.tpc", "exclusive"}) {
+            assertTrue(provenance.contains(required), "the provenance records " + required);
+        }
+    }
+
+    @Test
+    void everyMarsSystemResourceShipsOnTheClasspath() {
+        for (String resource : new String[] {
+                "manifest.properties", "juranometria-mar099-moons-2000-2050.bsp",
+                "NOTICE-mars-system.md", "PROVENANCE.md"}) {
+            assertNotNull(BundledNoticesTest.class.getResource("/resources/mars-system/" + resource),
+                    resource + " must ship as a resource");
         }
     }
 

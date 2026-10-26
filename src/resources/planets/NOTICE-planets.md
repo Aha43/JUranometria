@@ -39,6 +39,17 @@ no moon, over the same years with every coefficient unchanged. It
 too is a modified kernel, named, annotated and attributed as such.
 Venus's file was not rewritten when Mercury's was added.
 
+`juranometria-de440-mars-1900-2100.bsp` was produced the same way
+from the same kernel, in pack version 3: it keeps one segment, the
+Mars barycentre relative to the solar-system barycentre, over the
+same years with every coefficient unchanged. That kernel carries
+no segment for Mars's centre. NAIF's Mars satellite ephemeris
+`mar099s.bsp` puts the centre within 0.210 m of the barycentre, so
+the atlas takes the barycentre as the planet, as ruled on #601;
+the builder measures that bound again before it writes. It too is
+a modified kernel, named, annotated and attributed as such.
+Neither Venus's nor Mercury's file was rewritten.
+
 NAIF's rules, quoted: "Redistribution of SPICE kernels distributed
 by NAIF is permitted as long as they have not been modified." "If
 a kernel distributed by NAIF has been modified in any way, any
@@ -64,8 +75,11 @@ visible cloud deck lies higher, and the atlas states, never draws,
 that difference. Mercury's radii are its triaxial figure,
 2440.53 km, 2440.53 km and 2438.26 km; the atlas uses the
 equatorial 2440.53 km, as JPL Horizons does, and never substitutes
-the mean. The PCK file itself is not redistributed; its digest is
-recorded.
+the mean. Mars's radii are 3396.19 km at the equator and 3376.20 km
+at the poles, the mean of the north and south polar radii, as the
+PCK states; the atlas also copies Mars's pole and rotation model
+in full, with its periodic terms. The PCK file itself is
+not redistributed; its digest is recorded.
 
 ## Provenance
 

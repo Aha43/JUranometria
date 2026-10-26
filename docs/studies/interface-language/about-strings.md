@@ -57,6 +57,7 @@ with it paragraph by paragraph.
 | `joviansystem` | Jovian System ephemeris |
 | `planets` | Planets ephemeris |
 | `saturnsystem` | Saturn System ephemeris |
+| `marssystem` | Mars System ephemeris |
 | `tabler` | Tabler icons licence |
 
 ### Light
@@ -74,7 +75,7 @@ with it paragraph by paragraph.
 | shown | *(the application mark: decorative, no text, no spoken name)* |
 | shown | JUranometria 5.4.0 |
 | shown | A quiet, interactive atlas for learning the geography of the sky. |
-| shown | *(read-only document, 1683 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 1964 characters — printed in full below or listed by path)* |
 | shown | Full notices and licences... |
 | shown | Close |
 
@@ -88,7 +89,7 @@ with it paragraph by paragraph.
 |---|---|
 | window title | About JUranometria |
 | window, spoken | Application identity, version, and licensing information |
-| shown | *(read-only document, 40286 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 44018 characters — printed in full below or listed by path)* |
 | shown | Close |
 
 
@@ -107,7 +108,7 @@ with it paragraph by paragraph.
 | shown | *(the application mark: decorative, no text, no spoken name)* |
 | shown | JUranometria 5.4.0 |
 | shown | A quiet, interactive atlas for learning the geography of the sky. |
-| shown | *(read-only document, 1683 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 1964 characters — printed in full below or listed by path)* |
 | shown | Full notices and licences... |
 | shown | Close |
 
@@ -121,13 +122,13 @@ with it paragraph by paragraph.
 |---|---|
 | window title | About JUranometria |
 | window, spoken | Application identity, version, and licensing information |
-| shown | *(read-only document, 40286 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 44018 characters — printed in full below or listed by path)* |
 | shown | Close |
 
 
 ### The compact licensing summary, in full
 
-Its own document (1683 characters), the canonical English one, used whole because this language has not written its own. Every licence identifier below is exact and untranslated.
+Its own document (1964 characters), the canonical English one, used whole because this language has not written its own. Every licence identifier below is exact and untranslated.
 
 ```
 Code and documentation: MIT license, copyright JUranometria
@@ -159,13 +160,19 @@ constants copied from NAIF's planetary-constants kernel.
 Planets ephemeris: one excerpt of NASA/JPL's DE440 per planet,
 modified by JUranometria under NAIF's rules for modified SPICE
 kernels (no fee or licence); the IAU 2015 radii copied from NAIF's
-planetary-constants kernel.
+planetary-constants kernel and, for Mars, its pole and rotation
+model.
 
 Saturn System ephemeris: two excerpts of NASA/JPL's SAT441 (with
 DE440's Saturn barycentre), modified by JUranometria under NAIF's
 rules for modified SPICE kernels (no fee or licence); the IAU 2015
 constants copied from NAIF's planetary-constants kernel and four
 ring radii quoted from NASA's Planetary Data System Rings Node.
+
+Mars System ephemeris: one excerpt of NASA/JPL's MAR099 for Phobos
+and Deimos, modified by JUranometria under NAIF's rules for modified
+SPICE kernels (no fee or licence); the IAU 2015 radii copied from
+NAIF's planetary-constants kernel.
 
 Toolbar icons from the Tabler icon set: MIT license.
 ```
@@ -204,6 +211,7 @@ Toolbar icons from the Tabler icon set: MIT license.
 | `joviansystem` | Jupitersystemefemeride |
 | `planets` | Planetefemeride |
 | `saturnsystem` | Saturnsystemefemeride |
+| `marssystem` | Marssystemefemeride |
 | `tabler` | Lisens for Tabler-ikonene |
 
 ### Light
@@ -235,7 +243,7 @@ Toolbar icons from the Tabler icon set: MIT license.
 |---|---|
 | window title | Om JUranometria |
 | window, spoken | Programmets navn, versjon og lisensopplysninger |
-| shown | *(read-only document, 40302 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 44032 characters — printed in full below or listed by path)* |
 | shown | Lukk |
 
 
@@ -268,7 +276,7 @@ Toolbar icons from the Tabler icon set: MIT license.
 |---|---|
 | window title | Om JUranometria |
 | window, spoken | Programmets navn, versjon og lisensopplysninger |
-| shown | *(read-only document, 40302 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 44032 characters — printed in full below or listed by path)* |
 | shown | Lukk |
 
 
@@ -331,10 +339,11 @@ Not reproduced here: they are upstream text, and a copy in a study is a copy tha
 | `bsd3` | `/resources/geo/constellations/LICENSE-BSD-3-Clause.txt` | 1480 |
 | `solarsystem` | `/resources/solar-system/NOTICE-solar-system.md` | 2353 |
 | `joviansystem` | `/resources/jovian-system/NOTICE-jovian-system.md` | 3759 |
-| `planets` | `/resources/planets/NOTICE-planets.md` | 3676 |
+| `planets` | `/resources/planets/NOTICE-planets.md` | 4533 |
 | `saturnsystem` | `/resources/saturn-system/NOTICE-saturn-system.md` | 3957 |
+| `marssystem` | `/resources/mars-system/NOTICE-mars-system.md` | 2752 |
 | `tabler` | `/resources/icons/LICENSE` | 1072 |
-| **seven** | | **38933** |
+| **seven** | | **42542** |
 
 ## The application mark
 
