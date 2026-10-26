@@ -27,7 +27,7 @@ import juranometria.ui.language.MnemonicText;
  * Opening it computes nothing: it shows what the session already holds,
  * and computes only when the reader asks - Compute, a view or Enter. What
  * is the dialog's own is its layout, the time note, Close and the access
- * letters. Nothing is drawn on the chart, and there is no Centre on chart.
+ * letters, and since #606 Centre on chart.
  */
 public final class MarsTableDialog extends JDialog {
 
@@ -37,13 +37,14 @@ public final class MarsTableDialog extends JDialog {
 
     private final Content content;
 
-    private MarsTableDialog(Frame owner, MarsTableSession session, InterfaceText said) {
+    private MarsTableDialog(Frame owner, MarsTableSession session, InterfaceText said,
+                            CentreOnChart centre, BodyOnChart layer) {
         super(owner, new SolarTableWords(said, "marstable").say("title"), false);
         SolarTableWords words = new SolarTableWords(said, "marstable");
         getAccessibleContext().setAccessibleName(words.say("a11y"));
         getAccessibleContext().setAccessibleDescription(words.say("explain"));
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        content = new Content(session, said, this::dispose);
+        content = new Content(session, said, this::dispose, centre, layer);
         setContentPane(content);
         getRootPane().registerKeyboardAction(e -> dispose(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
@@ -60,18 +61,33 @@ public final class MarsTableDialog extends JDialog {
 
     /** Opens the one Mars table over the shared session, or brings it to the front. */
     public static void open(Frame owner, MarsTableSession session, InterfaceText said) {
+        open(owner, session, said, null, null);
+    }
+
+    /**
+     * With Centre on chart (#606): the dialog's button turns {@code layer},
+     * the Solar System module's Mars switch, on and centres the chart on Mars.
+     */
+    public static void open(Frame owner, MarsTableSession session, InterfaceText said,
+                            CentreOnChart centre, BodyOnChart layer) {
         if (current != null && current.isDisplayable()) {
             current.toFront();
             current.requestFocus();
             return;
         }
-        current = new MarsTableDialog(owner, session, said);
+        current = new MarsTableDialog(owner, session, said, centre, layer);
         current.setVisible(true);
     }
 
     /** The content over a session, headless-constructible, for tests and studies. */
     public static Content content(MarsTableSession session, InterfaceText said) {
-        return new Content(session, said, () -> { });
+        return new Content(session, said, () -> { }, null, null);
+    }
+
+    /** The same, with Centre on chart (#606). */
+    public static Content content(MarsTableSession session, InterfaceText said,
+                                  CentreOnChart centre, BodyOnChart layer) {
+        return new Content(session, said, () -> { }, centre, layer);
     }
 
     /** This dialog's content. */
@@ -88,8 +104,9 @@ public final class MarsTableDialog extends JDialog {
         public final JLabel timeNote = new JLabel();
         public final JButton close;
 
-        Content(MarsTableSession session, InterfaceText language, Runnable closeAction) {
-            controls = new MarsTableControls(session, language, true);
+        Content(MarsTableSession session, InterfaceText language, Runnable closeAction,
+                CentreOnChart centre, BodyOnChart layer) {
+            controls = new MarsTableControls(session, language, true, null, centre, layer);
             SolarTableWords said = controls.words();
             MnemonicText letters = MnemonicText.in(language);
             setLayout(new BorderLayout(0, 8));
@@ -118,6 +135,9 @@ public final class MarsTableDialog extends JDialog {
             if (controls.setChartTime != null) {
                 buttons.add(controls.setChartTime);
                 buttons.add(Box.createHorizontalStrut(8));
+            }
+            if (controls.centreOnChart != null) {
+                buttons.add(controls.centreOnChart);
             }
             buttons.add(Box.createHorizontalGlue());
             buttons.add(close);

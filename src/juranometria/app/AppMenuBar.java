@@ -267,6 +267,11 @@ public final class AppMenuBar {
             juranometria.solarchart.SolarSystemModule.MERCURY
                     + MOON_CHART_ITEM.substring(juranometria.solarchart.SolarSystemModule.MOON.length());
 
+    /** Mars on the chart's item (#606), between the Moon's and Jupiter's, named by the same rule. */
+    public static final String MARS_CHART_ITEM =
+            juranometria.solarchart.SolarSystemModule.MARS
+                    + MOON_CHART_ITEM.substring(juranometria.solarchart.SolarSystemModule.MOON.length());
+
     public static javax.swing.JCheckBoxMenuItem mercuryChartItem(javax.swing.JMenuBar bar) {
         return checkBoxItem(bar, MERCURY_CHART_ITEM);
     }
@@ -1040,6 +1045,36 @@ public final class AppMenuBar {
         for (int i = 0; i < solar.getMenuComponentCount(); i++) {
             String name = solar.getMenuComponent(i).getName();
             if (SUN_CHART_ITEM.equals(name) || MERCURY_CHART_ITEM.equals(name)) {
+                after = i;
+            }
+        }
+        solar.insert(item, after + 1);
+        return item;
+    }
+
+    /**
+     * Adds View > Solar System > Mars on the chart directly after Moon on
+     * the chart (#606), outward from the Sun and so before Jupiter and moons
+     * on the chart: the one remembered switch for Mars's layer. No access
+     * letter: none of its letters is free on this menu in Norwegian, and
+     * every existing letter is kept, as ruled for Mars... on #603. Returns
+     * the item, or null on a bar without the submenu.
+     */
+    public static javax.swing.JCheckBoxMenuItem addMarsOnChart(javax.swing.JMenuBar bar,
+            juranometria.ui.language.InterfaceText said, Runnable toggleMarsOnChart) {
+        JMenu solar = solarSystemMenu(bar);
+        if (solar == null || toggleMarsOnChart == null) {
+            return null;
+        }
+        javax.swing.JCheckBoxMenuItem item = new javax.swing.JCheckBoxMenuItem(
+                said.say("menu.marschart.label"));
+        item.setName(MARS_CHART_ITEM);
+        item.getAccessibleContext().setAccessibleName(said.say("menu.marschart.a11y"));
+        juranometria.ui.Explain.selfExplanatory(item, said.say("menu.marschart.explain"));
+        item.addActionListener(event -> toggleMarsOnChart.run());
+        int after = -1;
+        for (int i = 0; i < solar.getMenuComponentCount(); i++) {
+            if (MOON_CHART_ITEM.equals(solar.getMenuComponent(i).getName())) {
                 after = i;
             }
         }

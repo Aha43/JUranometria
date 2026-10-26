@@ -232,6 +232,10 @@ public final class EvidenceContractMain {
         // its mock-ups are held through IMAGE_MAINS, its labels in the platform record.
         REPORT_MAINS.put("juranometria.tool.MarsCartographyStudyMain",
                 "docs/studies/mars-cartography/measurements.md");
+        // Mars on the chart (#606): production pages through the component with
+        // the Solar System module and Mars attached; its pages are held through IMAGE_MAINS.
+        REPORT_MAINS.put("juranometria.tool.MarsOnTheChartStudyMain",
+                "docs/studies/mars-on-the-chart/measurements.md");
         // Saturn on the chart (#579): production pages through the component
         // with the Saturn module attached; its pages are held through IMAGE_MAINS.
         REPORT_MAINS.put("juranometria.tool.SaturnOnTheChartStudyMain",
@@ -645,6 +649,9 @@ public final class EvidenceContractMain {
             // Mars, Phobos and Deimos on the page (issue #605): production pages
             // painted by the renderer, the study's candidate marks drawn over them.
             "juranometria.tool.MarsCartographyStudyMain",
+            // Mars on the chart (issue #606): production pages composed by the
+            // component with the Solar System module and Mars attached.
+            "juranometria.tool.MarsOnTheChartStudyMain",
             // Saturn on the chart (issue #579): production pages composed by the
             // component with the Saturn module attached, and the exported sheet.
             "juranometria.tool.SaturnOnTheChartStudyMain",
