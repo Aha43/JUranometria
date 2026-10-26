@@ -1168,8 +1168,10 @@ public final class AppMenuBar {
         }
         JMenuItem mars = new JMenuItem(said.say("menu.mars.label"));
         mars.setName("marsTableItem");
-        // No access letter: every letter of "Mars" is already claimed on this
-        // menu, in English and in Norwegian, and two items never share one.
+        // No access letter, as ruled on #603 (2026-10-26): every letter of
+        // "Mars" is already claimed on this menu, in English and in Norwegian,
+        // two items never share one, and every existing letter is kept.
+        // Revisited only if the Solar System menu is reorganized.
         mars.getAccessibleContext().setAccessibleName(said.say("menu.mars.a11y"));
         juranometria.ui.Explain.control(mars, said.say("menu.mars.hover"),
                 said.say("menu.mars.explain"));

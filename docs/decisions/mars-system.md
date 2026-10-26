@@ -476,4 +476,6 @@ The era boundaries are the shared time model's. Every cell the amendments do not
 
 **No access letter for *Mars...*.** Every letter of "Mars" is already claimed on View > Solar System: in English by the Moon (M), Saturn on the chart (A), Mercury (R) and the Sun (S); in Norwegian by the Moon (M), Saturn on the chart (A), Mercury (R) and Saturn (S). Two items never share a letter. The item is reachable by the menu's arrow keys and by its spoken name, as other unlettered items are. Re-lettering a released item to free one is an owner decision, and is not done here.
 
+**Ruled by the owner on 2026-10-26**, as given: "Mars… has no menu mnemonic in either language; preserve all existing mnemonics. Revisit only if the Solar System menu is reorganized later."
+
 **Evidence.** The companion photographs of the open Solar System tab and of Jupiter's group were regenerated, with the strings sheet. They now show the collapsed Mars group between the Moon and Jupiter.
