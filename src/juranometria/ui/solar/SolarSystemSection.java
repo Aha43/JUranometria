@@ -31,7 +31,10 @@ import juranometria.ui.language.InterfaceText;
  * Saturn group follows Jupiter's - the same order - introduced
  * collapsed, holding one {@link SaturnTableControls} over Saturn's
  * shared session, with no chart switch and no Centre on chart: no Saturn
- * is drawn yet.
+ * is drawn yet. Since #603 a Mars group stands between the Moon's and
+ * Jupiter's - the same order, outward from the Sun - introduced collapsed,
+ * holding one {@link MarsTableControls} over Mars's shared session, with
+ * no chart switch and no Centre on chart: no Mars is drawn yet.
  *
  * <p>Building the section computes nothing: each set of controls
  * reads the observer for its note and seeds, and shows whatever its
@@ -54,6 +57,8 @@ public final class SolarSystemSection {
     private final JovianTableControls jupiter;
     /** Saturn's controls, or null until a host gives the section Saturn's session. */
     private SaturnTableControls saturn;
+    /** Mars's controls, or null until a host gives the section Mars's session. */
+    private MarsTableControls mars;
 
     public SolarSystemSection(SolarTableSession sunSession, SolarTableSession moonSession,
                               BodyOnChart sunOnChart, BodyOnChart moonOnChart,
@@ -215,6 +220,27 @@ public final class SolarSystemSection {
         return saturn;
     }
 
+    /**
+     * Gives the section Mars's group between the Moon's and Jupiter's
+     * (#603): its controls over Mars's shared session, with no chart switch
+     * and no Centre on chart - no Mars is drawn yet. Stated before the tab
+     * is built; building them computes nothing and reads no pack.
+     */
+    public void withMars(MarsTableSession session, InterfaceText said) {
+        if (session == null || said == null) {
+            throw new IllegalArgumentException("Mars's session, in a language");
+        }
+        if (mars != null) {
+            mars.release();
+        }
+        mars = new MarsTableControls(session, said, false);
+    }
+
+    /** Mars's controls, or null for a host built without Mars. */
+    public MarsTableControls mars() {
+        return mars;
+    }
+
     /** Where the chart's instant is read, and how the tab follows it; null for none. */
     private java.util.function.Supplier<juranometria.sky.Observer> chartObserver;
     private java.util.function.Function<Runnable, Runnable> chartChanges;
@@ -339,6 +365,10 @@ public final class SolarSystemSection {
         }
         groups.add(CompanionSection.remembered(ID + ".moon",
                 said.say("solarsystem.moon"), moon.inController(), said, store, true));
+        if (mars != null) {
+            groups.add(CompanionSection.remembered(ID + ".mars",
+                    said.say("solarsystem.mars"), mars.inController(), said, store, true));
+        }
         if (jupiter != null) {
             groups.add(CompanionSection.remembered(ID + ".jupiter",
                     said.say("solarsystem.jupiter"), jupiter.inController(), said, store,
@@ -364,6 +394,9 @@ public final class SolarSystemSection {
             venus.release();
         }
         moon.release();
+        if (mars != null) {
+            mars.release();
+        }
         if (jupiter != null) {
             jupiter.release();
         }

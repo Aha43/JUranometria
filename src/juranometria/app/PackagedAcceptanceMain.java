@@ -516,6 +516,7 @@ public final class PackagedAcceptanceMain {
         solarSystemControlsJourney();
         jupiterTableJourney();
         saturnTableJourney();
+        marsTableJourney();
         centreOnChartJourney();
         jupiterOnTheChartJourney();
         saturnOnTheChartJourney();
@@ -2180,6 +2181,158 @@ public final class PackagedAcceptanceMain {
                 + " grouped by instant, each group Jupiter's position and its four moons,"
                 + " unfinished text untouched; Jupiter before 2000 with the"
                 + " moons refused; View > Solar System ends in Jupiter...)");
+    }
+
+    /**
+     * The Mars table (#603), inside the packaged image: one session in the
+     * Controller's Mars group and the dialog; building, expanding and
+     * opening compute nothing; at the study's "today" (2026-10-25 12:00 UTC,
+     * Oslo) Phobos and Deimos read clear of Mars and Mars gibbous, in English
+     * and Norwegian; Phobos behind Mars in its shadow where Horizons codes it
+     * U from Oslo (2005-02-27); the moons refused from the TDB boundary, Mars
+     * still shown; a range across the boundary keeps Mars at every instant
+     * and says where the moons are not computed; View > Solar System has
+     * Mars... between Moon... and Jupiter....
+     */
+    private static void marsTableJourney() throws Exception {
+        Preferences scratch = Preferences.userRoot()
+                .node("juranometria-packaged-mars-" + System.nanoTime());
+        try {
+            juranometria.ui.language.InterfaceText en =
+                    juranometria.ui.language.InterfaceText.forLanguage("en");
+            juranometria.ui.language.InterfaceText nb =
+                    juranometria.ui.language.InterfaceText.forLanguage("nb-NO");
+            juranometria.sky.Observer[] at = {new juranometria.sky.Observer(59.91, 10.75,
+                    MARS_SAMPLE_INSTANT)};
+            juranometria.solar.MarsService marsService = juranometria.solar.MarsService.load();
+            int[] loads = {0};
+            juranometria.ui.solar.MarsTableSession mars =
+                    new juranometria.ui.solar.MarsTableSession(() -> at[0], () -> {
+                        loads[0]++;
+                        return marsService;
+                    });
+            juranometria.solar.SolarSystemService solar =
+                    juranometria.solar.SolarSystemService.load();
+            juranometria.ui.solar.SolarTableSession sun =
+                    new juranometria.ui.solar.SolarTableSession(() -> at[0], solar,
+                            juranometria.ui.solar.SolarTable.sun());
+            juranometria.ui.solar.SolarTableSession moon =
+                    new juranometria.ui.solar.SolarTableSession(() -> at[0], solar,
+                            juranometria.ui.solar.SolarTable.moon());
+            juranometria.solarchart.SolarSystemModule module =
+                    new juranometria.solarchart.SolarSystemModule(() -> at[0],
+                            () -> solar, () -> true);
+            juranometria.ui.solar.SolarSystemSection[] section =
+                    new juranometria.ui.solar.SolarSystemSection[1];
+            juranometria.ui.solar.MarsTableDialog.Content[] norsk =
+                    new juranometria.ui.solar.MarsTableDialog.Content[1];
+            javax.swing.JMenuBar[] bar = new javax.swing.JMenuBar[1];
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                section[0] = new juranometria.ui.solar.SolarSystemSection(sun, moon,
+                        juranometria.ui.solar.SunChartSession.switchOf(module,
+                                juranometria.ui.solar.SunChartStore.forNode(scratch)),
+                        juranometria.ui.solar.MoonChartSession.switchOf(module,
+                                juranometria.ui.solar.MoonChartStore.forNode(scratch)),
+                        null, en);
+                section[0].withMars(mars, en);
+                section[0].inController(
+                        juranometria.ui.companion.CompanionStore.forNode(scratch), en);
+            });
+            require(mars.computations() == 0 && loads[0] == 0,
+                    "building the Mars group computes nothing and reads no pack");
+            javax.swing.SwingUtilities.invokeAndWait(() ->
+                    norsk[0] = juranometria.ui.solar.MarsTableDialog.content(mars, nb));
+            require(mars.computations() == 0, "opening the Mars dialog computes nothing");
+
+            juranometria.ui.solar.MarsTableControls group = section[0].mars();
+            juranometria.ui.solar.MarsTableControls dialog = norsk[0].controls();
+            javax.swing.SwingUtilities.invokeAndWait(group::apply);
+            require(mars.computations() == 1 && group.shown() == dialog.shown()
+                            && group.model.getRowCount() == 2,
+                    "one computation in the Controller is the dialog's result too");
+            require("clear of Mars".equals(group.model.getValueAt(0, 6))
+                            && "clear of Mars".equals(group.model.getValueAt(1, 6))
+                            && "klar av Mars".equals(dialog.model.getValueAt(0, 6))
+                            && "Avstand fra Mars".equals(dialog.model.getColumnName(4)),
+                    "on 2026-10-25 Phobos and Deimos are clear of Mars, in both languages");
+            require("gibbous".equals(group.cardValue("phase"))
+                            && "mer enn halvt belyst".equals(dialog.cardValue("phase")),
+                    "Mars is gibbous: " + group.cardValue("phase"));
+            require(group.cardTitle.getText().equals("Mars · 2026-10-25 12:00:00 UTC"),
+                    "the Mars card names its instant: " + group.cardTitle.getText());
+
+            at[0] = new juranometria.sky.Observer(59.91, 10.75,
+                    java.time.Instant.parse("2005-02-27T00:00:00Z"));
+            javax.swing.SwingUtilities.invokeAndWait(group::apply);
+            require("behind Mars, in its shadow".equals(group.model.getValueAt(0, 6))
+                            && "bak Mars, i skyggen".equals(dialog.model.getValueAt(0, 6)),
+                    "Phobos behind Mars in its shadow where Horizons codes U: "
+                            + group.model.getValueAt(0, 6));
+
+            at[0] = new juranometria.sky.Observer(59.91, 10.75,
+                    java.time.Instant.parse("2049-12-31T23:59:30Z"));
+            javax.swing.SwingUtilities.invokeAndWait(group::apply);
+            // The status as spoken, unwrapped: the Controller's narrow layout
+            // wraps the shown text where the platform's fonts break it.
+            String refusal = group.status.getAccessibleContext().getAccessibleName();
+            require(group.cardTitle.getText().startsWith("Mars · 2049-12-31")
+                            && group.model.getRowCount() == 0
+                            && refusal.contains("end of 2049"),
+                    "Mars answers past the TDB boundary, the moons refuse: " + refusal);
+
+            at[0] = new juranometria.sky.Observer(59.91, 10.75,
+                    java.time.Instant.parse("2049-12-10T00:00:00Z"));
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                group.rangeView.setSelected(true);
+                group.span.setSelectedIndex(2);
+                group.step.setSelectedIndex(3);
+                group.apply();
+            });
+            String partly = group.status.getAccessibleContext().getAccessibleName();
+            require(mars.result().outcome()
+                            == juranometria.ui.solar.MarsTableSession.Outcome.ROWS_MOONS_IN_PART
+                            && group.model.groups() == mars.result().entries().size()
+                            && partly.contains("Phobos and Deimos are not shown"),
+                    "a range across the boundary keeps Mars at every instant: " + partly);
+
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                bar[0] = AppMenuBar.create(new ChartViewController(), () -> { },
+                        () -> { }, () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
+                        () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
+                        () -> { }, () -> { }, en);
+                AppMenuBar.addJupiterTable(bar[0], en, () -> { });
+                AppMenuBar.addMarsTable(bar[0], en, () -> { });
+            });
+            javax.swing.JMenu solarMenu = AppMenuBar.solarSystemMenu(bar[0]);
+            int moonAt = -1;
+            int marsAt = -1;
+            int jupiterAt = -1;
+            for (int i = 0; i < solarMenu.getItemCount(); i++) {
+                javax.swing.JMenuItem item = solarMenu.getItem(i);
+                String name = item == null ? null : item.getName();
+                if (AppMenuBar.MOON_ITEM.equals(name)) {
+                    moonAt = i;
+                }
+                if ("marsTableItem".equals(name)) {
+                    marsAt = i;
+                }
+                if ("jupiterTableItem".equals(name)) {
+                    jupiterAt = i;
+                }
+            }
+            require(moonAt >= 0 && marsAt == moonAt + 1 && jupiterAt == marsAt + 1,
+                    "View > Solar System has Mars... between Moon... and Jupiter...");
+            section[0].release();
+            norsk[0].controls().release();
+        } finally {
+            scratch.removeNode();
+        }
+        System.out.println("mars table OK (one session in two hosts, building computes nothing"
+                + " and reads no pack; on 2026-10-25 12:00 UTC at Oslo Phobos and Deimos clear of"
+                + " Mars, Mars gibbous, in English and Norwegian; Phobos behind Mars in its shadow"
+                + " on 2005-02-27; the moons refused from the TDB boundary with Mars still shown;"
+                + " a range across it keeps Mars at every instant; View > Solar System has Mars..."
+                + " between Moon... and Jupiter...)");
     }
 
     /**
