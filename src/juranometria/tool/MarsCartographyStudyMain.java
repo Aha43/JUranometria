@@ -154,15 +154,26 @@ public final class MarsCartographyStudyMain {
                 + " viewports, as #539 painted them; the ladder still refuses them. Regenerate with"
                 + " `make mars-cartography-study`.");
         p("");
-        Ranges r = ranges();
-        scale(r);
-        thresholds(r);
-        frame(r);
-        mockups();
-        proposals(r);
-        System.out.print(REPORT);
-        System.out.flush();
-        PlatformEvidence.write(PLATFORM, new File(DIR, "platform.md").toString());
+        try {
+            Ranges r = ranges();
+            scale(r);
+            thresholds(r);
+            frame(r);
+            mockups();
+            proposals(r);
+            System.out.print(REPORT);
+            System.out.flush();
+            PlatformEvidence.write(PLATFORM, new File(DIR, "platform.md").toString());
+        } finally {
+            // The evidence contract runs every generator in one JVM under a measured
+            // heap (#323): nothing this study loaded may outlive it.
+            service = null;
+            solar = null;
+            REPORT.setLength(0);
+            REPORT.trimToSize();
+            PLATFORM.setLength(0);
+            PLATFORM.trimToSize();
+        }
     }
 
     // ---- the century's ranges --------------------------------------------------
