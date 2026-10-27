@@ -377,7 +377,11 @@ asked:
   second cell moved again, 125 pixels in each image, columns 222–232
   of rows 33–47; every sheet PNG stayed pixel-identical, the Saturn
   A4 sheet now among the seven, and each of the ten PDFs and SVGs
-  differed by one byte.
+  differed by one byte. At 5.5.0 (4→5) the same second cell moved
+  again, 124 pixels in each light image and 123 in each dark one,
+  columns 222–232 of rows 33–47; all eight sheet PNGs (the chart-instant
+  furniture sheet among them) stayed pixel-identical and each of the
+  ten PDFs and SVGs differed by one byte.
 - **The articles.** Their footer names the release, and
   `scripts/build-articles.py` reads it from `VERSION` when the site is
   built rather than carrying a number - so there is nothing to

@@ -7,6 +7,8 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [5.5.0] - 2026-10-27
+
 **Saturn's rings on the page (#607).** A new reader article, in
 English and Norwegian (*Saturns ringer på siden*): what the atlas draws
 of Saturn as released in 5.4 - where its numbers come from and how
