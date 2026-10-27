@@ -231,8 +231,8 @@ Whether a particular read happens on the event thread is control flow, which tex
 
 | class | the contract | files |
 |---|---|---|
-| deterministic-report | regenerates byte-for-byte on the same tree | 170 |
-| byte-exact-fixture | committed data with provenance; never regenerated casually | 306 |
+| deterministic-report | regenerates byte-for-byte on the same tree | 175 |
+| byte-exact-fixture | committed data with provenance; never regenerated casually | 360 |
 | captured-evidence | an operating-system screenshot, digest-pinned; a re-capture is a provenance event | 13 |
 | renderer-drawn | byte-reproducible per machine; production ink, no widgets | 848 |
 | widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 186 |
@@ -511,6 +511,60 @@ The byte-exact fixtures:
 - docs/studies/solar-system/seasons-2026.txt
 - docs/studies/solar-system/spk-reference.txt
 - docs/studies/solar-system/sun-invariance.txt
+- docs/studies/uranus-system/horizons/magnitudes-30d-ariel-geocentric.txt
+- docs/studies/uranus-system/horizons/magnitudes-30d-miranda-geocentric.txt
+- docs/studies/uranus-system/horizons/magnitudes-30d-oberon-geocentric.txt
+- docs/studies/uranus-system/horizons/magnitudes-30d-titania-geocentric.txt
+- docs/studies/uranus-system/horizons/magnitudes-30d-umbriel-geocentric.txt
+- docs/studies/uranus-system/horizons/magnitudes-30d-uranus-geocentric.txt
+- docs/studies/uranus-system/horizons/matrix-7d-ariel-oslo.txt
+- docs/studies/uranus-system/horizons/matrix-7d-miranda-oslo.txt
+- docs/studies/uranus-system/horizons/matrix-7d-oberon-oslo.txt
+- docs/studies/uranus-system/horizons/matrix-7d-titania-oslo.txt
+- docs/studies/uranus-system/horizons/matrix-7d-umbriel-oslo.txt
+- docs/studies/uranus-system/horizons/matrix-7d-uranus-oslo.txt
+- docs/studies/uranus-system/horizons/named-ariel-alert.txt
+- docs/studies/uranus-system/horizons/named-ariel-cape-town.txt
+- docs/studies/uranus-system/horizons/named-ariel-chatham.txt
+- docs/studies/uranus-system/horizons/named-ariel-oslo.txt
+- docs/studies/uranus-system/horizons/named-ariel-quito.txt
+- docs/studies/uranus-system/horizons/named-miranda-alert.txt
+- docs/studies/uranus-system/horizons/named-miranda-cape-town.txt
+- docs/studies/uranus-system/horizons/named-miranda-chatham.txt
+- docs/studies/uranus-system/horizons/named-miranda-oslo.txt
+- docs/studies/uranus-system/horizons/named-miranda-quito.txt
+- docs/studies/uranus-system/horizons/named-oberon-alert.txt
+- docs/studies/uranus-system/horizons/named-oberon-cape-town.txt
+- docs/studies/uranus-system/horizons/named-oberon-chatham.txt
+- docs/studies/uranus-system/horizons/named-oberon-oslo.txt
+- docs/studies/uranus-system/horizons/named-oberon-quito.txt
+- docs/studies/uranus-system/horizons/named-titania-alert.txt
+- docs/studies/uranus-system/horizons/named-titania-cape-town.txt
+- docs/studies/uranus-system/horizons/named-titania-chatham.txt
+- docs/studies/uranus-system/horizons/named-titania-oslo.txt
+- docs/studies/uranus-system/horizons/named-titania-quito.txt
+- docs/studies/uranus-system/horizons/named-umbriel-alert.txt
+- docs/studies/uranus-system/horizons/named-umbriel-cape-town.txt
+- docs/studies/uranus-system/horizons/named-umbriel-chatham.txt
+- docs/studies/uranus-system/horizons/named-umbriel-oslo.txt
+- docs/studies/uranus-system/horizons/named-umbriel-quito.txt
+- docs/studies/uranus-system/horizons/named-uranus-alert.txt
+- docs/studies/uranus-system/horizons/named-uranus-cape-town.txt
+- docs/studies/uranus-system/horizons/named-uranus-chatham.txt
+- docs/studies/uranus-system/horizons/named-uranus-oslo.txt
+- docs/studies/uranus-system/horizons/named-uranus-quito.txt
+- docs/studies/uranus-system/horizons/opposition-2003-uranus-oslo-hourly.txt
+- docs/studies/uranus-system/horizons/opposition-2012-uranus-oslo-hourly.txt
+- docs/studies/uranus-system/horizons/opposition-2018-uranus-oslo-hourly.txt
+- docs/studies/uranus-system/horizons/opposition-2026-ariel-geocentric-10m.txt
+- docs/studies/uranus-system/horizons/opposition-2026-miranda-geocentric-10m.txt
+- docs/studies/uranus-system/horizons/opposition-2026-oberon-geocentric-10m.txt
+- docs/studies/uranus-system/horizons/opposition-2026-titania-geocentric-10m.txt
+- docs/studies/uranus-system/horizons/opposition-2026-umbriel-geocentric-10m.txt
+- docs/studies/uranus-system/horizons/opposition-2026-uranus-oslo-hourly.txt
+- docs/studies/uranus-system/horizons/opposition-2027-uranus-oslo-hourly.txt
+- docs/studies/uranus-system/horizons/opposition-2100-uranus-oslo-hourly.txt
+- docs/studies/uranus-system/uranus-events.txt
 - docs/studies/venus/horizons/apparition-2026-oslo-10.txt
 - docs/studies/venus/horizons/apparition-2026-oslo-299.txt
 - docs/studies/venus/horizons/appearances-alert-10.txt
