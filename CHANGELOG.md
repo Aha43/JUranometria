@@ -48,6 +48,16 @@ production pages are in `docs/studies/mars-on-the-chart/`. *Mars on
 the chart* has no access letter in either language, as *Mars...* has
 none.
 
+**Mars on the page, measured (#605).** The cartography study and its
+eight rulings in `docs/decisions/mars-cartography.md`: rule M phased,
+no colour, the moons only where they stand clear of Mars's mark with
+no floor, Jupiter's vocabulary for their states, Mars selectable and
+its moons not, the closer fields, the inherited contracts, and the
+split into Mars first and the moons second.
+
+**Mars handed to cartography (#604).** The settled numerical contract
+in one place: `docs/decisions/mars-handover.md`.
+
 **Mars, Phobos and Deimos in the Solar System tables (#603, ruled on
 #601).** View > Solar System gains *Mars...* between *Moon...* and
 *Jupiter...*, and the Controller's Solar System tab a Mars group in the
@@ -80,6 +90,28 @@ front of, behind, or in Mars's shadow. Its notice is in About, in both
 languages. No table or chart shows Mars yet; the first numbers are in
 `docs/studies/mars-system/`. The released Sun, Moon, Mercury, Venus,
 Jupiter and Saturn answers are unchanged.
+
+**Mars, Phobos and Deimos: the system contract (#601).** The
+authority, interval, frames, observables and words for Mars and its
+two moons, ruled M-1 to M-12 with M-7a: `docs/decisions/mars-system.md`.
+
+**Centre on coordinates (#623, rulings C-1 to C-4).** View ▸ *Centre
+on coordinates...* opens a modeless window where you type a J2000
+right ascension and declination and centre the chart there, through
+the same rule Search uses for typed coordinates; the selection is
+cleared, and a small cross marks the requested position until the
+next centring, search or selection - never selectable, inspected or
+exported. Search's explanation now says its coordinates are J2000 and
+promises a mark only for an object it finds.
+
+**Subdue below horizon (#615, rulings of 2026-10-24).** Place and Time
+gains *Subdue below horizon*, on by default: the sky below the
+observer's mathematical horizon is drawn at reduced contrast - each ink
+keeps 40 % of its distance from the ground - whether or not the
+horizon line is drawn. A label follows its anchor, a curve changes tone
+where it crosses the horizon, emphasis keeps its accent, and the
+selection and the reader's working marks stay at full ink; screen and
+paper use the same rule. It makes no claim about what can be seen.
 
 **One chart, one time and place (#612, absorbing #569; Sprint 54).**
 The chart's time and place are one shared context, installed together
