@@ -7,6 +7,17 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Saturn's rings on the page (#607).** A new reader article, in
+English and Norwegian (*Saturns ringer på siden*): what the atlas draws
+of Saturn as released in 5.4 - where its numbers come from and how
+closely they match JPL Horizons, the planetocentric ring opening and
+the face the Sun lights, the unlit face and the edge-on crossings, the
+switch from the 6-pixel symbol to the true globe and rings, the near
+and far halves of the rings over the years, the seven ruled moons and
+their states - and what it does not claim. Every figure is a released
+evidence page and every number is quoted from the report that measured
+it.
+
 **Phobos and Deimos on the chart (#606, part 2, ruled on #605).** With
 *Mars on the chart* on, Mars's two moons are drawn from 2000 to 2049
 as 3-pixel symbols at their own places, each only where its mark
