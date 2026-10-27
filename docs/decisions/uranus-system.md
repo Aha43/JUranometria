@@ -191,3 +191,25 @@ against Horizons; the almanac is a coarse cross-check.
   only.
 - **U-13, the production split.** As Mars's: #634 the packs and the service,
   #635 the tables with a packaged checkpoint, #636 the numerical handover.
+
+## The ruling
+
+The owner's ruling of 2026-10-27, as given: "Rule U-1 to U-13 as proposed".
+
+**U-1 to U-13 are ruled as proposed above**, each with its recommended
+choice:
+- **U-1a.** Uranus's place is the barycentre from `ura184_part-3`'s own DE442
+  segment, 1900-2100 (372,736 bytes). The Sun and the Earth stay DE440's.
+- **U-2.** The barycentre stands for the centre; no centre excerpt ships.
+- **U-6a.** Miranda, Ariel, Umbriel, Titania and Oberon, 2000-2100, in their
+  own pack (38,041,600 bytes); before 2000 Uranus is shown alone.
+- **U-8.** No ring rows in the table; an Epsilon outline is #637's question.
+
+The rest stand as written: the PCK figure (U-3), the IAU pole with the tilt
+planetocentric (U-4), the fraction and phase angle without phase words
+(U-5), Jupiter's six states on the flattened figure (U-7), the vocabulary
+(U-9), Saturn's and Mars's targets (U-10), the fixtures (U-11), the stated
+event limitation (U-12) and Mars's production split (U-13).
+
+No production Uranus code begins before this study's landing; #634 builds
+the packs and the service from it.
