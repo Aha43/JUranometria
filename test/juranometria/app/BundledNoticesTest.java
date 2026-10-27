@@ -256,6 +256,37 @@ class BundledNoticesTest {
     }
 
     @Test
+    void theUranusSystemPackShipsWithItsNoticeAndProvenance() {
+        String notice = resourceText("/resources/uranus-system/NOTICE-uranus-system.md")
+                .replaceAll("\\s+", " ");
+        assertTrue(notice.contains("modified") && notice.contains("kernel"),
+                "the excerpts are called what NAIF's rules call them");
+        assertTrue(notice.contains("not original JPL files") && notice.contains("JPL did not produce"),
+                "and never presented as JPL's own");
+        assertTrue(notice.contains("NAIF") && notice.contains("URA182.21") && notice.contains("DE442"));
+        assertTrue(notice.contains("pck00011.tpc") && notice.contains("not redistributed"),
+                "the constants' source is named and the file is not shipped");
+        assertTrue(notice.contains("2000 to 2100") && notice.contains("1900 to 2100"),
+                "the planet's and the moons' years (#633, U-6a)");
+        assertTrue(notice.contains("does not change"), "the packs beside it are untouched");
+        String provenance = resourceText("/resources/uranus-system/PROVENANCE.md");
+        for (String required : new String[] {"naif.jpl.nasa.gov", "SHA-256", "SpkExcerpt", "Validation",
+                "as the source's", "untouched", "pck00011.tpc", "DE-0442", "45.136 km"}) {
+            assertTrue(provenance.contains(required), "the provenance records " + required);
+        }
+    }
+
+    @Test
+    void everyUranusSystemResourceShipsOnTheClasspath() {
+        for (String resource : new String[] {
+                "manifest.properties", "juranometria-de442-uranus-1900-2100.bsp",
+                "juranometria-ura182-moons-2000-2100.bsp", "NOTICE-uranus-system.md", "PROVENANCE.md"}) {
+            assertNotNull(BundledNoticesTest.class.getResource("/resources/uranus-system/" + resource),
+                    resource + " must ship as a resource");
+        }
+    }
+
+    @Test
     void everyMarsSystemResourceShipsOnTheClasspath() {
         for (String resource : new String[] {
                 "manifest.properties", "juranometria-mar099-moons-2000-2050.bsp",

@@ -90,6 +90,8 @@ public final class AboutDialog extends JDialog {
                     "/resources/saturn-system/NOTICE-saturn-system.md"),
             new Notice("marssystem",
                     "/resources/mars-system/NOTICE-mars-system.md"),
+            new Notice("uranussystem",
+                    "/resources/uranus-system/NOTICE-uranus-system.md"),
             new Notice("tabler", "/resources/icons/LICENSE"));
 
     private final juranometria.ui.language.AboutText said;

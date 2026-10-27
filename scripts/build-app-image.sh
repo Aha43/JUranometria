@@ -162,6 +162,7 @@ done
     exit 1
 }
 jarlist=$(unzip -l "$appjar")
+checked=0
 for resource in \
         resources/about/licensing-summary.txt \
         resources/catalog/bright-sky/NOTICE-tycho2.md \
@@ -176,12 +177,14 @@ for resource in \
         resources/planets/NOTICE-planets.md \
         resources/saturn-system/NOTICE-saturn-system.md \
         resources/mars-system/NOTICE-mars-system.md \
+        resources/uranus-system/NOTICE-uranus-system.md \
         resources/icons/LICENSE; do
     echo "$jarlist" | grep -q " $resource\$" || {
         echo "build-app-image: packaged licensing inventory missing" \
              "$resource" >&2
         exit 1
     }
+    checked=$((checked + 1))
 done
 for module in java.base java.datatransfer java.xml java.prefs \
         java.desktop java.logging; do
@@ -191,7 +194,9 @@ for module in java.base java.datatransfer java.xml java.prefs \
         exit 1
     }
 done
-echo "packaged licensing inventory: complete (13 resources, 6 module"
+# The count is the list's own, never typed: it read 13 while the list
+# held 14 from #602 to #634.
+echo "packaged licensing inventory: complete ($checked resources, 6 module"
 echo "legal directories)"
 
 # The packaged headless smoke path through the NATIVE image: the
