@@ -107,7 +107,7 @@ Bar packed 892 × 379 px; widest popup 232 px.
 | item spoken description \| Shows or hides the Moon on the chart, drawn at its true size where it stands for the chart time and place, lit on the side the Moon table states; below a drawn horizon it is dimmed and says so. |
 | item label \| Mars on the chart |
 | item spoken name \| Mars on the chart |
-| item spoken description \| Shows or hides Mars on the chart where it stands for the chart time and place, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
+| item spoken description \| Shows or hides Mars on the chart where it stands for the chart time and place, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Phobos and Deimos are drawn with it from 2000 to 2049 as 3-pixel symbols at their own places, each only where its mark stands clear of Mars and of the other moon: a filled dot clear of Mars, a dot ringed in the page's ground in front of it, a hollow ring in its shadow; a moon behind Mars, or too close to tell apart at the field, is not drawn, and the page says so. Hidden until you ask. |
 | item label \| Jupiter and moons on the chart |
 | item spoken name \| Jupiter and moons on the chart |
 | item spoken description \| Shows or hides Jupiter on the chart where it stands for the chart time and place: at its true size once that is at least 6 pixels across, otherwise as a 6-pixel cartographic symbol, not its apparent diameter; below a drawn horizon it is dimmed and says so. Io, Europa, Ganymede and Callisto are drawn as 3-pixel symbols at their own places: a filled dot clear of Jupiter, a dot ringed in the page's ground in front of it, a hollow ring in its shadow, and nothing behind it; at wider fields only the moons whose marks can be told apart are drawn. |
@@ -137,7 +137,7 @@ Bar packed 892 × 379 px; widest popup 232 px.
 | item label \| Mars... |
 | item hover \| Where Mars, Phobos and Deimos are, for the chart time and place |
 | item spoken name \| Mars table |
-| item spoken description \| Opens a table of Mars's computed position, height, distance, size, phase, lit side, pole and tilt, and of where Phobos and Deimos stand beside it - clear of Mars, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2049. Mars is drawn on the chart by Mars on the chart; its moons are not drawn yet. |
+| item spoken description \| Opens a table of Mars's computed position, height, distance, size, phase, lit side, pole and tilt, and of where Phobos and Deimos stand beside it - clear of Mars, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2049. Mars and its moons are drawn on the chart by Mars on the chart. |
 | item label \| Jupiter... |
 | item hover \| Where Jupiter and its four large moons are, for the chart time and place |
 | item spoken name \| Jupiter table |
@@ -237,7 +237,7 @@ Bar packed 892 × 379 px; widest popup 232 px.
 | item spoken description \| Shows or hides the Moon on the chart, drawn at its true size where it stands for the chart time and place, lit on the side the Moon table states; below a drawn horizon it is dimmed and says so. |
 | item label [checked] \| Mars on the chart |
 | item spoken name \| Mars on the chart |
-| item spoken description \| Shows or hides Mars on the chart where it stands for the chart time and place, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
+| item spoken description \| Shows or hides Mars on the chart where it stands for the chart time and place, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Phobos and Deimos are drawn with it from 2000 to 2049 as 3-pixel symbols at their own places, each only where its mark stands clear of Mars and of the other moon: a filled dot clear of Mars, a dot ringed in the page's ground in front of it, a hollow ring in its shadow; a moon behind Mars, or too close to tell apart at the field, is not drawn, and the page says so. Hidden until you ask. |
 | item label [checked] \| Jupiter and moons on the chart |
 | item spoken name \| Jupiter and moons on the chart |
 | item spoken description \| Shows or hides Jupiter on the chart where it stands for the chart time and place: at its true size once that is at least 6 pixels across, otherwise as a 6-pixel cartographic symbol, not its apparent diameter; below a drawn horizon it is dimmed and says so. Io, Europa, Ganymede and Callisto are drawn as 3-pixel symbols at their own places: a filled dot clear of Jupiter, a dot ringed in the page's ground in front of it, a hollow ring in its shadow, and nothing behind it; at wider fields only the moons whose marks can be told apart are drawn. |
@@ -267,7 +267,7 @@ Bar packed 892 × 379 px; widest popup 232 px.
 | item label \| Mars... |
 | item hover \| Where Mars, Phobos and Deimos are, for the chart time and place |
 | item spoken name \| Mars table |
-| item spoken description \| Opens a table of Mars's computed position, height, distance, size, phase, lit side, pole and tilt, and of where Phobos and Deimos stand beside it - clear of Mars, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2049. Mars is drawn on the chart by Mars on the chart; its moons are not drawn yet. |
+| item spoken description \| Opens a table of Mars's computed position, height, distance, size, phase, lit side, pole and tilt, and of where Phobos and Deimos stand beside it - clear of Mars, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2049. Mars and its moons are drawn on the chart by Mars on the chart. |
 | item label \| Jupiter... |
 | item hover \| Where Jupiter and its four large moons are, for the chart time and place |
 | item spoken name \| Jupiter table |
@@ -367,7 +367,7 @@ Bar packed 892 × 379 px; widest popup 232 px.
 | item spoken description \| Shows or hides the Moon on the chart, drawn at its true size where it stands for the chart time and place, lit on the side the Moon table states; below a drawn horizon it is dimmed and says so. |
 | item label \| Mars on the chart |
 | item spoken name \| Mars on the chart |
-| item spoken description \| Shows or hides Mars on the chart where it stands for the chart time and place, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
+| item spoken description \| Shows or hides Mars on the chart where it stands for the chart time and place, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Phobos and Deimos are drawn with it from 2000 to 2049 as 3-pixel symbols at their own places, each only where its mark stands clear of Mars and of the other moon: a filled dot clear of Mars, a dot ringed in the page's ground in front of it, a hollow ring in its shadow; a moon behind Mars, or too close to tell apart at the field, is not drawn, and the page says so. Hidden until you ask. |
 | item label \| Jupiter and moons on the chart |
 | item spoken name \| Jupiter and moons on the chart |
 | item spoken description \| Shows or hides Jupiter on the chart where it stands for the chart time and place: at its true size once that is at least 6 pixels across, otherwise as a 6-pixel cartographic symbol, not its apparent diameter; below a drawn horizon it is dimmed and says so. Io, Europa, Ganymede and Callisto are drawn as 3-pixel symbols at their own places: a filled dot clear of Jupiter, a dot ringed in the page's ground in front of it, a hollow ring in its shadow, and nothing behind it; at wider fields only the moons whose marks can be told apart are drawn. |
@@ -397,7 +397,7 @@ Bar packed 892 × 379 px; widest popup 232 px.
 | item label \| Mars... |
 | item hover \| Where Mars, Phobos and Deimos are, for the chart time and place |
 | item spoken name \| Mars table |
-| item spoken description \| Opens a table of Mars's computed position, height, distance, size, phase, lit side, pole and tilt, and of where Phobos and Deimos stand beside it - clear of Mars, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2049. Mars is drawn on the chart by Mars on the chart; its moons are not drawn yet. |
+| item spoken description \| Opens a table of Mars's computed position, height, distance, size, phase, lit side, pole and tilt, and of where Phobos and Deimos stand beside it - clear of Mars, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2049. Mars and its moons are drawn on the chart by Mars on the chart. |
 | item label \| Jupiter... |
 | item hover \| Where Jupiter and its four large moons are, for the chart time and place |
 | item spoken name \| Jupiter table |
@@ -497,7 +497,7 @@ Bar packed 892 × 379 px; widest popup 232 px.
 | item spoken description \| Shows or hides the Moon on the chart, drawn at its true size where it stands for the chart time and place, lit on the side the Moon table states; below a drawn horizon it is dimmed and says so. |
 | item label \| Mars on the chart |
 | item spoken name \| Mars on the chart |
-| item spoken description \| Shows or hides Mars on the chart where it stands for the chart time and place, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Hidden until you ask. |
+| item spoken description \| Shows or hides Mars on the chart where it stands for the chart time and place, phased as the table says, at its true size or as a 6-pixel cartographic symbol, whichever is larger. Phobos and Deimos are drawn with it from 2000 to 2049 as 3-pixel symbols at their own places, each only where its mark stands clear of Mars and of the other moon: a filled dot clear of Mars, a dot ringed in the page's ground in front of it, a hollow ring in its shadow; a moon behind Mars, or too close to tell apart at the field, is not drawn, and the page says so. Hidden until you ask. |
 | item label \| Jupiter and moons on the chart |
 | item spoken name \| Jupiter and moons on the chart |
 | item spoken description \| Shows or hides Jupiter on the chart where it stands for the chart time and place: at its true size once that is at least 6 pixels across, otherwise as a 6-pixel cartographic symbol, not its apparent diameter; below a drawn horizon it is dimmed and says so. Io, Europa, Ganymede and Callisto are drawn as 3-pixel symbols at their own places: a filled dot clear of Jupiter, a dot ringed in the page's ground in front of it, a hollow ring in its shadow, and nothing behind it; at wider fields only the moons whose marks can be told apart are drawn. |
@@ -527,7 +527,7 @@ Bar packed 892 × 379 px; widest popup 232 px.
 | item label \| Mars... |
 | item hover \| Where Mars, Phobos and Deimos are, for the chart time and place |
 | item spoken name \| Mars table |
-| item spoken description \| Opens a table of Mars's computed position, height, distance, size, phase, lit side, pole and tilt, and of where Phobos and Deimos stand beside it - clear of Mars, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2049. Mars is drawn on the chart by Mars on the chart; its moons are not drawn yet. |
+| item spoken description \| Opens a table of Mars's computed position, height, distance, size, phase, lit side, pole and tilt, and of where Phobos and Deimos stand beside it - clear of Mars, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2049. Mars and its moons are drawn on the chart by Mars on the chart. |
 | item label \| Jupiter... |
 | item hover \| Where Jupiter and its four large moons are, for the chart time and place |
 | item spoken name \| Jupiter table |
@@ -630,7 +630,7 @@ Bar packed 882 × 379 px; widest popup 229 px.
 | item access letter (language) \| N |
 | item label \| Mars på kartet |
 | item spoken name \| Mars på kartet |
-| item spoken description \| Viser eller skjuler Mars på kartet der den står for karttiden og stedet, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om det. |
+| item spoken description \| Viser eller skjuler Mars på kartet der den står for karttiden og stedet, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Phobos og Deimos tegnes sammen med den fra 2000 til 2049 som symboler på 3 piksler der de står, hver bare der merket står klar av Mars og av den andre månen: en fylt prikk klar av Mars, en prikk med en ring i sidens bunnfarge foran den, en hul ring i skyggen; en måne bak Mars, eller for nær til å skjelnes i feltet, tegnes ikke, og siden sier fra. Skjult til du ber om det. |
 | item label \| Jupiter og månene på kartet |
 | item spoken name \| Jupiter og månene på kartet |
 | item spoken description \| Viser eller skjuler Jupiter på kartet der den står for karttiden og stedet: i sann størrelse når den er minst 6 piksler bred, ellers som et kartografisk symbol på 6 piksler, ikke den tilsynelatende diameteren; under en tegnet horisont dempes den og sier fra. Io, Europa, Ganymedes og Callisto tegnes som symboler på 3 piksler der de står: en fylt prikk klar av Jupiter, en prikk med en ring i sidens bunnfarge foran den, en hul ring i skyggen, og ingenting bak den; i videre felt tegnes bare de månene som kan skilles fra hverandre. |
@@ -659,7 +659,7 @@ Bar packed 882 × 379 px; widest popup 229 px.
 | item label \| Mars... |
 | item hover \| Hvor Mars, Phobos og Deimos er, for karttiden og stedet |
 | item spoken name \| Marstabell |
-| item spoken description \| Åpner en tabell over Mars' beregnede posisjon, høyde, avstand, størrelse, fase, belyst side, pol og helning, og over hvor Phobos og Deimos står ved siden av - klar av Mars, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2049. Mars tegnes på kartet med Mars på kartet; månene tegnes ikke ennå. |
+| item spoken description \| Åpner en tabell over Mars' beregnede posisjon, høyde, avstand, størrelse, fase, belyst side, pol og helning, og over hvor Phobos og Deimos står ved siden av - klar av Mars, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2049. Mars og månene tegnes på kartet med Mars på kartet. |
 | item label \| Jupiter... |
 | item hover \| Hvor Jupiter og de fire store månene er, for karttiden og stedet |
 | item spoken name \| Jupitertabell |
@@ -760,7 +760,7 @@ Bar packed 882 × 379 px; widest popup 229 px.
 | item access letter (language) \| N |
 | item label [checked] \| Mars på kartet |
 | item spoken name \| Mars på kartet |
-| item spoken description \| Viser eller skjuler Mars på kartet der den står for karttiden og stedet, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om det. |
+| item spoken description \| Viser eller skjuler Mars på kartet der den står for karttiden og stedet, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Phobos og Deimos tegnes sammen med den fra 2000 til 2049 som symboler på 3 piksler der de står, hver bare der merket står klar av Mars og av den andre månen: en fylt prikk klar av Mars, en prikk med en ring i sidens bunnfarge foran den, en hul ring i skyggen; en måne bak Mars, eller for nær til å skjelnes i feltet, tegnes ikke, og siden sier fra. Skjult til du ber om det. |
 | item label [checked] \| Jupiter og månene på kartet |
 | item spoken name \| Jupiter og månene på kartet |
 | item spoken description \| Viser eller skjuler Jupiter på kartet der den står for karttiden og stedet: i sann størrelse når den er minst 6 piksler bred, ellers som et kartografisk symbol på 6 piksler, ikke den tilsynelatende diameteren; under en tegnet horisont dempes den og sier fra. Io, Europa, Ganymedes og Callisto tegnes som symboler på 3 piksler der de står: en fylt prikk klar av Jupiter, en prikk med en ring i sidens bunnfarge foran den, en hul ring i skyggen, og ingenting bak den; i videre felt tegnes bare de månene som kan skilles fra hverandre. |
@@ -789,7 +789,7 @@ Bar packed 882 × 379 px; widest popup 229 px.
 | item label \| Mars... |
 | item hover \| Hvor Mars, Phobos og Deimos er, for karttiden og stedet |
 | item spoken name \| Marstabell |
-| item spoken description \| Åpner en tabell over Mars' beregnede posisjon, høyde, avstand, størrelse, fase, belyst side, pol og helning, og over hvor Phobos og Deimos står ved siden av - klar av Mars, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2049. Mars tegnes på kartet med Mars på kartet; månene tegnes ikke ennå. |
+| item spoken description \| Åpner en tabell over Mars' beregnede posisjon, høyde, avstand, størrelse, fase, belyst side, pol og helning, og over hvor Phobos og Deimos står ved siden av - klar av Mars, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2049. Mars og månene tegnes på kartet med Mars på kartet. |
 | item label \| Jupiter... |
 | item hover \| Hvor Jupiter og de fire store månene er, for karttiden og stedet |
 | item spoken name \| Jupitertabell |
@@ -890,7 +890,7 @@ Bar packed 882 × 379 px; widest popup 229 px.
 | item access letter (language) \| N |
 | item label \| Mars på kartet |
 | item spoken name \| Mars på kartet |
-| item spoken description \| Viser eller skjuler Mars på kartet der den står for karttiden og stedet, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om det. |
+| item spoken description \| Viser eller skjuler Mars på kartet der den står for karttiden og stedet, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Phobos og Deimos tegnes sammen med den fra 2000 til 2049 som symboler på 3 piksler der de står, hver bare der merket står klar av Mars og av den andre månen: en fylt prikk klar av Mars, en prikk med en ring i sidens bunnfarge foran den, en hul ring i skyggen; en måne bak Mars, eller for nær til å skjelnes i feltet, tegnes ikke, og siden sier fra. Skjult til du ber om det. |
 | item label \| Jupiter og månene på kartet |
 | item spoken name \| Jupiter og månene på kartet |
 | item spoken description \| Viser eller skjuler Jupiter på kartet der den står for karttiden og stedet: i sann størrelse når den er minst 6 piksler bred, ellers som et kartografisk symbol på 6 piksler, ikke den tilsynelatende diameteren; under en tegnet horisont dempes den og sier fra. Io, Europa, Ganymedes og Callisto tegnes som symboler på 3 piksler der de står: en fylt prikk klar av Jupiter, en prikk med en ring i sidens bunnfarge foran den, en hul ring i skyggen, og ingenting bak den; i videre felt tegnes bare de månene som kan skilles fra hverandre. |
@@ -919,7 +919,7 @@ Bar packed 882 × 379 px; widest popup 229 px.
 | item label \| Mars... |
 | item hover \| Hvor Mars, Phobos og Deimos er, for karttiden og stedet |
 | item spoken name \| Marstabell |
-| item spoken description \| Åpner en tabell over Mars' beregnede posisjon, høyde, avstand, størrelse, fase, belyst side, pol og helning, og over hvor Phobos og Deimos står ved siden av - klar av Mars, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2049. Mars tegnes på kartet med Mars på kartet; månene tegnes ikke ennå. |
+| item spoken description \| Åpner en tabell over Mars' beregnede posisjon, høyde, avstand, størrelse, fase, belyst side, pol og helning, og over hvor Phobos og Deimos står ved siden av - klar av Mars, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2049. Mars og månene tegnes på kartet med Mars på kartet. |
 | item label \| Jupiter... |
 | item hover \| Hvor Jupiter og de fire store månene er, for karttiden og stedet |
 | item spoken name \| Jupitertabell |
@@ -1020,7 +1020,7 @@ Bar packed 882 × 379 px; widest popup 229 px.
 | item access letter (language) \| N |
 | item label \| Mars på kartet |
 | item spoken name \| Mars på kartet |
-| item spoken description \| Viser eller skjuler Mars på kartet der den står for karttiden og stedet, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Skjult til du ber om det. |
+| item spoken description \| Viser eller skjuler Mars på kartet der den står for karttiden og stedet, med fasen slik tabellen oppgir den, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst. Phobos og Deimos tegnes sammen med den fra 2000 til 2049 som symboler på 3 piksler der de står, hver bare der merket står klar av Mars og av den andre månen: en fylt prikk klar av Mars, en prikk med en ring i sidens bunnfarge foran den, en hul ring i skyggen; en måne bak Mars, eller for nær til å skjelnes i feltet, tegnes ikke, og siden sier fra. Skjult til du ber om det. |
 | item label \| Jupiter og månene på kartet |
 | item spoken name \| Jupiter og månene på kartet |
 | item spoken description \| Viser eller skjuler Jupiter på kartet der den står for karttiden og stedet: i sann størrelse når den er minst 6 piksler bred, ellers som et kartografisk symbol på 6 piksler, ikke den tilsynelatende diameteren; under en tegnet horisont dempes den og sier fra. Io, Europa, Ganymedes og Callisto tegnes som symboler på 3 piksler der de står: en fylt prikk klar av Jupiter, en prikk med en ring i sidens bunnfarge foran den, en hul ring i skyggen, og ingenting bak den; i videre felt tegnes bare de månene som kan skilles fra hverandre. |
@@ -1049,7 +1049,7 @@ Bar packed 882 × 379 px; widest popup 229 px.
 | item label \| Mars... |
 | item hover \| Hvor Mars, Phobos og Deimos er, for karttiden og stedet |
 | item spoken name \| Marstabell |
-| item spoken description \| Åpner en tabell over Mars' beregnede posisjon, høyde, avstand, størrelse, fase, belyst side, pol og helning, og over hvor Phobos og Deimos står ved siden av - klar av Mars, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2049. Mars tegnes på kartet med Mars på kartet; månene tegnes ikke ennå. |
+| item spoken description \| Åpner en tabell over Mars' beregnede posisjon, høyde, avstand, størrelse, fase, belyst side, pol og helning, og over hvor Phobos og Deimos står ved siden av - klar av Mars, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2049. Mars og månene tegnes på kartet med Mars på kartet. |
 | item label \| Jupiter... |
 | item hover \| Hvor Jupiter og de fire store månene er, for karttiden og stedet |
 | item spoken name \| Jupitertabell |

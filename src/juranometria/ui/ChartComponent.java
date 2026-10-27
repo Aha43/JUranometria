@@ -457,6 +457,17 @@ public final class ChartComponent extends JComponent {
         return said.toString();
     }
 
+    /** Each undrawn moon's name and why it is not drawn, after the bodies drawn. */
+    static String withUnseenMoons(String base, java.util.List<ReferenceInk.UnseenMoon> unseen,
+            juranometria.project.PageWords words) {
+        StringBuilder said = new StringBuilder(base);
+        for (ReferenceInk.UnseenMoon moon : unseen) {
+            said.append(' ').append(words.bodyName(moon.identity())).append(", ")
+                    .append(words.bodyState(moon.state())).append('.');
+        }
+        return said.toString();
+    }
+
     private String describe(ChartScene scene) {
         // One source for what a page says it is, shared with the
         // title block and the exported sheet (#301), and now in one
@@ -1296,9 +1307,13 @@ public final class ChartComponent extends JComponent {
             // A direction the page omitted is not spoken, because a
             // description of ink that is not there would be the lie
             // accessibility exists to prevent.
+            // A moon of Mars the page leaves undrawn is still given (#606,
+            // R-3 and R-4 on #605): behind Mars, or too close to tell apart.
             getAccessibleContext().setAccessibleDescription(withFurniture(
-                    withBodies(withDirections(describe(scene), spokenDirections),
-                            drawnBodies, words), drawnFurniture));
+                    withUnseenMoons(withBodies(withDirections(describe(scene),
+                            spokenDirections), drawnBodies, words),
+                            ReferenceInk.unseenMoons(juranometria.project.DrawnPage.of(scene),
+                                    overlays.collect()), words), drawnFurniture));
             // One ring per selected drawn member (issue #261): the
             // renderer draws nothing for an identity the page does
             // not draw, so an on-page undrawn member is left to its

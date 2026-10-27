@@ -46,7 +46,10 @@ import juranometria.ui.language.PageText;
  * languages; Mars behind the Sun at the hour of 1912 the service finds it
  * deepest; and the day of the 2018 perihelic apparition on which Mars's
  * dark side is widest on the sky, its drawn lit share and facing measured
- * from the rendered pixels against the service's own k and χ. Written to
+ * from the rendered pixels against the service's own k and χ. Part 2 adds
+ * Phobos and Deimos (R-3 to R-5): clear, in front, in the shadow, behind
+ * and too close to tell apart, each found by the service, and Mars alone
+ * after the moons' years. Written to
  * {@code docs/studies/mars-on-the-chart/} by
  * {@code make mars-on-the-chart-study}: the report to stdout, the pages
  * beside it.
@@ -99,8 +102,12 @@ public final class MarsOnTheChartStudyMain {
                 + " equatorial disc and a 6 px mark, the lit region turned through the page's"
                 + " north and east at Mars; no colour (R-2); the planet selectable and pointed"
                 + " at as an occurrence (R-5); eligible for the closer fields (R-6); on screen"
-                + " and on paper as the other bodies (R-7). The moons are not drawn: they are"
-                + " part 2 (R-8). The instants are Espenak's rows in"
+                + " and on paper as the other bodies (R-7). Part 2 draws Phobos and Deimos"
+                + " (R-3, R-4): each a 3 px symbol at its own J2000 place, drawn only where it"
+                + " stands clear of Mars's drawn mark and of the other moon, on every field -"
+                + " no floor; in front only over a drawn disc of at least 12 px; in the shadow a"
+                + " hollow ring; behind, or too close to tell apart, not drawn but spoken; not"
+                + " selectable (R-5). The instants are Espenak's rows in"
                 + " `docs/studies/mars-system/mars-events.txt` and hours the service itself"
                 + " finds; positions and phases are the service's for Oslo at sea level."
                 + " Regenerate with `make mars-on-the-chart-study`.");
@@ -160,6 +167,7 @@ public final class MarsOnTheChartStudyMain {
                 ChartViewState.normalMinimumFieldDegrees(), 0, NORSK, ChartPalette.BLACK_SKY,
                 true, "The same, spoken in Norwegian.");
         gibbous(Instant.parse("2018-01-01T00:00:00Z"), Instant.parse("2019-01-01T00:00:00Z"));
+        moons();
         p("## Outside the years");
         p("");
         Observer before = new Observer(OSLO_LAT, OSLO_LON, Instant.parse("1899-12-31T12:00:00Z"));
@@ -184,9 +192,9 @@ public final class MarsOnTheChartStudyMain {
                 v.elongationDegrees());
     }
 
-    /** The description's last body sentence: Mars's, in either language. */
+    /** The description from Mars's sentence on: Mars's, then its moons', in either language. */
     private static String spokenTail(String said) {
-        int at = said.lastIndexOf(". Mars");
+        int at = said.indexOf(". Mars");
         return (at < 0 ? said : said.substring(at + 1)).strip();
     }
 
@@ -404,6 +412,95 @@ public final class MarsOnTheChartStudyMain {
             throw new IllegalStateException("the drawn phase disagrees with the service: lit "
                     + share + ", facing " + off + "° from χ");
         }
+    }
+
+    /** The first ten-minute step from {@code from} over {@code days} where the moon is as asked. */
+    private static Instant first(Instant from, int days, MarsService.Moon moon,
+            java.util.function.Predicate<MarsService.MoonPlace> asked) {
+        for (Instant t = from; t.isBefore(from.plus(Duration.ofDays(days)));
+                t = t.plus(Duration.ofMinutes(10))) {
+            if (asked.test(mars.observeMoons(new Observer(OSLO_LAT, OSLO_LON, t)).moon(moon))) {
+                return t;
+            }
+        }
+        throw new IllegalStateException("no such instant from " + from);
+    }
+
+    /** One moon page: Mars centred at the field, the moons as the page decides them. */
+    private static void moonPage(String name, String title, Instant when, double field,
+                                 int closerSteps, PageText words, ChartPalette palette,
+                                 String caption) throws Exception {
+        Observer at = new Observer(OSLO_LAT, OSLO_LON, when);
+        MarsObservation v = mars.observe(at);
+        StringBuilder states = new StringBuilder();
+        if (mars.moonsAnswerAt(when)) {
+            for (MarsService.MoonPlace m : mars.observeMoons(at).moons()) {
+                states.append(String.format(Locale.ROOT, " %s %.1f″ from Mars's centre, %s, %s;",
+                        m.moon().name().charAt(0) + m.moon().name().substring(1)
+                                .toLowerCase(Locale.ROOT), m.separationArcseconds(),
+                        m.discRelation().name().toLowerCase(Locale.ROOT).replace('_', ' '),
+                        m.shadowRelation().name().toLowerCase(Locale.ROOT).replace('_', ' ')));
+            }
+        }
+        page(name, title + ", " + when, at, v, field, closerSteps, words, palette, false,
+                String.format(Locale.ROOT, "Mars %.1f″ across.", v.equatorialDiameterArcseconds())
+                        + (states.length() == 0 ? " No moons computed." : " The service:"
+                        + states.substring(0, states.length() - 1) + ".") + " " + caption);
+    }
+
+    /** Phobos and Deimos (#606 part 2), each case found by the service, for Oslo. */
+    private static void moons() throws Exception {
+        double one = ChartViewState.normalMinimumFieldDegrees();
+        p("## Phobos and Deimos");
+        p("");
+        p("Each case is the first ten-minute step the service finds, for Oslo, in the window"
+                + " named. The 2003 pages above are drawn with the moons as the page decides"
+                + " them; on the ordinary ladder they stand on Mars's mark and are spoken, not"
+                + " drawn.");
+        p("");
+        Instant opposition = Instant.parse("2018-07-27T06:00:00Z");
+        Instant wide = first(opposition, 3, MarsService.Moon.DEIMOS,
+                m -> m.separationArcseconds() > 70.0
+                        && m.discRelation() == MarsService.DiscRelation.CLEAR);
+        moonPage("deimos-wide-2018-0.25", "Deimos near its greatest elongation", wide, one, 2,
+                ENGLISH, ChartPalette.WHITE_PAPER,
+                "At 0.25° Deimos stands clear: a filled dot, named.");
+        moonPage("deimos-wide-2018-1-nb", "The same at 1°, in Norwegian", wide, one, 0, NORSK,
+                ChartPalette.WHITE_PAPER, "At 1° the page decides each moon on its own.");
+        moonPage("deimos-wide-2018-8", "The same at 8°", wide, 8.0, 0, ENGLISH,
+                ChartPalette.WHITE_PAPER, "At 8° both stand on Mars's mark: neither is drawn,"
+                        + " and the page says so (no floor, R-3).");
+        Instant transit = first(Instant.parse("2001-06-30T12:00:00Z"), 1, MarsService.Moon.PHOBOS,
+                m -> m.discRelation() == MarsService.DiscRelation.IN_FRONT
+                        && m.shadowRelation() == MarsService.ShadowRelation.SUNLIT
+                        && m.separationMarsRadii() < 0.8);
+        moonPage("phobos-in-front-2001-0.25", "Phobos in front of Mars", transit, one, 2,
+                ENGLISH, ChartPalette.WHITE_PAPER, "Over a drawn disc of at least 12 px:"
+                        + " the dot ringed in the page's ground, painted with the disc.");
+        moonPage("phobos-in-front-2001-0.25-dark", "The same on the black sky", transit, one, 2,
+                NORSK, ChartPalette.BLACK_SKY, "In Norwegian.");
+        Instant behind = first(opposition, 2, MarsService.Moon.PHOBOS,
+                m -> m.discRelation() == MarsService.DiscRelation.BEHIND);
+        moonPage("phobos-behind-2018-0.25", "Phobos behind Mars", behind, one, 2, ENGLISH,
+                ChartPalette.WHITE_PAPER, "Behind Mars: not drawn, and spoken.");
+        Instant from = Instant.parse("2018-05-01T00:00:00Z");
+        Instant shadowed = null;
+        for (Instant t = from; shadowed == null && t.isBefore(from.plus(Duration.ofDays(20)));
+                t = t.plus(Duration.ofMinutes(10))) {
+            Observer o = new Observer(OSLO_LAT, OSLO_LON, t);
+            MarsService.MoonPlace m = mars.observeMoons(o).moon(MarsService.Moon.PHOBOS);
+            if (m.shadowRelation() == MarsService.ShadowRelation.IN_SHADOW
+                    && m.discRelation() == MarsService.DiscRelation.CLEAR
+                    && m.separationArcseconds()
+                            - mars.observe(o).equatorialDiameterArcseconds() / 2.0 > 6.0) {
+                shadowed = t;
+            }
+        }
+        moonPage("phobos-shadow-2018-0.25", "Phobos in Mars's shadow, beside the disc", shadowed,
+                one, 2, ENGLISH, ChartPalette.WHITE_PAPER, "A hollow ring, with its state.");
+        moonPage("after-the-moons-2051-0.25", "After the moons' years", Instant.parse(
+                "2051-03-01T00:00:00Z"), one, 2, ENGLISH, ChartPalette.WHITE_PAPER,
+                "Mars alone, as the table shows it; nothing is said of moons with no numbers.");
     }
 
     private static String trim(double field) {

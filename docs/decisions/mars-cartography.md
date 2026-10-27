@@ -148,3 +148,31 @@ R-8's first part: Mars itself. The moons follow in part 2.
   showing *Mars...*, *Saturn...* and *Saturn on the chart*, which they
   had lacked since #575, #579 and #603.
 
+## Phobos and Deimos on the chart, as built (#606, part 2)
+
+- **The rule (R-3).** Each moon is a 3 px symbol at its own astrometric
+  J2000 place, contributed with Mars under the same switch and decided
+  on its own by `SatelliteMarks` with no floor: drawn only where its
+  mark's edge stands at least 3 px from Mars's drawn edge and its
+  centre at least 6 px from the other moon's, on every field. Jupiter's floor applies to Jupiter only; the page reads it per
+  system (`ReferenceInk.roundSystemsOn`).
+- **The states (R-4).** Jupiter's vocabulary A: in front, the dot ringed
+  in the ground, only over a drawn disc of at least 12 px, painted with
+  the disc; in the shadow, wholly or partly, a hollow ring, spoken *in
+  Mars's shadow* / *partly in Mars's shadow*; behind, not drawn.
+- **Spoken, not drawn.** A moon the page leaves out though Mars is drawn
+  is still given in the page's description, after Mars: *Phobos, behind
+  Mars, not drawn* / *Phobos, bak Mars, ikke tegnet*, and *Deimos, too
+  close to tell apart at this field, not drawn* / *Deimos, for nær til
+  å skjelnes i dette feltet, ikke tegnet*. A moon off the paper is not
+  spoken. Jupiter's and Saturn's pages are unchanged: this is Mars's
+  ruling ("behind: not drawn, and spoken").
+- **Not selectable (R-5).** A click on a moon is not an occurrence of it.
+- **Outside 2000-2049** Mars is drawn alone and nothing is said of moons.
+- **Evidence.** `MarsMoonsInkTest` (clear at 0.25° and unresolved at 8°,
+  in front over the 2001 20″ disc, behind, in the shadow, after the
+  years); the study's *Phobos and Deimos* section; the packaged journey
+  *mars moons on the chart OK* at 2018-07-27 13:00 UTC, held to the
+  study by `PackagedMarsSampleTest`. The explanations of *Mars on the
+  chart*, *Mars...* and the Mars table now describe the moons.
+

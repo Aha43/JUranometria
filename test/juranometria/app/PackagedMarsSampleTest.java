@@ -8,9 +8,10 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 /**
- * The packaged Mars journey (#602) restates two Horizons rows so the
- * native image can check itself without the study's files. The
- * restatements are held here to the committed rows they cite.
+ * The packaged Mars journeys (#602, #606) restate two Horizons rows and one
+ * of the Mars-on-the-chart study's instants so the native image can check
+ * itself without the study's files. The restatements are held here to the
+ * committed rows and report they cite.
  */
 class PackagedMarsSampleTest {
 
@@ -33,5 +34,16 @@ class PackagedMarsSampleTest {
                 .findFirst().orElseThrow();
         assertEquals(java.time.Instant.parse("2018-07-26T12:30:00Z"), PackagedAcceptanceMain.PHOBOS_ECLIPSE_INSTANT);
         assertEquals("U", row.split(",")[13].strip(), "occulted and in total umbral eclipse");
+    }
+
+    @Test
+    void theMoonsSampleIsTheStudysDeimosPage() throws Exception {
+        String heading = Files.readString(Path.of("docs/studies/mars-on-the-chart/measurements.md"),
+                StandardCharsets.UTF_8).lines()
+                .filter(l -> l.startsWith("### Deimos near its greatest elongation, "))
+                .findFirst().orElseThrow();
+        assertEquals(java.time.Instant.parse(heading.substring(heading.indexOf(", ") + 2,
+                        heading.indexOf(" (the page's field"))),
+                PackagedAcceptanceMain.MARS_MOONS_SAMPLE_INSTANT);
     }
 }
