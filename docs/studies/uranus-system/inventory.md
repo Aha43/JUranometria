@@ -75,3 +75,23 @@ asked for: NAIF's satellite summary and checksums, the `.cmt` and
 `ura182` and `ura117` - 478,499 bytes in all, by `HEAD` - and the two
 ring pages. The kernel, the Horizons fixtures and anything to be
 committed are separate requests after them.
+
+## After requests 1 and 2 (approved 2026-10-27, "approve requests 1 and 2")
+
+Retrieved at the sizes asked about (478,499 bytes from NAIF; the ring
+pages 17,789 and 4,338 bytes), digests in `imports/raw/uranus-system/RETRIEVED.txt`
+and `~/juranometria-runs/uranus-raw/RETRIEVED.txt`. What they settle,
+read from the files:
+
+- **`ura184_part-3.bsp`** (NAIF, 2025-09-25) carries Uranus (7 → 799)
+  and **all five major moons** (7 → 701-705), with nine irregular moons
+  and S/2023 U 1, over **1600 JAN 04 - 2399 DEC 17 TDB**; the satellites
+  from URA182.21 (fit to data, DE442), the Uranus barycentre, Sun and
+  Earth from DE442. NAIF's checksum list gives it MD5
+  `cf24471fb9037543cdbe168bc0fd4c2e`.
+- **Parts 1 and 2** hold only the small inner moons (706-715, 725-727).
+- **`ura111xl-*`** cover 12001 BC - 17000 AD (URA111, DE441), hence
+  their size; **`ura111l.bsp`** (old versions) is URA111 for 701-705 and
+  799 over 1600-2399 with DE440's planets: the superseded solution.
+- **The rings.** Both pages give the ε ring's dimensions (PDS: semimajor
+  axis, modes; NSSDCA: radius, width), with sources; read in the study.
