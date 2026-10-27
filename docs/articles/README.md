@@ -28,6 +28,11 @@ behind that argument.
   symbol, what the closer fields add, and what it does not claim. Also in
   Norwegian: [Merkur, aldri langt fra
   Solen](merkur-aldri-langt-fra-solen.md).
+- [Saturn's rings on the page](saturns-rings-on-the-page.md) — what the
+  atlas draws of Saturn, its rings and seven moons, how the rings turn
+  over the years, how to read the figure and the marks, and what it does
+  not claim. Also in Norwegian: [Saturns ringer på
+  siden](saturns-ringer-pa-siden.md).
 
 ## How JUranometria works
 
