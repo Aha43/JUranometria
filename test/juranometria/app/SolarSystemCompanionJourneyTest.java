@@ -116,7 +116,8 @@ class SolarSystemCompanionJourneyTest {
                     assertEquals(List.of("heading.solarsystem.sun", "heading.solarsystem.mercury",
                             "heading.solarsystem.venus", "heading.solarsystem.moon",
                             "heading.solarsystem.mars",
-                            "heading.solarsystem.jupiter", "heading.solarsystem.saturn"), headings,
+                            "heading.solarsystem.jupiter", "heading.solarsystem.saturn",
+                            "heading.solarsystem.uranus"), headings,
                             "outward from the Sun, the bodies the atlas has");
                     // Mercury (#530): between the Sun and Venus, introduced
                     // collapsed; opened, it has computed nothing; since #542
@@ -203,6 +204,22 @@ class SolarSystemCompanionJourneyTest {
                     assertFalse(((javax.swing.JCheckBox) find(content, "saturnOnChart"))
                             .isSelected(), "off by default: opening draws nothing");
                     assertNotNull(find(content, "saturnCentreOnChart"), "and Centre on chart");
+
+                    // Uranus (#635): after Saturn, introduced collapsed;
+                    // opened, it has computed nothing; no chart switch and no
+                    // Centre on chart - no Uranus is drawn yet.
+                    AbstractButton uranusHeading = (AbstractButton) named(content,
+                            "heading.solarsystem.uranus");
+                    assertFalse(uranusHeading.isSelected(), "Uranus introduced collapsed");
+                    reveal(uranusHeading);
+                    ReaderInput.click(uranusHeading);
+                    drain();
+                    assertTrue(uranusHeading.isSelected(), "Uranus opened");
+                    assertNull(find(content, "uranusCard"), "Uranus, opened, has computed nothing: no card");
+                    assertNull(find(content, "uranusTable"), "and no moons");
+                    assertNotNull(find(content, "uranusCompute"), "but its controls are there");
+                    assertNull(find(content, "uranusOnChart"), "no Show on chart for Uranus yet");
+                    assertNull(find(content, "uranusCentreOnChart"), "and no Centre on chart");
 
                     // Show on chart, pressed for real: View's item follows,
                     // and the key is the one it always was.
@@ -309,9 +326,9 @@ class SolarSystemCompanionJourneyTest {
                             "Venus on the chart", "Moon on the chart", "Mars on the chart",
                             "Jupiter and moons on the chart", "Saturn on the chart", "—",
                             "Sun...", "Mercury...", "Venus...", "Moon...", "Mars...", "Jupiter...",
-                            "Saturn..."),
+                            "Saturn...", "Uranus..."),
                             order, "outward from the Sun, the switches and the tables (#530, #542,"
-                                    + " #576, #579, #603, #606)");
+                                    + " #576, #579, #603, #606, #635)");
 
                     // The window's own focus traversal reaches the group: the
                     // chosen view (its sibling is reached by the arrow keys,

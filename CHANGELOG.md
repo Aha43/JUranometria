@@ -7,6 +7,22 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Uranus and its five moons in the Solar System tables (#635, ruled on
+#633).** View > Solar System gains *Uranus...* directly after
+*Saturn...*, and the Controller's Solar System tab a Uranus group in the
+same place, introduced collapsed; both hosts share one session, and
+opening, expanding or building either computes nothing. The Uranus card
+gives the position, height, distance, apparent diameter across the
+equator and from pole to pole, the illuminated fraction and the phase
+angle - Uranus is never less than 99.92 % lit, so there are no phase
+words - the north pole's position angle and how far that pole is tipped
+towards you; Miranda, Ariel, Umbriel, Titania and Oberon follow in
+Jupiter's columns, with their states - clear of Uranus, in front of it,
+behind it or in its shadow. The moons are computed for 2000 to 2100:
+before 2000 Uranus is shown alone and the table says why, and a range
+across 2000 keeps Uranus at every instant. In English and Norwegian.
+Uranus is not drawn on the chart yet.
+
 **Uranus, computed offline (#634, ruled on #633).** A sixth pack,
 Uranus System, holds two excerpts of NAIF's `ura184_part-3.bsp`:
 DE442's Uranus barycentre over 1900-2100 (387,072 bytes), which stands

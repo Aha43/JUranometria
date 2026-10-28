@@ -542,6 +542,7 @@ public final class PackagedAcceptanceMain {
         jupiterTableJourney();
         saturnTableJourney();
         marsTableJourney();
+        uranusTableJourney();
         centreOnChartJourney();
         jupiterOnTheChartJourney();
         saturnOnTheChartJourney();
@@ -2358,6 +2359,170 @@ public final class PackagedAcceptanceMain {
                 + " on 2005-02-27; the moons refused from the TDB boundary with Mars still shown;"
                 + " a range across it keeps Mars at every instant; View > Solar System has Mars..."
                 + " between Moon... and Jupiter...)");
+    }
+
+    /**
+     * The Uranus table (#635), inside the packaged image: one session in
+     * the Controller's Uranus group and the dialog; building, expanding and
+     * opening compute nothing; at the study's "today" (2026-10-27 12:00 UTC,
+     * Oslo) all five moons read clear of Uranus, in English and Norwegian,
+     * with the phase angle and no phase word; Miranda behind Uranus in its
+     * shadow where Horizons codes it U from Oslo (2005-03-19); before 2000
+     * Uranus shown and the moons refused; a range across 2000-01-01 keeps
+     * Uranus at every instant; View > Solar System has Uranus... directly
+     * after Saturn..., lettered N in English and U in Norwegian.
+     */
+    private static void uranusTableJourney() throws Exception {
+        Preferences scratch = Preferences.userRoot()
+                .node("juranometria-packaged-uranus-" + System.nanoTime());
+        try {
+            juranometria.ui.language.InterfaceText en =
+                    juranometria.ui.language.InterfaceText.forLanguage("en");
+            juranometria.ui.language.InterfaceText nb =
+                    juranometria.ui.language.InterfaceText.forLanguage("nb-NO");
+            juranometria.sky.Observer[] at = {new juranometria.sky.Observer(59.91, 10.75,
+                    URANUS_SAMPLE_INSTANT)};
+            juranometria.solar.UranusService uranusService = juranometria.solar.UranusService.load();
+            int[] loads = {0};
+            juranometria.ui.solar.UranusTableSession uranus =
+                    new juranometria.ui.solar.UranusTableSession(() -> at[0], () -> {
+                        loads[0]++;
+                        return uranusService;
+                    });
+            juranometria.solar.SolarSystemService solar =
+                    juranometria.solar.SolarSystemService.load();
+            juranometria.ui.solar.SolarTableSession sun =
+                    new juranometria.ui.solar.SolarTableSession(() -> at[0], solar,
+                            juranometria.ui.solar.SolarTable.sun());
+            juranometria.ui.solar.SolarTableSession moon =
+                    new juranometria.ui.solar.SolarTableSession(() -> at[0], solar,
+                            juranometria.ui.solar.SolarTable.moon());
+            juranometria.solarchart.SolarSystemModule module =
+                    new juranometria.solarchart.SolarSystemModule(() -> at[0],
+                            () -> solar, () -> true);
+            juranometria.ui.solar.SolarSystemSection[] section =
+                    new juranometria.ui.solar.SolarSystemSection[1];
+            juranometria.ui.solar.UranusTableDialog.Content[] norsk =
+                    new juranometria.ui.solar.UranusTableDialog.Content[1];
+            javax.swing.JMenuBar[] bar = new javax.swing.JMenuBar[2];
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                section[0] = new juranometria.ui.solar.SolarSystemSection(sun, moon,
+                        juranometria.ui.solar.SunChartSession.switchOf(module,
+                                juranometria.ui.solar.SunChartStore.forNode(scratch)),
+                        juranometria.ui.solar.MoonChartSession.switchOf(module,
+                                juranometria.ui.solar.MoonChartStore.forNode(scratch)),
+                        null, en);
+                section[0].withUranus(uranus, en);
+                section[0].inController(
+                        juranometria.ui.companion.CompanionStore.forNode(scratch), en);
+            });
+            require(uranus.computations() == 0 && loads[0] == 0,
+                    "building the Uranus group computes nothing and reads no pack");
+            javax.swing.SwingUtilities.invokeAndWait(() ->
+                    norsk[0] = juranometria.ui.solar.UranusTableDialog.content(uranus, nb));
+            require(uranus.computations() == 0, "opening the Uranus dialog computes nothing");
+
+            juranometria.ui.solar.UranusTableControls group = section[0].uranus();
+            juranometria.ui.solar.UranusTableControls dialog = norsk[0].controls();
+            javax.swing.SwingUtilities.invokeAndWait(group::apply);
+            require(uranus.computations() == 1 && group.shown() == dialog.shown()
+                            && group.model.getRowCount() == 5,
+                    "one computation in the Controller is the dialog's result too");
+            boolean allClear = true;
+            for (int row = 0; row < 5; row++) {
+                allClear &= "clear of Uranus".equals(group.model.getValueAt(row, 6))
+                        && "klar av Uranus".equals(dialog.model.getValueAt(row, 6));
+            }
+            require(allClear && "Avstand fra Uranus".equals(dialog.model.getColumnName(4))
+                            && "Miranda".equals(group.model.getValueAt(0, 0))
+                            && "Oberon".equals(dialog.model.getValueAt(4, 0)),
+                    "on 2026-10-27 all five moons are clear of Uranus, in both languages");
+            require(group.cardValue("phaseangle").endsWith("°")
+                            && dialog.cardValue("phaseangle").contains(","),
+                    "the phase angle, no phase word: " + group.cardValue("phaseangle"));
+            require(group.cardTitle.getText().equals("Uranus · 2026-10-27 12:00:00 UTC"),
+                    "the Uranus card names its instant: " + group.cardTitle.getText());
+
+            at[0] = new juranometria.sky.Observer(59.91, 10.75, MIRANDA_ECLIPSE_INSTANT);
+            javax.swing.SwingUtilities.invokeAndWait(group::apply);
+            require("behind Uranus, in its shadow".equals(group.model.getValueAt(0, 6))
+                            && "bak Uranus, i skyggen".equals(dialog.model.getValueAt(0, 6)),
+                    "Miranda behind Uranus in its shadow where Horizons codes U: "
+                            + group.model.getValueAt(0, 6));
+
+            at[0] = new juranometria.sky.Observer(59.91, 10.75,
+                    java.time.Instant.parse("1999-12-31T23:59:59Z"));
+            javax.swing.SwingUtilities.invokeAndWait(group::apply);
+            // The status as spoken, unwrapped: the Controller's narrow layout
+            // wraps the shown text where the platform's fonts break it.
+            String refusal = group.status.getAccessibleContext().getAccessibleName();
+            require(group.cardTitle.getText().startsWith("Uranus · 1999-12-31")
+                            && group.model.getRowCount() == 0
+                            && refusal.contains("2000-01-01") && refusal.contains("only Uranus"),
+                    "Uranus answers before 2000, the moons refuse: " + refusal);
+
+            at[0] = new juranometria.sky.Observer(59.91, 10.75,
+                    java.time.Instant.parse("1999-12-10T00:00:00Z"));
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                group.rangeView.setSelected(true);
+                group.span.setSelectedIndex(2);
+                group.step.setSelectedIndex(3);
+                group.apply();
+            });
+            String partly = group.status.getAccessibleContext().getAccessibleName();
+            require(uranus.result().outcome()
+                            == juranometria.ui.solar.UranusTableSession.Outcome.ROWS_MOONS_IN_PART
+                            && group.model.groups() == uranus.result().entries().size()
+                            && partly.contains("the moons are not shown"),
+                    "a range across 2000-01-01 keeps Uranus at every instant: " + partly);
+
+            juranometria.ui.language.InterfaceText[] languages = {en, nb};
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                for (int l = 0; l < 2; l++) {
+                    bar[l] = AppMenuBar.create(new ChartViewController(), () -> { },
+                            () -> { }, () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
+                            () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
+                            () -> { }, () -> { }, languages[l]);
+                    AppMenuBar.addJupiterTable(bar[l], languages[l], () -> { });
+                    AppMenuBar.addSaturnTable(bar[l], languages[l], () -> { });
+                    AppMenuBar.addUranusTable(bar[l], languages[l], () -> { });
+                }
+            });
+            int[] letters = {java.awt.event.KeyEvent.VK_N, java.awt.event.KeyEvent.VK_U};
+            for (int l = 0; l < 2; l++) {
+                javax.swing.JMenu solarMenu = AppMenuBar.solarSystemMenu(bar[l]);
+                int saturnAt = -1;
+                int uranusAt = -1;
+                java.util.Set<Integer> claimed = new java.util.HashSet<>();
+                boolean unique = true;
+                for (int i = 0; i < solarMenu.getItemCount(); i++) {
+                    javax.swing.JMenuItem item = solarMenu.getItem(i);
+                    String name = item == null ? null : item.getName();
+                    if (item != null && item.getMnemonic() != 0) {
+                        unique &= claimed.add(item.getMnemonic());
+                    }
+                    if ("saturnTableItem".equals(name)) {
+                        saturnAt = i;
+                    }
+                    if ("uranusTableItem".equals(name)) {
+                        uranusAt = i;
+                        unique &= item.getMnemonic() == letters[l];
+                    }
+                }
+                require(saturnAt >= 0 && uranusAt == saturnAt + 1 && unique,
+                        "View > Solar System has Uranus... directly after Saturn..., its own letter");
+            }
+            section[0].release();
+            norsk[0].controls().release();
+        } finally {
+            scratch.removeNode();
+        }
+        System.out.println("uranus table OK (one session in two hosts, building computes nothing"
+                + " and reads no pack; on 2026-10-27 12:00 UTC at Oslo all five moons clear of"
+                + " Uranus, the phase angle and no phase word, in English and Norwegian; Miranda"
+                + " behind Uranus in its shadow on 2005-03-19; before 2000 Uranus shown and the"
+                + " moons refused; a range across 2000-01-01 keeps Uranus at every instant;"
+                + " View > Solar System has Uranus... after Saturn..., lettered N and U)");
     }
 
     /**
