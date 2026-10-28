@@ -1,6 +1,6 @@
 # Drawing Uranus and its five moons
 
-**Issue #637, the first issue of Part II of the Uranus road (#632).** This is the cartography contract for Uranus and its five ruled moons, proposed from measurement before any production Uranus ink exists. **Not yet ruled.** It stops for the owner's rulings before implementation (#638).
+**Issue #637, the first issue of Part II of the Uranus road (#632).** This is the cartography contract for Uranus and its five ruled moons, proposed from measurement before any production Uranus ink exists. **Ruled by the owner on 2026-10-28.** [The ruling](#the-ruling), at the end, governs.
 
 It inherits:
 - the Sun's and the Moon's cartography (`solar-cartography.md`);
@@ -109,3 +109,15 @@ At the 2026 conjunction (Espenak's hour) Uranus is behind the Sun's disc, so the
     - each with its packaged owner checkpoint.
 
 The Mars article (#639) and the release boundary (#640) follow, as the road orders them.
+
+## The ruling
+
+The owner's ruling of 2026-10-28, as given: "I agree with the recommendations. Rule R-1 through R-10 exactly as proposed, including table-only rings, Mars's clearance rule for the moons, and closer-field eligibility at 0.5° and 0.25°."
+
+**R-1 to R-10 are ruled as proposed above**, each as its proposal, not its alternative:
+- **The rings are table-only.** No ring is drawn on any field, the closer ones included.
+- **The moons follow Mars's clearance rule.** Each moon's 3 px symbol is drawn only where it stands clear of Uranus's drawn mark and of the moons already drawn, on every field. Jupiter's floor rule does not apply to Uranus.
+- **Uranus is eligible for the closer fields,** 0.5° and 0.25°.
+
+No production Uranus ink begins before this study lands; #638 draws from it.
+
