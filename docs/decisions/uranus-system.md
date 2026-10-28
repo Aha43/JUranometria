@@ -272,7 +272,12 @@ in its shadow on 2005-03-19, and the moons' refusal before 2000.
 
 ## #635, the table, as built: a packaged checkpoint
 
-**Not yet accepted.** Issue #635 adds Uranus and its ruled moons to the
+**Accepted by the owner on 2026-10-28, untested in the packaged build**, as given:
+"Don't got chance to test. Chance is ok, always been. Leave letter. Go on."
+Read as: the candidate `8a1f40e0` is accepted without the packaged
+journey; the access letters stay as built (N in English, U in Norwegian);
+the illuminated line, and no elongation or lit side, stay as U-5 and U-9
+rule them. Issue #635 adds Uranus and its ruled moons to the
 Solar System tables, for the owner's numerical and layout journey in the
 packaged build. The table follows the card and columns ruled in U-5 and U-9,
 and Mars's table (#603) in everything else.
