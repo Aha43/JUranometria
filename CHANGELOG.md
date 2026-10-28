@@ -7,6 +7,17 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Uranus on the chart (#638, part 1, ruled on #637).** View > Solar
+System gains *Uranus on the chart* after *Saturn on the chart*, and the
+Controller's Uranus group its Show on chart and Centre on chart; the
+Uranus table's dialog has Centre on chart too. Uranus is drawn as a
+6-pixel cartographic symbol on every field - its true disc is never that
+large, not even at the closest field - full and round, in the page's ink,
+with no pole and no rings (they stay in the table). It is selectable, said
+as a symbol, covered by the Sun when behind it, and offers the closer
+fields 0.5° and 0.25°. Hidden until you ask; in English and Norwegian. The
+moons follow in part 2.
+
 **Uranus and its five moons in the Solar System tables (#635, ruled on
 #633).** View > Solar System gains *Uranus...* directly after
 *Saturn...*, and the Controller's Solar System tab a Uranus group in the

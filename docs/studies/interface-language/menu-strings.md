@@ -40,7 +40,7 @@ open menu would cover the thing it explains.
 
 ![](menu-en-1-menus.png)
 
-Bar packed 892 × 379 px; widest popup 232 px.
+Bar packed 892 × 425 px; widest popup 232 px.
 
 | channel | words |
 |---|---|
@@ -115,6 +115,9 @@ Bar packed 892 × 379 px; widest popup 232 px.
 | item spoken name \| Saturn on the chart |
 | item spoken description \| Shows or hides Saturn on the chart where it stands for the chart time and place: its globe and rings at their true size once the rings are at least 6 pixels across, otherwise as a 6-pixel cartographic symbol, not its apparent diameter; below a drawn horizon it is dimmed and says so. The rings' near half is drawn over the globe; seen edge-on they are a line, and when their unlit face is seen they are dimmed. Its seven ruled moons are drawn with it as 3-pixel symbols, each where it stands and only where its mark can be told apart, with its state: in front of Saturn, in or partly in its shadow; a moon behind Saturn is not drawn. |
 | item access letter (language) \| A |
+| item label \| Uranus on the chart |
+| item spoken name \| Uranus on the chart |
+| item spoken description \| Shows or hides Uranus on the chart where it stands for the chart time and place, as a 6-pixel cartographic symbol: Uranus is never large enough to draw at its true size. Its rings are given in the table, not drawn. Hidden until you ask. |
 | item label \| Sun... |
 | item hover \| Where the Sun is, for the chart time and place |
 | item spoken name \| Sun table |
@@ -147,6 +150,11 @@ Bar packed 892 × 379 px; widest popup 232 px.
 | item hover \| Where Saturn, its rings and its seven moons are, for the chart time and place |
 | item spoken name \| Saturn table |
 | item spoken description \| Opens a table of Saturn's computed position, height, distance, size and pole, how far its rings are open and how large they appear, and of where Mimas, Enceladus, Tethys, Dione, Rhea, Titan and Iapetus stand beside it - clear of Saturn, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. Saturn and its rings are drawn on the chart by Saturn on the chart; its seven moons with it, as 3-pixel symbols with their states. |
+| item label \| Uranus... |
+| item hover \| Where Uranus and its five largest moons are, for the chart time and place |
+| item spoken name \| Uranus table |
+| item spoken description \| Opens a table of Uranus's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Miranda, Ariel, Umbriel, Titania and Oberon stand beside it - clear of Uranus, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Uranus is drawn on the chart by Uranus on the chart. |
+| item access letter (language) \| N |
 | item label \| Zoom In |
 | item spoken name \| Zoom In |
 | item spoken description \| Shows a narrower field, with fainter stars on it |
@@ -170,7 +178,7 @@ Bar packed 892 × 379 px; widest popup 232 px.
 
 ![](menu-en-2-checked.png)
 
-Bar packed 892 × 379 px; widest popup 232 px.
+Bar packed 892 × 425 px; widest popup 232 px.
 
 | channel | words |
 |---|---|
@@ -245,6 +253,9 @@ Bar packed 892 × 379 px; widest popup 232 px.
 | item spoken name \| Saturn on the chart |
 | item spoken description \| Shows or hides Saturn on the chart where it stands for the chart time and place: its globe and rings at their true size once the rings are at least 6 pixels across, otherwise as a 6-pixel cartographic symbol, not its apparent diameter; below a drawn horizon it is dimmed and says so. The rings' near half is drawn over the globe; seen edge-on they are a line, and when their unlit face is seen they are dimmed. Its seven ruled moons are drawn with it as 3-pixel symbols, each where it stands and only where its mark can be told apart, with its state: in front of Saturn, in or partly in its shadow; a moon behind Saturn is not drawn. |
 | item access letter (language) \| A |
+| item label [checked] \| Uranus on the chart |
+| item spoken name \| Uranus on the chart |
+| item spoken description \| Shows or hides Uranus on the chart where it stands for the chart time and place, as a 6-pixel cartographic symbol: Uranus is never large enough to draw at its true size. Its rings are given in the table, not drawn. Hidden until you ask. |
 | item label \| Sun... |
 | item hover \| Where the Sun is, for the chart time and place |
 | item spoken name \| Sun table |
@@ -277,6 +288,11 @@ Bar packed 892 × 379 px; widest popup 232 px.
 | item hover \| Where Saturn, its rings and its seven moons are, for the chart time and place |
 | item spoken name \| Saturn table |
 | item spoken description \| Opens a table of Saturn's computed position, height, distance, size and pole, how far its rings are open and how large they appear, and of where Mimas, Enceladus, Tethys, Dione, Rhea, Titan and Iapetus stand beside it - clear of Saturn, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. Saturn and its rings are drawn on the chart by Saturn on the chart; its seven moons with it, as 3-pixel symbols with their states. |
+| item label \| Uranus... |
+| item hover \| Where Uranus and its five largest moons are, for the chart time and place |
+| item spoken name \| Uranus table |
+| item spoken description \| Opens a table of Uranus's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Miranda, Ariel, Umbriel, Titania and Oberon stand beside it - clear of Uranus, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Uranus is drawn on the chart by Uranus on the chart. |
+| item access letter (language) \| N |
 | item label \| Zoom In |
 | item spoken name \| Zoom In |
 | item spoken description \| Shows a narrower field, with fainter stars on it |
@@ -300,7 +316,7 @@ Bar packed 892 × 379 px; widest popup 232 px.
 
 ![](menu-en-3-widest.png)
 
-Bar packed 892 × 379 px; widest popup 232 px.
+Bar packed 892 × 425 px; widest popup 232 px.
 
 | channel | words |
 |---|---|
@@ -375,6 +391,9 @@ Bar packed 892 × 379 px; widest popup 232 px.
 | item spoken name \| Saturn on the chart |
 | item spoken description \| Shows or hides Saturn on the chart where it stands for the chart time and place: its globe and rings at their true size once the rings are at least 6 pixels across, otherwise as a 6-pixel cartographic symbol, not its apparent diameter; below a drawn horizon it is dimmed and says so. The rings' near half is drawn over the globe; seen edge-on they are a line, and when their unlit face is seen they are dimmed. Its seven ruled moons are drawn with it as 3-pixel symbols, each where it stands and only where its mark can be told apart, with its state: in front of Saturn, in or partly in its shadow; a moon behind Saturn is not drawn. |
 | item access letter (language) \| A |
+| item label \| Uranus on the chart |
+| item spoken name \| Uranus on the chart |
+| item spoken description \| Shows or hides Uranus on the chart where it stands for the chart time and place, as a 6-pixel cartographic symbol: Uranus is never large enough to draw at its true size. Its rings are given in the table, not drawn. Hidden until you ask. |
 | item label \| Sun... |
 | item hover \| Where the Sun is, for the chart time and place |
 | item spoken name \| Sun table |
@@ -407,6 +426,11 @@ Bar packed 892 × 379 px; widest popup 232 px.
 | item hover \| Where Saturn, its rings and its seven moons are, for the chart time and place |
 | item spoken name \| Saturn table |
 | item spoken description \| Opens a table of Saturn's computed position, height, distance, size and pole, how far its rings are open and how large they appear, and of where Mimas, Enceladus, Tethys, Dione, Rhea, Titan and Iapetus stand beside it - clear of Saturn, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. Saturn and its rings are drawn on the chart by Saturn on the chart; its seven moons with it, as 3-pixel symbols with their states. |
+| item label \| Uranus... |
+| item hover \| Where Uranus and its five largest moons are, for the chart time and place |
+| item spoken name \| Uranus table |
+| item spoken description \| Opens a table of Uranus's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Miranda, Ariel, Umbriel, Titania and Oberon stand beside it - clear of Uranus, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Uranus is drawn on the chart by Uranus on the chart. |
+| item access letter (language) \| N |
 | item label \| Zoom In |
 | item spoken name \| Zoom In |
 | item spoken description \| Shows a narrower field, with fainter stars on it |
@@ -430,7 +454,7 @@ Bar packed 892 × 379 px; widest popup 232 px.
 
 ![](menu-en-4-narrowest.png)
 
-Bar packed 892 × 379 px; widest popup 232 px.
+Bar packed 892 × 425 px; widest popup 232 px.
 
 | channel | words |
 |---|---|
@@ -505,6 +529,9 @@ Bar packed 892 × 379 px; widest popup 232 px.
 | item spoken name \| Saturn on the chart |
 | item spoken description \| Shows or hides Saturn on the chart where it stands for the chart time and place: its globe and rings at their true size once the rings are at least 6 pixels across, otherwise as a 6-pixel cartographic symbol, not its apparent diameter; below a drawn horizon it is dimmed and says so. The rings' near half is drawn over the globe; seen edge-on they are a line, and when their unlit face is seen they are dimmed. Its seven ruled moons are drawn with it as 3-pixel symbols, each where it stands and only where its mark can be told apart, with its state: in front of Saturn, in or partly in its shadow; a moon behind Saturn is not drawn. |
 | item access letter (language) \| A |
+| item label \| Uranus on the chart |
+| item spoken name \| Uranus on the chart |
+| item spoken description \| Shows or hides Uranus on the chart where it stands for the chart time and place, as a 6-pixel cartographic symbol: Uranus is never large enough to draw at its true size. Its rings are given in the table, not drawn. Hidden until you ask. |
 | item label \| Sun... |
 | item hover \| Where the Sun is, for the chart time and place |
 | item spoken name \| Sun table |
@@ -537,9 +564,14 @@ Bar packed 892 × 379 px; widest popup 232 px.
 | item hover \| Where Saturn, its rings and its seven moons are, for the chart time and place |
 | item spoken name \| Saturn table |
 | item spoken description \| Opens a table of Saturn's computed position, height, distance, size and pole, how far its rings are open and how large they appear, and of where Mimas, Enceladus, Tethys, Dione, Rhea, Titan and Iapetus stand beside it - clear of Saturn, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. Saturn and its rings are drawn on the chart by Saturn on the chart; its seven moons with it, as 3-pixel symbols with their states. |
+| item label \| Uranus... |
+| item hover \| Where Uranus and its five largest moons are, for the chart time and place |
+| item spoken name \| Uranus table |
+| item spoken description \| Opens a table of Uranus's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Miranda, Ariel, Umbriel, Titania and Oberon stand beside it - clear of Uranus, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Uranus is drawn on the chart by Uranus on the chart. |
+| item access letter (language) \| N |
 | item label [unavailable] \| Zoom In |
 | item spoken name [unavailable] \| Zoom In |
-| item spoken description [unavailable] \| Unavailable: a closer field is offered only when Mercury, Venus, Mars, Jupiter or Saturn, shown on the chart, is on the page the step would show |
+| item spoken description [unavailable] \| Unavailable: a closer field is offered only when Mercury, Venus, Mars, Jupiter, Saturn or Uranus, shown on the chart, is on the page the step would show |
 | item accelerator (platform notation) \| ⌘= |
 | item label \| Zoom Out |
 | item spoken name \| Zoom Out |
@@ -562,7 +594,7 @@ Bar packed 892 × 379 px; widest popup 232 px.
 
 ![](menu-nb-NO-5-menus.png)
 
-Bar packed 882 × 379 px; widest popup 229 px.
+Bar packed 882 × 425 px; widest popup 229 px.
 
 | channel | words |
 |---|---|
@@ -639,6 +671,9 @@ Bar packed 882 × 379 px; widest popup 229 px.
 | item spoken name \| Saturn på kartet |
 | item spoken description \| Viser eller skjuler Saturn på kartet der den står for karttiden og stedet: kloden og ringene i sann størrelse når ringene er minst 6 piksler brede, ellers som et kartografisk symbol på 6 piksler, ikke den tilsynelatende diameteren; under en tegnet horisont dempes den og sier fra. Ringenes nære halvdel tegnes over kloden; sett på kant er de en strek, og når den ubelyste siden sees, dempes de. De sju månene tegnes sammen med den som symboler på 3 piksler, hver der den står og bare der merket kan skjelnes, med sin tilstand: foran Saturn, i eller delvis i skyggen; en måne bak Saturn tegnes ikke. |
 | item access letter (language) \| A |
+| item label \| Uranus på kartet |
+| item spoken name \| Uranus på kartet |
+| item spoken description \| Viser eller skjuler Uranus på kartet der den står for karttiden og stedet, som et kartografisk symbol på 6 piksler: Uranus er aldri stor nok til å tegnes i sann størrelse. Ringene oppgis i tabellen, de tegnes ikke. Skjult til du ber om det. |
 | item label \| Solen... |
 | item hover \| Hvor Solen er, for karttiden og stedet |
 | item spoken name \| Soltabell |
@@ -669,6 +704,10 @@ Bar packed 882 × 379 px; widest popup 229 px.
 | item hover \| Hvor Saturn, ringene og de sju månene er, for karttiden og stedet |
 | item spoken name \| Saturntabell |
 | item spoken description \| Åpner en tabell over Saturns beregnede posisjon, høyde, avstand, størrelse og pol, hvor langt ringene er åpnet og hvor store de ser ut, og over hvor Mimas, Enceladus, Tethys, Dione, Rhea, Titan og Iapetus står ved siden av - klar av Saturn, foran, bak eller i skyggen - for karttiden og observasjonsstedet, ved det tidspunktet eller over et tidsrom. Saturn og ringene tegnes på kartet med Saturn på kartet; de sju månene sammen med den, som symboler på 3 piksler med sine tilstander. |
+| item label \| Uranus... |
+| item hover \| Hvor Uranus og de fem største månene er, for karttiden og stedet |
+| item spoken name \| Uranustabell |
+| item spoken description \| Åpner en tabell over Uranus' beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Miranda, Ariel, Umbriel, Titania og Oberon står ved siden av - klar av Uranus, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Uranus tegnes på kartet med Uranus på kartet. |
 | item label \| Zoom inn |
 | item spoken name \| Zoom inn |
 | item spoken description \| Viser et smalere synsfelt med svakere stjerner |
@@ -692,7 +731,7 @@ Bar packed 882 × 379 px; widest popup 229 px.
 
 ![](menu-nb-NO-6-checked.png)
 
-Bar packed 882 × 379 px; widest popup 229 px.
+Bar packed 882 × 425 px; widest popup 229 px.
 
 | channel | words |
 |---|---|
@@ -769,6 +808,9 @@ Bar packed 882 × 379 px; widest popup 229 px.
 | item spoken name \| Saturn på kartet |
 | item spoken description \| Viser eller skjuler Saturn på kartet der den står for karttiden og stedet: kloden og ringene i sann størrelse når ringene er minst 6 piksler brede, ellers som et kartografisk symbol på 6 piksler, ikke den tilsynelatende diameteren; under en tegnet horisont dempes den og sier fra. Ringenes nære halvdel tegnes over kloden; sett på kant er de en strek, og når den ubelyste siden sees, dempes de. De sju månene tegnes sammen med den som symboler på 3 piksler, hver der den står og bare der merket kan skjelnes, med sin tilstand: foran Saturn, i eller delvis i skyggen; en måne bak Saturn tegnes ikke. |
 | item access letter (language) \| A |
+| item label [checked] \| Uranus på kartet |
+| item spoken name \| Uranus på kartet |
+| item spoken description \| Viser eller skjuler Uranus på kartet der den står for karttiden og stedet, som et kartografisk symbol på 6 piksler: Uranus er aldri stor nok til å tegnes i sann størrelse. Ringene oppgis i tabellen, de tegnes ikke. Skjult til du ber om det. |
 | item label \| Solen... |
 | item hover \| Hvor Solen er, for karttiden og stedet |
 | item spoken name \| Soltabell |
@@ -799,6 +841,10 @@ Bar packed 882 × 379 px; widest popup 229 px.
 | item hover \| Hvor Saturn, ringene og de sju månene er, for karttiden og stedet |
 | item spoken name \| Saturntabell |
 | item spoken description \| Åpner en tabell over Saturns beregnede posisjon, høyde, avstand, størrelse og pol, hvor langt ringene er åpnet og hvor store de ser ut, og over hvor Mimas, Enceladus, Tethys, Dione, Rhea, Titan og Iapetus står ved siden av - klar av Saturn, foran, bak eller i skyggen - for karttiden og observasjonsstedet, ved det tidspunktet eller over et tidsrom. Saturn og ringene tegnes på kartet med Saturn på kartet; de sju månene sammen med den, som symboler på 3 piksler med sine tilstander. |
+| item label \| Uranus... |
+| item hover \| Hvor Uranus og de fem største månene er, for karttiden og stedet |
+| item spoken name \| Uranustabell |
+| item spoken description \| Åpner en tabell over Uranus' beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Miranda, Ariel, Umbriel, Titania og Oberon står ved siden av - klar av Uranus, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Uranus tegnes på kartet med Uranus på kartet. |
 | item label \| Zoom inn |
 | item spoken name \| Zoom inn |
 | item spoken description \| Viser et smalere synsfelt med svakere stjerner |
@@ -822,7 +868,7 @@ Bar packed 882 × 379 px; widest popup 229 px.
 
 ![](menu-nb-NO-7-widest.png)
 
-Bar packed 882 × 379 px; widest popup 229 px.
+Bar packed 882 × 425 px; widest popup 229 px.
 
 | channel | words |
 |---|---|
@@ -899,6 +945,9 @@ Bar packed 882 × 379 px; widest popup 229 px.
 | item spoken name \| Saturn på kartet |
 | item spoken description \| Viser eller skjuler Saturn på kartet der den står for karttiden og stedet: kloden og ringene i sann størrelse når ringene er minst 6 piksler brede, ellers som et kartografisk symbol på 6 piksler, ikke den tilsynelatende diameteren; under en tegnet horisont dempes den og sier fra. Ringenes nære halvdel tegnes over kloden; sett på kant er de en strek, og når den ubelyste siden sees, dempes de. De sju månene tegnes sammen med den som symboler på 3 piksler, hver der den står og bare der merket kan skjelnes, med sin tilstand: foran Saturn, i eller delvis i skyggen; en måne bak Saturn tegnes ikke. |
 | item access letter (language) \| A |
+| item label \| Uranus på kartet |
+| item spoken name \| Uranus på kartet |
+| item spoken description \| Viser eller skjuler Uranus på kartet der den står for karttiden og stedet, som et kartografisk symbol på 6 piksler: Uranus er aldri stor nok til å tegnes i sann størrelse. Ringene oppgis i tabellen, de tegnes ikke. Skjult til du ber om det. |
 | item label \| Solen... |
 | item hover \| Hvor Solen er, for karttiden og stedet |
 | item spoken name \| Soltabell |
@@ -929,6 +978,10 @@ Bar packed 882 × 379 px; widest popup 229 px.
 | item hover \| Hvor Saturn, ringene og de sju månene er, for karttiden og stedet |
 | item spoken name \| Saturntabell |
 | item spoken description \| Åpner en tabell over Saturns beregnede posisjon, høyde, avstand, størrelse og pol, hvor langt ringene er åpnet og hvor store de ser ut, og over hvor Mimas, Enceladus, Tethys, Dione, Rhea, Titan og Iapetus står ved siden av - klar av Saturn, foran, bak eller i skyggen - for karttiden og observasjonsstedet, ved det tidspunktet eller over et tidsrom. Saturn og ringene tegnes på kartet med Saturn på kartet; de sju månene sammen med den, som symboler på 3 piksler med sine tilstander. |
+| item label \| Uranus... |
+| item hover \| Hvor Uranus og de fem største månene er, for karttiden og stedet |
+| item spoken name \| Uranustabell |
+| item spoken description \| Åpner en tabell over Uranus' beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Miranda, Ariel, Umbriel, Titania og Oberon står ved siden av - klar av Uranus, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Uranus tegnes på kartet med Uranus på kartet. |
 | item label \| Zoom inn |
 | item spoken name \| Zoom inn |
 | item spoken description \| Viser et smalere synsfelt med svakere stjerner |
@@ -952,7 +1005,7 @@ Bar packed 882 × 379 px; widest popup 229 px.
 
 ![](menu-nb-NO-8-narrowest.png)
 
-Bar packed 882 × 379 px; widest popup 229 px.
+Bar packed 882 × 425 px; widest popup 229 px.
 
 | channel | words |
 |---|---|
@@ -1029,6 +1082,9 @@ Bar packed 882 × 379 px; widest popup 229 px.
 | item spoken name \| Saturn på kartet |
 | item spoken description \| Viser eller skjuler Saturn på kartet der den står for karttiden og stedet: kloden og ringene i sann størrelse når ringene er minst 6 piksler brede, ellers som et kartografisk symbol på 6 piksler, ikke den tilsynelatende diameteren; under en tegnet horisont dempes den og sier fra. Ringenes nære halvdel tegnes over kloden; sett på kant er de en strek, og når den ubelyste siden sees, dempes de. De sju månene tegnes sammen med den som symboler på 3 piksler, hver der den står og bare der merket kan skjelnes, med sin tilstand: foran Saturn, i eller delvis i skyggen; en måne bak Saturn tegnes ikke. |
 | item access letter (language) \| A |
+| item label \| Uranus på kartet |
+| item spoken name \| Uranus på kartet |
+| item spoken description \| Viser eller skjuler Uranus på kartet der den står for karttiden og stedet, som et kartografisk symbol på 6 piksler: Uranus er aldri stor nok til å tegnes i sann størrelse. Ringene oppgis i tabellen, de tegnes ikke. Skjult til du ber om det. |
 | item label \| Solen... |
 | item hover \| Hvor Solen er, for karttiden og stedet |
 | item spoken name \| Soltabell |
@@ -1059,9 +1115,13 @@ Bar packed 882 × 379 px; widest popup 229 px.
 | item hover \| Hvor Saturn, ringene og de sju månene er, for karttiden og stedet |
 | item spoken name \| Saturntabell |
 | item spoken description \| Åpner en tabell over Saturns beregnede posisjon, høyde, avstand, størrelse og pol, hvor langt ringene er åpnet og hvor store de ser ut, og over hvor Mimas, Enceladus, Tethys, Dione, Rhea, Titan og Iapetus står ved siden av - klar av Saturn, foran, bak eller i skyggen - for karttiden og observasjonsstedet, ved det tidspunktet eller over et tidsrom. Saturn og ringene tegnes på kartet med Saturn på kartet; de sju månene sammen med den, som symboler på 3 piksler med sine tilstander. |
+| item label \| Uranus... |
+| item hover \| Hvor Uranus og de fem største månene er, for karttiden og stedet |
+| item spoken name \| Uranustabell |
+| item spoken description \| Åpner en tabell over Uranus' beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Miranda, Ariel, Umbriel, Titania og Oberon står ved siden av - klar av Uranus, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Uranus tegnes på kartet med Uranus på kartet. |
 | item label [unavailable] \| Zoom inn |
 | item spoken name [unavailable] \| Zoom inn |
-| item spoken description [unavailable] \| Utilgjengelig: et nærfelt tilbys bare når Merkur, Venus, Mars, Jupiter eller Saturn, vist på kartet, står på siden steget ville vise |
+| item spoken description [unavailable] \| Utilgjengelig: et nærfelt tilbys bare når Merkur, Venus, Mars, Jupiter, Saturn eller Uranus, vist på kartet, står på siden steget ville vise |
 | item accelerator (platform notation) \| ⌘= |
 | item label \| Zoom ut |
 | item spoken name \| Zoom ut |

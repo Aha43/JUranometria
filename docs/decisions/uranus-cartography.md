@@ -121,3 +121,16 @@ The owner's ruling of 2026-10-28, as given: "I agree with the recommendations. R
 
 No production Uranus ink begins before this study lands; #638 draws from it.
 
+## #638 part 1, Uranus on the chart, as built: a packaged checkpoint
+
+**Not yet accepted.** Uranus itself under R-1 to R-9; the moons are part 2 (R-10).
+
+- **The figure (R-1, R-2).** The Solar System module offers Uranus as a body with the 6 px minimum mark and a fully lit disc: the page draws the mark, round, in its ink and ground, on every field. `UranusInkTest` measures every pixel inside the mark's outline lit; the study measures the same on the 0.25° page.
+- **No pole, no rings (R-3, R-4).** Nothing is drawn for either.
+- **Behind the Sun.** Where Uranus's disc meets the Sun's the page states *behind the Sun* and the Sun's opaque disc covers the mark (#514), as at Espenak's 2026 conjunction hour.
+- **Selection and Centre on chart (R-8).** Uranus is an occurrence on the page (#513); the Controller's Uranus group has Show on chart and Centre on chart, and the table's dialog Centre on chart.
+- **The closer fields (R-7).** Uranus joins the bodies that offer 0.5° and 0.25°; the packaged journey zooms to 0.25° on Uranus and finds the 6 px mark.
+- **The switch.** *Uranus on the chart* after *Saturn on the chart*, remembered, hidden by default. No access letter: in Norwegian none of its letters is free on that menu, and every existing letter is kept, as for *Mars on the chart*.
+- **Words.** The three texts naming the closer fields' bodies now end "Saturn or Uranus" (*Saturn eller Uranus*); the Uranus table no longer says Uranus is not drawn.
+- **Evidence.** `docs/studies/uranus-on-the-chart/` (production pages: the 2026 opposition from 8° to 0.25°, the 2026 conjunction behind the Sun in both languages, nothing before 1900), registered in the evidence contract; the menu sheets now show *Uranus...* (missing since #635) and *Uranus on the chart*; the closer-fields notes name Uranus.
+

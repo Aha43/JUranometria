@@ -206,8 +206,8 @@ class SolarSystemCompanionJourneyTest {
                     assertNotNull(find(content, "saturnCentreOnChart"), "and Centre on chart");
 
                     // Uranus (#635): after Saturn, introduced collapsed;
-                    // opened, it has computed nothing; no chart switch and no
-                    // Centre on chart - no Uranus is drawn yet.
+                    // opened, it has computed nothing; since #638 it offers
+                    // Uranus on the chart and Centre on chart, as Mars's.
                     AbstractButton uranusHeading = (AbstractButton) named(content,
                             "heading.solarsystem.uranus");
                     assertFalse(uranusHeading.isSelected(), "Uranus introduced collapsed");
@@ -218,8 +218,10 @@ class SolarSystemCompanionJourneyTest {
                     assertNull(find(content, "uranusCard"), "Uranus, opened, has computed nothing: no card");
                     assertNull(find(content, "uranusTable"), "and no moons");
                     assertNotNull(find(content, "uranusCompute"), "but its controls are there");
-                    assertNull(find(content, "uranusOnChart"), "no Show on chart for Uranus yet");
-                    assertNull(find(content, "uranusCentreOnChart"), "and no Centre on chart");
+                    assertNotNull(find(content, "uranusOnChart"), "Show on chart for Uranus (#638)");
+                    assertFalse(((javax.swing.JCheckBox) find(content, "uranusOnChart")).isSelected(),
+                            "off by default: opening draws nothing");
+                    assertNotNull(find(content, "uranusCentreOnChart"), "and Centre on chart");
 
                     // Show on chart, pressed for real: View's item follows,
                     // and the key is the one it always was.
@@ -324,11 +326,12 @@ class SolarSystemCompanionJourneyTest {
                     }
                     assertEquals(List.of("Sun on the chart", "Mercury on the chart",
                             "Venus on the chart", "Moon on the chart", "Mars on the chart",
-                            "Jupiter and moons on the chart", "Saturn on the chart", "—",
+                            "Jupiter and moons on the chart", "Saturn on the chart",
+                            "Uranus on the chart", "—",
                             "Sun...", "Mercury...", "Venus...", "Moon...", "Mars...", "Jupiter...",
                             "Saturn...", "Uranus..."),
                             order, "outward from the Sun, the switches and the tables (#530, #542,"
-                                    + " #576, #579, #603, #606, #635)");
+                                    + " #576, #579, #603, #606, #635, #638)");
 
                     // The window's own focus traversal reaches the group: the
                     // chosen view (its sibling is reached by the arrow keys,
@@ -439,6 +442,7 @@ class SolarSystemCompanionJourneyTest {
                 juranometria.ui.solar.JovianChartStore.forNode(node),
                 juranometria.ui.solar.SaturnChartStore.forNode(node),
                 juranometria.ui.solar.MarsChartStore.forNode(node),
+                juranometria.ui.solar.UranusChartStore.forNode(node),
                 ZoomLockStore.forNode(node),
                 juranometria.ui.companion.CompanionStore.forNode(node),
                 ChartChromeStore.forNode(node),

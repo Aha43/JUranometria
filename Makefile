@@ -711,7 +711,7 @@ black-sky-study: classes
 		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BlackSkyStudyMain \
 		> docs/studies/black-sky/measurements.md
 
-.PHONY: spk-boundary-fixture import-saturn-system saturn-accuracy-report saturn-table-study import-jovian-system import-planets venus-accuracy-report venus-table-study mercury-accuracy-report mercury-table-study jovian-accuracy-report jovian-cartography-study venus-cartography-study evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study venus-pack-study sun-on-the-chart-study moon-on-the-chart-study venus-on-the-chart-study mercury-on-the-chart-study jupiter-on-the-chart-study mercury-cartography-study solar-system-labels-study printable-chart-study meridian-ticks-study mercury-pack-study mercury-system-study closer-fields-study chart-instant-study chart-instant-furniture star-identity-density-study all-star-identities saturn-pack-study saturn-system-study saturn-cartography-study saturn-on-the-chart-study mars-pack-study import-mars-system mars-accuracy-report mars-table-study mars-cartography-study mars-on-the-chart-study uranus-pack-study import-uranus-system uranus-accuracy-report uranus-cartography-study
+.PHONY: spk-boundary-fixture import-saturn-system saturn-accuracy-report saturn-table-study import-jovian-system import-planets venus-accuracy-report venus-table-study mercury-accuracy-report mercury-table-study jovian-accuracy-report jovian-cartography-study venus-cartography-study evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study venus-pack-study sun-on-the-chart-study moon-on-the-chart-study venus-on-the-chart-study mercury-on-the-chart-study jupiter-on-the-chart-study mercury-cartography-study solar-system-labels-study printable-chart-study meridian-ticks-study mercury-pack-study mercury-system-study closer-fields-study chart-instant-study chart-instant-furniture star-identity-density-study all-star-identities saturn-pack-study saturn-system-study saturn-cartography-study saturn-on-the-chart-study mars-pack-study import-mars-system mars-accuracy-report mars-table-study mars-cartography-study mars-on-the-chart-study uranus-pack-study import-uranus-system uranus-accuracy-report uranus-cartography-study uranus-on-the-chart-study
 # The heap is stated rather than inherited from whatever a machine's
 # ergonomics chose for it: the CI runner's default quarter-of-RAM is
 # not the same number as a developer's.
@@ -1017,6 +1017,15 @@ uranus-cartography-study: classes
 		juranometria.tool.UranusCartographyStudyMain \
 		> docs/studies/uranus-cartography/measurements.md
 	@echo "written to docs/studies/uranus-cartography/measurements.md"
+
+# Uranus on the chart (issue #638): production pages through the component
+# with the Solar System module and Uranus attached.
+uranus-on-the-chart-study: classes
+	mkdir -p docs/studies/uranus-on-the-chart
+	$(JAVA) -Djava.awt.headless=true -cp "$(CLASSES_DIR):$(LIB_DIR)/*" \
+		juranometria.tool.UranusOnTheChartStudyMain \
+		> docs/studies/uranus-on-the-chart/measurements.md
+	@echo "written to docs/studies/uranus-on-the-chart/measurements.md"
 
 mars-on-the-chart-study: classes
 	mkdir -p docs/studies/mars-on-the-chart

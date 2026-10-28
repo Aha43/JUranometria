@@ -77,6 +77,23 @@ public final class SolarSystemModule implements ChartModule {
     /** R-3 on #605: each of Mars's moons is Jupiter's 3 px symbol, never its apparent diameter. */
     public static final double MARS_MOON_MARK_PX = MARS_MINIMUM_MARK_PX / 2.0;
 
+    /**
+     * Uranus's identity on the page (#638), derived from its service's name
+     * as Mars's is: Uranus has its own service (#634).
+     */
+    public static final String URANUS = juranometria.solar.UranusService.class.getSimpleName()
+            .substring(0, 6).toLowerCase(java.util.Locale.ROOT);
+    /** Rule M for Uranus (R-1 on #637): the same 6 px mark, which always stands in. */
+    public static final double URANUS_MINIMUM_MARK_PX = VENUS_MINIMUM_MARK_PX;
+    /** The page's state key for Uranus behind the Sun's disc; an outer planet is never in front. */
+    public static final String URANUS_BEHIND = URANUS + VENUS_BEHIND.substring(VENUS.length());
+    /**
+     * R-2 on #637: Uranus's mark is drawn full and round. It is never less
+     * than 99.92 % lit, a dark part of 0.005 px on the mark, so the page is
+     * given a fully lit disc rather than an invisible phase.
+     */
+    static final OverlayContribution.Lit URANUS_FULL = new OverlayContribution.Lit(1.0, 0.0, 0.0);
+
     /** A moon of Mars's identity on the page, {@code mars.phobos} and {@code mars.deimos}. */
     public static String identityOf(juranometria.solar.MarsService.Moon moon) {
         return MARS + "." + moon.name().toLowerCase(java.util.Locale.ROOT);
@@ -211,6 +228,46 @@ public final class SolarSystemModule implements ChartModule {
         listener.accept(marsShowing);
     }
 
+    private boolean uranusShowing;
+    private final java.util.List<java.util.function.Consumer<Boolean>> uranusListeners =
+            new java.util.ArrayList<>();
+    /** Uranus's service, read only when Uranus is shown (#638); null until a host gives it. */
+    private Supplier<juranometria.solar.UranusService> uranus;
+
+    /** Gives the module Uranus's service, read lazily the first time Uranus is drawn (#638). */
+    public void withUranus(Supplier<juranometria.solar.UranusService> service) {
+        if (service == null) {
+            throw new IllegalArgumentException("Uranus's service is required");
+        }
+        this.uranus = service;
+    }
+
+    public boolean uranusShowing() {
+        return uranusShowing;
+    }
+
+    /** Uranus on the chart (#638): its own switch, independent of every other body's. */
+    public void uranusShowing(boolean showing) {
+        boolean changed = this.uranusShowing != showing;
+        this.uranusShowing = showing;
+        if (services != null) {
+            services.redraw();
+        }
+        if (changed) {
+            for (java.util.function.Consumer<Boolean> listener : java.util.List.copyOf(uranusListeners)) {
+                listener.accept(showing);
+            }
+        }
+    }
+
+    public void onUranusChange(java.util.function.Consumer<Boolean> listener) {
+        if (listener == null) {
+            throw new IllegalArgumentException("a listener is required");
+        }
+        uranusListeners.add(listener);
+        listener.accept(uranusShowing);
+    }
+
     private boolean mercuryShowing;
     private final java.util.List<java.util.function.Consumer<Boolean>> mercuryListeners =
             new java.util.ArrayList<>();
@@ -332,7 +389,7 @@ public final class SolarSystemModule implements ChartModule {
     public List<OverlayContribution> contributedGeometry() {
         contributions++;
         if (!sunShowing && !moonShowing && !venusShowing && !mercuryShowing
-                && !(marsShowing && mars != null)) {
+                && !(marsShowing && mars != null) && !(uranusShowing && uranus != null)) {
             return List.of();
         }
         Observer now = observer.get();
@@ -423,6 +480,24 @@ public final class SolarSystemModule implements ChartModule {
                                 ? MARS_BEHIND : null));
                 offered.addAll(marsMoons(now, horizon
                         && planet.horizontal().altitudeDegrees() < 0.0));
+            } catch (IllegalArgumentException outsideTheYears) {
+                // Nothing for this instant.
+            }
+        }
+        if (uranusShowing && uranus != null) {
+            // Uranus (#638, the rulings on #637): rule M, the 6 px mark always
+            // standing in (R-1), drawn full and round with no colour (R-2), the
+            // pole not drawn (R-3), no ring (R-4), selectable as an occurrence
+            // (R-8), spoken behind the Sun when its disc meets the Sun's.
+            // Outside its years nothing is drawn.
+            try {
+                juranometria.solar.UranusService.UranusObservation planet = uranus.get().observe(now);
+                offered.add(new OverlayContribution.Body(URANUS, "Uranus",
+                        planet.astrometricJ2000(), planet.equatorialDiameterArcseconds(),
+                        URANUS_FULL, horizon && planet.horizontal().altitudeDegrees() < 0.0,
+                        planet.distanceKm(), InkRole.BODY,
+                        OverlayContribution.Moment.of(now), true, URANUS_MINIMUM_MARK_PX,
+                        planet.behindSun() ? URANUS_BEHIND : null));
             } catch (IllegalArgumentException outsideTheYears) {
                 // Nothing for this instant.
             }

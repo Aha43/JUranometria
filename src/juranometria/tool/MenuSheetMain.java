@@ -243,6 +243,16 @@ public final class MenuSheetMain {
                 if (marsOnChart != null) {
                     marsOnChart.setSelected(state.checked());
                 }
+                // Uranus... (#635) and Uranus on the chart (#638), in the
+                // application's order - Uranus... absent from this photograph
+                // until #638.
+                AppMenuBar.addUranusTable(bar[0],
+                        juranometria.ui.language.InterfaceText.forLanguage(language), () -> { });
+                JCheckBoxMenuItem uranusOnChart = AppMenuBar.addUranusOnChart(bar[0],
+                        juranometria.ui.language.InterfaceText.forLanguage(language), () -> { });
+                if (uranusOnChart != null) {
+                    uranusOnChart.setSelected(state.checked());
+                }
 
                 // Centre on coordinates... (#623), which the application adds
                 // after the bar is built, after the Controller item.

@@ -27,7 +27,7 @@ import juranometria.ui.language.MnemonicText;
  * Opening it computes nothing: it shows what the session already holds,
  * and computes only when the reader asks - Compute, a view or Enter. What
  * is the dialog's own is its layout, the time note, Close and the access
- * letters. No Centre on chart: no Uranus is drawn yet.
+ * letters, and since #638 Centre on chart.
  */
 public final class UranusTableDialog extends JDialog {
 
@@ -37,13 +37,14 @@ public final class UranusTableDialog extends JDialog {
 
     private final Content content;
 
-    private UranusTableDialog(Frame owner, UranusTableSession session, InterfaceText said) {
+    private UranusTableDialog(Frame owner, UranusTableSession session, InterfaceText said,
+                              CentreOnChart centre, BodyOnChart layer) {
         super(owner, new SolarTableWords(said, "uranustable").say("title"), false);
         SolarTableWords words = new SolarTableWords(said, "uranustable");
         getAccessibleContext().setAccessibleName(words.say("a11y"));
         getAccessibleContext().setAccessibleDescription(words.say("explain"));
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        content = new Content(session, said, this::dispose);
+        content = new Content(session, said, this::dispose, centre, layer);
         setContentPane(content);
         getRootPane().registerKeyboardAction(e -> dispose(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
@@ -60,18 +61,33 @@ public final class UranusTableDialog extends JDialog {
 
     /** Opens the one Uranus table over the shared session, or brings it to the front. */
     public static void open(Frame owner, UranusTableSession session, InterfaceText said) {
+        open(owner, session, said, null, null);
+    }
+
+    /**
+     * With Centre on chart (#638): the dialog's button turns {@code layer},
+     * the Solar System module's Uranus switch, on and centres the chart on Uranus.
+     */
+    public static void open(Frame owner, UranusTableSession session, InterfaceText said,
+                            CentreOnChart centre, BodyOnChart layer) {
         if (current != null && current.isDisplayable()) {
             current.toFront();
             current.requestFocus();
             return;
         }
-        current = new UranusTableDialog(owner, session, said);
+        current = new UranusTableDialog(owner, session, said, centre, layer);
         current.setVisible(true);
     }
 
     /** The content over a session, headless-constructible, for tests and studies. */
     public static Content content(UranusTableSession session, InterfaceText said) {
-        return new Content(session, said, () -> { });
+        return new Content(session, said, () -> { }, null, null);
+    }
+
+    /** The same, with Centre on chart (#638). */
+    public static Content content(UranusTableSession session, InterfaceText said,
+                                  CentreOnChart centre, BodyOnChart layer) {
+        return new Content(session, said, () -> { }, centre, layer);
     }
 
     /** This dialog's content. */
@@ -88,8 +104,9 @@ public final class UranusTableDialog extends JDialog {
         public final JLabel timeNote = new JLabel();
         public final JButton close;
 
-        Content(UranusTableSession session, InterfaceText language, Runnable closeAction) {
-            controls = new UranusTableControls(session, language, true);
+        Content(UranusTableSession session, InterfaceText language, Runnable closeAction,
+                CentreOnChart centre, BodyOnChart layer) {
+            controls = new UranusTableControls(session, language, true, null, centre, layer);
             SolarTableWords said = controls.words();
             MnemonicText letters = MnemonicText.in(language);
             setLayout(new BorderLayout(0, 8));
@@ -118,6 +135,9 @@ public final class UranusTableDialog extends JDialog {
             if (controls.setChartTime != null) {
                 buttons.add(controls.setChartTime);
                 buttons.add(Box.createHorizontalStrut(8));
+            }
+            if (controls.centreOnChart != null) {
+                buttons.add(controls.centreOnChart);
             }
             buttons.add(Box.createHorizontalGlue());
             buttons.add(close);
