@@ -4,7 +4,7 @@
 
 Every number it quotes comes from a report, a fixture or a run record named beside it. Every ruling it quotes is the owner's, dated. The contract itself is `uranus-system.md`: the study, the #633 rulings, the #634 distance amendment, and #634 and #635 as built. This document says what stands, what was measured, what stopped, what moved, and what Part II must decide.
 
-**Baseline.** The Uranus feature work (#633–#635) was complete at main `6e45f155` (2026-10-28). There was no infrastructure repair chain; one gate stop on #635 changed the evidence contracts' heap (§2). No `VERSION` change (5.5.0), no tag, no release.
+**Baseline.** The Uranus feature work (#633–#635) was complete at main `6e45f155` (2026-10-28). There was no infrastructure repair chain; one gate stop on #635 changed the evidence contracts' heap (§2). Uranus Part I made no VERSION change, tag or release. It began from the already published 5.5.0 baseline (`v5.5.0` → `6958ce75`).
 
 ## 1. What is settled
 
@@ -198,7 +198,7 @@ All records are kept under `~/juranometria-runs/runs/` on the owner's machine, e
 - **Raw downloads outlive worktrees.** Fetch into the main checkout's ignored `imports/raw/<system>/`, copy into a worktree, never the reverse.
 - **A study must measure every observable a ruling touches, not only the angle.** The barycentre-for-centre ruling was measured in arcseconds and never in kilometres; the distance target met it only in #634.
 - **The evidence contracts' heap is now 2 GiB,** and the record says what it retains is not yet measured. At 1 GiB, gate 4 took 38.6–38.8 minutes on the #633 and #634 heads; at 2 GiB it took 19.7 (§3.3).
-- **The Uranus accuracy report is not registered in the evidence contract,** while Mars's is. A stale or hand-edited `service-accuracy.md` would not be caught there; `UranusReferenceVectorTest` still holds its numbers to the targets. Filed as a separate task, not done here.
+- **The Uranus accuracy report is not registered in the evidence contract,** while Mars's is. A stale or hand-edited `service-accuracy.md` would not be caught there; `UranusReferenceVectorTest` still holds its numbers to the targets. Deferred and not yet filed: register `service-accuracy.md` in the evidence contract.
 - **A new identifier on an application surface is routed, not reviewed.** The ledger stands at 159 of fewer than 160; one more unrouted literal fails the suite.
 - **A menu or Controller group added in outward order moves every journey that pins that order, and the companion sheets** (Mars's lesson, met again).
 
@@ -315,5 +315,5 @@ Completing Part I changes no `VERSION`. Tag and publication remain separate owne
 - **The moons before 2000** need the five-moon excerpt over 1900–2100 (U-6b, 75,637,760 bytes), which was not ruled in.
 - **The irregular moons** (`ura116xl`) were not studied for inclusion.
 - **A Uranus magnitude** needs its own model and authority.
-- **Registering `service-accuracy.md` in the evidence contract** (§2).
-- **Measuring what the evidence contract's process retains** (§2, §3.3).
+- **Deferred and not yet filed: register `service-accuracy.md` in the evidence contract** (§2).
+- **Deferred and not yet filed: measure what the evidence contract's process retains** (§2, §3.3).
