@@ -123,7 +123,7 @@ No production Uranus ink begins before this study lands; #638 draws from it.
 
 ## #638 part 1, Uranus on the chart, as built: a packaged checkpoint
 
-**Not yet accepted.** Uranus itself under R-1 to R-9; the moons are part 2 (R-10).
+**Accepted by the owner on 2026-10-28**, as given: "Accept part 1, run the gates and CI", after trying the candidate `5ddbf42e` ("Nice it is spot on the ecliptic NOW"). The gate plan, all seven gates, was approved with it. Uranus itself under R-1 to R-9; the moons are part 2 (R-10).
 
 - **The figure (R-1, R-2).** The Solar System module offers Uranus as a body with the 6 px minimum mark and a fully lit disc: the page draws the mark, round, in its ink and ground, on every field. `UranusInkTest` measures every pixel inside the mark's outline lit; the study measures the same on the 0.25° page.
 - **No pole, no rings (R-3, R-4).** Nothing is drawn for either.
