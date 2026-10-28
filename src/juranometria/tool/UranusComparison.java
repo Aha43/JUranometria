@@ -85,7 +85,13 @@ public final class UranusComparison {
         TARGETS.put("Uranus astrometric", new double[] {0.05, 0.05, 0.01, 3.0});
         TARGETS.put("Uranus apparent, > 1° from the Sun", new double[] {0.3, 0.1, 0.2, 3.0});
         TARGETS.put("Uranus horizontal", new double[] {20.0, 20.0, 20.0, nan});
-        TARGETS.put("Uranus distance km", new double[] {40.0, 20.0, 1.0, 7000.0});
+        // The exact eras' distance target amended to 50 km on the #634
+        // checkpoint (owner, 2026-10-28): Horizons measures to the centre,
+        // U-2 ships the barycentre, within 45.136 km of it - a consequence
+        // #633 missed, not a fault in the service. The builder still
+        // refuses an offset above 50 km; the 7000 km after the exact
+        // interval stands as ruled.
+        TARGETS.put("Uranus distance km", new double[] {50.0, 50.0, 50.0, 7000.0});
         TARGETS.put("equatorial diameter", new double[] {0.001, 0.001, 0.001, 0.01});
         TARGETS.put("illuminated points", new double[] {0.001, 0.001, 0.001, 0.01});
         TARGETS.put("phase angle, against phi", new double[] {0.5, 0.5, 0.5, 10.0});

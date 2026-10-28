@@ -229,18 +229,28 @@ name differ, or if the PCK carries periodic pole terms for Uranus. Two
 builds are byte-identical.
 
 **The targets (U-10) and the results** (`docs/studies/uranus-system/service-accuracy.md`).
-Every ruled target is met but one: the distance. Horizons measures to
+Every target is met, the distance against its amended target (below). As
+first measured against U-10's targets it was the one miss: Horizons measures to
 Uranus's centre; U-2 ships the barycentre, which lies up to 45.136 km from
 it. The worst rows are 47.658 km (1900-1961), 42.964 km (1962-1971) and
 43.529 km (1972-exact), against 40, 20 and 1 km; after the exact interval,
 4000.031 km against 7000 km. The study measured only U-2's angular effect
-(0.0035″) and not its distance, so the conflict surfaced here. **It awaits
-the owner's ruling** (posted on #634): (a) amend the distance target to
-50 km in every exact era, or (b) ship the 7→799 centre excerpt (about
-7.35 MB) and keep the targets.
+(0.0035″) and not its distance, so the conflict surfaced here.
+
+**The distance amendment, ruled on the #634 checkpoint** (owner,
+2026-10-28): "Choose (a): keep the barycentre and amend the exact-era
+distance target to 50 km." The exact eras' target is 50 km; the 7000 km
+after the exact interval stands as ruled; the builder keeps its 50 km
+offset refusal. No centre excerpt ships: another 7.35 MB would improve a
+value whose difference is below the table's displayed precision, with no
+benefit a reader can see, and the barycentre is fully adequate for
+direction, figure and chart placement. **This amendment corrects #633's
+missed consequence of centre versus barycentre for the distance; it is not
+a relaxation caused by a faulty service.**
 
 **Measured, printed, not asserted**, each inherited from Saturn's or Mars's
-ruling:
+ruling and confirmed on the #634 checkpoint with the single-pack layout and
+the computed inventory count:
 - The pole position angle within 1° of the Sun (12.938″ and 16.779″ at
   conjunctions); beyond 1° it is held to 0.5″ (worst 0.224″).
 - The moons' position angle within 20″ of Uranus, Mars's threshold; beyond
@@ -255,7 +265,8 @@ ruling:
 ephemeris" / "Uranussystemefemeride"), in the image's `licenses/` and in
 the licensing records. `build-app-image.sh` counted 13 licensing resources
 from #602 while its list held 14; the count is now computed from the list
-and reads 15. The packaged acceptance journey checks Uranus at Oslo,
+and reads 15, and `LicensingInventoryCountTest` refuses a typed count and a
+list that leaves out a notice About shows. The packaged acceptance journey checks Uranus at Oslo,
 2026-10-27 12:00 UTC, against Horizons within 0.01″, Miranda behind Uranus
 in its shadow on 2005-03-19, and the moons' refusal before 2000.
 
