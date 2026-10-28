@@ -34,7 +34,11 @@ import juranometria.ui.language.InterfaceText;
  * is drawn yet. Since #603 a Mars group stands between the Moon's and
  * Jupiter's - the same order, outward from the Sun - introduced collapsed,
  * holding one {@link MarsTableControls} over Mars's shared session, with
- * no chart switch and no Centre on chart: no Mars is drawn yet.
+ * no chart switch and no Centre on chart: no Mars is drawn yet. Since
+ * #635 a Uranus group follows Saturn's - the same order, outward from the
+ * Sun - introduced collapsed, holding one {@link UranusTableControls} over
+ * Uranus's shared session, with no chart switch and no Centre on chart: no
+ * Uranus is drawn yet.
  *
  * <p>Building the section computes nothing: each set of controls
  * reads the observer for its note and seeds, and shows whatever its
@@ -57,6 +61,8 @@ public final class SolarSystemSection {
     private final JovianTableControls jupiter;
     /** Saturn's controls, or null until a host gives the section Saturn's session. */
     private SaturnTableControls saturn;
+    /** Uranus's controls, or null until a host gives the section Uranus's session. */
+    private UranusTableControls uranus;
     /** Mars's controls, or null until a host gives the section Mars's session. */
     private MarsTableControls mars;
 
@@ -218,6 +224,27 @@ public final class SolarSystemSection {
     /** Saturn's controls, or null for a host built without Saturn. */
     public SaturnTableControls saturn() {
         return saturn;
+    }
+
+    /**
+     * Gives the section Uranus's group after Saturn's (#635): its controls
+     * over Uranus's shared session, with no chart switch and no Centre on
+     * chart - no Uranus is drawn yet. Stated before the tab is built;
+     * building them computes nothing and reads no pack.
+     */
+    public void withUranus(UranusTableSession session, InterfaceText said) {
+        if (session == null || said == null) {
+            throw new IllegalArgumentException("Uranus's session, in a language");
+        }
+        if (uranus != null) {
+            uranus.release();
+        }
+        uranus = new UranusTableControls(session, said, false);
+    }
+
+    /** Uranus's controls, or null for a host built without Uranus. */
+    public UranusTableControls uranus() {
+        return uranus;
     }
 
     /**
@@ -390,6 +417,11 @@ public final class SolarSystemSection {
                     said.say("solarsystem.saturn"), saturn.inController(), said, store,
                     true));
         }
+        if (uranus != null) {
+            groups.add(CompanionSection.remembered(ID + ".uranus",
+                    said.say("solarsystem.uranus"), uranus.inController(), said, store,
+                    true));
+        }
         return groups;
     }
 
@@ -413,6 +445,9 @@ public final class SolarSystemSection {
         }
         if (saturn != null) {
             saturn.release();
+        }
+        if (uranus != null) {
+            uranus.release();
         }
     }
 }

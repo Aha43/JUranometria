@@ -270,3 +270,69 @@ list that leaves out a notice About shows. The packaged acceptance journey check
 2026-10-27 12:00 UTC, against Horizons within 0.01″, Miranda behind Uranus
 in its shadow on 2005-03-19, and the moons' refusal before 2000.
 
+## #635, the table, as built: a packaged checkpoint
+
+**Accepted by the owner on 2026-10-28, untested in the packaged build**, as given:
+"Don't got chance to test. Chance is ok, always been. Leave letter. Go on."
+Read as: the candidate `8a1f40e0` is accepted without the packaged
+journey; the access letters stay as built (N in English, U in Norwegian);
+the illuminated line, and no elongation or lit side, stay as U-5 and U-9
+rule them. Issue #635 adds Uranus and its ruled moons to the
+Solar System tables, for the owner's numerical and layout journey in the
+packaged build. The table follows the card and columns ruled in U-5 and U-9,
+and Mars's table (#603) in everything else.
+
+**Hosts and order.**
+- **Where it lives.** View > Solar System gains *Uranus...* directly after
+  *Saturn...*. The Controller's Solar System tab gains a Uranus group after
+  Saturn's, introduced collapsed.
+- **One session.** Both hosts share one `UranusTableSession`. Drafts are each
+  host's own. Building, opening, expanding and choosing a tab compute
+  nothing, and read no pack: the years the table names are
+  `UranusService`'s constants, which the service holds the pack's manifest
+  to when it loads.
+- **No chart surface.** There is no Show on chart and no Centre on chart: no
+  Uranus is drawn yet. *Set chart time to this instant* is offered, as in
+  every table (#612, P2).
+- **Access letter.** *Uranus...* is lettered **N** in English and **U** in
+  Norwegian: in English U, R, A and S are already claimed on the menu, and
+  two items never share a letter; in Norwegian U is free.
+
+**The card,** ten lines: right ascension and declination (J2000), altitude,
+azimuth, distance, apparent diameter across the equator and from pole to
+pole, illuminated fraction, phase angle (U-5: no phase words), the north
+pole's position angle, and the tilt with the pole tipped towards the
+observer (Mars's, U-9). Saturn's card shows no elongation and no lit side,
+and neither does this one; both are a line each if the owner wants them.
+
+**The moons.** Miranda, Ariel, Umbriel, Titania then Oberon, outward from
+Uranus, in Jupiter's columns: side, east–west, north–south, separation,
+separation in Uranus radii, and state. The names are the same in both
+languages. The state is the flattened figure's (U-7): on 2004-05-29 Horizons
+codes Miranda O, behind its sphere, while at 1.0035 radii it clears the
+flattened limb and the table says *clear of Uranus*.
+
+**Ranges.** These are grouped by instant. Each group is one Uranus result: a
+heading, then three summary lines (position; figure and pole; light and
+tilt). The moons follow beneath it. A range is capped at 200 instants, five
+moon rows each, within the released 1,000-row cap.
+
+**Outside the moons' years.** As Mars's table (#603, ruled 2026-10-26): Uranus
+is shown at every instant, always. A single instant before 2000 shows Uranus
+and says the moons are refused, naming their years (2000-01-01 to
+2100-12-31). A range shows the moons wherever they answer and, in place of
+them, a line saying they are not computed there; the status counts those
+instants. Whether the moons answer is the service's `moonsAnswerAt`.
+
+**Evidence.** The companion photographs of the open Solar System tab and of
+Jupiter's group were regenerated, with the strings sheet: they now show the
+collapsed Uranus group after Saturn's. The packaged journey prints
+"uranus table OK".
+
+**The evidence contracts' heap.** The seven gates on `c936de1b` stopped at gate 4:
+the portable contract's one process ran out of its 1 GiB inside the label
+study, which #635 does not touch and which alone peaks at 372 MB live. It was
+not rerun. By the owner's choice (2026-10-28) the three contract routes now run
+at 2 GiB, the Makefile recording why; the record of the stop is kept with that
+gate run.
+

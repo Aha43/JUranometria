@@ -1248,4 +1248,33 @@ public final class AppMenuBar {
         }
         solar.insert(saturn, at);
     }
+
+    /**
+     * Adds View > Solar System > Uranus... directly after Saturn... (#635),
+     * outward from the Sun: the Uranus table's dialog, kept beside the
+     * Controller's Uranus group for dogfooding as Mars's is. Opening it
+     * computes nothing. No Uranus on the chart item: no Uranus is drawn yet.
+     */
+    public static void addUranusTable(javax.swing.JMenuBar bar,
+                                      juranometria.ui.language.InterfaceText said,
+                                      Runnable openUranusTable) {
+        JMenu solar = solarSystemMenu(bar);
+        if (solar == null || openUranusTable == null) {
+            return;
+        }
+        JMenuItem uranus = new JMenuItem(said.say("menu.uranus.label"));
+        uranus.setName("uranusTableItem");
+        juranometria.ui.language.MnemonicText.in(said).apply(uranus, "menu.uranus.mnemonic");
+        uranus.getAccessibleContext().setAccessibleName(said.say("menu.uranus.a11y"));
+        juranometria.ui.Explain.control(uranus, said.say("menu.uranus.hover"),
+                said.say("menu.uranus.explain"));
+        uranus.addActionListener(event -> openUranusTable.run());
+        int at = solar.getMenuComponentCount();
+        for (int i = 0; i < solar.getMenuComponentCount(); i++) {
+            if ("saturnTableItem".equals(solar.getMenuComponent(i).getName())) {
+                at = i + 1;
+            }
+        }
+        solar.insert(uranus, at);
+    }
 }

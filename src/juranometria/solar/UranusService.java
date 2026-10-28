@@ -74,6 +74,16 @@ public final class UranusService {
     private static final double ARCSEC = 3600.0;
     private static final Instant J2000_TT_AS_INSTANT = Instant.ofEpochSecond(946_728_000L);
 
+    /**
+     * The civil days Uranus and its moons answer for, inclusive (#633,
+     * U-1a, U-6a), stated here so a table can say them without reading the
+     * pack; the constructor holds the pack's manifest to them.
+     */
+    public static final LocalDate URANUS_FIRST_DAY = LocalDate.of(1900, 1, 1);
+    public static final LocalDate URANUS_LAST_DAY = LocalDate.of(2100, 12, 31);
+    public static final LocalDate MOONS_FIRST_DAY = LocalDate.of(2000, 1, 1);
+    public static final LocalDate MOONS_LAST_DAY = LocalDate.of(2100, 12, 31);
+
     /** The ruled moons (#633, U-6a), outward from Uranus. */
     public enum Moon {
         MIRANDA(705), ARIEL(701), UMBRIEL(702), TITANIA(703), OBERON(704);
@@ -224,6 +234,14 @@ public final class UranusService {
     public UranusService(SolarSystemPack solar, UranusSystemPack pack) {
         if (solar == null || pack == null) {
             throw new IllegalArgumentException("the service reads two packs");
+        }
+        if (!pack.firstDay().equals(URANUS_FIRST_DAY) || !pack.lastDay().equals(URANUS_LAST_DAY)
+                || !pack.moonsFirstDay().equals(MOONS_FIRST_DAY)
+                || !pack.moonsLastDay().equals(MOONS_LAST_DAY)) {
+            throw new juranometria.catalog.PackIntegrityException("the uranus-system pack's years ("
+                    + pack.firstDay() + " to " + pack.lastDay() + ", the moons "
+                    + pack.moonsFirstDay() + " to " + pack.moonsLastDay()
+                    + ") are not the ruled ones the tables say");
         }
         this.solar = solar;
         this.pack = pack;

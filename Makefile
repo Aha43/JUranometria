@@ -730,20 +730,28 @@ black-sky-study: classes
 # floor, costs under 1%, and leaves room for a runner whose garbage
 # collector has a different number of threads than this laptop's.
 # Three consecutive runs at this limit: 1.03, 1.03, 1.04 GiB peak.
+#
+# 2 GiB since #635 (the owner's choice, 2026-10-28). The portable run on
+# c936de1b ran out of heap at 1 GiB inside the label study, while the
+# label study alone under 1 GiB peaks at 372 MB live and reproduces its
+# files: the one process now carries more from the generators before it
+# than it did at #323, as the planet reports and studies were added.
+# What it retains is not yet measured. The three routes run the same
+# instrument and keep the same limit.
 evidence-contracts: classes
-	$(JAVA) -Xmx1g -cp "$(CLASSES_DIR):$(LIB_DIR)/*" -Djava.awt.headless=true juranometria.tool.EvidenceContractMain
+	$(JAVA) -Xmx2g -cp "$(CLASSES_DIR):$(LIB_DIR)/*" -Djava.awt.headless=true juranometria.tool.EvidenceContractMain
 
 # What CI runs: the same instrument, forbidden to compare a rendering
 # here with pixels recorded on another machine. See
 # docs/decisions/test-evidence.md.
 evidence-contracts-ci: classes
-	$(JAVA) -Xmx1g -cp "$(CLASSES_DIR):$(LIB_DIR)/*" -Djava.awt.headless=true juranometria.tool.EvidenceContractMain ci
+	$(JAVA) -Xmx2g -cp "$(CLASSES_DIR):$(LIB_DIR)/*" -Djava.awt.headless=true juranometria.tool.EvidenceContractMain ci
 
 # The interaction route (#428): the portable contract over the
 # generators that own no chart picture; every chart picture is held as
 # committed, with its provenance account, and none is drawn.
 evidence-contracts-interaction: classes
-	$(JAVA) -Xmx1g -cp "$(CLASSES_DIR):$(LIB_DIR)/*" -Djava.awt.headless=true juranometria.tool.EvidenceContractMain interaction
+	$(JAVA) -Xmx2g -cp "$(CLASSES_DIR):$(LIB_DIR)/*" -Djava.awt.headless=true juranometria.tool.EvidenceContractMain interaction
 
 # Run on the machine that promotes reference images, after a reviewed
 # regeneration: records when, on what, and from which generator each
