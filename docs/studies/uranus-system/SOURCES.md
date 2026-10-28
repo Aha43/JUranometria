@@ -2,6 +2,8 @@
 
 Issue #633. The raw inputs of the Uranus system study, retrieved under the owner's approvals of 2026-10-27 ("approve requests 1 and 2", "approve requests 3 and 4") for measurement only. They are kept whole and unmodified, gitignored and outside Git. Each is verified against its pin before every use. No excerpt is committed or bundled until the #633 checkpoint is ruled.
 
+**Correction (#636, 2026-10-28).** `imports/raw/uranus-system/` below was the #633 worktree's, and removing that worktree deleted it. On 2026-10-27 `ura184_part-3.bsp`, `.cmt` and `.mrg` were re-fetched, approved, into the main checkout's ignored `imports/raw/uranus-system/` (`RETRIEVED.txt`), the kernel's MD5 and SHA-256 matching the pins below. Request 1's other descriptive files were not re-fetched; no tool reads them. See `docs/decisions/uranus-handover.md`, §1.1.
+
 ## Request 1: NAIF's descriptive files, retrieved 2026-10-27T18:43:54Z
 
 Under `imports/raw/uranus-system/`, 478,499 bytes in all, each equal to the `Content-Length` NAIF served and asked about before approval. They chose the kernel; none is read by any study tool.
