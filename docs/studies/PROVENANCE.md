@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**848 promoted artifacts.**
+**867 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -846,6 +846,25 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/sun-on-the-chart/horizon-below-36.png` | `c49da0b302222754191e3fcb48ed7ad3c414ff7f135ccddab3bd305c269e1392` | 2026-10-25 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/sun-on-the-chart/horizon-hidden-36.png` | `27c9afcb6ed185d6c08217a9c24bf1a634242f4fd20225e52ca115d014a6d09c` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/sun-on-the-chart/september-equinox-6.png` | `bde7fb98b5e44e5bf3aa8eda732219f536acb575b0fcc182a450aff435810988` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/uranus-cartography/ariel-in-shadow-0.25.png` | `3f73ff23044f9182da2be73b50199335dac630e27fcf1c0e96af39762e76fe0f` | 2026-10-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/uranus-cartography/before-the-moons-1.png` | `d40c2f31a54f324272a76d8c2aa71b4ec192cec302cd2e048c38aca55fc2cf23` | 2026-10-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/uranus-cartography/below-horizon-8.png` | `221aa1ba884a7baffe01abc33aff3804d0b18f0e14a3afcfd58f2171fe293709` | 2026-10-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/uranus-cartography/conjunction-2026-3.png` | `73a0067dc6de998b37e1497a3de3bc4609cd0858b2f89faa8228c651a305e3d1` | 2026-10-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/uranus-cartography/largest-0.25.png` | `e9ea86eaf8be3ee626e53ac4672aeca588c3026039119d62b3bba8a856956866` | 2026-10-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/uranus-cartography/miranda-behind-in-shadow-0.25.png` | `7080a746003e2335d414314a9d1d85ff28b7c23025e5558fb6bffaaeaa7ae2e8` | 2026-10-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/uranus-cartography/miranda-in-front-0.25.png` | `08b5e51cbf8164873d73f0edbfec89d665b733205a8e9c906b6a2d081825fc0d` | 2026-10-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/uranus-cartography/oberon-widest-0.25.png` | `6c83b03e431440bee754446f950ead40a800be6b0060d0f1959b7002be3f423a` | 2026-10-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/uranus-cartography/oberon-widest-1.png` | `e74a1ce88703ba4b996a9929ae1d9e880b7238677553480c0e86a9f67510a2dd` | 2026-10-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/uranus-cartography/opposition-2026-0.25.png` | `bfd4e47ba2a6877dafd256e053e07802e70e361596db24167a4bff1d2c451837` | 2026-10-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/uranus-cartography/opposition-2026-0.5.png` | `71f1f2334612fbeeebd69bc808cb285b988fdd92b60b37d6c1d9792eb10f2013` | 2026-10-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/uranus-cartography/opposition-2026-1.png` | `63c77d8a021ca601547a309721480f447040f1d2463949dfa8ba57c5aefedf1c` | 2026-10-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/uranus-cartography/opposition-2026-2.png` | `bb4895fcba6df2926da6d7f6c208f0bab2f3d965367c45157bdba9936609ab47` | 2026-10-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/uranus-cartography/opposition-2026-8.png` | `535eb3ee724f36b90364ada433748aebdaa81954556ce649ffb596b178650e39` | 2026-10-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/uranus-cartography/printable-a4-1.png` | `b1fd0a107f3aa852962b1be39cfe0f902b79ec3819748e3132894eef2ea498a9` | 2026-10-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/uranus-cartography/ring-equator-on-0.25.png` | `bb762172eee598a1fe71e5abed1b14ab8a517797f7cde93098cc214fee97979b` | 2026-10-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/uranus-cartography/ring-pole-on-0.25.png` | `396c7b233aab40fd37502dbdbae78a686c03d419a61fa987693f49f493846eb1` | 2026-10-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/uranus-cartography/ring-pole-on-1.png` | `e881c7ee84105668f8b892ba05c2e367f5b4e3294adf0cb7ceb2f3484a3ca97f` | 2026-10-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/uranus-cartography/umbriel-behind-0.25.png` | `f882c15fd6bbe6bbda811c0985e1041878d6f32ee72fb230da6b5e79cd031842` | 2026-10-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/venus-cartography/appearance-1.png` | `7c60c152aab5ae9d013d5a167cd45f71f1c511ffd27d9a5d1a302186a8bb53a5` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/venus-cartography/appearance-2.png` | `41d720cf9ed4d7fe9e8c43d841c60cf913c975e1b9a41ca41fc5137ac3425ec5` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/venus-cartography/appearance-3.png` | `a53a26fc0805c81d38efc6c48cd3a462a207df798bcba266f3b4ddbf32bd2d03` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
