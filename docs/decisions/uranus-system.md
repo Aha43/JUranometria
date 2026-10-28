@@ -329,3 +329,10 @@ Jupiter's group were regenerated, with the strings sheet: they now show the
 collapsed Uranus group after Saturn's. The packaged journey prints
 "uranus table OK".
 
+**The evidence contracts' heap.** The seven gates on `c936de1b` stopped at gate 4:
+the portable contract's one process ran out of its 1 GiB inside the label
+study, which #635 does not touch and which alone peaks at 372 MB live. It was
+not rerun. By the owner's choice (2026-10-28) the three contract routes now run
+at 2 GiB, the Makefile recording why; the record of the stop is kept with that
+gate run.
+
