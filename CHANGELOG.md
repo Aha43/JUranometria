@@ -7,6 +7,23 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Uranus, computed offline (#634, ruled on #633).** A sixth pack,
+Uranus System, holds two excerpts of NAIF's `ura184_part-3.bsp`:
+DE442's Uranus barycentre over 1900-2100 (387,072 bytes), which stands
+for the planet - Uranus's centre lies within 45.136 km of it, re-measured
+by the builder before it writes - and Miranda, Ariel, Umbriel, Titania
+and Oberon from URA182.21 over 2000-2100 (38,055,936 bytes). Before
+2000 Uranus answers and the moons refuse, naming their years. The
+Uranus service gives the chart place, the apparent and horizontal
+place, the distance, the equatorial and polar diameter at the tilt,
+the illuminated fraction and phase angle, the north pole from the IAU
+model, the planetocentric tilt, and each moon's offsets and state -
+clear, in front of, behind, or in Uranus's shadow. Its notice is in
+About, in both languages. No table or chart shows Uranus yet; the
+first numbers are in `docs/studies/uranus-system/service-accuracy.md`.
+The Sun and the Earth stay DE440's, and the released Sun, Moon,
+Mercury, Venus, Mars, Jupiter and Saturn answers are unchanged.
+
 ## [5.5.0] - 2026-10-27
 
 **Saturn's rings on the page (#607).** A new reader article, in

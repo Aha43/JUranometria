@@ -19,6 +19,7 @@ this archive.
 | Planets ephemeris (JUranometria-modified excerpts of NASA/JPL DE440, one per planet; IAU 2015 constants, with Mars's pole model, copied from NAIF's PCK) | NAIF rules for modified SPICE kernels (no fee or licence) | [`licenses/NOTICE-planets.md`](licenses/NOTICE-planets.md) |
 | Saturn System ephemeris (two JUranometria-modified excerpts of NASA/JPL SAT441 with DE440; IAU 2015 constants copied from NAIF's PCK; four ring radii quoted from the PDS Ring-Moon Systems Node) | NAIF rules for modified SPICE kernels (no fee or licence); PDS values quoted with their source | [`licenses/NOTICE-saturn-system.md`](licenses/NOTICE-saturn-system.md) |
 | Mars System ephemeris (one JUranometria-modified excerpt of NASA/JPL MAR099 for Phobos and Deimos; IAU 2015 radii copied from NAIF's PCK) | NAIF rules for modified SPICE kernels (no fee or licence) | [`licenses/NOTICE-mars-system.md`](licenses/NOTICE-mars-system.md) |
+| Uranus System ephemeris (two JUranometria-modified excerpts of NAIF's ura184_part-3: the Uranus barycentre from NASA/JPL DE442 and the five major moons from URA182.21; IAU 2015 radii and pole copied from NAIF's PCK) | NAIF rules for modified SPICE kernels (no fee or licence) | [`licenses/NOTICE-uranus-system.md`](licenses/NOTICE-uranus-system.md) |
 | Toolbar icons (Tabler) | MIT | [`licenses/LICENSE-Tabler-MIT.txt`](licenses/LICENSE-Tabler-MIT.txt) |
 | Application mark | MIT (JUranometria's own) | this repository's `LICENSE` |
 

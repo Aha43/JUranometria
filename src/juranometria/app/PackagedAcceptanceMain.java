@@ -87,6 +87,20 @@ public final class PackagedAcceptanceMain {
      */
     static final java.time.Instant MARS_MOONS_SAMPLE_INSTANT =
             java.time.Instant.parse("2018-07-27T13:00:00Z");
+    /**
+     * The packaged Uranus journey's samples (#634), restated once from the
+     * committed Horizons responses and held equal to them by
+     * {@code PackagedUranusSampleTest}: Uranus for Oslo at the study's
+     * "today" row (docs/studies/uranus-system/horizons/named-uranus-oslo.txt),
+     * and Miranda from Oslo in a row Horizons codes U, behind Uranus and
+     * totally eclipsed (docs/studies/uranus-system/horizons/matrix-7d-miranda-oslo.txt).
+     */
+    static final java.time.Instant URANUS_SAMPLE_INSTANT =
+            java.time.Instant.parse("2026-10-27T12:00:00Z");
+    static final double URANUS_SAMPLE_RA = 62.512161152;
+    static final double URANUS_SAMPLE_DEC = 20.879366485;
+    static final java.time.Instant MIRANDA_ECLIPSE_INSTANT =
+            java.time.Instant.parse("2005-03-19T00:00:00Z");
     static final java.time.Instant PHOBOS_ECLIPSE_INSTANT =
             java.time.Instant.parse("2018-07-26T12:30:00Z");
     static final java.time.Instant SATURN_CARD_INSTANT =
@@ -6858,6 +6872,42 @@ public final class PackagedAcceptanceMain {
                 + String.format(java.util.Locale.ROOT, "%.4f", marsOff)
                 + " arcsecond of Horizons; Phobos behind Mars in its shadow on 2018-07-26;"
                 + " the moons refused from the TDB boundary on 2049-12-31)");
+        // Uranus and its moons (issue #634), inside the packaged image: the
+        // Uranus System pack loads through the image's own classpath and
+        // verifies its checksums; Uranus for Oslo at the study's "today"
+        // agrees with Horizons' astrometric row to the ruled 0.01 arcsecond
+        // (#633, U-1a: the DE442 barycentre); Miranda is behind Uranus in its
+        // shadow where Horizons codes it U; and the moons refuse before 2000
+        // while Uranus answers (U-6a).
+        juranometria.solar.UranusService uranusService = juranometria.solar.UranusService.load();
+        double uranusOff = uranusService.observe(new juranometria.sky.Observer(59.91, 10.75,
+                        URANUS_SAMPLE_INSTANT)).astrometricJ2000().separationDegrees(
+                new juranometria.chart.SkyPosition(URANUS_SAMPLE_RA, URANUS_SAMPLE_DEC)) * 3600.0;
+        require(uranusOff < 0.01, "the packaged Uranus agrees with Horizons for Oslo,"
+                + " 2026-10-27 12:00 UTC, within 0.01 arcsecond: " + uranusOff);
+        juranometria.solar.UranusService.MoonPlace miranda = uranusService
+                .observeMoons(new juranometria.sky.Observer(59.91, 10.75, MIRANDA_ECLIPSE_INSTANT))
+                .moon(juranometria.solar.UranusService.Moon.MIRANDA);
+        require(miranda.sphericalDiscRelation() == juranometria.solar.UranusService.DiscRelation.BEHIND
+                        && miranda.sphericalShadowRelation()
+                                == juranometria.solar.UranusService.ShadowRelation.IN_SHADOW,
+                "on 2005-03-19 00:00 UTC at Oslo Miranda is behind Uranus in its shadow: "
+                        + miranda.sphericalDiscRelation() + ", " + miranda.sphericalShadowRelation());
+        require(!uranusService.moonsAnswerAt(java.time.Instant.parse("1999-12-31T23:59:59Z"))
+                        && uranusService.observe(new juranometria.sky.Observer(59.91, 10.75,
+                                java.time.Instant.parse("1999-12-31T23:59:59Z"))).distanceKm() > 0.0,
+                "before 2000 the moons refuse and Uranus answers");
+        require(PackagedAcceptanceMain.class.getResourceAsStream(
+                        "/resources/uranus-system/NOTICE-uranus-system.md") != null
+                        && PackagedAcceptanceMain.class.getResourceAsStream(
+                                "/resources/uranus-system/PROVENANCE.md") != null,
+                "the Uranus System pack's notice and provenance travel with it");
+        System.out.println("uranus system pack OK (URA182.21 and DE442 excerpts v"
+                + juranometria.solar.UranusSystemPack.load().manifest().get("pack.version")
+                + ", Uranus at Oslo within "
+                + String.format(java.util.Locale.ROOT, "%.4f", uranusOff)
+                + " arcsecond of Horizons; Miranda behind Uranus in its shadow on 2005-03-19;"
+                + " the moons refused before 2000, Uranus answering)");
         System.out.println("jovian system pack OK (JUP365 excerpts v"
                 + jovian.pack().manifest().get("pack.version") + ", Jupiter at Oslo within "
                 + String.format(java.util.Locale.ROOT, "%.4f", jupiterOff)

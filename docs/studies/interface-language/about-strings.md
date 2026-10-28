@@ -58,6 +58,7 @@ with it paragraph by paragraph.
 | `planets` | Planets ephemeris |
 | `saturnsystem` | Saturn System ephemeris |
 | `marssystem` | Mars System ephemeris |
+| `uranussystem` | Uranus System ephemeris |
 | `tabler` | Tabler icons licence |
 
 ### Light
@@ -75,7 +76,7 @@ with it paragraph by paragraph.
 | shown | *(the application mark: decorative, no text, no spoken name)* |
 | shown | JUranometria 5.5.0 |
 | shown | A quiet, interactive atlas for learning the geography of the sky. |
-| shown | *(read-only document, 1964 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 2308 characters — printed in full below or listed by path)* |
 | shown | Full notices and licences... |
 | shown | Close |
 
@@ -89,7 +90,7 @@ with it paragraph by paragraph.
 |---|---|
 | window title | About JUranometria |
 | window, spoken | Application identity, version, and licensing information |
-| shown | *(read-only document, 44018 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 46804 characters — printed in full below or listed by path)* |
 | shown | Close |
 
 
@@ -108,7 +109,7 @@ with it paragraph by paragraph.
 | shown | *(the application mark: decorative, no text, no spoken name)* |
 | shown | JUranometria 5.5.0 |
 | shown | A quiet, interactive atlas for learning the geography of the sky. |
-| shown | *(read-only document, 1964 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 2308 characters — printed in full below or listed by path)* |
 | shown | Full notices and licences... |
 | shown | Close |
 
@@ -122,13 +123,13 @@ with it paragraph by paragraph.
 |---|---|
 | window title | About JUranometria |
 | window, spoken | Application identity, version, and licensing information |
-| shown | *(read-only document, 44018 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 46804 characters — printed in full below or listed by path)* |
 | shown | Close |
 
 
 ### The compact licensing summary, in full
 
-Its own document (1964 characters), the canonical English one, used whole because this language has not written its own. Every licence identifier below is exact and untranslated.
+Its own document (2308 characters), the canonical English one, used whole because this language has not written its own. Every licence identifier below is exact and untranslated.
 
 ```
 Code and documentation: MIT license, copyright JUranometria
@@ -174,6 +175,12 @@ and Deimos, modified by JUranometria under NAIF's rules for modified
 SPICE kernels (no fee or licence); the IAU 2015 radii copied from
 NAIF's planetary-constants kernel.
 
+Uranus System ephemeris: two excerpts of NAIF's ura184_part-3 kernel,
+the Uranus barycentre from NASA/JPL DE442 and Miranda, Ariel, Umbriel,
+Titania and Oberon from URA182.21, modified by JUranometria under
+NAIF's rules for modified SPICE kernels (no fee or licence); the IAU
+2015 radii and pole copied from NAIF's planetary-constants kernel.
+
 Toolbar icons from the Tabler icon set: MIT license.
 ```
 
@@ -212,6 +219,7 @@ Toolbar icons from the Tabler icon set: MIT license.
 | `planets` | Planetefemeride |
 | `saturnsystem` | Saturnsystemefemeride |
 | `marssystem` | Marssystemefemeride |
+| `uranussystem` | Uranussystemefemeride |
 | `tabler` | Lisens for Tabler-ikonene |
 
 ### Light
@@ -243,7 +251,7 @@ Toolbar icons from the Tabler icon set: MIT license.
 |---|---|
 | window title | Om JUranometria |
 | window, spoken | Programmets navn, versjon og lisensopplysninger |
-| shown | *(read-only document, 44032 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 46816 characters — printed in full below or listed by path)* |
 | shown | Lukk |
 
 
@@ -276,7 +284,7 @@ Toolbar icons from the Tabler icon set: MIT license.
 |---|---|
 | window title | Om JUranometria |
 | window, spoken | Programmets navn, versjon og lisensopplysninger |
-| shown | *(read-only document, 44032 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 46816 characters — printed in full below or listed by path)* |
 | shown | Lukk |
 
 
@@ -342,8 +350,9 @@ Not reproduced here: they are upstream text, and a copy in a study is a copy tha
 | `planets` | `/resources/planets/NOTICE-planets.md` | 4533 |
 | `saturnsystem` | `/resources/saturn-system/NOTICE-saturn-system.md` | 3957 |
 | `marssystem` | `/resources/mars-system/NOTICE-mars-system.md` | 2752 |
+| `uranussystem` | `/resources/uranus-system/NOTICE-uranus-system.md` | 2661 |
 | `tabler` | `/resources/icons/LICENSE` | 1072 |
-| **seven** | | **42542** |
+| **seven** | | **45203** |
 
 ## The application mark
 

@@ -45,6 +45,7 @@ $name/licenses/NOTICE-saturn-system.md
 $name/licenses/NOTICE-solar-system.md
 $name/licenses/NOTICE-star-identities.md
 $name/licenses/NOTICE-tycho2.md
+$name/licenses/NOTICE-uranus-system.md
 LIST
 actual="$work/actual"
 (cd "$target" && find "$name" | LC_ALL=C sort) > "$actual"

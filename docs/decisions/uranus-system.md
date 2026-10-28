@@ -213,3 +213,60 @@ event limitation (U-12) and Mars's production split (U-13).
 
 No production Uranus code begins before this study's landing; #634 builds
 the packs and the service from it.
+
+## #634, measured and as built
+
+**The layout.** One `uranus-system` pack holds both kernels, as Saturn's
+does: `juranometria-de442-uranus-1900-2100.bsp` (0→7, 387,072 bytes) and
+`juranometria-ura182-moons-2000-2100.bsp` (7→705, 701, 702, 703, 704;
+38,055,936 bytes). Each is 14,336 bytes over the study's cut: the comment
+and attribution area NAIF's rules for a modified kernel require. The planets
+pack stays at version 3; no released kernel changes, and the builder refuses
+if one does. The builder re-measures Uranus's centre against the barycentre
+hourly over 1900-2100 and refuses above 50 km (measured 45.136 km); it
+refuses if `ura184_part-3.bsp`'s SHA-256, the PCK pin or the DE-0442 segment
+name differ, or if the PCK carries periodic pole terms for Uranus. Two
+builds are byte-identical.
+
+**The targets (U-10) and the results** (`docs/studies/uranus-system/service-accuracy.md`).
+Every target is met, the distance against its amended target (below). As
+first measured against U-10's targets it was the one miss: Horizons measures to
+Uranus's centre; U-2 ships the barycentre, which lies up to 45.136 km from
+it. The worst rows are 47.658 km (1900-1961), 42.964 km (1962-1971) and
+43.529 km (1972-exact), against 40, 20 and 1 km; after the exact interval,
+4000.031 km against 7000 km. The study measured only U-2's angular effect
+(0.0035″) and not its distance, so the conflict surfaced here.
+
+**The distance amendment, ruled on the #634 checkpoint** (owner,
+2026-10-28): "Choose (a): keep the barycentre and amend the exact-era
+distance target to 50 km." The exact eras' target is 50 km; the 7000 km
+after the exact interval stands as ruled; the builder keeps its 50 km
+offset refusal. No centre excerpt ships: another 7.35 MB would improve a
+value whose difference is below the table's displayed precision, with no
+benefit a reader can see, and the barycentre is fully adequate for
+direction, figure and chart placement. **This amendment corrects #633's
+missed consequence of centre versus barycentre for the distance; it is not
+a relaxation caused by a faulty service.**
+
+**Measured, printed, not asserted**, each inherited from Saturn's or Mars's
+ruling and confirmed on the #634 checkpoint with the single-pack layout and
+the computed inventory count:
+- The pole position angle within 1° of the Sun (12.938″ and 16.779″ at
+  conjunctions); beyond 1° it is held to 0.5″ (worst 0.224″).
+- The moons' position angle within 20″ of Uranus, Mars's threshold; beyond
+  it, held to 0.01° (worst 0.0051°).
+- The moons' apparent place within 1° of the Sun, and the planetodetic tilt.
+- Five moon-state disagreements with Horizons, all after the exact interval
+  (2048-2094), where the instant itself is estimated.
+- Espenak's oppositions and conjunctions, −210 to +37 minutes from the
+  listed hour (U-12); the instants rest on the astrometric targets.
+
+**The distribution.** The notice travels in About ("Uranus System
+ephemeris" / "Uranussystemefemeride"), in the image's `licenses/` and in
+the licensing records. `build-app-image.sh` counted 13 licensing resources
+from #602 while its list held 14; the count is now computed from the list
+and reads 15, and `LicensingInventoryCountTest` refuses a typed count and a
+list that leaves out a notice About shows. The packaged acceptance journey checks Uranus at Oslo,
+2026-10-27 12:00 UTC, against Horizons within 0.01″, Miranda behind Uranus
+in its shadow on 2005-03-19, and the moons' refusal before 2000.
+
