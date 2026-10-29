@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**874 promoted artifacts.**
+**881 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -865,11 +865,18 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/uranus-cartography/ring-pole-on-0.25.png` | `396c7b233aab40fd37502dbdbae78a686c03d419a61fa987693f49f493846eb1` | 2026-10-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/uranus-cartography/ring-pole-on-1.png` | `e881c7ee84105668f8b892ba05c2e367f5b4e3294adf0cb7ceb2f3484a3ca97f` | 2026-10-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/uranus-cartography/umbriel-behind-0.25.png` | `f882c15fd6bbe6bbda811c0985e1041878d6f32ee72fb230da6b5e79cd031842` | 2026-10-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/uranus-on-the-chart/ariel-shadow-2006-0.25-nb.png` | `8ba33674c51b2d79fe794545a2e3c28feb4c2c941da872f12dcab00adf66f25d` | 2026-10-29 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/uranus-on-the-chart/before-the-moons-1999-0.25.png` | `c59e4005d09a9debb857da55b432973aa214dbf06a743940170fd27def0f33e5` | 2026-10-29 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/uranus-on-the-chart/conjunction-2026-1-nb.png` | `caa8aa44556960c30e5f2daf83782d033affd9b8077b0887179fec1c2de71148` | 2026-10-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/uranus-on-the-chart/conjunction-2026-1.png` | `b106ab0a98c09074fc44878c447fcab1232a9b27b9f70e3ea4517deb801f0c1f` | 2026-10-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/uranus-on-the-chart/opposition-2026-0.25-dark.png` | `2d95447d11ac2189f9af9c5971e5066581b19bdd755e30cca73ca5cdae51cfe0` | 2026-10-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/uranus-on-the-chart/opposition-2026-0.5-nb.png` | `8db905ed6ccf4e3f183368c7a650fc30317bd38e3bc66bdfe15f7551bbda9007` | 2026-10-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/uranus-on-the-chart/opposition-2026-1.png` | `8e85b77c8bc748f4879b04b4ec258a9eb035be8d0971c522f92735426d010d2b` | 2026-10-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/uranus-on-the-chart/miranda-behind-2005-0.25.png` | `24574ea48b9ed827fe64b9fbf93422b4340fb23d1f26f06be650fc2ec6bbfda4` | 2026-10-29 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/uranus-on-the-chart/miranda-in-front-2005-0.25-dark.png` | `73a7cd1c2ff901d4386df8e5d958f659697e35676de5ba53004bca044f29fc0f` | 2026-10-29 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/uranus-on-the-chart/moons-widest-2052-0.25-nb.png` | `c5afe78e17f90d1c9897e0b544521eae1b293df735bfc8cb40c103cb068cb200` | 2026-10-29 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/uranus-on-the-chart/moons-widest-2052-1.png` | `23e7eb71cec6c82343fe97b9c6615466af73a26f734fab83f3d6a15dcea43af8` | 2026-10-29 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/uranus-on-the-chart/moons-widest-2052-8.png` | `69018f672728735fcbfe367483c51203307ccbaca86c8240250356f96beb08b2` | 2026-10-29 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/uranus-on-the-chart/opposition-2026-0.25-dark.png` | `51a798268fc2133e8fc5c4b49ffe9eb5bdc692c71c84b820c64fc1d0412877f7` | 2026-10-29 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/uranus-on-the-chart/opposition-2026-0.5-nb.png` | `76717e6971186c2675a820faad28ab7d2354f811cecd65ae70d442bf232123f6` | 2026-10-29 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/uranus-on-the-chart/opposition-2026-1.png` | `1cb25c2aaf7c814bf98ac0683268a4667a42cfac9469aefbf536214e8d968410` | 2026-10-29 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/uranus-on-the-chart/opposition-2026-3-dark.png` | `ee08a588663701d705850c7a0ef509bdefd3dd27566a64b54076c77bc0e9189e` | 2026-10-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/uranus-on-the-chart/opposition-2026-8-nb.png` | `ced6144b9750ccb9d9689897588cdd1d363a6496589a099ef4c1c4136126975c` | 2026-10-28 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/venus-cartography/appearance-1.png` | `7c60c152aab5ae9d013d5a167cd45f71f1c511ffd27d9a5d1a302186a8bb53a5` | 2026-10-11 | Mac OS X aarch64, Java 21.0.12.1 | various |

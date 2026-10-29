@@ -99,6 +99,13 @@ public final class PackagedAcceptanceMain {
             java.time.Instant.parse("2026-10-27T12:00:00Z");
     static final double URANUS_SAMPLE_RA = 62.512161152;
     static final double URANUS_SAMPLE_DEC = 20.879366485;
+    /**
+     * The packaged Uranus moons' sample (#638 part 2): Espenak's 2026
+     * opposition hour (docs/studies/uranus-system/uranus-events.txt), where at
+     * the minimum field Titania and Oberon stand clear of Uranus's mark.
+     */
+    static final java.time.Instant URANUS_MOONS_SAMPLE_INSTANT =
+            java.time.Instant.parse("2026-11-25T23:00:00Z");
     static final java.time.Instant MIRANDA_ECLIPSE_INSTANT =
             java.time.Instant.parse("2005-03-19T00:00:00Z");
     static final java.time.Instant PHOBOS_ECLIPSE_INSTANT =
@@ -529,6 +536,7 @@ public final class PackagedAcceptanceMain {
         marsOnTheChartJourney();
         uranusOnTheChartJourney();
         marsMoonsOnTheChartJourney();
+        uranusMoonsOnTheChartJourney();
         closerFieldsJourney();
         moonOnTheChartJourney();
         solarSystemSheetJourney();
@@ -3373,10 +3381,13 @@ public final class PackagedAcceptanceMain {
             });
             try {
                 paintHeadless(chart[0]);
+                // Since #638 part 2 a moon standing clear is drawn too: Uranus is
+                // found by its identity, first among the bodies the page draws.
                 java.util.List<juranometria.ui.ReferenceInk.BodyPlacement> drawn =
-                        chart[0].renderedBodies();
-                require(drawn.size() == 1 && identity.equals(drawn.get(0).identity()),
-                        "the packaged chart drew Uranus at " + field + "°: " + drawn);
+                        chart[0].renderedBodies().stream()
+                                .filter(b -> identity.equals(b.identity())).toList();
+                require(drawn.size() == 1,
+                        "the packaged chart drew Uranus at " + field + "°: " + chart[0].renderedBodies());
                 juranometria.project.DrawnPage page =
                         juranometria.project.DrawnPage.of(chart[0].currentScene());
                 juranometria.project.PixelPoint expected =
@@ -3502,6 +3513,97 @@ public final class PackagedAcceptanceMain {
                 + " Deimos at the moons' sample as 3 px symbols at their own J2000 places at the"
                 + " minimum field, named and not selectable; at 8° neither is drawn and the page"
                 + " says each is too close to tell apart)");
+    }
+
+    /**
+     * Uranus's moons on the chart (#638 part 2), inside the image: at the
+     * moons' sample, Uranus on and the page centred on it, at the minimum
+     * field Titania and Oberon are drawn as 3 px symbols at their own J2000
+     * places, named, not selectable (R-5, R-8), and every moon not drawn is
+     * spoken as too close to tell apart; at 8° none is drawn (no floor).
+     */
+    private static void uranusMoonsOnTheChartJourney() throws Exception {
+        juranometria.solar.SolarSystemService solar =
+                juranometria.solar.SolarSystemService.load();
+        juranometria.solar.UranusService uranusService = juranometria.solar.UranusService.load();
+        juranometria.sky.Observer oslo = new juranometria.sky.Observer(59.91, 10.75,
+                URANUS_MOONS_SAMPLE_INSTANT);
+        juranometria.solar.UranusService.Configuration moons = uranusService.observeMoons(oslo);
+        for (double field : new double[] {
+                juranometria.chart.ChartViewState.normalMinimumFieldDegrees(), 8.0}) {
+            juranometria.ui.ChartComponent[] chart = new juranometria.ui.ChartComponent[1];
+            juranometria.chart.SelectionModel selection = new juranometria.chart.SelectionModel();
+            juranometria.ui.ChartModuleHost[] host = new juranometria.ui.ChartModuleHost[1];
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                chart[0] = new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
+                chart[0].setSize(900, 700);
+                chart[0].setViewState(new juranometria.chart.ChartViewState(
+                        uranusService.observe(oslo).astrometricJ2000(), field, 8.0, null, null));
+                host[0] = new juranometria.ui.ChartModuleHost(chart[0], selection, r -> { });
+                juranometria.ui.SelectInteraction.install(chart[0], selection,
+                        host[0].workingSelection(), new juranometria.chart.SelectionMode());
+                juranometria.solarchart.SolarSystemModule module =
+                        juranometria.ui.solar.SunChartSession.begin(host[0], () -> oslo,
+                                () -> solar, () -> false);
+                module.withUranus(() -> uranusService);
+                module.sunShowing(false);
+                module.uranusShowing(true);
+            });
+            try {
+                paintHeadless(chart[0]);
+                java.util.List<juranometria.ui.ReferenceInk.BodyPlacement> drawn =
+                        chart[0].renderedBodies();
+                String said = chart[0].getAccessibleContext().getAccessibleDescription();
+                juranometria.project.DrawnPage page =
+                        juranometria.project.DrawnPage.of(chart[0].currentScene());
+                juranometria.project.ViewportMapping mapping =
+                        new juranometria.project.ViewportMapping(page);
+                int count = 0;
+                for (juranometria.solar.UranusService.MoonPlace moon : moons.moons()) {
+                    String identity = juranometria.solarchart.SolarSystemModule.identityOf(
+                            moon.moon());
+                    String name = moon.moon().name().charAt(0)
+                            + moon.moon().name().substring(1).toLowerCase(java.util.Locale.ROOT);
+                    juranometria.ui.ReferenceInk.BodyPlacement placed = drawn.stream()
+                            .filter(b -> identity.equals(b.identity())).findFirst().orElse(null);
+                    if (placed == null) {
+                        require(said.contains(" " + name + ", too close to tell apart at this field,"
+                                + " not drawn."), "at " + field + "° " + name + " is not drawn and"
+                                + " is spoken so: " + said);
+                        continue;
+                    }
+                    count++;
+                    require(field != 8.0, "at 8° no moon of Uranus is drawn: " + drawn);
+                    require(placed.symbol() && !placed.selectable()
+                            && Math.abs(placed.disc().getBounds2D().getWidth()
+                                    - juranometria.solarchart.SolarSystemModule.URANUS_MOON_MARK_PX)
+                                    < 0.05, name + " is a 3 px symbol, not selectable: " + drawn);
+                    juranometria.project.PixelPoint expected = mapping.toPixel(page.projection()
+                            .project(moon.astrometricJ2000()).orElseThrow());
+                    require(Math.hypot(placed.centre().x() - expected.x(),
+                                    placed.centre().y() - expected.y()) < 0.01,
+                            name + " at the service's J2000 place");
+                    require(said.contains(" " + name + " (a cartographic symbol, not " + name
+                            + "'s apparent diameter)."), "spoken as a symbol: " + said);
+                }
+                if (field != 8.0) {
+                    String titania = juranometria.solarchart.SolarSystemModule.identityOf(
+                            juranometria.solar.UranusService.Moon.TITANIA);
+                    String oberon = juranometria.solarchart.SolarSystemModule.identityOf(
+                            juranometria.solar.UranusService.Moon.OBERON);
+                    require(drawn.stream().anyMatch(b -> titania.equals(b.identity()))
+                                    && drawn.stream().anyMatch(b -> oberon.equals(b.identity())),
+                            "at the minimum field Titania and Oberon stand clear and are drawn: "
+                                    + count + " moons drawn");
+                }
+            } finally {
+                javax.swing.SwingUtilities.invokeAndWait(host[0]::detachAll);
+            }
+        }
+        System.out.println("uranus moons on the chart OK (the packaged component draws Titania and"
+                + " Oberon at the 2026 opposition as 3 px symbols at their own J2000 places at the"
+                + " minimum field, named and not selectable, every moon not drawn spoken as too close"
+                + " to tell apart; at 8° none is drawn)");
     }
 
     /**

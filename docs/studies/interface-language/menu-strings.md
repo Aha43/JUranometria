@@ -117,7 +117,7 @@ Bar packed 892 × 425 px; widest popup 232 px.
 | item access letter (language) \| A |
 | item label \| Uranus on the chart |
 | item spoken name \| Uranus on the chart |
-| item spoken description \| Shows or hides Uranus on the chart where it stands for the chart time and place, as a 6-pixel cartographic symbol: Uranus is never large enough to draw at its true size. Its rings are given in the table, not drawn. Hidden until you ask. |
+| item spoken description \| Shows or hides Uranus on the chart where it stands for the chart time and place, as a 6-pixel cartographic symbol: Uranus is never large enough to draw at its true size. Its rings are given in the table, not drawn. The five moons are drawn with it from 2000 to 2100 as 3-pixel symbols at their own places, each only where its mark stands clear of Uranus and of the moons already drawn - mostly at the narrowest fields: a filled dot clear of Uranus, a hollow ring in its shadow; a moon behind Uranus, or too close to tell apart at the field, is not drawn, and the page says so. Hidden until you ask. |
 | item label \| Sun... |
 | item hover \| Where the Sun is, for the chart time and place |
 | item spoken name \| Sun table |
@@ -153,7 +153,7 @@ Bar packed 892 × 425 px; widest popup 232 px.
 | item label \| Uranus... |
 | item hover \| Where Uranus and its five largest moons are, for the chart time and place |
 | item spoken name \| Uranus table |
-| item spoken description \| Opens a table of Uranus's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Miranda, Ariel, Umbriel, Titania and Oberon stand beside it - clear of Uranus, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Uranus is drawn on the chart by Uranus on the chart. |
+| item spoken description \| Opens a table of Uranus's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Miranda, Ariel, Umbriel, Titania and Oberon stand beside it - clear of Uranus, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Uranus and its moons are drawn on the chart by Uranus on the chart. |
 | item access letter (language) \| N |
 | item label \| Zoom In |
 | item spoken name \| Zoom In |
@@ -255,7 +255,7 @@ Bar packed 892 × 425 px; widest popup 232 px.
 | item access letter (language) \| A |
 | item label [checked] \| Uranus on the chart |
 | item spoken name \| Uranus on the chart |
-| item spoken description \| Shows or hides Uranus on the chart where it stands for the chart time and place, as a 6-pixel cartographic symbol: Uranus is never large enough to draw at its true size. Its rings are given in the table, not drawn. Hidden until you ask. |
+| item spoken description \| Shows or hides Uranus on the chart where it stands for the chart time and place, as a 6-pixel cartographic symbol: Uranus is never large enough to draw at its true size. Its rings are given in the table, not drawn. The five moons are drawn with it from 2000 to 2100 as 3-pixel symbols at their own places, each only where its mark stands clear of Uranus and of the moons already drawn - mostly at the narrowest fields: a filled dot clear of Uranus, a hollow ring in its shadow; a moon behind Uranus, or too close to tell apart at the field, is not drawn, and the page says so. Hidden until you ask. |
 | item label \| Sun... |
 | item hover \| Where the Sun is, for the chart time and place |
 | item spoken name \| Sun table |
@@ -291,7 +291,7 @@ Bar packed 892 × 425 px; widest popup 232 px.
 | item label \| Uranus... |
 | item hover \| Where Uranus and its five largest moons are, for the chart time and place |
 | item spoken name \| Uranus table |
-| item spoken description \| Opens a table of Uranus's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Miranda, Ariel, Umbriel, Titania and Oberon stand beside it - clear of Uranus, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Uranus is drawn on the chart by Uranus on the chart. |
+| item spoken description \| Opens a table of Uranus's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Miranda, Ariel, Umbriel, Titania and Oberon stand beside it - clear of Uranus, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Uranus and its moons are drawn on the chart by Uranus on the chart. |
 | item access letter (language) \| N |
 | item label \| Zoom In |
 | item spoken name \| Zoom In |
@@ -393,7 +393,7 @@ Bar packed 892 × 425 px; widest popup 232 px.
 | item access letter (language) \| A |
 | item label \| Uranus on the chart |
 | item spoken name \| Uranus on the chart |
-| item spoken description \| Shows or hides Uranus on the chart where it stands for the chart time and place, as a 6-pixel cartographic symbol: Uranus is never large enough to draw at its true size. Its rings are given in the table, not drawn. Hidden until you ask. |
+| item spoken description \| Shows or hides Uranus on the chart where it stands for the chart time and place, as a 6-pixel cartographic symbol: Uranus is never large enough to draw at its true size. Its rings are given in the table, not drawn. The five moons are drawn with it from 2000 to 2100 as 3-pixel symbols at their own places, each only where its mark stands clear of Uranus and of the moons already drawn - mostly at the narrowest fields: a filled dot clear of Uranus, a hollow ring in its shadow; a moon behind Uranus, or too close to tell apart at the field, is not drawn, and the page says so. Hidden until you ask. |
 | item label \| Sun... |
 | item hover \| Where the Sun is, for the chart time and place |
 | item spoken name \| Sun table |
@@ -429,7 +429,7 @@ Bar packed 892 × 425 px; widest popup 232 px.
 | item label \| Uranus... |
 | item hover \| Where Uranus and its five largest moons are, for the chart time and place |
 | item spoken name \| Uranus table |
-| item spoken description \| Opens a table of Uranus's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Miranda, Ariel, Umbriel, Titania and Oberon stand beside it - clear of Uranus, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Uranus is drawn on the chart by Uranus on the chart. |
+| item spoken description \| Opens a table of Uranus's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Miranda, Ariel, Umbriel, Titania and Oberon stand beside it - clear of Uranus, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Uranus and its moons are drawn on the chart by Uranus on the chart. |
 | item access letter (language) \| N |
 | item label \| Zoom In |
 | item spoken name \| Zoom In |
@@ -531,7 +531,7 @@ Bar packed 892 × 425 px; widest popup 232 px.
 | item access letter (language) \| A |
 | item label \| Uranus on the chart |
 | item spoken name \| Uranus on the chart |
-| item spoken description \| Shows or hides Uranus on the chart where it stands for the chart time and place, as a 6-pixel cartographic symbol: Uranus is never large enough to draw at its true size. Its rings are given in the table, not drawn. Hidden until you ask. |
+| item spoken description \| Shows or hides Uranus on the chart where it stands for the chart time and place, as a 6-pixel cartographic symbol: Uranus is never large enough to draw at its true size. Its rings are given in the table, not drawn. The five moons are drawn with it from 2000 to 2100 as 3-pixel symbols at their own places, each only where its mark stands clear of Uranus and of the moons already drawn - mostly at the narrowest fields: a filled dot clear of Uranus, a hollow ring in its shadow; a moon behind Uranus, or too close to tell apart at the field, is not drawn, and the page says so. Hidden until you ask. |
 | item label \| Sun... |
 | item hover \| Where the Sun is, for the chart time and place |
 | item spoken name \| Sun table |
@@ -567,7 +567,7 @@ Bar packed 892 × 425 px; widest popup 232 px.
 | item label \| Uranus... |
 | item hover \| Where Uranus and its five largest moons are, for the chart time and place |
 | item spoken name \| Uranus table |
-| item spoken description \| Opens a table of Uranus's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Miranda, Ariel, Umbriel, Titania and Oberon stand beside it - clear of Uranus, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Uranus is drawn on the chart by Uranus on the chart. |
+| item spoken description \| Opens a table of Uranus's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Miranda, Ariel, Umbriel, Titania and Oberon stand beside it - clear of Uranus, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Uranus and its moons are drawn on the chart by Uranus on the chart. |
 | item access letter (language) \| N |
 | item label [unavailable] \| Zoom In |
 | item spoken name [unavailable] \| Zoom In |
@@ -673,7 +673,7 @@ Bar packed 882 × 425 px; widest popup 229 px.
 | item access letter (language) \| A |
 | item label \| Uranus på kartet |
 | item spoken name \| Uranus på kartet |
-| item spoken description \| Viser eller skjuler Uranus på kartet der den står for karttiden og stedet, som et kartografisk symbol på 6 piksler: Uranus er aldri stor nok til å tegnes i sann størrelse. Ringene oppgis i tabellen, de tegnes ikke. Skjult til du ber om det. |
+| item spoken description \| Viser eller skjuler Uranus på kartet der den står for karttiden og stedet, som et kartografisk symbol på 6 piksler: Uranus er aldri stor nok til å tegnes i sann størrelse. Ringene oppgis i tabellen, de tegnes ikke. De fem månene tegnes sammen med den fra 2000 til 2100 som symboler på 3 piksler der de står, hver bare der merket står klar av Uranus og av månene som alt er tegnet - stort sett i de smaleste feltene: en fylt prikk klar av Uranus, en hul ring i skyggen; en måne bak Uranus, eller for nær til å skjelnes i feltet, tegnes ikke, og siden sier fra. Skjult til du ber om det. |
 | item label \| Solen... |
 | item hover \| Hvor Solen er, for karttiden og stedet |
 | item spoken name \| Soltabell |
@@ -707,7 +707,7 @@ Bar packed 882 × 425 px; widest popup 229 px.
 | item label \| Uranus... |
 | item hover \| Hvor Uranus og de fem største månene er, for karttiden og stedet |
 | item spoken name \| Uranustabell |
-| item spoken description \| Åpner en tabell over Uranus' beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Miranda, Ariel, Umbriel, Titania og Oberon står ved siden av - klar av Uranus, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Uranus tegnes på kartet med Uranus på kartet. |
+| item spoken description \| Åpner en tabell over Uranus' beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Miranda, Ariel, Umbriel, Titania og Oberon står ved siden av - klar av Uranus, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Uranus og månene tegnes på kartet med Uranus på kartet. |
 | item label \| Zoom inn |
 | item spoken name \| Zoom inn |
 | item spoken description \| Viser et smalere synsfelt med svakere stjerner |
@@ -810,7 +810,7 @@ Bar packed 882 × 425 px; widest popup 229 px.
 | item access letter (language) \| A |
 | item label [checked] \| Uranus på kartet |
 | item spoken name \| Uranus på kartet |
-| item spoken description \| Viser eller skjuler Uranus på kartet der den står for karttiden og stedet, som et kartografisk symbol på 6 piksler: Uranus er aldri stor nok til å tegnes i sann størrelse. Ringene oppgis i tabellen, de tegnes ikke. Skjult til du ber om det. |
+| item spoken description \| Viser eller skjuler Uranus på kartet der den står for karttiden og stedet, som et kartografisk symbol på 6 piksler: Uranus er aldri stor nok til å tegnes i sann størrelse. Ringene oppgis i tabellen, de tegnes ikke. De fem månene tegnes sammen med den fra 2000 til 2100 som symboler på 3 piksler der de står, hver bare der merket står klar av Uranus og av månene som alt er tegnet - stort sett i de smaleste feltene: en fylt prikk klar av Uranus, en hul ring i skyggen; en måne bak Uranus, eller for nær til å skjelnes i feltet, tegnes ikke, og siden sier fra. Skjult til du ber om det. |
 | item label \| Solen... |
 | item hover \| Hvor Solen er, for karttiden og stedet |
 | item spoken name \| Soltabell |
@@ -844,7 +844,7 @@ Bar packed 882 × 425 px; widest popup 229 px.
 | item label \| Uranus... |
 | item hover \| Hvor Uranus og de fem største månene er, for karttiden og stedet |
 | item spoken name \| Uranustabell |
-| item spoken description \| Åpner en tabell over Uranus' beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Miranda, Ariel, Umbriel, Titania og Oberon står ved siden av - klar av Uranus, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Uranus tegnes på kartet med Uranus på kartet. |
+| item spoken description \| Åpner en tabell over Uranus' beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Miranda, Ariel, Umbriel, Titania og Oberon står ved siden av - klar av Uranus, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Uranus og månene tegnes på kartet med Uranus på kartet. |
 | item label \| Zoom inn |
 | item spoken name \| Zoom inn |
 | item spoken description \| Viser et smalere synsfelt med svakere stjerner |
@@ -947,7 +947,7 @@ Bar packed 882 × 425 px; widest popup 229 px.
 | item access letter (language) \| A |
 | item label \| Uranus på kartet |
 | item spoken name \| Uranus på kartet |
-| item spoken description \| Viser eller skjuler Uranus på kartet der den står for karttiden og stedet, som et kartografisk symbol på 6 piksler: Uranus er aldri stor nok til å tegnes i sann størrelse. Ringene oppgis i tabellen, de tegnes ikke. Skjult til du ber om det. |
+| item spoken description \| Viser eller skjuler Uranus på kartet der den står for karttiden og stedet, som et kartografisk symbol på 6 piksler: Uranus er aldri stor nok til å tegnes i sann størrelse. Ringene oppgis i tabellen, de tegnes ikke. De fem månene tegnes sammen med den fra 2000 til 2100 som symboler på 3 piksler der de står, hver bare der merket står klar av Uranus og av månene som alt er tegnet - stort sett i de smaleste feltene: en fylt prikk klar av Uranus, en hul ring i skyggen; en måne bak Uranus, eller for nær til å skjelnes i feltet, tegnes ikke, og siden sier fra. Skjult til du ber om det. |
 | item label \| Solen... |
 | item hover \| Hvor Solen er, for karttiden og stedet |
 | item spoken name \| Soltabell |
@@ -981,7 +981,7 @@ Bar packed 882 × 425 px; widest popup 229 px.
 | item label \| Uranus... |
 | item hover \| Hvor Uranus og de fem største månene er, for karttiden og stedet |
 | item spoken name \| Uranustabell |
-| item spoken description \| Åpner en tabell over Uranus' beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Miranda, Ariel, Umbriel, Titania og Oberon står ved siden av - klar av Uranus, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Uranus tegnes på kartet med Uranus på kartet. |
+| item spoken description \| Åpner en tabell over Uranus' beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Miranda, Ariel, Umbriel, Titania og Oberon står ved siden av - klar av Uranus, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Uranus og månene tegnes på kartet med Uranus på kartet. |
 | item label \| Zoom inn |
 | item spoken name \| Zoom inn |
 | item spoken description \| Viser et smalere synsfelt med svakere stjerner |
@@ -1084,7 +1084,7 @@ Bar packed 882 × 425 px; widest popup 229 px.
 | item access letter (language) \| A |
 | item label \| Uranus på kartet |
 | item spoken name \| Uranus på kartet |
-| item spoken description \| Viser eller skjuler Uranus på kartet der den står for karttiden og stedet, som et kartografisk symbol på 6 piksler: Uranus er aldri stor nok til å tegnes i sann størrelse. Ringene oppgis i tabellen, de tegnes ikke. Skjult til du ber om det. |
+| item spoken description \| Viser eller skjuler Uranus på kartet der den står for karttiden og stedet, som et kartografisk symbol på 6 piksler: Uranus er aldri stor nok til å tegnes i sann størrelse. Ringene oppgis i tabellen, de tegnes ikke. De fem månene tegnes sammen med den fra 2000 til 2100 som symboler på 3 piksler der de står, hver bare der merket står klar av Uranus og av månene som alt er tegnet - stort sett i de smaleste feltene: en fylt prikk klar av Uranus, en hul ring i skyggen; en måne bak Uranus, eller for nær til å skjelnes i feltet, tegnes ikke, og siden sier fra. Skjult til du ber om det. |
 | item label \| Solen... |
 | item hover \| Hvor Solen er, for karttiden og stedet |
 | item spoken name \| Soltabell |
@@ -1118,7 +1118,7 @@ Bar packed 882 × 425 px; widest popup 229 px.
 | item label \| Uranus... |
 | item hover \| Hvor Uranus og de fem største månene er, for karttiden og stedet |
 | item spoken name \| Uranustabell |
-| item spoken description \| Åpner en tabell over Uranus' beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Miranda, Ariel, Umbriel, Titania og Oberon står ved siden av - klar av Uranus, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Uranus tegnes på kartet med Uranus på kartet. |
+| item spoken description \| Åpner en tabell over Uranus' beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Miranda, Ariel, Umbriel, Titania og Oberon står ved siden av - klar av Uranus, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Uranus og månene tegnes på kartet med Uranus på kartet. |
 | item label [unavailable] \| Zoom inn |
 | item spoken name [unavailable] \| Zoom inn |
 | item spoken description [unavailable] \| Utilgjengelig: et nærfelt tilbys bare når Merkur, Venus, Mars, Jupiter, Saturn eller Uranus, vist på kartet, står på siden steget ville vise |

@@ -102,8 +102,9 @@ class UranusInkTest {
         for (double field : new double[] {8.0, ChartViewState.normalMinimumFieldDegrees()}) {
             ChartScene scene = page(u.astrometricJ2000(), field);
             List<ReferenceInk.BodyPlacement> drawn = placed(scene, offering(OPPOSITION_2026, false), ENGLISH);
-            assertEquals(1, drawn.size());
-            ReferenceInk.BodyPlacement uranus = drawn.get(0);
+            // Since #638 part 2 a moon standing clear is drawn too (at 1°, Titania and Oberon).
+            ReferenceInk.BodyPlacement uranus = drawn.stream()
+                    .filter(b -> SolarSystemModule.URANUS.equals(b.identity())).findFirst().orElseThrow();
             assertEquals(SolarSystemModule.URANUS, uranus.identity());
             assertEquals(SolarSystemModule.URANUS_MINIMUM_MARK_PX, uranus.disc().getBounds2D().getWidth(), 0.05,
                     field + "°: the 6 px mark - the true disc is about a pixel at most");
@@ -127,7 +128,8 @@ class UranusInkTest {
     void theMarkIsDrawnFullAndRoundNeverPhased() {
         UranusService.UranusObservation u = uranus(OPPOSITION_2026);
         ChartScene scene = page(u.astrometricJ2000(), ChartViewState.normalMinimumFieldDegrees());
-        ReferenceInk.BodyPlacement uranus = placed(scene, offering(OPPOSITION_2026, false), ENGLISH).get(0);
+        ReferenceInk.BodyPlacement uranus = placed(scene, offering(OPPOSITION_2026, false), ENGLISH).stream()
+                .filter(b -> SolarSystemModule.URANUS.equals(b.identity())).findFirst().orElseThrow();
         BufferedImage image = painted(scene, offering(OPPOSITION_2026, false), ChartPalette.WHITE_PAPER, ENGLISH);
         double width = uranus.disc().getBounds2D().getWidth();
         double[] share = litShare(image, uranus.centre().x(), uranus.centre().y(), width / 2.0 - 1.0);

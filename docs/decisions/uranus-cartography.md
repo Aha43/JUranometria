@@ -134,3 +134,14 @@ No production Uranus ink begins before this study lands; #638 draws from it.
 - **Words.** The three texts naming the closer fields' bodies now end "Saturn or Uranus" (*Saturn eller Uranus*); the Uranus table no longer says Uranus is not drawn.
 - **Evidence.** `docs/studies/uranus-on-the-chart/` (production pages: the 2026 opposition from 8° to 0.25°, the 2026 conjunction behind the Sun in both languages, nothing before 1900), registered in the evidence contract; the menu sheets now show *Uranus...* (missing since #635) and *Uranus on the chart*; the closer-fields notes name Uranus.
 
+## #638 part 2, the moons on the chart, as built: a packaged checkpoint
+
+**Not yet accepted.** Miranda, Ariel, Umbriel, Titania and Oberon under R-5, R-6 and R-8.
+
+- **The moons (R-5).** The Solar System module offers each moon, from 2000 to 2100, as a satellite of Uranus at its own astrometric J2000 place, with its disc and shadow states, outward from Uranus. The page decides each on its own through the round-system painting Mars's moons use (#606): drawn as a 3 px symbol only where it stands clear of Uranus's drawn mark and of the moons already drawn, on every field, with no floor.
+- **The states (R-6).** A moon in Uranus's shadow is a hollow ring where it stands clear, which the geometry rarely allows. A moon behind Uranus, in transit (the 6 px mark cannot hold one) or too close to tell apart is not drawn, and the page's description says *behind Uranus, not drawn* or *too close to tell apart at this field, not drawn*.
+- **Not selectable (R-8).** The moons are named and spoken as symbols; a click on one is not an occurrence of it.
+- **Before 2000** Uranus is drawn alone.
+- **As the study measured.** At the 2026 opposition at 1° Titania and Oberon are drawn; on 2052-03-23 at 1° Titania is drawn and Oberon refused as colliding, as #637's section E showed; at 0.25° most of the system stands apart.
+- **Evidence.** `docs/studies/uranus-on-the-chart/` gains the moons' pages - their widest at 1°, 0.25° and 8°, Horizons' behind, transit and eclipse rows at 0.25°, and Uranus alone before 2000 - and its opposition pages now show the moons that stand clear; `UranusMoonsInkTest` and the packaged journey ("uranus moons on the chart OK") hold them.
+

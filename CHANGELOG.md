@@ -18,6 +18,16 @@ as a symbol, covered by the Sun when behind it, and offers the closer
 fields 0.5° and 0.25°. Hidden until you ask; in English and Norwegian. The
 moons follow in part 2.
 
+**Uranus's moons on the chart (#638, part 2, ruled on #637).** Uranus on
+the chart now draws Miranda, Ariel, Umbriel, Titania and Oberon from 2000
+to 2100 as 3-pixel symbols at their own places, each only where its mark
+stands clear of Uranus's and of the moons already drawn - Mars's rule, so
+mostly at the minimum and closer fields: at 1° Titania and Oberon often,
+at 0.25° most of the system. A moon in Uranus's shadow is a hollow ring; a
+moon behind Uranus, in transit, or too close to tell apart is not drawn,
+and the page's description says so. The moons are named and not
+selectable. Before 2000 Uranus is drawn alone, as the table shows it.
+
 **Uranus and its five moons in the Solar System tables (#635, ruled on
 #633).** View > Solar System gains *Uranus...* directly after
 *Saturn...*, and the Controller's Solar System tab a Uranus group in the
