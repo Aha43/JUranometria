@@ -246,8 +246,9 @@ Filed when this handover lands, shaped like #632, its issues in order:
 8. **the integrated 6.0.0 handover and release boundary**, with the
    evidence flush and the packaged release journey of section 8.
 
-Neptune's own article opens the 7.0.0 road on the same cadence. After
-6.0.0, the road to 7.0.0 is planned around general GUI, chart, catalogue
+**The Neptune road includes the Uranus article; the Neptune article
+opens the post-6.0 road toward 7.0.0**, both on the one-planet-later
+cadence. After 6.0.0, the road to 7.0.0 is planned around general GUI, chart, catalogue
 and workflow improvements; candidates already filed include #613, #617,
 #618, #553 and the GUI refinements set aside during the Mars road. Pluto
 and the wider outer Solar System wait for a later second Solar System
