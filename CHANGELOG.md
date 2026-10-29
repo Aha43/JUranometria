@@ -7,6 +7,15 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Mars on the page (#639).** A new reader article, in English and
+Norwegian (*Mars på siden*): what the atlas draws of Mars as released in
+5.5 - where its numbers come from and how closely they match JPL
+Horizons, its phase and planetocentric tilt, the switch from the 6-pixel
+symbol to the true disc, the closer fields, Phobos and Deimos and the
+rule that draws them only where they stand clear, their states and their
+years - and what it does not claim. Every figure is a released evidence
+page and every number is quoted from the report that measured it.
+
 **Uranus on the chart (#638, part 1, ruled on #637).** View > Solar
 System gains *Uranus on the chart* after *Saturn on the chart*, and the
 Controller's Uranus group its Show on chart and Centre on chart; the
