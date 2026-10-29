@@ -308,3 +308,72 @@ The rest stand as written:
 
 No production Neptune code begins before this study lands. #655 builds the
 pack and the service from it.
+
+## #655, measured and as built
+
+**The layout.** One `neptune-system` pack holds both kernels, as Uranus's
+does:
+- `juranometria-de442-neptune-1900-2100.bsp` (0 → 8, 416,768 bytes);
+- `juranometria-nep098-moons-2000-2100.bsp` (8 → 801, 802; 50,302,976
+  bytes).
+
+Each kernel is 44,032 bytes over the study's cut. That is the comment and
+attribution area NAIF's rules for a modified kernel require. It is larger
+than Uranus's 14,336 because nep098's own comment area, kept as source
+attribution, is longer.
+
+**What the builder refuses.** The builder re-measures Neptune's centre
+against the barycentre hourly over 1900-2100 and refuses above **80 km**
+(N-2a; measured 74.190 km). It also refuses if any of these differ from
+the ruled values:
+- `nep098_part-1.bsp`'s SHA-256;
+- the PCK pin;
+- the DE-0442 segment name;
+- the PCK's periodic pole term (0.70 sin N, -0.51 cos N, N = 357.85° +
+  52.316° T, every other coefficient zero; N-4).
+
+No released kernel changes, Uranus's included, and the builder refuses if
+one does. Two builds are byte-identical.
+
+**The targets (N-10) and the results**
+(`docs/studies/neptune-system/service-accuracy.md`). Every asserted target
+is met. The worst figures:
+- astrometric: 0.0050″, 0.0035″ and 0.0035″ in the three exact eras, and
+  0.2078″ after;
+- distance: **93.426 km, 79.211 km and 66.760 km** against N-2a's 100 km,
+  and 4,071.648 km after, against 7,000 km;
+- pole position angle beyond 1° of the Sun: at most 0.210″ in the exact
+  eras;
+- moon offsets and separation: 0.0038″ in the exact era, 0.0259″ after;
+- moon position angle beyond 20″ of Neptune, against the angle Horizons'
+  own X and Y give: 0.0070° (target 0.01°).
+
+Horizons' `SatPANG` beyond 20″ is printed, not asserted, as N-10 rules.
+It differs from ours by 0.0190°, which is Horizons' own disagreement
+with its own X and Y, measured in #654.
+
+**Mutation rivals.** Each step done the wrong way fails its target. The
+new one is the pole without its periodic term, which fails the pole's
+position angle against Horizons.
+
+**States.** On Horizons' sphere they agree on every row except one:
+Triton on 2049-04-19, ours clear, Horizons in transit. That row falls
+after the exact interval, where the instant itself is estimated, so it is
+printed and not asserted (Saturn's ruling, inherited). Espenak's events
+are printed, not asserted, within -17 to +114 minutes (N-12).
+
+**The evidence contract.** `NeptuneAccuracyReportMain` and
+`UranusAccuracyReportMain` are now registered report mains. The Uranus
+registration was deferred from the #640 handover. Both reproduce byte
+for byte.
+
+**The distribution.** The notice travels in About ("Neptune System
+ephemeris" / "Neptunsystemefemeride"), in the image's `licenses/` and in
+the licensing records. The packaged licensing inventory counts 16
+resources, computed from its list. The packaged acceptance journey
+checks three things:
+- Neptune at Oslo, 2026-10-29 12:00 UTC, against Horizons within 0.01″;
+- Triton behind Neptune in its shadow on 2044-09-26, the first row of the
+  moons' years Horizons codes `U` (Triton's eclipse season falls around
+  2045);
+- the moons refusing before 2000.

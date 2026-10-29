@@ -47,4 +47,10 @@ Titania and Oberon from URA182.21, modified by JUranometria under
 NAIF's rules for modified SPICE kernels (no fee or licence); the IAU
 2015 radii and pole copied from NAIF's planetary-constants kernel.
 
+Neptune System ephemeris: two excerpts of NAIF's nep098_part-1 kernel,
+the Neptune barycentre from NASA/JPL DE442 and Triton and Nereid from
+NEP098, modified by JUranometria under NAIF's rules for modified SPICE
+kernels (no fee or licence); the IAU 2015 radii and pole, with its
+periodic term, copied from NAIF's planetary-constants kernel.
+
 Toolbar icons from the Tabler icon set: MIT license.

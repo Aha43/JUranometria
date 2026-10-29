@@ -7,6 +7,32 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Neptune, computed offline (#655, ruled on #654).** A seventh pack,
+Neptune System, holds two excerpts of NAIF's `nep098_part-1.bsp`:
+DE442's Neptune barycentre over 1900-2100 (416,768 bytes), which stands
+for the planet - Neptune's centre lies within 74.190 km of it,
+re-measured by the builder, which refuses above 80 km - and Triton and
+Nereid from NEP098 over 2000-2100 (50,302,976 bytes). Before 2000
+Neptune answers and the moons refuse, naming their years. The Neptune
+service gives the chart place, the apparent and horizontal place, the
+distance, the equatorial and polar diameter at the tilt, the
+illuminated fraction and phase angle, the north pole from the IAU model
+with its periodic term, the planetocentric tilt, and each moon's
+offsets, position angle and state - clear, in front of, behind, or in
+Neptune's shadow. Its notice is in About, in both languages. No table
+or chart shows Neptune yet; the first numbers are in
+`docs/studies/neptune-system/service-accuracy.md`, which the evidence
+contract now reproduces, as it now does Uranus's. The Sun and the
+Earth stay DE440's, and every released answer, Uranus's included, is
+unchanged.
+
+**Neptune, Triton and Nereid: the system contract (#654).** The
+authority, interval, frames, observables and words for Neptune and its
+moons, ruled N-1 to N-14 - DE442's barycentre for Neptune with a 100 km
+distance target, the pole with its periodic term, Triton and Nereid for
+2000-2100, the inner moons excluded on measurement, no rings:
+`docs/decisions/neptune-system.md`.
+
 **Mars on the page (#639).** A new reader article, in English and
 Norwegian (*Mars på siden*): what the atlas draws of Mars as released in
 5.5 - where its numbers come from and how closely they match JPL

@@ -97,6 +97,8 @@ help:
 	@echo "  mars-table-study     The first Mars table: Mars, Phobos and Deimos for the established observers and cases (issue #602)"
 	@echo "  import-mars-system    Build the Mars System pack (Phobos, Deimos) from mar099s.bsp and pck00011.tpc, proved against the sources (issue #602)"
 	@echo "  import-uranus-system  Build the Uranus System pack (the DE442 barycentre and the five major moons) from ura184_part-3.bsp and pck00011.tpc, proved against the source (issue #634)"
+	@echo "  import-neptune-system Build the Neptune System pack (the DE442 barycentre, Triton and Nereid) from nep098_part-1.bsp and pck00011.tpc, proved against the source (issue #655)"
+	@echo "  neptune-accuracy-report Measure the Neptune service against the #654 Horizons fixtures and targets (issue #655)"
 	@echo "  saturn-accuracy-report  The Saturn service against Horizons and the named cases, the report the tests hold (issue #575)"
 	@echo "  saturn-table-study    The first Saturn table: Saturn, the rings and the seven moons for the established observers and cases (issue #575)"
 	@echo "  jovian-cartography-study  Measure Jupiter and the moons on the atlas's pages, with mockups (issue #482)"
@@ -348,6 +350,14 @@ uranus-accuracy-report: classes
 
 import-uranus-system: classes
 	$(JAVA) -Xmx3g -cp "$(CLASSES_DIR)" juranometria.tool.UranusSystemPackMain
+
+neptune-accuracy-report: classes
+	mkdir -p docs/studies/neptune-system
+	$(JAVA) -Xmx2g -cp "$(CLASSES_DIR)" juranometria.tool.NeptuneAccuracyReportMain \
+		> docs/studies/neptune-system/service-accuracy.md
+
+import-neptune-system: classes
+	$(JAVA) -Xmx3g -cp "$(CLASSES_DIR)" juranometria.tool.NeptuneSystemPackMain
 
 # The Saturn service against Horizons and the named cases (issue #575):
 # the accuracy report the tests hold, with the first generated table.
@@ -712,7 +722,7 @@ black-sky-study: classes
 		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BlackSkyStudyMain \
 		> docs/studies/black-sky/measurements.md
 
-.PHONY: spk-boundary-fixture import-saturn-system saturn-accuracy-report saturn-table-study import-jovian-system import-planets venus-accuracy-report venus-table-study mercury-accuracy-report mercury-table-study jovian-accuracy-report jovian-cartography-study venus-cartography-study evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study venus-pack-study sun-on-the-chart-study moon-on-the-chart-study venus-on-the-chart-study mercury-on-the-chart-study jupiter-on-the-chart-study mercury-cartography-study solar-system-labels-study printable-chart-study meridian-ticks-study mercury-pack-study mercury-system-study closer-fields-study chart-instant-study chart-instant-furniture star-identity-density-study all-star-identities saturn-pack-study saturn-system-study saturn-cartography-study saturn-on-the-chart-study mars-pack-study import-mars-system mars-accuracy-report mars-table-study mars-cartography-study mars-on-the-chart-study uranus-pack-study import-uranus-system uranus-accuracy-report uranus-cartography-study uranus-on-the-chart-study neptune-pack-study
+.PHONY: spk-boundary-fixture import-saturn-system saturn-accuracy-report saturn-table-study import-jovian-system import-planets venus-accuracy-report venus-table-study mercury-accuracy-report mercury-table-study jovian-accuracy-report jovian-cartography-study venus-cartography-study evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study venus-pack-study sun-on-the-chart-study moon-on-the-chart-study venus-on-the-chart-study mercury-on-the-chart-study jupiter-on-the-chart-study mercury-cartography-study solar-system-labels-study printable-chart-study meridian-ticks-study mercury-pack-study mercury-system-study closer-fields-study chart-instant-study chart-instant-furniture star-identity-density-study all-star-identities saturn-pack-study saturn-system-study saturn-cartography-study saturn-on-the-chart-study mars-pack-study import-mars-system mars-accuracy-report mars-table-study mars-cartography-study mars-on-the-chart-study uranus-pack-study import-uranus-system uranus-accuracy-report uranus-cartography-study uranus-on-the-chart-study neptune-pack-study import-neptune-system neptune-accuracy-report
 # The heap is stated rather than inherited from whatever a machine's
 # ergonomics chose for it: the CI runner's default quarter-of-RAM is
 # not the same number as a developer's.
