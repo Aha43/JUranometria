@@ -169,6 +169,14 @@ class PlaceAndTimeGateTest {
     private static final Path URANUS_SYSTEM_PACK =
             Path.of("src/resources/uranus-system");
 
+    /**
+     * The seventh, ruled on #654 (N-1a, N-6a) and built in #655: Neptune,
+     * Triton and Nereid, owned by the Neptune service and carrying its own
+     * source, digests, coverage and terms beside its data. No time scales.
+     */
+    private static final Path NEPTUNE_SYSTEM_PACK =
+            Path.of("src/resources/neptune-system");
+
     private static final List<String> TIME_AND_EPHEMERIS_NAMES =
             List.of("leap", "ut1", "ephemeris", "iers", "horizon",
                     "de440", "delta-t", "deltat", ".bsp", ".tls");
@@ -195,7 +203,8 @@ class PlaceAndTimeGateTest {
                         || path.startsWith(PLANETS_PACK)
                         || path.startsWith(SATURN_SYSTEM_PACK)
                         || path.startsWith(MARS_SYSTEM_PACK)
-                        || path.startsWith(URANUS_SYSTEM_PACK)) && name.endsWith(".bsp");
+                        || path.startsWith(URANUS_SYSTEM_PACK)
+                        || path.startsWith(NEPTUNE_SYSTEM_PACK)) && name.endsWith(".bsp");
                 if (astronomical && !path.startsWith(SOLAR_SYSTEM_PACK)
                         && !jovianEphemeris) {
                     strays.add(path.toString());
@@ -207,8 +216,8 @@ class PlaceAndTimeGateTest {
                         + " provenance of its own outside "
                         + SOLAR_SYSTEM_PACK + ", and nothing but ephemeris in "
                         + JOVIAN_SYSTEM_PACK + ", " + PLANETS_PACK + ", "
-                        + SATURN_SYSTEM_PACK + ", " + MARS_SYSTEM_PACK + " and "
-                        + URANUS_SYSTEM_PACK);
+                        + SATURN_SYSTEM_PACK + ", " + MARS_SYSTEM_PACK + ", "
+                        + URANUS_SYSTEM_PACK + " and " + NEPTUNE_SYSTEM_PACK);
     }
 
     /**

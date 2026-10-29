@@ -108,6 +108,21 @@ public final class PackagedAcceptanceMain {
             java.time.Instant.parse("2026-11-25T23:00:00Z");
     static final java.time.Instant MIRANDA_ECLIPSE_INSTANT =
             java.time.Instant.parse("2005-03-19T00:00:00Z");
+    /**
+     * The packaged Neptune journey's samples (#655), restated once from the
+     * committed Horizons responses and held equal to them by
+     * {@code PackagedNeptuneSampleTest}: Neptune for Oslo at the study's
+     * "today" row (docs/studies/neptune-system/horizons/named-neptune-oslo.txt),
+     * and Triton from Oslo in the first row of the moons' years Horizons codes
+     * U, behind Neptune and totally eclipsed
+     * (docs/studies/neptune-system/horizons/matrix-7d-triton-oslo.txt).
+     */
+    static final java.time.Instant NEPTUNE_SAMPLE_INSTANT =
+            java.time.Instant.parse("2026-10-29T12:00:00Z");
+    static final double NEPTUNE_SAMPLE_RA = 2.173809494;
+    static final double NEPTUNE_SAMPLE_DEC = -0.600840866;
+    static final java.time.Instant TRITON_ECLIPSE_INSTANT =
+            java.time.Instant.parse("2044-09-26T00:00:00Z");
     static final java.time.Instant PHOBOS_ECLIPSE_INSTANT =
             java.time.Instant.parse("2018-07-26T12:30:00Z");
     static final java.time.Instant SATURN_CARD_INSTANT =
@@ -7272,6 +7287,42 @@ public final class PackagedAcceptanceMain {
                 + String.format(java.util.Locale.ROOT, "%.4f", uranusOff)
                 + " arcsecond of Horizons; Miranda behind Uranus in its shadow on 2005-03-19;"
                 + " the moons refused before 2000, Uranus answering)");
+        // Neptune, Triton and Nereid (issue #655), inside the packaged image:
+        // the Neptune System pack loads through the image's own classpath and
+        // verifies its checksums; Neptune for Oslo at the study's "today"
+        // agrees with Horizons' astrometric row to the ruled 0.01 arcsecond
+        // (#654, N-1a: the DE442 barycentre); Triton is behind Neptune in its
+        // shadow where Horizons codes it U; and the moons refuse before 2000
+        // while Neptune answers (N-6a).
+        juranometria.solar.NeptuneService neptuneService = juranometria.solar.NeptuneService.load();
+        double neptuneOff = neptuneService.observe(new juranometria.sky.Observer(59.91, 10.75,
+                        NEPTUNE_SAMPLE_INSTANT)).astrometricJ2000().separationDegrees(
+                new juranometria.chart.SkyPosition(NEPTUNE_SAMPLE_RA, NEPTUNE_SAMPLE_DEC)) * 3600.0;
+        require(neptuneOff < 0.01, "the packaged Neptune agrees with Horizons for Oslo,"
+                + " 2026-10-29 12:00 UTC, within 0.01 arcsecond: " + neptuneOff);
+        juranometria.solar.NeptuneService.MoonPlace triton = neptuneService
+                .observeMoons(new juranometria.sky.Observer(59.91, 10.75, TRITON_ECLIPSE_INSTANT))
+                .moon(juranometria.solar.NeptuneService.Moon.TRITON);
+        require(triton.sphericalDiscRelation() == juranometria.solar.NeptuneService.DiscRelation.BEHIND
+                        && triton.sphericalShadowRelation()
+                                == juranometria.solar.NeptuneService.ShadowRelation.IN_SHADOW,
+                "on 2044-09-26 00:00 UTC at Oslo Triton is behind Neptune in its shadow: "
+                        + triton.sphericalDiscRelation() + ", " + triton.sphericalShadowRelation());
+        require(!neptuneService.moonsAnswerAt(java.time.Instant.parse("1999-12-31T23:59:59Z"))
+                        && neptuneService.observe(new juranometria.sky.Observer(59.91, 10.75,
+                                java.time.Instant.parse("1999-12-31T23:59:59Z"))).distanceKm() > 0.0,
+                "before 2000 the moons refuse and Neptune answers");
+        require(PackagedAcceptanceMain.class.getResourceAsStream(
+                        "/resources/neptune-system/NOTICE-neptune-system.md") != null
+                        && PackagedAcceptanceMain.class.getResourceAsStream(
+                                "/resources/neptune-system/PROVENANCE.md") != null,
+                "the Neptune System pack's notice and provenance travel with it");
+        System.out.println("neptune system pack OK (NEP098 and DE442 excerpts v"
+                + juranometria.solar.NeptuneSystemPack.load().manifest().get("pack.version")
+                + ", Neptune at Oslo within "
+                + String.format(java.util.Locale.ROOT, "%.4f", neptuneOff)
+                + " arcsecond of Horizons; Triton behind Neptune in its shadow on 2044-09-26;"
+                + " the moons refused before 2000, Neptune answering)");
         System.out.println("jovian system pack OK (JUP365 excerpts v"
                 + jovian.pack().manifest().get("pack.version") + ", Jupiter at Oslo within "
                 + String.format(java.util.Locale.ROOT, "%.4f", jupiterOff)

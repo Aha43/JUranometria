@@ -38,6 +38,7 @@ $name/licenses/LICENSE-Tabler-MIT.txt
 $name/licenses/NOTICE-constellations.md
 $name/licenses/NOTICE-jovian-system.md
 $name/licenses/NOTICE-mars-system.md
+$name/licenses/NOTICE-neptune-system.md
 $name/licenses/NOTICE-openngc.md
 $name/licenses/NOTICE-planets.md
 $name/licenses/NOTICE-runtime-libraries.md

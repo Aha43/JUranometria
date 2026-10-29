@@ -165,6 +165,14 @@ public final class EvidenceContractMain {
                 "docs/studies/mars-system/service-accuracy.md");
         REPORT_MAINS.put("juranometria.tool.MarsTableStudyMain",
                 "docs/studies/mars-system/table-measurements.md");
+        // The Uranus service against Horizons and Espenak (#634), registered
+        // in #655 (deferred from the #640 handover), and the Neptune service
+        // the same way (#655): the bundled packs and the committed fixtures
+        // only, never the gitignored raw sources.
+        REPORT_MAINS.put("juranometria.tool.UranusAccuracyReportMain",
+                "docs/studies/uranus-system/service-accuracy.md");
+        REPORT_MAINS.put("juranometria.tool.NeptuneAccuracyReportMain",
+                "docs/studies/neptune-system/service-accuracy.md");
         // Jupiter and the moons on the page (#482): the report is
         // deterministic; its mockups are held through IMAGE_MAINS.
         REPORT_MAINS.put("juranometria.tool.JovianCartographyStudyMain",

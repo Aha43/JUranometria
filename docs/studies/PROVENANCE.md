@@ -292,9 +292,9 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/gallery/place-and-time-zenith.png` | `4f50707e9f8e78cc429df7ba74e9e82b09134c5e76902bac317b69b4d7ebc249` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/gallery/sun-and-moon-crescent.png` | `b3b05987db7cda875a97581c8ea1af5cf00ab61183139ff812296c935dc571e4` | 2026-10-01 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/gallery/sun-and-moon-horizon.png` | `525e202d43309184d52a0495252370f4306925777f099f468df185374f27a9ba` | 2026-10-25 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/about-en-1-compact-light.png` | `3fe2ecd80a85058bb4dc70ff20e0be7c46fa4d5c0bc6ea8cec022290dac0fc9c` | 2026-10-27 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/about-en-1-compact-light.png` | `dda24d07adaf5183ea746e61355aab955194b9174805615424d376217a561896` | 2026-10-29 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/about-en-2-notices-light.png` | `4e77229c21ad64603fe5c22e3f4d70f9824ebbceeaa199465fe06411bf808914` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/about-en-3-compact-dark.png` | `7b57acabcfb2be0b21ba2391d1af42244d3f734277f9a3a66f57db779909d81c` | 2026-10-27 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/about-en-3-compact-dark.png` | `d764aedf336b2211b42edf34480eba183d565abbe6903e961852fde90ab90d11` | 2026-10-29 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/about-en-4-notices-dark.png` | `4d8cf2718f716a90b13eff01adacc8ac2494fc603d2b40bc78872b536d6f44ba` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/about-nb-NO-5-compact-light.png` | `8818eb91f2c6fabbdd1f040bedc3377e6973c3e44d34a1bba37687873753e473` | 2026-10-27 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/about-nb-NO-6-notices-light.png` | `9ba22416a2697ad4b5b6976d7564979a5b8447ede04c4ba3418a7b9fd8798738` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |

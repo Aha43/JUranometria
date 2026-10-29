@@ -178,6 +178,7 @@ for resource in \
         resources/saturn-system/NOTICE-saturn-system.md \
         resources/mars-system/NOTICE-mars-system.md \
         resources/uranus-system/NOTICE-uranus-system.md \
+        resources/neptune-system/NOTICE-neptune-system.md \
         resources/icons/LICENSE; do
     echo "$jarlist" | grep -q " $resource\$" || {
         echo "build-app-image: packaged licensing inventory missing" \
