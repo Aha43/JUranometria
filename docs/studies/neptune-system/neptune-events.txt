@@ -1,0 +1,29 @@
+# Neptune's named events, quoted from Fred Espenak's Sky Event Almanacs
+# (GMT; astropixels.com), with attribution. Read by
+# scripts/horizons-neptune-fetch.py, which verifies each page against the
+# digest below before parsing it. The pages are kept outside Git (retained
+# from the Venus and Mars studies; no page was fetched for #654).
+#
+#   https://astropixels.com/almanac/almanac01/almanac2003gmt.html  sha256 50811f3be0f29b6de42cd4f3ad2bdbc3c296b9ced7c3807d8e08cff8c5fd4cc3  36381 B
+#   https://astropixels.com/almanac/almanac01/almanac2012gmt.html  sha256 251a85e49504212df9391af58daec07b72f4fee86c77fe22b443e44c1018b307  36080 B
+#   https://astropixels.com/almanac/almanac01/almanac2018gmt.html  sha256 8f0d441a2b224cef1af9ce0544274d3f97d1d758a1a3525ccab50a95f2b830be  35949 B
+#   https://astropixels.com/almanac/almanac21/almanac2026gmt.html  sha256 4236c51d23297c270a42a3cb7a17c82881c1e5020de06b890594a1f40d80ce17  37476 B
+#   https://astropixels.com/almanac/almanac21/almanac2027gmt.html  sha256 af77389f672434ed752163a351533ce68ba31b51a030663795e76ed8388f9540  36654 B
+#   https://astropixels.com/almanac/almanac21/almanac2035gmt.html  sha256 0af51c5ed77b28875654ebd91f97c9ee086857ebca3eaabb847545fb3f397fdd  35946 B
+#   https://astropixels.com/almanac/almanac81/almanac2100gmt.html  sha256 1178bd6d049593e5a3f40a94e6dbdf4210637587b09a25c3972b4d79b81aecd6  37241 B
+#
+# year  month day hour(GMT)  event
+2003 Jan 30 23 Neptune in Conjunction with Sun
+2003 Aug 04 12 Neptune at Opposition
+2012 Feb 19 20 Neptune in Conjunction with Sun
+2012 Aug 24 11 Neptune at Opposition
+2018 Mar 04 14 Neptune in Conjunction with Sun
+2018 Sep 07 17 Neptune at Opposition
+2026 Mar 22 10 Neptune in Conjunction with Sun
+2026 Sep 26 00 Neptune at Opposition
+2027 Mar 24 22 Neptune in Conjunction with Sun
+2027 Sep 28 13 Neptune at Opposition
+2035 Apr 12 02 Neptune in Conjunction with Sun
+2035 Oct 16 17 Neptune at Opposition
+2100 Mar 06 12 Neptune at Opposition
+2100 Sep 09 15 Neptune in Conjunction with Sun

@@ -231,8 +231,8 @@ Whether a particular read happens on the event thread is control flow, which tex
 
 | class | the contract | files |
 |---|---|---|
-| deterministic-report | regenerates byte-for-byte on the same tree | 179 |
-| byte-exact-fixture | committed data with provenance; never regenerated casually | 360 |
+| deterministic-report | regenerates byte-for-byte on the same tree | 184 |
+| byte-exact-fixture | committed data with provenance; never regenerated casually | 397 |
 | captured-evidence | an operating-system screenshot, digest-pinned; a re-capture is a provenance event | 13 |
 | renderer-drawn | byte-reproducible per machine; production ink, no widgets | 881 |
 | widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 186 |
@@ -395,6 +395,43 @@ The byte-exact fixtures:
 - docs/studies/mercury/horizons/transits-quito-10.txt
 - docs/studies/mercury/horizons/transits-quito-199.txt
 - docs/studies/mercury/mercury-events.txt
+- docs/studies/neptune-system/horizons/magnitudes-30d-despina-geocentric.txt
+- docs/studies/neptune-system/horizons/magnitudes-30d-galatea-geocentric.txt
+- docs/studies/neptune-system/horizons/magnitudes-30d-larissa-geocentric.txt
+- docs/studies/neptune-system/horizons/magnitudes-30d-naiad-geocentric.txt
+- docs/studies/neptune-system/horizons/magnitudes-30d-neptune-geocentric.txt
+- docs/studies/neptune-system/horizons/magnitudes-30d-nereid-geocentric.txt
+- docs/studies/neptune-system/horizons/magnitudes-30d-proteus-geocentric.txt
+- docs/studies/neptune-system/horizons/magnitudes-30d-thalassa-geocentric.txt
+- docs/studies/neptune-system/horizons/magnitudes-30d-triton-geocentric.txt
+- docs/studies/neptune-system/horizons/matrix-7d-neptune-oslo.txt
+- docs/studies/neptune-system/horizons/matrix-7d-nereid-oslo.txt
+- docs/studies/neptune-system/horizons/matrix-7d-triton-oslo.txt
+- docs/studies/neptune-system/horizons/named-neptune-alert.txt
+- docs/studies/neptune-system/horizons/named-neptune-cape-town.txt
+- docs/studies/neptune-system/horizons/named-neptune-chatham.txt
+- docs/studies/neptune-system/horizons/named-neptune-oslo.txt
+- docs/studies/neptune-system/horizons/named-neptune-quito.txt
+- docs/studies/neptune-system/horizons/named-nereid-alert.txt
+- docs/studies/neptune-system/horizons/named-nereid-cape-town.txt
+- docs/studies/neptune-system/horizons/named-nereid-chatham.txt
+- docs/studies/neptune-system/horizons/named-nereid-oslo.txt
+- docs/studies/neptune-system/horizons/named-nereid-quito.txt
+- docs/studies/neptune-system/horizons/named-triton-alert.txt
+- docs/studies/neptune-system/horizons/named-triton-cape-town.txt
+- docs/studies/neptune-system/horizons/named-triton-chatham.txt
+- docs/studies/neptune-system/horizons/named-triton-oslo.txt
+- docs/studies/neptune-system/horizons/named-triton-quito.txt
+- docs/studies/neptune-system/horizons/opposition-2003-neptune-oslo-hourly.txt
+- docs/studies/neptune-system/horizons/opposition-2012-neptune-oslo-hourly.txt
+- docs/studies/neptune-system/horizons/opposition-2018-neptune-oslo-hourly.txt
+- docs/studies/neptune-system/horizons/opposition-2026-neptune-oslo-hourly.txt
+- docs/studies/neptune-system/horizons/opposition-2026-nereid-geocentric-10m.txt
+- docs/studies/neptune-system/horizons/opposition-2026-triton-geocentric-10m.txt
+- docs/studies/neptune-system/horizons/opposition-2027-neptune-oslo-hourly.txt
+- docs/studies/neptune-system/horizons/opposition-2035-neptune-oslo-hourly.txt
+- docs/studies/neptune-system/horizons/opposition-2100-neptune-oslo-hourly.txt
+- docs/studies/neptune-system/neptune-events.txt
 - docs/studies/place-and-time/reference-vectors.txt
 - docs/studies/saturn-system/horizons/NAMED-CASES.txt
 - docs/studies/saturn-system/horizons/dense-2026-dione-oslo.txt
