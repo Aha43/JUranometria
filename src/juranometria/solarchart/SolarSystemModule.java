@@ -93,6 +93,13 @@ public final class SolarSystemModule implements ChartModule {
      * given a fully lit disc rather than an invisible phase.
      */
     static final OverlayContribution.Lit URANUS_FULL = new OverlayContribution.Lit(1.0, 0.0, 0.0);
+    /** R-5 on #637: each of Uranus's moons is Jupiter's 3 px symbol, never its apparent diameter. */
+    public static final double URANUS_MOON_MARK_PX = URANUS_MINIMUM_MARK_PX / 2.0;
+
+    /** A moon of Uranus's identity on the page, {@code uranus.miranda} to {@code uranus.oberon}. */
+    public static String identityOf(juranometria.solar.UranusService.Moon moon) {
+        return URANUS + "." + moon.name().toLowerCase(java.util.Locale.ROOT);
+    }
 
     /** A moon of Mars's identity on the page, {@code mars.phobos} and {@code mars.deimos}. */
     public static String identityOf(juranometria.solar.MarsService.Moon moon) {
@@ -498,6 +505,8 @@ public final class SolarSystemModule implements ChartModule {
                         planet.distanceKm(), InkRole.BODY,
                         OverlayContribution.Moment.of(now), true, URANUS_MINIMUM_MARK_PX,
                         planet.behindSun() ? URANUS_BEHIND : null));
+                offered.addAll(uranusMoons(now, horizon
+                        && planet.horizontal().altitudeDegrees() < 0.0));
             } catch (IllegalArgumentException outsideTheYears) {
                 // Nothing for this instant.
             }
@@ -543,6 +552,40 @@ public final class SolarSystemModule implements ChartModule {
                     moon.shadowRelation()
                             == juranometria.solar.MarsService.ShadowRelation.PARTLY_IN_SHADOW,
                     moon.moon().ordinal(), MARS_MOON_MARK_PX, below, InkRole.BODY,
+                    OverlayContribution.Moment.of(now), false));
+        }
+        return out;
+    }
+
+    /**
+     * Miranda, Ariel, Umbriel, Titania and Oberon (#638 part 2, R-5 and R-6
+     * on #637), where they have numbers (2000-2100): each at its own
+     * astrometric J2000 place with its disc and shadow states, outward from
+     * Uranus, for the page to decide on its own - drawn only where it stands
+     * clear of Uranus's drawn mark and of the moons already drawn, on every
+     * field (Mars's clearance rule). Not selectable (R-8). Before 2000
+     * Uranus is drawn alone, as the table shows it.
+     */
+    private List<OverlayContribution> uranusMoons(Observer now, boolean below) {
+        juranometria.solar.UranusService service = uranus.get();
+        if (!service.moonsAnswerAt(now.instant())) {
+            return List.of();
+        }
+        List<OverlayContribution> out = new ArrayList<>();
+        for (juranometria.solar.UranusService.MoonPlace moon : service.observeMoons(now).moons()) {
+            OverlayContribution.Satellite.Relation relation = switch (moon.discRelation()) {
+                case CLEAR -> OverlayContribution.Satellite.Relation.CLEAR;
+                case IN_FRONT -> OverlayContribution.Satellite.Relation.IN_FRONT;
+                case BEHIND -> OverlayContribution.Satellite.Relation.BEHIND;
+            };
+            out.add(new OverlayContribution.Satellite(identityOf(moon.moon()),
+                    moon.moon().name().charAt(0)
+                            + moon.moon().name().substring(1).toLowerCase(java.util.Locale.ROOT),
+                    moon.astrometricJ2000(), URANUS, relation,
+                    moon.shadowRelation() != juranometria.solar.UranusService.ShadowRelation.SUNLIT,
+                    moon.shadowRelation()
+                            == juranometria.solar.UranusService.ShadowRelation.PARTLY_IN_SHADOW,
+                    moon.moon().ordinal(), URANUS_MOON_MARK_PX, below, InkRole.BODY,
                     OverlayContribution.Moment.of(now), false));
         }
         return out;

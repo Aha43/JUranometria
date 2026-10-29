@@ -33,13 +33,15 @@ import juranometria.ui.language.PageText;
 
 /**
  * Uranus on the chart, as the production composition draws it (issue
- * #638, part 1, under the rulings on #637): the Solar System module
+ * #638, parts 1 and 2, under the rulings on #637): the Solar System module
  * attached to the real component with Uranus switched on, production ink
  * only, no study overlay. Espenak's cited rows in
  * {@code docs/studies/uranus-system/uranus-events.txt} - the 2026
  * opposition and conjunction - at the ordinary fields and the closer
  * fields the controller reaches (R-7), both palettes and both languages;
- * the mark measured from the rendered pixels as drawn full (R-2). Written
+ * the mark measured from the rendered pixels as drawn full (R-2); and,
+ * since part 2, the five moons by Mars's clearance rule (R-5): at their
+ * widest, and in the states Horizons codes from Oslo. Written
  * to {@code docs/studies/uranus-on-the-chart/} by
  * {@code make uranus-on-the-chart-study}: the report to stdout, the pages
  * beside it.
@@ -86,15 +88,19 @@ public final class UranusOnTheChartStudyMain {
         Map<String, Instant> events = events();
         p("# Uranus on the chart");
         p("");
-        p("Issue #638, part 1. The production composition - `ChartComponent` over the"
+        p("Issue #638, parts 1 and 2. The production composition - `ChartComponent` over the"
                 + " bundled catalogue, with the Solar System module attached and Uranus"
                 + " switched on - under the rulings on #637: rule M with the 6 px mark always"
                 + " standing in (R-1), drawn full and round with no colour (R-2), the pole and"
                 + " the rings not drawn (R-3, R-4), the planet selectable and pointed at as an"
                 + " occurrence (R-8), eligible for the closer fields (R-7), on screen and on"
-                + " paper as the other bodies (R-9). The moons are not drawn: they are part 2"
-                + " (R-10). The instants are Espenak's rows in"
-                + " `docs/studies/uranus-system/uranus-events.txt`; positions are the service's"
+                + " paper as the other bodies (R-9). Since part 2 the five moons are drawn as 3 px"
+                + " symbols at their own J2000 places, each only where it stands clear of Uranus's"
+                + " mark and of the moons already drawn, on every field (R-5); a moon behind, in"
+                + " transit or too close is not drawn and the page says so (R-6); none is"
+                + " selectable (R-8). The instants are Espenak's rows in"
+                + " `docs/studies/uranus-system/uranus-events.txt` and the Horizons rows in"
+                + " `docs/studies/uranus-system/horizons/`; positions are the service's"
                 + " for Oslo at sea level. Regenerate with `make uranus-on-the-chart-study`.");
         p("");
         Instant opposition = events.get("2026 Nov 25 Uranus at Opposition");
@@ -138,6 +144,7 @@ public final class UranusOnTheChartStudyMain {
         page("conjunction-2026-1-nb", "At 1°, in Norwegian on the black sky", atConjunction, c,
                 ChartViewState.normalMinimumFieldDegrees(), 0, NORSK, ChartPalette.BLACK_SKY,
                 true, "The same, spoken in Norwegian.");
+        moons();
         p("## Outside the years");
         p("");
         Observer before = new Observer(OSLO_LAT, OSLO_LON, Instant.parse("1899-12-31T12:00:00Z"));
@@ -148,6 +155,56 @@ public final class UranusOnTheChartStudyMain {
                 + " nothing of it.", before.instant(), UranusService.URANUS_FIRST_DAY,
                 early.renderedBodies().size()));
         p("");
+    }
+
+    /**
+     * The moons (#638 part 2): Titania and Oberon at their widest in the
+     * weekly Oslo matrix (measurements.md, 2052-03-23), and the states
+     * Horizons codes from Oslo - Miranda behind in the shadow (U, 2005-03-19),
+     * in front (t, 2005-05-28), Ariel in the shadow (u, 2006-02-04) - with
+     * Uranus alone before the moons' years.
+     */
+    private static void moons() throws Exception {
+        p("## The moons");
+        p("");
+        Instant widest = Instant.parse("2052-03-23T00:00:00Z");
+        Observer atWidest = new Observer(OSLO_LAT, OSLO_LON, widest);
+        UranusObservation w = uranus.observe(atWidest);
+        p("### Titania and Oberon at their widest, " + widest + ", Oslo");
+        p("");
+        page("moons-widest-2052-1", "The minimum field, 1°", atWidest, w,
+                ChartViewState.normalMinimumFieldDegrees(), 0, ENGLISH, ChartPalette.WHITE_PAPER,
+                false, "The outer moons stand clear of the mark; the inner ones are spoken.");
+        page("moons-widest-2052-0.25-nb", "The 0.25° closer field, in Norwegian", atWidest, w,
+                ChartViewState.normalMinimumFieldDegrees(), 2, NORSK, ChartPalette.WHITE_PAPER,
+                false, "Where most of the system stands apart.");
+        page("moons-widest-2052-8", "8°", atWidest, w, 8.0, 0, ENGLISH, ChartPalette.WHITE_PAPER,
+                false, "No moon clears the mark: none drawn, each spoken (R-5, no floor).");
+        state("miranda-behind-2005-0.25", "Miranda behind Uranus in its shadow (Horizons U, 2005-03-19)",
+                Instant.parse("2005-03-19T00:00:00Z"), ENGLISH, ChartPalette.WHITE_PAPER,
+                "Behind: not drawn, and spoken.");
+        state("miranda-in-front-2005-0.25-dark", "Miranda in front of Uranus (Horizons t, 2005-05-28)",
+                Instant.parse("2005-05-28T00:00:00Z"), ENGLISH, ChartPalette.BLACK_SKY,
+                "The mark cannot hold a transit: not drawn, and spoken as too close (R-6).");
+        state("ariel-shadow-2006-0.25-nb", "Ariel in Uranus's shadow (Horizons u, 2006-02-04)",
+                Instant.parse("2006-02-04T00:00:00Z"), NORSK, ChartPalette.WHITE_PAPER,
+                "An eclipsed moon stands beside the limb, not clear of the mark: not drawn, and spoken.");
+        Instant before = Instant.parse("1999-12-31T12:00:00Z");
+        Observer atBefore = new Observer(OSLO_LAT, OSLO_LON, before);
+        p("### Before the moons' years, " + before);
+        p("");
+        page("before-the-moons-1999-0.25", "The 0.25° closer field", atBefore,
+                uranus.observe(atBefore), ChartViewState.normalMinimumFieldDegrees(), 2, ENGLISH,
+                ChartPalette.WHITE_PAPER, false, "Uranus alone, as the table shows it.");
+    }
+
+    private static void state(String name, String title, Instant when, PageText words,
+                              ChartPalette palette, String caption) throws Exception {
+        Observer at = new Observer(OSLO_LAT, OSLO_LON, when);
+        p("### " + title);
+        p("");
+        page(name, "The 0.25° closer field", at, uranus.observe(at),
+                ChartViewState.normalMinimumFieldDegrees(), 2, words, palette, false, caption);
     }
 
     /** What the Uranus table says of this instant, in the page's terms. */
@@ -281,7 +338,8 @@ public final class UranusOnTheChartStudyMain {
      */
     private static void full(ChartComponent chart, UranusObservation v) throws Exception {
         BufferedImage image = paint(chart);
-        ReferenceInk.BodyPlacement drawn = chart.renderedBodies().get(0);
+        ReferenceInk.BodyPlacement drawn = chart.renderedBodies().stream()
+                .filter(b -> SolarSystemModule.URANUS.equals(b.identity())).findFirst().orElseThrow();
         double cx = drawn.centre().x() + chart.pageOffsetX();
         double cy = drawn.centre().y() + chart.pageOffsetY();
         double r = drawn.disc().getBounds2D().getWidth() / 2.0 - 1.0;

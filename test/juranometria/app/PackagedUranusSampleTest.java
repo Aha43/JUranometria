@@ -26,6 +26,15 @@ class PackagedUranusSampleTest {
     }
 
     @Test
+    void theMoonsSampleIsEspenaksOppositionHour() throws Exception {
+        String row = Files.readString(Path.of("docs/studies/uranus-system/uranus-events.txt"),
+                StandardCharsets.UTF_8).lines().filter(l -> l.startsWith("2026 Nov 25 23 Uranus at Opposition"))
+                .findFirst().orElseThrow();
+        assertEquals(java.time.Instant.parse("2026-11-25T23:00:00Z"),
+                PackagedAcceptanceMain.URANUS_MOONS_SAMPLE_INSTANT, row);
+    }
+
+    @Test
     void theMirandaSampleIsARowHorizonsCodesBehindAndEclipsed() throws Exception {
         String row = Files.readString(Path.of(
                         "docs/studies/uranus-system/horizons/matrix-7d-miranda-oslo.txt"),
