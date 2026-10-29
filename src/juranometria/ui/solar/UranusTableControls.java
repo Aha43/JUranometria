@@ -42,8 +42,9 @@ import juranometria.ui.solar.SolarTableSession.Query;
  * status line, the Uranus card - its position, figure, light and tilt -
  * and Miranda, Ariel, Umbriel, Titania and Oberon. The Controller's Uranus
  * group holds one set in its narrow arrangement; the Uranus dialog, kept
- * for dogfooding as Mars's is, holds another. No Show on chart and no
- * Centre on chart: no Uranus is drawn yet.
+ * for dogfooding as Mars's is, holds another. Since #638 the Controller's
+ * group has Show on chart and both hosts Centre on chart, over the Solar
+ * System module's Uranus switch.
  *
  * <p>As with Mars's controls, <strong>drafts are the host's; the applied
  * query and its result are the session's</strong>: what a reader chooses
@@ -83,6 +84,10 @@ public final class UranusTableControls {
     public final JButton compute;
     /** Set chart time to this instant (#612, P2), or null over a session that cannot install. */
     public final JButton setChartTime;
+    /** The Controller's Show on chart box (#638), or null where the host has none. */
+    public final javax.swing.JCheckBox onChart;
+    /** Centre on chart (#638, through #483's seam), or null where the host has none. */
+    public final JButton centreOnChart;
     public final JLabel status = new JLabel(" ");
     /** The card's title: Uranus, the instant, its marks. */
     public final JLabel cardTitle = new JLabel(" ");
@@ -103,6 +108,18 @@ public final class UranusTableControls {
     /** @param letters whether the controls carry access letters (the dialog's do) */
     public UranusTableControls(UranusTableSession session, InterfaceText language,
                                boolean letters) {
+        this(session, language, letters, null, null, null);
+    }
+
+    /**
+     * With the Solar System module's Uranus switch (#638, R-8 on #637): a
+     * Show on chart box where {@code onChart} is given (the Controller's
+     * group), and Centre on chart where {@code centre} is given, turning
+     * {@code layer} on and choosing the chart's normal minimum field.
+     */
+    public UranusTableControls(UranusTableSession session, InterfaceText language,
+                               boolean letters, BodyOnChart onChart, CentreOnChart centre,
+                               BodyOnChart layer) {
         if (session == null || language == null) {
             throw new IllegalArgumentException(
                     "the controls follow a session, in a language");
@@ -136,6 +153,28 @@ public final class UranusTableControls {
         setChartTime = session.canSetChartTime()
                 ? button("setchart", "uranusSetChartTime", access) : null;
         status.setName("uranusStatus");
+
+        if (onChart != null) {
+            String stem = "solarsystem.uranus.onChart";
+            this.onChart = new javax.swing.JCheckBox(language.say(stem + ".label"),
+                    onChart.showing());
+            this.onChart.setName("uranusOnChart");
+            this.onChart.getAccessibleContext().setAccessibleName(language.say(stem + ".a11y"));
+            Explain.selfExplanatory(this.onChart, language.say(stem + ".explain"));
+            // Ask, then let the answer come back through the switch.
+            this.onChart.addActionListener(e -> onChart.show(this.onChart.isSelected()));
+            onChart.onChange(this.onChart::setSelected);
+        } else {
+            this.onChart = null;
+        }
+        if (centre != null) {
+            if (layer == null) {
+                throw new IllegalArgumentException("Centre on chart turns a layer on");
+            }
+            centreOnChart = centre.button(target(layer), said, "uranusCentreOnChart", access);
+        } else {
+            centreOnChart = null;
+        }
 
         // The card: a title, then one heading-and-value line per quantity.
         card.setName("uranusCard");
@@ -276,6 +315,34 @@ public final class UranusTableControls {
         stale = new StaleLine(said, "uranus");
         following = session.onChange(this::show);
         followingChart = session.onObserverChange(this::sayStale);
+    }
+
+    /**
+     * This host's Centre on chart target (#638, through #483's seam): the
+     * target applies this host's draft and answers Uranus's J2000 place, or
+     * null when the session refused; the field is the chart's normal
+     * minimum, as for every body.
+     */
+    public CentreOnChart.Target target(BodyOnChart layer) {
+        return new CentreOnChart.Target() {
+            @Override
+            public CentreOnChart.Body body() {
+                return CentreOnChart.Body.URANUS;
+            }
+
+            @Override
+            public juranometria.chart.SkyPosition applyTypedAndLocate() {
+                apply();
+                UranusTableSession.Result result = session.result();
+                return answered(result) && !result.entries().isEmpty()
+                        ? result.entries().get(0).uranus().astrometricJ2000() : null;
+            }
+
+            @Override
+            public BodyOnChart layer() {
+                return layer;
+            }
+        };
     }
 
     /** This host's draft, as a query. */
@@ -570,7 +637,8 @@ public final class UranusTableControls {
      * These controls as the Controller's Uranus group holds them: the note
      * wrapped; the views; the span; the step and Compute; the status; the
      * card and the five moons, or the grouped moons for a range, the table
-     * scrolling sideways; Set chart time to this instant. No Close.
+     * scrolling sideways; Show on chart and Centre on chart where given
+     * (#638); Set chart time to this instant. No Close.
      */
     public JComponent inController() {
         JPanel column = new JPanel();
@@ -613,6 +681,14 @@ public final class UranusTableControls {
         resultHolder.setAlignmentX(0f);
         column.add(resultHolder);
         column.add(Box.createVerticalStrut(6));
+        if (onChart != null) {
+            column.add(leading(onChart));
+            column.add(Box.createVerticalStrut(4));
+        }
+        if (centreOnChart != null) {
+            column.add(leading(centreOnChart));
+            column.add(Box.createVerticalStrut(4));
+        }
         if (setChartTime != null) {
             column.add(leading(setChartTime));
             column.add(Box.createVerticalStrut(4));

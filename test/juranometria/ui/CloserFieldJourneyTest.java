@@ -322,7 +322,7 @@ class CloserFieldJourneyTest {
         assertFalse(controller.canZoomIn());
         String note = chart.closerFieldNote(chart.currentScene());
         assertEquals(ENGLISH.closerFieldWithoutBody(), note);
-        assertTrue(note.contains("Mercury, Venus, Mars, Jupiter or Saturn"), note);
+        assertTrue(note.contains("Mercury, Venus, Mars, Jupiter, Saturn or Uranus"), note);
         SwingUtilities.invokeAndWait(controller::zoomOut);
         SwingUtilities.invokeAndWait(controller::zoomOut);
         assertEquals(1.0, controller.state().fieldWidthDegrees(), "back to the ladder");

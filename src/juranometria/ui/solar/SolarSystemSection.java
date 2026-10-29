@@ -37,8 +37,8 @@ import juranometria.ui.language.InterfaceText;
  * no chart switch and no Centre on chart: no Mars is drawn yet. Since
  * #635 a Uranus group follows Saturn's - the same order, outward from the
  * Sun - introduced collapsed, holding one {@link UranusTableControls} over
- * Uranus's shared session, with no chart switch and no Centre on chart: no
- * Uranus is drawn yet.
+ * Uranus's shared session, since #638 with its Show on chart and Centre
+ * on chart.
  *
  * <p>Building the section computes nothing: each set of controls
  * reads the observer for its note and seeds, and shows whatever its
@@ -229,17 +229,28 @@ public final class SolarSystemSection {
     /**
      * Gives the section Uranus's group after Saturn's (#635): its controls
      * over Uranus's shared session, with no chart switch and no Centre on
-     * chart - no Uranus is drawn yet. Stated before the tab is built;
-     * building them computes nothing and reads no pack.
+     * chart. Stated before the tab is built; building them computes nothing
+     * and reads no pack.
      */
     public void withUranus(UranusTableSession session, InterfaceText said) {
+        withUranus(session, said, null, null);
+    }
+
+    /**
+     * The same, with the Solar System module's Uranus switch (#638, R-8 on
+     * #637): Show on chart over {@code onChart}, and Centre on chart through
+     * {@code centre} where both are given.
+     */
+    public void withUranus(UranusTableSession session, InterfaceText said,
+                           BodyOnChart onChart, CentreOnChart centre) {
         if (session == null || said == null) {
             throw new IllegalArgumentException("Uranus's session, in a language");
         }
         if (uranus != null) {
             uranus.release();
         }
-        uranus = new UranusTableControls(session, said, false);
+        uranus = new UranusTableControls(session, said, false, onChart,
+                onChart == null ? null : centre, onChart);
     }
 
     /** Uranus's controls, or null for a host built without Uranus. */

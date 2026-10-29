@@ -210,6 +210,7 @@ class ChartInstantJourneyTest {
                 juranometria.ui.solar.JovianChartStore.forNode(node),
                 juranometria.ui.solar.SaturnChartStore.forNode(node),
                 juranometria.ui.solar.MarsChartStore.forNode(node),
+                juranometria.ui.solar.UranusChartStore.forNode(node),
                 ZoomLockStore.forNode(node),
                 juranometria.ui.companion.CompanionStore.forNode(node),
                 ChartChromeStore.forNode(node),

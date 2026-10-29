@@ -278,7 +278,7 @@ class ChartControlsTest {
     void bothHostsNameTheCloserStepAndItsBodiesTheSameWay() throws Exception {
         // #544: the toolbar and the Controller read one controller, so
         // the closer step and why it is withheld read alike in both -
-        // naming Mercury, Venus, Mars, Jupiter and Saturn, never only some of them.
+        // naming Mercury, Venus, Mars, Jupiter, Saturn and Uranus, never only some of them.
         Hosts hosts = new Hosts();
         boolean[] offered = {false};
         SwingUtilities.invokeAndWait(() -> {
@@ -286,7 +286,7 @@ class ChartControlsTest {
             hosts.controller.offerCloserFields(candidate -> offered[0]);
         });
         String withheld = EN.say("toolbar.zoomIn.closer.unavailable");
-        assertTrue(withheld.contains("Mercury, Venus, Mars, Jupiter or Saturn"), withheld);
+        assertTrue(withheld.contains("Mercury, Venus, Mars, Jupiter, Saturn or Uranus"), withheld);
         for (Component host : new Component[] {hosts.bar, hosts.section}) {
             assertEquals(withheld, named(host, "Zoom in").getAccessibleContext()
                     .getAccessibleDescription());
@@ -296,7 +296,7 @@ class ChartControlsTest {
             hosts.controller.closerOfferChanged();
         });
         String offer = EN.say("toolbar.zoomIn.closer.explain");
-        assertTrue(offer.contains("Mercury, Venus, Mars, Jupiter or Saturn"), offer);
+        assertTrue(offer.contains("Mercury, Venus, Mars, Jupiter, Saturn or Uranus"), offer);
         for (Component host : new Component[] {hosts.bar, hosts.section}) {
             AbstractButton zoomIn = named(host, "Zoom in");
             assertTrue(zoomIn.isEnabled(), "the offer reaches every host");
