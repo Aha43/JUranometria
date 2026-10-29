@@ -33,6 +33,10 @@ behind that argument.
   over the years, how to read the figure and the marks, and what it does
   not claim. Also in Norwegian: [Saturns ringer på
   siden](saturns-ringer-pa-siden.md).
+- [Mars on the page](mars-on-the-page.md) — what the atlas draws of Mars,
+  Phobos and Deimos, why Mars is usually a symbol and sometimes a disc,
+  how to read its phase and its two small moons, and what it does not
+  claim. Also in Norwegian: [Mars på siden](mars-pa-siden.md).
 
 ## How JUranometria works
 
