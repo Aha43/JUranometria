@@ -136,7 +136,7 @@ No production Uranus ink begins before this study lands; #638 draws from it.
 
 ## #638 part 2, the moons on the chart, as built: a packaged checkpoint
 
-**Not yet accepted.** Miranda, Ariel, Umbriel, Titania and Oberon under R-5, R-6 and R-8.
+**Accepted by the owner on 2026-10-29**, as given: "Accept part 2, run the gates and CI", after trying the candidate `4a97a521`. The gate plan, all seven gates, was approved with it. Miranda, Ariel, Umbriel, Titania and Oberon under R-5, R-6 and R-8.
 
 - **The moons (R-5).** The Solar System module offers each moon, from 2000 to 2100, as a satellite of Uranus at its own astrometric J2000 place, with its disc and shadow states, outward from Uranus. The page decides each on its own through the round-system painting Mars's moons use (#606): drawn as a 3 px symbol only where it stands clear of Uranus's drawn mark and of the moons already drawn, on every field, with no floor.
 - **The states (R-6).** A moon in Uranus's shadow is a hollow ring where it stands clear, which the geometry rarely allows. A moon behind Uranus, in transit (the 6 px mark cannot hold one) or too close to tell apart is not drawn, and the page's description says *behind Uranus, not drawn* or *too close to tell apart at this field, not drawn*.
