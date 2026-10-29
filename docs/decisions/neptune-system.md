@@ -274,3 +274,37 @@ was for Uranus (-210 to +37 minutes), not ours.
   and Uranus pack studies do, so it stays out of the contract on their
   stated precedent. `EvidenceContractMain` now says so for Neptune as well.
   The Python reports reproduce against the same pins, as Uranus's do.
+
+## The ruling
+
+The owner's ruling of 2026-10-29, as given: "Rule N-1 to N-14 as proposed".
+
+**N-1 to N-14 are ruled as proposed above**, each with its recommended
+choice:
+- **N-1a.** Neptune's place is the barycentre from `nep098_part-1`'s own
+  DE442 segment, 1900-2100 (372,736 bytes). The Sun and the Earth stay
+  DE440's.
+- **N-2a.** The barycentre stands for the centre, and no centre excerpt
+  ships. The exact-era distance target is 100 km, and the builder refuses a
+  centre offset above 80 km (74.190 km measured). This ruling settles in the
+  study the consequence that Uranus's #634 found only in the service.
+- **N-4.** The IAU 2015 pole with its periodic term over N.
+- **N-6a.** Triton and Nereid, 2000-2100, in their own pack (50,258,944
+  bytes). Before 2000 Neptune is shown alone. The inner moons are excluded
+  on measurement.
+- **N-8.** No ring rows, no ring ink, and no ring authority requested.
+
+The rest stand as written:
+- the PCK figure (N-3);
+- the fraction and phase angle without phase words (N-5);
+- Jupiter's six states on the flattened figure (N-7);
+- Uranus's vocabulary (N-9);
+- Uranus's targets with N-2's distance, and Nereid's position angle derived
+  from its offsets (N-10);
+- the fixtures (N-11);
+- the stated event limitation (N-12);
+- the production split (N-13);
+- the pack study kept out of the evidence contract on precedent (N-14).
+
+No production Neptune code begins before this study lands. #655 builds the
+pack and the service from it.
