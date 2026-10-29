@@ -77,6 +77,7 @@ help:
 	@echo "  jovian-system-study  Propose the Jupiter and Galilean-moons table from the kept Horizons fixtures, with mockups and diagrams (issue #472)"
 	@echo "  jovian-pack-study    Cut and measure the Jovian excerpt of jup365.bsp against its source (issue #472)"
 	@echo "  mars-pack-study      Cut and prove every candidate Mars kernel from mar099s.bsp and de440s.bsp, and measure Mars's centre against its barycentre (issue #601)"
+	@echo "  neptune-pack-study   Cut and prove every candidate Neptune kernel from nep098_part-1.bsp and de440s.bsp, and measure Neptune's centre against its barycentre (issue #654)"
 	@echo "  uranus-pack-study    Cut and prove every candidate Uranus kernel from ura184_part-3.bsp and de440s.bsp, and measure Uranus's centre against its barycentre (issue #633)"
 	@echo "  saturn-system-study  Propose the Saturn table, moons and ring geometry from the kept fixtures, with mockups and diagrams (issue #574)"
 	@echo "  venus-system-study   Propose the Venus table and the cartography handoff from the kept Horizons fixtures, with mockups and diagrams (issue #500)"
@@ -711,7 +712,7 @@ black-sky-study: classes
 		-cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BlackSkyStudyMain \
 		> docs/studies/black-sky/measurements.md
 
-.PHONY: spk-boundary-fixture import-saturn-system saturn-accuracy-report saturn-table-study import-jovian-system import-planets venus-accuracy-report venus-table-study mercury-accuracy-report mercury-table-study jovian-accuracy-report jovian-cartography-study venus-cartography-study evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study venus-pack-study sun-on-the-chart-study moon-on-the-chart-study venus-on-the-chart-study mercury-on-the-chart-study jupiter-on-the-chart-study mercury-cartography-study solar-system-labels-study printable-chart-study meridian-ticks-study mercury-pack-study mercury-system-study closer-fields-study chart-instant-study chart-instant-furniture star-identity-density-study all-star-identities saturn-pack-study saturn-system-study saturn-cartography-study saturn-on-the-chart-study mars-pack-study import-mars-system mars-accuracy-report mars-table-study mars-cartography-study mars-on-the-chart-study uranus-pack-study import-uranus-system uranus-accuracy-report uranus-cartography-study uranus-on-the-chart-study
+.PHONY: spk-boundary-fixture import-saturn-system saturn-accuracy-report saturn-table-study import-jovian-system import-planets venus-accuracy-report venus-table-study mercury-accuracy-report mercury-table-study jovian-accuracy-report jovian-cartography-study venus-cartography-study evidence-contracts evidence-contracts-interaction test-evidence-study place-and-time-study black-sky-study ecliptic-study sun-study moon-study solar-cartography-study companion-window-study chart-options-companion-study clean-chart-study solar-system-controls-study jovian-system-study jovian-pack-study venus-pack-study sun-on-the-chart-study moon-on-the-chart-study venus-on-the-chart-study mercury-on-the-chart-study jupiter-on-the-chart-study mercury-cartography-study solar-system-labels-study printable-chart-study meridian-ticks-study mercury-pack-study mercury-system-study closer-fields-study chart-instant-study chart-instant-furniture star-identity-density-study all-star-identities saturn-pack-study saturn-system-study saturn-cartography-study saturn-on-the-chart-study mars-pack-study import-mars-system mars-accuracy-report mars-table-study mars-cartography-study mars-on-the-chart-study uranus-pack-study import-uranus-system uranus-accuracy-report uranus-cartography-study uranus-on-the-chart-study neptune-pack-study
 # The heap is stated rather than inherited from whatever a machine's
 # ergonomics chose for it: the CI runner's default quarter-of-RAM is
 # not the same number as a developer's.
@@ -901,6 +902,13 @@ mars-pack-study: classes
 		juranometria.tool.MarsPackStudyMain \
 		> docs/studies/mars-system/contract/pack-measurements.md
 	@echo "written to docs/studies/mars-system/contract/pack-measurements.md"
+
+neptune-pack-study: classes
+	mkdir -p docs/studies/neptune-system/contract
+	$(JAVA) -Xmx4g -Djava.awt.headless=true -cp "$(CLASSES_DIR):$(LIB_DIR)/*" \
+		juranometria.tool.NeptunePackStudyMain \
+		> docs/studies/neptune-system/contract/pack-measurements.md
+	@echo "written to docs/studies/neptune-system/contract/pack-measurements.md"
 
 uranus-pack-study: classes
 	mkdir -p docs/studies/uranus-system/contract

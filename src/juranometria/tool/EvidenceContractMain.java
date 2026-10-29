@@ -210,6 +210,9 @@ public final class EvidenceContractMain {
         // not: both read the gitignored de440s.bsp and pck00011.tpc, which the CI
         // runner does not hold; `make mercury-pack-study` reproduces the report
         // locally against the pinned downloads, and it is held as committed.
+        // The Neptune pack study (#654) is not registered for the same reason:
+        // it reads the gitignored nep098_part-1.bsp and de440s.bsp;
+        // `make neptune-pack-study` reproduces it against the pins.
         // Jupiter and the moons on production pages (#486): the report
         // is deterministic, its pages held through IMAGE_MAINS, and where
         // each name went is the platform record (PLATFORM_REPORTS).
