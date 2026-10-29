@@ -1193,6 +1193,7 @@ dist: app
 	   $(CLASSES_DIR)/resources/saturn-system/NOTICE-saturn-system.md \
 	   $(CLASSES_DIR)/resources/mars-system/NOTICE-mars-system.md \
 	   $(CLASSES_DIR)/resources/uranus-system/NOTICE-uranus-system.md \
+	   $(CLASSES_DIR)/resources/neptune-system/NOTICE-neptune-system.md \
 	   $(DIST_STAGE)/licenses/
 	cp $(CLASSES_DIR)/resources/icons/LICENSE \
 	   $(DIST_STAGE)/licenses/LICENSE-Tabler-MIT.txt
