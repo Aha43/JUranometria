@@ -40,7 +40,7 @@ open menu would cover the thing it explains.
 
 ![](menu-en-1-menus.png)
 
-Bar packed 892 × 425 px; widest popup 232 px.
+Bar packed 892 × 448 px; widest popup 232 px.
 
 | channel | words |
 |---|---|
@@ -155,6 +155,10 @@ Bar packed 892 × 425 px; widest popup 232 px.
 | item spoken name \| Uranus table |
 | item spoken description \| Opens a table of Uranus's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Miranda, Ariel, Umbriel, Titania and Oberon stand beside it - clear of Uranus, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Uranus and its moons are drawn on the chart by Uranus on the chart. |
 | item access letter (language) \| N |
+| item label \| Neptune... |
+| item hover \| Where Neptune, Triton and Nereid are, for the chart time and place |
+| item spoken name \| Neptune table |
+| item spoken description \| Opens a table of Neptune's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Triton and Nereid stand beside it - clear of Neptune, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Neptune is not drawn on the chart yet. |
 | item label \| Zoom In |
 | item spoken name \| Zoom In |
 | item spoken description \| Shows a narrower field, with fainter stars on it |
@@ -178,7 +182,7 @@ Bar packed 892 × 425 px; widest popup 232 px.
 
 ![](menu-en-2-checked.png)
 
-Bar packed 892 × 425 px; widest popup 232 px.
+Bar packed 892 × 448 px; widest popup 232 px.
 
 | channel | words |
 |---|---|
@@ -293,6 +297,10 @@ Bar packed 892 × 425 px; widest popup 232 px.
 | item spoken name \| Uranus table |
 | item spoken description \| Opens a table of Uranus's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Miranda, Ariel, Umbriel, Titania and Oberon stand beside it - clear of Uranus, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Uranus and its moons are drawn on the chart by Uranus on the chart. |
 | item access letter (language) \| N |
+| item label \| Neptune... |
+| item hover \| Where Neptune, Triton and Nereid are, for the chart time and place |
+| item spoken name \| Neptune table |
+| item spoken description \| Opens a table of Neptune's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Triton and Nereid stand beside it - clear of Neptune, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Neptune is not drawn on the chart yet. |
 | item label \| Zoom In |
 | item spoken name \| Zoom In |
 | item spoken description \| Shows a narrower field, with fainter stars on it |
@@ -316,7 +324,7 @@ Bar packed 892 × 425 px; widest popup 232 px.
 
 ![](menu-en-3-widest.png)
 
-Bar packed 892 × 425 px; widest popup 232 px.
+Bar packed 892 × 448 px; widest popup 232 px.
 
 | channel | words |
 |---|---|
@@ -431,6 +439,10 @@ Bar packed 892 × 425 px; widest popup 232 px.
 | item spoken name \| Uranus table |
 | item spoken description \| Opens a table of Uranus's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Miranda, Ariel, Umbriel, Titania and Oberon stand beside it - clear of Uranus, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Uranus and its moons are drawn on the chart by Uranus on the chart. |
 | item access letter (language) \| N |
+| item label \| Neptune... |
+| item hover \| Where Neptune, Triton and Nereid are, for the chart time and place |
+| item spoken name \| Neptune table |
+| item spoken description \| Opens a table of Neptune's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Triton and Nereid stand beside it - clear of Neptune, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Neptune is not drawn on the chart yet. |
 | item label \| Zoom In |
 | item spoken name \| Zoom In |
 | item spoken description \| Shows a narrower field, with fainter stars on it |
@@ -454,7 +466,7 @@ Bar packed 892 × 425 px; widest popup 232 px.
 
 ![](menu-en-4-narrowest.png)
 
-Bar packed 892 × 425 px; widest popup 232 px.
+Bar packed 892 × 448 px; widest popup 232 px.
 
 | channel | words |
 |---|---|
@@ -569,6 +581,10 @@ Bar packed 892 × 425 px; widest popup 232 px.
 | item spoken name \| Uranus table |
 | item spoken description \| Opens a table of Uranus's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Miranda, Ariel, Umbriel, Titania and Oberon stand beside it - clear of Uranus, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Uranus and its moons are drawn on the chart by Uranus on the chart. |
 | item access letter (language) \| N |
+| item label \| Neptune... |
+| item hover \| Where Neptune, Triton and Nereid are, for the chart time and place |
+| item spoken name \| Neptune table |
+| item spoken description \| Opens a table of Neptune's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Triton and Nereid stand beside it - clear of Neptune, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Neptune is not drawn on the chart yet. |
 | item label [unavailable] \| Zoom In |
 | item spoken name [unavailable] \| Zoom In |
 | item spoken description [unavailable] \| Unavailable: a closer field is offered only when Mercury, Venus, Mars, Jupiter, Saturn or Uranus, shown on the chart, is on the page the step would show |
@@ -594,7 +610,7 @@ Bar packed 892 × 425 px; widest popup 232 px.
 
 ![](menu-nb-NO-5-menus.png)
 
-Bar packed 882 × 425 px; widest popup 229 px.
+Bar packed 882 × 448 px; widest popup 229 px.
 
 | channel | words |
 |---|---|
@@ -708,6 +724,10 @@ Bar packed 882 × 425 px; widest popup 229 px.
 | item hover \| Hvor Uranus og de fem største månene er, for karttiden og stedet |
 | item spoken name \| Uranustabell |
 | item spoken description \| Åpner en tabell over Uranus' beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Miranda, Ariel, Umbriel, Titania og Oberon står ved siden av - klar av Uranus, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Uranus og månene tegnes på kartet med Uranus på kartet. |
+| item label \| Neptun... |
+| item hover \| Hvor Neptun, Triton og Nereid er, for karttiden og stedet |
+| item spoken name \| Neptuntabell |
+| item spoken description \| Åpner en tabell over Neptuns beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Triton og Nereid står ved siden av - klar av Neptun, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Neptun tegnes ikke på kartet ennå. |
 | item label \| Zoom inn |
 | item spoken name \| Zoom inn |
 | item spoken description \| Viser et smalere synsfelt med svakere stjerner |
@@ -731,7 +751,7 @@ Bar packed 882 × 425 px; widest popup 229 px.
 
 ![](menu-nb-NO-6-checked.png)
 
-Bar packed 882 × 425 px; widest popup 229 px.
+Bar packed 882 × 448 px; widest popup 229 px.
 
 | channel | words |
 |---|---|
@@ -845,6 +865,10 @@ Bar packed 882 × 425 px; widest popup 229 px.
 | item hover \| Hvor Uranus og de fem største månene er, for karttiden og stedet |
 | item spoken name \| Uranustabell |
 | item spoken description \| Åpner en tabell over Uranus' beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Miranda, Ariel, Umbriel, Titania og Oberon står ved siden av - klar av Uranus, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Uranus og månene tegnes på kartet med Uranus på kartet. |
+| item label \| Neptun... |
+| item hover \| Hvor Neptun, Triton og Nereid er, for karttiden og stedet |
+| item spoken name \| Neptuntabell |
+| item spoken description \| Åpner en tabell over Neptuns beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Triton og Nereid står ved siden av - klar av Neptun, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Neptun tegnes ikke på kartet ennå. |
 | item label \| Zoom inn |
 | item spoken name \| Zoom inn |
 | item spoken description \| Viser et smalere synsfelt med svakere stjerner |
@@ -868,7 +892,7 @@ Bar packed 882 × 425 px; widest popup 229 px.
 
 ![](menu-nb-NO-7-widest.png)
 
-Bar packed 882 × 425 px; widest popup 229 px.
+Bar packed 882 × 448 px; widest popup 229 px.
 
 | channel | words |
 |---|---|
@@ -982,6 +1006,10 @@ Bar packed 882 × 425 px; widest popup 229 px.
 | item hover \| Hvor Uranus og de fem største månene er, for karttiden og stedet |
 | item spoken name \| Uranustabell |
 | item spoken description \| Åpner en tabell over Uranus' beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Miranda, Ariel, Umbriel, Titania og Oberon står ved siden av - klar av Uranus, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Uranus og månene tegnes på kartet med Uranus på kartet. |
+| item label \| Neptun... |
+| item hover \| Hvor Neptun, Triton og Nereid er, for karttiden og stedet |
+| item spoken name \| Neptuntabell |
+| item spoken description \| Åpner en tabell over Neptuns beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Triton og Nereid står ved siden av - klar av Neptun, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Neptun tegnes ikke på kartet ennå. |
 | item label \| Zoom inn |
 | item spoken name \| Zoom inn |
 | item spoken description \| Viser et smalere synsfelt med svakere stjerner |
@@ -1005,7 +1033,7 @@ Bar packed 882 × 425 px; widest popup 229 px.
 
 ![](menu-nb-NO-8-narrowest.png)
 
-Bar packed 882 × 425 px; widest popup 229 px.
+Bar packed 882 × 448 px; widest popup 229 px.
 
 | channel | words |
 |---|---|
@@ -1119,6 +1147,10 @@ Bar packed 882 × 425 px; widest popup 229 px.
 | item hover \| Hvor Uranus og de fem største månene er, for karttiden og stedet |
 | item spoken name \| Uranustabell |
 | item spoken description \| Åpner en tabell over Uranus' beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Miranda, Ariel, Umbriel, Titania og Oberon står ved siden av - klar av Uranus, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Uranus og månene tegnes på kartet med Uranus på kartet. |
+| item label \| Neptun... |
+| item hover \| Hvor Neptun, Triton og Nereid er, for karttiden og stedet |
+| item spoken name \| Neptuntabell |
+| item spoken description \| Åpner en tabell over Neptuns beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Triton og Nereid står ved siden av - klar av Neptun, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Neptun tegnes ikke på kartet ennå. |
 | item label [unavailable] \| Zoom inn |
 | item spoken name [unavailable] \| Zoom inn |
 | item spoken description [unavailable] \| Utilgjengelig: et nærfelt tilbys bare når Merkur, Venus, Mars, Jupiter, Saturn eller Uranus, vist på kartet, står på siden steget ville vise |

@@ -7,6 +7,23 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Neptune, Triton and Nereid in the Solar System tables (#656, ruled on
+#654).** View > Solar System gains *Neptune...* directly after
+*Uranus...*, and the Controller's Solar System tab a Neptune group in the
+same place, introduced collapsed; both hosts share one session, and
+opening, expanding or building either computes nothing. The Neptune card
+gives the position, height, distance, apparent diameter across the
+equator and from pole to pole, the illuminated fraction and the phase
+angle - Neptune is never less than 99.97 % lit, so there are no phase
+words - the north pole's position angle and how far that pole is tipped
+towards you; Triton and Nereid follow in Jupiter's columns, with their
+states - clear of Neptune, in front of it, behind it or in its shadow.
+The moons are computed for 2000 to 2100: before 2000 Neptune is shown
+alone and the table says why, and a range across 2000 keeps Neptune at
+every instant. In English and Norwegian. *Neptune...* has no access
+letter: every letter of its name is already taken on the menu, as for
+*Mars...*. Neptune is not drawn on the chart yet.
+
 **Neptune, computed offline (#655, ruled on #654).** A seventh pack,
 Neptune System, holds two excerpts of NAIF's `nep098_part-1.bsp`:
 DE442's Neptune barycentre over 1900-2100 (416,768 bytes), which stands

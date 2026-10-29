@@ -1315,4 +1315,35 @@ public final class AppMenuBar {
         }
         solar.insert(uranus, at);
     }
+
+    /**
+     * Adds View > Solar System > Neptune... directly after Uranus... (#656),
+     * outward from the Sun: the Neptune table's dialog, kept beside the
+     * Controller's Neptune group for dogfooding as Uranus's is. Opening it
+     * computes nothing. No Neptune on the chart item: no Neptune is drawn yet.
+     */
+    public static void addNeptuneTable(javax.swing.JMenuBar bar,
+                                       juranometria.ui.language.InterfaceText said,
+                                       Runnable openNeptuneTable) {
+        JMenu solar = solarSystemMenu(bar);
+        if (solar == null || openNeptuneTable == null) {
+            return;
+        }
+        JMenuItem neptune = new JMenuItem(said.say("menu.neptune.label"));
+        neptune.setName("neptuneTableItem");
+        // No access letter, on Mars's ruling (#603, 2026-10-26): every letter
+        // of "Neptune" and of "Neptun" is already claimed on this menu, two
+        // items never share one, and every existing letter is kept.
+        neptune.getAccessibleContext().setAccessibleName(said.say("menu.neptune.a11y"));
+        juranometria.ui.Explain.control(neptune, said.say("menu.neptune.hover"),
+                said.say("menu.neptune.explain"));
+        neptune.addActionListener(event -> openNeptuneTable.run());
+        int at = solar.getMenuComponentCount();
+        for (int i = 0; i < solar.getMenuComponentCount(); i++) {
+            if ("uranusTableItem".equals(solar.getMenuComponent(i).getName())) {
+                at = i + 1;
+            }
+        }
+        solar.insert(neptune, at);
+    }
 }
