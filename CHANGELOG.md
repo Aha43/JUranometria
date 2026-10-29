@@ -16,6 +16,16 @@ rule that draws them only where they stand clear, their states and their
 years - and what it does not claim. Every figure is a released evidence
 page and every number is quoted from the report that measured it.
 
+**Uranus's moons on the chart (#638, part 2, ruled on #637).** Uranus on
+the chart now draws Miranda, Ariel, Umbriel, Titania and Oberon from 2000
+to 2100 as 3-pixel symbols at their own places, each only where its mark
+stands clear of Uranus's and of the moons already drawn - Mars's rule, so
+mostly at the minimum and closer fields: at 1° Titania and Oberon often,
+at 0.25° most of the system. A moon in Uranus's shadow is a hollow ring; a
+moon behind Uranus, in transit, or too close to tell apart is not drawn,
+and the page's description says so. The moons are named and not
+selectable. Before 2000 Uranus is drawn alone, as the table shows it.
+
 **Uranus on the chart (#638, part 1, ruled on #637).** View > Solar
 System gains *Uranus on the chart* after *Saturn on the chart*, and the
 Controller's Uranus group its Show on chart and Centre on chart; the
@@ -27,15 +37,16 @@ as a symbol, covered by the Sun when behind it, and offers the closer
 fields 0.5° and 0.25°. Hidden until you ask; in English and Norwegian. The
 moons follow in part 2.
 
-**Uranus's moons on the chart (#638, part 2, ruled on #637).** Uranus on
-the chart now draws Miranda, Ariel, Umbriel, Titania and Oberon from 2000
-to 2100 as 3-pixel symbols at their own places, each only where its mark
-stands clear of Uranus's and of the moons already drawn - Mars's rule, so
-mostly at the minimum and closer fields: at 1° Titania and Oberon often,
-at 0.25° most of the system. A moon in Uranus's shadow is a hollow ring; a
-moon behind Uranus, in transit, or too close to tell apart is not drawn,
-and the page's description says so. The moons are named and not
-selectable. Before 2000 Uranus is drawn alone, as the table shows it.
+**Uranus on the page, measured (#637).** The cartography study and its
+ten rulings in `docs/decisions/uranus-cartography.md`: Uranus always the
+6-pixel symbol, its true disc never that large; unphased, round and
+uncoloured, its pole not drawn; its rings table-only; the moons drawn
+only where they stand clear of Uranus's mark, with no floor; Jupiter's
+vocabulary for their states; Uranus selectable and its moons not; the
+closer fields; the inherited contracts; and Uranus first, then the moons.
+
+**Uranus handed to cartography (#636).** The settled numerical contract
+in one place: `docs/decisions/uranus-handover.md`.
 
 **Uranus and its five moons in the Solar System tables (#635, ruled on
 #633).** View > Solar System gains *Uranus...* directly after
@@ -69,6 +80,12 @@ About, in both languages. No table or chart shows Uranus yet; the
 first numbers are in `docs/studies/uranus-system/service-accuracy.md`.
 The Sun and the Earth stay DE440's, and the released Sun, Moon,
 Mercury, Venus, Mars, Jupiter and Saturn answers are unchanged.
+
+**Uranus and its five major moons: the system contract (#633).** The
+authority, interval, frames, observables and words for Uranus and
+Miranda, Ariel, Umbriel, Titania and Oberon, ruled U-1 to U-13 - DE442's
+barycentre for Uranus, the five moons for 2000-2100, no ring rows:
+`docs/decisions/uranus-system.md`.
 
 ## [5.5.0] - 2026-10-27
 
