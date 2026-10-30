@@ -119,3 +119,26 @@ On the 900 × 700 page (the report gives every field):
     - each with its packaged owner checkpoint.
 
 The Uranus article (#660) and the integrated 6.0.0 handover (#661) follow, as the road orders them.
+
+## The ruling
+
+The owner's ruling of 2026-10-30, as given:
+
+> Rule R-1 through R-11 as proposed, choosing R-6a for Nereid: Neptune's moons are offered only at 1° and the closer fields, and each mark is still subject independently to the inherited clearance rule. Nereid remains a charted moon rather than table-only, but it must not appear as a lone magnitude-18.7 dot on wider pages whose stellar limit is magnitude 8 or brighter.
+> Draw every moon at its own J2000 chart position; do not derive its placement from a table-frame offset.
+
+**R-1 to R-11 are ruled as proposed above, R-6 as R-6a:**
+- **The moons are offered only at 1° and the closer fields** (0.5° and 0.25°). On every wider field neither moon is drawn.
+- **On those fields each mark is subject independently to Mars's clearance rule** (R-5). It is drawn only where its symbol stands clear of Neptune's drawn mark and of the moon already drawn. Triton in practice appears only on the closer fields; Nereid at 1° in 95.6 % of weeks.
+- **Nereid is a charted moon, not table-only.** It never appears as a lone magnitude-18.7 dot on a wider page, whose stellar limit is magnitude 8 or brighter.
+- **Every moon is drawn at its own astrometric J2000 chart position**, never Neptune's place plus a table-frame (apparent-of-date) offset. Over the moons' years the two differ by up to 2.317″, which is 2.32 px at 0.25° (section D).
+- **The rest stand as written:**
+  - the mark always, unphased, round, no colour, no pole (R-1 to R-3);
+  - no rings (R-4);
+  - Jupiter's vocabulary A (R-7);
+  - Neptune eligible for the closer fields (R-8);
+  - Neptune selectable, the moons not (R-9);
+  - screen, paper, accessibility and export, with the Solar System menu's spoken description made whole in #659 (R-10);
+  - Neptune first, then the moons (R-11).
+
+No production Neptune ink begins before this study lands; #659 draws from it.
