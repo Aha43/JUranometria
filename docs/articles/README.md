@@ -37,6 +37,11 @@ behind that argument.
   Phobos and Deimos, why Mars is usually a symbol and sometimes a disc,
   how to read its phase and its two small moons, and what it does not
   claim. Also in Norwegian: [Mars på siden](mars-pa-siden.md).
+- [Uranus on the page](uranus-on-the-page.md) — what the atlas draws of
+  Uranus and its five major moons, why Uranus is always a symbol and never
+  a disc, why its rings stay in the table, how to read its tilt and its
+  moons, and what it does not claim. Also in Norwegian: [Uranus på
+  siden](uranus-pa-siden.md).
 
 ## How JUranometria works
 
