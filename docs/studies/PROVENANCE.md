@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**881 promoted artifacts.**
+**899 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -601,6 +601,24 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/moon-on-the-chart/june-new-with-sun-12.png` | `751ecc2207254f78046353fadccecfd2933e53d2423e5cada37fc7ffce9a0d57` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/moon-on-the-chart/lunation-june-2026.png` | `a1fb2fe28b2bd30d6479475407c6da97fd21eafcc67c1f7aec7bd983b9c5d80e` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/moon-on-the-chart/perigee-nearest-3.png` | `bc6d0fb6939e924407418ba52e9dfe15dfd1079cef55be9c72a26e22046b369a` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/neptune-cartography/before-the-moons-1.png` | `dbc8f419e2a77dbb28ca1d6792272251da894634079becdce889a6f33c7af60f` | 2026-10-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/neptune-cartography/below-horizon-8.png` | `a4a39ae4d8685751862e69127f9bd129d9c1eae538fdc0acea9cf9d7918f54d5` | 2026-10-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/neptune-cartography/conjunction-2026-3.png` | `01b0d6b42b0a020610c2fb331e5e4469bb99f0ac38ff63eab8c25d8895b703ba` | 2026-10-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/neptune-cartography/largest-0.25.png` | `b3a0066c349b5bb62249eee2070f3decfea16d8b4a911eb0d2fb6c19fc1d962c` | 2026-10-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/neptune-cartography/nereid-nearest-0.25.png` | `78e114f58b40f686516baf4a2e58153e5bd9ebf70d8cbf330550abc90f342734` | 2026-10-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/neptune-cartography/nereid-widest-1.png` | `cea69e67e958a1d003bea7938c021fb94fe3be5486cc470cf5478067cfa98c7a` | 2026-10-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/neptune-cartography/nereid-widest-12.png` | `a6b1231376832b08d6266725b253852414d05f563de5c836d456d789769b4166` | 2026-10-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/neptune-cartography/opposition-2026-0.25.png` | `6799d3ded346e2857860566bdae8dbb65cb604972ee7a1fecd0f690f36b9ca06` | 2026-10-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/neptune-cartography/opposition-2026-0.5.png` | `0eb5ca9b31d48fe9360d114ee8352f97739dfb8a5cf4ff41175304f4137b8baa` | 2026-10-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/neptune-cartography/opposition-2026-1.png` | `1685f7017152bcd8ee5def588b59be0d134323c6c8f6def1939ec3bf4f47a344` | 2026-10-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/neptune-cartography/opposition-2026-12.png` | `264782781f7371f1634c13fc6b7f0f230eb8c1d5c558f05bdce50a2dda038449` | 2026-10-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/neptune-cartography/opposition-2026-2.png` | `c62adb72ba27204ff87cb64901a2b383537a5eb2087e801e07da1a518ddd6898` | 2026-10-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/neptune-cartography/opposition-2026-8.png` | `44f3d21bb48ca48d347e38b62ffe260df90dfd4fbc4d693805e0b1dffddbcb5e` | 2026-10-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/neptune-cartography/printable-a4-1.png` | `3ca1b1cd5869d76e2d726f63c2b8153496cfcca0c8123ff8e1fdc3ad47d5dfb8` | 2026-10-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/neptune-cartography/triton-behind-in-shadow-0.25.png` | `597100a7185b1760de5c061726f2428532b3a896bf7f1a2d004db327cefc392a` | 2026-10-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/neptune-cartography/triton-in-front-0.25.png` | `d7e6db0c982299fa2cf1a92b56c1ed47aba4c389c4d19d2fe09ef350c2fde78c` | 2026-10-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/neptune-cartography/triton-widest-0.25.png` | `bf49520e7147cd0ff8e844eda16e3816e4a44a9a5feb580b8a49fd0e61dae1fa` | 2026-10-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/neptune-cartography/triton-widest-1.png` | `55f4bc35f5d8bdc7b122916345d706d5dbedcffb8b54dbb1f938c9b93c29f43e` | 2026-10-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/overview-projection/equinox-060-gnomonic.png` | `db5f4a200e926cd155358254502f4d85dd2d185a3e473e75024125aa14d5b52d` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/overview-projection/equinox-060-orthographic.png` | `4ecd89f9b4f5d55c1b07ff041b987a6ce9e722ca71c32ae607a00fed0fbbd298` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/overview-projection/equinox-060-stereographic.png` | `c43ca687588e0624d05864edf527e365740fa4fedd835676566e20d08dcf5fd7` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
