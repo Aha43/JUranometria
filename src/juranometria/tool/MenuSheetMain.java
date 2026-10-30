@@ -253,10 +253,15 @@ public final class MenuSheetMain {
                 if (uranusOnChart != null) {
                     uranusOnChart.setSelected(state.checked());
                 }
-                // Neptune... (#656), directly after Uranus..., in the
-                // application's order; no Neptune on the chart item yet.
+                // Neptune... (#656) and Neptune on the chart (#659), directly
+                // after Uranus's, in the application's order.
                 AppMenuBar.addNeptuneTable(bar[0],
                         juranometria.ui.language.InterfaceText.forLanguage(language), () -> { });
+                JCheckBoxMenuItem neptuneOnChart = AppMenuBar.addNeptuneOnChart(bar[0],
+                        juranometria.ui.language.InterfaceText.forLanguage(language), () -> { });
+                if (neptuneOnChart != null) {
+                    neptuneOnChart.setSelected(state.checked());
+                }
 
                 // Centre on coordinates... (#623), which the application adds
                 // after the bar is built, after the Controller item.

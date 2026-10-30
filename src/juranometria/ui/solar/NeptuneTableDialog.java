@@ -27,7 +27,7 @@ import juranometria.ui.language.MnemonicText;
  * Opening it computes nothing: it shows what the session already holds,
  * and computes only when the reader asks - Compute, a view or Enter. What
  * is the dialog's own is its layout, the time note, Close and the access
- * letters. No Centre on chart: no Neptune is drawn yet.
+ * letters, and since #659 Centre on chart.
  */
 public final class NeptuneTableDialog extends JDialog {
 
@@ -37,13 +37,14 @@ public final class NeptuneTableDialog extends JDialog {
 
     private final Content content;
 
-    private NeptuneTableDialog(Frame owner, NeptuneTableSession session, InterfaceText said) {
+    private NeptuneTableDialog(Frame owner, NeptuneTableSession session, InterfaceText said,
+                               CentreOnChart centre, BodyOnChart layer) {
         super(owner, new SolarTableWords(said, "neptunetable").say("title"), false);
         SolarTableWords words = new SolarTableWords(said, "neptunetable");
         getAccessibleContext().setAccessibleName(words.say("a11y"));
         getAccessibleContext().setAccessibleDescription(words.say("explain"));
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        content = new Content(session, said, this::dispose);
+        content = new Content(session, said, this::dispose, centre, layer);
         setContentPane(content);
         getRootPane().registerKeyboardAction(e -> dispose(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
@@ -60,18 +61,33 @@ public final class NeptuneTableDialog extends JDialog {
 
     /** Opens the one Neptune table over the shared session, or brings it to the front. */
     public static void open(Frame owner, NeptuneTableSession session, InterfaceText said) {
+        open(owner, session, said, null, null);
+    }
+
+    /**
+     * With Centre on chart (#659): the dialog's button turns {@code layer},
+     * the Solar System module's Neptune switch, on and centres the chart on Neptune.
+     */
+    public static void open(Frame owner, NeptuneTableSession session, InterfaceText said,
+                            CentreOnChart centre, BodyOnChart layer) {
         if (current != null && current.isDisplayable()) {
             current.toFront();
             current.requestFocus();
             return;
         }
-        current = new NeptuneTableDialog(owner, session, said);
+        current = new NeptuneTableDialog(owner, session, said, centre, layer);
         current.setVisible(true);
     }
 
     /** The content over a session, headless-constructible, for tests and studies. */
     public static Content content(NeptuneTableSession session, InterfaceText said) {
-        return new Content(session, said, () -> { });
+        return new Content(session, said, () -> { }, null, null);
+    }
+
+    /** The same, with Centre on chart (#659). */
+    public static Content content(NeptuneTableSession session, InterfaceText said,
+                                  CentreOnChart centre, BodyOnChart layer) {
+        return new Content(session, said, () -> { }, centre, layer);
     }
 
     /** This dialog's content. */
@@ -88,8 +104,9 @@ public final class NeptuneTableDialog extends JDialog {
         public final JLabel timeNote = new JLabel();
         public final JButton close;
 
-        Content(NeptuneTableSession session, InterfaceText language, Runnable closeAction) {
-            controls = new NeptuneTableControls(session, language, true);
+        Content(NeptuneTableSession session, InterfaceText language, Runnable closeAction,
+                CentreOnChart centre, BodyOnChart layer) {
+            controls = new NeptuneTableControls(session, language, true, null, centre, layer);
             SolarTableWords said = controls.words();
             MnemonicText letters = MnemonicText.in(language);
             setLayout(new BorderLayout(0, 8));
@@ -118,6 +135,9 @@ public final class NeptuneTableDialog extends JDialog {
             if (controls.setChartTime != null) {
                 buttons.add(controls.setChartTime);
                 buttons.add(Box.createHorizontalStrut(8));
+            }
+            if (controls.centreOnChart != null) {
+                buttons.add(controls.centreOnChart);
             }
             buttons.add(Box.createHorizontalGlue());
             buttons.add(close);

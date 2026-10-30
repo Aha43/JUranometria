@@ -550,6 +550,7 @@ public final class PackagedAcceptanceMain {
         mercuryOnTheChartJourney();
         marsOnTheChartJourney();
         uranusOnTheChartJourney();
+        neptuneOnTheChartJourney();
         marsMoonsOnTheChartJourney();
         uranusMoonsOnTheChartJourney();
         closerFieldsJourney();
@@ -3619,6 +3620,101 @@ public final class PackagedAcceptanceMain {
     }
 
     /**
+     * Neptune on the chart (#659), inside the image: Uranus's journey over the
+     * Neptune sample, with the Neptune System pack's service attached as the
+     * application attaches it - the 6 px symbol at 8° and at the minimum
+     * field, spoken as one (R-1); a click on the mark selects Neptune's
+     * occurrence (R-9); and at 1° the closer fields offered with Neptune on
+     * the page (R-8), zoom in reaching 0.25° with Neptune still the 6 px mark.
+     */
+    private static void neptuneOnTheChartJourney() throws Exception {
+        juranometria.solar.SolarSystemService solar =
+                juranometria.solar.SolarSystemService.load();
+        juranometria.solar.NeptuneService neptuneService = juranometria.solar.NeptuneService.load();
+        juranometria.sky.Observer oslo = new juranometria.sky.Observer(59.91, 10.75,
+                NEPTUNE_SAMPLE_INSTANT);
+        juranometria.solar.NeptuneService.NeptuneObservation neptune = neptuneService.observe(oslo);
+        String identity = juranometria.solarchart.SolarSystemModule.NEPTUNE;
+        for (double field : new double[] {8.0,
+                juranometria.chart.ChartViewState.normalMinimumFieldDegrees()}) {
+            juranometria.ui.ChartComponent[] chart = new juranometria.ui.ChartComponent[1];
+            juranometria.chart.SelectionModel selection = new juranometria.chart.SelectionModel();
+            juranometria.ui.ChartModuleHost[] host = new juranometria.ui.ChartModuleHost[1];
+            juranometria.ui.ChartViewController controller =
+                    new juranometria.ui.ChartViewController();
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                chart[0] = new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
+                chart[0].setSize(900, 700);
+                controller.onChange(chart[0]::setViewState);
+                chart[0].setCloserFieldBodies(CLOSER_FIELD_BODIES);
+                controller.offerCloserFields(chart[0]::offersCloserField);
+                chart[0].onPageContentsChange(controller::closerOfferChanged);
+                controller.recenter(neptune.astrometricJ2000(), field);
+                host[0] = new juranometria.ui.ChartModuleHost(chart[0], selection, r -> { });
+                juranometria.ui.SelectInteraction.install(chart[0], selection,
+                        host[0].workingSelection(), new juranometria.chart.SelectionMode());
+                juranometria.solarchart.SolarSystemModule module =
+                        juranometria.ui.solar.SunChartSession.begin(host[0], () -> oslo,
+                                () -> solar, () -> false);
+                module.withNeptune(() -> neptuneService);
+                module.sunShowing(false);
+                module.neptuneShowing(true);
+            });
+            try {
+                paintHeadless(chart[0]);
+                java.util.List<juranometria.ui.ReferenceInk.BodyPlacement> drawn =
+                        chart[0].renderedBodies();
+                require(drawn.size() == 1 && identity.equals(drawn.get(0).identity()),
+                        "the packaged chart drew Neptune at " + field + "°: " + drawn);
+                juranometria.project.DrawnPage page =
+                        juranometria.project.DrawnPage.of(chart[0].currentScene());
+                juranometria.project.PixelPoint expected =
+                        new juranometria.project.ViewportMapping(page).toPixel(
+                                page.projection().project(neptune.astrometricJ2000()).orElseThrow());
+                juranometria.project.PixelPoint centre = drawn.get(0).centre();
+                require(Math.hypot(centre.x() - expected.x(), centre.y() - expected.y()) < 0.01,
+                        "at the service's J2000 place at " + field + "°");
+                require(drawn.get(0).symbol() && Math.abs(drawn.get(0).disc().getBounds2D()
+                                .getWidth() - juranometria.solarchart.SolarSystemModule
+                                .NEPTUNE_MINIMUM_MARK_PX) < 0.05,
+                        "rule M: the 6 px symbol at " + field + "°");
+                String said = chart[0].getAccessibleContext().getAccessibleDescription();
+                require(said.contains(" Neptune (a cartographic symbol, not Neptune's apparent"
+                        + " diameter)."), "spoken as a symbol: " + said);
+                if (field == juranometria.chart.ChartViewState.normalMinimumFieldDegrees()) {
+                    clickOn(chart[0], centre);
+                    require(selection.selection() instanceof juranometria.chart.Selection
+                            .Occurrence chosen && identity.equals(chosen.identity())
+                            && NEPTUNE_SAMPLE_INSTANT.equals(chosen.instant()),
+                            "a click on Neptune's mark is Neptune's occurrence (R-9): "
+                                    + selection.selection());
+                    javax.swing.SwingUtilities.invokeAndWait(() -> { });
+                    require(controller.canZoomIn(), "at 1° with Neptune on the page, the closer"
+                            + " step is offered (R-8)");
+                    javax.swing.SwingUtilities.invokeAndWait(controller::zoomIn);
+                    javax.swing.SwingUtilities.invokeAndWait(() -> { });
+                    javax.swing.SwingUtilities.invokeAndWait(controller::zoomIn);
+                    require(controller.state().fieldWidthDegrees() == 0.25,
+                            "zoom in reaches 0.25° on Neptune");
+                    paintHeadless(chart[0]);
+                    require(chart[0].renderedBodies().stream()
+                                    .anyMatch(b -> identity.equals(b.identity()) && b.symbol()
+                                            && Math.abs(b.disc().getBounds2D().getWidth()
+                                                    - juranometria.solarchart.SolarSystemModule
+                                                    .NEPTUNE_MINIMUM_MARK_PX) < 0.05),
+                            "Neptune still the 6 px mark at 0.25° (R-1)");
+                }
+            } finally {
+                javax.swing.SwingUtilities.invokeAndWait(host[0]::detachAll);
+            }
+        }
+        System.out.println("neptune on the chart OK (the packaged component draws Neptune where the"
+                + " Neptune System pack puts it at the Neptune sample - the 6 px symbol at 8° and at"
+                + " the minimum field, spoken as one - a click on the mark selects Neptune's"
+                + " occurrence, and the closer fields reach 0.25° on Neptune, still the 6 px mark)");
+    }
+
+    /**
      * Phobos and Deimos on the chart (#606 part 2), inside the image: at
      * the moons' sample, Mars on and the page centred on it, at the
      * minimum field both moons are drawn as 3 px symbols at their own
@@ -3903,7 +3999,8 @@ public final class PackagedAcceptanceMain {
             juranometria.solarchart.SolarSystemModule.VENUS,
             juranometria.solarchart.SolarSystemModule.MARS,
             juranometria.jovianchart.JovianModule.JUPITER,
-            juranometria.solarchart.SolarSystemModule.URANUS);
+            juranometria.solarchart.SolarSystemModule.URANUS,
+            juranometria.solarchart.SolarSystemModule.NEPTUNE);
 
     /** Jupiter's half of the closer-fields journey, at the Jovian sheet's moment. */
     private static void closerFieldsForJupiter() throws Exception {

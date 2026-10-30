@@ -46,7 +46,7 @@ public final class CentreOnChart {
 
     /** The bodies a target can be for, for counting presses per body. */
     public enum Body {
-        SUN, MOON, JUPITER, VENUS, MERCURY, SATURN, MARS, URANUS
+        SUN, MOON, JUPITER, VENUS, MERCURY, SATURN, MARS, URANUS, NEPTUNE
     }
 
     /** What the action moves: the application's chart window. */

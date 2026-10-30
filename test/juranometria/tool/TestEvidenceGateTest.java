@@ -490,6 +490,7 @@ class TestEvidenceGateTest {
                         "MarsChartStore.us" + "er(",
                         "MercuryChartStore.us" + "er(",
                         "MoonChartStore.us" + "er(",
+                        "NeptuneChartStore.us" + "er(",
                         "PackagedAcceptanceMain.ma" + "in(",
                         "PlaceStore.us" + "er(",
                         "SaturnChartStore.us" + "er(",
@@ -499,7 +500,7 @@ class TestEvidenceGateTest {
                         "VenusChartStore.us" + "er(",
                         "ZoomLockStore.us" + "er("),
                 TestEvidenceScan.realPreferenceDoors(),
-                "the nineteen production entry points to the reader's"
+                "the twenty production entry points to the reader's"
                         + " store - the sixth is #274's, which keeps"
                         + " one key for whether the ecliptic is shown,"
                         + " the seventh is #348's, which keeps the"
@@ -518,8 +519,9 @@ class TestEvidenceGateTest {
                         + " Venus is on the chart, the sixteenth is"
                         + " #542's, whether Mercury is, the seventeenth"
                         + " is #579's, whether Saturn is, the eighteenth"
-                        + " is #606's, whether Mars is, and the nineteenth"
-                        + " is #638's, whether Uranus is. Each arrived by this"
+                        + " is #606's, whether Mars is, the nineteenth"
+                        + " is #638's, whether Uranus is, and the twentieth"
+                        + " is #659's, whether Neptune is. Each arrived by this"
                         + " pin changing rather than by a silent gap"
                         + " in a remembered list, which is the whole"
                         + " reason the set is derived");

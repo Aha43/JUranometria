@@ -101,6 +101,23 @@ public final class SolarSystemModule implements ChartModule {
         return URANUS + "." + moon.name().toLowerCase(java.util.Locale.ROOT);
     }
 
+    /**
+     * Neptune's identity on the page (#659), derived from its service's name
+     * as Uranus's is: Neptune has its own service (#655).
+     */
+    public static final String NEPTUNE = juranometria.solar.NeptuneService.class.getSimpleName()
+            .substring(0, 7).toLowerCase(java.util.Locale.ROOT);
+    /** Rule M for Neptune (R-1 on #658): the same 6 px mark, which always stands in. */
+    public static final double NEPTUNE_MINIMUM_MARK_PX = VENUS_MINIMUM_MARK_PX;
+    /** The page's state key for Neptune behind the Sun's disc; an outer planet is never in front. */
+    public static final String NEPTUNE_BEHIND = NEPTUNE + VENUS_BEHIND.substring(VENUS.length());
+    /**
+     * R-2 on #658: Neptune's mark is drawn full and round. It is never less
+     * than 99.971 % lit, a dark part of 0.002 px on the mark, so the page is
+     * given a fully lit disc rather than an invisible phase.
+     */
+    static final OverlayContribution.Lit NEPTUNE_FULL = new OverlayContribution.Lit(1.0, 0.0, 0.0);
+
     /** A moon of Mars's identity on the page, {@code mars.phobos} and {@code mars.deimos}. */
     public static String identityOf(juranometria.solar.MarsService.Moon moon) {
         return MARS + "." + moon.name().toLowerCase(java.util.Locale.ROOT);
@@ -275,6 +292,46 @@ public final class SolarSystemModule implements ChartModule {
         listener.accept(uranusShowing);
     }
 
+    private boolean neptuneShowing;
+    private final java.util.List<java.util.function.Consumer<Boolean>> neptuneListeners =
+            new java.util.ArrayList<>();
+    /** Neptune's service, read only when Neptune is shown (#659); null until a host gives it. */
+    private Supplier<juranometria.solar.NeptuneService> neptune;
+
+    /** Gives the module Neptune's service, read lazily the first time Neptune is drawn (#659). */
+    public void withNeptune(Supplier<juranometria.solar.NeptuneService> service) {
+        if (service == null) {
+            throw new IllegalArgumentException("Neptune's service is required");
+        }
+        this.neptune = service;
+    }
+
+    public boolean neptuneShowing() {
+        return neptuneShowing;
+    }
+
+    /** Neptune on the chart (#659): its own switch, independent of every other body's. */
+    public void neptuneShowing(boolean showing) {
+        boolean changed = this.neptuneShowing != showing;
+        this.neptuneShowing = showing;
+        if (services != null) {
+            services.redraw();
+        }
+        if (changed) {
+            for (java.util.function.Consumer<Boolean> listener : java.util.List.copyOf(neptuneListeners)) {
+                listener.accept(showing);
+            }
+        }
+    }
+
+    public void onNeptuneChange(java.util.function.Consumer<Boolean> listener) {
+        if (listener == null) {
+            throw new IllegalArgumentException("a listener is required");
+        }
+        neptuneListeners.add(listener);
+        listener.accept(neptuneShowing);
+    }
+
     private boolean mercuryShowing;
     private final java.util.List<java.util.function.Consumer<Boolean>> mercuryListeners =
             new java.util.ArrayList<>();
@@ -396,7 +453,8 @@ public final class SolarSystemModule implements ChartModule {
     public List<OverlayContribution> contributedGeometry() {
         contributions++;
         if (!sunShowing && !moonShowing && !venusShowing && !mercuryShowing
-                && !(marsShowing && mars != null) && !(uranusShowing && uranus != null)) {
+                && !(marsShowing && mars != null) && !(uranusShowing && uranus != null)
+                && !(neptuneShowing && neptune != null)) {
             return List.of();
         }
         Observer now = observer.get();
@@ -507,6 +565,24 @@ public final class SolarSystemModule implements ChartModule {
                         planet.behindSun() ? URANUS_BEHIND : null));
                 offered.addAll(uranusMoons(now, horizon
                         && planet.horizontal().altitudeDegrees() < 0.0));
+            } catch (IllegalArgumentException outsideTheYears) {
+                // Nothing for this instant.
+            }
+        }
+        if (neptuneShowing && neptune != null) {
+            // Neptune (#659 part 1, the rulings on #658): rule M, the 6 px mark
+            // always standing in (R-1), drawn full and round with no colour (R-2),
+            // the pole not drawn (R-3), no ring (R-4), selectable as an occurrence
+            // (R-9), spoken behind the Sun when its disc meets the Sun's. Outside
+            // its years nothing is drawn. The moons are part 2 (R-6a, R-11).
+            try {
+                juranometria.solar.NeptuneService.NeptuneObservation planet = neptune.get().observe(now);
+                offered.add(new OverlayContribution.Body(NEPTUNE, "Neptune",
+                        planet.astrometricJ2000(), planet.equatorialDiameterArcseconds(),
+                        NEPTUNE_FULL, horizon && planet.horizontal().altitudeDegrees() < 0.0,
+                        planet.distanceKm(), InkRole.BODY,
+                        OverlayContribution.Moment.of(now), true, NEPTUNE_MINIMUM_MARK_PX,
+                        planet.behindSun() ? NEPTUNE_BEHIND : null));
             } catch (IllegalArgumentException outsideTheYears) {
                 // Nothing for this instant.
             }

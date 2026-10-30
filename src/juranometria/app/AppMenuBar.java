@@ -1020,6 +1020,44 @@ public final class AppMenuBar {
         return item;
     }
 
+    /** Neptune on the chart's item (#659), after Uranus's, named by the Moon's rule. */
+    public static final String NEPTUNE_CHART_ITEM =
+            juranometria.solarchart.SolarSystemModule.NEPTUNE
+                    + MOON_CHART_ITEM.substring(juranometria.solarchart.SolarSystemModule.MOON.length());
+
+    /**
+     * Adds View > Solar System > Neptune on the chart directly after Uranus
+     * on the chart (#659), outward from the Sun: the one remembered switch
+     * for Neptune's layer. No access letter: every letter of "Neptune" and
+     * "Neptun" is already claimed on this menu, and every existing letter is
+     * kept, as for Mars on the chart (#606). Returns the item, or null on a
+     * bar without the submenu.
+     */
+    public static javax.swing.JCheckBoxMenuItem addNeptuneOnChart(javax.swing.JMenuBar bar,
+            juranometria.ui.language.InterfaceText said, Runnable toggleNeptuneOnChart) {
+        JMenu solar = solarSystemMenu(bar);
+        if (solar == null || toggleNeptuneOnChart == null) {
+            return null;
+        }
+        javax.swing.JCheckBoxMenuItem item = new javax.swing.JCheckBoxMenuItem(
+                said.say("menu.neptunechart.label"));
+        item.setName(NEPTUNE_CHART_ITEM);
+        item.getAccessibleContext().setAccessibleName(said.say("menu.neptunechart.a11y"));
+        juranometria.ui.Explain.selfExplanatory(item, said.say("menu.neptunechart.explain"));
+        item.addActionListener(event -> toggleNeptuneOnChart.run());
+        int after = -1;
+        for (int i = 0; i < solar.getMenuComponentCount(); i++) {
+            String name = solar.getMenuComponent(i).getName();
+            if (URANUS_CHART_ITEM.equals(name) || "saturnOnChartItem".equals(name)
+                    || "jupiterOnChartItem".equals(name) || MARS_CHART_ITEM.equals(name)
+                    || MOON_CHART_ITEM.equals(name) || SUN_CHART_ITEM.equals(name)) {
+                after = i;
+            }
+        }
+        solar.insert(item, after + 1);
+        return item;
+    }
+
     /**
      * Adds View > Solar System > Jupiter... after Moon... (#474): the
      * Jupiter table's dialog, kept beside the Controller's Jupiter group

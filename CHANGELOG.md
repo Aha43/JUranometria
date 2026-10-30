@@ -7,6 +7,19 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Neptune on the chart (#659, part 1, ruled on #658).** View > Solar
+System gains *Neptune on the chart* after *Uranus on the chart*, and the
+Controller's Neptune group its Show on chart and Centre on chart; the
+Neptune table's dialog has Centre on chart too. Neptune is drawn as a
+6-pixel cartographic symbol on every field - its true disc is never that
+large, not even at the closest field - full and round, in the page's ink,
+with no pole and no rings. It is selectable, said as a symbol, covered by
+the Sun when behind it (as at the 2003 conjunction) and drawn beside the
+Sun when not (as at the 2026 one), and offers the closer fields 0.5° and
+0.25°. Hidden until you ask; in English and Norwegian. The Solar System
+menu's spoken description now names every body the menu holds. Triton and
+Nereid follow in part 2.
+
 **Neptune handed to cartography (#657).** The settled numerical contract
 in one place: `docs/decisions/neptune-handover.md`.
 
