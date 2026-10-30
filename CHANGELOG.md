@@ -7,6 +7,9 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Neptune handed to cartography (#657).** The settled numerical contract
+in one place: `docs/decisions/neptune-handover.md`.
+
 **Neptune, Triton and Nereid in the Solar System tables (#656, ruled on
 #654).** View > Solar System gains *Neptune...* directly after
 *Uranus...*, and the Controller's Solar System tab a Neptune group in the
