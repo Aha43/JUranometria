@@ -142,3 +142,16 @@ The owner's ruling of 2026-10-30, as given:
   - Neptune first, then the moons (R-11).
 
 No production Neptune ink begins before this study lands; #659 draws from it.
+
+## #659 part 1, Neptune on the chart, as built: a packaged checkpoint
+
+**Accepted by the owner on 2026-10-30**, as given: "Accept part 1, app closed, run all seven gates", after trying the candidate `3fcccc4e`. The gate plan, all seven gates, was approved with it. Neptune itself under R-1 to R-4 and R-8 to R-10; the moons are part 2 (R-6a, R-11).
+
+- **The figure (R-1, R-2).** The Solar System module offers Neptune as a body with the 6 px minimum mark and a fully lit disc: the page draws the mark, round, in its ink and ground, on every field. `NeptuneInkTest` measures every pixel inside the mark's outline lit; the study measures the same on the 0.25° page (12 of 12).
+- **No pole, no rings (R-3, R-4).** Nothing is drawn for either.
+- **The Sun.** Where Neptune's disc meets the Sun's the page states *behind the Sun* and the Sun's opaque disc covers the mark (#514), as at Espenak's 2003 conjunction hour. At the 2026 conjunction Neptune is 1.3° from the Sun's centre: drawn beside the Sun, with no Sun relation stated.
+- **Selection and Centre on chart (R-9).** Neptune is an occurrence on the page (#513); the Controller's Neptune group has Show on chart and Centre on chart, and the table's dialog Centre on chart.
+- **The closer fields (R-8).** Neptune joins the bodies that offer 0.5° and 0.25°; the packaged journey zooms to 0.25° on Neptune and finds the 6 px mark.
+- **The switch.** *Neptune on the chart* after *Uranus on the chart*, remembered, hidden by default. No access letter: every letter of "Neptune" and "Neptun" is already claimed on that menu, and every existing letter is kept, as for *Mars on the chart*.
+- **Words (R-10).** The texts naming the closer fields' bodies now end "Uranus or Neptune" (*Uranus eller Neptun*); the Neptune table no longer says Neptune is not drawn; and the Solar System menu's spoken description, which had named only the Sun, Mercury, Venus, the Moon, Jupiter and Saturn since Mars's road, now names every body the menu holds, in both languages.
+- **Evidence.** `docs/studies/neptune-on-the-chart/` (production pages: the 2026 opposition from 8° to 0.25°, the 2026 conjunction beside the Sun, the 2003 conjunction behind it in both languages, nothing before 1900), registered in the evidence contract; the menu sheets show *Neptune on the chart*; the closer-fields notes name Neptune.
