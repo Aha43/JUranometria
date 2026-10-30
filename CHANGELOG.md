@@ -7,6 +7,16 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Uranus on the page (#660).** A new reader article, in English and
+Norwegian (*Uranus på siden*): what the atlas draws of Uranus as released
+for 6.0 - where its numbers come from, DE442 and the 50 km distance
+amendment, and how closely they match JPL Horizons; a planet that is
+always full and lies on its side; the 6-pixel symbol on every field; the
+rings that stay in the table; the five moons and the rule that draws
+them only where they stand clear, their states and their years - and
+what it does not claim. Every figure is a released evidence page and
+every number is quoted from the report that measured it.
+
 **Triton and Nereid on the chart (#659, part 2, ruled on #658).**
 Neptune on the chart now draws Triton and Nereid from 2000 to 2100 as
 3-pixel symbols at their own places, at the 1-degree field and the closer
