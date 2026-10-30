@@ -247,6 +247,10 @@ public final class EvidenceContractMain {
         // its mock-ups are held through IMAGE_MAINS, its labels in the platform record.
         REPORT_MAINS.put("juranometria.tool.UranusCartographyStudyMain",
                 "docs/studies/uranus-cartography/measurements.md");
+        // Neptune, Triton and Nereid on the page (#658): the report is deterministic;
+        // its mock-ups are held through IMAGE_MAINS, its labels in the platform record.
+        REPORT_MAINS.put("juranometria.tool.NeptuneCartographyStudyMain",
+                "docs/studies/neptune-cartography/measurements.md");
         // Mars on the chart (#606): production pages through the component with
         // the Solar System module and Mars attached; its pages are held through IMAGE_MAINS.
         REPORT_MAINS.put("juranometria.tool.MarsOnTheChartStudyMain",
@@ -469,6 +473,8 @@ public final class EvidenceContractMain {
                 "docs/studies/mars-cartography/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.UranusCartographyStudyMain",
                 "docs/studies/uranus-cartography/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.NeptuneCartographyStudyMain",
+                "docs/studies/neptune-cartography/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.SaturnOnTheChartStudyMain",
                 "docs/studies/saturn-on-the-chart/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.ChartInstantStudyMain",
@@ -673,6 +679,9 @@ public final class EvidenceContractMain {
             // Uranus and its five moons on the page (issue #637): production pages
             // painted by the renderer, the study's candidate marks and rings drawn over them.
             "juranometria.tool.UranusCartographyStudyMain",
+            // Neptune, Triton and Nereid on the page (issue #658): production pages
+            // painted by the renderer, the study's candidate marks drawn over them.
+            "juranometria.tool.NeptuneCartographyStudyMain",
             // Mars on the chart (issue #606): production pages composed by the
             // component with the Solar System module and Mars attached.
             "juranometria.tool.MarsOnTheChartStudyMain",
