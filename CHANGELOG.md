@@ -53,6 +53,18 @@ Sun when not (as at the 2026 one), and offers the closer fields 0.5° and
 menu's spoken description now names every body the menu holds. Triton and
 Nereid follow in part 2.
 
+**Neptune on the page, measured (#658).** The cartography study and
+its eleven rulings in `docs/decisions/neptune-cartography.md`: Neptune
+always the 6-pixel symbol, its true disc never that large; unphased,
+round and uncoloured, its pole not drawn; no rings; Triton and Nereid
+drawn only where they stand clear of Neptune's mark, and offered only at
+the 1-degree field and the closer fields, so that Nereid - fainter than
+any star the atlas draws by ten magnitudes - is never a lone dot on a
+wide page; every moon at its own J2000 place; Jupiter's vocabulary for
+their states; Neptune selectable and its moons not; the closer fields;
+the Solar System menu's spoken description to be made whole; and Neptune
+first, then the moons.
+
 **Neptune handed to cartography (#657).** The settled numerical contract
 in one place: `docs/decisions/neptune-handover.md`.
 

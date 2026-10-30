@@ -747,8 +747,11 @@ black-sky-study: classes
 # label study alone under 1 GiB peaks at 372 MB live and reproduces its
 # files: the one process now carries more from the generators before it
 # than it did at #323, as the planet reports and studies were added.
-# What it retains is not yet measured. The three routes run the same
-# instrument and keep the same limit.
+# What it retains was measured on main 5bc01c2b (#661): under -Xlog:gc*
+# the canonical route kept 1.1-1.5 GiB live at its peak and the portable
+# route 1.2-1.7 GiB, the heap committed to its 2 GiB cap from a few
+# minutes in, no Full GC (docs/reviews/release-6.0.0-handover.md, 8).
+# The three routes run the same instrument and keep the same limit.
 evidence-contracts: classes
 	$(JAVA) -Xmx2g -cp "$(CLASSES_DIR):$(LIB_DIR)/*" -Djava.awt.headless=true juranometria.tool.EvidenceContractMain
 
