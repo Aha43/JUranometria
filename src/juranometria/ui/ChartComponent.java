@@ -87,7 +87,7 @@ public final class ChartComponent extends JComponent {
         }
         this.words = words;
         this.renderer = new ChartRenderer(StarSizePolicy.DEFAULT, words);
-        // A closer page with no Mercury, Venus, Mars, Jupiter, Saturn or Uranus on it says why zoom in
+        // A closer page with no Mercury, Venus, Mars, Jupiter, Saturn, Uranus or Neptune on it says why zoom in
         // offers nothing more (#544); every other page carries no note.
         this.renderer.setTitleNote(this::closerFieldNote);
         // The modules' furniture (#259): none until a module offers

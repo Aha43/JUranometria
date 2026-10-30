@@ -1,6 +1,6 @@
 # The closer fields: foundations and the offer
 
-Sprint 50, issues #543 and #544 (#481). The four foundations ruling 5 on #539 requires before any surface offers 0.5° or 0.25° (#543), proven on production pages: the production `ChartComponent` over the bundled catalogue, set to a state at the field; then the offer itself (#544, section 5): zoom in at the floor is the closer step where Mercury, Venus, Mars, Jupiter, Saturn or Uranus, as drawn, lies on the page that step would display, through the same controller and component the application wires. The instants are the cited rows in `docs/studies/mercury/mercury-events.txt` and `docs/studies/venus/venus-events.txt`; positions are the services' for Oslo at sea level. Where names and grid figures found room is in `platform.md`. Regenerate with `make closer-fields-study`.
+Sprint 50, issues #543 and #544 (#481). The four foundations ruling 5 on #539 requires before any surface offers 0.5° or 0.25° (#543), proven on production pages: the production `ChartComponent` over the bundled catalogue, set to a state at the field; then the offer itself (#544, section 5): zoom in at the floor is the closer step where Mercury, Venus, Mars, Jupiter, Saturn, Uranus or Neptune, as drawn, lies on the page that step would display, through the same controller and component the application wires. The instants are the cited rows in `docs/studies/mercury/mercury-events.txt` and `docs/studies/venus/venus-events.txt`; positions are the services' for Oslo at sea level. Where names and grid figures found room is in `platform.md`. Regenerate with `make closer-fields-study`.
 
 ## 1. The field's words on every surface
 
@@ -106,17 +106,17 @@ Jupiter joined the closer fields at the owner's #544 checkpoint (Saturn waits fo
 
 ## 5. The closer step offered, and the way back
 
-Mercury at its 2026 greatest eastern elongation, wired as the application wires the chart (#544): the controller asks the component whether Mercury, Venus, Mars, Jupiter, Saturn or Uranus, as the Solar System module contributes them, lies on the page a closer step would display. The toolbar, the View menu, the shortcuts and the wheel all make these controller calls; what the zoom-in control explains is the toolbar's own sentence. A pan of a degree then takes Mercury off the 0.25° page.
+Mercury at its 2026 greatest eastern elongation, wired as the application wires the chart (#544): the controller asks the component whether Mercury, Venus, Mars, Jupiter, Saturn, Uranus or Neptune, as the Solar System module contributes them, lies on the page a closer step would display. The toolbar, the View menu, the shortcuts and the wheel all make these controller calls; what the zoom-in control explains is the toolbar's own sentence. A pan of a degree then takes Mercury off the 0.25° page.
 
 | step | field | toolbar | zoom in | zoom in explains | title note |
 |---|---:|---|---|---|---|
-| Mercury hidden | 1° | Field 1° · Stars to V 8.0 | unavailable | Unavailable: a closer field is offered only when Mercury, Venus, Mars, Jupiter, Saturn or Uranus, shown on the chart, is on the page the step would show | - |
-| Mercury shown | 1° | Field 1° · Stars to V 8.0 | to 0.5° | The next step in is a closer field, offered because Mercury, Venus, Mars, Jupiter, Saturn or Uranus is on the page it would show | - |
-| zoom in | 0.5° | Field 0.5° · Stars to V 8.0 | to 0.25° | The next step in is a closer field, offered because Mercury, Venus, Mars, Jupiter, Saturn or Uranus is on the page it would show | - |
+| Mercury hidden | 1° | Field 1° · Stars to V 8.0 | unavailable | Unavailable: a closer field is offered only when Mercury, Venus, Mars, Jupiter, Saturn, Uranus or Neptune, shown on the chart, is on the page the step would show | - |
+| Mercury shown | 1° | Field 1° · Stars to V 8.0 | to 0.5° | The next step in is a closer field, offered because Mercury, Venus, Mars, Jupiter, Saturn, Uranus or Neptune is on the page it would show | - |
+| zoom in | 0.5° | Field 0.5° · Stars to V 8.0 | to 0.25° | The next step in is a closer field, offered because Mercury, Venus, Mars, Jupiter, Saturn, Uranus or Neptune is on the page it would show | - |
 | zoom in | 0.25° | Field 0.25° · Stars to V 8.0 | unavailable | Unavailable: this is the narrowest field the atlas draws | - |
-| pan a degree east | 0.25° | Field 0.25° · Stars to V 8.0 | unavailable | Unavailable: this is the narrowest field the atlas draws | No Mercury, Venus, Mars, Jupiter, Saturn or Uranus on this page: no closer step from here |
-| zoom out | 0.5° | Field 0.5° · Stars to V 8.0 | unavailable | Unavailable: a closer field is offered only when Mercury, Venus, Mars, Jupiter, Saturn or Uranus, shown on the chart, is on the page the step would show | No Mercury, Venus, Mars, Jupiter, Saturn or Uranus on this page: no closer step from here |
-| zoom out | 1° | Field 1° · Stars to V 8.0 | unavailable | Unavailable: a closer field is offered only when Mercury, Venus, Mars, Jupiter, Saturn or Uranus, shown on the chart, is on the page the step would show | - |
+| pan a degree east | 0.25° | Field 0.25° · Stars to V 8.0 | unavailable | Unavailable: this is the narrowest field the atlas draws | No Mercury, Venus, Mars, Jupiter, Saturn, Uranus or Neptune on this page: no closer step from here |
+| zoom out | 0.5° | Field 0.5° · Stars to V 8.0 | unavailable | Unavailable: a closer field is offered only when Mercury, Venus, Mars, Jupiter, Saturn, Uranus or Neptune, shown on the chart, is on the page the step would show | No Mercury, Venus, Mars, Jupiter, Saturn, Uranus or Neptune on this page: no closer step from here |
+| zoom out | 1° | Field 1° · Stars to V 8.0 | unavailable | Unavailable: a closer field is offered only when Mercury, Venus, Mars, Jupiter, Saturn, Uranus or Neptune, shown on the chart, is on the page the step would show | - |
 | zoom out | 2° | Field 2° · Stars to V 8.0 | to 1° | Shows a narrower field, with fainter stars on it | - |
 
 The page Mercury has left, at 0.25° - the field kept, the title block saying why there is no closer step:
@@ -129,13 +129,13 @@ Nothing persists the view: a new controller - every start - opens at the release
 
 | step | field | toolbar | zoom in | zoom in explains | title note |
 |---|---:|---|---|---|---|
-| Jupiter hidden | 1° | Field 1° · Stars to V 8.0 | unavailable | Unavailable: a closer field is offered only when Mercury, Venus, Mars, Jupiter, Saturn or Uranus, shown on the chart, is on the page the step would show | - |
-| Jupiter shown | 1° | Field 1° · Stars to V 8.0 | to 0.5° | The next step in is a closer field, offered because Mercury, Venus, Mars, Jupiter, Saturn or Uranus is on the page it would show | - |
-| zoom in | 0.5° | Field 0.5° · Stars to V 8.0 | to 0.25° | The next step in is a closer field, offered because Mercury, Venus, Mars, Jupiter, Saturn or Uranus is on the page it would show | - |
+| Jupiter hidden | 1° | Field 1° · Stars to V 8.0 | unavailable | Unavailable: a closer field is offered only when Mercury, Venus, Mars, Jupiter, Saturn, Uranus or Neptune, shown on the chart, is on the page the step would show | - |
+| Jupiter shown | 1° | Field 1° · Stars to V 8.0 | to 0.5° | The next step in is a closer field, offered because Mercury, Venus, Mars, Jupiter, Saturn, Uranus or Neptune is on the page it would show | - |
+| zoom in | 0.5° | Field 0.5° · Stars to V 8.0 | to 0.25° | The next step in is a closer field, offered because Mercury, Venus, Mars, Jupiter, Saturn, Uranus or Neptune is on the page it would show | - |
 | zoom in | 0.25° | Field 0.25° · Stars to V 8.0 | unavailable | Unavailable: this is the narrowest field the atlas draws | - |
-| pan a degree east | 0.25° | Field 0.25° · Stars to V 8.0 | unavailable | Unavailable: this is the narrowest field the atlas draws | No Mercury, Venus, Mars, Jupiter, Saturn or Uranus on this page: no closer step from here |
-| zoom out | 0.5° | Field 0.5° · Stars to V 8.0 | unavailable | Unavailable: a closer field is offered only when Mercury, Venus, Mars, Jupiter, Saturn or Uranus, shown on the chart, is on the page the step would show | No Mercury, Venus, Mars, Jupiter, Saturn or Uranus on this page: no closer step from here |
-| zoom out | 1° | Field 1° · Stars to V 8.0 | unavailable | Unavailable: a closer field is offered only when Mercury, Venus, Mars, Jupiter, Saturn or Uranus, shown on the chart, is on the page the step would show | - |
+| pan a degree east | 0.25° | Field 0.25° · Stars to V 8.0 | unavailable | Unavailable: this is the narrowest field the atlas draws | No Mercury, Venus, Mars, Jupiter, Saturn, Uranus or Neptune on this page: no closer step from here |
+| zoom out | 0.5° | Field 0.5° · Stars to V 8.0 | unavailable | Unavailable: a closer field is offered only when Mercury, Venus, Mars, Jupiter, Saturn, Uranus or Neptune, shown on the chart, is on the page the step would show | No Mercury, Venus, Mars, Jupiter, Saturn, Uranus or Neptune on this page: no closer step from here |
+| zoom out | 1° | Field 1° · Stars to V 8.0 | unavailable | Unavailable: a closer field is offered only when Mercury, Venus, Mars, Jupiter, Saturn, Uranus or Neptune, shown on the chart, is on the page the step would show | - |
 
 ## 6. The exported sheet at 0.25°
 

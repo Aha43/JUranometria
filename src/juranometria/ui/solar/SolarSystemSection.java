@@ -40,8 +40,8 @@ import juranometria.ui.language.InterfaceText;
  * Uranus's shared session, since #638 with its Show on chart and Centre
  * on chart. Since #656 a Neptune group follows Uranus's - the same order -
  * introduced collapsed, holding one {@link NeptuneTableControls} over
- * Neptune's shared session, with no chart switch and no Centre on chart:
- * no Neptune is drawn yet.
+ * Neptune's shared session, since #659 with its Show on chart and Centre
+ * on chart.
  *
  * <p>Building the section computes nothing: each set of controls
  * reads the observer for its note and seeds, and shows whatever its
@@ -266,17 +266,28 @@ public final class SolarSystemSection {
     /**
      * Gives the section Neptune's group after Uranus's (#656): its controls
      * over Neptune's shared session, with no chart switch and no Centre on
-     * chart - no Neptune is drawn yet. Stated before the tab is built;
-     * building them computes nothing and reads no pack.
+     * chart. Stated before the tab is built; building them computes nothing
+     * and reads no pack.
      */
     public void withNeptune(NeptuneTableSession session, InterfaceText said) {
+        withNeptune(session, said, null, null);
+    }
+
+    /**
+     * The same, with the Solar System module's Neptune switch (#659, R-9 on
+     * #658): Show on chart over {@code onChart}, and Centre on chart through
+     * {@code centre} where both are given.
+     */
+    public void withNeptune(NeptuneTableSession session, InterfaceText said,
+                            BodyOnChart onChart, CentreOnChart centre) {
         if (session == null || said == null) {
             throw new IllegalArgumentException("Neptune's session, in a language");
         }
         if (neptune != null) {
             neptune.release();
         }
-        neptune = new NeptuneTableControls(session, said, false);
+        neptune = new NeptuneTableControls(session, said, false, onChart,
+                onChart == null ? null : centre, onChart);
     }
 
     /** Neptune's controls, or null for a host built without Neptune. */

@@ -259,6 +259,10 @@ public final class EvidenceContractMain {
         // the Solar System module and Uranus attached; its pages are held through IMAGE_MAINS.
         REPORT_MAINS.put("juranometria.tool.UranusOnTheChartStudyMain",
                 "docs/studies/uranus-on-the-chart/measurements.md");
+        // Neptune on the chart (#659): production pages through the component with
+        // the Solar System module and Neptune attached; its pages are held through IMAGE_MAINS.
+        REPORT_MAINS.put("juranometria.tool.NeptuneOnTheChartStudyMain",
+                "docs/studies/neptune-on-the-chart/measurements.md");
         // Saturn on the chart (#579): production pages through the component
         // with the Saturn module attached; its pages are held through IMAGE_MAINS.
         REPORT_MAINS.put("juranometria.tool.SaturnOnTheChartStudyMain",
@@ -688,6 +692,9 @@ public final class EvidenceContractMain {
             // Uranus on the chart (issue #638): production pages composed by the
             // component with the Solar System module and Uranus attached.
             "juranometria.tool.UranusOnTheChartStudyMain",
+            // Neptune on the chart (issue #659): production pages composed by the
+            // component with the Solar System module and Neptune attached.
+            "juranometria.tool.NeptuneOnTheChartStudyMain",
             // Saturn on the chart (issue #579): production pages composed by the
             // component with the Saturn module attached, and the exported sheet.
             "juranometria.tool.SaturnOnTheChartStudyMain",

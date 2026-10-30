@@ -54,7 +54,7 @@ import juranometria.ui.language.PageText;
  *
  * <p>Every page is the production {@code ChartComponent} over the bundled
  * catalogue, set to a state at 1°, 0.5° or 0.25° - a state the view state
- * holds and, since #544, zoom in offers where Mercury, Venus, Mars, Jupiter, Saturn or Uranus stands. The report records what is the
+ * holds and, since #544, zoom in offers where Mercury, Venus, Mars, Jupiter, Saturn, Uranus or Neptune stands. The report records what is the
  * same on every desktop: the field's words on every surface, the grid's
  * steps and line counts, the catalogue's answer at the page's own field,
  * each body's mark, the zoom back to the ladder and the exported sheet's
@@ -114,7 +114,7 @@ public final class CloserFieldsStudyMain {
                 + " requires before any surface offers 0.5° or 0.25° (#543), proven on production"
                 + " pages: the production `ChartComponent` over the bundled catalogue, set to a"
                 + " state at the field; then the offer itself (#544, section 5): zoom in at the"
-                + " floor is the closer step where Mercury, Venus, Mars, Jupiter, Saturn or Uranus, as drawn, lies on the page"
+                + " floor is the closer step where Mercury, Venus, Mars, Jupiter, Saturn, Uranus or Neptune, as drawn, lies on the page"
                 + " that step would display, through the same controller and component the"
                 + " application wires. The"
                 + " instants are the cited rows in `docs/studies/mercury/mercury-events.txt` and"
@@ -314,7 +314,7 @@ public final class CloserFieldsStudyMain {
         p("## 5. The closer step offered, and the way back");
         p("");
         p("Mercury at its 2026 greatest eastern elongation, wired as the application wires"
-                + " the chart (#544): the controller asks the component whether Mercury, Venus, Mars, Jupiter, Saturn or Uranus,"
+                + " the chart (#544): the controller asks the component whether Mercury, Venus, Mars, Jupiter, Saturn, Uranus or Neptune,"
                 + " as the Solar System module contributes them, lies on the page a closer step"
                 + " would display. The toolbar, the View menu, the shortcuts and the wheel all"
                 + " make these controller calls; what the zoom-in control explains is the"
