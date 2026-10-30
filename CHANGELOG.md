@@ -7,6 +7,18 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Neptune on the page (#670).** A new reader article, in English and
+Norwegian (*Neptun på siden*): what the atlas draws of Neptune, Triton
+and Nereid in the release that follows 5.5 - where its numbers come from,
+DE442, the 74 km centre offset and the 100 km distance target, and how
+closely they match JPL Horizons; a pole with a periodic term; the 6-pixel
+symbol on every field; no rings; two moons drawn only at the 1-degree
+field and the closer fields, each where it stands clear, and why a moon
+ten magnitudes fainter than any star the atlas draws is never a lone dot
+on a wider page - and what it does not claim. Every figure is an
+evidence page and every number is quoted from the report that measured
+it.
+
 **Uranus on the page (#660).** A new reader article, in English and
 Norwegian (*Uranus på siden*): what the atlas draws of Uranus as released
 for 6.0 - where its numbers come from, DE442 and the 50 km distance
