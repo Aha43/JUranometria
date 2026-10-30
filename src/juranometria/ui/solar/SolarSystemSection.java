@@ -38,7 +38,10 @@ import juranometria.ui.language.InterfaceText;
  * #635 a Uranus group follows Saturn's - the same order, outward from the
  * Sun - introduced collapsed, holding one {@link UranusTableControls} over
  * Uranus's shared session, since #638 with its Show on chart and Centre
- * on chart.
+ * on chart. Since #656 a Neptune group follows Uranus's - the same order -
+ * introduced collapsed, holding one {@link NeptuneTableControls} over
+ * Neptune's shared session, with no chart switch and no Centre on chart:
+ * no Neptune is drawn yet.
  *
  * <p>Building the section computes nothing: each set of controls
  * reads the observer for its note and seeds, and shows whatever its
@@ -63,6 +66,8 @@ public final class SolarSystemSection {
     private SaturnTableControls saturn;
     /** Uranus's controls, or null until a host gives the section Uranus's session. */
     private UranusTableControls uranus;
+    /** Neptune's controls, or null until a host gives the section Neptune's session. */
+    private NeptuneTableControls neptune;
     /** Mars's controls, or null until a host gives the section Mars's session. */
     private MarsTableControls mars;
 
@@ -259,6 +264,27 @@ public final class SolarSystemSection {
     }
 
     /**
+     * Gives the section Neptune's group after Uranus's (#656): its controls
+     * over Neptune's shared session, with no chart switch and no Centre on
+     * chart - no Neptune is drawn yet. Stated before the tab is built;
+     * building them computes nothing and reads no pack.
+     */
+    public void withNeptune(NeptuneTableSession session, InterfaceText said) {
+        if (session == null || said == null) {
+            throw new IllegalArgumentException("Neptune's session, in a language");
+        }
+        if (neptune != null) {
+            neptune.release();
+        }
+        neptune = new NeptuneTableControls(session, said, false);
+    }
+
+    /** Neptune's controls, or null for a host built without Neptune. */
+    public NeptuneTableControls neptune() {
+        return neptune;
+    }
+
+    /**
      * Gives the section Mars's group between the Moon's and Jupiter's
      * (#603): its controls over Mars's shared session, with no chart switch
      * and no Centre on chart - no Mars is drawn yet. Stated before the tab
@@ -433,6 +459,11 @@ public final class SolarSystemSection {
                     said.say("solarsystem.uranus"), uranus.inController(), said, store,
                     true));
         }
+        if (neptune != null) {
+            groups.add(CompanionSection.remembered(ID + ".neptune",
+                    said.say("solarsystem.neptune"), neptune.inController(), said, store,
+                    true));
+        }
         return groups;
     }
 
@@ -459,6 +490,9 @@ public final class SolarSystemSection {
         }
         if (uranus != null) {
             uranus.release();
+        }
+        if (neptune != null) {
+            neptune.release();
         }
     }
 }

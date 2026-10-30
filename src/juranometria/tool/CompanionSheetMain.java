@@ -314,6 +314,11 @@ public final class CompanionSheetMain {
                 // nothing, so the pack is never read.
                 solarSection.withUranus(new juranometria.ui.solar.UranusTableSession(
                         () -> observer, juranometria.solar.UranusService::load), words);
+                // Neptune's group (#656) after Uranus's, as the application's
+                // Controller holds it: introduced collapsed, it computes
+                // nothing, so the pack is never read.
+                solarSection.withNeptune(new juranometria.ui.solar.NeptuneTableSession(
+                        () -> observer, juranometria.solar.NeptuneService::load), words);
                 // The tab opens with the chart's instant and Update to now
                 // (#259, ruling 9 on #556), as the application holds it.
                 solarSection.showChartInstant(() -> observer, listener -> () -> { },

@@ -567,6 +567,7 @@ public final class PackagedAcceptanceMain {
         saturnTableJourney();
         marsTableJourney();
         uranusTableJourney();
+        neptuneTableJourney();
         centreOnChartJourney();
         jupiterOnTheChartJourney();
         saturnOnTheChartJourney();
@@ -2548,6 +2549,172 @@ public final class PackagedAcceptanceMain {
                 + " moons refused; a range across 2000-01-01 keeps Uranus at every instant;"
                 + " View > Solar System has Uranus... after Saturn..., lettered N and U)");
     }
+
+    /**
+     * The Neptune table (#656), inside the packaged image: one session in
+     * the Controller's Neptune group and the dialog; building, expanding and
+     * opening compute nothing; at the study's "today" (2026-10-29 12:00 UTC,
+     * Oslo) Triton and Nereid read clear of Neptune, in English and
+     * Norwegian, with the phase angle and no phase word; Triton behind
+     * Neptune in its shadow where Horizons codes it U from Oslo
+     * (2044-09-26); before 2000 Neptune shown and the moons refused; a range
+     * across 2000-01-01 keeps Neptune at every instant; View > Solar System
+     * has Neptune... directly after Uranus..., with no letter (Mars's ruling
+     * on #603: every letter of its name is already claimed).
+     */
+    private static void neptuneTableJourney() throws Exception {
+        Preferences scratch = Preferences.userRoot()
+                .node("juranometria-packaged-neptune-" + System.nanoTime());
+        try {
+            juranometria.ui.language.InterfaceText en =
+                    juranometria.ui.language.InterfaceText.forLanguage("en");
+            juranometria.ui.language.InterfaceText nb =
+                    juranometria.ui.language.InterfaceText.forLanguage("nb-NO");
+            juranometria.sky.Observer[] at = {new juranometria.sky.Observer(59.91, 10.75,
+                    NEPTUNE_SAMPLE_INSTANT)};
+            juranometria.solar.NeptuneService neptuneService = juranometria.solar.NeptuneService.load();
+            int[] loads = {0};
+            juranometria.ui.solar.NeptuneTableSession neptune =
+                    new juranometria.ui.solar.NeptuneTableSession(() -> at[0], () -> {
+                        loads[0]++;
+                        return neptuneService;
+                    });
+            juranometria.solar.SolarSystemService solar =
+                    juranometria.solar.SolarSystemService.load();
+            juranometria.ui.solar.SolarTableSession sun =
+                    new juranometria.ui.solar.SolarTableSession(() -> at[0], solar,
+                            juranometria.ui.solar.SolarTable.sun());
+            juranometria.ui.solar.SolarTableSession moon =
+                    new juranometria.ui.solar.SolarTableSession(() -> at[0], solar,
+                            juranometria.ui.solar.SolarTable.moon());
+            juranometria.solarchart.SolarSystemModule module =
+                    new juranometria.solarchart.SolarSystemModule(() -> at[0],
+                            () -> solar, () -> true);
+            juranometria.ui.solar.SolarSystemSection[] section =
+                    new juranometria.ui.solar.SolarSystemSection[1];
+            juranometria.ui.solar.NeptuneTableDialog.Content[] norsk =
+                    new juranometria.ui.solar.NeptuneTableDialog.Content[1];
+            javax.swing.JMenuBar[] bar = new javax.swing.JMenuBar[2];
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                section[0] = new juranometria.ui.solar.SolarSystemSection(sun, moon,
+                        juranometria.ui.solar.SunChartSession.switchOf(module,
+                                juranometria.ui.solar.SunChartStore.forNode(scratch)),
+                        juranometria.ui.solar.MoonChartSession.switchOf(module,
+                                juranometria.ui.solar.MoonChartStore.forNode(scratch)),
+                        null, en);
+                section[0].withNeptune(neptune, en);
+                section[0].inController(
+                        juranometria.ui.companion.CompanionStore.forNode(scratch), en);
+            });
+            require(neptune.computations() == 0 && loads[0] == 0,
+                    "building the Neptune group computes nothing and reads no pack");
+            javax.swing.SwingUtilities.invokeAndWait(() ->
+                    norsk[0] = juranometria.ui.solar.NeptuneTableDialog.content(neptune, nb));
+            require(neptune.computations() == 0, "opening the Neptune dialog computes nothing");
+
+            juranometria.ui.solar.NeptuneTableControls group = section[0].neptune();
+            juranometria.ui.solar.NeptuneTableControls dialog = norsk[0].controls();
+            javax.swing.SwingUtilities.invokeAndWait(group::apply);
+            require(neptune.computations() == 1 && group.shown() == dialog.shown()
+                            && group.model.getRowCount() == 2,
+                    "one computation in the Controller is the dialog's result too");
+            boolean allClear = true;
+            for (int row = 0; row < 2; row++) {
+                allClear &= "clear of Neptune".equals(group.model.getValueAt(row, 6))
+                        && "klar av Neptun".equals(dialog.model.getValueAt(row, 6));
+            }
+            require(allClear && "Avstand fra Neptun".equals(dialog.model.getColumnName(4))
+                            && "Triton".equals(group.model.getValueAt(0, 0))
+                            && "Nereid".equals(dialog.model.getValueAt(1, 0)),
+                    "on 2026-10-29 Triton and Nereid are clear of Neptune, in both languages");
+            require(group.cardValue("phaseangle").endsWith("°")
+                            && dialog.cardValue("phaseangle").contains(","),
+                    "the phase angle, no phase word: " + group.cardValue("phaseangle"));
+            require(group.cardTitle.getText().equals("Neptune · 2026-10-29 12:00:00 UTC"),
+                    "the Neptune card names its instant: " + group.cardTitle.getText());
+
+            at[0] = new juranometria.sky.Observer(59.91, 10.75, TRITON_ECLIPSE_INSTANT);
+            javax.swing.SwingUtilities.invokeAndWait(group::apply);
+            require("behind Neptune, in its shadow".equals(group.model.getValueAt(0, 6))
+                            && "bak Neptun, i skyggen".equals(dialog.model.getValueAt(0, 6)),
+                    "Triton behind Neptune in its shadow where Horizons codes U: "
+                            + group.model.getValueAt(0, 6));
+
+            at[0] = new juranometria.sky.Observer(59.91, 10.75,
+                    java.time.Instant.parse("1999-12-31T23:59:59Z"));
+            javax.swing.SwingUtilities.invokeAndWait(group::apply);
+            // The status as spoken, unwrapped: the Controller's narrow layout
+            // wraps the shown text where the platform's fonts break it.
+            String refusal = group.status.getAccessibleContext().getAccessibleName();
+            require(group.cardTitle.getText().startsWith("Neptune · 1999-12-31")
+                            && group.model.getRowCount() == 0
+                            && refusal.contains("2000-01-01") && refusal.contains("only Neptune"),
+                    "Neptune answers before 2000, the moons refuse: " + refusal);
+
+            at[0] = new juranometria.sky.Observer(59.91, 10.75,
+                    java.time.Instant.parse("1999-12-10T00:00:00Z"));
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                group.rangeView.setSelected(true);
+                group.span.setSelectedIndex(2);
+                group.step.setSelectedIndex(3);
+                group.apply();
+            });
+            String partly = group.status.getAccessibleContext().getAccessibleName();
+            require(neptune.result().outcome()
+                            == juranometria.ui.solar.NeptuneTableSession.Outcome.ROWS_MOONS_IN_PART
+                            && group.model.groups() == neptune.result().entries().size()
+                            && partly.contains("the moons are not shown"),
+                    "a range across 2000-01-01 keeps Neptune at every instant: " + partly);
+
+            juranometria.ui.language.InterfaceText[] languages = {en, nb};
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                for (int l = 0; l < 2; l++) {
+                    bar[l] = AppMenuBar.create(new ChartViewController(), () -> { },
+                            () -> { }, () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
+                            () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
+                            () -> { }, () -> { }, languages[l]);
+                    AppMenuBar.addJupiterTable(bar[l], languages[l], () -> { });
+                    AppMenuBar.addSaturnTable(bar[l], languages[l], () -> { });
+                    AppMenuBar.addUranusTable(bar[l], languages[l], () -> { });
+                    AppMenuBar.addNeptuneTable(bar[l], languages[l], () -> { });
+                }
+            });
+            for (int l = 0; l < 2; l++) {
+                javax.swing.JMenu solarMenu = AppMenuBar.solarSystemMenu(bar[l]);
+                int uranusAt = -1;
+                int neptuneAt = -1;
+                java.util.Set<Integer> claimed = new java.util.HashSet<>();
+                boolean unique = true;
+                for (int i = 0; i < solarMenu.getItemCount(); i++) {
+                    javax.swing.JMenuItem item = solarMenu.getItem(i);
+                    String name = item == null ? null : item.getName();
+                    if (item != null && item.getMnemonic() != 0) {
+                        unique &= claimed.add(item.getMnemonic());
+                    }
+                    if ("uranusTableItem".equals(name)) {
+                        uranusAt = i;
+                    }
+                    if ("neptuneTableItem".equals(name)) {
+                        neptuneAt = i;
+                        unique &= item.getMnemonic() == 0;
+                    }
+                }
+                require(uranusAt >= 0 && neptuneAt == uranusAt + 1 && unique,
+                        "View > Solar System has Neptune... directly after Uranus..., with no letter");
+            }
+            section[0].release();
+            norsk[0].controls().release();
+        } finally {
+            scratch.removeNode();
+        }
+        System.out.println("neptune table OK (one session in two hosts, building computes nothing"
+                + " and reads no pack; on 2026-10-29 12:00 UTC at Oslo Triton and Nereid clear of"
+                + " Neptune, the phase angle and no phase word, in English and Norwegian; Triton"
+                + " behind Neptune in its shadow on 2044-09-26; before 2000 Neptune shown and the"
+                + " moons refused; a range across 2000-01-01 keeps Neptune at every instant;"
+                + " View > Solar System has Neptune... after Uranus..., with no letter)");
+    }
+
 
     /**
      * The Saturn table (#576), inside the packaged image: one session in

@@ -377,3 +377,46 @@ checks three things:
   moons' years Horizons codes `U` (Triton's eclipse season falls around
   2045);
 - the moons refusing before 2000.
+
+## #656, the table, as built: a packaged checkpoint
+
+**Where it lives.** *Neptune...* in View ▸ Solar System, directly after
+*Uranus...*, and a Neptune group in the Controller's Solar System tab after
+Uranus's, introduced collapsed. Both hosts share one `NeptuneTableSession`
+with host-local drafts, on the settled chart-time and range contract.
+Building, opening, expanding, restoring or changing tabs computes nothing.
+The 50 MB pack is read once, on the first Compute.
+
+**What it shows (N-5, N-9).** Uranus's card for Neptune: right ascension
+and declination (J2000), altitude, azimuth, distance, diameter across the
+equator and the poles, illuminated fraction, phase angle, the north pole's
+position angle, and the tilt with the pole towards you. There are no phase
+words. Triton and Nereid follow in Jupiter's columns, in both languages,
+with the moon names identical in both.
+
+**The moons' years.** Before 2000 and after 2100 the card still shows
+Neptune, and the status names the moons' years. A range across either
+boundary keeps Neptune's three summary lines at every instant and says,
+group by group, where the moons are not computed.
+
+**The range limit** is the row cap divided by the moon count, as every
+table's is: 500 instants of two moon rows (Mars's arithmetic).
+
+**No access letter.** Every letter of "Neptune" and "Neptun" is already
+claimed on the Solar System menu, so *Neptune...* has none. This applies
+Mars's ruling on #603, which keeps every existing letter and never shares
+one.
+
+**No Show or Centre on chart** until the cartography exists (#658, #659).
+
+**Evidence.** The Controller photographs (four companion images and
+`companion-strings.md`) and the menu photographs (all eight and
+`menu-strings.md`) show the new group and the new item. Uranus's tables
+missed the menu photographs until #638; Neptune's carry them from the
+start. The packaged journey checks:
+- the shared session, with nothing computed on opening;
+- Triton and Nereid clear of Neptune at the study's "today", in both
+  languages;
+- Triton behind Neptune in its shadow on 2044-09-26;
+- the refusal before 2000, and the range across 2000;
+- the menu order, with no letter.
