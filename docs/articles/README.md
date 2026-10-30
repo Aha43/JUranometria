@@ -42,6 +42,10 @@ behind that argument.
   a disc, why its rings stay in the table, how to read its tilt and its
   moons, and what it does not claim. Also in Norwegian: [Uranus på
   siden](uranus-pa-siden.md).
+- [Neptune on the page](neptune-on-the-page.md) — what the atlas draws of
+  Neptune, Triton and Nereid, why Neptune is always a symbol, why its moons
+  appear only on the narrowest pages, and what it does not claim. Also in
+  Norwegian: [Neptun på siden](neptun-pa-siden.md).
 
 ## How JUranometria works
 
