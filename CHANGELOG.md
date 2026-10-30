@@ -7,6 +7,17 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Triton and Nereid on the chart (#659, part 2, ruled on #658).**
+Neptune on the chart now draws Triton and Nereid from 2000 to 2100 as
+3-pixel symbols at their own places, at the 1-degree field and the closer
+fields only, each only where its mark stands clear of Neptune's and of the
+other moon: Nereid on most 1-degree pages, Triton mostly at 0.25°. On
+wider fields the moons are not drawn, so a moon fainter than any star the
+atlas draws never stands alone among them. A moon in Neptune's shadow is a
+hollow ring; a moon behind Neptune, in transit, or too close to tell apart
+is not drawn, and the page's description says so. The moons are named and
+not selectable. Before 2000 Neptune is drawn alone, as the table shows it.
+
 **Neptune on the chart (#659, part 1, ruled on #658).** View > Solar
 System gains *Neptune on the chart* after *Uranus on the chart*, and the
 Controller's Neptune group its Show on chart and Centre on chart; the

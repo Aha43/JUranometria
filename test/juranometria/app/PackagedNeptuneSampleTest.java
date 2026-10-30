@@ -26,6 +26,15 @@ class PackagedNeptuneSampleTest {
     }
 
     @Test
+    void theMoonsSampleIsEspenaksOppositionHour() throws Exception {
+        String row = Files.readString(Path.of("docs/studies/neptune-system/neptune-events.txt"),
+                StandardCharsets.UTF_8).lines().filter(l -> l.startsWith("2026 Sep 26 00 Neptune at Opposition"))
+                .findFirst().orElseThrow();
+        assertEquals(java.time.Instant.parse("2026-09-26T00:00:00Z"),
+                PackagedAcceptanceMain.NEPTUNE_MOONS_SAMPLE_INSTANT, row);
+    }
+
+    @Test
     void theTritonSampleIsARowHorizonsCodesBehindAndEclipsed() throws Exception {
         String row = Files.readString(Path.of(
                         "docs/studies/neptune-system/horizons/matrix-7d-triton-oslo.txt"),

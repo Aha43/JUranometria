@@ -33,14 +33,17 @@ import juranometria.ui.language.PageText;
 
 /**
  * Neptune on the chart, as the production composition draws it (issue
- * #659, part 1, under the rulings on #658): the Solar System module
+ * #659, parts 1 and 2, under the rulings on #658): the Solar System module
  * attached to the real component with Neptune switched on, production ink
  * only, no study overlay. Espenak's cited rows in
  * {@code docs/studies/neptune-system/neptune-events.txt} - the 2026
  * opposition, the 2026 conjunction beside the Sun and the 2003 conjunction
  * behind it - at the ordinary fields and the closer fields the controller
  * reaches (R-8), both palettes and both languages; the mark measured from
- * the rendered pixels as drawn full (R-2). Written
+ * the rendered pixels as drawn full (R-2); and, since part 2, Triton and
+ * Nereid at the floor and the closer fields only, by Mars's clearance rule
+ * there (R-5, R-6a): at their extremes, and in the states Horizons codes
+ * from Oslo. Written
  * to {@code docs/studies/neptune-on-the-chart/} by
  * {@code make neptune-on-the-chart-study}: the report to stdout, the pages
  * beside it.
@@ -87,14 +90,18 @@ public final class NeptuneOnTheChartStudyMain {
         Map<String, Instant> events = events();
         p("# Neptune on the chart");
         p("");
-        p("Issue #659, part 1. The production composition - `ChartComponent` over the"
+        p("Issue #659, parts 1 and 2. The production composition - `ChartComponent` over the"
                 + " bundled catalogue, with the Solar System module attached and Neptune"
                 + " switched on - under the rulings on #658: rule M with the 6 px mark always"
                 + " standing in (R-1), drawn full and round with no colour (R-2), the pole not"
                 + " drawn and no rings (R-3, R-4), the planet selectable and pointed at as an"
                 + " occurrence (R-9), eligible for the closer fields (R-8), on screen and on"
-                + " paper as the other bodies (R-10). The moons are not drawn: they are part 2"
-                + " (R-6a, R-11). The instants are Espenak's rows in"
+                + " paper as the other bodies (R-10). Since part 2 Triton and Nereid are drawn as"
+                + " 3 px symbols at their own J2000 places, offered only at the 1° field and the"
+                + " closer fields, each there only where it stands clear of Neptune's mark and of"
+                + " the other moon (R-5, R-6a); on wider fields no moon is drawn or spoken; a moon"
+                + " behind, in transit or too close is not drawn and the page says so; none is"
+                + " selectable (R-9). The instants are Espenak's rows in"
                 + " `docs/studies/neptune-system/neptune-events.txt`; positions are the service's"
                 + " for Oslo at sea level. Regenerate with `make neptune-on-the-chart-study`.");
         p("");
@@ -152,6 +159,7 @@ public final class NeptuneOnTheChartStudyMain {
         page("conjunction-2003-1-nb", "At 1°, in Norwegian on the black sky", atBehind, b,
                 ChartViewState.normalMinimumFieldDegrees(), 0, NORSK, ChartPalette.BLACK_SKY,
                 true, "The same, spoken in Norwegian.");
+        moons();
         p("## Outside the years");
         p("");
         Observer before = new Observer(OSLO_LAT, OSLO_LON, Instant.parse("1899-12-31T12:00:00Z"));
@@ -162,6 +170,74 @@ public final class NeptuneOnTheChartStudyMain {
                 + " nothing of it.", before.instant(), NeptuneService.NEPTUNE_FIRST_DAY,
                 early.renderedBodies().size()));
         p("");
+    }
+
+    /**
+     * The moons (#659 part 2): Triton at its widest and Nereid at its widest
+     * and its nearest in the weekly Oslo matrix (the cartography study's
+     * section A: 2045-11-04, 2018-08-25 and 2008-03-22), the states Horizons
+     * codes from Oslo - Triton behind Neptune in its shadow (U, 2044-09-26)
+     * and in front (t, 2043-09-07) - and Neptune alone before the moons' years.
+     */
+    private static void moons() throws Exception {
+        p("## The moons");
+        p("");
+        Instant tritonWidest = Instant.parse("2045-11-04T00:00:00Z");
+        Observer atTriton = new Observer(OSLO_LAT, OSLO_LON, tritonWidest);
+        NeptuneObservation t = neptune.observe(atTriton);
+        p("### Triton at its widest, " + tritonWidest + ", Oslo");
+        p("");
+        page("triton-widest-2045-1", "The minimum field, 1°", atTriton, t,
+                ChartViewState.normalMinimumFieldDegrees(), 0, ENGLISH, ChartPalette.WHITE_PAPER,
+                false, "Even at its widest Triton stands on Neptune's mark at 1°: spoken, not drawn;"
+                        + " Nereid where it stands.");
+        page("triton-widest-2045-0.25-nb", "The 0.25° closer field, in Norwegian", atTriton, t,
+                ChartViewState.normalMinimumFieldDegrees(), 2, NORSK, ChartPalette.WHITE_PAPER,
+                false, "Triton clear of the mark at 0.25°.");
+        page("triton-widest-2045-8", "8°", atTriton, t, 8.0, 0, ENGLISH, ChartPalette.WHITE_PAPER,
+                false, "A wider field: the moons are not offered (R-6a), so none is drawn and none"
+                        + " is spoken.");
+        Instant nereidWidest = Instant.parse("2018-08-25T00:00:00Z");
+        Observer atNereid = new Observer(OSLO_LAT, OSLO_LON, nereidWidest);
+        p("### Nereid at its widest, " + nereidWidest + ", Oslo");
+        p("");
+        page("nereid-widest-2018-1", "The minimum field, 1°", atNereid, neptune.observe(atNereid),
+                ChartViewState.normalMinimumFieldDegrees(), 0, ENGLISH, ChartPalette.BLACK_SKY,
+                false, "Nereid far out on the 1° page, among stars at least ten magnitudes"
+                        + " brighter; this is the widest field it is ever drawn on.");
+        page("nereid-widest-2018-2", "2°", atNereid, neptune.observe(atNereid), 2.0, 0, ENGLISH,
+                ChartPalette.WHITE_PAPER, false,
+                "At 2° Nereid would stand clear, and is not offered: Neptune alone (R-6a).");
+        Instant nereidNearest = Instant.parse("2008-03-22T00:00:00Z");
+        Observer atNearest = new Observer(OSLO_LAT, OSLO_LON, nereidNearest);
+        p("### Nereid at its nearest, " + nereidNearest + ", Oslo");
+        p("");
+        page("nereid-nearest-2008-0.25", "The 0.25° closer field", atNearest,
+                neptune.observe(atNearest), ChartViewState.normalMinimumFieldDegrees(), 2, ENGLISH,
+                ChartPalette.WHITE_PAPER, false,
+                "At its least separation Nereid stands on the mark even at 0.25°: spoken, not drawn.");
+        state("triton-behind-2044-0.25", "Triton behind Neptune in its shadow (Horizons U, 2044-09-26)",
+                Instant.parse("2044-09-26T00:00:00Z"), ENGLISH, ChartPalette.WHITE_PAPER,
+                "Behind: not drawn, and spoken.");
+        state("triton-in-front-2043-0.25-dark", "Triton in front of Neptune (Horizons t, 2043-09-07)",
+                Instant.parse("2043-09-07T00:00:00Z"), NORSK, ChartPalette.BLACK_SKY,
+                "The mark cannot hold a transit: not drawn, and spoken as too close (R-7).");
+        Instant before = Instant.parse("1999-12-31T12:00:00Z");
+        Observer atBefore = new Observer(OSLO_LAT, OSLO_LON, before);
+        p("### Before the moons' years, " + before);
+        p("");
+        page("before-the-moons-1999-0.25", "The 0.25° closer field", atBefore,
+                neptune.observe(atBefore), ChartViewState.normalMinimumFieldDegrees(), 2, ENGLISH,
+                ChartPalette.WHITE_PAPER, false, "Neptune alone, as the table shows it.");
+    }
+
+    private static void state(String name, String title, Instant when, PageText words,
+                              ChartPalette palette, String caption) throws Exception {
+        Observer at = new Observer(OSLO_LAT, OSLO_LON, when);
+        p("### " + title);
+        p("");
+        page(name, "The 0.25° closer field", at, neptune.observe(at),
+                ChartViewState.normalMinimumFieldDegrees(), 2, words, palette, false, caption);
     }
 
     /** What the Neptune table says of this instant, in the page's terms. */
@@ -296,7 +372,8 @@ public final class NeptuneOnTheChartStudyMain {
      */
     private static void full(ChartComponent chart, NeptuneObservation v) throws Exception {
         BufferedImage image = paint(chart);
-        ReferenceInk.BodyPlacement drawn = chart.renderedBodies().get(0);
+        ReferenceInk.BodyPlacement drawn = chart.renderedBodies().stream()
+                .filter(b -> SolarSystemModule.NEPTUNE.equals(b.identity())).findFirst().orElseThrow();
         double cx = drawn.centre().x() + chart.pageOffsetX();
         double cy = drawn.centre().y() + chart.pageOffsetY();
         double r = drawn.disc().getBounds2D().getWidth() / 2.0 - 1.0;

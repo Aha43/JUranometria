@@ -117,6 +117,13 @@ public final class SolarSystemModule implements ChartModule {
      * given a fully lit disc rather than an invisible phase.
      */
     static final OverlayContribution.Lit NEPTUNE_FULL = new OverlayContribution.Lit(1.0, 0.0, 0.0);
+    /** R-5 on #658: each of Neptune's moons is Jupiter's 3 px symbol, never its apparent diameter. */
+    public static final double NEPTUNE_MOON_MARK_PX = NEPTUNE_MINIMUM_MARK_PX / 2.0;
+
+    /** A moon of Neptune's identity on the page, {@code neptune.triton} and {@code neptune.nereid}. */
+    public static String identityOf(juranometria.solar.NeptuneService.Moon moon) {
+        return NEPTUNE + "." + moon.name().toLowerCase(java.util.Locale.ROOT);
+    }
 
     /** A moon of Mars's identity on the page, {@code mars.phobos} and {@code mars.deimos}. */
     public static String identityOf(juranometria.solar.MarsService.Moon moon) {
@@ -574,7 +581,8 @@ public final class SolarSystemModule implements ChartModule {
             // always standing in (R-1), drawn full and round with no colour (R-2),
             // the pole not drawn (R-3), no ring (R-4), selectable as an occurrence
             // (R-9), spoken behind the Sun when its disc meets the Sun's. Outside
-            // its years nothing is drawn. The moons are part 2 (R-6a, R-11).
+            // its years nothing is drawn. The moons follow, offered to the page
+            // as satellites (part 2, R-5 and R-6a).
             try {
                 juranometria.solar.NeptuneService.NeptuneObservation planet = neptune.get().observe(now);
                 offered.add(new OverlayContribution.Body(NEPTUNE, "Neptune",
@@ -583,6 +591,8 @@ public final class SolarSystemModule implements ChartModule {
                         planet.distanceKm(), InkRole.BODY,
                         OverlayContribution.Moment.of(now), true, NEPTUNE_MINIMUM_MARK_PX,
                         planet.behindSun() ? NEPTUNE_BEHIND : null));
+                offered.addAll(neptuneMoons(now, horizon
+                        && planet.horizontal().altitudeDegrees() < 0.0));
             } catch (IllegalArgumentException outsideTheYears) {
                 // Nothing for this instant.
             }
@@ -662,6 +672,41 @@ public final class SolarSystemModule implements ChartModule {
                     moon.shadowRelation()
                             == juranometria.solar.UranusService.ShadowRelation.PARTLY_IN_SHADOW,
                     moon.moon().ordinal(), URANUS_MOON_MARK_PX, below, InkRole.BODY,
+                    OverlayContribution.Moment.of(now), false));
+        }
+        return out;
+    }
+
+    /**
+     * Triton and Nereid (#659 part 2, R-5 and R-6a on #658), where they have
+     * numbers (2000-2100): each at its own astrometric J2000 place with its
+     * disc and shadow states, outward from Neptune, for the page to decide
+     * on its own. The page offers them only at its normal minimum field and
+     * the closer fields (R-6a), and there draws each only where it stands
+     * clear of Neptune's drawn mark and of the other moon (Mars's clearance
+     * rule). Not selectable (R-9). Before 2000 Neptune is drawn alone, as
+     * the table shows it.
+     */
+    private List<OverlayContribution> neptuneMoons(Observer now, boolean below) {
+        juranometria.solar.NeptuneService service = neptune.get();
+        if (!service.moonsAnswerAt(now.instant())) {
+            return List.of();
+        }
+        List<OverlayContribution> out = new ArrayList<>();
+        for (juranometria.solar.NeptuneService.MoonPlace moon : service.observeMoons(now).moons()) {
+            OverlayContribution.Satellite.Relation relation = switch (moon.discRelation()) {
+                case CLEAR -> OverlayContribution.Satellite.Relation.CLEAR;
+                case IN_FRONT -> OverlayContribution.Satellite.Relation.IN_FRONT;
+                case BEHIND -> OverlayContribution.Satellite.Relation.BEHIND;
+            };
+            out.add(new OverlayContribution.Satellite(identityOf(moon.moon()),
+                    moon.moon().name().charAt(0)
+                            + moon.moon().name().substring(1).toLowerCase(java.util.Locale.ROOT),
+                    moon.astrometricJ2000(), NEPTUNE, relation,
+                    moon.shadowRelation() != juranometria.solar.NeptuneService.ShadowRelation.SUNLIT,
+                    moon.shadowRelation()
+                            == juranometria.solar.NeptuneService.ShadowRelation.PARTLY_IN_SHADOW,
+                    moon.moon().ordinal(), NEPTUNE_MOON_MARK_PX, below, InkRole.BODY,
                     OverlayContribution.Moment.of(now), false));
         }
         return out;
