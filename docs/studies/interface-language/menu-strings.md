@@ -120,7 +120,7 @@ Bar packed 892 × 471 px; widest popup 232 px.
 | item spoken description \| Shows or hides Uranus on the chart where it stands for the chart time and place, as a 6-pixel cartographic symbol: Uranus is never large enough to draw at its true size. Its rings are given in the table, not drawn. The five moons are drawn with it from 2000 to 2100 as 3-pixel symbols at their own places, each only where its mark stands clear of Uranus and of the moons already drawn - mostly at the narrowest fields: a filled dot clear of Uranus, a hollow ring in its shadow; a moon behind Uranus, or too close to tell apart at the field, is not drawn, and the page says so. Hidden until you ask. |
 | item label \| Neptune on the chart |
 | item spoken name \| Neptune on the chart |
-| item spoken description \| Shows or hides Neptune on the chart where it stands for the chart time and place, as a 6-pixel cartographic symbol: Neptune is never large enough to draw at its true size. Hidden until you ask. |
+| item spoken description \| Shows or hides Neptune on the chart where it stands for the chart time and place, as a 6-pixel cartographic symbol: Neptune is never large enough to draw at its true size. Triton and Nereid are drawn with it from 2000 to 2100, at the 1-degree field and the closer fields only, as 3-pixel symbols at their own places, each only where its mark stands clear of Neptune and of the other moon: a filled dot clear of Neptune, a hollow ring in its shadow; a moon behind Neptune, or too close to tell apart at the field, is not drawn, and the page says so. On wider fields the moons are not drawn. Hidden until you ask. |
 | item label \| Sun... |
 | item hover \| Where the Sun is, for the chart time and place |
 | item spoken name \| Sun table |
@@ -161,7 +161,7 @@ Bar packed 892 × 471 px; widest popup 232 px.
 | item label \| Neptune... |
 | item hover \| Where Neptune, Triton and Nereid are, for the chart time and place |
 | item spoken name \| Neptune table |
-| item spoken description \| Opens a table of Neptune's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Triton and Nereid stand beside it - clear of Neptune, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Neptune is drawn on the chart by Neptune on the chart. |
+| item spoken description \| Opens a table of Neptune's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Triton and Nereid stand beside it - clear of Neptune, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Neptune and its moons are drawn on the chart by Neptune on the chart. |
 | item label \| Zoom In |
 | item spoken name \| Zoom In |
 | item spoken description \| Shows a narrower field, with fainter stars on it |
@@ -265,7 +265,7 @@ Bar packed 892 × 471 px; widest popup 232 px.
 | item spoken description \| Shows or hides Uranus on the chart where it stands for the chart time and place, as a 6-pixel cartographic symbol: Uranus is never large enough to draw at its true size. Its rings are given in the table, not drawn. The five moons are drawn with it from 2000 to 2100 as 3-pixel symbols at their own places, each only where its mark stands clear of Uranus and of the moons already drawn - mostly at the narrowest fields: a filled dot clear of Uranus, a hollow ring in its shadow; a moon behind Uranus, or too close to tell apart at the field, is not drawn, and the page says so. Hidden until you ask. |
 | item label [checked] \| Neptune on the chart |
 | item spoken name \| Neptune on the chart |
-| item spoken description \| Shows or hides Neptune on the chart where it stands for the chart time and place, as a 6-pixel cartographic symbol: Neptune is never large enough to draw at its true size. Hidden until you ask. |
+| item spoken description \| Shows or hides Neptune on the chart where it stands for the chart time and place, as a 6-pixel cartographic symbol: Neptune is never large enough to draw at its true size. Triton and Nereid are drawn with it from 2000 to 2100, at the 1-degree field and the closer fields only, as 3-pixel symbols at their own places, each only where its mark stands clear of Neptune and of the other moon: a filled dot clear of Neptune, a hollow ring in its shadow; a moon behind Neptune, or too close to tell apart at the field, is not drawn, and the page says so. On wider fields the moons are not drawn. Hidden until you ask. |
 | item label \| Sun... |
 | item hover \| Where the Sun is, for the chart time and place |
 | item spoken name \| Sun table |
@@ -306,7 +306,7 @@ Bar packed 892 × 471 px; widest popup 232 px.
 | item label \| Neptune... |
 | item hover \| Where Neptune, Triton and Nereid are, for the chart time and place |
 | item spoken name \| Neptune table |
-| item spoken description \| Opens a table of Neptune's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Triton and Nereid stand beside it - clear of Neptune, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Neptune is drawn on the chart by Neptune on the chart. |
+| item spoken description \| Opens a table of Neptune's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Triton and Nereid stand beside it - clear of Neptune, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Neptune and its moons are drawn on the chart by Neptune on the chart. |
 | item label \| Zoom In |
 | item spoken name \| Zoom In |
 | item spoken description \| Shows a narrower field, with fainter stars on it |
@@ -410,7 +410,7 @@ Bar packed 892 × 471 px; widest popup 232 px.
 | item spoken description \| Shows or hides Uranus on the chart where it stands for the chart time and place, as a 6-pixel cartographic symbol: Uranus is never large enough to draw at its true size. Its rings are given in the table, not drawn. The five moons are drawn with it from 2000 to 2100 as 3-pixel symbols at their own places, each only where its mark stands clear of Uranus and of the moons already drawn - mostly at the narrowest fields: a filled dot clear of Uranus, a hollow ring in its shadow; a moon behind Uranus, or too close to tell apart at the field, is not drawn, and the page says so. Hidden until you ask. |
 | item label \| Neptune on the chart |
 | item spoken name \| Neptune on the chart |
-| item spoken description \| Shows or hides Neptune on the chart where it stands for the chart time and place, as a 6-pixel cartographic symbol: Neptune is never large enough to draw at its true size. Hidden until you ask. |
+| item spoken description \| Shows or hides Neptune on the chart where it stands for the chart time and place, as a 6-pixel cartographic symbol: Neptune is never large enough to draw at its true size. Triton and Nereid are drawn with it from 2000 to 2100, at the 1-degree field and the closer fields only, as 3-pixel symbols at their own places, each only where its mark stands clear of Neptune and of the other moon: a filled dot clear of Neptune, a hollow ring in its shadow; a moon behind Neptune, or too close to tell apart at the field, is not drawn, and the page says so. On wider fields the moons are not drawn. Hidden until you ask. |
 | item label \| Sun... |
 | item hover \| Where the Sun is, for the chart time and place |
 | item spoken name \| Sun table |
@@ -451,7 +451,7 @@ Bar packed 892 × 471 px; widest popup 232 px.
 | item label \| Neptune... |
 | item hover \| Where Neptune, Triton and Nereid are, for the chart time and place |
 | item spoken name \| Neptune table |
-| item spoken description \| Opens a table of Neptune's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Triton and Nereid stand beside it - clear of Neptune, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Neptune is drawn on the chart by Neptune on the chart. |
+| item spoken description \| Opens a table of Neptune's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Triton and Nereid stand beside it - clear of Neptune, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Neptune and its moons are drawn on the chart by Neptune on the chart. |
 | item label \| Zoom In |
 | item spoken name \| Zoom In |
 | item spoken description \| Shows a narrower field, with fainter stars on it |
@@ -555,7 +555,7 @@ Bar packed 892 × 471 px; widest popup 232 px.
 | item spoken description \| Shows or hides Uranus on the chart where it stands for the chart time and place, as a 6-pixel cartographic symbol: Uranus is never large enough to draw at its true size. Its rings are given in the table, not drawn. The five moons are drawn with it from 2000 to 2100 as 3-pixel symbols at their own places, each only where its mark stands clear of Uranus and of the moons already drawn - mostly at the narrowest fields: a filled dot clear of Uranus, a hollow ring in its shadow; a moon behind Uranus, or too close to tell apart at the field, is not drawn, and the page says so. Hidden until you ask. |
 | item label \| Neptune on the chart |
 | item spoken name \| Neptune on the chart |
-| item spoken description \| Shows or hides Neptune on the chart where it stands for the chart time and place, as a 6-pixel cartographic symbol: Neptune is never large enough to draw at its true size. Hidden until you ask. |
+| item spoken description \| Shows or hides Neptune on the chart where it stands for the chart time and place, as a 6-pixel cartographic symbol: Neptune is never large enough to draw at its true size. Triton and Nereid are drawn with it from 2000 to 2100, at the 1-degree field and the closer fields only, as 3-pixel symbols at their own places, each only where its mark stands clear of Neptune and of the other moon: a filled dot clear of Neptune, a hollow ring in its shadow; a moon behind Neptune, or too close to tell apart at the field, is not drawn, and the page says so. On wider fields the moons are not drawn. Hidden until you ask. |
 | item label \| Sun... |
 | item hover \| Where the Sun is, for the chart time and place |
 | item spoken name \| Sun table |
@@ -596,7 +596,7 @@ Bar packed 892 × 471 px; widest popup 232 px.
 | item label \| Neptune... |
 | item hover \| Where Neptune, Triton and Nereid are, for the chart time and place |
 | item spoken name \| Neptune table |
-| item spoken description \| Opens a table of Neptune's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Triton and Nereid stand beside it - clear of Neptune, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Neptune is drawn on the chart by Neptune on the chart. |
+| item spoken description \| Opens a table of Neptune's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Triton and Nereid stand beside it - clear of Neptune, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Neptune and its moons are drawn on the chart by Neptune on the chart. |
 | item label [unavailable] \| Zoom In |
 | item spoken name [unavailable] \| Zoom In |
 | item spoken description [unavailable] \| Unavailable: a closer field is offered only when Mercury, Venus, Mars, Jupiter, Saturn, Uranus or Neptune, shown on the chart, is on the page the step would show |
@@ -704,7 +704,7 @@ Bar packed 882 × 471 px; widest popup 229 px.
 | item spoken description \| Viser eller skjuler Uranus på kartet der den står for karttiden og stedet, som et kartografisk symbol på 6 piksler: Uranus er aldri stor nok til å tegnes i sann størrelse. Ringene oppgis i tabellen, de tegnes ikke. De fem månene tegnes sammen med den fra 2000 til 2100 som symboler på 3 piksler der de står, hver bare der merket står klar av Uranus og av månene som alt er tegnet - stort sett i de smaleste feltene: en fylt prikk klar av Uranus, en hul ring i skyggen; en måne bak Uranus, eller for nær til å skjelnes i feltet, tegnes ikke, og siden sier fra. Skjult til du ber om det. |
 | item label \| Neptun på kartet |
 | item spoken name \| Neptun på kartet |
-| item spoken description \| Viser eller skjuler Neptun på kartet der den står for karttiden og stedet, som et kartografisk symbol på 6 piksler: Neptun er aldri stor nok til å tegnes i sann størrelse. Skjult til du ber om det. |
+| item spoken description \| Viser eller skjuler Neptun på kartet der den står for karttiden og stedet, som et kartografisk symbol på 6 piksler: Neptun er aldri stor nok til å tegnes i sann størrelse. Triton og Nereid tegnes sammen med den fra 2000 til 2100, bare i 1-gradersfeltet og nærfeltene, som symboler på 3 piksler der de står, hver bare der merket står klar av Neptun og av den andre månen: en fylt prikk klar av Neptun, en hul ring i skyggen; en måne bak Neptun, eller for nær til å skjelnes i feltet, tegnes ikke, og siden sier fra. I videre felt tegnes ikke månene. Skjult til du ber om det. |
 | item label \| Solen... |
 | item hover \| Hvor Solen er, for karttiden og stedet |
 | item spoken name \| Soltabell |
@@ -742,7 +742,7 @@ Bar packed 882 × 471 px; widest popup 229 px.
 | item label \| Neptun... |
 | item hover \| Hvor Neptun, Triton og Nereid er, for karttiden og stedet |
 | item spoken name \| Neptuntabell |
-| item spoken description \| Åpner en tabell over Neptuns beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Triton og Nereid står ved siden av - klar av Neptun, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Neptun tegnes på kartet med Neptun på kartet. |
+| item spoken description \| Åpner en tabell over Neptuns beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Triton og Nereid står ved siden av - klar av Neptun, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Neptun og månene tegnes på kartet med Neptun på kartet. |
 | item label \| Zoom inn |
 | item spoken name \| Zoom inn |
 | item spoken description \| Viser et smalere synsfelt med svakere stjerner |
@@ -848,7 +848,7 @@ Bar packed 882 × 471 px; widest popup 229 px.
 | item spoken description \| Viser eller skjuler Uranus på kartet der den står for karttiden og stedet, som et kartografisk symbol på 6 piksler: Uranus er aldri stor nok til å tegnes i sann størrelse. Ringene oppgis i tabellen, de tegnes ikke. De fem månene tegnes sammen med den fra 2000 til 2100 som symboler på 3 piksler der de står, hver bare der merket står klar av Uranus og av månene som alt er tegnet - stort sett i de smaleste feltene: en fylt prikk klar av Uranus, en hul ring i skyggen; en måne bak Uranus, eller for nær til å skjelnes i feltet, tegnes ikke, og siden sier fra. Skjult til du ber om det. |
 | item label [checked] \| Neptun på kartet |
 | item spoken name \| Neptun på kartet |
-| item spoken description \| Viser eller skjuler Neptun på kartet der den står for karttiden og stedet, som et kartografisk symbol på 6 piksler: Neptun er aldri stor nok til å tegnes i sann størrelse. Skjult til du ber om det. |
+| item spoken description \| Viser eller skjuler Neptun på kartet der den står for karttiden og stedet, som et kartografisk symbol på 6 piksler: Neptun er aldri stor nok til å tegnes i sann størrelse. Triton og Nereid tegnes sammen med den fra 2000 til 2100, bare i 1-gradersfeltet og nærfeltene, som symboler på 3 piksler der de står, hver bare der merket står klar av Neptun og av den andre månen: en fylt prikk klar av Neptun, en hul ring i skyggen; en måne bak Neptun, eller for nær til å skjelnes i feltet, tegnes ikke, og siden sier fra. I videre felt tegnes ikke månene. Skjult til du ber om det. |
 | item label \| Solen... |
 | item hover \| Hvor Solen er, for karttiden og stedet |
 | item spoken name \| Soltabell |
@@ -886,7 +886,7 @@ Bar packed 882 × 471 px; widest popup 229 px.
 | item label \| Neptun... |
 | item hover \| Hvor Neptun, Triton og Nereid er, for karttiden og stedet |
 | item spoken name \| Neptuntabell |
-| item spoken description \| Åpner en tabell over Neptuns beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Triton og Nereid står ved siden av - klar av Neptun, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Neptun tegnes på kartet med Neptun på kartet. |
+| item spoken description \| Åpner en tabell over Neptuns beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Triton og Nereid står ved siden av - klar av Neptun, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Neptun og månene tegnes på kartet med Neptun på kartet. |
 | item label \| Zoom inn |
 | item spoken name \| Zoom inn |
 | item spoken description \| Viser et smalere synsfelt med svakere stjerner |
@@ -992,7 +992,7 @@ Bar packed 882 × 471 px; widest popup 229 px.
 | item spoken description \| Viser eller skjuler Uranus på kartet der den står for karttiden og stedet, som et kartografisk symbol på 6 piksler: Uranus er aldri stor nok til å tegnes i sann størrelse. Ringene oppgis i tabellen, de tegnes ikke. De fem månene tegnes sammen med den fra 2000 til 2100 som symboler på 3 piksler der de står, hver bare der merket står klar av Uranus og av månene som alt er tegnet - stort sett i de smaleste feltene: en fylt prikk klar av Uranus, en hul ring i skyggen; en måne bak Uranus, eller for nær til å skjelnes i feltet, tegnes ikke, og siden sier fra. Skjult til du ber om det. |
 | item label \| Neptun på kartet |
 | item spoken name \| Neptun på kartet |
-| item spoken description \| Viser eller skjuler Neptun på kartet der den står for karttiden og stedet, som et kartografisk symbol på 6 piksler: Neptun er aldri stor nok til å tegnes i sann størrelse. Skjult til du ber om det. |
+| item spoken description \| Viser eller skjuler Neptun på kartet der den står for karttiden og stedet, som et kartografisk symbol på 6 piksler: Neptun er aldri stor nok til å tegnes i sann størrelse. Triton og Nereid tegnes sammen med den fra 2000 til 2100, bare i 1-gradersfeltet og nærfeltene, som symboler på 3 piksler der de står, hver bare der merket står klar av Neptun og av den andre månen: en fylt prikk klar av Neptun, en hul ring i skyggen; en måne bak Neptun, eller for nær til å skjelnes i feltet, tegnes ikke, og siden sier fra. I videre felt tegnes ikke månene. Skjult til du ber om det. |
 | item label \| Solen... |
 | item hover \| Hvor Solen er, for karttiden og stedet |
 | item spoken name \| Soltabell |
@@ -1030,7 +1030,7 @@ Bar packed 882 × 471 px; widest popup 229 px.
 | item label \| Neptun... |
 | item hover \| Hvor Neptun, Triton og Nereid er, for karttiden og stedet |
 | item spoken name \| Neptuntabell |
-| item spoken description \| Åpner en tabell over Neptuns beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Triton og Nereid står ved siden av - klar av Neptun, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Neptun tegnes på kartet med Neptun på kartet. |
+| item spoken description \| Åpner en tabell over Neptuns beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Triton og Nereid står ved siden av - klar av Neptun, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Neptun og månene tegnes på kartet med Neptun på kartet. |
 | item label \| Zoom inn |
 | item spoken name \| Zoom inn |
 | item spoken description \| Viser et smalere synsfelt med svakere stjerner |
@@ -1136,7 +1136,7 @@ Bar packed 882 × 471 px; widest popup 229 px.
 | item spoken description \| Viser eller skjuler Uranus på kartet der den står for karttiden og stedet, som et kartografisk symbol på 6 piksler: Uranus er aldri stor nok til å tegnes i sann størrelse. Ringene oppgis i tabellen, de tegnes ikke. De fem månene tegnes sammen med den fra 2000 til 2100 som symboler på 3 piksler der de står, hver bare der merket står klar av Uranus og av månene som alt er tegnet - stort sett i de smaleste feltene: en fylt prikk klar av Uranus, en hul ring i skyggen; en måne bak Uranus, eller for nær til å skjelnes i feltet, tegnes ikke, og siden sier fra. Skjult til du ber om det. |
 | item label \| Neptun på kartet |
 | item spoken name \| Neptun på kartet |
-| item spoken description \| Viser eller skjuler Neptun på kartet der den står for karttiden og stedet, som et kartografisk symbol på 6 piksler: Neptun er aldri stor nok til å tegnes i sann størrelse. Skjult til du ber om det. |
+| item spoken description \| Viser eller skjuler Neptun på kartet der den står for karttiden og stedet, som et kartografisk symbol på 6 piksler: Neptun er aldri stor nok til å tegnes i sann størrelse. Triton og Nereid tegnes sammen med den fra 2000 til 2100, bare i 1-gradersfeltet og nærfeltene, som symboler på 3 piksler der de står, hver bare der merket står klar av Neptun og av den andre månen: en fylt prikk klar av Neptun, en hul ring i skyggen; en måne bak Neptun, eller for nær til å skjelnes i feltet, tegnes ikke, og siden sier fra. I videre felt tegnes ikke månene. Skjult til du ber om det. |
 | item label \| Solen... |
 | item hover \| Hvor Solen er, for karttiden og stedet |
 | item spoken name \| Soltabell |
@@ -1174,7 +1174,7 @@ Bar packed 882 × 471 px; widest popup 229 px.
 | item label \| Neptun... |
 | item hover \| Hvor Neptun, Triton og Nereid er, for karttiden og stedet |
 | item spoken name \| Neptuntabell |
-| item spoken description \| Åpner en tabell over Neptuns beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Triton og Nereid står ved siden av - klar av Neptun, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Neptun tegnes på kartet med Neptun på kartet. |
+| item spoken description \| Åpner en tabell over Neptuns beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Triton og Nereid står ved siden av - klar av Neptun, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Neptun og månene tegnes på kartet med Neptun på kartet. |
 | item label [unavailable] \| Zoom inn |
 | item spoken name [unavailable] \| Zoom inn |
 | item spoken description [unavailable] \| Utilgjengelig: et nærfelt tilbys bare når Merkur, Venus, Mars, Jupiter, Saturn, Uranus eller Neptun, vist på kartet, står på siden steget ville vise |

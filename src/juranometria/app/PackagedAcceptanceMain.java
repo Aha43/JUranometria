@@ -123,6 +123,14 @@ public final class PackagedAcceptanceMain {
     static final double NEPTUNE_SAMPLE_DEC = -0.600840866;
     static final java.time.Instant TRITON_ECLIPSE_INSTANT =
             java.time.Instant.parse("2044-09-26T00:00:00Z");
+    /**
+     * The packaged Neptune moons' sample (#659 part 2): Espenak's 2026
+     * opposition hour (docs/studies/neptune-system/neptune-events.txt), where
+     * at the minimum field Nereid stands clear of Neptune's mark and Triton
+     * on it.
+     */
+    static final java.time.Instant NEPTUNE_MOONS_SAMPLE_INSTANT =
+            java.time.Instant.parse("2026-09-26T00:00:00Z");
     static final java.time.Instant PHOBOS_ECLIPSE_INSTANT =
             java.time.Instant.parse("2018-07-26T12:30:00Z");
     static final java.time.Instant SATURN_CARD_INSTANT =
@@ -553,6 +561,7 @@ public final class PackagedAcceptanceMain {
         neptuneOnTheChartJourney();
         marsMoonsOnTheChartJourney();
         uranusMoonsOnTheChartJourney();
+        neptuneMoonsOnTheChartJourney();
         closerFieldsJourney();
         moonOnTheChartJourney();
         solarSystemSheetJourney();
@@ -3662,10 +3671,13 @@ public final class PackagedAcceptanceMain {
             });
             try {
                 paintHeadless(chart[0]);
+                // Since #659 part 2 a moon standing clear is drawn too at 1°: Neptune is
+                // found by its identity among the bodies the page draws.
                 java.util.List<juranometria.ui.ReferenceInk.BodyPlacement> drawn =
-                        chart[0].renderedBodies();
-                require(drawn.size() == 1 && identity.equals(drawn.get(0).identity()),
-                        "the packaged chart drew Neptune at " + field + "°: " + drawn);
+                        chart[0].renderedBodies().stream()
+                                .filter(b -> identity.equals(b.identity())).toList();
+                require(drawn.size() == 1,
+                        "the packaged chart drew Neptune at " + field + "°: " + chart[0].renderedBodies());
                 juranometria.project.DrawnPage page =
                         juranometria.project.DrawnPage.of(chart[0].currentScene());
                 juranometria.project.PixelPoint expected =
@@ -3712,6 +3724,100 @@ public final class PackagedAcceptanceMain {
                 + " Neptune System pack puts it at the Neptune sample - the 6 px symbol at 8° and at"
                 + " the minimum field, spoken as one - a click on the mark selects Neptune's"
                 + " occurrence, and the closer fields reach 0.25° on Neptune, still the 6 px mark)");
+    }
+
+    /**
+     * Neptune's moons on the chart (#659 part 2), inside the image: at the
+     * moons' sample, Neptune on and the page centred on it, at the minimum
+     * field Nereid is drawn as a 3 px symbol at its own J2000 place, named,
+     * not selectable (R-5, R-9), and Triton, on the mark, is spoken as too
+     * close to tell apart; at 8° the moons are not offered (R-6a): none is
+     * drawn and none is spoken.
+     */
+    private static void neptuneMoonsOnTheChartJourney() throws Exception {
+        juranometria.solar.SolarSystemService solar =
+                juranometria.solar.SolarSystemService.load();
+        juranometria.solar.NeptuneService neptuneService = juranometria.solar.NeptuneService.load();
+        juranometria.sky.Observer oslo = new juranometria.sky.Observer(59.91, 10.75,
+                NEPTUNE_MOONS_SAMPLE_INSTANT);
+        juranometria.solar.NeptuneService.Configuration moons = neptuneService.observeMoons(oslo);
+        for (double field : new double[] {
+                juranometria.chart.ChartViewState.normalMinimumFieldDegrees(), 8.0}) {
+            juranometria.ui.ChartComponent[] chart = new juranometria.ui.ChartComponent[1];
+            juranometria.chart.SelectionModel selection = new juranometria.chart.SelectionModel();
+            juranometria.ui.ChartModuleHost[] host = new juranometria.ui.ChartModuleHost[1];
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                chart[0] = new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
+                chart[0].setSize(900, 700);
+                chart[0].setViewState(new juranometria.chart.ChartViewState(
+                        neptuneService.observe(oslo).astrometricJ2000(), field, 8.0, null, null));
+                host[0] = new juranometria.ui.ChartModuleHost(chart[0], selection, r -> { });
+                juranometria.ui.SelectInteraction.install(chart[0], selection,
+                        host[0].workingSelection(), new juranometria.chart.SelectionMode());
+                juranometria.solarchart.SolarSystemModule module =
+                        juranometria.ui.solar.SunChartSession.begin(host[0], () -> oslo,
+                                () -> solar, () -> false);
+                module.withNeptune(() -> neptuneService);
+                module.sunShowing(false);
+                module.neptuneShowing(true);
+            });
+            try {
+                paintHeadless(chart[0]);
+                java.util.List<juranometria.ui.ReferenceInk.BodyPlacement> drawn =
+                        chart[0].renderedBodies();
+                String said = chart[0].getAccessibleContext().getAccessibleDescription();
+                juranometria.project.DrawnPage page =
+                        juranometria.project.DrawnPage.of(chart[0].currentScene());
+                juranometria.project.ViewportMapping mapping =
+                        new juranometria.project.ViewportMapping(page);
+                for (juranometria.solar.NeptuneService.MoonPlace moon : moons.moons()) {
+                    String identity = juranometria.solarchart.SolarSystemModule.identityOf(
+                            moon.moon());
+                    String name = moon.moon().name().charAt(0)
+                            + moon.moon().name().substring(1).toLowerCase(java.util.Locale.ROOT);
+                    juranometria.ui.ReferenceInk.BodyPlacement placed = drawn.stream()
+                            .filter(b -> identity.equals(b.identity())).findFirst().orElse(null);
+                    if (field == 8.0) {
+                        require(placed == null && !said.contains(" " + name),
+                                "at 8° " + name + " is neither drawn nor spoken (R-6a): " + said);
+                        continue;
+                    }
+                    if (placed == null) {
+                        require(said.contains(" " + name + ", too close to tell apart at this field,"
+                                + " not drawn."), "at " + field + "° " + name + " is not drawn and"
+                                + " is spoken so: " + said);
+                        continue;
+                    }
+                    require(placed.symbol() && !placed.selectable()
+                            && Math.abs(placed.disc().getBounds2D().getWidth()
+                                    - juranometria.solarchart.SolarSystemModule.NEPTUNE_MOON_MARK_PX)
+                                    < 0.05, name + " is a 3 px symbol, not selectable: " + drawn);
+                    juranometria.project.PixelPoint expected = mapping.toPixel(page.projection()
+                            .project(moon.astrometricJ2000()).orElseThrow());
+                    require(Math.hypot(placed.centre().x() - expected.x(),
+                                    placed.centre().y() - expected.y()) < 0.01,
+                            name + " at the service's J2000 place");
+                    require(said.contains(" " + name + " (a cartographic symbol, not " + name
+                            + "'s apparent diameter)."), "spoken as a symbol: " + said);
+                }
+                if (field != 8.0) {
+                    String nereid = juranometria.solarchart.SolarSystemModule.identityOf(
+                            juranometria.solar.NeptuneService.Moon.NEREID);
+                    String triton = juranometria.solarchart.SolarSystemModule.identityOf(
+                            juranometria.solar.NeptuneService.Moon.TRITON);
+                    require(drawn.stream().anyMatch(b -> nereid.equals(b.identity()))
+                                    && drawn.stream().noneMatch(b -> triton.equals(b.identity())),
+                            "at the minimum field Nereid stands clear and is drawn, Triton on the"
+                                    + " mark is not: " + drawn);
+                }
+            } finally {
+                javax.swing.SwingUtilities.invokeAndWait(host[0]::detachAll);
+            }
+        }
+        System.out.println("neptune moons on the chart OK (the packaged component draws Nereid at the"
+                + " 2026 opposition as a 3 px symbol at its own J2000 place at the minimum field,"
+                + " named and not selectable, Triton on the mark spoken as too close to tell apart;"
+                + " at 8° the moons are not offered: none drawn, none spoken)");
     }
 
     /**

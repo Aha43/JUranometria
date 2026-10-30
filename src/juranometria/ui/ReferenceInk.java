@@ -1634,12 +1634,25 @@ public final class ReferenceInk {
     }
 
     /**
+     * Round primaries whose moons are offered only at the chart's normal
+     * minimum field and the closer fields (R-6a on #658): Neptune's. On a
+     * wider page the system is not formed, so no moon is drawn or spoken
+     * there - Nereid, magnitude 18.7, is never a lone dot among stars ten
+     * magnitudes brighter. At the floor and closer the clearance rule below
+     * decides each mark as it does every round primary's.
+     */
+    static final java.util.Set<String> FLOOR_ONLY_MOONS =
+            java.util.Set.of(juranometria.solarchart.SolarSystemModule.NEPTUNE);
+
+    /**
      * Every round body's system on this page - Mars with Phobos and
-     * Deimos (#606 part 2) - each satellite decided on its own against the
-     * drawn disc or mark, with no floor (R-3 on #605): a moon is drawn
-     * only where its symbol stands clear of the primary's drawn mark and
-     * of the other moon, on every field; in front only on a drawn disc
-     * that can hold it.
+     * Deimos (#606 part 2), Uranus with its five (#638 part 2), Neptune
+     * with Triton and Nereid at the floor and closer (#659 part 2) - each
+     * satellite decided on its own against the drawn disc or mark, with no
+     * floor (R-3 on #605): a moon is drawn only where its symbol stands
+     * clear of the primary's drawn mark and of the other moons, on every
+     * field the system is offered on; in front only on a drawn disc that
+     * can hold it.
      */
     static List<RoundSystem> roundSystemsOn(DrawnPage page,
             List<OverlayRegistry.Owned> contributions) {
@@ -1659,6 +1672,12 @@ public final class ReferenceInk {
             }
             List<OverlayContribution.Satellite> moons = SatelliteMarks.of(primary.identity(),
                     offered);
+            if (FLOOR_ONLY_MOONS.contains(primary.identity())
+                    && page.scene().viewport().fieldWidthDegrees()
+                            > juranometria.chart.ChartViewState.normalMinimumFieldDegrees() + 1e-9) {
+                // R-6a on #658: not offered on this field, so neither drawn nor spoken.
+                moons = List.of();
+            }
             if (moons.isEmpty()) {
                 continue;
             }
