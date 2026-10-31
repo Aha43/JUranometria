@@ -76,9 +76,9 @@ The gate test pins all of it: zero unprotected, and the
 non-preference locals list is exactly `SwingSession.java`.
 
 The standing counts, quoted from the scanner so the gate can hold
-this document to them: **79 files** touch process-wide state —
-**37** use the shared guard, **41** restore locally,
-**0 flagged unprotected** — and **57 files** depend on a display,
+this document to them: **80 files** touch process-wide state —
+**38** use the shared guard, **41** restore locally,
+**0 flagged unprotected** — and **58 files** depend on a display,
 of which **19** state a focus premise and **34** a reachability
 premise through the shared route helper. (#558 added one
 guard-protected toucher: the all-star-identities option test, whose
@@ -384,7 +384,7 @@ Text cannot decide whether a read runs on the event thread — that
 is control flow, and #220 proved the cost of guessing, three times
 (the journey's mark derivation, its page offset, and finally its
 own premise capture). The measurements count the traffic: **478
-reads of live chart state** against **1107 explicit hand-offs**
+reads of live chart state** against **1117 explicit hand-offs**
 suite-wide (requoted for the #261 reader-surface tests, which read
 scenes and marks under the same one-hand-off discipline; for #275's
 closing journey, which reads the page's own objects and takes its

@@ -103,10 +103,18 @@ class EclipticControlsJourneyTest {
 
     /** Chart Options' controls over a scratch options store, with or without the ecliptic's switch. */
     private static ChartOptionsControls controls(EclipticSession.Switch ecliptic) {
-        return new ChartOptionsControls(new ChartOptionsController(
-                ChartOptionsStore.forNode(java.util.prefs.Preferences.userRoot()
-                        .node("juranometria/test/ecliptic-options-" + System.nanoTime()))),
-                () -> false, ecliptic,
+        // An in-memory options store: no preference node of the reader's.
+        return new ChartOptionsControls(new ChartOptionsController(new ChartOptionsStore() {
+            private juranometria.render.ChartOptions kept = juranometria.render.ChartOptions.DEFAULTS;
+            @Override
+            public juranometria.render.ChartOptions load() {
+                return kept;
+            }
+            @Override
+            public void save(juranometria.render.ChartOptions options) {
+                kept = options;
+            }
+        }), () -> false, ecliptic,
                 juranometria.ui.language.InterfaceText.forLanguage("en"));
     }
 

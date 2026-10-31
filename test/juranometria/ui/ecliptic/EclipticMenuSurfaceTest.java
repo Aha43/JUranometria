@@ -67,11 +67,21 @@ class EclipticMenuSurfaceTest {
                             : base.deriveFont((float) points));
                     juranometria.app.ChartOptionsControls controls =
                             new juranometria.app.ChartOptionsControls(
+                                    // An in-memory options store: this test touches no
+                                    // preference node of the reader's.
                                     new juranometria.app.ChartOptionsController(
-                                            juranometria.app.ChartOptionsStore.forNode(
-                                                    java.util.prefs.Preferences.userRoot().node(
-                                                            "juranometria/test/ecliptic-surface-"
-                                                                    + System.nanoTime()))),
+                                            new juranometria.app.ChartOptionsStore() {
+                                                private juranometria.render.ChartOptions kept =
+                                                        juranometria.render.ChartOptions.DEFAULTS;
+                                                @Override
+                                                public juranometria.render.ChartOptions load() {
+                                                    return kept;
+                                                }
+                                                @Override
+                                                public void save(juranometria.render.ChartOptions options) {
+                                                    kept = options;
+                                                }
+                                            }),
                                     () -> false,
                                     EclipticSession.of(new juranometria.ecliptic.EclipticModule(),
                                             EclipticStore.inMemory()),

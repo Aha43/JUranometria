@@ -570,7 +570,7 @@ class TestEvidenceGateTest {
                         || f.premises().contains("focus-owner")).count();
         long reachPremise = display.stream().filter(f ->
                 f.premises().contains("point-reachable")).count();
-        assertEquals(57, display.size(),
+        assertEquals(58, display.size(),
                 "the display corpus is the twenty the decision names"
                         + " plus the black-sky journey (#246), the"
                         + " #261 pair - the surfaces journey and the"
@@ -730,7 +730,11 @@ class TestEvidenceGateTest {
                         + " buttons, the chart keyboard's W - with their"
                         + " reachability and focus proven, because one"
                         + " clock read per press is a claim about the"
-                        + " running atlas");
+                        + " running atlas; and #675's Controller strip test,"
+                        + " which lays the strip out in a shown window at the"
+                        + " Controller's width and an external display's,"
+                        + " because which row a group lands on is a claim"
+                        + " about the room a window gives it");
         assertTrue(focusPremise >= 14,
                 "focus premises spread under #243 and may not"
                         + " retreat: " + focusPremise + " of "
@@ -783,7 +787,7 @@ class TestEvidenceGateTest {
                 f.routes().contains("back-door-click")).count();
         long postAction = files.stream().filter(f ->
                 f.routes().contains("back-door-commit")).count();
-        assertTrue(doClick <= 39,
+        assertTrue(doClick <= 41,
                 "doClick files shrank under #243 to menu convention"
                         + " and mechanism tests, and may not grow"
                         + " beyond them - the black-sky journey"
@@ -846,8 +850,13 @@ class TestEvidenceGateTest {
                         + " content's own kind, driving one controls class"
                         + " in its two hosts, and it takes the place #443's"
                         + " first pull request freed when the globe test"
-                        + " stopped pressing Restore Defaults by doClick. A bound that bends when it is"
-                        + " inconvenient is not a bound: " + doClick);
+                        + " stopped pressing Restore Defaults by doClick; and #675"
+                        + " added two control-mechanism files of the #261 kind -"
+                        + " the toolbar's Place and Time and Controls buttons, and"
+                        + " the range fields that follow the view radios - whose"
+                        + " controls are driven headlessly there and pressed for"
+                        + " real in the companion and Solar System journeys. A bound"
+                        + " that bends when it is inconvenient is not a bound: " + doClick);
         assertTrue(postAction <= 4,
                 "postActionEvent survives only in the named mechanism"
                         + " tests - the dialog content's, and #434's"

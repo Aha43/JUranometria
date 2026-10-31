@@ -204,10 +204,18 @@ class SprintTwentyEightJourneyTest {
                         EclipticSession.of(ecliptic, store);
                 javax.swing.JCheckBox item = new juranometria.app.ChartOptionsControls(
                         new juranometria.app.ChartOptionsController(
-                                juranometria.app.ChartOptionsStore.forNode(
-                                        java.util.prefs.Preferences.userRoot().node(
-                                                "juranometria/test/sprint-28-options-"
-                                                        + System.nanoTime()))),
+                                new juranometria.app.ChartOptionsStore() {
+                                        private juranometria.render.ChartOptions kept =
+                                                juranometria.render.ChartOptions.DEFAULTS;
+                                        @Override
+                                        public juranometria.render.ChartOptions load() {
+                                            return kept;
+                                        }
+                                        @Override
+                                        public void save(juranometria.render.ChartOptions options) {
+                                            kept = options;
+                                        }
+                                }),
                         () -> false, eclipticSwitch,
                         juranometria.ui.language.InterfaceText.forLanguage("en"))
                         .eclipticBox();
