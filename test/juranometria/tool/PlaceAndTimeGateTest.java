@@ -177,6 +177,8 @@ class PlaceAndTimeGateTest {
     private static final Path NEPTUNE_SYSTEM_PACK =
             Path.of("src/resources/neptune-system");
 
+    private static final Path ICONS = Path.of("src/resources/icons");
+
     private static final List<String> TIME_AND_EPHEMERIS_NAMES =
             List.of("leap", "ut1", "ephemeris", "iers", "horizon",
                     "de440", "delta-t", "deltat", ".bsp", ".tls");
@@ -197,7 +199,12 @@ class PlaceAndTimeGateTest {
                     .filter(Files::isRegularFile)::iterator) {
                 String name = path.getFileName().toString()
                         .toLowerCase(java.util.Locale.ROOT);
-                boolean astronomical = TIME_AND_EPHEMERIS_NAMES.stream()
+                // The interface's icons (src/resources/icons, Tabler, MIT,
+                // recorded in ICONS.md) are glyphs, not data: Tabler's
+                // "adjustments-horizontal" carries the horizon's name by
+                // accident of spelling (#675 stage 2).
+                boolean icon = path.startsWith(ICONS);
+                boolean astronomical = !icon && TIME_AND_EPHEMERIS_NAMES.stream()
                         .anyMatch(name::contains);
                 boolean jovianEphemeris = (path.startsWith(JOVIAN_SYSTEM_PACK)
                         || path.startsWith(PLANETS_PACK)

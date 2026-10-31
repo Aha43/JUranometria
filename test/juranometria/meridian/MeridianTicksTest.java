@@ -126,7 +126,8 @@ class MeridianTicksTest {
         List<OverlayContribution.Tick> ticks = offered.stream()
                 .filter(c -> c instanceof OverlayContribution.Tick)
                 .map(c -> (OverlayContribution.Tick) c).toList();
-        assertEquals(1 + 16, offered.size(), "the line and eight ticks on each half");
+        assertEquals(1 + 1 + 16, offered.size(),
+                "the line, the altitude readout it offers with the ticks (#563), and eight ticks on each half");
         assertEquals(16, ticks.size());
         LocalSky sky = new LocalSky(OSLO);
         assertEquals(16, ticks.stream().map(OverlayContribution.Tick::identity)
@@ -154,7 +155,8 @@ class MeridianTicksTest {
         module.onChange(() -> heard[0]++);
         module.ticks(new MeridianModule.Ticks(5.0, 10.0));
         assertEquals(1, heard[0], "a presentation is told");
-        assertEquals(1 + 2 * 17, module.contributedGeometry().size());
+        assertEquals(1 + 1 + 2 * 17, module.contributedGeometry().size(),
+                "the line, the readout and seventeen ticks on each half");
         module.ticksShowing(false);
         assertEquals(2, heard[0]);
         assertEquals(1, module.contributedGeometry().size());

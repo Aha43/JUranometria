@@ -126,9 +126,12 @@ class ChartModuleBoundaryTest {
         // in the chart's frame, the ring opening and the ruled ring
         // edges - typed geometry still, and the page, not the module,
         // decides when the minimum is a symbol and how the rings are inked.
+        // #563 (R-1, R-9) adds the altitude readout: the meridian's pole and
+        // the zenith, from which the page alone decides where one reading
+        // stands and what it states.
         java.util.List<String> vocabulary = java.util.List.of("GreatCircle",
                 "Point", "Path", "Region", "DirectionMark", "Tick", "Body",
-                "OblateBody", "RingedBody", "Satellite");
+                "OblateBody", "RingedBody", "Satellite", "AltitudeReadout");
         assertEquals(vocabulary,
                 java.util.Arrays.stream(OverlayContribution.class
                                 .getPermittedSubclasses())
@@ -136,7 +139,8 @@ class ChartModuleBoundaryTest {
                                 java.util.Comparator.comparingInt(vocabulary::indexOf))
                         .toList(),
                 "a great circle, a point, a path, a region, a direction mark, a"
-                        + " tick, a body, an oblate body, a ringed body and a satellite - the geometry"
+                        + " tick, a body, an oblate body, a ringed body, a satellite and an altitude"
+                        + " readout - the geometry"
                         + " a module may contribute, and nothing else");
     }
 
