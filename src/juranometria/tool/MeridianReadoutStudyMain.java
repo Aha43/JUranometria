@@ -90,7 +90,10 @@ public final class MeridianReadoutStudyMain {
                 + " of the meridian nearest the page centre, stating its own altitude rounded to the"
                 + " whole degree with `PageText.altitudeTick`; a stroke half a ruled tick's. The"
                 + " whole-degree candidate the study first measured beside it was removed with the"
-                + " ruling; its numbers are quoted in `docs/decisions/meridian-readout.md`.");
+                + " ruling; its numbers are quoted in `docs/decisions/meridian-readout.md`. Amended"
+                + " R-9 (2026-10-31): when the nearest point reads as the zenith's, the readout stands"
+                + " at the visible point farthest from the zenith instead, the south half first, kept"
+                + " " + figure(MeridianReadout.EDGE_ROOM) + " px inside the page's edge.");
         p("");
         p("## Pages");
         p("");
@@ -127,6 +130,32 @@ public final class MeridianReadoutStudyMain {
                     + " The rule inherits the refusal.");
         }
         p("");
+        p("## Centred on the zenith (R-9)");
+        p("");
+        p("The owner's page of 2026-10-31: *Centre on zenith*, then zoom in. The point nearest the"
+                + " centre is the zenith itself, 90°, which R-8 never states and the zenith mark"
+                + " already names; before R-9 the line carried no figure once the 80° ticks had left"
+                + " the page. Under R-9 the readout stands at the visible point farthest from the"
+                + " zenith, on the south half.");
+        p("");
+        p("| page | field | ruled ticks on page | visible altitudes | nearest point | stated | drawn |");
+        p("|---|---|---|---|---|---|---|");
+        page("zenith-18", sky.zenith(), 18.0, false, ENGLISH, ChartPalette.WHITE_PAPER,
+                "centred on the zenith, 18°");
+        page("zenith-4", sky.zenith(), 4.0, false, ENGLISH, ChartPalette.WHITE_PAPER,
+                "centred on the zenith, 4°");
+        p("");
+        p("| field | ruled ticks on page | readout offered | stands at | stated |");
+        p("|---|---|---|---|---|");
+        for (double field : new double[] {42.0, 36.0, 24.0, 18.0, 12.0, 8.0, 4.0}) {
+            Measured m = measure(sky.zenith(), field, false);
+            p("| " + figure(field) + "° | " + m.ticksOnPage + " | "
+                    + (m.offered ? "yes" : "no: a ruled tick is on the page") + " | "
+                    + (m.a == null ? "—" : (m.atTheEdge ? "the farthest visible point (R-9), " : "the nearest point, ")
+                            + fmt(m.a.altitudeDegrees(), 2) + "° at " + pixel(m.a)) + " | "
+                    + m.stated + " |");
+        }
+        p("");
         p("## Panning along the line, 4° field, south half");
         p("");
         p("Eight steps of a quarter degree of altitude. The readout glides with the centre; its"
@@ -138,7 +167,7 @@ public final class MeridianReadoutStudyMain {
             double centre = 35.12 + 0.25 * k;
             Measured m = measure(sky.onMeridian(centre, false), 4.0, false);
             p("| " + fmt(centre, 2) + "° | " + (m.a == null ? "—" : fmt(m.a.altitudeDegrees(), 2) + "°")
-                    + " | " + (m.a == null ? "—" : figure(MeridianReadout.roundedToTheDegree(m.a.altitudeDegrees())) + "°")
+                    + " | " + m.stated
                     + " | " + (m.a == null ? "—" : pixel(m.a)) + " |");
         }
         p("");
@@ -150,7 +179,7 @@ public final class MeridianReadoutStudyMain {
             Measured m = measure(sky.onMeridian(35.37, false), field, false);
             p("| " + figure(field) + "° | " + fmt(field * 700.0 / 900.0, 1) + "° | " + m.ticksOnPage + " | "
                     + (m.offered ? "yes" : "no: a ruled tick is on the page") + " | "
-                    + (m.a == null ? "—" : figure(MeridianReadout.roundedToTheDegree(m.a.altitudeDegrees())) + "°") + " |");
+                    + m.stated + " |");
         }
         p("");
         p("## What the measurements support");
@@ -166,7 +195,9 @@ public final class MeridianReadoutStudyMain {
                 + " along the line.");
         p("4. **Words.** The figure is `PageText.altitudeTick`, the page's own, in both languages; a"
                 + " half-degree figure would write one decimal, as the ticks' contract already allows.");
-        p("5. **Edges.** Nothing below the horizon; nothing at 90°; refused at the geographic pole.");
+        p("5. **Edges.** Nothing below the horizon; nothing at 90°; refused at the geographic pole."
+                + " A page whose centre is the zenith's reads its farthest visible point instead (R-9),"
+                + " so a meridian drawn with its ticks on always carries one figure.");
         p("6. **Ink.** A stroke across the line as the ruled ticks', shorter, and the figure placed by"
                 + " the production placement and refused alone - here only mocked up.");
         System.out.print(PlatformEvidence.portable(REPORT.toString()));
@@ -174,8 +205,24 @@ public final class MeridianReadoutStudyMain {
     }
 
     private record Measured(int ticksOnPage, double low, double high, boolean offered,
-                            MeridianReadout.Sample a,
+                            MeridianReadout.Sample a, boolean atTheEdge, String stated,
                             BufferedImage page, ChartModuleHost host, List<MeridianReadout.Sample> visible) {
+    }
+
+    /**
+     * The figure the production page states, read from its own spoken
+     * description ("Meridian altitude here: about 84°." / "Meridianens
+     * høyde her: omtrent 84°."), or an em dash when it states none. The
+     * study's helper samples the line on its own grid; the figure a
+     * reader sees is the page's, so the tables quote the page.
+     */
+    private static String stated(ChartComponent chart) throws Exception {
+        String[] said = new String[1];
+        SwingUtilities.invokeAndWait(() ->
+                said[0] = chart.getAccessibleContext().getAccessibleDescription());
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("(?:about|omtrent) (\\d+°)\\.")
+                .matcher(said[0] == null ? "" : said[0]);
+        return m.find() ? m.group(1) : "—";
     }
 
     private static Measured measure(SkyPosition centre, double field, boolean north) throws Exception {
@@ -199,6 +246,7 @@ public final class MeridianReadoutStudyMain {
             module.ticksShowing(true);
         });
         BufferedImage page = paint(chart[0]);
+        String stated = stated(chart[0]);
         LocalSky sky = new LocalSky(OSLO);
         int ticks = 0;
         for (double altitude : MeridianModule.Ticks.PROPOSED.altitudes()) {
@@ -224,13 +272,21 @@ public final class MeridianReadoutStudyMain {
         double high = visible.stream().mapToDouble(MeridianReadout.Sample::altitudeDegrees).max().orElse(Double.NaN);
         boolean offered = !visible.isEmpty() && high > 0.0
                 && !MeridianReadout.aRuledTickIsVisible(visible, MeridianModule.Ticks.PROPOSED);
-        MeridianReadout.Sample a = offered
-                ? MeridianReadout.nearestTheCentre(visible, CX, CY)
-                        .filter(s -> MeridianReadout.statable(
-                                MeridianReadout.roundedToTheDegree(s.altitudeDegrees())))
-                        .orElse(null)
-                : null;
-        return new Measured(ticks, low, high, offered, a, page, host[0], visible);
+        MeridianReadout.Sample nearest = offered
+                ? MeridianReadout.nearestTheCentre(visible, CX, CY).orElse(null) : null;
+        MeridianReadout.Sample a = nearest != null && MeridianReadout.statable(
+                MeridianReadout.roundedToTheDegree(nearest.altitudeDegrees())) ? nearest : null;
+        boolean atTheEdge = false;
+        if (nearest != null && MeridianReadout.readsAsTheZenith(
+                MeridianReadout.roundedToTheDegree(nearest.altitudeDegrees()))) {
+            // R-9: the centre is the zenith's; the farthest visible point stands in.
+            a = MeridianReadout.farthestFromTheZenith(visible, 900.0, 700.0)
+                    .filter(s -> MeridianReadout.statable(
+                            MeridianReadout.roundedToTheDegree(s.altitudeDegrees())))
+                    .orElse(null);
+            atTheEdge = a != null;
+        }
+        return new Measured(ticks, low, high, offered, a, atTheEdge, stated, page, host[0], visible);
     }
 
     private static boolean inside(double[] px) {
@@ -245,9 +301,10 @@ public final class MeridianReadoutStudyMain {
         int overlap = -1;
         String mockFigure = "—";
         if (m.offered && m.a != null) {
-            mockFigure = words.altitudeTick(MeridianReadout.roundedToTheDegree(m.a.altitudeDegrees()));
+            mockFigure = m.stated;
             overlap = figureRoom(image, m, mockFigure, palette);
-            drawn = "production ink at " + pixel(m.a) + ", figure " + mockFigure;
+            drawn = "production ink at " + pixel(m.a) + ", figure " + mockFigure
+                    + (m.atTheEdge ? " (R-9: the farthest visible point, the centre being the zenith's)" : "");
         } else if (m.offered) {
             drawn = "nothing: no statable altitude on the visible line";
         }
@@ -255,7 +312,7 @@ public final class MeridianReadoutStudyMain {
         p("| ![](" + name + ".png) " + name + " (" + caption + ") | " + figure(field) + "° | " + m.ticksOnPage
                 + " | " + (m.visible.isEmpty() ? "none" : fmt(m.low, 2) + "°–" + fmt(m.high, 2) + "°")
                 + " | " + (m.a == null ? "—" : fmt(m.a.altitudeDegrees(), 2) + "° at " + pixel(m.a))
-                + " | " + (m.a == null ? "—" : figure(MeridianReadout.roundedToTheDegree(m.a.altitudeDegrees())) + "°")
+                + " | " + m.stated
                 + " | " + drawn + " |");
         q("| " + name + " | " + mockFigure + " | " + (overlap < 0 ? "—" : Integer.toString(overlap)) + " |");
     }

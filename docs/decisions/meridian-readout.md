@@ -114,6 +114,38 @@ to the whole degree.** Candidate C was removed from `MeridianReadout`
 with the ruling; its measurements stay quoted above as the record of
 why.
 
+## Amendment of 2026-10-31: R-9, the zenith at the centre
+
+At the Stage 5 checkpoint the owner pressed *Centre on zenith* with the
+altitude ticks on and zoomed in to 18°: the meridian crossed the whole
+page and carried no figure. The probe reproduced it at every field from
+36° down. The cause was R-2 with R-8: the visible point nearest the
+centre was the zenith itself, 90°, which is never stated. The owner's
+expectation, in their words: *"if tick selected you always see one"*,
+and, offered the choice between amending the rule and rolling the stage
+back, *"Your recommendation"* - the amendment.
+
+9. **R-9, the zenith at the centre.** When the point nearest the page
+   centre reads as the zenith's (rounds to 90°), the readout stands
+   instead at the **visible point farthest from the zenith** - the
+   lowest altitude on the page - **on the south half when both halves
+   are on the page**, the north half otherwise, and kept
+   `MeridianReadout.EDGE_ROOM` (24 px) inside the page's edge so its
+   stroke and figure have room. It states that point's altitude to the
+   degree as any readout does; R-8 still holds (never 90°, never 0°).
+   The zenith mark names the centre; the readout names the edge.
+
+Measured (`zenith-18`, `zenith-4` and the zoom table in the study): on
+the study's 900 × 700 page an 80° tick is on the page at 42° and 36° and
+the readout is withheld; from 24° down no ruled tick is on the page and
+the readout stands near the bottom edge, 24 px inside it, reading 81° at
+24°, 84° at 18°, 86° at 12°, 87° at 8° and 89° at 4° (the study quotes
+the page's own spoken figure, not its helper's rounding: at 18° the
+helper's 0.05° grid reads 83.50° and the page's 0.25° grid a hair above
+the half, so the page says 84°). On the owner's
+wider page (about 2000 × 1070) the 80° ticks leave at 36° and the
+readout appears there.
+
 ## As built (#675, stage 5)
 
 - **The module offers, the page decides.** `MeridianModule` adds one
@@ -126,7 +158,10 @@ why.
   the circle and refined to a thousandth (R-2, R-7); its altitude, 90°
   less its distance from the zenith, rounded to the whole degree with a
   half rounding up (R-3); nothing at or below 0° and nothing at 90°
-  (R-8). The painter and the spoken description read that one answer.
+  (R-8). When that nearest point reads 90°, the visible point farthest
+  from the zenith stands in, the south half first, 24 px inside the
+  page's edge (R-9). The painter and the spoken description read that
+  one answer.
 - **The ink.** A stroke across the line half a ruled tick's length
   (`GRADUATION / 2`), in the line's own accent and raised with the
   meridian's emphasis (R-4, R-6); the figure is the page's
@@ -138,8 +173,11 @@ why.
   cannot see the stroke is told what it reads (R-6). No new switch, no
   shortcut; the readout rides the altitude ticks and is reported with
   them.
-- **Held by** `MeridianReadoutTest` (the rule) and `MeridianReadoutInkTest`
-  (a 4° page between ticks draws and speaks it; a 12° page with a ruled
-  tick on it does not; 89.8° is not stated; 3.7° reads 4°; Norwegian on
-  the black sky; nothing with ticks off). The study was regenerated for
-  the ruled candidate alone.
+- **Held by** `MeridianReadoutTest` (the rule, R-9's farthest point and
+  room) and `MeridianReadoutInkTest` (a 4° page between ticks draws and
+  speaks it; a 12° page with a ruled tick on it does not; 89.8° is not
+  stated and the page reads 89° at its edge instead; a page centred on
+  the zenith at 18° inks nothing at the centre and reads 83° or 84° near
+  the bottom edge; 3.7° reads 4°; Norwegian on the black sky; nothing
+  with ticks off). The study was regenerated for the ruled candidate
+  alone, then again with the zenith pages for R-9.

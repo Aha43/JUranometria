@@ -32,7 +32,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * ruled R-1 to R-8 on #675 stage 5): drawn only while altitude ticks are
  * on and no ruled tick is on the page, at the visible point nearest the
  * page centre, its altitude to the degree, spoken in the page's words;
- * never at the zenith; nothing where a ruled tick shows.
+ * never at the zenith - a page whose centre is the zenith's reads the
+ * farthest visible point instead (R-9); nothing where a ruled tick shows.
  */
 class MeridianReadoutInkTest {
 
@@ -77,9 +78,15 @@ class MeridianReadoutInkTest {
 
     /** Pixels that differ between two paints within a radius of the page centre. */
     private static int differencesNearTheCentre(BufferedImage a, BufferedImage b, int radius) {
+        return differencesWithin(a, b, 450 - radius, 350 - radius, 450 + radius, 350 + radius);
+    }
+
+    /** Pixels that differ between two paints inside a box of the page. */
+    private static int differencesWithin(BufferedImage a, BufferedImage b,
+                                         int x0, int y0, int x1, int y1) {
         int n = 0;
-        for (int y = 350 - radius; y <= 350 + radius; y++) {
-            for (int x = 450 - radius; x <= 450 + radius; x++) {
+        for (int y = y0; y <= y1; y++) {
+            for (int x = x0; x <= x1; x++) {
                 if (a.getRGB(x, y) != b.getRGB(x, y)) {
                     n++;
                 }
@@ -125,8 +132,11 @@ class MeridianReadoutInkTest {
         Page nearZenith = page(SKY.onMeridian(89.8, false), 2.0, "en", ChartPalette.WHITE_PAPER);
         SwingUtilities.invokeAndWait(() -> nearZenith.module().ticksShowing(true));
         paint(nearZenith.chart());
-        assertFalse(spoken(nearZenith.chart()).contains("Meridian altitude here"),
-                "89.8° rounds to 90°, the zenith's, which is never stated");
+        String said = spoken(nearZenith.chart());
+        assertFalse(said.contains("about 90°"),
+                "89.8° rounds to 90°, the zenith's, which is never stated: " + said);
+        assertTrue(said.contains("Meridian altitude here: about 89°."),
+                "R-9: the farthest visible point of the south half stands in, 89°: " + said);
         Page nearHorizon = page(SKY.onMeridian(3.7, false), 4.0, "en", ChartPalette.WHITE_PAPER);
         SwingUtilities.invokeAndWait(() -> nearHorizon.module().ticksShowing(true));
         paint(nearHorizon.chart());
@@ -143,6 +153,24 @@ class MeridianReadoutInkTest {
         assertTrue(differencesNearTheCentre(without, with, 40) > 4, "drawn on the black sky too");
         assertTrue(spoken(norsk.chart()).contains("Meridianens høyde her: omtrent 35°."),
                 "in the page's language: " + spoken(norsk.chart()));
+    }
+
+    @Test
+    void centredOnTheZenithTheReadoutStandsAtTheFarthestVisiblePointOfTheSouthHalf() throws Exception {
+        // The owner's page of 2026-10-31: Centre on zenith, then zoom in
+        // until the 80° ticks have left the page. Without R-9 the line
+        // carried no figure at all.
+        Page page = page(SKY.zenith(), 18.0, "en", ChartPalette.WHITE_PAPER);
+        BufferedImage without = paint(page.chart());
+        SwingUtilities.invokeAndWait(() -> page.module().ticksShowing(true));
+        BufferedImage with = paint(page.chart());
+        assertEquals(0, differencesNearTheCentre(without, with, 30),
+                "nothing is drawn at the zenith itself");
+        assertTrue(differencesWithin(without, with, 330, 560, 570, 699) > 4,
+                "the stroke (and its figure, where it found room) is inked near the bottom edge");
+        String said = spoken(page.chart());
+        assertTrue(said.matches("(?s).*Meridian altitude here: about 8[34]°\\..*"),
+                "the page's lowest visible point of the south half, about 83°: " + said);
     }
 
     @Test

@@ -35,3 +35,5 @@ Recorded on: `Mac OS X 27.0.1/aarch64/Homebrew 21.0.12.1`
 | south-88-4 | 88° | 0 |
 | south-35-2-dark | 35° | 25 |
 | south-35-2-nb | 35° | 25 |
+| zenith-18 | 84° | 38 |
+| zenith-4 | 89° | 37 |

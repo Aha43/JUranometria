@@ -436,8 +436,9 @@ public final class MeridianModule implements ChartModule {
                 // One contextual readout (#563, ruled on #675 stage 5):
                 // offered with the ticks; the page draws it only while no
                 // tick of the line is on the page, at the visible point
-                // nearest its centre, rounded to the degree. Refused with
-                // the ticks at the geographic poles.
+                // nearest its centre - or farthest from the zenith when the
+                // centre is the zenith's (R-9) - rounded to the degree.
+                // Refused with the ticks at the geographic poles.
                 offered.add(new OverlayContribution.AltitudeReadout(
                         ID + "/readout", ID, sky.meridian().pole(), sky.zenith(),
                         InkRole.REFERENCE_LINE));

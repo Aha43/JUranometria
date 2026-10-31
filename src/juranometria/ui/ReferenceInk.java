@@ -409,9 +409,10 @@ public final class ReferenceInk {
             }
             // The contextual readout (#563, ruled on #675 stage 5): only
             // while no ruled tick of the line is on the page, at the
-            // visible point nearest the page centre, its altitude to the
-            // degree; a stroke half a tick's, the figure placed as a
-            // tick's is and refused alone.
+            // visible point nearest the page centre - or, when that point
+            // is the zenith's, at the visible point farthest from the
+            // zenith (R-9) - its altitude to the degree; a stroke half a
+            // tick's, the figure placed as a tick's is and refused alone.
             altitudeReadout(page, contributions).ifPresent(readout ->
                     drawTick(g2, projection, mapping, paper, sky, bounded,
                             new OverlayContribution.Tick(readout.lineIdentity() + "/readout",
@@ -3059,8 +3060,13 @@ public final class ReferenceInk {
      * module adds the readout with them) and none of those ticks is on
      * the page. R-2: the visible point nearest the page centre. R-3: its
      * altitude to the degree. R-8: nothing at or below the horizon, nothing
-     * at the zenith. Sampled every quarter degree around the circle, then
-     * refined to a thousandth where the samples are nearest.
+     * at the zenith. R-9 (amendment of 2026-10-31): when the nearest point
+     * reads as the zenith's, the readout stands instead at the visible
+     * point farthest from the zenith - on the south half when both halves
+     * are on the page - kept {@link MeridianReadout#EDGE_ROOM} inside the
+     * page's edge so its stroke and figure have room. Sampled every
+     * quarter degree around the circle, the nearest point then refined to
+     * a thousandth where the samples are nearest.
      */
     public static java.util.Optional<ReadoutPlacement> altitudeReadout(DrawnPage page,
             List<OverlayRegistry.Owned> contributions) {
@@ -3119,6 +3125,45 @@ public final class ReferenceInk {
             double[] v = onCircle(theta, e1, e2);
             double altitude = 90.0 - Math.toDegrees(Math.acos(Math.max(-1.0, Math.min(1.0, dot(v, zenith)))));
             double rounded = juranometria.meridian.MeridianReadout.roundedToTheDegree(altitude);
+            if (juranometria.meridian.MeridianReadout.readsAsTheZenith(rounded)) {
+                // R-9: the centre is the zenith's own point, which the zenith
+                // mark already names; the readout stands at the visible point
+                // farthest from it, the south half first.
+                double[] north = towardTheNorthHorizon(zenith);
+                double room = juranometria.meridian.MeridianReadout.EDGE_ROOM;
+                Rectangle2D inside = new Rectangle2D.Double(paper.getX() + room, paper.getY() + room,
+                        Math.max(0.0, paper.getWidth() - 2.0 * room),
+                        Math.max(0.0, paper.getHeight() - 2.0 * room));
+                double farTheta = Double.NaN;
+                for (boolean south : new boolean[] {true, false}) {
+                    double lowest = Double.MAX_VALUE;
+                    for (double t = 0.0; t < 360.0; t += 0.25) {
+                        double[] w = onCircle(t, e1, e2);
+                        double up = dot(w, zenith);
+                        if (up <= 0.0 || (dot(w, north) < 0.0) != south) {
+                            continue;
+                        }
+                        PixelPoint px = projection.project(juranometria.sky.SkyFrame.toPosition(w))
+                                .map(mapping::toPixel).orElse(null);
+                        if (px == null || !inside.contains(px.x(), px.y())) {
+                            continue;
+                        }
+                        if (up < lowest) {
+                            lowest = up;
+                            farTheta = t;
+                        }
+                    }
+                    if (!Double.isNaN(farTheta)) {
+                        break;
+                    }
+                }
+                if (Double.isNaN(farTheta)) {
+                    continue;
+                }
+                v = onCircle(farTheta, e1, e2);
+                altitude = 90.0 - Math.toDegrees(Math.acos(Math.max(-1.0, Math.min(1.0, dot(v, zenith)))));
+                rounded = juranometria.meridian.MeridianReadout.roundedToTheDegree(altitude);
+            }
             if (!juranometria.meridian.MeridianReadout.statable(rounded)) {
                 continue;
             }
@@ -3147,6 +3192,20 @@ public final class ReferenceInk {
             return Double.MAX_VALUE;
         }
         return Math.hypot(px.x() - cx, px.y() - cy);
+    }
+
+    /**
+     * The unit direction from the zenith toward the north point of the
+     * horizon: the celestial pole's direction with its upward part removed.
+     * Undefined only at the geographic poles, where the module offers no
+     * readout.
+     */
+    private static double[] towardTheNorthHorizon(double[] zenith) {
+        double[] pole = {0.0, 0.0, 1.0};
+        double up = dot(pole, zenith);
+        double[] n = {pole[0] - up * zenith[0], pole[1] - up * zenith[1], pole[2] - up * zenith[2]};
+        double length = Math.sqrt(dot(n, n));
+        return new double[] {n[0] / length, n[1] / length, n[2] / length};
     }
 
     private static double[] onCircle(double thetaDegrees, double[] e1, double[] e2) {

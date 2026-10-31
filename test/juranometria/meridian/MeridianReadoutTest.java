@@ -48,4 +48,17 @@ class MeridianReadoutTest {
         assertTrue(MeridianReadout.statable(1.0));
         assertTrue(MeridianReadout.statable(89.0));
     }
+
+    @Test
+    void whenTheCentreReadsAsTheZenithTheFarthestVisiblePointInsideTheRoomStandsIn() {
+        assertTrue(MeridianReadout.readsAsTheZenith(90.0), "90° is the zenith's reading (R-9)");
+        assertFalse(MeridianReadout.readsAsTheZenith(89.0));
+        // 80° at y = 700 (the edge), 80.5° at 650, ... 90° at -300: the
+        // lowest altitude at least EDGE_ROOM inside a 900 x 700 page.
+        MeridianReadout.Sample edge = MeridianReadout.farthestFromTheZenith(line(80.0, 90.0, 0.5),
+                900.0, 700.0).orElseThrow();
+        assertEquals(80.5, edge.altitudeDegrees(), 1e-9,
+                "80° stands on the edge itself, outside the room; 80.5° is the first inside it");
+        assertTrue(MeridianReadout.farthestFromTheZenith(List.of(), 900.0, 700.0).isEmpty());
+    }
 }

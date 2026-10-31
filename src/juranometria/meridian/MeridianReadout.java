@@ -10,9 +10,20 @@ import java.util.Optional;
  * visible line at the point nearest the page centre and states that
  * point's altitude rounded to the whole degree (ruling R-2, R-3: "A to
  * the degree"). The whole-degree candidate the study also measured was
- * removed with the ruling.
+ * removed with the ruling. Amended the same day (R-9): when the nearest
+ * point is the zenith's own, which the zenith mark already names, the
+ * readout stands instead at the visible point farthest from the zenith,
+ * kept {@link #EDGE_ROOM} inside the page's edge, so a meridian drawn
+ * with its ticks on always carries one figure.
  */
 public final class MeridianReadout {
+
+    /**
+     * How far inside the page's edge the farthest point is taken (R-9),
+     * in pixels: room for the stroke and a figure's box, eight times a
+     * ruled tick's half-length.
+     */
+    public static final double EDGE_ROOM = 24.0;
 
     private MeridianReadout() {
     }
@@ -51,6 +62,35 @@ public final class MeridianReadout {
             }
         }
         return Optional.ofNullable(best);
+    }
+
+    /**
+     * The visible sample farthest from the zenith - the lowest altitude
+     * above the horizon - among those at least {@link #EDGE_ROOM} inside
+     * the page (R-9); empty when none is.
+     */
+    public static Optional<Sample> farthestFromTheZenith(List<Sample> visible,
+                                                         double width, double height) {
+        Sample best = null;
+        for (Sample sample : visible) {
+            if (sample.altitudeDegrees() <= 0.0
+                    || sample.x() < EDGE_ROOM || sample.y() < EDGE_ROOM
+                    || sample.x() > width - EDGE_ROOM || sample.y() > height - EDGE_ROOM) {
+                continue;
+            }
+            if (best == null || sample.altitudeDegrees() < best.altitudeDegrees()) {
+                best = sample;
+            }
+        }
+        return Optional.ofNullable(best);
+    }
+
+    /**
+     * Whether a rounded reading is the zenith's (R-9): 90°, which is never
+     * stated; the readout then stands at the farthest visible point instead.
+     */
+    public static boolean readsAsTheZenith(double roundedDegrees) {
+        return roundedDegrees >= 90.0;
     }
 
     /**
