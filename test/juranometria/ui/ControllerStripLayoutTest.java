@@ -147,7 +147,21 @@ class ControllerStripLayoutTest {
                                 + strip.getHeight() + " for rows to " + bottom);
                 int rows = rows(strip);
                 if (width == WIDE) {
-                    assertEquals(1, rows, what + ": one row on a wide display");
+                    // One row when the groups fit beside each other; the
+                    // groups' widths are the desktop's fonts' (CI's Linux
+                    // fonts at 18 pt outgrow 760 px), so the expectation is
+                    // read from them, never assumed.
+                    int groups = 0;
+                    for (Component group : strip.getComponents()) {
+                        groups += group.getWidth();
+                    }
+                    int reserved = Math.max(javax.swing.UIManager.getInt("ScrollBar.width"), 12);
+                    if (groups + reserved <= strip.getWidth()) {
+                        assertEquals(1, rows, what + ": one row on a wide display");
+                    } else {
+                        assertTrue(rows >= 2, what + ": the groups (" + groups + " px) outgrow"
+                                + " the wide display (" + strip.getWidth() + " px) and wrap");
+                    }
                 } else {
                     assertTrue(rows >= 1 && rows <= 3, what + ": " + rows + " rows at the"
                             + " Controller's default width");

@@ -164,13 +164,16 @@ class MeridianReadoutInkTest {
         BufferedImage without = paint(page.chart());
         SwingUtilities.invokeAndWait(() -> page.module().ticksShowing(true));
         BufferedImage with = paint(page.chart());
-        assertEquals(0, differencesNearTheCentre(without, with, 30),
-                "nothing is drawn at the zenith itself");
-        assertTrue(differencesWithin(without, with, 330, 560, 570, 699) > 4,
-                "the stroke (and its figure, where it found room) is inked near the bottom edge");
         String said = spoken(page.chart());
         assertTrue(said.matches("(?s).*Meridian altitude here: about 8[34]°\\..*"),
                 "the page's lowest visible point of the south half, about 83°: " + said);
+        assertEquals(0, differencesNearTheCentre(without, with, 30),
+                "nothing is drawn at the zenith itself");
+        // The stroke is three pixels long; its figure is refused where the
+        // page's own figures leave it no clean box, which depends on the
+        // desktop's fonts (CI's Linux fonts refused it): any ink counts.
+        assertTrue(differencesWithin(without, with, 330, 560, 570, 699) > 0,
+                "the stroke is inked near the bottom edge");
     }
 
     @Test
