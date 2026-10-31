@@ -7,6 +7,8 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [6.0.0] - 2026-10-31
+
 **Neptune on the page (#670).** A new reader article, in English and
 Norwegian (*Neptun på siden*): what the atlas draws of Neptune, Triton
 and Nereid in the release that follows 5.5 - where its numbers come from,
