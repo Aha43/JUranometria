@@ -23,6 +23,10 @@ Icons bundled:
 | `list-details.svg` | Toolbar: show or hide the Inspector |
 | `x.svg` | Inspector: close the pane from its own heading |
 | `door-exit.svg` | Toolbar: exit JUranometria |
+| `clock-pin.svg` | Toolbar: Place and Time (#675) |
+| `adjustments-horizontal.svg` | Toolbar: show or hide the Controller (#675) |
+| `stack-2.svg` | Toolbar and Controller: Accumulate selection (#675) |
+| `sparkles.svg` | Toolbar and Controller: Emphasis (#675) |
 
 Add an icon only when a real action needs it: add the name to the
 script's `ICONS` list, re-run the script, and record it here.

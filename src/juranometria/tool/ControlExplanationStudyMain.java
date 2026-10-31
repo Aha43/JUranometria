@@ -332,11 +332,16 @@ public final class ControlExplanationStudyMain {
         // is found here.
         juranometria.ui.ChartActions actions =
                 new juranometria.ui.ChartActions(navigation);
-        surfaces.put("Toolbar", new juranometria.ui.AtlasToolbar(
+        juranometria.ui.AtlasToolbar toolbar = new juranometria.ui.AtlasToolbar(
                 navigation, search,
                 new juranometria.ui.InspectorToggle(), "0.0.0",
                 () -> { }, new juranometria.chart.SelectionMode(),
-                new juranometria.ui.ZoomLock(), actions, english));
+                new juranometria.ui.ZoomLock(), actions, english);
+        // Place and Time and Controls (#675, stage 2), attached as the
+        // application attaches them, so their words are audited too.
+        toolbar.attachPlaceAndTime(() -> { });
+        toolbar.attachControls(() -> { });
+        surfaces.put("Toolbar", toolbar);
         juranometria.ui.ChartControls chartControls =
                 new juranometria.ui.ChartControls(navigation,
                         new juranometria.ui.SearchField(Atlas.search(),

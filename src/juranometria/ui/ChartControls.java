@@ -158,7 +158,11 @@ public final class ChartControls {
             inspector.onChange(this::syncInspector);
         }
         if (selectionMode != null) {
-            accumulate = new JToggleButton(said.say("toolbar.accumulate.label"));
+            // Icon-only since #675: the spoken name and the hover carry
+            // the words; the pressed state and the hover say whether it
+            // is on, as the Inspector's toggle does.
+            accumulate = new JToggleButton(
+                    new FlatSVGIcon("resources/icons/" + ACCUMULATE_ICON + ".svg", 16, 16));
             accumulate.setFocusable(true);
             accumulate.getAccessibleContext().setAccessibleName(
                     said.say("toolbar.accumulate.a11y"));
@@ -182,6 +186,101 @@ public final class ChartControls {
     }
 
     /**
+     * The icons the toolbar's two new buttons wear (#675, stage 2): Tabler
+     * outline icons bundled under {@code resources/icons}, recorded in
+     * {@code ICONS.md}. Named here so the photographs, the tests and the
+     * application agree on them.
+     */
+    public static final String PLACE_AND_TIME_ICON = "clock-pin";
+    public static final String CONTROLS_ICON = "adjustments-horizontal";
+
+    /**
+     * Accumulate and Emphasis wear icons since the Stage 2 ruling on
+     * #675 ("accumulate is ok with stack 2 and I go with sparkles");
+     * Lock zoom keeps its text, a lock alone not saying what is locked.
+     * The same glyph in both hosts, since both build these controls here.
+     */
+    public static final String ACCUMULATE_ICON = "stack-2";
+    public static final String EMPHASIS_ICON = "sparkles";
+
+    /** The Place and Time button's name, for tests and journeys. */
+    public static final String PLACE_AND_TIME = "placeAndTime";
+
+    /** The Controls button's name, for tests and journeys. */
+    public static final String CONTROLS = "controls";
+
+    private JButton placeAndTime;
+    private JToggleButton controlsButton;
+
+    /**
+     * Place and Time (#675, stage 2): an icon-only button opening the
+     * same window as Chart's item, attached once, when the application
+     * has the window to open. Returns the button.
+     */
+    public JButton attachPlaceAndTime(Runnable open) {
+        if (open == null) {
+            throw new IllegalArgumentException("Place and Time needs its window");
+        }
+        if (placeAndTime != null) {
+            throw new IllegalStateException("Place and Time is attached once");
+        }
+        placeAndTime = iconButton(PLACE_AND_TIME_ICON,
+                said.say("toolbar.placeAndTime.a11y"),
+                said.say("toolbar.placeAndTime.hover"),
+                said.say("toolbar.placeAndTime.explain"), open);
+        placeAndTime.setName(PLACE_AND_TIME);
+        return placeAndTime;
+    }
+
+    /**
+     * Controls (#675, stage 2): an icon-only toggle showing or hiding
+     * the Controller window - the same switch as Chart's Controls item,
+     * and like it a checked control, so a reader can see whether the
+     * window is open. The host tells it the window's state through
+     * {@link #controlsShowing(boolean)}; pressing asks, it does not
+     * decide. Attached once. Returns the toggle.
+     */
+    public JToggleButton attachControls(Runnable toggle) {
+        if (toggle == null) {
+            throw new IllegalArgumentException("Controls needs its window's switch");
+        }
+        if (controlsButton != null) {
+            throw new IllegalStateException("Controls is attached once");
+        }
+        controlsButton = new JToggleButton(
+                new FlatSVGIcon("resources/icons/" + CONTROLS_ICON + ".svg", 16, 16));
+        controlsButton.setName(CONTROLS);
+        controlsButton.setFocusable(true);
+        controlsButton.getAccessibleContext().setAccessibleName(
+                said.say("toolbar.companion.a11y"));
+        controlsButton.addActionListener(event -> toggle.run());
+        controlsShowing(false);
+        return controlsButton;
+    }
+
+    /** What the Controls toggle shows and says: the window is open, or it is not. */
+    public void controlsShowing(boolean showing) {
+        if (controlsButton == null) {
+            return;
+        }
+        controlsButton.setSelected(showing);
+        String state = showing ? "showing" : "hidden";
+        Explain.control(controlsButton,
+                said.say("toolbar.companion." + state + ".hover"),
+                said.say("toolbar.companion." + state + ".explain"));
+    }
+
+    /** The Place and Time button, or null before the application attached it. */
+    public JButton placeAndTime() {
+        return placeAndTime;
+    }
+
+    /** The Controls toggle, or null before the application attached it. */
+    public JToggleButton controls() {
+        return controlsButton;
+    }
+
+    /**
      * The compact Emphasis control (issue #361): one button opening the
      * one menu the actions build, which reads the chart each time it
      * opens. Built once, when a host attaches the chart; before that
@@ -199,7 +298,8 @@ public final class ChartControls {
                     "the emphasis control is attached once");
         }
         actions.attachEmphasis(chart);
-        emphasis = new JButton(said.say("toolbar.emphasis.label"));
+        emphasis = new JButton(
+                new FlatSVGIcon("resources/icons/" + EMPHASIS_ICON + ".svg", 16, 16));
         emphasis.setFocusable(true);
         emphasis.getAccessibleContext().setAccessibleName(
                 said.say("toolbar.emphasis.a11y"));

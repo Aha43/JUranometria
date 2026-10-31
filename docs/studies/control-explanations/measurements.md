@@ -20,8 +20,10 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Toolbar | JButton | (icon only) | Show fewer stars with a brighter magnitude limit | Draws only the brighter stars, one step at a time | dynamic |
 | Toolbar | JButton | (icon only) | Unavailable: V 8.0 is the faintest magnitude limit | Unavailable: V 8.0 is the faintest magnitude limit the atlas draws | dynamic |
 | Toolbar | JButton | (icon only) | Reset view: back to the atlas's first page | Returns the chart to where every reader begins, and clears the search; what the chart d... | hovered |
+| Toolbar | JButton | (icon only) | Place and Time: where and when the chart is drawn for | Opens the window that sets your location and the instant the chart is drawn for; the sa... | hovered |
 | Toolbar | JToggleButton | (icon only) | Show the Inspector: what the selected mark is (<key:inspector>) | Hidden; press to open the panel that identifies what you selected and lists what is on ... | dynamic |
-| Toolbar | JToggleButton | Accumulate | When on, choosing objects adds them to the working selection and choosing them again re... | Off, each object you choose replaces the working selection; on, it is added to it, and ... | hovered |
+| Toolbar | JToggleButton | (icon only) | Show the Controller: the chart's controls beside the chart | Hidden; press to open the JUranometria Controller window, which keeps the chart's contr... | hovered |
+| Toolbar | JToggleButton | (icon only) | When on, choosing objects adds them to the working selection and choosing them again re... | Off, each object you choose replaces the working selection; on, it is added to it, and ... | hovered |
 | Toolbar | SearchField | (a field) | Find an object or J2000 coordinates, e.g. M 31, NGC 224, TYC 2801-2090-1, or 0:42:44 +4... | Type a Messier or NGC number, a star's catalogue identity, or a J2000 right ascension a... | hovered |
 | Toolbar | JButton | (icon only) | Exit JUranometria | Closes the atlas; what you chose is remembered | hovered |
 | Chart controls | JButton | (icon only) | Zoom in (<key:zoomIn>) | Shows a narrower field, with fainter stars on it | dynamic |
@@ -31,8 +33,8 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Chart controls | JButton | (icon only) | Unavailable: V 8.0 is the faintest magnitude limit | Unavailable: V 8.0 is the faintest magnitude limit the atlas draws | dynamic |
 | Chart controls | JButton | (icon only) | Reset view: back to the atlas's first page | Returns the chart to where every reader begins, and clears the search; what the chart d... | hovered |
 | Chart controls | JToggleButton | (icon only) | Show the Inspector: what the selected mark is (<key:inspector>) | Hidden; press to open the panel that identifies what you selected and lists what is on ... | dynamic |
-| Chart controls | JToggleButton | Accumulate | When on, choosing objects adds them to the working selection and choosing them again re... | Off, each object you choose replaces the working selection; on, it is added to it, and ... | hovered |
-| Chart controls | JButton | Emphasis | Let one or more chart structures rise from the page | Temporarily strengthens chosen structures so they are easy to follow — the meridian, th... | hovered |
+| Chart controls | JToggleButton | (icon only) | When on, choosing objects adds them to the working selection and choosing them again re... | Off, each object you choose replaces the working selection; on, it is added to it, and ... | hovered |
+| Chart controls | JButton | (icon only) | Let one or more chart structures rise from the page | Temporarily strengthens chosen structures so they are easy to follow — the meridian, th... | hovered |
 | Chart controls | SearchField | (a field) | Find an object or J2000 coordinates, e.g. M 31, NGC 224, TYC 2801-2090-1, or 0:42:44 +4... | Type a Messier or NGC number, a star's catalogue identity, or a J2000 right ascension a... | hovered |
 | Emphasis | JCheckBox | Meridian | &mdash; | Raises it on the chart - Meridian - until it is unchecked, Normal is chosen, or it can ... | self-explanatory |
 | Emphasis | JCheckBox | Ecliptic | &mdash; | Raises it on the chart - Ecliptic - until it is unchecked, Normal is chosen, or it can ... | self-explanatory |
@@ -158,7 +160,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 
 ## The audit
 
-**141 operable controls** across 17 surfaces: **86** hovered, **12** dynamic, **43** left to their own visible words, **0 undecided**.
+**143 operable controls** across 17 surfaces: **88** hovered, **12** dynamic, **43** left to their own visible words, **0 undecided**.
 
 **0** say the same words twice - a tooltip read back as a description. The seam refuses it, so this is zero or a finding.
 

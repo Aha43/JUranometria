@@ -745,6 +745,25 @@ public final class JUranometriaMain {
                         eclipticSwitch,
                         companionWords).inCompanion(companionStore,
                         companionWords));
+        // Place and Time and the Controller's switch (#675, stage 2): one
+        // opener and one toggle each, handed to the Chart menu's item and
+        // to the toolbar's icon-only button alike, so the two routes are
+        // one action. Opened by the reader, the companion takes the keyboard.
+        Runnable openPlaceAndTime =
+                () -> juranometria.ui.placeandtime.PlaceAndTimeDialog.open(
+                        frame, meridian, placeStore,
+                        clock,
+                        juranometria.ui.language.InterfaceText.forLanguage(
+                                language.interfaceLanguage()));
+        Runnable toggleCompanion = () -> {
+            if (companion.isVisible()) {
+                companion.hideCompanion();
+            } else {
+                companion.showCompanion(true);
+            }
+        };
+        toolbar.attachPlaceAndTime(openPlaceAndTime);
+        toolbar.attachControls(toggleCompanion);
         // Built after the controls seam, because the menu
         // says its words in the same language the seam
         // derived from the session (#350).
@@ -773,11 +792,7 @@ public final class JUranometriaMain {
                     frame.revalidate();
                     frame.repaint();
                 },
-                () -> juranometria.ui.placeandtime.PlaceAndTimeDialog.open(
-                        frame, meridian, placeStore,
-                        clock,
-                        juranometria.ui.language.InterfaceText.forLanguage(
-                                language.interfaceLanguage())),
+                openPlaceAndTime,
                 // The ecliptic's switch is no longer on the bar (#675):
                 // it is the Ecliptic box in Chart Options. The arity is
                 // kept; the bar builds no item for it.
@@ -831,15 +846,9 @@ public final class JUranometriaMain {
                 // same module, remembered the same way.
                 juranometria.ui.solar.MoonChartSession.toggle(sunOnChart,
                         moonChartStore),
-                // View, Controls (#434): the companion, shown or hidden.
-                // Opened by the reader, it takes the keyboard.
-                () -> {
-                    if (companion.isVisible()) {
-                        companion.hideCompanion();
-                    } else {
-                        companion.showCompanion(true);
-                    }
-                },
+                // Chart, Controls (#434): the companion, shown or hidden -
+                // the same switch the toolbar's Controls toggle runs (#675).
+                toggleCompanion,
                 // View, Chart Toolbar (#450): the bar, shown or hidden,
                 // from the item or its keystroke.
                 () -> showToolbar(frame, toolbar, chart, !toolbar.isVisible())));
@@ -1026,13 +1035,16 @@ public final class JUranometriaMain {
             @Override
             public void componentShown(java.awt.event.ComponentEvent event) {
                 companionItem.setSelected(true);
+                toolbar.controlsShowing(true);
             }
 
             @Override
             public void componentHidden(java.awt.event.ComponentEvent event) {
                 companionItem.setSelected(false);
+                toolbar.controlsShowing(false);
             }
         });
+        toolbar.controlsShowing(companion.isVisible());
         // The Chart Toolbar tick follows the bar, however it was
         // hidden, and the store follows it too (#450).
         javax.swing.JCheckBoxMenuItem toolbarItem =

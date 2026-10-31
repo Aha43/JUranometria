@@ -414,6 +414,60 @@ public final class AtlasToolbar extends JToolBar {
         return controls.emphasis();
     }
 
+    /**
+     * Place and Time (#675, stage 2): directly after Reset view, where
+     * the chart's own context - its first page, then its place and
+     * instant - stands together, before the window toggles. Re-asserted
+     * focusable after it is added, as Emphasis is (#449).
+     */
+    public JButton attachPlaceAndTime(Runnable open) {
+        JButton button = controls.attachPlaceAndTime(open);
+        int home = getComponentIndex(controls.home());
+        // After Home and the separator that follows it.
+        add(button, home + 2);
+        add(new javax.swing.JToolBar.Separator(), home + 3);
+        button.setFocusable(true);
+        return button;
+    }
+
+    /**
+     * Controls (#675, stage 2): beside the Inspector's toggle, the two
+     * window switches together; when the bar has no Inspector it takes
+     * the Inspector's place before Accumulate. Re-asserted focusable
+     * after it is added (#449).
+     */
+    public javax.swing.JToggleButton attachControls(Runnable toggle) {
+        javax.swing.JToggleButton button = controls.attachControls(toggle);
+        int at;
+        if (controls.inspector() != null) {
+            at = getComponentIndex(controls.inspector()) + 1;
+            add(button, at);
+        } else {
+            at = controls.accumulate() != null
+                    ? getComponentIndex(controls.accumulate())
+                    : getComponentIndex(searchFieldComponent);
+            add(button, at);
+            add(new javax.swing.JToolBar.Separator(), at + 1);
+        }
+        button.setFocusable(true);
+        return button;
+    }
+
+    /** The Controls toggle, or null before the application attached it. */
+    public javax.swing.JToggleButton controlsButton() {
+        return controls.controls();
+    }
+
+    /** The Place and Time button, or null before the application attached it. */
+    public JButton placeAndTimeButton() {
+        return controls.placeAndTime();
+    }
+
+    /** Tells the Controls toggle whether the Controller window is open. */
+    public void controlsShowing(boolean showing) {
+        controls.controlsShowing(showing);
+    }
+
     /** The menu, reading the chart at the moment it opens. */
     javax.swing.JPopupMenu emphasisMenu(ChartComponent chart) {
         return ChartActions.emphasisMenu(chart, said);
