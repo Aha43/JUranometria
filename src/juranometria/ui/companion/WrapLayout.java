@@ -20,21 +20,102 @@ import java.awt.Insets;
  * else changes, so the children's order - the keyboard's order - is
  * untouched by wrapping; only the row a child lands on moves.
  *
- * <p>Before the container has a width - a window being packed, a host
- * asking what its content needs - the preferred width is the widest
- * single child, not the one row: a strip that asked for its whole row
- * before it was laid out would widen the window that holds it, and the
- * Controller keeps its own width (#449) and lets the strip wrap.
+ * <p>Two things keep the rows the same from one layout to the next.
+ * A {@code reserved} width is always subtracted from the room, so a
+ * strip in a scrolling column wraps as if the column's scrollbar were
+ * there whether or not it is - otherwise the rows and the scrollbar
+ * decide each other (one row leaves the column short enough to need no
+ * scrollbar, which widens the room, which keeps the one row; two rows
+ * need the scrollbar, which narrows the room, which keeps the two), and
+ * a photograph of the window depended on which of the two it settled
+ * into. And before the container has a width - a window being packed, a
+ * host asking what its content needs, a tab not yet shown - the rows
+ * are worked out for a stated {@code fallbackWidth}, the Controller's
+ * own, so the height asked for is the height the common case takes and
+ * a strip never widens the window that holds it (#449).
  */
 public final class WrapLayout extends FlowLayout {
 
+    private final int reserved;
+    private final int fallbackWidth;
+
     public WrapLayout(int align, int hgap, int vgap) {
+        this(align, hgap, vgap, 0, 0);
+    }
+
+    /**
+     * @param reserved      a width always subtracted from the room, such
+     *                      as a scrollbar's; never negative
+     * @param fallbackWidth the width the rows are worked out for before
+     *                      the container has one; zero means the widest
+     *                      single child
+     */
+    public WrapLayout(int align, int hgap, int vgap, int reserved, int fallbackWidth) {
         super(align, hgap, vgap);
+        if (reserved < 0 || fallbackWidth < 0) {
+            throw new IllegalArgumentException("widths are not negative");
+        }
+        this.reserved = reserved;
+        this.fallbackWidth = fallbackWidth;
     }
 
     @Override
     public Dimension preferredLayoutSize(Container target) {
         return wrapped(target, true);
+    }
+
+    /**
+     * Lays the rows out with the same room {@link #preferredLayoutSize}
+     * reckoned with - the reserved width subtracted - so the height
+     * asked for is the height the rows take. {@code FlowLayout}'s own
+     * layout would use the whole width and could fit one row where two
+     * were reserved, leaving a gap beneath.
+     */
+    @Override
+    public void layoutContainer(Container target) {
+        synchronized (target.getTreeLock()) {
+            Insets insets = target.getInsets();
+            int room = target.getWidth() - insets.left - insets.right - getHgap() * 2
+                    - reserved;
+            int x = 0;
+            int y = insets.top + getVgap();
+            int rowHeight = 0;
+            int rowStart = 0;
+            Component[] children = target.getComponents();
+            for (int i = 0; i < children.length; i++) {
+                Component child = children[i];
+                if (!child.isVisible()) {
+                    continue;
+                }
+                Dimension size = child.getPreferredSize();
+                child.setSize(size);
+                if (x > 0 && x + size.width > room) {
+                    place(target, children, rowStart, i, y, rowHeight);
+                    y += rowHeight + getVgap();
+                    x = 0;
+                    rowHeight = 0;
+                    rowStart = i;
+                }
+                if (x > 0) {
+                    x += getHgap();
+                }
+                child.setLocation(insets.left + getHgap() + x, y);
+                x += size.width;
+                rowHeight = Math.max(rowHeight, size.height);
+            }
+            place(target, children, rowStart, children.length, y, rowHeight);
+        }
+    }
+
+    /** Centres a row's children on the row's height, as FlowLayout does. */
+    private static void place(Container target, Component[] children, int from, int to,
+                              int y, int rowHeight) {
+        for (int i = from; i < to; i++) {
+            Component child = children[i];
+            if (child.isVisible()) {
+                child.setLocation(child.getX(), y + (rowHeight - child.getHeight()) / 2);
+            }
+        }
     }
 
     @Override
@@ -58,6 +139,12 @@ public final class WrapLayout extends FlowLayout {
                 // height made a photograph depend on when it was taken).
                 Insets around = target.getParent().getInsets();
                 available = target.getParent().getWidth() - around.left - around.right;
+            }
+            if (available <= 0 && fallbackWidth > 0) {
+                available = fallbackWidth;
+            }
+            if (available > 0) {
+                available -= reserved;
             }
             if (available <= 0) {
                 // Nothing laid out yet: ask for no more than the widest child.

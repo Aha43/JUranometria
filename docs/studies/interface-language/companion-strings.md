@@ -312,12 +312,6 @@ arrangement at its frozen instant.
 | Computed for chart time 2026-03-20 21:33:00 UTC at latitude 59.913, longitude 10.752 east. | — | Computed for chart time 2026-03-20 21:33:00 UTC at latitude 59.913, longitude 10.752 east. | — |
 | At chart time | One row, at the chart time | Show the Sun at the chart time | Shows a single row: the Sun at the chart time. |
 | Over a time range | A row for every step from the chart time, over a span | Show the Sun over a range of instants | Shows a row for every step from the chart time over the span chosen, as many whole steps as the span holds; the first row is the chart time, read again whenever you compute. To range from another instant, set the chart time. |
-| Span | — | Span | — |
-| — | How far the rows reach from the chart time | Span of the range from the chart time | How far from the chart time the rows reach, in whole steps of the step beside it. |
-| — | How far the rows reach from the chart time | — | How far the rows reach from the chart time |
-| Every | — | Every | — |
-| — | The elapsed time between rows | Step between rows | The elapsed time between rows, on the UTC timeline, so a daily range does not drift across a change of civil clock. |
-| — | The elapsed time between rows | — | The elapsed time between rows |
 | Compute | Fill the table for the span and step above, from the chart time | Compute the range | Computes a row for every step of the span above, from the chart time now. |
 | 1 rows. | — | 1 rows. | — |
 | — | — | The Sun's computed quantities | — |
@@ -368,12 +362,6 @@ arrangement at its frozen instant.
 | Chart time 2026-03-20 21:33:00 UTC at latitude 59.913, longitude 10.752 east, from Place and Time. | — | Chart time 2026-03-20 21:33:00 UTC at latitude 59.913, longitude 10.752 east, from Place and Time. | — |
 | At chart time | One row, at the chart time | Show Jupiter and its moons at the chart time | Shows Jupiter at the chart time, and below it the four moons in a fixed order. |
 | Over a time range | A row for every step from the chart time, over a span | Show the four moons over a range of instants | Shows the four moons for every step from the start to the end, both included, grouped under each instant; an end that is not on the grid is added as the last group and marked. This samples the range; it does not search for the moment a moon enters or leaves Jupiter's disc. |
-| Span | — | Span | — |
-| — | How far the rows reach from the chart time | Span of the range from the chart time | How far from the chart time the rows reach, in whole steps of the step beside it. |
-| — | How far the rows reach from the chart time | — | How far the rows reach from the chart time |
-| Every | — | Every | — |
-| — | The elapsed time between rows | Step between rows | The elapsed time between rows, on the UTC timeline, so a daily range does not drift across a change of civil clock. |
-| — | The elapsed time between rows | — | The elapsed time between rows |
 | Compute | Fill the table for the span and step above, from the chart time | Compute the range | Computes a row for every step of the span above, from the chart time now. |
 | Jupiter and moons on the chart | — | Jupiter and moons on the chart | Shows or hides Jupiter on the chart where it stands for the chart time and place, at its true size or as a 6-pixel cartographic symbol, whichever is larger; the same choice as View's. Io, Europa, Ganymede and Callisto are drawn as 3-pixel symbols at their own places: a filled dot clear of Jupiter, a dot ringed in the page's ground in front of it, a hollow ring in its shadow, and nothing behind it; at wider fields only the moons whose marks can be told apart are drawn. |
 | ▸ Saturn | Show or hide this section | Saturn, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
@@ -724,12 +712,6 @@ arrangement at its frozen instant.
 | Beregnet for karttid 2026-03-20 21:33:00 UTC på bredde 59,913, lengde 10,752 øst. | — | Beregnet for karttid 2026-03-20 21:33:00 UTC på bredde 59,913, lengde 10,752 øst. | — |
 | Ved karttid | Én rad, ved karttiden | Vis Solen ved karttiden | Viser én rad: Solen ved karttiden. |
 | Over et tidsrom | Én rad for hvert steg fra karttiden, over et omfang | Vis Solen over et tidsrom | Viser én rad for hvert steg fra karttiden over omfanget valgt, så mange hele steg som omfanget rommer; første rad er karttiden, lest på nytt hver gang du beregner. Sett karttiden for å regne fra et annet tidspunkt. |
-| Omfang | — | Omfang | — |
-| — | Hvor langt radene rekker fra karttiden | Tidsrommets omfang fra karttiden | Hvor langt fra karttiden radene rekker, i hele steg av steget ved siden av. |
-| — | Hvor langt radene rekker fra karttiden | — | Hvor langt radene rekker fra karttiden |
-| Hvert | — | Hvert | — |
-| — | Tiden som går mellom radene | Steg mellom radene | Tiden som går mellom radene, på UTC-tidslinjen, så et daglig tidsrom ikke forskyver seg ved skifte av sivil klokke. |
-| — | Tiden som går mellom radene | — | Tiden som går mellom radene |
 | Beregn | Fyll tabellen for omfanget og steget over, fra karttiden | Beregn tidsrommet | Beregner én rad for hvert steg i omfanget over, fra karttiden nå. |
 | 1 rader. | — | 1 rader. | — |
 | — | — | Solens beregnede størrelser | — |
@@ -780,12 +762,6 @@ arrangement at its frozen instant.
 | Karttid 2026-03-20 21:33:00 UTC på bredde 59,913, lengde 10,752 øst, fra Sted og tid. | — | Karttid 2026-03-20 21:33:00 UTC på bredde 59,913, lengde 10,752 øst, fra Sted og tid. | — |
 | Ved karttid | Én rad, ved karttiden | Vis Jupiter og månene ved karttiden | Viser Jupiter ved karttiden, og under den de fire månene i fast rekkefølge. |
 | Over et tidsrom | Én rad for hvert steg fra karttiden, over et omfang | Vis de fire månene over et tidsrom | Viser de fire månene for hvert steg fra starten til slutten, begge medregnet, gruppert under hvert tidspunkt; en slutt som ikke ligger på rutenettet, legges til som siste gruppe og merkes. Dette er utvalgte tidspunkter; tabellen leter ikke etter øyeblikket en måne går inn på eller ut av Jupiterskiven. |
-| Omfang | — | Omfang | — |
-| — | Hvor langt radene rekker fra karttiden | Tidsrommets omfang fra karttiden | Hvor langt fra karttiden radene rekker, i hele steg av steget ved siden av. |
-| — | Hvor langt radene rekker fra karttiden | — | Hvor langt radene rekker fra karttiden |
-| Hvert | — | Hvert | — |
-| — | Tiden som går mellom radene | Steg mellom radene | Tiden som går mellom radene, på UTC-tidslinjen, så et daglig tidsrom ikke forskyver seg ved skifte av sivil klokke. |
-| — | Tiden som går mellom radene | — | Tiden som går mellom radene |
 | Beregn | Fyll tabellen for omfanget og steget over, fra karttiden | Beregn tidsrommet | Beregner én rad for hvert steg i omfanget over, fra karttiden nå. |
 | Jupiter og månene på kartet | — | Jupiter og månene på kartet | Viser eller skjuler Jupiter på kartet der den står for karttiden og stedet, i sann størrelse eller som et kartografisk symbol på 6 piksler, det som er størst; samme valg som i Solsystem-menyen. Io, Europa, Ganymedes og Callisto tegnes som symboler på 3 piksler der de står: en fylt prikk klar av Jupiter, en prikk med en ring i sidens bunnfarge foran den, en hul ring i skyggen, og ingenting bak den; i videre felt tegnes bare de månene som kan skilles fra hverandre. |
 | ▸ Saturn | Vis eller skjul denne delen | Saturn, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |

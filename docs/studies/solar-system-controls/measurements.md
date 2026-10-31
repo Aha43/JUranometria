@@ -114,7 +114,7 @@ of their own (the dialogs keep theirs), or distinct ones.
 
 | arrangement | headings | controls | stops |
 |---|---:|---:|---:|
-| the Sun dialog's content | 0 | 7 | 7 |
+| the Sun dialog's content | 0 | 5 | 5 |
 | the Sun group, card | 1 | 6 | 7 |
 | Solar System, both open, card | 3 | 12 | 15 |
 | Solar System, collapsed | 3 | 0 | 3 |
@@ -123,7 +123,7 @@ of their own (the dialogs keep theirs), or distinct ones.
 
 | arrangement | headings | controls | stops |
 |---|---:|---:|---:|
-| the Sun dialog's content | 0 | 7 | 7 |
+| the Sun dialog's content | 0 | 5 | 5 |
 | the Sun group, card | 1 | 6 | 7 |
 | Solar System, both open, card | 3 | 12 | 15 |
 | Solar System, collapsed | 3 | 0 | 3 |

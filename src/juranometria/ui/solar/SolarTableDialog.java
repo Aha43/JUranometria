@@ -293,22 +293,28 @@ public final class SolarTableDialog extends JDialog {
             JPanel rangeRow = new JPanel();
             rangeRow.setLayout(new BoxLayout(rangeRow, BoxLayout.X_AXIS));
             rangeRow.setAlignmentX(0.0f);
+            // The range's fields, shown only under Over a time range
+            // (#675, stage 4); Compute stays whatever the view.
+            JPanel rangeFields = new JPanel();
+            rangeFields.setLayout(new BoxLayout(rangeFields, BoxLayout.X_AXIS));
             JLabel over = new JLabel(said.say("span.label"));
             over.setLabelFor(span);
             letters.apply(over, said.key("span.mnemonic"));
-            rangeRow.add(over);
-            rangeRow.add(Box.createHorizontalStrut(6));
-            rangeRow.add(span);
-            rangeRow.add(Box.createHorizontalStrut(12));
+            rangeFields.add(over);
+            rangeFields.add(Box.createHorizontalStrut(6));
+            rangeFields.add(span);
+            rangeFields.add(Box.createHorizontalStrut(12));
             JLabel every = new JLabel(said.say("range.step.label"));
             every.setLabelFor(step);
             letters.apply(every, said.key("range.step.mnemonic"));
-            rangeRow.add(every);
-            rangeRow.add(Box.createHorizontalStrut(6));
-            rangeRow.add(step);
-            rangeRow.add(Box.createHorizontalStrut(12));
+            rangeFields.add(every);
+            rangeFields.add(Box.createHorizontalStrut(6));
+            rangeFields.add(step);
+            rangeFields.add(Box.createHorizontalStrut(12));
+            rangeRow.add(rangeFields);
             rangeRow.add(compute);
             top.add(rangeRow);
+            RangeFields.follow(rangeView, rangeFields);
             top.add(Box.createVerticalStrut(6));
             status.setAlignmentX(0.0f);
             top.add(status);

@@ -392,8 +392,13 @@ public final class ChartControls {
         rows.putClientProperty(MARK, Boolean.TRUE);
         // As wide as the section gives it, as tall as its rows: the
         // column's layout may stretch it sideways, never downwards.
+        // Wrapping as if the column's scrollbar were always there, and
+        // worked out for the Controller's own width before it is laid
+        // out (see WrapLayout): the same rows from one layout to the next.
+        int scrollbar = Math.max(javax.swing.UIManager.getInt("ScrollBar.width"), 12);
         JPanel strip = new JPanel(new juranometria.ui.companion.WrapLayout(
-                java.awt.FlowLayout.LEADING, 0, 2)) {
+                java.awt.FlowLayout.LEADING, 0, 2, scrollbar,
+                juranometria.ui.companion.CompanionWindow.DEFAULT_WIDTH - 24)) {
             @Override
             public Dimension getMaximumSize() {
                 return new Dimension(Integer.MAX_VALUE, getPreferredSize().height);
