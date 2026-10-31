@@ -28,10 +28,10 @@ Recorded on: `Mac OS X 27.0.1/aarch64/Homebrew 21.0.12.1`
 |---|---|---|
 | south-35-8 | 35° | 0 |
 | south-35-4 | 35° | 28 |
-| south-35-2 | 35° | 0 |
-| south-35-1 | 35° | 0 |
-| north-65-4 | 65° | 26 |
+| south-35-2 | 35° | 25 |
+| south-35-1 | 35° | 64 |
+| north-65-4 | 65° | 60 |
 | south-4-4 | 4° | 0 |
 | south-88-4 | 88° | 0 |
-| south-35-2-dark | 35° | 0 |
-| south-35-2-nb | 35° | 0 |
+| south-35-2-dark | 35° | 25 |
+| south-35-2-nb | 35° | 25 |

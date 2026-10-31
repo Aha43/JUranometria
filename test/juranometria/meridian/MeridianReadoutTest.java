@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** The readout's rule candidates (#563), held as the study measures them. */
+/** The readout's rule (#563, ruled "A to the degree" on #675 stage 5). */
 class MeridianReadoutTest {
 
     private static List<MeridianReadout.Sample> line(double from, double to, double step) {
@@ -30,23 +30,22 @@ class MeridianReadoutTest {
     }
 
     @Test
-    void theNearestPointStatesItsOwnAltitudeAndTheWholeDegreeIsAnExactOne() {
+    void theNearestPointStatesItsOwnAltitudeRoundedToTheDegree() {
         List<MeridianReadout.Sample> visible = line(33.0, 37.0, 0.5);
         MeridianReadout.Sample nearest = MeridianReadout.nearestTheCentre(visible, 450.0, 350.0)
                 .orElseThrow();
         assertEquals(36.5, nearest.altitudeDegrees(), 1e-9, "350 px up the line from 700 at 33°");
-        MeridianReadout.Sample whole = MeridianReadout.wholeDegreeNearestTheCentre(visible, 450.0, 350.0)
-                .orElseThrow();
-        assertEquals(36.0, whole.altitudeDegrees(), 1e-9, "36° or 37° are equally near; the lower wins");
-        assertEquals(400.0, whole.y(), 1e-9, "interpolated onto the line");
+        assertEquals(36.0, MeridianReadout.roundedToTheDegree(36.49), 1e-9);
+        assertEquals(37.0, MeridianReadout.roundedToTheDegree(36.5), 1e-9, "the half rounds up");
     }
 
     @Test
-    void nothingBelowTheHorizonOrAtTheZenithIsOffered() {
-        assertTrue(MeridianReadout.nearestTheCentre(line(-5.0, 0.0, 0.5), 450.0, 350.0).isEmpty());
-        assertTrue(MeridianReadout.wholeDegreeNearestTheCentre(line(89.2, 90.0, 0.1), 450.0, 350.0)
-                .isEmpty(), "90 is the zenith, never a readout");
-        assertEquals(36.0, MeridianReadout.roundedToTheDegree(36.49), 1e-9);
-        assertEquals(36.5, MeridianReadout.roundedToTheHalfDegree(36.4), 1e-9);
+    void nothingBelowTheHorizonOrAtTheZenithIsStated() {
+        assertTrue(MeridianReadout.nearestTheCentre(line(-5.0, 0.0, 0.5), 450.0, 350.0).isEmpty(),
+                "nothing at or below the horizon is a readout");
+        assertFalse(MeridianReadout.statable(0.0));
+        assertFalse(MeridianReadout.statable(90.0), "90 is the zenith, never a readout");
+        assertTrue(MeridianReadout.statable(1.0));
+        assertTrue(MeridianReadout.statable(89.0));
     }
 }

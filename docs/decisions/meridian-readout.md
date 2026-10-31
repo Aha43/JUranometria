@@ -103,7 +103,43 @@ change.
 8. **R-8, the edges.** Nothing below the horizon; never at 90°; refused at
    the geographic pole with the ticks.
 
-The candidate not ruled in is removed from `MeridianReadout` with the
-ruling. No production ink begins before the ruling; the ink is the
-last Stage 5 work of #675, after which the road's documentation
-inventory, one regeneration, the seven gates and CI follow.
+## The ruling
+
+The owner's ruling of 2026-10-31, as given on #563:
+
+> Rule R-1 through R-8 as proposed, A to the degree.
+
+**R-1 to R-8 stand as written above, R-2 and R-3 as candidate A rounded
+to the whole degree.** Candidate C was removed from `MeridianReadout`
+with the ruling; its measurements stay quoted above as the record of
+why.
+
+## As built (#675, stage 5)
+
+- **The module offers, the page decides.** `MeridianModule` adds one
+  `OverlayContribution.AltitudeReadout` - the meridian's pole and the
+  zenith - whenever it offers its ticks, and refuses both at the
+  geographic poles. `ReferenceInk.altitudeReadout(page, contributions)`
+  decides from the page's own geometry: nothing while any ruled tick of
+  the line is on the page (R-1); otherwise the visible point of the
+  meridian nearest the page centre, sampled every quarter degree around
+  the circle and refined to a thousandth (R-2, R-7); its altitude, 90°
+  less its distance from the zenith, rounded to the whole degree with a
+  half rounding up (R-3); nothing at or below 0° and nothing at 90°
+  (R-8). The painter and the spoken description read that one answer.
+- **The ink.** A stroke across the line half a ruled tick's length
+  (`GRADUATION / 2`), in the line's own accent and raised with the
+  meridian's emphasis (R-4, R-6); the figure is the page's
+  `altitudeTick` word, written through the same placement as a tick's
+  figure and refused alone where no clean box exists (R-5).
+- **The words.** The page's description gains, after its directions,
+  *Meridian altitude here: about 35°.* / *Meridianens høyde her:
+  omtrent 35°.* - whether or not the figure found room, so a reader who
+  cannot see the stroke is told what it reads (R-6). No new switch, no
+  shortcut; the readout rides the altitude ticks and is reported with
+  them.
+- **Held by** `MeridianReadoutTest` (the rule) and `MeridianReadoutInkTest`
+  (a 4° page between ticks draws and speaks it; a 12° page with a ruled
+  tick on it does not; 89.8° is not stated; 3.7° reads 4°; Norwegian on
+  the black sky; nothing with ticks off). The study was regenerated for
+  the ruled candidate alone.

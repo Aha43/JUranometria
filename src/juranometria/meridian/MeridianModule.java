@@ -433,6 +433,14 @@ public final class MeridianModule implements ChartModule {
             // would stop the page.
             if (ticksShowing
                     && Math.abs(observer.latitudeDegrees()) < 90.0 - 1e-9) {
+                // One contextual readout (#563, ruled on #675 stage 5):
+                // offered with the ticks; the page draws it only while no
+                // tick of the line is on the page, at the visible point
+                // nearest its centre, rounded to the degree. Refused with
+                // the ticks at the geographic poles.
+                offered.add(new OverlayContribution.AltitudeReadout(
+                        ID + "/readout", ID, sky.meridian().pole(), sky.zenith(),
+                        InkRole.REFERENCE_LINE));
                 for (double altitude : ticks.altitudes()) {
                     for (boolean north : new boolean[] {true, false}) {
                         // Its own identity, unique in the module: the

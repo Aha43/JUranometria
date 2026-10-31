@@ -404,9 +404,21 @@ public final class ReferenceInk {
                         instanceof OverlayContribution.Tick tick) {
                     drawTick(g2, projection, mapping, paper, sky, bounded,
                             tick, words, taken, reserved, discs, palette,
-                            emphasized);
+                            emphasized, GRADUATION);
                 }
             }
+            // The contextual readout (#563, ruled on #675 stage 5): only
+            // while no ruled tick of the line is on the page, at the
+            // visible point nearest the page centre, its altitude to the
+            // degree; a stroke half a tick's, the figure placed as a
+            // tick's is and refused alone.
+            altitudeReadout(page, contributions).ifPresent(readout ->
+                    drawTick(g2, projection, mapping, paper, sky, bounded,
+                            new OverlayContribution.Tick(readout.lineIdentity() + "/readout",
+                                    readout.lineIdentity(), readout.at(), readout.alongPole(),
+                                    readout.altitudeDegrees(), true, InkRole.REFERENCE_LINE),
+                            words, taken, reserved, discs, palette, emphasized,
+                            GRADUATION / 2.0));
             return laid.directions();
         } finally {
             g2.dispose();
@@ -436,7 +448,8 @@ public final class ReferenceInk {
                                  juranometria.render.ChartPalette palette,
                                  java.util.function.Predicate<
                                          juranometria.render.ChartStructure>
-                                         emphasized) {
+                                         emphasized,
+                                 double halfLength) {
         PixelPoint at = projection.project(tick.at())
                 .map(mapping::toPixel).orElse(null);
         if (at == null || !sky.contains(at.x(), at.y())) {
@@ -468,9 +481,9 @@ public final class ReferenceInk {
                                         .Style(palette.figureInk(), SOLID));
         g.setColor(style.color());
         g.setStroke(style.stroke());
-        g.draw(new Line2D.Double(at.x() - nx * GRADUATION,
-                at.y() - ny * GRADUATION,
-                at.x() + nx * GRADUATION, at.y() + ny * GRADUATION));
+        g.draw(new Line2D.Double(at.x() - nx * halfLength,
+                at.y() - ny * halfLength,
+                at.x() + nx * halfLength, at.y() + ny * halfLength));
         if (!tick.labelled()) {
             return;
         }
@@ -3030,6 +3043,133 @@ public final class ReferenceInk {
     }
 
     /** Every round primary's undrawn moon on this page, in offered order. */
+    /**
+     * The meridian's contextual altitude readout on this page (#563,
+     * ruled on #675 stage 5): where it stands and what it states, or
+     * empty. Decided from the page's own geometry, so the painter and
+     * the spoken description read one answer.
+     */
+    public record ReadoutPlacement(String lineIdentity, juranometria.chart.SkyPosition at,
+                                   juranometria.chart.SkyPosition alongPole, PixelPoint pixel,
+                                   double altitudeDegrees) {
+    }
+
+    /**
+     * R-1: offered only while the line's module offers its ticks (the
+     * module adds the readout with them) and none of those ticks is on
+     * the page. R-2: the visible point nearest the page centre. R-3: its
+     * altitude to the degree. R-8: nothing at or below the horizon, nothing
+     * at the zenith. Sampled every quarter degree around the circle, then
+     * refined to a thousandth where the samples are nearest.
+     */
+    public static java.util.Optional<ReadoutPlacement> altitudeReadout(DrawnPage page,
+            List<OverlayRegistry.Owned> contributions) {
+        Projection projection = page.projection();
+        ViewportMapping mapping = new ViewportMapping(page);
+        Rectangle2D paper = ChartRenderer.paperOf(page.scene());
+        double cx = paper.getCenterX();
+        double cy = paper.getCenterY();
+        for (OverlayRegistry.Owned owned : contributions) {
+            if (!(owned.geometry() instanceof OverlayContribution.AltitudeReadout readout)) {
+                continue;
+            }
+            boolean ticked = false;
+            for (OverlayRegistry.Owned other : contributions) {
+                if (other.geometry() instanceof OverlayContribution.Tick tick
+                        && tick.lineIdentity().equals(readout.lineIdentity())) {
+                    PixelPoint px = projection.project(tick.at()).map(mapping::toPixel).orElse(null);
+                    if (px != null && paper.contains(px.x(), px.y())) {
+                        ticked = true;
+                        break;
+                    }
+                }
+            }
+            if (ticked) {
+                continue;
+            }
+            double[] pole = juranometria.sky.SkyFrame.toVector(readout.pole());
+            double[] zenith = juranometria.sky.SkyFrame.toVector(readout.zenith());
+            double[] e1 = perpendicular(pole);
+            double[] e2 = cross(pole, e1);
+            double bestTheta = Double.NaN;
+            double bestDistance = Double.MAX_VALUE;
+            for (double theta = 0.0; theta < 360.0; theta += 0.25) {
+                double d = distanceOnPage(theta, e1, e2, zenith, projection, mapping, paper, cx, cy);
+                if (d < bestDistance) {
+                    bestDistance = d;
+                    bestTheta = theta;
+                }
+            }
+            if (Double.isNaN(bestTheta)) {
+                continue;
+            }
+            double low = bestTheta - 0.25;
+            double high = bestTheta + 0.25;
+            for (int i = 0; i < 40; i++) {
+                double m1 = low + (high - low) / 3.0;
+                double m2 = high - (high - low) / 3.0;
+                if (distanceOnPage(m1, e1, e2, zenith, projection, mapping, paper, cx, cy)
+                        <= distanceOnPage(m2, e1, e2, zenith, projection, mapping, paper, cx, cy)) {
+                    high = m2;
+                } else {
+                    low = m1;
+                }
+            }
+            double theta = (low + high) / 2.0;
+            double[] v = onCircle(theta, e1, e2);
+            double altitude = 90.0 - Math.toDegrees(Math.acos(Math.max(-1.0, Math.min(1.0, dot(v, zenith)))));
+            double rounded = juranometria.meridian.MeridianReadout.roundedToTheDegree(altitude);
+            if (!juranometria.meridian.MeridianReadout.statable(rounded)) {
+                continue;
+            }
+            juranometria.chart.SkyPosition at = juranometria.sky.SkyFrame.toPosition(v);
+            PixelPoint px = projection.project(at).map(mapping::toPixel).orElse(null);
+            if (px == null || !paper.contains(px.x(), px.y())) {
+                continue;
+            }
+            return java.util.Optional.of(new ReadoutPlacement(readout.lineIdentity(), at,
+                    readout.pole(), px, rounded));
+        }
+        return java.util.Optional.empty();
+    }
+
+    /** The page distance from the centre of the circle's point at this angle, or infinity off the page or below the horizon. */
+    private static double distanceOnPage(double theta, double[] e1, double[] e2, double[] zenith,
+                                         Projection projection, ViewportMapping mapping,
+                                         Rectangle2D paper, double cx, double cy) {
+        double[] v = onCircle(theta, e1, e2);
+        if (dot(v, zenith) <= 0.0) {
+            return Double.MAX_VALUE;
+        }
+        PixelPoint px = projection.project(juranometria.sky.SkyFrame.toPosition(v))
+                .map(mapping::toPixel).orElse(null);
+        if (px == null || !paper.contains(px.x(), px.y())) {
+            return Double.MAX_VALUE;
+        }
+        return Math.hypot(px.x() - cx, px.y() - cy);
+    }
+
+    private static double[] onCircle(double thetaDegrees, double[] e1, double[] e2) {
+        double c = Math.cos(Math.toRadians(thetaDegrees));
+        double s = Math.sin(Math.toRadians(thetaDegrees));
+        return new double[] {e1[0] * c + e2[0] * s, e1[1] * c + e2[1] * s, e1[2] * c + e2[2] * s};
+    }
+
+    private static double[] perpendicular(double[] p) {
+        double[] axis = Math.abs(p[2]) < 0.9 ? new double[] {0, 0, 1} : new double[] {1, 0, 0};
+        double[] e = cross(p, axis);
+        double n = Math.sqrt(dot(e, e));
+        return new double[] {e[0] / n, e[1] / n, e[2] / n};
+    }
+
+    private static double[] cross(double[] a, double[] b) {
+        return new double[] {a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]};
+    }
+
+    private static double dot(double[] a, double[] b) {
+        return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+    }
+
     public static List<UnseenMoon> unseenMoons(DrawnPage page,
             List<OverlayRegistry.Owned> contributions) {
         java.util.Map<String, String> decided = new java.util.LinkedHashMap<>();

@@ -38,9 +38,10 @@ import juranometria.ui.language.PageText;
  * meridian crosses it with none of its 10° ticks on it, and what one
  * readout would state and where it would stand - measured through the
  * production composition (the component with the meridian module
- * attached), with the candidate mark drawn by this study over the
- * production page, as the planets' cartography studies drew theirs.
- * Nothing here is production ink; every image says so in its corner.
+ * attached), with the mark drawn by this study over the production
+ * page, as the planets' cartography studies drew theirs - the study
+ * that preceded the ruling, kept as the readout's record. Every image
+ * says so in its corner.
  *
  * <p>Written to {@code docs/studies/meridian-readout/} by
  * {@code make meridian-readout-study}: the portable report on standard
@@ -86,16 +87,15 @@ public final class MeridianReadoutStudyMain {
                 + " projection: which ruled ticks lie on the page, which altitudes of the meridian the"
                 + " page shows, and where each candidate would stand.");
         p("");
-        p("Two candidates (`MeridianReadout`), each stating its altitude with `PageText.altitudeTick`:");
-        p("");
-        p("- **A, the nearest point:** the visible point of the meridian nearest the page centre,"
-                + " stating its own altitude rounded to the degree (or the half degree).");
-        p("- **C, the whole degree:** the whole degree of altitude on the visible line nearest the page"
-                + " centre - an exact tick outside the 10° sequence, drawn as a shorter stroke.");
+        p("The rule (`MeridianReadout`, ruled on #563 as \"A to the degree\"): the visible point"
+                + " of the meridian nearest the page centre, stating its own altitude rounded to the"
+                + " whole degree with `PageText.altitudeTick`; a stroke half a ruled tick's. The"
+                + " whole-degree candidate the study first measured beside it was removed with the"
+                + " ruling; its numbers are quoted in `docs/decisions/meridian-readout.md`.");
         p("");
         p("## Pages");
         p("");
-        p("| page | field | ruled ticks on page | visible altitudes | A: nearest point | C: whole degree | drawn |");
+        p("| page | field | ruled ticks on page | visible altitudes | nearest point | stated | drawn |");
         p("|---|---|---|---|---|---|---|");
         LocalSky sky = new LocalSky(OSLO);
         // Centres a reader would land on, not whole degrees: where the
@@ -130,32 +130,28 @@ public final class MeridianReadoutStudyMain {
         p("");
         p("## Panning along the line, 4° field, south half");
         p("");
-        p("Eight steps of a quarter degree of altitude. What each candidate would state, and how its"
-                + " figure moves: A glides with the centre and its rounded figure changes at each half-degree"
-                + " or degree boundary; C stands at an exact degree and steps to the next whole degree"
-                + " when that comes nearer the centre.");
+        p("Eight steps of a quarter degree of altitude. The readout glides with the centre; its"
+                + " figure changes where the altitude under the centre crosses a half degree.");
         p("");
-        p("| centre altitude | A: exact | A to the degree | A to the half degree | C: whole degree | C on page |");
-        p("|---|---|---|---|---|---|");
+        p("| centre altitude | nearest point: exact | stated, to the degree | on page |");
+        p("|---|---|---|---|");
         for (int k = 0; k <= 8; k++) {
             double centre = 35.12 + 0.25 * k;
             Measured m = measure(sky.onMeridian(centre, false), 4.0, false);
             p("| " + fmt(centre, 2) + "° | " + (m.a == null ? "—" : fmt(m.a.altitudeDegrees(), 2) + "°")
                     + " | " + (m.a == null ? "—" : figure(MeridianReadout.roundedToTheDegree(m.a.altitudeDegrees())) + "°")
-                    + " | " + (m.a == null ? "—" : figure(MeridianReadout.roundedToTheHalfDegree(m.a.altitudeDegrees())) + "°")
-                    + " | " + (m.c == null ? "—" : figure(m.c.altitudeDegrees()) + "°")
-                    + " | " + (m.c == null ? "—" : pixel(m.c)) + " |");
+                    + " | " + (m.a == null ? "—" : pixel(m.a)) + " |");
         }
         p("");
         p("## Zooming in on the same point, south half at 35.37°");
         p("");
-        p("| field | page height in degrees (approx.) | ruled ticks on page | readout offered | C: whole degree |");
+        p("| field | page height in degrees (approx.) | ruled ticks on page | readout offered | stated |");
         p("|---|---|---|---|---|");
         for (double field : new double[] {24.0, 12.0, 8.0, 6.0, 4.0, 3.0, 2.0, 1.0}) {
             Measured m = measure(sky.onMeridian(35.37, false), field, false);
             p("| " + figure(field) + "° | " + fmt(field * 700.0 / 900.0, 1) + "° | " + m.ticksOnPage + " | "
                     + (m.offered ? "yes" : "no: a ruled tick is on the page") + " | "
-                    + (m.c == null ? "—" : figure(m.c.altitudeDegrees()) + "°") + " |");
+                    + (m.a == null ? "—" : figure(MeridianReadout.roundedToTheDegree(m.a.altitudeDegrees())) + "°") + " |");
         }
         p("");
         p("## What the measurements support");
@@ -164,10 +160,11 @@ public final class MeridianReadoutStudyMain {
                 + " on, a positive-altitude part of it is on the page, and no ruled tick is. The zoom"
                 + " table says at which fields a page centred between two ticks shows neither: the page"
                 + " is 700/900 of its field tall, so the gap first opens below about 13° of field.");
-        p("2. **Where.** Candidate C stands at an exact whole degree; candidate A at the centre's own"
-                + " point with a rounded figure. Both stand on the visible line, nearest the page centre.");
-        p("3. **Stability.** Panning moves A continuously and changes its figure at every boundary; C"
-                + " holds its degree and steps once per degree of pan.");
+        p("2. **Where.** At the visible point nearest the page centre, stating its altitude to the"
+                + " degree (ruled R-2, R-3).");
+        p("3. **Stability.** Panning moves the readout continuously with the centre; its figure"
+                + " changes where the altitude under the centre crosses a half degree, never jumping"
+                + " along the line.");
         p("4. **Words.** The figure is `PageText.altitudeTick`, the page's own, in both languages; a"
                 + " half-degree figure would write one decimal, as the ticks' contract already allows.");
         p("5. **Edges.** Nothing below the horizon; nothing at 90°; refused at the geographic pole.");
@@ -178,7 +175,7 @@ public final class MeridianReadoutStudyMain {
     }
 
     private record Measured(int ticksOnPage, double low, double high, boolean offered,
-                            MeridianReadout.Sample a, MeridianReadout.Sample c,
+                            MeridianReadout.Sample a,
                             BufferedImage page, ChartModuleHost host, List<MeridianReadout.Sample> visible) {
     }
 
@@ -229,10 +226,12 @@ public final class MeridianReadoutStudyMain {
         boolean offered = !visible.isEmpty() && high > 0.0
                 && !MeridianReadout.aRuledTickIsVisible(visible, MeridianModule.Ticks.PROPOSED);
         MeridianReadout.Sample a = offered
-                ? MeridianReadout.nearestTheCentre(visible, CX, CY).orElse(null) : null;
-        MeridianReadout.Sample c = offered
-                ? MeridianReadout.wholeDegreeNearestTheCentre(visible, CX, CY).orElse(null) : null;
-        return new Measured(ticks, low, high, offered, a, c, page, host[0], visible);
+                ? MeridianReadout.nearestTheCentre(visible, CX, CY)
+                        .filter(s -> MeridianReadout.statable(
+                                MeridianReadout.roundedToTheDegree(s.altitudeDegrees())))
+                        .orElse(null)
+                : null;
+        return new Measured(ticks, low, high, offered, a, page, host[0], visible);
     }
 
     private static boolean inside(double[] px) {
@@ -246,26 +245,26 @@ public final class MeridianReadoutStudyMain {
         String drawn = "nothing: a ruled tick is on the page";
         int overlap = -1;
         String mockFigure = "—";
-        if (m.offered && m.c != null) {
-            mockFigure = words.altitudeTick(m.c.altitudeDegrees());
+        if (m.offered && m.a != null) {
+            mockFigure = words.altitudeTick(MeridianReadout.roundedToTheDegree(m.a.altitudeDegrees()));
             overlap = overlay(image, m, mockFigure, palette);
-            drawn = "C at " + pixel(m.c) + ", figure " + mockFigure;
+            drawn = "at " + pixel(m.a) + ", figure " + mockFigure;
         } else if (m.offered) {
-            drawn = "nothing: no whole degree on the visible line";
+            drawn = "nothing: no statable altitude on the visible line";
         }
         caption(image, palette);
         ImageIO.write(image, "png", new File(DIR, name + ".png"));
         p("| ![](" + name + ".png) " + name + " (" + caption + ") | " + figure(field) + "° | " + m.ticksOnPage
                 + " | " + (m.visible.isEmpty() ? "none" : fmt(m.low, 2) + "°–" + fmt(m.high, 2) + "°")
                 + " | " + (m.a == null ? "—" : fmt(m.a.altitudeDegrees(), 2) + "° at " + pixel(m.a))
-                + " | " + (m.c == null ? "—" : figure(m.c.altitudeDegrees()) + "° at " + pixel(m.c))
+                + " | " + (m.a == null ? "—" : figure(MeridianReadout.roundedToTheDegree(m.a.altitudeDegrees())) + "°")
                 + " | " + drawn + " |");
         q("| " + name + " | " + mockFigure + " | " + (overlap < 0 ? "—" : Integer.toString(overlap)) + " |");
     }
 
     /** The candidate's stroke and figure over the production page; returns the figure box's overlap with existing ink. */
     private static int overlay(BufferedImage image, Measured m, String figureText, ChartPalette palette) {
-        MeridianReadout.Sample at = m.c;
+        MeridianReadout.Sample at = m.a;
         // The line's direction: the visible sample nearest to the mark, a little along.
         MeridianReadout.Sample ahead = null;
         for (MeridianReadout.Sample s : m.visible) {

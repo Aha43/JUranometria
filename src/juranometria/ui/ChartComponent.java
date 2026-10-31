@@ -431,6 +431,22 @@ public final class ChartComponent extends JComponent {
         return said.toString();
     }
 
+    /**
+     * The description, then the meridian's contextual altitude readout
+     * where the page draws one (#563): a reading of the line, in the
+     * page's words, so a reader who cannot see the stroke is told what it
+     * says.
+     */
+    static String withReadout(String base,
+            java.util.Optional<ReferenceInk.ReadoutPlacement> readout,
+            juranometria.project.PageWords words) {
+        if (readout.isEmpty()) {
+            return base;
+        }
+        return base + ' ' + words.altitudeReadoutSpoken(
+                words.altitudeTick(readout.get().altitudeDegrees()));
+    }
+
     /** The description, then each drawn body by its name on the page (#415). */
     static String withBodies(String base,
             java.util.List<ReferenceInk.BodyPlacement> bodies,
@@ -1310,8 +1326,10 @@ public final class ChartComponent extends JComponent {
             // A moon of Mars the page leaves undrawn is still given (#606,
             // R-3 and R-4 on #605): behind Mars, or too close to tell apart.
             getAccessibleContext().setAccessibleDescription(withFurniture(
-                    withUnseenMoons(withBodies(withDirections(describe(scene),
-                            spokenDirections), drawnBodies, words),
+                    withUnseenMoons(withBodies(withReadout(withDirections(describe(scene),
+                            spokenDirections),
+                            ReferenceInk.altitudeReadout(juranometria.project.DrawnPage.of(scene),
+                                    overlays.collect()), words), drawnBodies, words),
                             ReferenceInk.unseenMoons(juranometria.project.DrawnPage.of(scene),
                                     overlays.collect()), words), drawnFurniture));
             // One ring per selected drawn member (issue #261): the
