@@ -97,7 +97,7 @@ airless horizon. All five moons are clear of Uranus.
 ## From the numbers to the chart
 
 The chart draws Uranus where the numbers put it, through the switch
-*Uranus on the chart* in View ▸ Solar System and in the Controller's
+*Uranus on the chart* in Solar System ▸ Uranus on the chart (before 6.1 the Solar System menu stood under View) and in the Controller's
 Uranus group - off until you choose it, then remembered. The rule is the
 one Mars follows: **Uranus is drawn as the larger of its true disc and a
 6 px cartographic symbol.** For Uranus that is always the symbol. Its

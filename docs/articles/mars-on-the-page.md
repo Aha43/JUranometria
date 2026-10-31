@@ -82,7 +82,7 @@ pole at **0.2°**, and tilted **19.37° (north pole toward us)**.
 ## From the numbers to the chart
 
 The chart draws Mars where the numbers put it, through the switch *Mars
-on the chart* in View ▸ Solar System and in the Controller's Mars group -
+on the chart* in Solar System ▸ Mars on the chart (before 6.1 the Solar System menu stood under View) and in the Controller's Mars group -
 off until you choose it, then remembered. The rule is the one Venus and
 Mercury follow: **Mars is drawn as the larger of its true disc and a
 6 px cartographic symbol**, and either is phased as the table says.

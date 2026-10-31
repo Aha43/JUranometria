@@ -113,7 +113,7 @@ service's, the time note below it.*
 ## From the numbers to the chart
 
 The chart draws Mercury where the numbers put it, through the switch
-*Mercury on the chart* in View ▸ Solar System and in the Controller's
+*Mercury on the chart* in Solar System ▸ Mercury on the chart (before 6.1 the Solar System menu stood under View) and in the Controller's
 Mercury group - off until you choose it, then remembered. The rule is
 Venus's, unchanged: **Mercury is drawn at its true size where that can
 be seen, and as a phased symbol where it cannot.**
@@ -167,7 +167,7 @@ true disc reaches the 6 px mark only at **0.51°** when Mercury is
 nearest and at **0.19°** when it is farthest. So 5.3 opens two fields
 below the 1° floor, **0.5°** and **0.25°**, and calls them *closer
 fields*. Zoom in offers the next of them - from the toolbar, the
-Controller, the View menu, the shortcuts or the wheel - when Mercury,
+Controller, the Solar System menu, the shortcuts or the wheel - when Mercury,
 Venus or Jupiter, shown on the chart, is on the page that step would
 show; the page says it is a closer field; panning keeps the field;
 zoom out returns to the ordinary ladder; Home is unchanged; and a

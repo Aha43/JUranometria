@@ -7,6 +7,28 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**The controls where they belong (#674, #675).** The View menu is now
+the **Chart** menu, ordered by what a reader reaches for: Place and
+Time, Chart Options and the Inspector, Centre on coordinates, the
+Controls and the Toolbar, then Zoom. **Solar System** is a top-level
+menu of its own; the Ecliptic is a box in Chart Options beside the
+grid, the one switch the keyboard shortcut, the Controller and the
+menu all read. The toolbar gains two icon buttons, Place and Time and
+Controls, and draws Accumulate and Emphasis as icons too (Tabler
+icons, MIT). The Controller's chart controls stand in one strip that
+wraps to the window's width in keyboard order, and the Solar System
+tables show their span and step fields only while a range is asked
+for. Articles name the new routes, each with one note on where the
+menu stood before 6.1.
+
+**One altitude readout on the meridian (#563).** With altitude ticks
+on, a page the meridian crosses with none of its 10° ticks on it
+carries one short tick stating the line's altitude to the degree at
+the point nearest the centre - and, when that point is the zenith,
+at the page's farthest visible point instead. Spoken with the page's
+directions; nothing new to switch on. Ruled R-1 to R-9 in
+`docs/decisions/meridian-readout.md` from the study that measured it.
+
 ## [6.0.0] - 2026-10-31
 
 **Neptune on the page (#670).** A new reader article, in English and

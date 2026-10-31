@@ -102,7 +102,7 @@ luftløse horisonten. Begge månene er klar av Neptun.
 ## Fra tallene til kartet
 
 Kartet tegner Neptun der tallene plasserer den, med bryteren *Neptun på
-kartet* i Vis ▸ Solsystem og i Kontrollerens Neptun-gruppe - av til du
+kartet* i Solsystem ▸ Neptun på kartet (før 6.1 lå Solsystem-menyen under Vis) og i Kontrollerens Neptun-gruppe - av til du
 velger den, og deretter husket. Regelen er den samme som for Mars og
 Uranus: **Neptun tegnes som det største av den sanne skiven og et
 kartografisk symbol på 6 px.** For Neptun er det alltid symbolet. Den

@@ -126,7 +126,7 @@ rather than hidden.
 ## From the numbers to the chart
 
 The chart draws Jupiter where the numbers put it, through the same
-switch, *Jupiter and moons on the chart*, in the View menu and in the
+switch, *Jupiter and moons on the chart*, in the Solar System menu (before 6.1 under View) and in the
 Controller's Jupiter group - off until you choose it, then remembered.
 Two rules decide what you see.
 

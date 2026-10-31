@@ -115,7 +115,7 @@ fra tjenesten, tidsmerknaden under.*
 ## Fra tallene til kartet
 
 Kartet tegner Merkur der tallene plasserer den, gjennom bryteren
-*Merkur på kartet* i Vis ▸ Solsystem og i Kontrollerens Merkur-gruppe
+*Merkur på kartet* i Solsystem ▸ Merkur på kartet (før 6.1 lå Solsystem-menyen under Vis) og i Kontrollerens Merkur-gruppe
 - av til du velger den, deretter husket. Regelen er Venus', uendret:
 **Merkur tegnes i sann størrelse der den kan sees, og som et symbol
 med fase der den ikke kan det.**
@@ -169,7 +169,7 @@ Målt over hver uke i 1900–2100 kan Merkurs fase leses på skjermen i
 når merket på 6 px først ved **0.51°** når Merkur er nærmest og ved
 **0.19°** når den er lengst borte. Derfor åpner 5.3 to felt under
 1°-gulvet, **0.5°** og **0.25°**, og kaller dem *nærfelt*. Zoom inn
-tilbyr det neste av dem - fra verktøylinjen, Kontrolleren, Vis-menyen,
+tilbyr det neste av dem - fra verktøylinjen, Kontrolleren, Solsystem-menyen,
 hurtigtastene eller hjulet - når Merkur, Venus eller Jupiter, vist på
 kartet, ligger på siden det steget ville vist; siden sier at den er et
 nærfelt; panorering beholder feltet; zoom ut går tilbake til den
