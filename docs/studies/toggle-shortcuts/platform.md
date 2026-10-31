@@ -20,11 +20,11 @@ Recorded on: `Mac OS X 27.0.1/aarch64/Homebrew 21.0.12.1`
 
 | keystroke | what it does | where it is bound |
 |---|---|---|
-| `⌃+⇧+T` | Chart Toolbar | the View menu |
 | `⌃+E` | Export Chart Sheet... | the File menu |
-| `⌃+I` | Inspector | the View menu |
-| `⌃+=` | Zoom In | the View menu |
-| `⌃+-` | Zoom Out | the View menu |
+| `⌃+I` | Inspector | the Chart menu |
+| `⌃+⇧+T` | Toolbar | the Chart menu |
+| `⌃+=` | Zoom In | the Chart menu |
+| `⌃+-` | Zoom Out | the Chart menu |
 | `⌃++` | chart.zoomIn | the window's own keys |
 | `⌃+=` | chart.zoomIn | the window's own keys |
 | `⌃+⇧+=` | chart.zoomIn | the window's own keys |

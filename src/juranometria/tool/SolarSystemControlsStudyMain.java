@@ -514,7 +514,7 @@ public final class SolarSystemControlsStudyMain {
         }
         out.append("\nNeither dialog persists anything (ruled on #400), and"
                 + " neither is told when Place and\nTime changes: the observer is"
-                + " pulled, never pushed. The chart-visibility switches\n(View ▸"
+                + " pulled, never pushed. The chart-visibility switches\n(Solar System ▸"
                 + " Sun on the chart, Moon on the chart) are `SolarSystemModule`"
                 + " flags with\n**no notification seam**: the menu tick is the"
                 + " item's own, and nothing follows the\nmodule. Toggling opens"

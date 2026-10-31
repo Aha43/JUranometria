@@ -18,13 +18,13 @@ The authority is the object a second presentation would follow.
 
 | # | control | kind | focusable | class | authority | menu or key | remembered |
 |---:|---|---|---|---|---|---|---|
-| 1 | Zoom in | JButton | yes | action | `ChartViewController` | View ▸ Zoom In, ⌘/Ctrl = | no |
-| 2 | Zoom out | JButton | yes | action | `ChartViewController` | View ▸ Zoom Out, ⌘/Ctrl − | no |
+| 1 | Zoom in | JButton | yes | action | `ChartViewController` | Chart ▸ Zoom In, ⌘/Ctrl = | no |
+| 2 | Zoom out | JButton | yes | action | `ChartViewController` | Chart ▸ Zoom Out, ⌘/Ctrl − | no |
 | 3 | Lock zoom | JToggleButton | yes | state | `ZoomLock` | none | yes, `zoomLocked` |
 | 4 | Fewer stars | JButton | yes | action | `ChartViewController` | none | no |
 | 5 | More stars | JButton | yes | action | `ChartViewController` | none | no |
 | 6 | Reset view | JButton | yes | action | `ChartViewController.reset` and the search field's clearing | none | no |
-| 7 | Inspector | JToggleButton | yes | state | `InspectorToggle` | View ▸ Inspector, ⌘/Ctrl I | no |
+| 7 | Inspector | JToggleButton | yes | state | `InspectorToggle` | Chart ▸ Inspector, ⌘/Ctrl I | no |
 | 8 | Accumulate selection | JToggleButton | yes | state | `SelectionMode` | none; the platform's add-to-selection modifier | no |
 | 9 | Emphasis | JButton | yes | state | `ChartComponent` (`toggleEmphasis`, `emphasizedSet`, `emphasisAvailable`) | none | no |
 | 10 | Search the atlas | SearchField | yes | action, with a local query | `LocalSearch`, `SearchNavigation`, the selection | none | no |

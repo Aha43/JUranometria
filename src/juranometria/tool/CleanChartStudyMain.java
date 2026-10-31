@@ -681,9 +681,9 @@ public final class CleanChartStudyMain {
     /** class, authority, menu or key, remembered - per control. */
     private static final Map<String, String[]> CLASSES = Map.ofEntries(
             Map.entry("zoomIn", new String[] {"action", "`ChartViewController`",
-                    "View ▸ Zoom In, ⌘/Ctrl =", "no"}),
+                    "Chart ▸ Zoom In, ⌘/Ctrl =", "no"}),
             Map.entry("zoomOut", new String[] {"action", "`ChartViewController`",
-                    "View ▸ Zoom Out, ⌘/Ctrl −", "no"}),
+                    "Chart ▸ Zoom Out, ⌘/Ctrl −", "no"}),
             Map.entry("zoomLock", new String[] {"state", "`ZoomLock`", "none",
                     "yes, `zoomLocked`"}),
             Map.entry("fewerStars", new String[] {"action", "`ChartViewController`",
@@ -694,7 +694,7 @@ public final class CleanChartStudyMain {
                     "`ChartViewController.reset` and the search field's clearing",
                     "none", "no"}),
             Map.entry("inspector", new String[] {"state", "`InspectorToggle`",
-                    "View ▸ Inspector, ⌘/Ctrl I", "no"}),
+                    "Chart ▸ Inspector, ⌘/Ctrl I", "no"}),
             Map.entry("accumulate", new String[] {"state", "`SelectionMode`",
                     "none; the platform's add-to-selection modifier", "no"}),
             Map.entry("emphasis", new String[] {"state",

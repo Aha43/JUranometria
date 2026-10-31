@@ -157,7 +157,7 @@ public final class ToggleShortcutStudyMain {
                 + " mnemonic - a route that needs the dialog open,"
                 + " which is the thing\nthis issue is asked to fix."
                 + " The module toggles are elsewhere: the ecliptic on"
-                + " the\nView menu, the observer's lines in Place and"
+                + " the\nChart menu, the observer's lines in Place and"
                 + " Time.\n\n");
     }
 

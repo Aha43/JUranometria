@@ -38,7 +38,7 @@ query; a **result** is what the service answered; a **mode** is which view is sh
 
 Neither dialog persists anything (ruled on #400), and neither is told when Place and
 Time changes: the observer is pulled, never pushed. The chart-visibility switches
-(View ▸ Sun on the chart, Moon on the chart) are `SolarSystemModule` flags with
+(Solar System ▸ Sun on the chart, Moon on the chart) are `SolarSystemModule` flags with
 **no notification seam**: the menu tick is the item's own, and nothing follows the
 module. Toggling opens no table; opening a table toggles nothing.
 

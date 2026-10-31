@@ -64,6 +64,10 @@ public final class MeridianReadoutStudyMain {
     }
 
     public static void main(String[] args) throws Exception {
+        // The contract runs a platform record's main twice in one JVM and
+        // holds the two records equal: the builders start empty each time.
+        REPORT.setLength(0);
+        PLATFORM.setLength(0);
         System.setProperty("java.awt.headless", "true");
         DIR.mkdirs();
         PlatformEvidence.preface(PLATFORM,

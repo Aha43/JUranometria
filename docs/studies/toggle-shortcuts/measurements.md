@@ -37,17 +37,17 @@ in their head.
 Every one of them is reachable today by opening Chart Options and pressing the
 control's own mnemonic - a route that needs the dialog open, which is the thing
 this issue is asked to fix. The module toggles are elsewhere: the ecliptic on the
-View menu, the observer's lines in Place and Time.
+Chart menu, the observer's lines in Place and Time.
 
 ## What the keyboard already means
 
 | what it does | where it is bound |
 |---|---|
-| Chart Toolbar | the View menu |
 | Export Chart Sheet... | the File menu |
-| Inspector | the View menu |
-| Zoom In | the View menu |
-| Zoom Out | the View menu |
+| Inspector | the Chart menu |
+| Toolbar | the Chart menu |
+| Zoom In | the Chart menu |
+| Zoom Out | the Chart menu |
 | chart.zoomIn | the window's own keys |
 | chart.zoomIn | the window's own keys |
 | chart.zoomIn | the window's own keys |
