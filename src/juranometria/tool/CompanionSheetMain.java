@@ -238,8 +238,13 @@ public final class CompanionSheetMain {
                 window[0].addSection("chartcontrols",
                         words.say("chartcontrols.title"),
                         chrome.companionControls(chart).inCompanion());
-                // Emphasis (#525), as the application holds it: after Chart
-                // controls, introduced collapsed, over the same chart.
+                // Place and Time directly after Chart controls, then
+                // Emphasis (#525) introduced collapsed over the same chart:
+                // the application's order since #675 (stage 3).
+                panel[0] = new PlaceAndTimePanel(module, store,
+                        () -> PlaceAndTimeSheetMain.WHEN, words);
+                window[0].addSection("placeandtime",
+                        words.say("placeandtime.title"), panel[0]);
                 juranometria.ui.EmphasisControls emphasis =
                         new juranometria.ui.EmphasisControls(chart, words);
                 window[0].addSection("emphasis", words.say("emphasis.title"),
@@ -247,10 +252,6 @@ public final class CompanionSheetMain {
                 if (state.emphasisOpen()) {
                     emphasis.choose(juranometria.render.ChartStructure.EQUATORIAL_GRID);
                 }
-                panel[0] = new PlaceAndTimePanel(module, store,
-                        () -> PlaceAndTimeSheetMain.WHEN, words);
-                window[0].addSection("placeandtime",
-                        words.say("placeandtime.title"), panel[0]);
                 CompanionStore companionStore = CompanionStore.forNode(node);
                 // Solar System (#458, ruled on #457): the Sun and Moon
                 // groups over sessions of their own and a chart switch
@@ -345,14 +346,15 @@ public final class CompanionSheetMain {
                                 juranometria.ui.ecliptic.EclipticSession.of(new juranometria.ecliptic.EclipticModule(), juranometria.ui.ecliptic.EclipticStore.forNode(node)),
                                 words).inCompanion(companionStore,
                                 words));
+                // Sections by name, not by position (#675 reordered them).
                 if (state.collapsed()) {
-                    window[0].sections().get(2).heading().doClick();
+                    section(window[0], "placeandtime").heading().doClick();
                 }
                 if (state.emphasisOpen()) {
-                    window[0].sections().get(1).heading().doClick();
+                    section(window[0], "emphasis").heading().doClick();
                 }
                 if (state.deepSkyOpen()) {
-                    deepSkyHeading(window[0].sections().get(3)).doClick();
+                    deepSkyHeading(section(window[0], "chartoptions")).doClick();
                 }
                 if (state.refused() != null) {
                     JTextField latitude = (JTextField) named(panel[0],
@@ -437,6 +439,17 @@ public final class CompanionSheetMain {
     }
 
     /** The Deep sky group's heading inside the Chart Options section. */
+    /** The Chart tab's section of that id. */
+    private static juranometria.ui.companion.CompanionSection section(
+            juranometria.ui.companion.CompanionWindow window, String id) {
+        for (juranometria.ui.companion.CompanionSection each : window.sections()) {
+            if (("section." + id).equals(each.getName())) {
+                return each;
+            }
+        }
+        throw new IllegalStateException("no section " + id);
+    }
+
     private static javax.swing.AbstractButton deepSkyHeading(Component root) {
         return (javax.swing.AbstractButton) named(root,
                 "heading.chartoptions.deepsky");

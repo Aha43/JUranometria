@@ -368,56 +368,90 @@ public final class ChartControls {
         return actions;
     }
 
+    /** Marks the companion's control strip, for a host or a test to find. */
+    public static final String STRIP = "juranometria.chartControls.strip";
+
     /**
      * These controls as the Controls companion holds them (ruled on
-     * #449): two compact rows - the navigation, then the Inspector,
-     * Accumulate and Emphasis - the search field as wide as the
-     * section, and the readout as a quiet line beneath. The version
-     * and Exit are the application's and are not here.
+     * #449; rearranged in #675, stage 3, ruled on #674): one strip of
+     * control groups that sits on one row whenever it fits and wraps at
+     * group boundaries into as many rows as the actual width needs,
+     * recomputed on resize - the zoom trio, the magnitude pair, Reset
+     * view, the Inspector and Accumulate, in that order, which is the
+     * keyboard's order whatever row each lands on; then the search
+     * field as wide as the section, and the readout as a quiet line
+     * beneath. Emphasis is not here: the Controller has its own
+     * Emphasis panel, and a second control for the same thing was the
+     * duplication #674 removes. The version and Exit are the
+     * application's and are not here either.
      */
     public JComponent inCompanion() {
         JPanel rows = new JPanel();
         rows.setLayout(new BoxLayout(rows, BoxLayout.Y_AXIS));
         rows.setBorder(BorderFactory.createEmptyBorder(4, 4, 2, 4));
         rows.putClientProperty(MARK, Boolean.TRUE);
-
-        JToolBar navigation = row();
-        navigation.add(zoomIn);
-        navigation.add(zoomOut);
+        // As wide as the section gives it, as tall as its rows: the
+        // column's layout may stretch it sideways, never downwards.
+        JPanel strip = new JPanel(new juranometria.ui.companion.WrapLayout(
+                java.awt.FlowLayout.LEADING, 0, 2)) {
+            @Override
+            public Dimension getMaximumSize() {
+                return new Dimension(Integer.MAX_VALUE, getPreferredSize().height);
+            }
+        };
+        strip.setName(STRIP);
+        strip.setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
+        // The column's other rows keep the default alignment; a strip
+        // aligned differently is set off the axis by BoxLayout, not
+        // stretched. Same alignment, full width, rows leading-aligned.
+        strip.setAlignmentX(0.5f);
+        JToolBar zoom = row();
+        zoom.add(zoomIn);
+        zoom.add(zoomOut);
         if (zoomLock != null) {
-            navigation.add(zoomLock);
+            zoom.add(zoomLock);
         }
-        navigation.addSeparator();
-        navigation.add(fewerStars);
-        navigation.add(moreStars);
-        navigation.addSeparator();
-        navigation.add(home);
-        rows.add(leading(navigation));
-
-        JToolBar work = row();
-        if (inspectorButton != null) {
-            work.add(inspectorButton);
-            work.addSeparator();
+        zoom.addSeparator();
+        strip.add(zoom);
+        JToolBar magnitude = row();
+        magnitude.add(fewerStars);
+        magnitude.add(moreStars);
+        magnitude.addSeparator();
+        strip.add(magnitude);
+        JToolBar first = row();
+        first.add(home);
+        strip.add(first);
+        if (inspectorButton != null || accumulate != null) {
+            JToolBar windows = row();
+            windows.addSeparator();
+            if (inspectorButton != null) {
+                windows.add(inspectorButton);
+            }
+            if (accumulate != null) {
+                if (inspectorButton != null) {
+                    windows.addSeparator();
+                }
+                windows.add(accumulate);
+            }
+            strip.add(windows);
         }
-        if (accumulate != null) {
-            work.add(accumulate);
-            work.addSeparator();
+        for (java.awt.Component group : strip.getComponents()) {
+            keepReachableByKeyboard((java.awt.Container) group);
         }
-        if (emphasis != null) {
-            work.add(emphasis);
-        }
-        if (work.getComponentCount() > 0) {
-            rows.add(leading(work));
-        }
-        keepReachableByKeyboard(navigation);
-        keepReachableByKeyboard(work);
-
+        // The strip re-asks for its height whenever its width changes,
+        // so a row that wraps or unwraps is given the room it needs.
+        strip.addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent event) {
+                strip.revalidate();
+            }
+        });
+        rows.add(strip);
         JPanel field = new JPanel(new BorderLayout());
         field.setBorder(BorderFactory.createEmptyBorder(4, 10, 4, 10));
         search.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
         field.add(search, BorderLayout.CENTER);
         rows.add(field);
-
         JPanel quiet = new JPanel(new BorderLayout());
         quiet.setBorder(BorderFactory.createEmptyBorder(2, 12, 6, 10));
         // Quiet visually, as the toolbar's version is: the theme's own
@@ -430,6 +464,22 @@ public final class ChartControls {
         quiet.add(readout, BorderLayout.WEST);
         rows.add(quiet);
         return rows;
+    }
+
+    /** The companion's control strip inside a host, or null. */
+    public static JComponent strip(java.awt.Container host) {
+        for (java.awt.Component child : host.getComponents()) {
+            if (child instanceof JComponent component && STRIP.equals(component.getName())) {
+                return component;
+            }
+            if (child instanceof java.awt.Container inner) {
+                JComponent found = strip(inner);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
     }
 
     private static JToolBar row() {

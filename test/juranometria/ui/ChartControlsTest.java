@@ -135,10 +135,17 @@ class ChartControlsTest {
                 ChartControls.MARK)), "the section is the controls' own host");
         for (String name : new String[] {"Zoom in", "Zoom out", "Lock zoom",
                 "Fewer stars", "More stars", "Reset view", "Inspector",
-                "Accumulate selection", "Emphasis"}) {
+                "Accumulate selection"}) {
             named(hosts.bar, name);
             named(hosts.section, name);
         }
+        // Emphasis is the bar's; the companion has its own Emphasis panel
+        // and, since #675, no second control for it in Chart controls.
+        named(hosts.bar, "Emphasis");
+        assertTrue(all(hosts.section).stream().noneMatch(c ->
+                c instanceof AbstractButton b && "Emphasis".equals(
+                        b.getAccessibleContext().getAccessibleName())),
+                "no duplicate Emphasis in the companion's Chart controls (#674)");
         assertEquals(2, hosts.actions.fields().size(),
                 "Home knows both fields, one per host");
         assertEquals(1, all(hosts.section).stream()
@@ -249,10 +256,12 @@ class ChartControlsTest {
                             + host.getClass().getSimpleName());
                 }
             }
-            assertNotNull(named(host, "Emphasis"));
-            assertTrue(named(host, "Emphasis").isFocusable(),
-                    "Emphasis, which the bar could not reach before #449");
         }
+        // Emphasis is the bar's alone since #675 (the companion has its
+        // own Emphasis panel): reachable there, as #449 made it.
+        assertNotNull(named(hosts.bar, "Emphasis"));
+        assertTrue(named(hosts.bar, "Emphasis").isFocusable(),
+                "Emphasis, which the bar could not reach before #449");
         assertFalse(hosts.companion.readout().isFocusable(),
                 "the readout is said, not operated");
     }

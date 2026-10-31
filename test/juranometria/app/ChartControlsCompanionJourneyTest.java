@@ -77,7 +77,9 @@ class ChartControlsCompanionJourneyTest {
                     assertReachable(frame, bar, "Emphasis", "Lock zoom",
                             "Accumulate selection", "Inspector", "Zoom in",
                             "Reset view", "Exit JUranometria");
-                    assertReachable(companion, section, "Emphasis", "Lock zoom",
+                    // No Emphasis in Chart controls since #675: the
+                    // Controller's own Emphasis panel is its one control.
+                    assertReachable(companion, section, "Lock zoom",
                             "Accumulate selection", "Inspector", "Zoom in",
                             "Reset view");
 

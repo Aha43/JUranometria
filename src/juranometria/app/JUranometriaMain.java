@@ -401,16 +401,19 @@ public final class JUranometriaMain {
         companion.addSection("chartcontrols",
                 companionWords.say("chartcontrols.title"),
                 chartControls.inCompanion());
-        // Emphasis (#525): one immediate box per choice of the toolbar's
-        // Emphasis popup, over the chart's one raised set; collapsed
-        // until a reader opens it, and nothing it shows is persisted.
-        companion.addSection("emphasis", companionWords.say("emphasis.title"),
-                new juranometria.ui.EmphasisControls(chart, companionWords).inController(),
-                true);
+        // Place and Time directly after Chart controls (#675, stage 3,
+        // ruled on #674): the chart's own context next to its controls.
         companion.addSection("placeandtime",
                 companionWords.say("placeandtime.title"),
                 new juranometria.ui.placeandtime.PlaceAndTimePanel(meridian,
                         placeStore, clock, companionWords));
+        // Emphasis (#525): one immediate box per choice of the toolbar's
+        // Emphasis popup, over the chart's one raised set; collapsed
+        // until a reader opens it, and nothing it shows is persisted.
+        // The Controller's one Emphasis control since #675.
+        companion.addSection("emphasis", companionWords.say("emphasis.title"),
+                new juranometria.ui.EmphasisControls(chart, companionWords).inController(),
+                true);
         shutdown.onShutdown(companion::dispose);
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.addWindowListener(new java.awt.event.WindowAdapter() {

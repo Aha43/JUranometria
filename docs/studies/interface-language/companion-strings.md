@@ -39,10 +39,8 @@ arrangement at its frozen instant.
 | — | Reset view: back to the atlas's first page | Reset view | Returns the chart to where every reader begins, and clears the search; what the chart draws is left as you chose it |
 | — | Show the Inspector: what the selected mark is (⌘I) | Inspector | Hidden; press to open the panel that identifies what you selected and lists what is on this page. |
 | — | When on, choosing objects adds them to the working selection and choosing them again removes them, instead of replacing the selection. The platform's add-to-selection modifier always works. | Accumulate selection | Off, each object you choose replaces the working selection; on, it is added to it, and choosing it again takes it out. Holding the platform's add-to-selection modifier does the same whether this is on or off. |
-| — | Let one or more chart structures rise from the page | Emphasis | Temporarily strengthens chosen structures so they are easy to follow — the meridian, the ecliptic, the grid, the horizon, the constellations’ own lines, or the Solar System bodies’ labels. Normal settles the chart back to its ordinary design. |
 | — | Find an object or J2000 coordinates, e.g. M 31, NGC 224, TYC 2801-2090-1, or 0:42:44 +41:16:09 | Search the atlas | Type a Messier or NGC number, a star's catalogue identity, or a J2000 right ascension and declination, then press Enter; the chart goes there and marks an object it finds |
 | Field 8° · Stars to V 8.0 | — | Field 8° · Stars to V 8.0 | — |
-| ▸ Emphasis | Show or hide this section | Emphasis, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▾ Place and Time | Show or hide this section | Place and Time, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | Latitude | — | Latitude | — |
 | 59.913 | Degrees north of the equator, e.g. 59.913; south is negative, -90 to 90 | Latitude | Degrees north of the equator, negative south, -90 to 90 |
@@ -60,6 +58,7 @@ arrangement at its frozen instant.
 | Subdue below horizon | Draw the sky below the mathematical horizon at reduced contrast | Subdue below horizon | Reduces the contrast of celestial content below the observer’s mathematical horizon. |
 | Update to now | Reads the clock once and freezes the chart at that instant | Update to now | Freezes the chart at the present moment. The clock is read once; nothing moves afterwards. |
 | Centre on zenith | Move the chart to the point overhead | Centre on zenith | Moves the page to the point directly above you. This is the only control in this window that moves the chart. |
+| ▸ Emphasis | Show or hide this section | Emphasis, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▾ Chart Options | Show or hide this section | Chart Options, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Deep sky | Show or hide this section | Deep sky, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▾ Stars | Show or hide this section | Stars, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
@@ -98,10 +97,8 @@ arrangement at its frozen instant.
 | — | Reset view: back to the atlas's first page | Reset view | Returns the chart to where every reader begins, and clears the search; what the chart draws is left as you chose it |
 | — | Show the Inspector: what the selected mark is (⌘I) | Inspector | Hidden; press to open the panel that identifies what you selected and lists what is on this page. |
 | — | When on, choosing objects adds them to the working selection and choosing them again removes them, instead of replacing the selection. The platform's add-to-selection modifier always works. | Accumulate selection | Off, each object you choose replaces the working selection; on, it is added to it, and choosing it again takes it out. Holding the platform's add-to-selection modifier does the same whether this is on or off. |
-| — | Let one or more chart structures rise from the page | Emphasis | Temporarily strengthens chosen structures so they are easy to follow — the meridian, the ecliptic, the grid, the horizon, the constellations’ own lines, or the Solar System bodies’ labels. Normal settles the chart back to its ordinary design. |
 | — | Find an object or J2000 coordinates, e.g. M 31, NGC 224, TYC 2801-2090-1, or 0:42:44 +41:16:09 | Search the atlas | Type a Messier or NGC number, a star's catalogue identity, or a J2000 right ascension and declination, then press Enter; the chart goes there and marks an object it finds |
 | Field 8° · Stars to V 8.0 | — | Field 8° · Stars to V 8.0 | — |
-| ▸ Emphasis | Show or hide this section | Emphasis, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▾ Place and Time | Show or hide this section | Place and Time, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | Latitude | — | Latitude | — |
 | 59.913 | Degrees north of the equator, e.g. 59.913; south is negative, -90 to 90 | Latitude | Degrees north of the equator, negative south, -90 to 90 |
@@ -119,6 +116,7 @@ arrangement at its frozen instant.
 | Subdue below horizon | Draw the sky below the mathematical horizon at reduced contrast | Subdue below horizon | Reduces the contrast of celestial content below the observer’s mathematical horizon. |
 | Update to now | Reads the clock once and freezes the chart at that instant | Update to now | Freezes the chart at the present moment. The clock is read once; nothing moves afterwards. |
 | Centre on zenith | Move the chart to the point overhead | Centre on zenith | Moves the page to the point directly above you. This is the only control in this window that moves the chart. |
+| ▸ Emphasis | Show or hide this section | Emphasis, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▾ Chart Options | Show or hide this section | Chart Options, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Deep sky | Show or hide this section | Deep sky, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▾ Stars | Show or hide this section | Stars, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
@@ -157,11 +155,10 @@ arrangement at its frozen instant.
 | — | Reset view: back to the atlas's first page | Reset view | Returns the chart to where every reader begins, and clears the search; what the chart draws is left as you chose it |
 | — | Show the Inspector: what the selected mark is (⌘I) | Inspector | Hidden; press to open the panel that identifies what you selected and lists what is on this page. |
 | — | When on, choosing objects adds them to the working selection and choosing them again removes them, instead of replacing the selection. The platform's add-to-selection modifier always works. | Accumulate selection | Off, each object you choose replaces the working selection; on, it is added to it, and choosing it again takes it out. Holding the platform's add-to-selection modifier does the same whether this is on or off. |
-| — | Let one or more chart structures rise from the page | Emphasis | Temporarily strengthens chosen structures so they are easy to follow — the meridian, the ecliptic, the grid, the horizon, the constellations’ own lines, or the Solar System bodies’ labels. Normal settles the chart back to its ordinary design. |
 | — | Find an object or J2000 coordinates, e.g. M 31, NGC 224, TYC 2801-2090-1, or 0:42:44 +41:16:09 | Search the atlas | Type a Messier or NGC number, a star's catalogue identity, or a J2000 right ascension and declination, then press Enter; the chart goes there and marks an object it finds |
 | Field 8° · Stars to V 8.0 | — | Field 8° · Stars to V 8.0 | — |
-| ▸ Emphasis | Show or hide this section | Emphasis, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Place and Time | Show or hide this section | Place and Time, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
+| ▸ Emphasis | Show or hide this section | Emphasis, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▾ Chart Options | Show or hide this section | Chart Options, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Deep sky | Show or hide this section | Deep sky, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▾ Stars | Show or hide this section | Stars, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
@@ -200,10 +197,8 @@ arrangement at its frozen instant.
 | — | Reset view: back to the atlas's first page | Reset view | Returns the chart to where every reader begins, and clears the search; what the chart draws is left as you chose it |
 | — | Show the Inspector: what the selected mark is (⌘I) | Inspector | Hidden; press to open the panel that identifies what you selected and lists what is on this page. |
 | — | When on, choosing objects adds them to the working selection and choosing them again removes them, instead of replacing the selection. The platform's add-to-selection modifier always works. | Accumulate selection | Off, each object you choose replaces the working selection; on, it is added to it, and choosing it again takes it out. Holding the platform's add-to-selection modifier does the same whether this is on or off. |
-| — | Let one or more chart structures rise from the page | Emphasis | Temporarily strengthens chosen structures so they are easy to follow — the meridian, the ecliptic, the grid, the horizon, the constellations’ own lines, or the Solar System bodies’ labels. Normal settles the chart back to its ordinary design. |
 | — | Find an object or J2000 coordinates, e.g. M 31, NGC 224, TYC 2801-2090-1, or 0:42:44 +41:16:09 | Search the atlas | Type a Messier or NGC number, a star's catalogue identity, or a J2000 right ascension and declination, then press Enter; the chart goes there and marks an object it finds |
 | Field 8° · Stars to V 8.0 | — | Field 8° · Stars to V 8.0 | — |
-| ▸ Emphasis | Show or hide this section | Emphasis, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▾ Place and Time | Show or hide this section | Place and Time, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | Latitude | — | Latitude | — |
 | 59.913 | Degrees north of the equator, e.g. 59.913; south is negative, -90 to 90 | Latitude | Latitude must be between −90° and 90°. Kept 59.913. |
@@ -222,6 +217,7 @@ arrangement at its frozen instant.
 | Update to now | Reads the clock once and freezes the chart at that instant | Update to now | Freezes the chart at the present moment. The clock is read once; nothing moves afterwards. |
 | Centre on zenith | Move the chart to the point overhead | Centre on zenith | Moves the page to the point directly above you. This is the only control in this window that moves the chart. |
 | Latitude must be between −90° and 90°. Kept 59.913. | — | Latitude must be between −90° and 90°. Kept 59.913. | — |
+| ▸ Emphasis | Show or hide this section | Emphasis, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▾ Chart Options | Show or hide this section | Chart Options, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Deep sky | Show or hide this section | Deep sky, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▾ Stars | Show or hide this section | Stars, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
@@ -260,11 +256,10 @@ arrangement at its frozen instant.
 | — | Reset view: back to the atlas's first page | Reset view | Returns the chart to where every reader begins, and clears the search; what the chart draws is left as you chose it |
 | — | Show the Inspector: what the selected mark is (⌘I) | Inspector | Hidden; press to open the panel that identifies what you selected and lists what is on this page. |
 | — | When on, choosing objects adds them to the working selection and choosing them again removes them, instead of replacing the selection. The platform's add-to-selection modifier always works. | Accumulate selection | Off, each object you choose replaces the working selection; on, it is added to it, and choosing it again takes it out. Holding the platform's add-to-selection modifier does the same whether this is on or off. |
-| — | Let one or more chart structures rise from the page | Emphasis | Temporarily strengthens chosen structures so they are easy to follow — the meridian, the ecliptic, the grid, the horizon, the constellations’ own lines, or the Solar System bodies’ labels. Normal settles the chart back to its ordinary design. |
 | — | Find an object or J2000 coordinates, e.g. M 31, NGC 224, TYC 2801-2090-1, or 0:42:44 +41:16:09 | Search the atlas | Type a Messier or NGC number, a star's catalogue identity, or a J2000 right ascension and declination, then press Enter; the chart goes there and marks an object it finds |
 | Field 8° · Stars to V 8.0 | — | Field 8° · Stars to V 8.0 | — |
-| ▸ Emphasis | Show or hide this section | Emphasis, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Place and Time | Show or hide this section | Place and Time, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
+| ▸ Emphasis | Show or hide this section | Emphasis, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▾ Chart Options | Show or hide this section | Chart Options, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▾ Deep sky | Show or hide this section | Deep sky, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | Deep-sky objects | Draw deep-sky objects on the chart at all. Shortcut: ⌘K then D. | Deep-sky objects | Draw deep-sky objects on the chart at all. Switch it here or from the chart with ⌘K then D. |
@@ -404,9 +399,9 @@ arrangement at its frozen instant.
 | — | Reset view: back to the atlas's first page | Reset view | Returns the chart to where every reader begins, and clears the search; what the chart draws is left as you chose it |
 | — | Show the Inspector: what the selected mark is (⌘I) | Inspector | Hidden; press to open the panel that identifies what you selected and lists what is on this page. |
 | — | When on, choosing objects adds them to the working selection and choosing them again removes them, instead of replacing the selection. The platform's add-to-selection modifier always works. | Accumulate selection | Off, each object you choose replaces the working selection; on, it is added to it, and choosing it again takes it out. Holding the platform's add-to-selection modifier does the same whether this is on or off. |
-| — | Let one or more chart structures rise from the page | Emphasis | Temporarily strengthens chosen structures so they are easy to follow — the meridian, the ecliptic, the grid, the horizon, the constellations’ own lines, or the Solar System bodies’ labels. Normal settles the chart back to its ordinary design. |
 | — | Find an object or J2000 coordinates, e.g. M 31, NGC 224, TYC 2801-2090-1, or 0:42:44 +41:16:09 | Search the atlas | Type a Messier or NGC number, a star's catalogue identity, or a J2000 right ascension and declination, then press Enter; the chart goes there and marks an object it finds |
 | Field 8° · Stars to V 8.0 | — | Field 8° · Stars to V 8.0 | — |
+| ▸ Place and Time | Show or hide this section | Place and Time, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▾ Emphasis | Show or hide this section | Emphasis, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | Meridian | — | Meridian | Raises it on the chart - Meridian - until it is unchecked, Normal is chosen, or it can no longer be drawn; the same choice as the toolbars Emphasis. Nothing is remembered after the atlas closes. |
 | Ecliptic | — | Ecliptic | Raises it on the chart - Ecliptic - until it is unchecked, Normal is chosen, or it can no longer be drawn; the same choice as the toolbars Emphasis. Nothing is remembered after the atlas closes. |
@@ -416,7 +411,6 @@ arrangement at its frozen instant.
 | Constellation figures | — | Constellation figures | Raises it on the chart - Constellation figures - until it is unchecked, Normal is chosen, or it can no longer be drawn; the same choice as the toolbars Emphasis. Nothing is remembered after the atlas closes. |
 | Solar System labels | — | Solar System labels | Raises it on the chart - Solar System labels - until it is unchecked, Normal is chosen, or it can no longer be drawn; the same choice as the toolbars Emphasis. Nothing is remembered after the atlas closes. |
 | Normal | — | Normal | Settles every raised structure at once, so the chart returns to its ordinary design. |
-| ▸ Place and Time | Show or hide this section | Place and Time, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▾ Chart Options | Show or hide this section | Chart Options, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Deep sky | Show or hide this section | Deep sky, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▾ Stars | Show or hide this section | Stars, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
@@ -457,10 +451,8 @@ arrangement at its frozen instant.
 | — | Tilbakestill visningen: tilbake til atlasets første side | Tilbakestill visningen | Fører kartet tilbake til startsiden og tømmer søket; det du har valgt å vise på kartet, endres ikke |
 | — | Vis utforskeren: hva det valgte merket er (⌘I) | Utforskeren | Skjult; trykk for å åpne panelet som viser hva du har valgt og hva som finnes på denne siden |
 | — | Når denne er på, legges objektene du velger til i arbeidsutvalget. Velger du et objekt på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker alltid. | Samle opp valgte objekter | Når denne er av, erstatter hvert nytt objekt arbeidsutvalget. Når den er på, legges objektet til; velger du det på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker i begge tilfeller. |
-| — | La én eller flere kartstrukturer løfte seg fra siden | Fremheving | Forsterker midlertidig valgte strukturer så de er lette å følge — meridianen, ekliptikken, rutenettet, horisonten, stjernebildenes egne streker eller solsystemlegemenes etiketter. Normal roer kartet tilbake til sin vanlige utforming. |
 | — | Finn et objekt eller J2000-koordinater, f.eks. M 31, NGC 224, TYC 2801-2090-1 eller 0:42:44 +41:16:09 | Søk i atlaset | Skriv et Messier- eller NGC-nummer, en stjernes katalogidentitet eller en J2000-rektascensjon og -deklinasjon, og trykk Enter. Kartet flyttes dit, og et objekt det finner, markeres. |
 | Synsfelt 8° · Stjerner til V 8.0 | — | Synsfelt 8° · Stjerner til V 8.0 | — |
-| ▸ Fremheving | Vis eller skjul denne delen | Fremheving, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▾ Sted og tid | Vis eller skjul denne delen | Sted og tid, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | Breddegrad | — | Breddegrad | — |
 | 59.913 | Grader nord for ekvator, f.eks. 59.913; sørlige breddegrader er negative, -90 til 90 | Breddegrad | Grader nord for ekvator; sørlige breddegrader er negative, -90 til 90 |
@@ -478,6 +470,7 @@ arrangement at its frozen instant.
 | Demp under horisonten | Tegn himmelen under den matematiske horisonten med redusert kontrast | Demp under horisonten | Reduserer kontrasten til himmelinnhold under observatørens matematiske horisont. |
 | Oppdater til nå | Les klokken én gang og sett kartets tidspunkt til nå | Oppdater til nå | Tegner kartet for tidspunktet nå. Klokken leses én gang; tiden går ikke videre etterpå. |
 | Sentrer på senit | Flytt kartet til punktet rett over deg | Sentrer på senit | Flytter siden til punktet rett over deg. Dette er den eneste knappen i dette vinduet som flytter kartet. |
+| ▸ Fremheving | Vis eller skjul denne delen | Fremheving, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▾ Kartvalg | Vis eller skjul denne delen | Kartvalg, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Dyphimmel | Vis eller skjul denne delen | Dyphimmel, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▾ Stjerner | Vis eller skjul denne delen | Stjerner, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
@@ -516,10 +509,8 @@ arrangement at its frozen instant.
 | — | Tilbakestill visningen: tilbake til atlasets første side | Tilbakestill visningen | Fører kartet tilbake til startsiden og tømmer søket; det du har valgt å vise på kartet, endres ikke |
 | — | Vis utforskeren: hva det valgte merket er (⌘I) | Utforskeren | Skjult; trykk for å åpne panelet som viser hva du har valgt og hva som finnes på denne siden |
 | — | Når denne er på, legges objektene du velger til i arbeidsutvalget. Velger du et objekt på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker alltid. | Samle opp valgte objekter | Når denne er av, erstatter hvert nytt objekt arbeidsutvalget. Når den er på, legges objektet til; velger du det på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker i begge tilfeller. |
-| — | La én eller flere kartstrukturer løfte seg fra siden | Fremheving | Forsterker midlertidig valgte strukturer så de er lette å følge — meridianen, ekliptikken, rutenettet, horisonten, stjernebildenes egne streker eller solsystemlegemenes etiketter. Normal roer kartet tilbake til sin vanlige utforming. |
 | — | Finn et objekt eller J2000-koordinater, f.eks. M 31, NGC 224, TYC 2801-2090-1 eller 0:42:44 +41:16:09 | Søk i atlaset | Skriv et Messier- eller NGC-nummer, en stjernes katalogidentitet eller en J2000-rektascensjon og -deklinasjon, og trykk Enter. Kartet flyttes dit, og et objekt det finner, markeres. |
 | Synsfelt 8° · Stjerner til V 8.0 | — | Synsfelt 8° · Stjerner til V 8.0 | — |
-| ▸ Fremheving | Vis eller skjul denne delen | Fremheving, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▾ Sted og tid | Vis eller skjul denne delen | Sted og tid, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | Breddegrad | — | Breddegrad | — |
 | 59.913 | Grader nord for ekvator, f.eks. 59.913; sørlige breddegrader er negative, -90 til 90 | Breddegrad | Grader nord for ekvator; sørlige breddegrader er negative, -90 til 90 |
@@ -537,6 +528,7 @@ arrangement at its frozen instant.
 | Demp under horisonten | Tegn himmelen under den matematiske horisonten med redusert kontrast | Demp under horisonten | Reduserer kontrasten til himmelinnhold under observatørens matematiske horisont. |
 | Oppdater til nå | Les klokken én gang og sett kartets tidspunkt til nå | Oppdater til nå | Tegner kartet for tidspunktet nå. Klokken leses én gang; tiden går ikke videre etterpå. |
 | Sentrer på senit | Flytt kartet til punktet rett over deg | Sentrer på senit | Flytter siden til punktet rett over deg. Dette er den eneste knappen i dette vinduet som flytter kartet. |
+| ▸ Fremheving | Vis eller skjul denne delen | Fremheving, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▾ Kartvalg | Vis eller skjul denne delen | Kartvalg, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Dyphimmel | Vis eller skjul denne delen | Dyphimmel, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▾ Stjerner | Vis eller skjul denne delen | Stjerner, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
@@ -575,11 +567,10 @@ arrangement at its frozen instant.
 | — | Tilbakestill visningen: tilbake til atlasets første side | Tilbakestill visningen | Fører kartet tilbake til startsiden og tømmer søket; det du har valgt å vise på kartet, endres ikke |
 | — | Vis utforskeren: hva det valgte merket er (⌘I) | Utforskeren | Skjult; trykk for å åpne panelet som viser hva du har valgt og hva som finnes på denne siden |
 | — | Når denne er på, legges objektene du velger til i arbeidsutvalget. Velger du et objekt på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker alltid. | Samle opp valgte objekter | Når denne er av, erstatter hvert nytt objekt arbeidsutvalget. Når den er på, legges objektet til; velger du det på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker i begge tilfeller. |
-| — | La én eller flere kartstrukturer løfte seg fra siden | Fremheving | Forsterker midlertidig valgte strukturer så de er lette å følge — meridianen, ekliptikken, rutenettet, horisonten, stjernebildenes egne streker eller solsystemlegemenes etiketter. Normal roer kartet tilbake til sin vanlige utforming. |
 | — | Finn et objekt eller J2000-koordinater, f.eks. M 31, NGC 224, TYC 2801-2090-1 eller 0:42:44 +41:16:09 | Søk i atlaset | Skriv et Messier- eller NGC-nummer, en stjernes katalogidentitet eller en J2000-rektascensjon og -deklinasjon, og trykk Enter. Kartet flyttes dit, og et objekt det finner, markeres. |
 | Synsfelt 8° · Stjerner til V 8.0 | — | Synsfelt 8° · Stjerner til V 8.0 | — |
-| ▸ Fremheving | Vis eller skjul denne delen | Fremheving, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Sted og tid | Vis eller skjul denne delen | Sted og tid, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
+| ▸ Fremheving | Vis eller skjul denne delen | Fremheving, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▾ Kartvalg | Vis eller skjul denne delen | Kartvalg, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Dyphimmel | Vis eller skjul denne delen | Dyphimmel, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▾ Stjerner | Vis eller skjul denne delen | Stjerner, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
@@ -618,10 +609,8 @@ arrangement at its frozen instant.
 | — | Tilbakestill visningen: tilbake til atlasets første side | Tilbakestill visningen | Fører kartet tilbake til startsiden og tømmer søket; det du har valgt å vise på kartet, endres ikke |
 | — | Vis utforskeren: hva det valgte merket er (⌘I) | Utforskeren | Skjult; trykk for å åpne panelet som viser hva du har valgt og hva som finnes på denne siden |
 | — | Når denne er på, legges objektene du velger til i arbeidsutvalget. Velger du et objekt på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker alltid. | Samle opp valgte objekter | Når denne er av, erstatter hvert nytt objekt arbeidsutvalget. Når den er på, legges objektet til; velger du det på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker i begge tilfeller. |
-| — | La én eller flere kartstrukturer løfte seg fra siden | Fremheving | Forsterker midlertidig valgte strukturer så de er lette å følge — meridianen, ekliptikken, rutenettet, horisonten, stjernebildenes egne streker eller solsystemlegemenes etiketter. Normal roer kartet tilbake til sin vanlige utforming. |
 | — | Finn et objekt eller J2000-koordinater, f.eks. M 31, NGC 224, TYC 2801-2090-1 eller 0:42:44 +41:16:09 | Søk i atlaset | Skriv et Messier- eller NGC-nummer, en stjernes katalogidentitet eller en J2000-rektascensjon og -deklinasjon, og trykk Enter. Kartet flyttes dit, og et objekt det finner, markeres. |
 | Synsfelt 8° · Stjerner til V 8.0 | — | Synsfelt 8° · Stjerner til V 8.0 | — |
-| ▸ Fremheving | Vis eller skjul denne delen | Fremheving, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▾ Sted og tid | Vis eller skjul denne delen | Sted og tid, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | Breddegrad | — | Breddegrad | — |
 | 59.913 | Grader nord for ekvator, f.eks. 59.913; sørlige breddegrader er negative, -90 til 90 | Breddegrad | Breddegraden må ligge mellom −90° og 90°. Beholdt 59.913. |
@@ -640,6 +629,7 @@ arrangement at its frozen instant.
 | Oppdater til nå | Les klokken én gang og sett kartets tidspunkt til nå | Oppdater til nå | Tegner kartet for tidspunktet nå. Klokken leses én gang; tiden går ikke videre etterpå. |
 | Sentrer på senit | Flytt kartet til punktet rett over deg | Sentrer på senit | Flytter siden til punktet rett over deg. Dette er den eneste knappen i dette vinduet som flytter kartet. |
 | Breddegraden må ligge mellom −90° og 90°. Beholdt 59.913. | — | Breddegraden må ligge mellom −90° og 90°. Beholdt 59.913. | — |
+| ▸ Fremheving | Vis eller skjul denne delen | Fremheving, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▾ Kartvalg | Vis eller skjul denne delen | Kartvalg, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Dyphimmel | Vis eller skjul denne delen | Dyphimmel, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▾ Stjerner | Vis eller skjul denne delen | Stjerner, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
@@ -678,11 +668,10 @@ arrangement at its frozen instant.
 | — | Tilbakestill visningen: tilbake til atlasets første side | Tilbakestill visningen | Fører kartet tilbake til startsiden og tømmer søket; det du har valgt å vise på kartet, endres ikke |
 | — | Vis utforskeren: hva det valgte merket er (⌘I) | Utforskeren | Skjult; trykk for å åpne panelet som viser hva du har valgt og hva som finnes på denne siden |
 | — | Når denne er på, legges objektene du velger til i arbeidsutvalget. Velger du et objekt på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker alltid. | Samle opp valgte objekter | Når denne er av, erstatter hvert nytt objekt arbeidsutvalget. Når den er på, legges objektet til; velger du det på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker i begge tilfeller. |
-| — | La én eller flere kartstrukturer løfte seg fra siden | Fremheving | Forsterker midlertidig valgte strukturer så de er lette å følge — meridianen, ekliptikken, rutenettet, horisonten, stjernebildenes egne streker eller solsystemlegemenes etiketter. Normal roer kartet tilbake til sin vanlige utforming. |
 | — | Finn et objekt eller J2000-koordinater, f.eks. M 31, NGC 224, TYC 2801-2090-1 eller 0:42:44 +41:16:09 | Søk i atlaset | Skriv et Messier- eller NGC-nummer, en stjernes katalogidentitet eller en J2000-rektascensjon og -deklinasjon, og trykk Enter. Kartet flyttes dit, og et objekt det finner, markeres. |
 | Synsfelt 8° · Stjerner til V 8.0 | — | Synsfelt 8° · Stjerner til V 8.0 | — |
-| ▸ Fremheving | Vis eller skjul denne delen | Fremheving, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Sted og tid | Vis eller skjul denne delen | Sted og tid, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
+| ▸ Fremheving | Vis eller skjul denne delen | Fremheving, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▾ Kartvalg | Vis eller skjul denne delen | Kartvalg, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▾ Dyphimmel | Vis eller skjul denne delen | Dyphimmel, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | Dyphimmelobjekter | Vis eller skjul alle dyphimmelobjekter på kartet. Snarvei: ⌘K deretter D. | Dyphimmelobjekter | Vis eller skjul alle dyphimmelobjekter på kartet. Slå det av eller på her eller fra kartet med ⌘K deretter D. |
@@ -822,9 +811,9 @@ arrangement at its frozen instant.
 | — | Tilbakestill visningen: tilbake til atlasets første side | Tilbakestill visningen | Fører kartet tilbake til startsiden og tømmer søket; det du har valgt å vise på kartet, endres ikke |
 | — | Vis utforskeren: hva det valgte merket er (⌘I) | Utforskeren | Skjult; trykk for å åpne panelet som viser hva du har valgt og hva som finnes på denne siden |
 | — | Når denne er på, legges objektene du velger til i arbeidsutvalget. Velger du et objekt på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker alltid. | Samle opp valgte objekter | Når denne er av, erstatter hvert nytt objekt arbeidsutvalget. Når den er på, legges objektet til; velger du det på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker i begge tilfeller. |
-| — | La én eller flere kartstrukturer løfte seg fra siden | Fremheving | Forsterker midlertidig valgte strukturer så de er lette å følge — meridianen, ekliptikken, rutenettet, horisonten, stjernebildenes egne streker eller solsystemlegemenes etiketter. Normal roer kartet tilbake til sin vanlige utforming. |
 | — | Finn et objekt eller J2000-koordinater, f.eks. M 31, NGC 224, TYC 2801-2090-1 eller 0:42:44 +41:16:09 | Søk i atlaset | Skriv et Messier- eller NGC-nummer, en stjernes katalogidentitet eller en J2000-rektascensjon og -deklinasjon, og trykk Enter. Kartet flyttes dit, og et objekt det finner, markeres. |
 | Synsfelt 8° · Stjerner til V 8.0 | — | Synsfelt 8° · Stjerner til V 8.0 | — |
+| ▸ Sted og tid | Vis eller skjul denne delen | Sted og tid, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▾ Fremheving | Vis eller skjul denne delen | Fremheving, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | Meridianen | — | Meridianen | Løfter den fram på kartet - Meridianen - til avkrysningen fjernes, Normal velges eller den ikke lenger kan tegnes; samme valg som Fremheving i verktøylinjen. Ingenting huskes etter at atlaset lukkes. |
 | Ekliptikken | — | Ekliptikken | Løfter den fram på kartet - Ekliptikken - til avkrysningen fjernes, Normal velges eller den ikke lenger kan tegnes; samme valg som Fremheving i verktøylinjen. Ingenting huskes etter at atlaset lukkes. |
@@ -834,7 +823,6 @@ arrangement at its frozen instant.
 | Stjernebildefigurer | — | Stjernebildefigurer | Løfter den fram på kartet - Stjernebildefigurer - til avkrysningen fjernes, Normal velges eller den ikke lenger kan tegnes; samme valg som Fremheving i verktøylinjen. Ingenting huskes etter at atlaset lukkes. |
 | Solsystemetiketter | — | Solsystemetiketter | Løfter den fram på kartet - Solsystemetiketter - til avkrysningen fjernes, Normal velges eller den ikke lenger kan tegnes; samme valg som Fremheving i verktøylinjen. Ingenting huskes etter at atlaset lukkes. |
 | Normal | — | Normal | Roer alle fremhevede strukturer på én gang, så kartet går tilbake til sin vanlige utforming. |
-| ▸ Sted og tid | Vis eller skjul denne delen | Sted og tid, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▾ Kartvalg | Vis eller skjul denne delen | Kartvalg, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Dyphimmel | Vis eller skjul denne delen | Dyphimmel, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▾ Stjerner | Vis eller skjul denne delen | Stjerner, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
