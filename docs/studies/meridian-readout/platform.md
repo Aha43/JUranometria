@@ -20,11 +20,11 @@ Recorded on: `Mac OS X 27.0.1/aarch64/Homebrew 21.0.12.1`
 > ink counts, font extents and encoded sizes depend on the fonts and the
 > rasteriser in front of them, and another machine measures differently
 > without anything being wrong. Held to reproducing here, never to matching
-> another machine's recording. What is portable - which ticks lie on each page, the visible altitudes and the candidates' altitudes and page positions - is in `measurements.md`. Whether the mock-up's figure overlaps the page's own ink depends on this desktop's fonts.
+> another machine's recording. What is portable - which ticks lie on each page, the visible altitudes and the readout's altitude and page position - is in `measurements.md`. Whether the figure's box meets the page's own ink depends on this desktop's fonts.
 >
 > Recorded on: `Mac OS X 27.0.1/aarch64/Homebrew 21.0.12.1`
 
-| page | mock-up figure | figure box overlaps production ink (px) |
+| page | figure | page ink the figure's box beside the mark meets (px) |
 |---|---|---|
 | south-35-8 | 35° | 0 |
 | south-35-4 | 35° | 28 |

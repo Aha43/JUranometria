@@ -38,10 +38,10 @@ import juranometria.ui.language.PageText;
  * meridian crosses it with none of its 10° ticks on it, and what one
  * readout would state and where it would stand - measured through the
  * production composition (the component with the meridian module
- * attached), with the mark drawn by this study over the production
- * page, as the planets' cartography studies drew theirs - the study
- * that preceded the ruling, kept as the readout's record. Every image
- * says so in its corner.
+ * attached). Before the ruling the study drew the candidate over the
+ * production page; since the ruling the page draws the readout itself,
+ * so every image here is production ink, and the study measures where
+ * the rule puts it and what it states.
  *
  * <p>Written to {@code docs/studies/meridian-readout/} by
  * {@code make meridian-readout-study}: the portable report on standard
@@ -70,10 +70,10 @@ public final class MeridianReadoutStudyMain {
                 "The meridian readout: this machine's mock-up placements (#563)",
                 "Sprint 55");
         PLATFORM.append(PlatformEvidence.observed("What is portable - which ticks lie on"
-                + " each page, the visible altitudes and the candidates' altitudes and"
-                + " page positions - is in `measurements.md`. Whether the mock-up's figure"
-                + " overlaps the page's own ink depends on this desktop's fonts."));
-        q("| page | mock-up figure | figure box overlaps production ink (px) |");
+                + " each page, the visible altitudes and the readout's altitude and page"
+                + " position - is in `measurements.md`. Whether the figure's box meets the"
+                + " page's own ink depends on this desktop's fonts."));
+        q("| page | figure | page ink the figure's box beside the mark meets (px) |");
         q("|---|---|---|");
         p("# One altitude readout on the meridian at narrow fields (#563)");
         p("");
@@ -81,11 +81,10 @@ public final class MeridianReadoutStudyMain {
                 + " The observer is the stated case of `docs/decisions/place-and-time.md`: Oslo,"
                 + " 59.913 N 10.752 E, 2026-03-20 21:33 UTC. Each page is the production composition"
                 + " - the component with the meridian module attached through the host, the meridian,"
-                + " the mathematical horizon and the ruled 10° ticks on - and the candidate readout is"
-                + " **drawn by this study over it**, in a grey the page never uses, with the figure the"
-                + " page's own words would give. The geometry below is read through the page's own"
+                + " the mathematical horizon and the ruled 10° ticks on - and the readout on it is the"
+                + " atlas's own ink since the ruling. The geometry below is read through the page's own"
                 + " projection: which ruled ticks lie on the page, which altitudes of the meridian the"
-                + " page shows, and where each candidate would stand.");
+                + " page shows, and where the rule puts the readout.");
         p("");
         p("The rule (`MeridianReadout`, ruled on #563 as \"A to the degree\"): the visible point"
                 + " of the meridian nearest the page centre, stating its own altitude rounded to the"
@@ -247,12 +246,11 @@ public final class MeridianReadoutStudyMain {
         String mockFigure = "—";
         if (m.offered && m.a != null) {
             mockFigure = words.altitudeTick(MeridianReadout.roundedToTheDegree(m.a.altitudeDegrees()));
-            overlap = overlay(image, m, mockFigure, palette);
-            drawn = "at " + pixel(m.a) + ", figure " + mockFigure;
+            overlap = figureRoom(image, m, mockFigure, palette);
+            drawn = "production ink at " + pixel(m.a) + ", figure " + mockFigure;
         } else if (m.offered) {
             drawn = "nothing: no statable altitude on the visible line";
         }
-        caption(image, palette);
         ImageIO.write(image, "png", new File(DIR, name + ".png"));
         p("| ![](" + name + ".png) " + name + " (" + caption + ") | " + figure(field) + "° | " + m.ticksOnPage
                 + " | " + (m.visible.isEmpty() ? "none" : fmt(m.low, 2) + "°–" + fmt(m.high, 2) + "°")
@@ -262,8 +260,8 @@ public final class MeridianReadoutStudyMain {
         q("| " + name + " | " + mockFigure + " | " + (overlap < 0 ? "—" : Integer.toString(overlap)) + " |");
     }
 
-    /** The candidate's stroke and figure over the production page; returns the figure box's overlap with existing ink. */
-    private static int overlay(BufferedImage image, Measured m, String figureText, ChartPalette palette) {
+    /** How much of the page's own ink the figure's box beside the mark meets - the placement's reason to refuse it. */
+    private static int figureRoom(BufferedImage image, Measured m, String figureText, ChartPalette palette) {
         MeridianReadout.Sample at = m.a;
         // The line's direction: the visible sample nearest to the mark, a little along.
         MeridianReadout.Sample ahead = null;
@@ -289,12 +287,6 @@ public final class MeridianReadoutStudyMain {
         try {
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-            Color pen = palette == ChartPalette.BLACK_SKY ? new Color(170, 170, 170) : new Color(110, 110, 110);
-            g.setColor(pen);
-            g.setStroke(new BasicStroke(1.2f));
-            double half = 3.5;
-            g.draw(new java.awt.geom.Line2D.Double(at.x() - nx * half, at.y() - ny * half,
-                    at.x() + nx * half, at.y() + ny * half));
             g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 11));
             java.awt.geom.Rectangle2D box = g.getFontMetrics().getStringBounds(figureText, g);
             int tx = (int) Math.round(at.x() + 7);
@@ -308,23 +300,10 @@ public final class MeridianReadoutStudyMain {
                     }
                 }
             }
-            g.drawString(figureText, tx, ty);
         } finally {
             g.dispose();
         }
         return overlap;
-    }
-
-    private static void caption(BufferedImage image, ChartPalette palette) {
-        Graphics2D g = image.createGraphics();
-        try {
-            g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-            g.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
-            g.setColor(palette == ChartPalette.BLACK_SKY ? new Color(170, 170, 170) : new Color(110, 110, 110));
-            g.drawString("study mock-up: the grey readout is proposed ink, not the atlas's", 8, 12);
-        } finally {
-            g.dispose();
-        }
     }
 
     private static String pixel(MeridianReadout.Sample s) {
