@@ -37,7 +37,9 @@ class MenuMnemonicTest {
 
     private static final List<String> ITEMS = List.of(
             "menu.export", "menu.chartoptions", "menu.placeandtime",
-            "menu.sun", "menu.inspector", "menu.ecliptic");
+            // The ecliptic's item left the bar in #675; its box in
+            // Chart Options carries a mnemonic of its own kind.
+            "menu.sun", "menu.inspector");
 
     /** Each item carries the letter its own language declares. */
     @Test

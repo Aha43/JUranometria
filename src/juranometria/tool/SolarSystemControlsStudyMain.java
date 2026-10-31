@@ -462,7 +462,8 @@ public final class SolarSystemControlsStudyMain {
                     ChartOptionsStore.forNode(node));
             return CompanionSection.forStudy("chartoptions",
                     said.say("chartoptions.title"),
-                    new ChartOptionsControls(controller, () -> false, said)
+                    new ChartOptionsControls(controller, () -> false,
+                            juranometria.ui.ecliptic.EclipticSession.of(new juranometria.ecliptic.EclipticModule(), juranometria.ui.ecliptic.EclipticStore.forNode(node)), said)
                             .inCompanion(CompanionStore.forNode(node), said), said);
         } finally {
             try {
@@ -557,16 +558,22 @@ public final class SolarSystemControlsStudyMain {
                         + " stays open.\n\n");
     }
 
-    /** The View menu as it is, and with a Solar System submenu. */
+    /**
+     * The View menu as it was at #457, and with a Solar System submenu.
+     *
+     * <p>A record of the #457 proposal, kept as the study drew it. The
+     * ecliptic's item left the bar in #675, so its word is read from the
+     * Chart Options box that replaced it - the same word, one key over.
+     */
     private static void menus(StringBuilder out) {
         out.append("## View, as it is and as proposed\n\n")
                 .append("| today (flat) | proposed |\n|---|---|\n");
         String[] today = {"menu.chartoptions", "menu.placeandtime", "menu.companion",
                 "menu.toolbar", "menu.sun", "menu.moon", "menu.inspector",
-                "menu.ecliptic", "menu.sunchart", "menu.moonchart", "—",
+                "chartoptions.ecliptic", "menu.sunchart", "menu.moonchart", "—",
                 "menu.zoomIn", "menu.zoomOut"};
         String[] proposed = {"menu.chartoptions", "menu.placeandtime", "menu.companion",
-                "menu.toolbar", "menu.inspector", "menu.ecliptic",
+                "menu.toolbar", "menu.inspector", "chartoptions.ecliptic",
                 "Solar System ▸ (menu.sunchart, menu.moonchart, —, menu.sun, menu.moon)",
                 "—", "menu.zoomIn", "menu.zoomOut"};
         InterfaceText said = InterfaceText.forLanguage("en");
@@ -583,7 +590,7 @@ public final class SolarSystemControlsStudyMain {
     }
 
     private static String label(InterfaceText said, String key) {
-        if (key.startsWith("menu.")) {
+        if (key.startsWith("menu.") || key.startsWith("chartoptions.")) {
             return said.say(key + ".label");
         }
         if (key.startsWith("Solar System")) {
@@ -782,11 +789,11 @@ public final class SolarSystemControlsStudyMain {
         menu.setOpaque(true);
         String[] keys = proposed
                 ? new String[] {"menu.chartoptions", "menu.placeandtime", "menu.companion:x",
-                        "menu.toolbar:x", "menu.inspector:x", "menu.ecliptic:x",
+                        "menu.toolbar:x", "menu.inspector:x", "chartoptions.ecliptic:x",
                         "submenu", "—", "menu.zoomIn", "menu.zoomOut"}
                 : new String[] {"menu.chartoptions", "menu.placeandtime", "menu.companion:x",
                         "menu.toolbar:x", "menu.sun", "menu.moon", "menu.inspector:x",
-                        "menu.ecliptic:x", "menu.sunchart:x", "menu.moonchart:x", "—",
+                        "chartoptions.ecliptic:x", "menu.sunchart:x", "menu.moonchart:x", "—",
                         "menu.zoomIn", "menu.zoomOut"};
         for (String key : keys) {
             if (key.equals("—")) {

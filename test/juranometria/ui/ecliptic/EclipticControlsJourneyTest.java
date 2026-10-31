@@ -4,13 +4,16 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
-import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JCheckBox;
 import javax.swing.JMenuBar;
 import javax.swing.SwingUtilities;
 
 import org.junit.jupiter.api.Test;
 
 import juranometria.app.AppMenuBar;
+import juranometria.app.ChartOptionsControls;
+import juranometria.app.ChartOptionsController;
+import juranometria.app.ChartOptionsStore;
 import juranometria.app.Atlas;
 import juranometria.app.SwingSession;
 import juranometria.chart.ChartViewState;
@@ -98,24 +101,33 @@ class EclipticControlsJourneyTest {
 
     // ---- the control exists only when the module does ----------------
 
+    /** Chart Options' controls over a scratch options store, with or without the ecliptic's switch. */
+    private static ChartOptionsControls controls(EclipticSession.Switch ecliptic) {
+        return new ChartOptionsControls(new ChartOptionsController(
+                ChartOptionsStore.forNode(java.util.prefs.Preferences.userRoot()
+                        .node("juranometria/test/ecliptic-options-" + System.nanoTime()))),
+                () -> false, ecliptic,
+                juranometria.ui.language.InterfaceText.forLanguage("en"));
+    }
+
     @Test
     void withNoEclipticModuleThereIsNoEclipticControl() {
-        JMenuBar bar = AppMenuBar.create(null, null, () -> { },
-                () -> { }, () -> { }, () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
-        assertNull(AppMenuBar.eclipticItem(bar),
+        assertNull(controls(null).eclipticBox(),
                 "an atlas without the module offers no switch for it:"
                         + " a tick for something that cannot be drawn"
                         + " would be a promise the atlas cannot keep");
+        JMenuBar bar = AppMenuBar.create(null, null, () -> { },
+                () -> { }, () -> { }, () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
         assertNotNull(AppMenuBar.inspectorItem(bar),
                 "while the controls that do belong to it are there,"
                         + " so the absence above is an answer");
     }
 
     @Test
-    void theControlIsACheckboxOnTheViewMenuUnderTheInspector() {
-        JMenuBar bar = AppMenuBar.create(null, null, () -> { },
-                () -> { }, () -> { }, () -> { }, () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
-        JCheckBoxMenuItem item = AppMenuBar.eclipticItem(bar);
+    void theControlIsABoxInChartOptionsChartChecklistAfterTheGrid() {
+        ChartOptionsControls controls = controls(EclipticSession.of(
+                new EclipticModule(), EclipticStore.inMemory()));
+        JCheckBox item = controls.eclipticBox();
         assertNotNull(item, "the ecliptic has a switch");
         assertEquals("Ecliptic", item.getText(),
                 "named in full, so nothing depends on a glyph, a"
@@ -129,32 +141,20 @@ class EclipticControlsJourneyTest {
                         + item.getAccessibleContext()
                                 .getAccessibleDescription());
 
-        // On the View menu, below the Inspector's.
-        javax.swing.JMenu view = null;
-        for (int i = 0; i < bar.getMenuCount(); i++) {
-            if ("View".equals(bar.getMenu(i).getText())) {
-                view = bar.getMenu(i);
+        // In the Chart checklist (#675, ruled on #674), directly after
+        // the equatorial grid: the two reference lines together.
+        ChartOptionsControls.Subject chart = controls.subjects().stream()
+                .filter(subject -> subject.id().equals("chart")).findFirst()
+                .orElseThrow();
+        java.util.List<String> boxes = new java.util.ArrayList<>();
+        for (java.awt.Component each : chart.column().getComponents()) {
+            if (each instanceof JCheckBox box) {
+                boxes.add(box.getText());
             }
         }
-        assertNotNull(view, "the View menu is where the gate put it");
-        int inspectorAt = -1;
-        int eclipticAt = -1;
-        for (int i = 0; i < view.getItemCount(); i++) {
-            javax.swing.JMenuItem each = view.getItem(i);
-            if (each == null) {
-                continue;
-            }
-            if (AppMenuBar.INSPECTOR_ITEM.equals(each.getName())) {
-                inspectorAt = i;
-            }
-            if (AppMenuBar.ECLIPTIC_ITEM.equals(each.getName())) {
-                eclipticAt = i;
-            }
-        }
-        assertTrue(inspectorAt >= 0 && eclipticAt == inspectorAt + 1,
-                "directly below the Inspector's, as the gate drew it:"
-                        + " inspector at " + inspectorAt + ", ecliptic"
-                        + " at " + eclipticAt);
+        assertEquals(java.util.List.of("Equatorial coordinate grid", "Ecliptic",
+                        "Title block", "Stellar-magnitude key", "Black sky"), boxes,
+                "the Chart checklist, with the ecliptic after the grid");
     }
 
     // ---- the routes a reader has --------------------------------------
@@ -162,23 +162,37 @@ class EclipticControlsJourneyTest {
     @Test
     void pointerAndKeyboardBothReachIt() {
         int[] toggles = {0};
-        JMenuBar bar = AppMenuBar.create(null, null, () -> { },
-                () -> { }, () -> { }, () -> { }, () -> toggles[0]++, juranometria.ui.language.InterfaceText.forLanguage("en"));
-        JCheckBoxMenuItem item = AppMenuBar.eclipticItem(bar);
+        EclipticModule module = new EclipticModule();
+        EclipticStore counting = new EclipticStore() {
+            private java.util.Optional<Boolean> kept = java.util.Optional.empty();
+            @Override
+            public java.util.Optional<Boolean> shown() {
+                return kept;
+            }
+            @Override
+            public void save(boolean shown) {
+                kept = java.util.Optional.of(shown);
+                toggles[0]++;
+            }
+            @Override
+            public void flush() {
+            }
+        };
+        JCheckBox item = controls(EclipticSession.of(module, counting)).eclipticBox();
 
-        // The pointer route: what a click on the item does.
+        // The pointer route: what a click on the box does.
         item.doClick();
-        assertEquals(1, toggles[0], "clicking the item toggles it");
+        assertEquals(1, toggles[0], "clicking the box toggles it");
+        assertTrue(module.showing(), "and the module shows");
 
-        // The keyboard route: the item carries a mnemonic, so the
-        // View menu can be walked to it without a pointer at all.
-        assertEquals('E', (char) item.getMnemonic(),
-                "and it has a mnemonic, so the menu is walkable");
+        // The keyboard route: the box carries a mnemonic, so the
+        // checklist can be walked to it without a pointer at all.
+        assertEquals('I', (char) item.getMnemonic(),
+                "and it has a mnemonic, so the checklist is walkable");
         assertTrue(item.isEnabled(),
-                "and the item is reachable rather than greyed");
+                "and the box is reachable rather than greyed");
 
         // Firing the action the keyboard would fire.
-        item.getAction();
         for (java.awt.event.ActionListener listener
                 : item.getActionListeners()) {
             listener.actionPerformed(new java.awt.event.ActionEvent(
@@ -193,13 +207,13 @@ class EclipticControlsJourneyTest {
     // ---- the wiring a reader actually sets off ------------------------
 
     @Test
-    void theMenuItemDrivesTheModuleAndRemembersTheChoice()
+    void theBoxDrivesTheModuleAndRemembersTheChoice()
             throws Exception {
-        // The chain, end to end, through the production menu bar and
-        // the production toggle. Rehearsing the item, the module and
+        // The chain, end to end, through the production controls and
+        // the production switch. Rehearsing the box, the module and
         // the store separately proves each of them and none of the
-        // wiring between them (PR #279 review): an item bound to
-        // nothing, or a toggle that forgot to save, would pass all
+        // wiring between them (PR #279 review): a box bound to
+        // nothing, or a switch that forgot to save, would pass all
         // three.
         SwingSession.scratchPreferences("ecliptic-wiring", node -> {
             EclipticStore store = EclipticStore.forNode(node);
@@ -211,23 +225,21 @@ class EclipticControlsJourneyTest {
             EclipticModule module = EclipticSession.begin(host);
             BufferedImage hidden = paint(chart);
 
-            JMenuBar bar = AppMenuBar.create(null, null, () -> { },
-                    () -> { }, () -> { }, () -> { },
-                    EclipticSession.toggle(module, store), juranometria.ui.language.InterfaceText.forLanguage("en"));
-            JCheckBoxMenuItem item = AppMenuBar.eclipticItem(bar);
+            EclipticSession.Switch eclipticSwitch = EclipticSession.of(module, store);
+            JCheckBox item = controls(eclipticSwitch).eclipticBox();
             // Production's own restore, not a rehearsal of it: one
             // call sets both the chart and the tick from one read of
             // the store.
-            EclipticSession.restore(module, store, item);
+            eclipticSwitch.restore();
             assertFalse(item.isSelected(),
-                    "the item starts out showing the released"
+                    "the box starts out showing the released"
                             + " default, which is hidden");
             assertFalse(module.showing(),
                     "and so does the chart");
 
             item.doClick();
             assertTrue(module.showing(),
-                    "the item drives the module");
+                    "the box drives the module");
             assertEquals(java.util.Optional.of(Boolean.TRUE),
                     store.shown(),
                     "and the same click remembers the choice");
@@ -259,15 +271,13 @@ class EclipticControlsJourneyTest {
                     new juranometria.chart.SelectionModel(), asked::add);
             EclipticStore store = EclipticStore.forNode(node);
             EclipticModule module = EclipticSession.begin(host);
-            JMenuBar bar = AppMenuBar.create(null, null, () -> { },
-                    () -> { }, () -> { }, () -> { },
-                    EclipticSession.toggle(module, store), juranometria.ui.language.InterfaceText.forLanguage("en"));
-            EclipticSession.restore(module, store,
-                    AppMenuBar.eclipticItem(bar));
+            EclipticSession.Switch eclipticSwitch = EclipticSession.of(module, store);
+            controls(eclipticSwitch);
+            eclipticSwitch.restore();
 
             ChartViewState where = chart.viewState();
             ChartOptions options = chart.chartOptions();
-            EclipticSession.toggle(module, store).run();
+            eclipticSwitch.toggle();
 
             assertEquals(where, chart.viewState(),
                     "showing the ecliptic leaves the page where the"
@@ -283,7 +293,8 @@ class EclipticControlsJourneyTest {
     void aLoadedModuleWithoutAControlIsRefused() throws Exception {
         // The pairing that must not exist: a module that can draw,
         // a remembered choice that says draw it, and nothing a
-        // reader could use to stop it (PR #279 round 3).
+        // reader could use to stop it (PR #279 round 3; the rule
+        // carried from the menu item to the switch in #675).
         SwingSession.scratchPreferences("ecliptic-no-control", node -> {
             EclipticStore store = EclipticStore.forNode(node);
             store.save(true);
@@ -293,9 +304,9 @@ class EclipticControlsJourneyTest {
                     new juranometria.chart.SelectionModel(),
                     request -> { });
             EclipticModule module = EclipticSession.begin(host);
+            EclipticSession.Switch nobodyFollows = EclipticSession.of(module, store);
 
-            assertThrows(IllegalArgumentException.class,
-                    () -> EclipticSession.restore(module, store, null),
+            assertThrows(IllegalStateException.class, nobodyFollows::restore,
                     "restoring a loaded module without a control is a"
                             + " miswiring, not a configuration");
             assertFalse(module.showing(),
@@ -303,16 +314,21 @@ class EclipticControlsJourneyTest {
                             + " the refusal leaves no half-restored"
                             + " chart behind");
 
-            // A bar built with no View menu has no item either, and
-            // is caught the same way rather than silently drawing.
-            JMenuBar noViewMenu = AppMenuBar.create(null, null, null,
-                    () -> { }, () -> { }, () -> { }, () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
-            assertNull(AppMenuBar.eclipticItem(noViewMenu),
-                    "a bar with no View menu carries no item");
-            assertThrows(IllegalArgumentException.class,
-                    () -> EclipticSession.restore(module, store,
-                            AppMenuBar.eclipticItem(noViewMenu)),
-                    "and restoring against it is refused too");
+            // Controls built without the switch carry no box, and give
+            // the switch nothing to follow: refused the same way rather
+            // than silently drawing.
+            assertNull(controls(null).eclipticBox(),
+                    "controls built without the switch carry no box");
+            assertEquals(0, nobodyFollows.followers(),
+                    "and the switch still has nothing following it");
+            assertThrows(IllegalStateException.class, nobodyFollows::restore,
+                    "and restoring is still refused");
+
+            // With the box following, the same restore draws the choice.
+            JCheckBox item = controls(nobodyFollows).eclipticBox();
+            nobodyFollows.restore();
+            assertTrue(module.showing() && item.isSelected(),
+                    "with a control, the remembered choice is drawn and shown");
         });
     }
 
@@ -494,18 +510,16 @@ class EclipticControlsJourneyTest {
             EclipticStore store = EclipticStore.forNode(node);
 
             // First session: the reader turns it on, the way the
-            // menu item does.
+            // Chart Options box does (#675).
             ChartComponent[] first = new ChartComponent[1];
             ChartComponent chartOne = chartOn(eclipticPage(), first);
             ChartModuleHost hostOne = new ChartModuleHost(chartOne,
                     new juranometria.chart.SelectionModel(),
                     request -> { });
             EclipticModule one = EclipticSession.begin(hostOne);
-            JMenuBar barOne = AppMenuBar.create(null, null, () -> { },
-                    () -> { }, () -> { }, () -> { },
-                    EclipticSession.toggle(one, store), juranometria.ui.language.InterfaceText.forLanguage("en"));
-            JCheckBoxMenuItem itemOne = AppMenuBar.eclipticItem(barOne);
-            EclipticSession.restore(one, store, itemOne);
+            EclipticSession.Switch switchOne = EclipticSession.of(one, store);
+            JCheckBox itemOne = controls(switchOne).eclipticBox();
+            switchOne.restore();
             assertFalse(one.showing(),
                     "a first session begins with the released"
                             + " default, hidden");
@@ -523,13 +537,10 @@ class EclipticControlsJourneyTest {
                     new juranometria.chart.SelectionModel(),
                     request -> { });
             EclipticModule two = EclipticSession.begin(hostTwo);
-            JMenuBar barTwo = AppMenuBar.create(null, null, () -> { },
-                    () -> { }, () -> { }, () -> { },
-                    EclipticSession.toggle(two,
-                            EclipticStore.forNode(node)), juranometria.ui.language.InterfaceText.forLanguage("en"));
-            JCheckBoxMenuItem itemTwo = AppMenuBar.eclipticItem(barTwo);
-            EclipticSession.restore(two, EclipticStore.forNode(node),
-                    itemTwo);
+            EclipticSession.Switch switchTwo = EclipticSession.of(two,
+                    EclipticStore.forNode(node));
+            JCheckBox itemTwo = controls(switchTwo).eclipticBox();
+            switchTwo.restore();
             assertTrue(two.showing(),
                     "and the second session draws what the first one"
                             + " chose");
@@ -546,12 +557,10 @@ class EclipticControlsJourneyTest {
                     new juranometria.chart.SelectionModel(),
                     request -> { });
             EclipticModule three = EclipticSession.begin(hostThree);
-            JMenuBar barThree = AppMenuBar.create(null, null, () -> { },
-                    () -> { }, () -> { }, () -> { },
-                    EclipticSession.toggle(three,
-                            EclipticStore.forNode(node)), juranometria.ui.language.InterfaceText.forLanguage("en"));
-            EclipticSession.restore(three, EclipticStore.forNode(node),
-                    AppMenuBar.eclipticItem(barThree));
+            EclipticSession.Switch switchThree = EclipticSession.of(three,
+                    EclipticStore.forNode(node));
+            controls(switchThree);
+            switchThree.restore();
             assertFalse(three.showing(),
                     "hiding it again is a choice that survives too,"
                             + " and is not read back as never having"

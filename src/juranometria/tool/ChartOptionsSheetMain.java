@@ -117,10 +117,14 @@ public final class ChartOptionsSheetMain {
             try {
                 SwingUtilities.invokeAndWait(() -> {
                     owner[0] = new javax.swing.JFrame("study");
+                    // With the ecliptic's switch (#675), so the Chart tab
+                    // shows the Ecliptic box a reader gets; the module is
+                    // the study's own, over this scratch node.
                     dialog[0] = ChartOptionsDialog.packedForStudy(owner[0],
                             language, new juranometria.app
                                     .ChartOptionsController(juranometria.app
-                                    .ChartOptionsStore.forNode(node)));
+                                    .ChartOptionsStore.forNode(node)),
+                            juranometria.ui.ecliptic.EclipticSession.of(new juranometria.ecliptic.EclipticModule(), juranometria.ui.ecliptic.EclipticStore.forNode(node)));
                 });
                 SwingUtilities.invokeAndWait(() -> { });
                 JComponent content =

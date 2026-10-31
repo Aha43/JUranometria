@@ -358,8 +358,11 @@ public final class ControlExplanationStudyMain {
                 () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
                 () -> { }, () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
                 () -> { }, () -> { }, english));
+        // With the ecliptic's switch (#675), so the Ecliptic box's own
+        // explanation is inventoried with the rest of the checklist's.
         surfaces.put("Chart Options",
-                ChartOptionsDialog.contentForStudy(options()));
+                ChartOptionsDialog.contentForStudy(options(), "en",
+                        juranometria.ui.ecliptic.EclipticSession.of(new juranometria.ecliptic.EclipticModule(), juranometria.ui.ecliptic.EclipticStore.inMemory())));
         surfaces.put("Place and Time", placeAndTime());
         // The companion's own control (#434): a section's heading,
         // which collapses it. What the section holds is Place and Time,

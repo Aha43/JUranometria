@@ -38,6 +38,9 @@ public final class ChartOptionsControls {
     /** Marks every subject column this class built, so a host can be checked. */
     public static final String MARK = "juranometria.chartOptionsControls";
 
+    /** The Ecliptic box's name (#675), for tests and journeys to find. */
+    public static final String ECLIPTIC_BOX = "eclipticBox";
+
     /** One subject: a stable id, its title in the host's language, its column. */
     public record Subject(String id, String title, JComponent column) {
     }
@@ -45,6 +48,8 @@ public final class ChartOptionsControls {
     private final List<Subject> subjects;
     private final JButton restoreDefaults;
     private final ChartOptionsController.Subscription following;
+    private final JCheckBox eclipticBox;
+    private final Runnable eclipticFollowing;
 
     /**
      * @param restoreConfirmed asked before Restore Defaults is applied;
@@ -52,6 +57,20 @@ public final class ChartOptionsControls {
      */
     public ChartOptionsControls(ChartOptionsController controller,
                                 BooleanSupplier restoreConfirmed,
+                                juranometria.ui.language.InterfaceText said) {
+        this(controller, restoreConfirmed, null, said);
+    }
+
+    /**
+     * The same, with the ecliptic's switch (#675, ruling 2 on #674):
+     * the Chart checklist then carries an Ecliptic box that drives the
+     * switch and follows it. The module and its store stay the one
+     * persisted authority; this box writes nothing of its own. Null
+     * leaves the box out, which is what a host without the module shows.
+     */
+    public ChartOptionsControls(ChartOptionsController controller,
+                                BooleanSupplier restoreConfirmed,
+                                juranometria.ui.ecliptic.EclipticSession.Switch ecliptic,
                                 juranometria.ui.language.InterfaceText said) {
         ChartOptions initial = controller.options();
 
@@ -139,6 +158,31 @@ public final class ChartOptionsControls {
                 said.say("chartoptions.blackSky.a11y"),
                 said.say("chartoptions.blackSky.explain"),
                 "chart.blackSky", said);
+        // The ecliptic (#675): a module's layer, not a chart option, so
+        // its box is outside the switches map below - it toggles the
+        // session's switch and follows it, and the switch remembers.
+        // The chart keyboard's letter is the registered one, so the
+        // hover and the spoken description promise the right key.
+        JCheckBox eclipticBox_ = null;
+        Runnable eclipticFollowing_ = () -> { };
+        if (ecliptic != null) {
+            JCheckBox box = ChartOptionsDialog.checkBox(
+                    said.say("chartoptions.ecliptic.label"), 'i',
+                    ecliptic.showing(),
+                    said.say("chartoptions.ecliptic.a11y"),
+                    said.say("chartoptions.ecliptic.explain"),
+                    "module.ecliptic", said);
+            box.setName(ECLIPTIC_BOX);
+            // A click is the switch's toggle, as the menu item's was;
+            // the follower then shows what the module says, so a box
+            // that had fallen behind a change made elsewhere ends up
+            // right rather than deciding from its own stale tick.
+            box.addActionListener(event -> ecliptic.toggle());
+            eclipticFollowing_ = ecliptic.follow(box::setSelected);
+            eclipticBox_ = box;
+        }
+        eclipticBox = eclipticBox_;
+        eclipticFollowing = eclipticFollowing_;
 
         // Each box and the switch it is: its keyboard id, the one
         // registry both routes read.
@@ -204,8 +248,11 @@ public final class ChartOptionsControls {
                         marked(ChartOptionsDialog.column(figures, boundaries,
                                 names))),
                 new Subject("chart", said.say("chartoptions.tab.chart"),
-                        marked(ChartOptionsDialog.column(grid, titleBlock,
-                                magnitudeKey, blackSky))));
+                        marked(ChartOptionsDialog.column(eclipticBox == null
+                                ? new JComponent[] {grid, titleBlock,
+                                        magnitudeKey, blackSky}
+                                : new JComponent[] {grid, eclipticBox,
+                                        titleBlock, magnitudeKey, blackSky}))));
 
         restoreDefaults = new JButton(said.say("chartoptions.defaults.label"));
         restoreDefaults.setMnemonic('R');
@@ -239,6 +286,27 @@ public final class ChartOptionsControls {
         return restoreDefaults;
     }
 
+    /** The Ecliptic box (#675), or null when these controls were built without the switch. */
+    public JCheckBox eclipticBox() {
+        return eclipticBox;
+    }
+
+    /** The Ecliptic box inside a host's component tree, or null. */
+    public static JCheckBox eclipticBox(java.awt.Container host) {
+        for (java.awt.Component child : host.getComponents()) {
+            if (child instanceof JCheckBox box && ECLIPTIC_BOX.equals(box.getName())) {
+                return box;
+            }
+            if (child instanceof java.awt.Container inner) {
+                JCheckBox found = eclipticBox(inner);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
+    }
+
     /**
      * Releases the subscription when the holder is disposed - the
      * window it is in going away - so reopening adds no listener.
@@ -254,6 +322,7 @@ public final class ChartOptionsControls {
                 shown[0] = true;
             } else if (shown[0]) {
                 following.cancel();
+                eclipticFollowing.run();
             }
         });
     }
@@ -306,5 +375,6 @@ public final class ChartOptionsControls {
     /** Releases the subscription now. */
     public void release() {
         following.cancel();
+        eclipticFollowing.run();
     }
 }

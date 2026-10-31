@@ -69,7 +69,7 @@ would show the last result for as long as the Controller stays open.
 | Chart Options... | Chart Options... |
 | Place and Time... | Place and Time... |
 | Controls | Controls |
-| Chart Toolbar | Chart Toolbar |
+| Toolbar | Toolbar |
 | Sun... | Inspector |
 | Moon... | Ecliptic |
 | Inspector | Solar System ▸ Sun on the chart, Moon on the chart, —, Sun..., Moon... |

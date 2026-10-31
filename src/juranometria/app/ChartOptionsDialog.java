@@ -113,6 +113,7 @@ public final class ChartOptionsDialog extends JDialog {
     public static final int MINIMUM_CEILING = 320;
 
     private ChartOptionsDialog(Frame owner, ChartOptionsController controller,
+                               juranometria.ui.ecliptic.EclipticSession.Switch ecliptic,
                                juranometria.ui.language.InterfaceText said) {
         super(owner, said.say("chartoptions.title"), false);
         getAccessibleContext().setAccessibleName(
@@ -126,7 +127,7 @@ public final class ChartOptionsDialog extends JDialog {
         // the keyboard's included (reproduced on #442).
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setContentPane(content(controller, this::dispose,
-                () -> restoreConfirmed(this, said), said));
+                () -> restoreConfirmed(this, said), ecliptic, said));
         getRootPane().registerKeyboardAction(event -> dispose(),
                 javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
@@ -144,12 +145,22 @@ public final class ChartOptionsDialog extends JDialog {
     /** The same, speaking a language the caller states (#350). */
     public static void open(Frame owner, ChartOptionsController controller,
                             juranometria.ui.language.InterfaceText said) {
+        open(owner, controller, null, said);
+    }
+
+    /**
+     * The same, with the ecliptic's switch (#675): the Chart checklist
+     * then carries the Ecliptic box. Null leaves it out.
+     */
+    public static void open(Frame owner, ChartOptionsController controller,
+                            juranometria.ui.ecliptic.EclipticSession.Switch ecliptic,
+                            juranometria.ui.language.InterfaceText said) {
         if (current != null && current.isDisplayable()) {
             current.toFront();
             current.requestFocus();
             return;
         }
-        current = new ChartOptionsDialog(owner, controller, said);
+        current = new ChartOptionsDialog(owner, controller, ecliptic, said);
         current.setVisible(true);
     }
 
@@ -196,11 +207,20 @@ public final class ChartOptionsDialog extends JDialog {
                               Runnable close,
                               java.util.function.BooleanSupplier restoreConfirmed,
                               juranometria.ui.language.InterfaceText said) {
+        return content(controller, close, restoreConfirmed, null, said);
+    }
+
+    /** The same, with the ecliptic's switch for the Chart checklist's Ecliptic box (#675). */
+    static JComponent content(ChartOptionsController controller,
+                              Runnable close,
+                              java.util.function.BooleanSupplier restoreConfirmed,
+                              juranometria.ui.ecliptic.EclipticSession.Switch ecliptic,
+                              juranometria.ui.language.InterfaceText said) {
         // The controls are ChartOptionsControls' - the same class the
         // companion holds (#443); this dialog is one host of them, its
         // tabs and its Close the only things that are its own.
         ChartOptionsControls controls =
-                new ChartOptionsControls(controller, restoreConfirmed, said);
+                new ChartOptionsControls(controller, restoreConfirmed, ecliptic, said);
         JPanel panel = new JPanel(new BorderLayout());
         controls.releaseWith(panel);
 
@@ -469,8 +489,15 @@ public final class ChartOptionsDialog extends JDialog {
      */
     public static ChartOptionsDialog packedForStudy(Frame owner,
             String interfaceLanguage, ChartOptionsController controller) {
+        return packedForStudy(owner, interfaceLanguage, controller, null);
+    }
+
+    /** The same, with the ecliptic's switch, so the study shows the Ecliptic box a reader gets (#675). */
+    public static ChartOptionsDialog packedForStudy(Frame owner,
+            String interfaceLanguage, ChartOptionsController controller,
+            juranometria.ui.ecliptic.EclipticSession.Switch ecliptic) {
         ChartOptionsDialog dialog = new ChartOptionsDialog(owner,
-                controller,
+                controller, ecliptic,
                 juranometria.ui.language.InterfaceText.forLanguage(
                         interfaceLanguage));
         settle(dialog);
@@ -517,6 +544,15 @@ public final class ChartOptionsDialog extends JDialog {
     public static JComponent contentForStudy(
             ChartOptionsController controller, String interfaceLanguage) {
         return content(controller, () -> { }, () -> false,
+                juranometria.ui.language.InterfaceText.forLanguage(
+                        interfaceLanguage));
+    }
+
+    /** The same, with the ecliptic's switch, so the Chart tab shows the Ecliptic box (#675). */
+    public static JComponent contentForStudy(
+            ChartOptionsController controller, String interfaceLanguage,
+            juranometria.ui.ecliptic.EclipticSession.Switch ecliptic) {
+        return content(controller, () -> { }, () -> false, ecliptic,
                 juranometria.ui.language.InterfaceText.forLanguage(
                         interfaceLanguage));
     }

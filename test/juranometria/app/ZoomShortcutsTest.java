@@ -137,9 +137,10 @@ class ZoomShortcutsTest {
         JMenuBar bar = AppMenuBar.create(navigation, null, () -> { },
                 () -> { }, juranometria.ui.language.InterfaceText.forLanguage("en"));
         JMenu view = bar.getMenu(0);
-        assertEquals("View", view.getText());
+        assertEquals("Chart", view.getText());
         assertEquals("Chart Options...", view.getItem(0).getText(),
-                "Chart Options stays the first View item");
+                "with no Place and Time on this bar, Chart Options is the"
+                        + " first Chart item (#675)");
         JMenuItem zoomIn = itemNamed(view, "Zoom In");
         JMenuItem zoomOut = itemNamed(view, "Zoom Out");
         assertEquals(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, MASK),

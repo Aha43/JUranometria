@@ -88,11 +88,11 @@ public final class MenuSheetMain {
     }
 
     private static final List<State> STATES = List.of(
-            new State("menus", "All three menus, nothing checked", 42.0, false),
-            new State("checked", "View with Inspector and Ecliptic on",
+            new State("menus", "All four menus, nothing checked", 42.0, false),
+            new State("checked", "Chart with Inspector, Controls and Toolbar on",
                     42.0, true),
-            new State("widest", "View at the widest field", 180.0, false),
-            new State("narrowest", "View at the narrowest field", 1.0, false));
+            new State("widest", "Chart at the widest field", 180.0, false),
+            new State("narrowest", "Chart at the narrowest field", 1.0, false));
 
     public static void main(String[] args) throws Exception {
         if (args.length > 0 && !args[0].isBlank()) {
@@ -276,19 +276,15 @@ public final class MenuSheetMain {
                 if (companion != null) {
                     companion.setSelected(state.checked());
                 }
-                JCheckBoxMenuItem ecliptic = AppMenuBar.eclipticItem(bar[0]);
-                if (ecliptic != null) {
-                    ecliptic.setSelected(state.checked());
-                }
                 // The chart window's toolbar (#450): checked with the
                 // rest, as the application ticks it while the bar shows.
                 JCheckBoxMenuItem toolbar = AppMenuBar.toolbarItem(bar[0]);
                 if (toolbar != null) {
                     toolbar.setSelected(state.checked());
                 }
-                // The Sun and the Moon on the chart (#458), in View's
-                // Solar System submenu: ticked with the rest, as the
-                // module ticks them while the bar shows.
+                // The Sun and the Moon on the chart (#458), on the Solar
+                // System menu (top-level since #675): ticked with the rest,
+                // as the module ticks them while the bar shows.
                 for (JCheckBoxMenuItem body : new JCheckBoxMenuItem[] {
                         AppMenuBar.sunChartItem(bar[0]),
                         AppMenuBar.moonChartItem(bar[0])}) {
@@ -330,8 +326,9 @@ public final class MenuSheetMain {
             // they overlapped, because a popup is wider than the
             // word that opens it - the first picture showed three
             // menus on top of each other.
-            // A submenu's popup (#458: View's Solar System) is a
-            // column of its own, after the menu that holds it.
+            // A submenu's popup, were there one, is a column of its own
+            // after the menu that holds it (#458); since #675 Solar
+            // System is a menu of the bar, with a column like the rest.
             List<javax.swing.JPopupMenu> popups = new java.util.ArrayList<>();
             for (int m = 0; m < bar.getMenuCount(); m++) {
                 JMenu menu = bar.getMenu(m);

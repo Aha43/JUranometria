@@ -45,20 +45,19 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Menu bar | JMenu | File | &mdash; | Exporting the chart and changing application settings | self-explanatory |
 | Menu bar | JMenuItem | Export Chart Sheet... | &mdash; | Exports this chart as an SVG, PDF or PNG sheet | self-explanatory |
 | Menu bar | JMenuItem | Settings... | &mdash; | Opens the window for appearance and for the languages used by the application and chart | self-explanatory |
-| Menu bar | JMenu | View | &mdash; | What the chart draws, where you are looking from, and how far out | self-explanatory |
-| Menu bar | JMenuItem | Chart Options... | &mdash; | Opens the window that chooses what the chart draws and labels. Chart shortcuts begin wi... | self-explanatory |
+| Menu bar | JMenu | Chart | &mdash; | What the chart draws, where you are looking from, and how far out | self-explanatory |
 | Menu bar | JMenuItem | Place and Time... | &mdash; | Opens the window that sets your location and the instant used to draw the meridian, hor... | self-explanatory |
-| Menu bar | JCheckBoxMenuItem | Controls | &mdash; | Shows or hides the JUranometria Controller window, which keeps the chart's controls bes... | self-explanatory |
-| Menu bar | JCheckBoxMenuItem | Chart Toolbar | &mdash; | Shows or hides the chart window's toolbar. Its controls remain in the JUranometria Cont... | self-explanatory |
+| Menu bar | JMenuItem | Chart Options... | &mdash; | Opens the window that chooses what the chart draws and labels. Chart shortcuts begin wi... | self-explanatory |
 | Menu bar | JCheckBoxMenuItem | Inspector | &mdash; | Shows or hides the panel that describes the selected mark and what is on this page | self-explanatory |
-| Menu bar | JCheckBoxMenuItem | Ecliptic | &mdash; | Shows or hides the ecliptic and its equinox and solstice marks. The chart shortcut is <... | self-explanatory |
+| Menu bar | JCheckBoxMenuItem | Controls | &mdash; | Shows or hides the JUranometria Controller window, which keeps the chart's controls bes... | self-explanatory |
+| Menu bar | JCheckBoxMenuItem | Toolbar | &mdash; | Shows or hides the chart window's toolbar. Its controls remain in the JUranometria Cont... | self-explanatory |
+| Menu bar | JMenuItem | Zoom In | &mdash; | Shows a narrower field, with fainter stars on it | self-explanatory |
+| Menu bar | JMenuItem | Zoom Out | &mdash; | Shows a wider field, with fewer stars on it | self-explanatory |
 | Menu bar | JMenu | Solar System | &mdash; | The Sun, Mercury, Venus, the Moon, Mars, Jupiter, Saturn, Uranus and Neptune: whether e... | self-explanatory |
 | Menu bar | JCheckBoxMenuItem | Sun on the chart | &mdash; | Shows or hides the Sun on the chart, drawn at its true size where it stands for the cha... | self-explanatory |
 | Menu bar | JCheckBoxMenuItem | Moon on the chart | &mdash; | Shows or hides the Moon on the chart, drawn at its true size where it stands for the ch... | self-explanatory |
 | Menu bar | JMenuItem | Sun... | Where the Sun is, for the chart time and place | Opens a table of the Sun's computed position, height above the horizon, distance and ap... | hovered |
 | Menu bar | JMenuItem | Moon... | Where the Moon is, for the chart time and place | Opens a table of the Moon's computed position, height above the horizon, distance, appa... | hovered |
-| Menu bar | JMenuItem | Zoom In | &mdash; | Shows a narrower field, with fainter stars on it | self-explanatory |
-| Menu bar | JMenuItem | Zoom Out | &mdash; | Shows a wider field, with fewer stars on it | self-explanatory |
 | Menu bar | JMenu | Help | &mdash; | Information about this application and what it is built on | self-explanatory |
 | Menu bar | JMenuItem | Copy View Report | Copies a text description of this view, including the observing place and instant from ... | Copies a text description of this view to the clipboard, including the observing place ... | hovered |
 | Menu bar | JMenuItem | About JUranometria | &mdash; | Opens the window with the application's name, version and the software and data it is b... | self-explanatory |
@@ -81,6 +80,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Chart Options | JCheckBox | Constellation boundaries | The IAU boundaries, precessed from B1875. Shortcut: <prefix> then B. | The IAU boundaries, precessed from B1875. Switch it here or from the chart with <prefix... | hovered |
 | Chart Options | JCheckBox | Constellation names | The figure's name, drawn where the figure is. Shortcut: <prefix> then N. | The figure's name, drawn where the figure is. Switch it here or from the chart with <pr... | hovered |
 | Chart Options | JCheckBox | Equatorial coordinate grid | ICRS/J2000 right-ascension and declination grid lines with coordinate labels. Shortcut:... | ICRS/J2000 right-ascension and declination grid lines with coordinate labels. Switch it... | hovered |
+| Chart Options | JCheckBox | Ecliptic | The ecliptic and its equinox and solstice marks. Shortcut: <prefix> then I. | The ecliptic and its equinox and solstice marks. Switch it here or from the chart with ... | hovered |
 | Chart Options | JCheckBox | Title block | The panel in the lower left stating the target, centre, frame, field width, limiting ma... | The panel in the lower left stating the target, centre, frame, field width, limiting ma... | hovered |
 | Chart Options | JCheckBox | Stellar-magnitude key | A key in the upper right showing the circle size the chart draws for three visual magni... | A key in the upper right showing the circle size the chart draws for three visual magni... | hovered |
 | Chart Options | JCheckBox | Black sky | White stars and restrained light ink on a black ground, instead of the white-paper char... | White stars and restrained light ink on a black ground, instead of the white-paper char... | hovered |
@@ -158,7 +158,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 
 ## The audit
 
-**141 operable controls** across 17 surfaces: **85** hovered, **12** dynamic, **44** left to their own visible words, **0 undecided**.
+**141 operable controls** across 17 surfaces: **86** hovered, **12** dynamic, **43** left to their own visible words, **0 undecided**.
 
 **0** say the same words twice - a tooltip read back as a description. The seam refuses it, so this is zero or a finding.
 

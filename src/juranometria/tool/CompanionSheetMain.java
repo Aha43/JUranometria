@@ -339,7 +339,11 @@ public final class CompanionSheetMain {
                         new juranometria.app.ChartOptionsControls(
                                 new juranometria.app.ChartOptionsController(
                                         juranometria.app.ChartOptionsStore.forNode(node)),
-                                () -> false, words).inCompanion(companionStore,
+                                () -> false,
+                                // The ecliptic's switch (#675): the Chart group
+                                // shows the Ecliptic box a reader gets.
+                                juranometria.ui.ecliptic.EclipticSession.of(new juranometria.ecliptic.EclipticModule(), juranometria.ui.ecliptic.EclipticStore.forNode(node)),
+                                words).inCompanion(companionStore,
                                 words));
                 if (state.collapsed()) {
                     window[0].sections().get(2).heading().doClick();

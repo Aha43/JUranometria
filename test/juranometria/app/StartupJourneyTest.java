@@ -103,16 +103,21 @@ class StartupJourneyTest {
 
             // The consequence that fixes the ordering in place. The
             // stored choice was "shown"; it can only have reached the
-            // item if the bar was set before the restore ran.
-            JCheckBoxMenuItem ecliptic =
-                    AppMenuBar.eclipticItem(app.menu());
+            // control if the Controller's Chart Options box (#675) was
+            // built and following before the restore ran.
+            javax.swing.JCheckBox ecliptic = null;
+            for (java.awt.Window owned : app.frame().getOwnedWindows()) {
+                if (owned instanceof juranometria.ui.companion.CompanionWindow) {
+                    ecliptic = ChartOptionsControls.eclipticBox(owned);
+                }
+            }
             assertNotNull(ecliptic,
-                    "the ecliptic's item is on the composed bar");
+                    "the ecliptic's box is in the Controller's Chart Options");
             assertTrue(ecliptic.isSelected(),
                     "and carries the choice the store remembered,"
-                            + " which is only possible if the bar was"
-                            + " on the frame when startup read it"
-                            + " back");
+                            + " which is only possible if the box was"
+                            + " following the switch when startup read"
+                            + " the store back");
 
             assertNotNull(AppMenuBar.inspectorItem(app.menu()),
                     "and the inspector's item is there to be wired to"

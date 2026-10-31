@@ -610,6 +610,7 @@ public final class CleanChartStudyMain {
             ChartOptionsController controller = new ChartOptionsController(
                     ChartOptionsStore.forNode(node));
             JComponent groups = new ChartOptionsControls(controller, () -> false,
+                    juranometria.ui.ecliptic.EclipticSession.of(new juranometria.ecliptic.EclipticModule(), juranometria.ui.ecliptic.EclipticStore.forNode(node)),
                     said).inCompanion(CompanionStore.forNode(node), said);
             return CompanionSection.forStudy("chartoptions",
                     said.say("chartoptions.title"), groups, said);

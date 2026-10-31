@@ -30,7 +30,7 @@ identity	file	literal	scanner-reason	disposition	why
 49e44a3b892b252d	app/AppInfo.java	https://github.com/Aha43/JUranometria	declared name has no use in this file	identifier	a stable key, path or stored value; no language changes it
 75ec4f72cfbdfd1e	app/AppMenuBar.java	inspectorItem	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 1158ad40a6f3f40f	app/AppMenuBar.java	exportSheetItem	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
-1d5074cea7ca679d	app/AppMenuBar.java	eclipticItem	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+ec14915691dc715b	app/ChartOptionsControls.java	eclipticBox	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 e55fa3a3adfcee26	app/AppMenuBar.java	copyViewReportItem	declared name used, but never at a known sink	identifier	the Copy View Report item's component name, which tests find it by (#372); never shown
 15ed09bb3dac2f90	app/AppearanceStore.java	light	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 fee9e234b9f9bc8a	app/AppearanceStore.java	dark	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it

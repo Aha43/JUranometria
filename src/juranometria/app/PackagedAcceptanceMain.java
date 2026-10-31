@@ -5530,23 +5530,24 @@ public final class PackagedAcceptanceMain {
             juranometria.ecliptic.EclipticModule remembered =
                     juranometria.ui.ecliptic.EclipticSession.begin(
                             nextHost);
-            javax.swing.JMenuBar nextBar = AppMenuBar.create(null, null,
-                    () -> { }, () -> { }, () -> { }, () -> { },
-                    juranometria.ui.ecliptic.EclipticSession.toggle(
-                            remembered, fresh),
-                    juranometria.ui.language.InterfaceText
-                            .forLanguage("en"));
-            javax.swing.JCheckBoxMenuItem nextItem =
-                    AppMenuBar.eclipticItem(nextBar);
-            juranometria.ui.ecliptic.EclipticSession.restore(remembered,
-                    fresh, nextItem);
+            // The reader's control since #675: the Ecliptic box in Chart
+            // Options' Chart checklist, over the session's one switch.
+            juranometria.ui.ecliptic.EclipticSession.Switch nextSwitch =
+                    juranometria.ui.ecliptic.EclipticSession.of(remembered, fresh);
+            ChartOptionsControls nextControls = new ChartOptionsControls(
+                    new ChartOptionsController(ChartOptionsStore.forNode(eclipticNode)),
+                    () -> false, nextSwitch,
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+            javax.swing.JCheckBox nextItem = nextControls.eclipticBox();
+            require(nextItem != null, "Chart Options carries the Ecliptic box");
+            nextSwitch.restore();
             require(!remembered.showing() && !nextItem.isSelected(),
                     "a first session opens hidden, chart and tick"
                             + " agreeing");
             require(differingPixels(nextWithout, paint(nextSession)) == 0,
                     "and draws the page the atlas draws without it");
 
-            // The reader asks, through the item.
+            // The reader asks, through the box.
             nextItem.doClick();
             fresh.flush();
             require(remembered.showing() && nextItem.isSelected(),
@@ -5573,16 +5574,14 @@ public final class PackagedAcceptanceMain {
             juranometria.ecliptic.EclipticModule secondModule =
                     juranometria.ui.ecliptic.EclipticSession.begin(
                             secondHost);
-            javax.swing.JMenuBar secondBar = AppMenuBar.create(null, null,
-                    () -> { }, () -> { }, () -> { }, () -> { },
-                    juranometria.ui.ecliptic.EclipticSession.toggle(
-                            secondModule, reopened),
-                    juranometria.ui.language.InterfaceText
-                            .forLanguage("en"));
-            javax.swing.JCheckBoxMenuItem secondItem =
-                    AppMenuBar.eclipticItem(secondBar);
-            juranometria.ui.ecliptic.EclipticSession.restore(secondModule,
-                    reopened, secondItem);
+            juranometria.ui.ecliptic.EclipticSession.Switch secondSwitch =
+                    juranometria.ui.ecliptic.EclipticSession.of(secondModule, reopened);
+            ChartOptionsControls secondControls = new ChartOptionsControls(
+                    new ChartOptionsController(ChartOptionsStore.forNode(eclipticNode)),
+                    () -> false, secondSwitch,
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+            javax.swing.JCheckBox secondItem = secondControls.eclipticBox();
+            secondSwitch.restore();
             require(secondModule.showing() && secondItem.isSelected(),
                     "and the next session opens with the ecliptic"
                             + " drawn and its tick set, from one read");

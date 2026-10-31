@@ -36,7 +36,7 @@ open menu would cover the thing it explains.
 
 ## English (`en`)
 
-### All three menus, nothing checked
+### All four menus, nothing checked
 
 ![](menu-en-1-menus.png)
 
@@ -55,43 +55,48 @@ Bar packed 892 × 471 px; widest popup 232 px.
 | item label \| Settings... |
 | item spoken name \| Settings |
 | item spoken description \| Opens the window for appearance and for the languages used by the application and chart |
-| menu label \| View |
-| menu spoken name \| View menu |
+| menu label \| Chart |
+| menu spoken name \| Chart menu |
 | menu spoken description \| What the chart draws, where you are looking from, and how far out |
-| item label \| Chart Options... |
-| item spoken name \| Chart Options |
-| item spoken description \| Opens the window that chooses what the chart draws and labels. Chart shortcuts begin with ⌘K. |
-| item access letter (language) \| C |
 | item label \| Place and Time... |
 | item spoken name \| Place and Time |
 | item spoken description \| Opens the window that sets your location and the instant used to draw the meridian, horizon and zenith |
 | item access letter (language) \| P |
-| item label \| Controls |
-| item spoken name \| Controls |
-| item spoken description \| Shows or hides the JUranometria Controller window, which keeps the chart's controls beside the chart; it opens again where you left it, and starts closed. |
-| item access letter (language) \| R |
-| item label \| Centre on coordinates... |
-| item spoken name \| Centre on coordinates |
-| item spoken description \| Opens a window where you type a J2000 right ascension and declination and centre the chart there |
-| item accelerator (platform notation) \| ⌘L |
-| item access letter (language) \| O |
-| item label \| Chart Toolbar |
-| item spoken name \| Chart Toolbar |
-| item spoken description \| Shows or hides the chart window's toolbar. Its controls remain in the JUranometria Controller window; the chart keeps its centre, field and everything it draws. |
-| item accelerator (platform notation) \| ⌘+⇧T |
-| item access letter (language) \| T |
+| item label \| Chart Options... |
+| item spoken name \| Chart Options |
+| item spoken description \| Opens the window that chooses what the chart draws and labels. Chart shortcuts begin with ⌘K. |
+| item access letter (language) \| C |
 | item label \| Inspector |
 | item spoken name \| Inspector |
 | item spoken description \| Shows or hides the panel that describes the selected mark and what is on this page |
 | item accelerator (platform notation) \| ⌘I |
 | item access letter (language) \| I |
-| item label \| Ecliptic |
-| item spoken name \| Ecliptic |
-| item spoken description \| Shows or hides the ecliptic and its equinox and solstice marks. The chart shortcut is ⌘K then I. |
-| submenu label \| Solar System |
-| submenu spoken name \| Solar System menu |
-| submenu spoken description \| The Sun, Mercury, Venus, the Moon, Mars, Jupiter, Saturn, Uranus and Neptune: whether each is drawn on the chart, and their tables |
-| submenu access letter (language) \| Y |
+| item label \| Centre on coordinates... |
+| item spoken name \| Centre on coordinates |
+| item spoken description \| Opens a window where you type a J2000 right ascension and declination and centre the chart there |
+| item accelerator (platform notation) \| ⌘L |
+| item access letter (language) \| O |
+| item label \| Controls |
+| item spoken name \| Controls |
+| item spoken description \| Shows or hides the JUranometria Controller window, which keeps the chart's controls beside the chart; it opens again where you left it, and starts closed. |
+| item access letter (language) \| R |
+| item label \| Toolbar |
+| item spoken name \| Toolbar |
+| item spoken description \| Shows or hides the chart window's toolbar. Its controls remain in the JUranometria Controller window; the chart keeps its centre, field and everything it draws. |
+| item accelerator (platform notation) \| ⌘+⇧T |
+| item access letter (language) \| T |
+| item label \| Zoom In |
+| item spoken name \| Zoom In |
+| item spoken description \| Shows a narrower field, with fainter stars on it |
+| item accelerator (platform notation) \| ⌘= |
+| item label \| Zoom Out |
+| item spoken name \| Zoom Out |
+| item spoken description \| Shows a wider field, with fewer stars on it |
+| item accelerator (platform notation) \| ⌘- |
+| menu label \| Solar System |
+| menu spoken name \| Solar System menu |
+| menu spoken description \| The Sun, Mercury, Venus, the Moon, Mars, Jupiter, Saturn, Uranus and Neptune: whether each is drawn on the chart, and their tables |
+| menu access letter (language) \| Y |
 | item label \| Sun on the chart |
 | item spoken name \| Sun on the chart |
 | item spoken description \| Shows or hides the Sun on the chart, drawn at its true size where it stands for the chart time and place; below a drawn horizon it is dimmed and says so. |
@@ -162,14 +167,6 @@ Bar packed 892 × 471 px; widest popup 232 px.
 | item hover \| Where Neptune, Triton and Nereid are, for the chart time and place |
 | item spoken name \| Neptune table |
 | item spoken description \| Opens a table of Neptune's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Triton and Nereid stand beside it - clear of Neptune, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Neptune and its moons are drawn on the chart by Neptune on the chart. |
-| item label \| Zoom In |
-| item spoken name \| Zoom In |
-| item spoken description \| Shows a narrower field, with fainter stars on it |
-| item accelerator (platform notation) \| ⌘= |
-| item label \| Zoom Out |
-| item spoken name \| Zoom Out |
-| item spoken description \| Shows a wider field, with fewer stars on it |
-| item accelerator (platform notation) \| ⌘- |
 | menu label \| Help |
 | menu spoken name \| Help menu |
 | menu spoken description \| Information about this application and what it is built on |
@@ -181,7 +178,7 @@ Bar packed 892 × 471 px; widest popup 232 px.
 | item spoken name \| About JUranometria |
 | item spoken description \| Opens the window with the application's name, version and the software and data it is built on |
 
-### View with Inspector and Ecliptic on
+### Chart with Inspector, Controls and Toolbar on
 
 ![](menu-en-2-checked.png)
 
@@ -200,43 +197,48 @@ Bar packed 892 × 471 px; widest popup 232 px.
 | item label \| Settings... |
 | item spoken name \| Settings |
 | item spoken description \| Opens the window for appearance and for the languages used by the application and chart |
-| menu label \| View |
-| menu spoken name \| View menu |
+| menu label \| Chart |
+| menu spoken name \| Chart menu |
 | menu spoken description \| What the chart draws, where you are looking from, and how far out |
-| item label \| Chart Options... |
-| item spoken name \| Chart Options |
-| item spoken description \| Opens the window that chooses what the chart draws and labels. Chart shortcuts begin with ⌘K. |
-| item access letter (language) \| C |
 | item label \| Place and Time... |
 | item spoken name \| Place and Time |
 | item spoken description \| Opens the window that sets your location and the instant used to draw the meridian, horizon and zenith |
 | item access letter (language) \| P |
-| item label [checked] \| Controls |
-| item spoken name \| Controls |
-| item spoken description \| Shows or hides the JUranometria Controller window, which keeps the chart's controls beside the chart; it opens again where you left it, and starts closed. |
-| item access letter (language) \| R |
-| item label \| Centre on coordinates... |
-| item spoken name \| Centre on coordinates |
-| item spoken description \| Opens a window where you type a J2000 right ascension and declination and centre the chart there |
-| item accelerator (platform notation) \| ⌘L |
-| item access letter (language) \| O |
-| item label [checked] \| Chart Toolbar |
-| item spoken name \| Chart Toolbar |
-| item spoken description \| Shows or hides the chart window's toolbar. Its controls remain in the JUranometria Controller window; the chart keeps its centre, field and everything it draws. |
-| item accelerator (platform notation) \| ⌘+⇧T |
-| item access letter (language) \| T |
+| item label \| Chart Options... |
+| item spoken name \| Chart Options |
+| item spoken description \| Opens the window that chooses what the chart draws and labels. Chart shortcuts begin with ⌘K. |
+| item access letter (language) \| C |
 | item label [checked] \| Inspector |
 | item spoken name \| Inspector |
 | item spoken description \| Shows or hides the panel that describes the selected mark and what is on this page |
 | item accelerator (platform notation) \| ⌘I |
 | item access letter (language) \| I |
-| item label [checked] \| Ecliptic |
-| item spoken name \| Ecliptic |
-| item spoken description \| Shows or hides the ecliptic and its equinox and solstice marks. The chart shortcut is ⌘K then I. |
-| submenu label \| Solar System |
-| submenu spoken name \| Solar System menu |
-| submenu spoken description \| The Sun, Mercury, Venus, the Moon, Mars, Jupiter, Saturn, Uranus and Neptune: whether each is drawn on the chart, and their tables |
-| submenu access letter (language) \| Y |
+| item label \| Centre on coordinates... |
+| item spoken name \| Centre on coordinates |
+| item spoken description \| Opens a window where you type a J2000 right ascension and declination and centre the chart there |
+| item accelerator (platform notation) \| ⌘L |
+| item access letter (language) \| O |
+| item label [checked] \| Controls |
+| item spoken name \| Controls |
+| item spoken description \| Shows or hides the JUranometria Controller window, which keeps the chart's controls beside the chart; it opens again where you left it, and starts closed. |
+| item access letter (language) \| R |
+| item label [checked] \| Toolbar |
+| item spoken name \| Toolbar |
+| item spoken description \| Shows or hides the chart window's toolbar. Its controls remain in the JUranometria Controller window; the chart keeps its centre, field and everything it draws. |
+| item accelerator (platform notation) \| ⌘+⇧T |
+| item access letter (language) \| T |
+| item label \| Zoom In |
+| item spoken name \| Zoom In |
+| item spoken description \| Shows a narrower field, with fainter stars on it |
+| item accelerator (platform notation) \| ⌘= |
+| item label \| Zoom Out |
+| item spoken name \| Zoom Out |
+| item spoken description \| Shows a wider field, with fewer stars on it |
+| item accelerator (platform notation) \| ⌘- |
+| menu label \| Solar System |
+| menu spoken name \| Solar System menu |
+| menu spoken description \| The Sun, Mercury, Venus, the Moon, Mars, Jupiter, Saturn, Uranus and Neptune: whether each is drawn on the chart, and their tables |
+| menu access letter (language) \| Y |
 | item label [checked] \| Sun on the chart |
 | item spoken name \| Sun on the chart |
 | item spoken description \| Shows or hides the Sun on the chart, drawn at its true size where it stands for the chart time and place; below a drawn horizon it is dimmed and says so. |
@@ -307,14 +309,6 @@ Bar packed 892 × 471 px; widest popup 232 px.
 | item hover \| Where Neptune, Triton and Nereid are, for the chart time and place |
 | item spoken name \| Neptune table |
 | item spoken description \| Opens a table of Neptune's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Triton and Nereid stand beside it - clear of Neptune, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Neptune and its moons are drawn on the chart by Neptune on the chart. |
-| item label \| Zoom In |
-| item spoken name \| Zoom In |
-| item spoken description \| Shows a narrower field, with fainter stars on it |
-| item accelerator (platform notation) \| ⌘= |
-| item label \| Zoom Out |
-| item spoken name \| Zoom Out |
-| item spoken description \| Shows a wider field, with fewer stars on it |
-| item accelerator (platform notation) \| ⌘- |
 | menu label \| Help |
 | menu spoken name \| Help menu |
 | menu spoken description \| Information about this application and what it is built on |
@@ -326,7 +320,7 @@ Bar packed 892 × 471 px; widest popup 232 px.
 | item spoken name \| About JUranometria |
 | item spoken description \| Opens the window with the application's name, version and the software and data it is built on |
 
-### View at the widest field
+### Chart at the widest field
 
 ![](menu-en-3-widest.png)
 
@@ -345,43 +339,48 @@ Bar packed 892 × 471 px; widest popup 232 px.
 | item label \| Settings... |
 | item spoken name \| Settings |
 | item spoken description \| Opens the window for appearance and for the languages used by the application and chart |
-| menu label \| View |
-| menu spoken name \| View menu |
+| menu label \| Chart |
+| menu spoken name \| Chart menu |
 | menu spoken description \| What the chart draws, where you are looking from, and how far out |
-| item label \| Chart Options... |
-| item spoken name \| Chart Options |
-| item spoken description \| Opens the window that chooses what the chart draws and labels. Chart shortcuts begin with ⌘K. |
-| item access letter (language) \| C |
 | item label \| Place and Time... |
 | item spoken name \| Place and Time |
 | item spoken description \| Opens the window that sets your location and the instant used to draw the meridian, horizon and zenith |
 | item access letter (language) \| P |
-| item label \| Controls |
-| item spoken name \| Controls |
-| item spoken description \| Shows or hides the JUranometria Controller window, which keeps the chart's controls beside the chart; it opens again where you left it, and starts closed. |
-| item access letter (language) \| R |
-| item label \| Centre on coordinates... |
-| item spoken name \| Centre on coordinates |
-| item spoken description \| Opens a window where you type a J2000 right ascension and declination and centre the chart there |
-| item accelerator (platform notation) \| ⌘L |
-| item access letter (language) \| O |
-| item label \| Chart Toolbar |
-| item spoken name \| Chart Toolbar |
-| item spoken description \| Shows or hides the chart window's toolbar. Its controls remain in the JUranometria Controller window; the chart keeps its centre, field and everything it draws. |
-| item accelerator (platform notation) \| ⌘+⇧T |
-| item access letter (language) \| T |
+| item label \| Chart Options... |
+| item spoken name \| Chart Options |
+| item spoken description \| Opens the window that chooses what the chart draws and labels. Chart shortcuts begin with ⌘K. |
+| item access letter (language) \| C |
 | item label \| Inspector |
 | item spoken name \| Inspector |
 | item spoken description \| Shows or hides the panel that describes the selected mark and what is on this page |
 | item accelerator (platform notation) \| ⌘I |
 | item access letter (language) \| I |
-| item label \| Ecliptic |
-| item spoken name \| Ecliptic |
-| item spoken description \| Shows or hides the ecliptic and its equinox and solstice marks. The chart shortcut is ⌘K then I. |
-| submenu label \| Solar System |
-| submenu spoken name \| Solar System menu |
-| submenu spoken description \| The Sun, Mercury, Venus, the Moon, Mars, Jupiter, Saturn, Uranus and Neptune: whether each is drawn on the chart, and their tables |
-| submenu access letter (language) \| Y |
+| item label \| Centre on coordinates... |
+| item spoken name \| Centre on coordinates |
+| item spoken description \| Opens a window where you type a J2000 right ascension and declination and centre the chart there |
+| item accelerator (platform notation) \| ⌘L |
+| item access letter (language) \| O |
+| item label \| Controls |
+| item spoken name \| Controls |
+| item spoken description \| Shows or hides the JUranometria Controller window, which keeps the chart's controls beside the chart; it opens again where you left it, and starts closed. |
+| item access letter (language) \| R |
+| item label \| Toolbar |
+| item spoken name \| Toolbar |
+| item spoken description \| Shows or hides the chart window's toolbar. Its controls remain in the JUranometria Controller window; the chart keeps its centre, field and everything it draws. |
+| item accelerator (platform notation) \| ⌘+⇧T |
+| item access letter (language) \| T |
+| item label \| Zoom In |
+| item spoken name \| Zoom In |
+| item spoken description \| Shows a narrower field, with fainter stars on it |
+| item accelerator (platform notation) \| ⌘= |
+| item label [unavailable] \| Zoom Out |
+| item spoken name [unavailable] \| Zoom Out |
+| item spoken description [unavailable] \| Unavailable: this is the widest field the atlas draws |
+| item accelerator (platform notation) \| ⌘- |
+| menu label \| Solar System |
+| menu spoken name \| Solar System menu |
+| menu spoken description \| The Sun, Mercury, Venus, the Moon, Mars, Jupiter, Saturn, Uranus and Neptune: whether each is drawn on the chart, and their tables |
+| menu access letter (language) \| Y |
 | item label \| Sun on the chart |
 | item spoken name \| Sun on the chart |
 | item spoken description \| Shows or hides the Sun on the chart, drawn at its true size where it stands for the chart time and place; below a drawn horizon it is dimmed and says so. |
@@ -452,14 +451,6 @@ Bar packed 892 × 471 px; widest popup 232 px.
 | item hover \| Where Neptune, Triton and Nereid are, for the chart time and place |
 | item spoken name \| Neptune table |
 | item spoken description \| Opens a table of Neptune's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Triton and Nereid stand beside it - clear of Neptune, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Neptune and its moons are drawn on the chart by Neptune on the chart. |
-| item label \| Zoom In |
-| item spoken name \| Zoom In |
-| item spoken description \| Shows a narrower field, with fainter stars on it |
-| item accelerator (platform notation) \| ⌘= |
-| item label [unavailable] \| Zoom Out |
-| item spoken name [unavailable] \| Zoom Out |
-| item spoken description [unavailable] \| Unavailable: this is the widest field the atlas draws |
-| item accelerator (platform notation) \| ⌘- |
 | menu label \| Help |
 | menu spoken name \| Help menu |
 | menu spoken description \| Information about this application and what it is built on |
@@ -471,7 +462,7 @@ Bar packed 892 × 471 px; widest popup 232 px.
 | item spoken name \| About JUranometria |
 | item spoken description \| Opens the window with the application's name, version and the software and data it is built on |
 
-### View at the narrowest field
+### Chart at the narrowest field
 
 ![](menu-en-4-narrowest.png)
 
@@ -490,43 +481,48 @@ Bar packed 892 × 471 px; widest popup 232 px.
 | item label \| Settings... |
 | item spoken name \| Settings |
 | item spoken description \| Opens the window for appearance and for the languages used by the application and chart |
-| menu label \| View |
-| menu spoken name \| View menu |
+| menu label \| Chart |
+| menu spoken name \| Chart menu |
 | menu spoken description \| What the chart draws, where you are looking from, and how far out |
-| item label \| Chart Options... |
-| item spoken name \| Chart Options |
-| item spoken description \| Opens the window that chooses what the chart draws and labels. Chart shortcuts begin with ⌘K. |
-| item access letter (language) \| C |
 | item label \| Place and Time... |
 | item spoken name \| Place and Time |
 | item spoken description \| Opens the window that sets your location and the instant used to draw the meridian, horizon and zenith |
 | item access letter (language) \| P |
-| item label \| Controls |
-| item spoken name \| Controls |
-| item spoken description \| Shows or hides the JUranometria Controller window, which keeps the chart's controls beside the chart; it opens again where you left it, and starts closed. |
-| item access letter (language) \| R |
-| item label \| Centre on coordinates... |
-| item spoken name \| Centre on coordinates |
-| item spoken description \| Opens a window where you type a J2000 right ascension and declination and centre the chart there |
-| item accelerator (platform notation) \| ⌘L |
-| item access letter (language) \| O |
-| item label \| Chart Toolbar |
-| item spoken name \| Chart Toolbar |
-| item spoken description \| Shows or hides the chart window's toolbar. Its controls remain in the JUranometria Controller window; the chart keeps its centre, field and everything it draws. |
-| item accelerator (platform notation) \| ⌘+⇧T |
-| item access letter (language) \| T |
+| item label \| Chart Options... |
+| item spoken name \| Chart Options |
+| item spoken description \| Opens the window that chooses what the chart draws and labels. Chart shortcuts begin with ⌘K. |
+| item access letter (language) \| C |
 | item label \| Inspector |
 | item spoken name \| Inspector |
 | item spoken description \| Shows or hides the panel that describes the selected mark and what is on this page |
 | item accelerator (platform notation) \| ⌘I |
 | item access letter (language) \| I |
-| item label \| Ecliptic |
-| item spoken name \| Ecliptic |
-| item spoken description \| Shows or hides the ecliptic and its equinox and solstice marks. The chart shortcut is ⌘K then I. |
-| submenu label \| Solar System |
-| submenu spoken name \| Solar System menu |
-| submenu spoken description \| The Sun, Mercury, Venus, the Moon, Mars, Jupiter, Saturn, Uranus and Neptune: whether each is drawn on the chart, and their tables |
-| submenu access letter (language) \| Y |
+| item label \| Centre on coordinates... |
+| item spoken name \| Centre on coordinates |
+| item spoken description \| Opens a window where you type a J2000 right ascension and declination and centre the chart there |
+| item accelerator (platform notation) \| ⌘L |
+| item access letter (language) \| O |
+| item label \| Controls |
+| item spoken name \| Controls |
+| item spoken description \| Shows or hides the JUranometria Controller window, which keeps the chart's controls beside the chart; it opens again where you left it, and starts closed. |
+| item access letter (language) \| R |
+| item label \| Toolbar |
+| item spoken name \| Toolbar |
+| item spoken description \| Shows or hides the chart window's toolbar. Its controls remain in the JUranometria Controller window; the chart keeps its centre, field and everything it draws. |
+| item accelerator (platform notation) \| ⌘+⇧T |
+| item access letter (language) \| T |
+| item label [unavailable] \| Zoom In |
+| item spoken name [unavailable] \| Zoom In |
+| item spoken description [unavailable] \| Unavailable: a closer field is offered only when Mercury, Venus, Mars, Jupiter, Saturn, Uranus or Neptune, shown on the chart, is on the page the step would show |
+| item accelerator (platform notation) \| ⌘= |
+| item label \| Zoom Out |
+| item spoken name \| Zoom Out |
+| item spoken description \| Shows a wider field, with fewer stars on it |
+| item accelerator (platform notation) \| ⌘- |
+| menu label \| Solar System |
+| menu spoken name \| Solar System menu |
+| menu spoken description \| The Sun, Mercury, Venus, the Moon, Mars, Jupiter, Saturn, Uranus and Neptune: whether each is drawn on the chart, and their tables |
+| menu access letter (language) \| Y |
 | item label \| Sun on the chart |
 | item spoken name \| Sun on the chart |
 | item spoken description \| Shows or hides the Sun on the chart, drawn at its true size where it stands for the chart time and place; below a drawn horizon it is dimmed and says so. |
@@ -597,14 +593,6 @@ Bar packed 892 × 471 px; widest popup 232 px.
 | item hover \| Where Neptune, Triton and Nereid are, for the chart time and place |
 | item spoken name \| Neptune table |
 | item spoken description \| Opens a table of Neptune's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Triton and Nereid stand beside it - clear of Neptune, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Neptune and its moons are drawn on the chart by Neptune on the chart. |
-| item label [unavailable] \| Zoom In |
-| item spoken name [unavailable] \| Zoom In |
-| item spoken description [unavailable] \| Unavailable: a closer field is offered only when Mercury, Venus, Mars, Jupiter, Saturn, Uranus or Neptune, shown on the chart, is on the page the step would show |
-| item accelerator (platform notation) \| ⌘= |
-| item label \| Zoom Out |
-| item spoken name \| Zoom Out |
-| item spoken description \| Shows a wider field, with fewer stars on it |
-| item accelerator (platform notation) \| ⌘- |
 | menu label \| Help |
 | menu spoken name \| Help menu |
 | menu spoken description \| Information about this application and what it is built on |
@@ -618,7 +606,7 @@ Bar packed 892 × 471 px; widest popup 232 px.
 
 ## Norsk bokmål (`nb-NO`)
 
-### All three menus, nothing checked
+### All four menus, nothing checked
 
 ![](menu-nb-NO-5-menus.png)
 
@@ -637,43 +625,48 @@ Bar packed 882 × 471 px; widest popup 229 px.
 | item label \| Innstillinger... |
 | item spoken name \| Innstillinger |
 | item spoken description \| Åpner vinduet for utseende og for språkene programmet og kartet bruker |
-| menu label \| Vis |
-| menu spoken name \| Vis-menyen |
+| menu label \| Kart |
+| menu spoken name \| Kart-menyen |
 | menu spoken description \| Hva kartet tegner, hvor du ser fra, og hvor langt ut |
-| item label \| Kartvalg... |
-| item spoken name \| Kartvalg |
-| item spoken description \| Åpner vinduet som velger hva kartet tegner og merker. Hurtigtaster for kartet begynner med ⌘K. |
-| item access letter (language) \| K |
 | item label \| Sted og tid... |
 | item spoken name \| Sted og tid |
 | item spoken description \| Åpner vinduet der du velger stedet og tidspunktet som brukes når meridianen, horisonten og senit tegnes |
 | item access letter (language) \| S |
-| item label \| Kontroller |
-| item spoken name \| Kontroller |
-| item spoken description \| Viser eller skjuler vinduet JUranometria Kontroller, som har kartets kontroller ved siden av kartet; det åpnes igjen der du forlot det, og starter lukket. |
-| item access letter (language) \| R |
-| item label \| Sentrer på koordinater... |
-| item spoken name \| Sentrer på koordinater |
-| item spoken description \| Åpner et vindu der du skriver en J2000-rektascensjon og -deklinasjon og sentrerer kartet der |
-| item accelerator (platform notation) \| ⌘L |
-| item access letter (language) \| O |
-| item label \| Kartverktøylinje |
-| item spoken name \| Kartverktøylinje |
-| item spoken description \| Viser eller skjuler verktøylinjen i kartvinduet. Kontrollene finnes fortsatt i vinduet JUranometria Kontroller; kartet beholder sentrum, synsfelt og alt det tegner. |
-| item accelerator (platform notation) \| ⌘+⇧T |
-| item access letter (language) \| V |
+| item label \| Kartvalg... |
+| item spoken name \| Kartvalg |
+| item spoken description \| Åpner vinduet som velger hva kartet tegner og merker. Hurtigtaster for kartet begynner med ⌘K. |
+| item access letter (language) \| K |
 | item label \| Utforskeren |
 | item spoken name \| Utforskeren |
 | item spoken description \| Viser eller skjuler panelet som beskriver det valgte merket og hva som finnes på denne siden |
 | item accelerator (platform notation) \| ⌘I |
 | item access letter (language) \| U |
-| item label \| Ekliptikken |
-| item spoken name \| Ekliptikken |
-| item spoken description \| Viser eller skjuler ekliptikken og merkene for jevndøgn og solverv. Hurtigtasten for kartet er ⌘K deretter I. |
-| submenu label \| Solsystem |
-| submenu spoken name \| Solsystem-meny |
-| submenu spoken description \| Solen, Merkur, Venus, Månen, Mars, Jupiter, Saturn, Uranus og Neptun: om hver av dem tegnes på kartet, og tabellene deres |
-| submenu access letter (language) \| Y |
+| item label \| Sentrer på koordinater... |
+| item spoken name \| Sentrer på koordinater |
+| item spoken description \| Åpner et vindu der du skriver en J2000-rektascensjon og -deklinasjon og sentrerer kartet der |
+| item accelerator (platform notation) \| ⌘L |
+| item access letter (language) \| O |
+| item label \| Kontroller |
+| item spoken name \| Kontroller |
+| item spoken description \| Viser eller skjuler vinduet JUranometria Kontroller, som har kartets kontroller ved siden av kartet; det åpnes igjen der du forlot det, og starter lukket. |
+| item access letter (language) \| R |
+| item label \| Verktøylinje |
+| item spoken name \| Verktøylinje |
+| item spoken description \| Viser eller skjuler verktøylinjen i kartvinduet. Kontrollene finnes fortsatt i vinduet JUranometria Kontroller; kartet beholder sentrum, synsfelt og alt det tegner. |
+| item accelerator (platform notation) \| ⌘+⇧T |
+| item access letter (language) \| V |
+| item label \| Zoom inn |
+| item spoken name \| Zoom inn |
+| item spoken description \| Viser et smalere synsfelt med svakere stjerner |
+| item accelerator (platform notation) \| ⌘= |
+| item label \| Zoom ut |
+| item spoken name \| Zoom ut |
+| item spoken description \| Viser et større synsfelt med færre stjerner |
+| item accelerator (platform notation) \| ⌘- |
+| menu label \| Solsystem |
+| menu spoken name \| Solsystem-menyen |
+| menu spoken description \| Solen, Merkur, Venus, Månen, Mars, Jupiter, Saturn, Uranus og Neptun: om hver av dem tegnes på kartet, og tabellene deres |
+| menu access letter (language) \| Y |
 | item label \| Solen på kartet |
 | item spoken name \| Solen på kartet |
 | item spoken description \| Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for karttiden og stedet; under en tegnet horisont dempes den og sier fra. |
@@ -743,14 +736,6 @@ Bar packed 882 × 471 px; widest popup 229 px.
 | item hover \| Hvor Neptun, Triton og Nereid er, for karttiden og stedet |
 | item spoken name \| Neptuntabell |
 | item spoken description \| Åpner en tabell over Neptuns beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Triton og Nereid står ved siden av - klar av Neptun, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Neptun og månene tegnes på kartet med Neptun på kartet. |
-| item label \| Zoom inn |
-| item spoken name \| Zoom inn |
-| item spoken description \| Viser et smalere synsfelt med svakere stjerner |
-| item accelerator (platform notation) \| ⌘= |
-| item label \| Zoom ut |
-| item spoken name \| Zoom ut |
-| item spoken description \| Viser et større synsfelt med færre stjerner |
-| item accelerator (platform notation) \| ⌘- |
 | menu label \| Hjelp |
 | menu spoken name \| Hjelp-menyen |
 | menu spoken description \| Informasjon om dette programmet og hva det er bygd på |
@@ -762,7 +747,7 @@ Bar packed 882 × 471 px; widest popup 229 px.
 | item spoken name \| Om JUranometria |
 | item spoken description \| Åpner vinduet med programmets navn, versjon og programvaren og dataene det er bygd på |
 
-### View with Inspector and Ecliptic on
+### Chart with Inspector, Controls and Toolbar on
 
 ![](menu-nb-NO-6-checked.png)
 
@@ -781,43 +766,48 @@ Bar packed 882 × 471 px; widest popup 229 px.
 | item label \| Innstillinger... |
 | item spoken name \| Innstillinger |
 | item spoken description \| Åpner vinduet for utseende og for språkene programmet og kartet bruker |
-| menu label \| Vis |
-| menu spoken name \| Vis-menyen |
+| menu label \| Kart |
+| menu spoken name \| Kart-menyen |
 | menu spoken description \| Hva kartet tegner, hvor du ser fra, og hvor langt ut |
-| item label \| Kartvalg... |
-| item spoken name \| Kartvalg |
-| item spoken description \| Åpner vinduet som velger hva kartet tegner og merker. Hurtigtaster for kartet begynner med ⌘K. |
-| item access letter (language) \| K |
 | item label \| Sted og tid... |
 | item spoken name \| Sted og tid |
 | item spoken description \| Åpner vinduet der du velger stedet og tidspunktet som brukes når meridianen, horisonten og senit tegnes |
 | item access letter (language) \| S |
-| item label [checked] \| Kontroller |
-| item spoken name \| Kontroller |
-| item spoken description \| Viser eller skjuler vinduet JUranometria Kontroller, som har kartets kontroller ved siden av kartet; det åpnes igjen der du forlot det, og starter lukket. |
-| item access letter (language) \| R |
-| item label \| Sentrer på koordinater... |
-| item spoken name \| Sentrer på koordinater |
-| item spoken description \| Åpner et vindu der du skriver en J2000-rektascensjon og -deklinasjon og sentrerer kartet der |
-| item accelerator (platform notation) \| ⌘L |
-| item access letter (language) \| O |
-| item label [checked] \| Kartverktøylinje |
-| item spoken name \| Kartverktøylinje |
-| item spoken description \| Viser eller skjuler verktøylinjen i kartvinduet. Kontrollene finnes fortsatt i vinduet JUranometria Kontroller; kartet beholder sentrum, synsfelt og alt det tegner. |
-| item accelerator (platform notation) \| ⌘+⇧T |
-| item access letter (language) \| V |
+| item label \| Kartvalg... |
+| item spoken name \| Kartvalg |
+| item spoken description \| Åpner vinduet som velger hva kartet tegner og merker. Hurtigtaster for kartet begynner med ⌘K. |
+| item access letter (language) \| K |
 | item label [checked] \| Utforskeren |
 | item spoken name \| Utforskeren |
 | item spoken description \| Viser eller skjuler panelet som beskriver det valgte merket og hva som finnes på denne siden |
 | item accelerator (platform notation) \| ⌘I |
 | item access letter (language) \| U |
-| item label [checked] \| Ekliptikken |
-| item spoken name \| Ekliptikken |
-| item spoken description \| Viser eller skjuler ekliptikken og merkene for jevndøgn og solverv. Hurtigtasten for kartet er ⌘K deretter I. |
-| submenu label \| Solsystem |
-| submenu spoken name \| Solsystem-meny |
-| submenu spoken description \| Solen, Merkur, Venus, Månen, Mars, Jupiter, Saturn, Uranus og Neptun: om hver av dem tegnes på kartet, og tabellene deres |
-| submenu access letter (language) \| Y |
+| item label \| Sentrer på koordinater... |
+| item spoken name \| Sentrer på koordinater |
+| item spoken description \| Åpner et vindu der du skriver en J2000-rektascensjon og -deklinasjon og sentrerer kartet der |
+| item accelerator (platform notation) \| ⌘L |
+| item access letter (language) \| O |
+| item label [checked] \| Kontroller |
+| item spoken name \| Kontroller |
+| item spoken description \| Viser eller skjuler vinduet JUranometria Kontroller, som har kartets kontroller ved siden av kartet; det åpnes igjen der du forlot det, og starter lukket. |
+| item access letter (language) \| R |
+| item label [checked] \| Verktøylinje |
+| item spoken name \| Verktøylinje |
+| item spoken description \| Viser eller skjuler verktøylinjen i kartvinduet. Kontrollene finnes fortsatt i vinduet JUranometria Kontroller; kartet beholder sentrum, synsfelt og alt det tegner. |
+| item accelerator (platform notation) \| ⌘+⇧T |
+| item access letter (language) \| V |
+| item label \| Zoom inn |
+| item spoken name \| Zoom inn |
+| item spoken description \| Viser et smalere synsfelt med svakere stjerner |
+| item accelerator (platform notation) \| ⌘= |
+| item label \| Zoom ut |
+| item spoken name \| Zoom ut |
+| item spoken description \| Viser et større synsfelt med færre stjerner |
+| item accelerator (platform notation) \| ⌘- |
+| menu label \| Solsystem |
+| menu spoken name \| Solsystem-menyen |
+| menu spoken description \| Solen, Merkur, Venus, Månen, Mars, Jupiter, Saturn, Uranus og Neptun: om hver av dem tegnes på kartet, og tabellene deres |
+| menu access letter (language) \| Y |
 | item label [checked] \| Solen på kartet |
 | item spoken name \| Solen på kartet |
 | item spoken description \| Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for karttiden og stedet; under en tegnet horisont dempes den og sier fra. |
@@ -887,14 +877,6 @@ Bar packed 882 × 471 px; widest popup 229 px.
 | item hover \| Hvor Neptun, Triton og Nereid er, for karttiden og stedet |
 | item spoken name \| Neptuntabell |
 | item spoken description \| Åpner en tabell over Neptuns beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Triton og Nereid står ved siden av - klar av Neptun, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Neptun og månene tegnes på kartet med Neptun på kartet. |
-| item label \| Zoom inn |
-| item spoken name \| Zoom inn |
-| item spoken description \| Viser et smalere synsfelt med svakere stjerner |
-| item accelerator (platform notation) \| ⌘= |
-| item label \| Zoom ut |
-| item spoken name \| Zoom ut |
-| item spoken description \| Viser et større synsfelt med færre stjerner |
-| item accelerator (platform notation) \| ⌘- |
 | menu label \| Hjelp |
 | menu spoken name \| Hjelp-menyen |
 | menu spoken description \| Informasjon om dette programmet og hva det er bygd på |
@@ -906,7 +888,7 @@ Bar packed 882 × 471 px; widest popup 229 px.
 | item spoken name \| Om JUranometria |
 | item spoken description \| Åpner vinduet med programmets navn, versjon og programvaren og dataene det er bygd på |
 
-### View at the widest field
+### Chart at the widest field
 
 ![](menu-nb-NO-7-widest.png)
 
@@ -925,43 +907,48 @@ Bar packed 882 × 471 px; widest popup 229 px.
 | item label \| Innstillinger... |
 | item spoken name \| Innstillinger |
 | item spoken description \| Åpner vinduet for utseende og for språkene programmet og kartet bruker |
-| menu label \| Vis |
-| menu spoken name \| Vis-menyen |
+| menu label \| Kart |
+| menu spoken name \| Kart-menyen |
 | menu spoken description \| Hva kartet tegner, hvor du ser fra, og hvor langt ut |
-| item label \| Kartvalg... |
-| item spoken name \| Kartvalg |
-| item spoken description \| Åpner vinduet som velger hva kartet tegner og merker. Hurtigtaster for kartet begynner med ⌘K. |
-| item access letter (language) \| K |
 | item label \| Sted og tid... |
 | item spoken name \| Sted og tid |
 | item spoken description \| Åpner vinduet der du velger stedet og tidspunktet som brukes når meridianen, horisonten og senit tegnes |
 | item access letter (language) \| S |
-| item label \| Kontroller |
-| item spoken name \| Kontroller |
-| item spoken description \| Viser eller skjuler vinduet JUranometria Kontroller, som har kartets kontroller ved siden av kartet; det åpnes igjen der du forlot det, og starter lukket. |
-| item access letter (language) \| R |
-| item label \| Sentrer på koordinater... |
-| item spoken name \| Sentrer på koordinater |
-| item spoken description \| Åpner et vindu der du skriver en J2000-rektascensjon og -deklinasjon og sentrerer kartet der |
-| item accelerator (platform notation) \| ⌘L |
-| item access letter (language) \| O |
-| item label \| Kartverktøylinje |
-| item spoken name \| Kartverktøylinje |
-| item spoken description \| Viser eller skjuler verktøylinjen i kartvinduet. Kontrollene finnes fortsatt i vinduet JUranometria Kontroller; kartet beholder sentrum, synsfelt og alt det tegner. |
-| item accelerator (platform notation) \| ⌘+⇧T |
-| item access letter (language) \| V |
+| item label \| Kartvalg... |
+| item spoken name \| Kartvalg |
+| item spoken description \| Åpner vinduet som velger hva kartet tegner og merker. Hurtigtaster for kartet begynner med ⌘K. |
+| item access letter (language) \| K |
 | item label \| Utforskeren |
 | item spoken name \| Utforskeren |
 | item spoken description \| Viser eller skjuler panelet som beskriver det valgte merket og hva som finnes på denne siden |
 | item accelerator (platform notation) \| ⌘I |
 | item access letter (language) \| U |
-| item label \| Ekliptikken |
-| item spoken name \| Ekliptikken |
-| item spoken description \| Viser eller skjuler ekliptikken og merkene for jevndøgn og solverv. Hurtigtasten for kartet er ⌘K deretter I. |
-| submenu label \| Solsystem |
-| submenu spoken name \| Solsystem-meny |
-| submenu spoken description \| Solen, Merkur, Venus, Månen, Mars, Jupiter, Saturn, Uranus og Neptun: om hver av dem tegnes på kartet, og tabellene deres |
-| submenu access letter (language) \| Y |
+| item label \| Sentrer på koordinater... |
+| item spoken name \| Sentrer på koordinater |
+| item spoken description \| Åpner et vindu der du skriver en J2000-rektascensjon og -deklinasjon og sentrerer kartet der |
+| item accelerator (platform notation) \| ⌘L |
+| item access letter (language) \| O |
+| item label \| Kontroller |
+| item spoken name \| Kontroller |
+| item spoken description \| Viser eller skjuler vinduet JUranometria Kontroller, som har kartets kontroller ved siden av kartet; det åpnes igjen der du forlot det, og starter lukket. |
+| item access letter (language) \| R |
+| item label \| Verktøylinje |
+| item spoken name \| Verktøylinje |
+| item spoken description \| Viser eller skjuler verktøylinjen i kartvinduet. Kontrollene finnes fortsatt i vinduet JUranometria Kontroller; kartet beholder sentrum, synsfelt og alt det tegner. |
+| item accelerator (platform notation) \| ⌘+⇧T |
+| item access letter (language) \| V |
+| item label \| Zoom inn |
+| item spoken name \| Zoom inn |
+| item spoken description \| Viser et smalere synsfelt med svakere stjerner |
+| item accelerator (platform notation) \| ⌘= |
+| item label [unavailable] \| Zoom ut |
+| item spoken name [unavailable] \| Zoom ut |
+| item spoken description [unavailable] \| Utilgjengelig: dette er atlasets største synsfelt |
+| item accelerator (platform notation) \| ⌘- |
+| menu label \| Solsystem |
+| menu spoken name \| Solsystem-menyen |
+| menu spoken description \| Solen, Merkur, Venus, Månen, Mars, Jupiter, Saturn, Uranus og Neptun: om hver av dem tegnes på kartet, og tabellene deres |
+| menu access letter (language) \| Y |
 | item label \| Solen på kartet |
 | item spoken name \| Solen på kartet |
 | item spoken description \| Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for karttiden og stedet; under en tegnet horisont dempes den og sier fra. |
@@ -1031,14 +1018,6 @@ Bar packed 882 × 471 px; widest popup 229 px.
 | item hover \| Hvor Neptun, Triton og Nereid er, for karttiden og stedet |
 | item spoken name \| Neptuntabell |
 | item spoken description \| Åpner en tabell over Neptuns beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Triton og Nereid står ved siden av - klar av Neptun, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Neptun og månene tegnes på kartet med Neptun på kartet. |
-| item label \| Zoom inn |
-| item spoken name \| Zoom inn |
-| item spoken description \| Viser et smalere synsfelt med svakere stjerner |
-| item accelerator (platform notation) \| ⌘= |
-| item label [unavailable] \| Zoom ut |
-| item spoken name [unavailable] \| Zoom ut |
-| item spoken description [unavailable] \| Utilgjengelig: dette er atlasets største synsfelt |
-| item accelerator (platform notation) \| ⌘- |
 | menu label \| Hjelp |
 | menu spoken name \| Hjelp-menyen |
 | menu spoken description \| Informasjon om dette programmet og hva det er bygd på |
@@ -1050,7 +1029,7 @@ Bar packed 882 × 471 px; widest popup 229 px.
 | item spoken name \| Om JUranometria |
 | item spoken description \| Åpner vinduet med programmets navn, versjon og programvaren og dataene det er bygd på |
 
-### View at the narrowest field
+### Chart at the narrowest field
 
 ![](menu-nb-NO-8-narrowest.png)
 
@@ -1069,43 +1048,48 @@ Bar packed 882 × 471 px; widest popup 229 px.
 | item label \| Innstillinger... |
 | item spoken name \| Innstillinger |
 | item spoken description \| Åpner vinduet for utseende og for språkene programmet og kartet bruker |
-| menu label \| Vis |
-| menu spoken name \| Vis-menyen |
+| menu label \| Kart |
+| menu spoken name \| Kart-menyen |
 | menu spoken description \| Hva kartet tegner, hvor du ser fra, og hvor langt ut |
-| item label \| Kartvalg... |
-| item spoken name \| Kartvalg |
-| item spoken description \| Åpner vinduet som velger hva kartet tegner og merker. Hurtigtaster for kartet begynner med ⌘K. |
-| item access letter (language) \| K |
 | item label \| Sted og tid... |
 | item spoken name \| Sted og tid |
 | item spoken description \| Åpner vinduet der du velger stedet og tidspunktet som brukes når meridianen, horisonten og senit tegnes |
 | item access letter (language) \| S |
-| item label \| Kontroller |
-| item spoken name \| Kontroller |
-| item spoken description \| Viser eller skjuler vinduet JUranometria Kontroller, som har kartets kontroller ved siden av kartet; det åpnes igjen der du forlot det, og starter lukket. |
-| item access letter (language) \| R |
-| item label \| Sentrer på koordinater... |
-| item spoken name \| Sentrer på koordinater |
-| item spoken description \| Åpner et vindu der du skriver en J2000-rektascensjon og -deklinasjon og sentrerer kartet der |
-| item accelerator (platform notation) \| ⌘L |
-| item access letter (language) \| O |
-| item label \| Kartverktøylinje |
-| item spoken name \| Kartverktøylinje |
-| item spoken description \| Viser eller skjuler verktøylinjen i kartvinduet. Kontrollene finnes fortsatt i vinduet JUranometria Kontroller; kartet beholder sentrum, synsfelt og alt det tegner. |
-| item accelerator (platform notation) \| ⌘+⇧T |
-| item access letter (language) \| V |
+| item label \| Kartvalg... |
+| item spoken name \| Kartvalg |
+| item spoken description \| Åpner vinduet som velger hva kartet tegner og merker. Hurtigtaster for kartet begynner med ⌘K. |
+| item access letter (language) \| K |
 | item label \| Utforskeren |
 | item spoken name \| Utforskeren |
 | item spoken description \| Viser eller skjuler panelet som beskriver det valgte merket og hva som finnes på denne siden |
 | item accelerator (platform notation) \| ⌘I |
 | item access letter (language) \| U |
-| item label \| Ekliptikken |
-| item spoken name \| Ekliptikken |
-| item spoken description \| Viser eller skjuler ekliptikken og merkene for jevndøgn og solverv. Hurtigtasten for kartet er ⌘K deretter I. |
-| submenu label \| Solsystem |
-| submenu spoken name \| Solsystem-meny |
-| submenu spoken description \| Solen, Merkur, Venus, Månen, Mars, Jupiter, Saturn, Uranus og Neptun: om hver av dem tegnes på kartet, og tabellene deres |
-| submenu access letter (language) \| Y |
+| item label \| Sentrer på koordinater... |
+| item spoken name \| Sentrer på koordinater |
+| item spoken description \| Åpner et vindu der du skriver en J2000-rektascensjon og -deklinasjon og sentrerer kartet der |
+| item accelerator (platform notation) \| ⌘L |
+| item access letter (language) \| O |
+| item label \| Kontroller |
+| item spoken name \| Kontroller |
+| item spoken description \| Viser eller skjuler vinduet JUranometria Kontroller, som har kartets kontroller ved siden av kartet; det åpnes igjen der du forlot det, og starter lukket. |
+| item access letter (language) \| R |
+| item label \| Verktøylinje |
+| item spoken name \| Verktøylinje |
+| item spoken description \| Viser eller skjuler verktøylinjen i kartvinduet. Kontrollene finnes fortsatt i vinduet JUranometria Kontroller; kartet beholder sentrum, synsfelt og alt det tegner. |
+| item accelerator (platform notation) \| ⌘+⇧T |
+| item access letter (language) \| V |
+| item label [unavailable] \| Zoom inn |
+| item spoken name [unavailable] \| Zoom inn |
+| item spoken description [unavailable] \| Utilgjengelig: et nærfelt tilbys bare når Merkur, Venus, Mars, Jupiter, Saturn, Uranus eller Neptun, vist på kartet, står på siden steget ville vise |
+| item accelerator (platform notation) \| ⌘= |
+| item label \| Zoom ut |
+| item spoken name \| Zoom ut |
+| item spoken description \| Viser et større synsfelt med færre stjerner |
+| item accelerator (platform notation) \| ⌘- |
+| menu label \| Solsystem |
+| menu spoken name \| Solsystem-menyen |
+| menu spoken description \| Solen, Merkur, Venus, Månen, Mars, Jupiter, Saturn, Uranus og Neptun: om hver av dem tegnes på kartet, og tabellene deres |
+| menu access letter (language) \| Y |
 | item label \| Solen på kartet |
 | item spoken name \| Solen på kartet |
 | item spoken description \| Viser eller skjuler Solen på kartet, tegnet i sann størrelse der den står for karttiden og stedet; under en tegnet horisont dempes den og sier fra. |
@@ -1175,14 +1159,6 @@ Bar packed 882 × 471 px; widest popup 229 px.
 | item hover \| Hvor Neptun, Triton og Nereid er, for karttiden og stedet |
 | item spoken name \| Neptuntabell |
 | item spoken description \| Åpner en tabell over Neptuns beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Triton og Nereid står ved siden av - klar av Neptun, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Neptun og månene tegnes på kartet med Neptun på kartet. |
-| item label [unavailable] \| Zoom inn |
-| item spoken name [unavailable] \| Zoom inn |
-| item spoken description [unavailable] \| Utilgjengelig: et nærfelt tilbys bare når Merkur, Venus, Mars, Jupiter, Saturn, Uranus eller Neptun, vist på kartet, står på siden steget ville vise |
-| item accelerator (platform notation) \| ⌘= |
-| item label \| Zoom ut |
-| item spoken name \| Zoom ut |
-| item spoken description \| Viser et større synsfelt med færre stjerner |
-| item accelerator (platform notation) \| ⌘- |
 | menu label \| Hjelp |
 | menu spoken name \| Hjelp-menyen |
 | menu spoken description \| Informasjon om dette programmet og hva det er bygd på |

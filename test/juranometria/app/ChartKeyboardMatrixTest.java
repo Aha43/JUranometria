@@ -364,6 +364,7 @@ class ChartKeyboardMatrixTest {
         private juranometria.ecliptic.EclipticModule ecliptic;
         private final List<Boolean> eclipticSaved = new ArrayList<>();
         private final List<String> placeSaved = new ArrayList<>();
+        private ChartOptionsControls chartOptionsControls;
         private ChartKeyboard palette;
         private java.util.prefs.Preferences node;
 
@@ -376,9 +377,12 @@ class ChartKeyboardMatrixTest {
                             java.time.Instant.parse(
                                     "2026-01-01T21:00:00Z")));
             ecliptic = new juranometria.ecliptic.EclipticModule();
-            Runnable theMenusOwnSwitch =
-                    juranometria.ui.ecliptic.EclipticSession.toggle(
+            // The one switch (#675): the Chart Options box and the
+            // palette's letter both run it.
+            juranometria.ui.ecliptic.EclipticSession.Switch eclipticSwitch =
+                    juranometria.ui.ecliptic.EclipticSession.of(
                             ecliptic, eclipticStore());
+            Runnable theMenusOwnSwitch = eclipticSwitch::toggle;
             SwingUtilities.invokeAndWait(() -> {
                 frame = new JFrame("chart keyboard modules");
                 frame.setLayout(new BorderLayout());
@@ -387,8 +391,13 @@ class ChartKeyboardMatrixTest {
                 frame.add(page, BorderLayout.CENTER);
                 frame.setSize(900, 600);
                 bar = AppMenuBar.create(null, null, () -> { }, () -> { },
-                        () -> { }, () -> { }, theMenusOwnSwitch, juranometria.ui.language.InterfaceText.forLanguage("en"));
+                        () -> { }, () -> { }, null, juranometria.ui.language.InterfaceText.forLanguage("en"));
                 frame.setJMenuBar(bar);
+                chartOptionsControls = new ChartOptionsControls(
+                        new ChartOptionsController(
+                                ChartOptionsStore.forNode(node)),
+                        () -> false, eclipticSwitch,
+                        juranometria.ui.language.InterfaceText.forLanguage("en"));
                 ChartKeyboard.install(frame.getRootPane(),
                         ChartSwitches.of(
                                 new ChartOptionsController(
@@ -432,18 +441,16 @@ class ChartKeyboardMatrixTest {
         }
 
         /**
-         * The ecliptic: the View menu's own item against the letter,
-         * from the same start, both ways.
+         * The ecliptic: Chart Options' own box (#675) against the
+         * letter, from the same start, both ways.
          *
-         * <p>A menu item's action is its whole surface, which is the
-         * convention the test-evidence decision records; the popup it
-         * lives in is shown and measured in its own test.
+         * <p>A box's action is its whole surface, which is the
+         * convention the test-evidence decision records.
          */
         void ecliptic(boolean from) throws Exception {
             String what = "The ecliptic from " + (from ? "on" : "off");
-            javax.swing.JCheckBoxMenuItem item =
-                    AppMenuBar.eclipticItem(bar);
-            assertNotNull(item, "the View menu carries the ecliptic");
+            javax.swing.JCheckBox item = chartOptionsControls.eclipticBox();
+            assertNotNull(item, "Chart Options carries the ecliptic");
 
             set(() -> ecliptic.showing(from));
             int savedBefore = eclipticSaved.size();
