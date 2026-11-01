@@ -24,7 +24,7 @@ Recorded on: `Mac OS X 27.0.1/aarch64/Homebrew 21.0.12.1`
 >
 > Recorded on: `Mac OS X 27.0.1/aarch64/Homebrew 21.0.12.1`
 
-| page | figure | page ink the figure's box beside the mark meets (px) |
+| page | figure the page states | page ink the figure's box beside the mark meets (px) |
 |---|---|---|
 | south-35-8 | 35° | 0 |
 | south-35-4 | 35° | 28 |
@@ -37,3 +37,18 @@ Recorded on: `Mac OS X 27.0.1/aarch64/Homebrew 21.0.12.1`
 | south-35-2-nb | 35° | 25 |
 | zenith-18 | 84° | 38 |
 | zenith-4 | 89° | 37 |
+| zoom 42° (zenith) | — | — |
+| zoom 36° (zenith) | — | — |
+| zoom 24° (zenith) | 81° | — |
+| zoom 18° (zenith) | 84° | — |
+| zoom 12° (zenith) | 86° | — |
+| zoom 8° (zenith) | 87° | — |
+| zoom 4° (zenith) | 89° | — |
+| zoom 24° (35.37°) | — | — |
+| zoom 12° (35.37°) | — | — |
+| zoom 8° (35.37°) | 35° | — |
+| zoom 6° (35.37°) | 35° | — |
+| zoom 4° (35.37°) | 35° | — |
+| zoom 3° (35.37°) | 35° | — |
+| zoom 2° (35.37°) | 35° | — |
+| zoom 1° (35.37°) | 35° | — |

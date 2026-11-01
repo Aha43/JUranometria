@@ -77,7 +77,7 @@ public final class MeridianReadoutStudyMain {
                 + " each page, the visible altitudes and the readout's altitude and page"
                 + " position - is in `measurements.md`. Whether the figure's box meets the"
                 + " page's own ink depends on this desktop's fonts."));
-        q("| page | figure | page ink the figure's box beside the mark meets (px) |");
+        q("| page | figure the page states | page ink the figure's box beside the mark meets (px) |");
         q("|---|---|---|");
         p("# One altitude readout on the meridian at narrow fields (#563)");
         p("");
@@ -97,7 +97,11 @@ public final class MeridianReadoutStudyMain {
                 + " ruling; its numbers are quoted in `docs/decisions/meridian-readout.md`. Amended"
                 + " R-9 (2026-10-31): when the nearest point reads as the zenith's, the readout stands"
                 + " at the visible point farthest from the zenith instead, the south half first, kept"
-                + " " + figure(MeridianReadout.EDGE_ROOM) + " px inside the page's edge.");
+                + " " + figure(MeridianReadout.EDGE_ROOM) + " px inside the page's edge. The figures"
+                + " below are the rule's at the helper's sampled point; the page itself stands clear of"
+                + " its own ink (furniture, names, glyphs) by " + figure(3.0) + " px, so where a title"
+                + " block or a name sits on the line - this desktop's fonts decide where - the page's"
+                + " figure may be the next clear point's, and is recorded in `platform.md`.");
         p("");
         p("## Pages");
         p("");
@@ -153,11 +157,12 @@ public final class MeridianReadoutStudyMain {
         p("|---|---|---|---|---|");
         for (double field : new double[] {42.0, 36.0, 24.0, 18.0, 12.0, 8.0, 4.0}) {
             Measured m = measure(sky.zenith(), field, false);
+            q("| zoom " + figure(field) + "° (zenith) | " + m.stated + " | — |");
             p("| " + figure(field) + "° | " + m.ticksOnPage + " | "
                     + (m.offered ? "yes" : "no: a ruled tick is on the page") + " | "
                     + (m.a == null ? "—" : (m.atTheEdge ? "the farthest visible point (R-9), " : "the nearest point, ")
                             + fmt(m.a.altitudeDegrees(), 2) + "° at " + pixel(m.a)) + " | "
-                    + m.stated + " |");
+                    + ruled(m) + " |");
         }
         p("");
         p("## Panning along the line, 4° field, south half");
@@ -171,7 +176,7 @@ public final class MeridianReadoutStudyMain {
             double centre = 35.12 + 0.25 * k;
             Measured m = measure(sky.onMeridian(centre, false), 4.0, false);
             p("| " + fmt(centre, 2) + "° | " + (m.a == null ? "—" : fmt(m.a.altitudeDegrees(), 2) + "°")
-                    + " | " + m.stated
+                    + " | " + ruled(m)
                     + " | " + (m.a == null ? "—" : pixel(m.a)) + " |");
         }
         p("");
@@ -181,9 +186,10 @@ public final class MeridianReadoutStudyMain {
         p("|---|---|---|---|---|");
         for (double field : new double[] {24.0, 12.0, 8.0, 6.0, 4.0, 3.0, 2.0, 1.0}) {
             Measured m = measure(sky.onMeridian(35.37, false), field, false);
+            q("| zoom " + figure(field) + "° (35.37°) | " + m.stated + " | — |");
             p("| " + figure(field) + "° | " + fmt(field * 700.0 / 900.0, 1) + "° | " + m.ticksOnPage + " | "
                     + (m.offered ? "yes" : "no: a ruled tick is on the page") + " | "
-                    + m.stated + " |");
+                    + ruled(m) + " |");
         }
         p("");
         p("## What the measurements support");
@@ -211,6 +217,11 @@ public final class MeridianReadoutStudyMain {
     private record Measured(int ticksOnPage, double low, double high, boolean offered,
                             MeridianReadout.Sample a, boolean atTheEdge, String stated,
                             BufferedImage page, ChartModuleHost host, List<MeridianReadout.Sample> visible) {
+    }
+
+    /** The rule's figure at the helper's point: portable, the deterministic report's. */
+    private static String ruled(Measured m) {
+        return m.a == null ? "—" : figure(MeridianReadout.roundedToTheDegree(m.a.altitudeDegrees())) + "°";
     }
 
     /**
@@ -307,7 +318,7 @@ public final class MeridianReadoutStudyMain {
         if (m.offered && m.a != null) {
             mockFigure = m.stated;
             overlap = figureRoom(image, m, mockFigure, palette);
-            drawn = "production ink at " + pixel(m.a) + ", figure " + mockFigure
+            drawn = "production ink at " + pixel(m.a) + ", figure " + ruled(m)
                     + (m.atTheEdge ? " (R-9: the farthest visible point, the centre being the zenith's)" : "");
         } else if (m.offered) {
             drawn = "nothing: no statable altitude on the visible line";
@@ -316,7 +327,7 @@ public final class MeridianReadoutStudyMain {
         p("| ![](" + name + ".png) " + name + " (" + caption + ") | " + figure(field) + "° | " + m.ticksOnPage
                 + " | " + (m.visible.isEmpty() ? "none" : fmt(m.low, 2) + "°–" + fmt(m.high, 2) + "°")
                 + " | " + (m.a == null ? "—" : fmt(m.a.altitudeDegrees(), 2) + "° at " + pixel(m.a))
-                + " | " + m.stated
+                + " | " + ruled(m)
                 + " | " + drawn + " |");
         q("| " + name + " | " + mockFigure + " | " + (overlap < 0 ? "—" : Integer.toString(overlap)) + " |");
     }

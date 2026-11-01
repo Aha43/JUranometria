@@ -138,13 +138,15 @@ back, *"Your recommendation"* - the amendment.
 Measured (`zenith-18`, `zenith-4` and the zoom table in the study): on
 the study's 900 × 700 page an 80° tick is on the page at 42° and 36° and
 the readout is withheld; from 24° down no ruled tick is on the page and
-the readout stands near the bottom edge, 24 px inside it, reading 81° at
-24°, 84° at 18°, 86° at 12°, 87° at 8° and 89° at 4° (the study quotes
-the page's own spoken figure, not its helper's rounding: at 18° the
-helper's 0.05° grid reads 83.50° and the page's 0.25° grid a hair above
-the half, so the page says 84°). On the owner's
-wider page (about 2000 × 1070) the 80° ticks leave at 36° and the
-readout appears there.
+the readout stands near the bottom edge, 24 px inside it, reading by the
+rule 81° at 24°, 83° at 18°, 86° at 12°, 87° at 8° and 89° at 4°. Those
+are the rule's figures at the helper's sampled point, the portable
+record; what the page itself states on a given desktop stands in
+`platform.md` (on this one 84° at 18°, the page's quarter-degree grid
+landing a hair above the half, and the same as the rule elsewhere),
+because the page stands clear of its own ink and a wider title block
+moves its point. On the owner's wider page (about 2000 × 1070) the 80°
+ticks leave at 36° and the readout appears there.
 
 ### Clear of the page's own ink (found on CI, 2026-11-01)
 

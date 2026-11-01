@@ -71,12 +71,36 @@ public final class WrapLayout extends FlowLayout {
      * layout would use the whole width and could fit one row where two
      * were reserved, leaving a gap beneath.
      */
+    /**
+     * The width the rows are wrapped to: the width the target would have
+     * with no vertical scrollbar beside it, less the scrollbar reserve.
+     * A scroll pane's vertical scrollbar narrows the viewport by its own
+     * width when it appears, and the reserve is at least that width, so
+     * the rows come out the same whether the bar is showing or not - and
+     * the same as the first pass, which reads them before anything is
+     * laid out. Gate 1 on f8ea4b87 (#675) caught the alternative: a
+     * companion photograph 30 px shorter on its second run, the preferred
+     * height read at one width and the rows laid at another.
+     */
+    private int roomOf(Container target, int width) {
+        for (Container up = target.getParent(); up != null; up = up.getParent()) {
+            if (up instanceof javax.swing.JScrollPane pane) {
+                javax.swing.JScrollBar bar = pane.getVerticalScrollBar();
+                if (bar != null && bar.isVisible() && bar.getWidth() > 0) {
+                    width += bar.getWidth();
+                }
+                break;
+            }
+        }
+        return width - reserved;
+    }
+
     @Override
     public void layoutContainer(Container target) {
         synchronized (target.getTreeLock()) {
             Insets insets = target.getInsets();
-            int room = target.getWidth() - insets.left - insets.right - getHgap() * 2
-                    - reserved;
+            int room = roomOf(target, target.getWidth()) - insets.left - insets.right
+                    - getHgap() * 2;
             int x = 0;
             int y = insets.top + getVgap();
             int rowHeight = 0;
@@ -144,7 +168,7 @@ public final class WrapLayout extends FlowLayout {
                 available = fallbackWidth;
             }
             if (available > 0) {
-                available -= reserved;
+                available = roomOf(target, available);
             }
             if (available <= 0) {
                 // Nothing laid out yet: ask for no more than the widest child.
