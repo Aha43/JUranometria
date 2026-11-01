@@ -198,11 +198,28 @@ class SprintTwentyEightJourneyTest {
                 ChartViewState wherever = chart.viewState();
 
                 EclipticModule ecliptic = EclipticSession.begin(host);
-                JMenuBar bar = AppMenuBar.create(null, null, () -> { },
-                        () -> { }, () -> { }, () -> { },
-                        EclipticSession.toggle(ecliptic, store), juranometria.ui.language.InterfaceText.forLanguage("en"));
-                JCheckBoxMenuItem item = AppMenuBar.eclipticItem(bar);
-                EclipticSession.restore(ecliptic, store, item);
+                // The reader's control since #675: the Ecliptic box in
+                // Chart Options' Chart checklist, over the one switch.
+                EclipticSession.Switch eclipticSwitch =
+                        EclipticSession.of(ecliptic, store);
+                javax.swing.JCheckBox item = new juranometria.app.ChartOptionsControls(
+                        new juranometria.app.ChartOptionsController(
+                                new juranometria.app.ChartOptionsStore() {
+                                        private juranometria.render.ChartOptions kept =
+                                                juranometria.render.ChartOptions.DEFAULTS;
+                                        @Override
+                                        public juranometria.render.ChartOptions load() {
+                                            return kept;
+                                        }
+                                        @Override
+                                        public void save(juranometria.render.ChartOptions options) {
+                                            kept = options;
+                                        }
+                                }),
+                        () -> false, eclipticSwitch,
+                        juranometria.ui.language.InterfaceText.forLanguage("en"))
+                        .eclipticBox();
+                eclipticSwitch.restore();
 
                 assertFalse(item.isSelected(),
                         "1. a reader who has never asked opens with the"

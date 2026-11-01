@@ -298,8 +298,8 @@ public final class NeptuneTableControls {
             step.setSelectedIndex(applied.query().step());
         }
 
-        instantView.addActionListener(e -> apply());
-        rangeView.addActionListener(e -> apply());
+        // The views switch the draft's mode and reveal or hide its
+        // fields (#675, stage 4); they compute nothing - Compute does.
         compute.addActionListener(e -> apply());
         if (setChartTime != null) {
             setChartTime.addActionListener(e -> {
@@ -608,17 +608,23 @@ public final class NeptuneTableControls {
         JPanel rangeRow = new JPanel();
         rangeRow.setLayout(new BoxLayout(rangeRow, BoxLayout.X_AXIS));
         rangeRow.setAlignmentX(0f);
+        // The range's fields, shown only under Over a time range (#675,
+        // stage 4); Compute stays whatever the view.
+        JPanel rangeFields = new JPanel();
+        rangeFields.setLayout(new BoxLayout(rangeFields, BoxLayout.X_AXIS));
         JComponent spanIn = spanRow();
-        rangeRow.add(spanIn);
-        rangeRow.add(Box.createHorizontalStrut(12));
+        rangeFields.add(spanIn);
+        rangeFields.add(Box.createHorizontalStrut(12));
         JLabel every = new JLabel(said.say("range.step.label"));
         every.setLabelFor(step);
-        rangeRow.add(every);
-        rangeRow.add(Box.createHorizontalStrut(6));
-        rangeRow.add(step);
-        rangeRow.add(Box.createHorizontalStrut(12));
+        rangeFields.add(every);
+        rangeFields.add(Box.createHorizontalStrut(6));
+        rangeFields.add(step);
+        rangeFields.add(Box.createHorizontalStrut(12));
+        rangeRow.add(rangeFields);
         rangeRow.add(compute);
         top.add(rangeRow);
+        RangeFields.follow(rangeView, rangeFields);
         top.add(Box.createVerticalStrut(6));
         status.setAlignmentX(0f);
         top.add(status);
@@ -663,17 +669,25 @@ public final class NeptuneTableControls {
         views.add(Box.createHorizontalStrut(10));
         views.add(rangeView);
         column.add(leading(views));
-        column.add(leading(spanRow()));
+        // The range's fields, shown only under Over a time range (#675,
+        // stage 4): the span on its row, the step beside Compute, which
+        // stays whatever the view.
+        JComponent spanIn = leading(spanRow());
+        column.add(spanIn);
         JPanel stepRow = new JPanel();
         stepRow.setLayout(new BoxLayout(stepRow, BoxLayout.X_AXIS));
+        JPanel rangeStep = new JPanel();
+        rangeStep.setLayout(new BoxLayout(rangeStep, BoxLayout.X_AXIS));
         JLabel every = new JLabel(said.say("range.step.label"));
         every.setLabelFor(step);
-        stepRow.add(every);
-        stepRow.add(Box.createHorizontalStrut(6));
-        stepRow.add(step);
-        stepRow.add(Box.createHorizontalStrut(10));
+        rangeStep.add(every);
+        rangeStep.add(Box.createHorizontalStrut(6));
+        rangeStep.add(step);
+        rangeStep.add(Box.createHorizontalStrut(10));
+        stepRow.add(rangeStep);
         stepRow.add(compute);
         column.add(leading(stepRow));
+        RangeFields.follow(rangeView, spanIn, rangeStep);
         column.add(Box.createVerticalStrut(4));
         column.add(leadingWide(status));
         column.add(Box.createVerticalStrut(4));

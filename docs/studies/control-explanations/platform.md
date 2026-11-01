@@ -54,6 +54,7 @@ Every one of them from the registry that binds it, so a tooltip cannot promise a
 | Chart Options | Constellation boundaries | The IAU boundaries, precessed from B1875. Shortcut: <prefix> then B. |
 | Chart Options | Constellation names | The figure's name, drawn where the figure is. Shortcut: <prefix> then N. |
 | Chart Options | Equatorial coordinate grid | ICRS/J2000 right-ascension and declination grid lines with coordinate labels. Shortcut:... |
+| Chart Options | Ecliptic | The ecliptic and its equinox and solstice marks. Shortcut: <prefix> then I. |
 | Chart Options | Title block | The panel in the lower left stating the target, centre, frame, field width, limiting ma... |
 | Chart Options | Stellar-magnitude key | A key in the upper right showing the circle size the chart draws for three visual magni... |
 | Chart Options | Black sky | White stars and restrained light ink on a black ground, instead of the white-paper char... |
@@ -61,7 +62,7 @@ Every one of them from the registry that binds it, so a tooltip cannot promise a
 | Place and Time | Mathematical horizon | Draw where the sky meets a perfectly flat, transparent Earth (<prefix> then H) |
 | Inspector | (icon only) | Close Inspector (<key:inspector>) |
 
-**26 explanations** name a key on this platform. The report beside this one
+**27 explanations** name a key on this platform. The report beside this one
 holds the same sentences with the modifier reduced to a token, so that what
 is pinned is which control quotes which switch rather than what this
 desktop calls a key.

@@ -29,11 +29,11 @@ class AppSurfaceTest {
         JMenuBar bar = AppMenuBar.create(() -> settings[0]++,
                 () -> chartOptions[0]++, () -> about[0]++, juranometria.ui.language.InterfaceText.forLanguage("en"));
         assertEquals(3, bar.getMenuCount(),
-                "File, View, and Help - nothing else");
+                "File, Chart, and Help - nothing else");
         assertEquals("File", bar.getMenu(0).getText());
         assertEquals(1, bar.getMenu(0).getItemCount(),
                 "no placeholder items beside Settings");
-        assertEquals("View", bar.getMenu(1).getText());
+        assertEquals("Chart", bar.getMenu(1).getText());
         assertEquals(1, bar.getMenu(1).getItemCount(),
                 "no placeholder items beside Chart Options");
         assertEquals("Help", bar.getMenu(2).getText());

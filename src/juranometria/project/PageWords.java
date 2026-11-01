@@ -241,4 +241,10 @@ public interface PageWords {
      * carries no words of its own.
      */
     String altitudeTick(double altitudeDegrees);
+
+    /**
+     * The spoken sentence for the meridian's contextual altitude readout
+     * (#563): the figure is {@link #altitudeTick}'s, already a word.
+     */
+    String altitudeReadoutSpoken(String figure);
 }

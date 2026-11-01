@@ -61,10 +61,15 @@ The shipped catalogue, nothing typed.
 | Reset view: back to the atlas's first page |
 | Reset view |
 | Returns the chart to where every reader begins, and clears the search; what the chart draws is left as you chose it |
+| Place and Time: where and when the chart is drawn for |
+| Place and Time |
+| Opens the window that sets your location and the instant the chart is drawn for; the same window as Chart's Place and Time... item opens |
 | Show the Inspector: what the selected mark is (⌘I) |
 | Inspector |
 | Hidden; press to open the panel that identifies what you selected and lists what is on this page. |
-| Accumulate |
+| Show the Controller: the chart's controls beside the chart |
+| Controls |
+| Hidden; press to open the JUranometria Controller window, which keeps the chart's controls beside the chart; the same switch as Chart's Controls item |
 | When on, choosing objects adds them to the working selection and choosing them again removes them, instead of replacing the selection. The platform's add-to-selection modifier always works. |
 | Accumulate selection |
 | Off, each object you choose replaces the working selection; on, it is added to it, and choosing it again takes it out. Holding the platform's add-to-selection modifier does the same whether this is on or off. |
@@ -104,10 +109,15 @@ The shipped catalogue. Every row is a catalogue identity pair and is not transla
 | Reset view: back to the atlas's first page |
 | Reset view |
 | Returns the chart to where every reader begins, and clears the search; what the chart draws is left as you chose it |
+| Place and Time: where and when the chart is drawn for |
+| Place and Time |
+| Opens the window that sets your location and the instant the chart is drawn for; the same window as Chart's Place and Time... item opens |
 | Show the Inspector: what the selected mark is (⌘I) |
 | Inspector |
 | Hidden; press to open the panel that identifies what you selected and lists what is on this page. |
-| Accumulate |
+| Show the Controller: the chart's controls beside the chart |
+| Controls |
+| Hidden; press to open the JUranometria Controller window, which keeps the chart's controls beside the chart; the same switch as Chart's Controls item |
 | When on, choosing objects adds them to the working selection and choosing them again removes them, instead of replacing the selection. The platform's add-to-selection modifier always works. |
 | Accumulate selection |
 | Off, each object you choose replaces the working selection; on, it is added to it, and choosing it again takes it out. Holding the platform's add-to-selection modifier does the same whether this is on or off. |
@@ -163,10 +173,15 @@ The shipped catalogue. The item is disabled because there really is nothing to c
 | Reset view: back to the atlas's first page |
 | Reset view |
 | Returns the chart to where every reader begins, and clears the search; what the chart draws is left as you chose it |
+| Place and Time: where and when the chart is drawn for |
+| Place and Time |
+| Opens the window that sets your location and the instant the chart is drawn for; the same window as Chart's Place and Time... item opens |
 | Show the Inspector: what the selected mark is (⌘I) |
 | Inspector |
 | Hidden; press to open the panel that identifies what you selected and lists what is on this page. |
-| Accumulate |
+| Show the Controller: the chart's controls beside the chart |
+| Controls |
+| Hidden; press to open the JUranometria Controller window, which keeps the chart's controls beside the chart; the same switch as Chart's Controls item |
 | When on, choosing objects adds them to the working selection and choosing them again removes them, instead of replacing the selection. The platform's add-to-selection modifier always works. |
 | Accumulate selection |
 | Off, each object you choose replaces the working selection; on, it is added to it, and choosing it again takes it out. Holding the platform's add-to-selection modifier does the same whether this is on or off. |
@@ -208,10 +223,15 @@ The shipped catalogue. The item is disabled because there really is nothing to c
 | Reset view: back to the atlas's first page |
 | Reset view |
 | Returns the chart to where every reader begins, and clears the search; what the chart draws is left as you chose it |
+| Place and Time: where and when the chart is drawn for |
+| Place and Time |
+| Opens the window that sets your location and the instant the chart is drawn for; the same window as Chart's Place and Time... item opens |
 | Show the Inspector: what the selected mark is (⌘I) |
 | Inspector |
 | Hidden; press to open the panel that identifies what you selected and lists what is on this page. |
-| Accumulate |
+| Show the Controller: the chart's controls beside the chart |
+| Controls |
+| Hidden; press to open the JUranometria Controller window, which keeps the chart's controls beside the chart; the same switch as Chart's Controls item |
 | When on, choosing objects adds them to the working selection and choosing them again removes them, instead of replacing the selection. The platform's add-to-selection modifier always works. |
 | Accumulate selection |
 | Off, each object you choose replaces the working selection; on, it is added to it, and choosing it again takes it out. Holding the platform's add-to-selection modifier does the same whether this is on or off. |
@@ -255,10 +275,15 @@ The shipped catalogue, nothing typed.
 | Tilbakestill visningen: tilbake til atlasets første side |
 | Tilbakestill visningen |
 | Fører kartet tilbake til startsiden og tømmer søket; det du har valgt å vise på kartet, endres ikke |
+| Sted og tid: hvor og når kartet tegnes for |
+| Sted og tid |
+| Åpner vinduet der du velger stedet og tidspunktet kartet tegnes for; det samme vinduet som Kart-menyens Sted og tid... åpner |
 | Vis utforskeren: hva det valgte merket er (⌘I) |
 | Utforskeren |
 | Skjult; trykk for å åpne panelet som viser hva du har valgt og hva som finnes på denne siden |
-| Samle opp |
+| Vis Kontrolleren: kartets kontroller ved siden av kartet |
+| Kontroller |
+| Skjult; trykk for å åpne vinduet JUranometria Kontroller, som har kartets kontroller ved siden av kartet; samme bryter som Kart-menyens Kontroller |
 | Når denne er på, legges objektene du velger til i arbeidsutvalget. Velger du et objekt på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker alltid. |
 | Samle opp valgte objekter |
 | Når denne er av, erstatter hvert nytt objekt arbeidsutvalget. Når den er på, legges objektet til; velger du det på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker i begge tilfeller. |
@@ -298,10 +323,15 @@ The shipped catalogue. Every row is a catalogue identity pair and is not transla
 | Tilbakestill visningen: tilbake til atlasets første side |
 | Tilbakestill visningen |
 | Fører kartet tilbake til startsiden og tømmer søket; det du har valgt å vise på kartet, endres ikke |
+| Sted og tid: hvor og når kartet tegnes for |
+| Sted og tid |
+| Åpner vinduet der du velger stedet og tidspunktet kartet tegnes for; det samme vinduet som Kart-menyens Sted og tid... åpner |
 | Vis utforskeren: hva det valgte merket er (⌘I) |
 | Utforskeren |
 | Skjult; trykk for å åpne panelet som viser hva du har valgt og hva som finnes på denne siden |
-| Samle opp |
+| Vis Kontrolleren: kartets kontroller ved siden av kartet |
+| Kontroller |
+| Skjult; trykk for å åpne vinduet JUranometria Kontroller, som har kartets kontroller ved siden av kartet; samme bryter som Kart-menyens Kontroller |
 | Når denne er på, legges objektene du velger til i arbeidsutvalget. Velger du et objekt på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker alltid. |
 | Samle opp valgte objekter |
 | Når denne er av, erstatter hvert nytt objekt arbeidsutvalget. Når den er på, legges objektet til; velger du det på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker i begge tilfeller. |
@@ -357,10 +387,15 @@ The shipped catalogue. The item is disabled because there really is nothing to c
 | Tilbakestill visningen: tilbake til atlasets første side |
 | Tilbakestill visningen |
 | Fører kartet tilbake til startsiden og tømmer søket; det du har valgt å vise på kartet, endres ikke |
+| Sted og tid: hvor og når kartet tegnes for |
+| Sted og tid |
+| Åpner vinduet der du velger stedet og tidspunktet kartet tegnes for; det samme vinduet som Kart-menyens Sted og tid... åpner |
 | Vis utforskeren: hva det valgte merket er (⌘I) |
 | Utforskeren |
 | Skjult; trykk for å åpne panelet som viser hva du har valgt og hva som finnes på denne siden |
-| Samle opp |
+| Vis Kontrolleren: kartets kontroller ved siden av kartet |
+| Kontroller |
+| Skjult; trykk for å åpne vinduet JUranometria Kontroller, som har kartets kontroller ved siden av kartet; samme bryter som Kart-menyens Kontroller |
 | Når denne er på, legges objektene du velger til i arbeidsutvalget. Velger du et objekt på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker alltid. |
 | Samle opp valgte objekter |
 | Når denne er av, erstatter hvert nytt objekt arbeidsutvalget. Når den er på, legges objektet til; velger du det på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker i begge tilfeller. |
@@ -402,10 +437,15 @@ The shipped catalogue. The item is disabled because there really is nothing to c
 | Tilbakestill visningen: tilbake til atlasets første side |
 | Tilbakestill visningen |
 | Fører kartet tilbake til startsiden og tømmer søket; det du har valgt å vise på kartet, endres ikke |
+| Sted og tid: hvor og når kartet tegnes for |
+| Sted og tid |
+| Åpner vinduet der du velger stedet og tidspunktet kartet tegnes for; det samme vinduet som Kart-menyens Sted og tid... åpner |
 | Vis utforskeren: hva det valgte merket er (⌘I) |
 | Utforskeren |
 | Skjult; trykk for å åpne panelet som viser hva du har valgt og hva som finnes på denne siden |
-| Samle opp |
+| Vis Kontrolleren: kartets kontroller ved siden av kartet |
+| Kontroller |
+| Skjult; trykk for å åpne vinduet JUranometria Kontroller, som har kartets kontroller ved siden av kartet; samme bryter som Kart-menyens Kontroller |
 | Når denne er på, legges objektene du velger til i arbeidsutvalget. Velger du et objekt på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker alltid. |
 | Samle opp valgte objekter |
 | Når denne er av, erstatter hvert nytt objekt arbeidsutvalget. Når den er på, legges objektet til; velger du det på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker i begge tilfeller. |

@@ -126,7 +126,7 @@ observer and 7.71° south face to the Sun, rings 44.7″ by
 ## From the numbers to the chart
 
 The chart draws Saturn where the numbers put it, through the switch
-*Saturn on the chart* in View ▸ Solar System, after Jupiter's, and in
+*Saturn on the chart* in Solar System ▸ Saturn on the chart (before 6.1 the Solar System menu stood under View), after Jupiter's, and in
 the Controller's Saturn group - off until you choose it, then
 remembered. The rule is Jupiter's, applied to the whole figure: **Saturn
 is drawn as its true globe and rings where the rings are at least 6 px

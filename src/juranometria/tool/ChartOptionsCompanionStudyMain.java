@@ -250,7 +250,12 @@ public final class ChartOptionsCompanionStudyMain {
     private static JComponent dialogContent(Preferences node, InterfaceText said,
                                             boolean deepSkyOff) {
         return ChartOptionsDialog.contentForStudy(controller(node, deepSkyOff),
-                said.language());
+                said.language(),
+                // The ecliptic's switch (#675): the Chart tab shows the
+                // Ecliptic box a reader gets, over this scratch node.
+                juranometria.ui.ecliptic.EclipticSession.of(
+                        new juranometria.ecliptic.EclipticModule(),
+                        juranometria.ui.ecliptic.EclipticStore.forNode(node)));
     }
 
     /** One subject: its tab's title and its column of controls. */

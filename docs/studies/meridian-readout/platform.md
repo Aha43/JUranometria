@@ -1,0 +1,54 @@
+# The meridian readout: this machine's mock-up placements (#563)
+
+Sprint 55
+
+**This is one machine's answer.** What is written here is what the desktop
+this was generated on calls things and binds; another desktop answers differently
+and is not wrong. The contract holds it to reproducing within an environment,
+never across two - the portable half of this study is the document beside it.
+
+| the machine | |
+|---|---|
+| operating system | Mac OS X |
+| architecture | aarch64 |
+| Java | 21.0.12.1 |
+| headless | true |
+
+Recorded on: `Mac OS X 27.0.1/aarch64/Homebrew 21.0.12.1`
+
+> **Platform observation.** The measurements below are this machine's:
+> ink counts, font extents and encoded sizes depend on the fonts and the
+> rasteriser in front of them, and another machine measures differently
+> without anything being wrong. Held to reproducing here, never to matching
+> another machine's recording. What is portable - which ticks lie on each page, the visible altitudes and the readout's altitude and page position - is in `measurements.md`. Whether the figure's box meets the page's own ink depends on this desktop's fonts.
+>
+> Recorded on: `Mac OS X 27.0.1/aarch64/Homebrew 21.0.12.1`
+
+| page | figure the page states | page ink the figure's box beside the mark meets (px) |
+|---|---|---|
+| south-35-8 | 35° | 0 |
+| south-35-4 | 35° | 28 |
+| south-35-2 | 35° | 25 |
+| south-35-1 | 35° | 64 |
+| north-65-4 | 65° | 60 |
+| south-4-4 | 4° | 0 |
+| south-88-4 | 88° | 0 |
+| south-35-2-dark | 35° | 25 |
+| south-35-2-nb | 35° | 25 |
+| zenith-18 | 84° | 38 |
+| zenith-4 | 89° | 37 |
+| zoom 42° (zenith) | — | — |
+| zoom 36° (zenith) | — | — |
+| zoom 24° (zenith) | 81° | — |
+| zoom 18° (zenith) | 84° | — |
+| zoom 12° (zenith) | 86° | — |
+| zoom 8° (zenith) | 87° | — |
+| zoom 4° (zenith) | 89° | — |
+| zoom 24° (35.37°) | — | — |
+| zoom 12° (35.37°) | — | — |
+| zoom 8° (35.37°) | 35° | — |
+| zoom 6° (35.37°) | 35° | — |
+| zoom 4° (35.37°) | 35° | — |
+| zoom 3° (35.37°) | 35° | — |
+| zoom 2° (35.37°) | 35° | — |
+| zoom 1° (35.37°) | 35° | — |

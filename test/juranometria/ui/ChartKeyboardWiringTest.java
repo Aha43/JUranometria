@@ -386,6 +386,7 @@ class ChartKeyboardWiringTest {
         juranometria.ecliptic.EclipticModule ecliptic;
         ChartViewController navigation;
         Runnable eclipticToggle;
+        juranometria.app.ChartOptionsControls chartOptionsControls;
         final List<Boolean> eclipticSaved = new ArrayList<>();
         ChartKeyboard palette;
         java.util.prefs.Preferences node;
@@ -418,12 +419,17 @@ class ChartKeyboardWiringTest {
                 frame.add(chart, java.awt.BorderLayout.CENTER);
                 frame.setSize(900, 700);
                 // One switch, handed to both routes, exactly as the
-                // application hands the View menu and the palette the
-                // ecliptic's own session switch.
-                eclipticToggle = juranometria.ui.ecliptic.EclipticSession
-                        .toggle(ecliptic, eclipticStore());
+                // application hands the Chart Options box and the
+                // palette the ecliptic's own session switch (#675).
+                juranometria.ui.ecliptic.EclipticSession.Switch eclipticSwitch =
+                        juranometria.ui.ecliptic.EclipticSession
+                                .of(ecliptic, eclipticStore());
+                eclipticToggle = eclipticSwitch::toggle;
+                chartOptionsControls = new juranometria.app.ChartOptionsControls(
+                        options, () -> false, eclipticSwitch,
+                        juranometria.ui.language.InterfaceText.forLanguage("en"));
                 frame.setJMenuBar(AppMenuBar.create(null, null, () -> { },
-                        () -> { }, () -> { }, () -> { }, eclipticToggle, juranometria.ui.language.InterfaceText.forLanguage("en")));
+                        () -> { }, () -> { }, () -> { }, null, juranometria.ui.language.InterfaceText.forLanguage("en")));
                 ChartKeyboardSession.install(frame.getRootPane(), options,
                         ecliptic, eclipticToggle, observer, juranometria.ui.language.InterfaceText.forLanguage("en"));
                 frame.setVisible(true);
@@ -475,17 +481,16 @@ class ChartKeyboardWiringTest {
         }
 
         /**
-         * The reader's own control for this module: the View menu's
-         * Ecliptic item, or the Place and Time checkbox.
+         * The reader's own control for this module: Chart Options'
+         * Ecliptic box (#675), or the Place and Time checkbox.
          */
         void readersControl(char letter) throws Exception {
             if (letter == 'I') {
-                javax.swing.JCheckBoxMenuItem item =
-                        AppMenuBar.eclipticItem(frame.getJMenuBar());
-                assertNotNull(item, "the View menu carries it");
-                // A menu item's action is its whole surface, which is
-                // the convention docs/decisions/test-evidence.md
-                // records and the scanner counts.
+                javax.swing.JCheckBox item = chartOptionsControls.eclipticBox();
+                assertNotNull(item, "Chart Options carries it");
+                // A box's action is its whole surface, which is the
+                // convention docs/decisions/test-evidence.md records
+                // and the scanner counts.
                 SwingUtilities.invokeAndWait(() -> item.doClick());
                 flush();
                 return;

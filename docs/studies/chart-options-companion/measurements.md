@@ -28,11 +28,12 @@ How tall and wide the words are drawn is one machine's answer, in
 | Constellations | Constellation boundaries | Constellation boundaries |
 | Constellations | Constellation names | Constellation names |
 | Chart | Equatorial coordinate grid | Equatorial coordinate grid |
+| Chart | Ecliptic | Ecliptic |
 | Chart | Title block | Title block |
 | Chart | Stellar-magnitude key | Stellar-magnitude key |
 | Chart | Black sky | Black sky |
 
-**18 checkboxes in 4 subjects.** Any layout below holds exactly these.
+**19 checkboxes in 4 subjects.** Any layout below holds exactly these.
 
 ## The controls in `nb-NO`
 
@@ -53,11 +54,12 @@ How tall and wide the words are drawn is one machine's answer, in
 | Stjernebilder | Stjernebildegrenser | Stjernebildegrenser |
 | Stjernebilder | Stjernebildenavn | Stjernebildenavn |
 | Kart | Ekvatorialt rutenett | Ekvatorialt rutenett |
+| Kart | Ekliptikken | Ekliptikken |
 | Kart | Tittelfelt | Tittelfelt |
 | Kart | Magnitudeforklaring | Magnitudeforklaring |
 | Kart | Svart himmel | Svart himmel |
 
-**18 checkboxes in 4 subjects.** Any layout below holds exactly these.
+**19 checkboxes in 4 subjects.** Any layout below holds exactly these.
 
 ## Keyboard stops through Chart Options
 
@@ -67,7 +69,7 @@ every layout.
 | layout | stops before the last control |
 |---|---:|
 | tabs: the strip, then the open tab's boxes | 8 to reach Deep sky's last; a different tab is a separate gesture |
-| groups, all open: four headings and every box | 22 |
+| groups, all open: four headings and every box | 23 |
 | groups, one open: four headings and the open subject's boxes | 11 with Deep sky open |
 
 ## The images

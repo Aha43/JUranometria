@@ -57,15 +57,16 @@ class SolarSystemCompanionJourneyTest {
                     // Since #507 the Solar System is the Controller's second
                     // tab, its groups standing on it with no outer group;
                     // Chart Options is the Chart tab's fourth section, after
-                    // Chart controls, Emphasis (#525) and Place and Time.
+                    // Chart controls, Place and Time and Emphasis (#525) - the
+                    // order ruled on #674 (#675, stage 3).
                     juranometria.ui.companion.CompanionTabs tabs = companion.tabs();
                     assertEquals(List.of(juranometria.ui.companion.CompanionTabs.CHART, "solarsystem"),
                             tabs.ids());
                     assertEquals(juranometria.ui.companion.CompanionTabs.CHART, tabs.chosen(),
                             "a fresh profile opens Chart");
                     List<CompanionSection> sections = companion.sections();
-                    assertEquals("section.emphasis", sections.get(1).getName(),
-                            "Emphasis is the Chart tab's second section (#525)");
+                    assertEquals("section.emphasis", sections.get(2).getName(),
+                            "Emphasis is the Chart tab's third section (#525, moved in #675)");
                     assertEquals("section.chartoptions", sections.get(3).getName(),
                             "Chart Options is the Chart tab's fourth section");
                     JComponent content = tabs.content("solarsystem");
@@ -353,15 +354,27 @@ class SolarSystemCompanionJourneyTest {
 
                     // The window's own focus traversal reaches the group: the
                     // chosen view (its sibling is reached by the arrow keys,
-                    // as in every Swing button group), the fields, Compute,
-                    // the box. No Update from Place and Time since #612: a
-                    // table the chart moved on from says it is stale, and
-                    // Compute computes for the chart's context now.
+                    // as in every Swing button group), Compute, the box. No
+                    // Update from Place and Time since #612: a table the chart
+                    // moved on from says it is stale, and Compute computes for
+                    // the chart's context now. The range's fields are shown -
+                    // and so reached - only under Over a time range (#675,
+                    // stage 4): hidden under At chart time, there after.
                     assertReachable(companion, content,
                             "Show the Sun at the chart time",
-                            "Span of the range from the chart time", "Step between rows",
                             "Compute the range",
                             "Sun on the chart");
+                    assertFalse(((JComponent) named(content, "sunRangeSpan")).isShowing(),
+                            "the span is hidden under At chart time (#675)");
+                    reveal((JComponent) named(content, "sunRangeView"));
+                    ReaderInput.click((JComponent) named(content, "sunRangeView"));
+                    drain();
+                    assertReachable(companion, content,
+                            "Span of the range from the chart time", "Step between rows",
+                            "Compute the range");
+                    reveal((JComponent) named(content, "sunInstantView"));
+                    ReaderInput.click((JComponent) named(content, "sunInstantView"));
+                    drain();
 
                     // Jupiter's group the same way, by its own spoken names;
                     // then Compute, pressed for real: the card and the four

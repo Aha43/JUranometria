@@ -38,7 +38,7 @@ query; a **result** is what the service answered; a **mode** is which view is sh
 
 Neither dialog persists anything (ruled on #400), and neither is told when Place and
 Time changes: the observer is pulled, never pushed. The chart-visibility switches
-(View ▸ Sun on the chart, Moon on the chart) are `SolarSystemModule` flags with
+(Solar System ▸ Sun on the chart, Moon on the chart) are `SolarSystemModule` flags with
 **no notification seam**: the menu tick is the item's own, and nothing follows the
 module. Toggling opens no table; opening a table toggles nothing.
 
@@ -69,7 +69,7 @@ would show the last result for as long as the Controller stays open.
 | Chart Options... | Chart Options... |
 | Place and Time... | Place and Time... |
 | Controls | Controls |
-| Chart Toolbar | Chart Toolbar |
+| Toolbar | Toolbar |
 | Sun... | Inspector |
 | Moon... | Ecliptic |
 | Inspector | Solar System ▸ Sun on the chart, Moon on the chart, —, Sun..., Moon... |
@@ -114,7 +114,7 @@ of their own (the dialogs keep theirs), or distinct ones.
 
 | arrangement | headings | controls | stops |
 |---|---:|---:|---:|
-| the Sun dialog's content | 0 | 7 | 7 |
+| the Sun dialog's content | 0 | 5 | 5 |
 | the Sun group, card | 1 | 6 | 7 |
 | Solar System, both open, card | 3 | 12 | 15 |
 | Solar System, collapsed | 3 | 0 | 3 |
@@ -123,7 +123,7 @@ of their own (the dialogs keep theirs), or distinct ones.
 
 | arrangement | headings | controls | stops |
 |---|---:|---:|---:|
-| the Sun dialog's content | 0 | 7 | 7 |
+| the Sun dialog's content | 0 | 5 | 5 |
 | the Sun group, card | 1 | 6 | 7 |
 | Solar System, both open, card | 3 | 12 | 15 |
 | Solar System, collapsed | 3 | 0 | 3 |

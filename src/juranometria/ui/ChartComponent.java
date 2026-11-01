@@ -431,6 +431,22 @@ public final class ChartComponent extends JComponent {
         return said.toString();
     }
 
+    /**
+     * The description, then the meridian's contextual altitude readout
+     * where the page draws one (#563): a reading of the line, in the
+     * page's words, so a reader who cannot see the stroke is told what it
+     * says.
+     */
+    static String withReadout(String base,
+            java.util.Optional<ReferenceInk.ReadoutPlacement> readout,
+            juranometria.project.PageWords words) {
+        if (readout.isEmpty()) {
+            return base;
+        }
+        return base + ' ' + words.altitudeReadoutSpoken(
+                words.altitudeTick(readout.get().altitudeDegrees()));
+    }
+
     /** The description, then each drawn body by its name on the page (#415). */
     static String withBodies(String base,
             java.util.List<ReferenceInk.BodyPlacement> bodies,
@@ -592,6 +608,8 @@ public final class ChartComponent extends JComponent {
         }
     }
 
+    /** The meridian's altitude readout the last paint decided and drew, if any (#563). */
+    private java.util.Optional<ReferenceInk.ReadoutPlacement> readout = java.util.Optional.empty();
     /** The furniture the last paint drew, in the order the page allocated it. */
     private java.util.List<DrawnFurniture> drawnFurniture = java.util.List.of();
     /** The key of the box whose control holds the keyboard, or null. */
@@ -1235,14 +1253,23 @@ public final class ChartComponent extends JComponent {
             // contributing, the layer is empty and the page is the
             // released page.
             juranometria.render.ChartOptions drawn = drawnOptions();
+            readout = java.util.Optional.empty();
             renderer.render(g2, scene, drawn,
                     ChartRenderer.ReferenceLayer.subduing(
-                            (layerG, layerScene, reserved) ->
-                                    spokenDirections = ReferenceInk.paint(
-                                            layerG, layerScene,
-                                            overlays.collect(),
-                                            drawn.palette(), words, reserved,
-                                            emphasized, belowHorizon(layerScene)),
+                            (layerG, layerScene, reserved) -> {
+                                java.util.List<juranometria.module.OverlayRegistry.Owned>
+                                        offered = overlays.collect();
+                                // The readout the layer draws, decided once
+                                // against the same reserved ink, so the
+                                // spoken description reads what is inked.
+                                readout = ReferenceInk.altitudeReadout(
+                                        juranometria.project.DrawnPage.of(layerScene),
+                                        offered, reserved);
+                                spokenDirections = ReferenceInk.paint(
+                                        layerG, layerScene, offered,
+                                        drawn.palette(), words, reserved,
+                                        emphasized, belowHorizon(layerScene));
+                            },
                             this::belowHorizon),
                     // The Solar System bodies (#415), above every
                     // catalogue mark and label: opaque, at true scale.
@@ -1310,8 +1337,9 @@ public final class ChartComponent extends JComponent {
             // A moon of Mars the page leaves undrawn is still given (#606,
             // R-3 and R-4 on #605): behind Mars, or too close to tell apart.
             getAccessibleContext().setAccessibleDescription(withFurniture(
-                    withUnseenMoons(withBodies(withDirections(describe(scene),
-                            spokenDirections), drawnBodies, words),
+                    withUnseenMoons(withBodies(withReadout(withDirections(describe(scene),
+                            spokenDirections),
+                            readout, words), drawnBodies, words),
                             ReferenceInk.unseenMoons(juranometria.project.DrawnPage.of(scene),
                                     overlays.collect()), words), drawnFurniture));
             // One ring per selected drawn member (issue #261): the

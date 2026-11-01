@@ -101,7 +101,7 @@ service's, the time note below it.*
 ## From the numbers to the chart
 
 The chart draws Venus where the numbers put it, through the switch
-*Venus on the chart* in View ▸ Solar System and in the Controller's
+*Venus on the chart* in Solar System ▸ Venus on the chart (before 6.1 the Solar System menu stood under View) and in the Controller's
 Venus group - off until you choose it, then remembered. One rule
 decides what you see, and it is the same rule that draws Jupiter.
 

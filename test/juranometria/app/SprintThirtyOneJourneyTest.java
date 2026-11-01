@@ -145,14 +145,19 @@ class SprintThirtyOneJourneyTest {
             SelectionModel selection = new SelectionModel();
             ChartModuleHost[] hostHolder = new ChartModuleHost[1];
         Runnable[] eclipticToggle = new Runnable[1];
+        javax.swing.JCheckBox[] eclipticBox = new javax.swing.JCheckBox[1];
 
-            // The ecliptic's own session switch, handed to the View
-            // menu and to the chart keyboard alike - which is what
-            // the application does, and the only way this journey can
-            // press one route and check the other.
-            eclipticToggle[0] = juranometria.ui.ecliptic.EclipticSession
-                    .toggle(ecliptic, juranometria.ui.ecliptic
-                            .EclipticStore.forNode(node));
+            // The ecliptic's own session switch (#675), handed to the
+            // Chart Options box and to the chart keyboard alike - which
+            // is what the application does, and the only way this
+            // journey can press one route and check the other.
+            juranometria.ui.ecliptic.EclipticSession.Switch eclipticSwitch =
+                    juranometria.ui.ecliptic.EclipticSession.of(ecliptic,
+                            juranometria.ui.ecliptic.EclipticStore.forNode(node));
+            eclipticToggle[0] = eclipticSwitch::toggle;
+            eclipticBox[0] = new ChartOptionsControls(options, () -> false,
+                    eclipticSwitch, juranometria.ui.language.InterfaceText.forLanguage("en"))
+                    .eclipticBox();
             SwingUtilities.invokeAndWait(() -> {
                 ChartComponent chart = new ChartComponent(Atlas.assembler(), ENGLISH);
                 navigation.onChange(chart::setViewState);
@@ -426,7 +431,9 @@ class SprintThirtyOneJourneyTest {
             List<LabelPlacement.Placement> before =
                     placement(onEdt(chart::currentScene),
                             onEdt(options::options));
-            choose(window[0], "Ecliptic");
+            // The reader's control since #675: Chart Options' Ecliptic box.
+            SwingUtilities.invokeAndWait(() -> eclipticBox[0].doClick());
+            flush();
             assertTrue(onEdt(() -> ecliptic.showing()),
                     "5. the reader switches the ecliptic on");
             // And their own sky, through the surface that owns it:
@@ -564,7 +571,8 @@ class SprintThirtyOneJourneyTest {
                     "8. Reset view is Home, exactly as it was");
             toggle(place, "showMeridian");
             toggle(place, "showMathematicalhorizon");
-            choose(window[0], "Ecliptic");
+            SwingUtilities.invokeAndWait(() -> eclipticBox[0].doClick());
+            flush();
             assertFalse(meridian.meridianShowing()
                             || meridian.horizonShowing(),
                     "the observer's lines go away through the controls"

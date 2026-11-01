@@ -84,7 +84,7 @@ tverrmål, ekvator og poler, **89.6 %** belyst og *mer enn halvt belyst*,
 ## Fra tallene til kartet
 
 Kartet tegner Mars der tallene plasserer den, med bryteren *Mars på
-kartet* i Vis ▸ Solsystem og i Kontrollerens Mars-gruppe - av til du
+kartet* i Solsystem ▸ Mars på kartet (før 6.1 lå Solsystem-menyen under Vis) og i Kontrollerens Mars-gruppe - av til du
 velger den, og deretter husket. Regelen er den samme som for Venus og
 Merkur: **Mars tegnes som det største av den sanne skiven og et
 kartografisk symbol på 6 px**, og begge får fasen slik tabellen oppgir

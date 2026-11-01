@@ -50,6 +50,31 @@ public interface EclipticStore {
      */
     boolean DEFAULT_SHOWN = false;
 
+    /**
+     * A store that remembers within one process and writes nothing
+     * down (#675): for a study photographing the Ecliptic box, or a
+     * test, where a preference node would be a side effect.
+     */
+    static EclipticStore inMemory() {
+        return new EclipticStore() {
+            private Optional<Boolean> kept = Optional.empty();
+
+            @Override
+            public Optional<Boolean> shown() {
+                return kept;
+            }
+
+            @Override
+            public void save(boolean shown) {
+                kept = Optional.of(shown);
+            }
+
+            @Override
+            public void flush() {
+            }
+        };
+    }
+
     /** What the reader chose, or empty if they never have. */
     Optional<Boolean> shown();
 

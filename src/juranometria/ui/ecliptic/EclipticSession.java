@@ -1,20 +1,25 @@
 package juranometria.ui.ecliptic;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
+
 import juranometria.ecliptic.EclipticModule;
 import juranometria.ui.ChartModuleHost;
 
 /**
- * How a session starts the ecliptic module (Sprint 28, issue #274).
+ * The ecliptic's session (Sprint 28, issue #274): begun by attaching
+ * the module, switched through one {@link Switch} that remembers the
+ * choice in the store as it is made, and restored from that store at
+ * startup.
  *
- * <p>The one seam that owns session-start policy, so the decision is
- * stated in a place a reader of the code can find rather than hidden
- * in a constructor - the same shape as
- * {@code PlaceAndTimeSession}.
- *
- * <p>The module is attached and then told what the reader last
- * chose. A reader who has never chosen gets the released default,
- * which is <strong>hidden</strong>: installing a removable module
- * must not change the page for someone who never asked for it.
+ * <p>Since #675 the reader's control is the Ecliptic box in Chart
+ * Options' Chart checklist - in the dialog and in the Controller - and
+ * no longer a menu item. {@code EclipticStore} and this session stay
+ * the single persisted authority (ruling 2 on #674): the boxes drive
+ * the switch and follow it, so a change made by any route - a box, the
+ * chart keyboard's letter - is shown by every box at once, and nothing
+ * is written down twice.
  */
 public final class EclipticSession {
 
@@ -22,80 +27,98 @@ public final class EclipticSession {
     }
 
     /**
-     * What the Ecliptic menu item does.
-     *
-     * <p>Here rather than inline in the application, so the chain a
-     * reader actually sets off - item to module to remembered choice
-     * - is one named thing that a test can drive (PR #279 review).
-     * Rehearsing the three effects separately proves each of them
-     * and none of the wiring between them.
-     *
-     * <p>Two effects and no others: the module shows or stops
-     * showing, and the reader's choice is remembered. The page does
-     * not move, the selection does not change, no clock is read, and
-     * no chart option is touched.
+     * The one switch for the ecliptic: what it shows, how it is
+     * toggled, and who follows it. Every route to the ecliptic runs
+     * through one of these, which is why the boxes agree.
      */
-    public static Runnable toggle(EclipticModule module,
-                                  EclipticStore store) {
+    public static final class Switch {
+        private final EclipticModule module;
+        private final EclipticStore store;
+        private final List<Consumer<Boolean>> followers =
+                new CopyOnWriteArrayList<>();
+
+        private Switch(EclipticModule module, EclipticStore store) {
+            this.module = module;
+            this.store = store;
+        }
+
+        /** Whether the ecliptic is showing now. */
+        public boolean showing() {
+            return module.showing();
+        }
+
+        /** Flips the ecliptic, writes the choice down, and tells every follower. */
+        public void toggle() {
+            module.showing(!module.showing());
+            store.save(module.showing());
+            tell();
+        }
+
+        /**
+         * Adds a control that shows the switch's state; it is told the
+         * state at once and on every change. Returns what cancels it.
+         */
+        public Runnable follow(Consumer<Boolean> follower) {
+            if (follower == null) {
+                throw new IllegalArgumentException("a follower is a control");
+            }
+            followers.add(follower);
+            follower.accept(module.showing());
+            return () -> followers.remove(follower);
+        }
+
+        /** How many controls follow this switch. */
+        public int followers() {
+            return followers.size();
+        }
+
+        /**
+         * Sets the module from the remembered choice - the released
+         * default, hidden, for a reader who never chose - and tells
+         * every follower. Refuses when nothing follows: a remembered
+         * choice could then draw the ecliptic with no way for a reader
+         * to turn it off (#274's rule, carried over from the menu item).
+         */
+        public void restore() {
+            if (followers.isEmpty()) {
+                throw new IllegalStateException(
+                        "a loaded ecliptic module has a control: without"
+                                + " one, a remembered choice could draw"
+                                + " the ecliptic with no way for a reader"
+                                + " to turn it off");
+            }
+            module.showing(store.shownOrDefault());
+            tell();
+        }
+
+        private void tell() {
+            boolean showing = module.showing();
+            for (Consumer<Boolean> follower : followers) {
+                follower.accept(showing);
+            }
+        }
+    }
+
+    /** The switch for an attached module and its store. */
+    public static Switch of(EclipticModule module, EclipticStore store) {
         if (module == null || store == null) {
             throw new IllegalArgumentException(
                     "the switch needs a module and a store");
         }
-        return () -> {
-            module.showing(!module.showing());
-            store.save(module.showing());
-        };
+        return new Switch(module, store);
     }
 
     /**
-     * Attaches the module, showing nothing.
-     *
-     * <p>Attaching alone must change no page, so the module arrives
-     * hidden and stays hidden until {@link #restore} says otherwise.
+     * The toggle alone, as an action, for a route that needs nothing
+     * else of the switch. It follows nobody: a caller with controls to
+     * keep in step uses {@link #of} and hands every route the same switch.
      */
+    public static Runnable toggle(EclipticModule module,
+                                  EclipticStore store) {
+        return of(module, store)::toggle;
+    }
+
     public static EclipticModule begin(ChartModuleHost modules) {
         return modules.attach(new EclipticModule());
-    }
-
-    /**
-     * Turns a remembered choice into both a drawn chart and a shown
-     * tick - in one place.
-     *
-     * <p>The store is read exactly once, here, and both things that
-     * have to agree about it are set from that one read. An earlier
-     * version restored the module in one statement and the tick in
-     * another, so a test could only rehearse the pairing rather than
-     * drive it, and deleting either statement left the other looking
-     * right (PR #279 re-review).
-     *
-     * <p><strong>The item is required.</strong> An earlier version
-     * accepted null, on the reasoning that an atlas without the
-     * module has no such item - but a module being restored is a
-     * module that is loaded, and the pairing that allows is the one
-     * thing this must not permit: a remembered choice drawing the
-     * ecliptic on a reader's chart with no control anywhere to turn
-     * it off (PR #279 round 3). An atlas without the module does not
-     * reach here at all; one that does reach here has a control, or
-     * it is miswired.
-     *
-     * @param item the Ecliptic menu item, which a loaded module
-     *     always has
-     */
-    public static void restore(EclipticModule module,
-                               EclipticStore store,
-                               javax.swing.JCheckBoxMenuItem item) {
-        if (module == null || store == null) {
-            throw new IllegalArgumentException(
-                    "a session restores a module from a store");
-        }
-        if (item == null) {
-            throw new IllegalArgumentException(
-                    "a loaded ecliptic module has a control: without"
-                            + " one, a remembered choice could draw"
-                            + " the ecliptic with no way for a reader"
-                            + " to turn it off");
-        }
-        module.showing(store.shownOrDefault());
-        item.setSelected(module.showing());
     }
 }

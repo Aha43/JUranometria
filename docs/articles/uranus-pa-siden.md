@@ -95,7 +95,7 @@ horisonten. Alle fem månene er klar av Uranus.
 ## Fra tallene til kartet
 
 Kartet tegner Uranus der tallene plasserer den, med bryteren *Uranus på
-kartet* i Vis ▸ Solsystem og i Kontrollerens Uranus-gruppe - av til du
+kartet* i Solsystem ▸ Uranus på kartet (før 6.1 lå Solsystem-menyen under Vis) og i Kontrollerens Uranus-gruppe - av til du
 velger den, og deretter husket. Regelen er den samme som for Mars:
 **Uranus tegnes som det største av den sanne skiven og et kartografisk
 symbol på 6 px.** For Uranus er det alltid symbolet. Den største skiven

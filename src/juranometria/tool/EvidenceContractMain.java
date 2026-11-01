@@ -214,6 +214,9 @@ public final class EvidenceContractMain {
         // The meridian's graduation on production pages (#515), the same way.
         REPORT_MAINS.put("juranometria.tool.MeridianTicksStudyMain",
                 "docs/studies/meridian-ticks/measurements.md");
+        // One altitude readout on the meridian at narrow fields (#563, #675 stage 5), the same way.
+        REPORT_MAINS.put("juranometria.tool.MeridianReadoutStudyMain",
+                "docs/studies/meridian-readout/measurements.md");
         // The Mercury pack study (#528) is not registered, as the Venus one is
         // not: both read the gitignored de440s.bsp and pck00011.tpc, which the CI
         // runner does not hold; `make mercury-pack-study` reproduces the report
@@ -465,6 +468,8 @@ public final class EvidenceContractMain {
         // room depend on this desktop's fonts; which ticks lie on a page does not.
         PLATFORM_REPORTS.put("juranometria.tool.MeridianTicksStudyMain",
                 "docs/studies/meridian-ticks/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.MeridianReadoutStudyMain",
+                "docs/studies/meridian-readout/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.JupiterOnTheChartStudyMain",
                 "docs/studies/jupiter-on-the-chart/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.SolarSystemLabelsStudyMain",
@@ -664,6 +669,9 @@ public final class EvidenceContractMain {
             // The meridian's graduation (issue #515): production pages
             // composed by the component with the module attached.
             "juranometria.tool.MeridianTicksStudyMain",
+            // One altitude readout on the meridian (issue #563): production
+            // pages with the candidate mocked up over them.
+            "juranometria.tool.MeridianReadoutStudyMain",
             // Jupiter and the Galilean moons on the chart (issue #486):
             // production pages composed by the component with the Jovian
             // module attached.

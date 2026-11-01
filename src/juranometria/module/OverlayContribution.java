@@ -264,6 +264,36 @@ public sealed interface OverlayContribution {
      * pole and the tick's position - across the line, never along it -
      * and draws nothing where the position is off the page.
      */
+    /**
+     * One contextual altitude readout a module offers for a graduated
+     * line (#563, ruled on #675 stage 5): the page decides whether and
+     * where it is drawn - only while none of the line's ticks is on the
+     * page, at the visible point nearest the page centre - and what it
+     * states, the altitude there rounded to the degree. The altitude of
+     * any point is 90° less its distance from the zenith, so the zenith
+     * is all the page needs to read the line.
+     */
+    record AltitudeReadout(String identity, String lineIdentity, SkyPosition pole,
+                           SkyPosition zenith, InkRole role)
+            implements OverlayContribution {
+
+        public AltitudeReadout {
+            if (identity == null || identity.isBlank()) {
+                throw new IllegalArgumentException("a readout carries an identity of its own");
+            }
+            if (lineIdentity == null || lineIdentity.isBlank()) {
+                throw new IllegalArgumentException("a readout belongs to a named line: " + identity);
+            }
+            if (pole == null || zenith == null) {
+                throw new IllegalArgumentException(
+                        "a readout is given by its line's pole and the zenith: " + identity);
+            }
+            if (role == null) {
+                throw new IllegalArgumentException("a readout has an ink role: " + identity);
+            }
+        }
+    }
+
     record Tick(String identity, String lineIdentity, SkyPosition at,
                 SkyPosition alongPole, double altitudeDegrees,
                 boolean labelled, InkRole role)

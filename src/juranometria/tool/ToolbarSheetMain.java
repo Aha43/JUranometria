@@ -218,6 +218,10 @@ public final class ToolbarSheetMain {
                         Atlas.search(), assembler, toggle, "2.0.0",
                         () -> { }, new SelectionMode(),
                         new juranometria.ui.ZoomLock());
+                // Place and Time and Controls (#675, stage 2), which the
+                // application attaches after the bar is built.
+                controls[0].toolbar().attachPlaceAndTime(() -> { });
+                controls[0].toolbar().attachControls(() -> { });
 
                 owner[0] = new JFrame("study");
                 SheetCapture.prepareShownWindow(owner[0]);

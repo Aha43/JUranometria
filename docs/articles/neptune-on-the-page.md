@@ -104,7 +104,7 @@ below the airless horizon. Both moons are clear of Neptune.
 ## From the numbers to the chart
 
 The chart draws Neptune where the numbers put it, through the switch
-*Neptune on the chart* in View ▸ Solar System and in the Controller's
+*Neptune on the chart* in Solar System ▸ Neptune on the chart (before 6.1 the Solar System menu stood under View) and in the Controller's
 Neptune group - off until you choose it, then remembered. The rule is the
 one Mars and Uranus follow: **Neptune is drawn as the larger of its true
 disc and a 6 px cartographic symbol.** For Neptune that is always the

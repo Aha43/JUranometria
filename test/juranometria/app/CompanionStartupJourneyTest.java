@@ -55,10 +55,16 @@ class CompanionStartupJourneyTest {
                         assertNotNull(item, "View carries the Controls switch");
                         assertEquals("Controls", item.getText());
                         JMenu view = viewOf(frame, item);
+                        // Since #675 (ruled on #674) Controls opens the Chart
+                        // menu's third group, after a separator, with Toolbar
+                        // directly after it: the two window switches together.
                         int at = Arrays.asList(view.getMenuComponents()).indexOf(item);
-                        assertEquals("Place and Time...",
-                                ((JMenuItem) view.getMenuComponent(at - 1)).getText(),
-                                "directly after the section it holds");
+                        assertTrue(view.getMenuComponent(at - 1)
+                                        instanceof javax.swing.JPopupMenu.Separator,
+                                "Controls opens its own group");
+                        assertEquals("Toolbar",
+                                ((JMenuItem) view.getMenuComponent(at + 1)).getText(),
+                                "with Toolbar directly after it");
                         assertFalse(item.isSelected(), "a fresh profile: closed");
                         assertEquals(null, companion(), "and not on screen");
 
@@ -84,13 +90,18 @@ class CompanionStartupJourneyTest {
                                 List.of(companion.tabs().getTitleAt(0),
                                         companion.tabs().getTitleAt(1)));
                         assertEquals(4, companion.sections().size(),
-                                "on Chart: Chart controls, Emphasis (#525), Place and"
-                                        + " Time, then Chart Options");
+                                "on Chart: Chart controls, Place and Time, Emphasis"
+                                        + " (#525), then Chart Options - the order"
+                                        + " ruled on #674 (#675, stage 3)");
                         assertEquals("Chart controls, expanded",
                                 companion.sections().get(0).heading()
                                         .getAccessibleContext().getAccessibleName());
-                        assertEquals("Emphasis, collapsed",
+                        assertEquals("Place and Time, expanded",
                                 companion.sections().get(1).heading()
+                                        .getAccessibleContext().getAccessibleName(),
+                                "Place and Time directly after Chart controls");
+                        assertEquals("Emphasis, collapsed",
+                                companion.sections().get(2).heading()
                                         .getAccessibleContext().getAccessibleName(),
                                 "Emphasis is introduced collapsed");
                         assertEquals("Chart Options, expanded",

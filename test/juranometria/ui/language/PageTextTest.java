@@ -246,6 +246,11 @@ class PageTextTest {
             public String altitudeTick(double altitudeDegrees) {
                 return EN.altitudeTick(altitudeDegrees);
             }
+
+            @Override
+            public String altitudeReadoutSpoken(String figure) {
+                return "readout " + figure;
+            }
         };
 
         assertEquals("spherical Mercator",

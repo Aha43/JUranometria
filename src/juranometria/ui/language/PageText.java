@@ -94,6 +94,11 @@ public final class PageText implements PageWords {
     }
 
     @Override
+    public String altitudeReadoutSpoken(String figure) {
+        return said.say(STEM + "altitude.readout.spoken", figure);
+    }
+
+    @Override
     public String chartInstructions() {
         return said.say(STEM + "chart.explain");
     }

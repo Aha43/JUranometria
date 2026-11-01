@@ -173,7 +173,7 @@ exempt from thresholds and collisions, with no new symbol.
 From Sprint 12 the reader may hide layers (deep-sky symbols and
 labels, figures, boundaries, names, star names, Bayer letters and
 Flamsteed numbers each on their own, and the equatorial coordinate
-grid) through View > Chart Options; from Sprint 20 the title block
+grid) through Chart > Chart Options (View > Chart Options before 6.1); from Sprint 20 the title block
 and the stellar-magnitude key; and from Sprint 21 each of the five
 deep-sky families on its own, beneath the deep-sky master. An
 enabled layer still obeys every rule above, a label never outlives

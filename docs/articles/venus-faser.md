@@ -101,7 +101,7 @@ fra tjenesten, tidsmerknaden under.*
 ## Fra tallene til kartet
 
 Kartet tegner Venus der tallene plasserer den, gjennom bryteren
-*Venus på kartet* i Vis ▸ Solsystem og i Kontrollerens Venus-gruppe -
+*Venus på kartet* i Solsystem ▸ Venus på kartet (før 6.1 lå Solsystem-menyen under Vis) og i Kontrollerens Venus-gruppe -
 av til du velger den, deretter husket. Én regel avgjør hva du ser, og
 det er den samme regelen som tegner Jupiter.
 

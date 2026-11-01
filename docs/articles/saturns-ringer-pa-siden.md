@@ -126,7 +126,7 @@ begge mot sørsiden, ringene 44,7″ ganger
 ## Fra tallene til kartet
 
 Kartet tegner Saturn der tallene plasserer den, gjennom bryteren *Saturn
-på kartet* i Vis ▸ Solsystem, etter Jupiters, og i Kontrollerens
+på kartet* i Solsystem ▸ Saturn på kartet (før 6.1 lå Solsystem-menyen under Vis), etter Jupiters, og i Kontrollerens
 Saturn-gruppe - av til du velger den, deretter husket. Regelen er
 Jupiters, brukt på hele figuren: **Saturn tegnes som sin sanne klode og
 sine sanne ringer der ringene er minst 6 px brede, og som et

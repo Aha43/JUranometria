@@ -112,6 +112,7 @@ help:
 	@echo "  saturn-cartography-study Saturn, its rings and the seven moons on the atlas's pages, with mock-ups (issue #578)"
 	@echo "  saturn-on-the-chart-study  Saturn's figure on production pages (issue #579)"
 	@echo "  meridian-ticks-study   The meridian's graduation on production pages, three densities, the bodies invariant (issue #515)"
+	@echo "  meridian-readout-study One altitude readout on the meridian at narrow fields, the candidates mocked up (issue #563)"
 	@echo "  pan-study         Measure the Sprint 8 grab-to-pan geometry and costs"
 	@echo "  chart-options-study  Render the Sprint 12 chart-options candidates"
 	@echo "  star-identity-study  Measure and render the Sprint 13 star-identity candidates"
@@ -1167,6 +1168,12 @@ meridian-ticks-study: classes
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.MeridianTicksStudyMain \
 		> docs/studies/meridian-ticks/measurements.md
 	@echo "written to docs/studies/meridian-ticks/measurements.md"
+
+meridian-readout-study: classes
+	mkdir -p docs/studies/meridian-readout
+	$(JAVA) -Djava.awt.headless=true -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.MeridianReadoutStudyMain \
+		> docs/studies/meridian-readout/measurements.md
+	@echo "written to docs/studies/meridian-readout/measurements.md"
 
 ecliptic-study: classes
 	mkdir -p docs/studies/ecliptic

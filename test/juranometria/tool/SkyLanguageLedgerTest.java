@@ -48,7 +48,10 @@ class SkyLanguageLedgerTest {
         // 150 from #347 to #259, which brought three reviewed identifiers
         // (the Place and Time box's identity, its action's, and the view
         // report's furniture key) to a boundary that stood at 149.
-        assertTrue(unresolved.size() < 160,
+        // #675 stage 2 adds seven more in ChartControls: four icon file
+        // names, two button names and the Controls button's two states,
+        // every one a key the language files resolve - 166 at that head.
+        assertTrue(unresolved.size() < 170,
                 "and the boundary stays small enough to read: "
                         + unresolved.size());
     }

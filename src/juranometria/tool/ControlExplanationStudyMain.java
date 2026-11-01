@@ -332,11 +332,16 @@ public final class ControlExplanationStudyMain {
         // is found here.
         juranometria.ui.ChartActions actions =
                 new juranometria.ui.ChartActions(navigation);
-        surfaces.put("Toolbar", new juranometria.ui.AtlasToolbar(
+        juranometria.ui.AtlasToolbar toolbar = new juranometria.ui.AtlasToolbar(
                 navigation, search,
                 new juranometria.ui.InspectorToggle(), "0.0.0",
                 () -> { }, new juranometria.chart.SelectionMode(),
-                new juranometria.ui.ZoomLock(), actions, english));
+                new juranometria.ui.ZoomLock(), actions, english);
+        // Place and Time and Controls (#675, stage 2), attached as the
+        // application attaches them, so their words are audited too.
+        toolbar.attachPlaceAndTime(() -> { });
+        toolbar.attachControls(() -> { });
+        surfaces.put("Toolbar", toolbar);
         juranometria.ui.ChartControls chartControls =
                 new juranometria.ui.ChartControls(navigation,
                         new juranometria.ui.SearchField(Atlas.search(),
@@ -358,8 +363,11 @@ public final class ControlExplanationStudyMain {
                 () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
                 () -> { }, () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
                 () -> { }, () -> { }, english));
+        // With the ecliptic's switch (#675), so the Ecliptic box's own
+        // explanation is inventoried with the rest of the checklist's.
         surfaces.put("Chart Options",
-                ChartOptionsDialog.contentForStudy(options()));
+                ChartOptionsDialog.contentForStudy(options(), "en",
+                        juranometria.ui.ecliptic.EclipticSession.of(new juranometria.ecliptic.EclipticModule(), juranometria.ui.ecliptic.EclipticStore.inMemory())));
         surfaces.put("Place and Time", placeAndTime());
         // The companion's own control (#434): a section's heading,
         // which collapses it. What the section holds is Place and Time,

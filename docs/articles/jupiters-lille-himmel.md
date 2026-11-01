@@ -124,7 +124,7 @@ berører, og den sies i stedet for å gjemmes.
 ## Fra tallene til kartet
 
 Kartet tegner Jupiter der tallene setter den, gjennom samme bryter,
-*Jupiter og måner på kartet*, i Vis-menyen og i Kontrollerens
+*Jupiter og måner på kartet*, i Solsystem-menyen (før 6.1 under Vis) og i Kontrollerens
 Jupiter-gruppe - av til du velger den, siden husket. To regler avgjør
 hva du ser.
 
