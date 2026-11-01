@@ -608,6 +608,8 @@ public final class ChartComponent extends JComponent {
         }
     }
 
+    /** The meridian's altitude readout the last paint decided and drew, if any (#563). */
+    private java.util.Optional<ReferenceInk.ReadoutPlacement> readout = java.util.Optional.empty();
     /** The furniture the last paint drew, in the order the page allocated it. */
     private java.util.List<DrawnFurniture> drawnFurniture = java.util.List.of();
     /** The key of the box whose control holds the keyboard, or null. */
@@ -1251,14 +1253,23 @@ public final class ChartComponent extends JComponent {
             // contributing, the layer is empty and the page is the
             // released page.
             juranometria.render.ChartOptions drawn = drawnOptions();
+            readout = java.util.Optional.empty();
             renderer.render(g2, scene, drawn,
                     ChartRenderer.ReferenceLayer.subduing(
-                            (layerG, layerScene, reserved) ->
-                                    spokenDirections = ReferenceInk.paint(
-                                            layerG, layerScene,
-                                            overlays.collect(),
-                                            drawn.palette(), words, reserved,
-                                            emphasized, belowHorizon(layerScene)),
+                            (layerG, layerScene, reserved) -> {
+                                java.util.List<juranometria.module.OverlayRegistry.Owned>
+                                        offered = overlays.collect();
+                                // The readout the layer draws, decided once
+                                // against the same reserved ink, so the
+                                // spoken description reads what is inked.
+                                readout = ReferenceInk.altitudeReadout(
+                                        juranometria.project.DrawnPage.of(layerScene),
+                                        offered, reserved);
+                                spokenDirections = ReferenceInk.paint(
+                                        layerG, layerScene, offered,
+                                        drawn.palette(), words, reserved,
+                                        emphasized, belowHorizon(layerScene));
+                            },
                             this::belowHorizon),
                     // The Solar System bodies (#415), above every
                     // catalogue mark and label: opaque, at true scale.
@@ -1328,8 +1339,7 @@ public final class ChartComponent extends JComponent {
             getAccessibleContext().setAccessibleDescription(withFurniture(
                     withUnseenMoons(withBodies(withReadout(withDirections(describe(scene),
                             spokenDirections),
-                            ReferenceInk.altitudeReadout(juranometria.project.DrawnPage.of(scene),
-                                    overlays.collect()), words), drawnBodies, words),
+                            readout, words), drawnBodies, words),
                             ReferenceInk.unseenMoons(juranometria.project.DrawnPage.of(scene),
                                     overlays.collect()), words), drawnFurniture));
             // One ring per selected drawn member (issue #261): the

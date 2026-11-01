@@ -413,7 +413,7 @@ public final class ReferenceInk {
             // is the zenith's, at the visible point farthest from the
             // zenith (R-9) - its altitude to the degree; a stroke half a
             // tick's, the figure placed as a tick's is and refused alone.
-            altitudeReadout(page, contributions).ifPresent(readout ->
+            altitudeReadout(page, contributions, reserved).ifPresent(readout ->
                     drawTick(g2, projection, mapping, paper, sky, bounded,
                             new OverlayContribution.Tick(readout.lineIdentity() + "/readout",
                                     readout.lineIdentity(), readout.at(), readout.alongPole(),
@@ -3070,6 +3070,19 @@ public final class ReferenceInk {
      */
     public static java.util.Optional<ReadoutPlacement> altitudeReadout(DrawnPage page,
             List<OverlayRegistry.Owned> contributions) {
+        return altitudeReadout(page, contributions, List.of());
+    }
+
+    /**
+     * As {@link #altitudeReadout(DrawnPage, List)}, standing clear of the
+     * page's own ink: a candidate point is refused where any reserved
+     * shape - a furniture box, a written name, a deep-sky glyph - comes
+     * within {@link #READOUT_CLEARANCE} pixels of it. The page's furniture
+     * paints over this layer, and a stroke under the title block is no
+     * reading (found on CI, whose fonts widen the block: #675).
+     */
+    public static java.util.Optional<ReadoutPlacement> altitudeReadout(DrawnPage page,
+            List<OverlayRegistry.Owned> contributions, List<java.awt.Shape> reserved) {
         Projection projection = page.projection();
         ViewportMapping mapping = new ViewportMapping(page);
         Rectangle2D paper = ChartRenderer.paperOf(page.scene());
@@ -3100,7 +3113,7 @@ public final class ReferenceInk {
             double bestTheta = Double.NaN;
             double bestDistance = Double.MAX_VALUE;
             for (double theta = 0.0; theta < 360.0; theta += 0.25) {
-                double d = distanceOnPage(theta, e1, e2, zenith, projection, mapping, paper, cx, cy);
+                double d = distanceOnPage(theta, e1, e2, zenith, projection, mapping, paper, cx, cy, reserved);
                 if (d < bestDistance) {
                     bestDistance = d;
                     bestTheta = theta;
@@ -3114,8 +3127,8 @@ public final class ReferenceInk {
             for (int i = 0; i < 40; i++) {
                 double m1 = low + (high - low) / 3.0;
                 double m2 = high - (high - low) / 3.0;
-                if (distanceOnPage(m1, e1, e2, zenith, projection, mapping, paper, cx, cy)
-                        <= distanceOnPage(m2, e1, e2, zenith, projection, mapping, paper, cx, cy)) {
+                if (distanceOnPage(m1, e1, e2, zenith, projection, mapping, paper, cx, cy, reserved)
+                        <= distanceOnPage(m2, e1, e2, zenith, projection, mapping, paper, cx, cy, reserved)) {
                     high = m2;
                 } else {
                     low = m1;
@@ -3145,7 +3158,8 @@ public final class ReferenceInk {
                         }
                         PixelPoint px = projection.project(juranometria.sky.SkyFrame.toPosition(w))
                                 .map(mapping::toPixel).orElse(null);
-                        if (px == null || !inside.contains(px.x(), px.y())) {
+                        if (px == null || !inside.contains(px.x(), px.y())
+                                || !clearOf(reserved, px)) {
                             continue;
                         }
                         if (up < lowest) {
@@ -3178,17 +3192,32 @@ public final class ReferenceInk {
         return java.util.Optional.empty();
     }
 
-    /** The page distance from the centre of the circle's point at this angle, or infinity off the page or below the horizon. */
+    /** How far from the page's own ink a readout's point stands, in pixels. */
+    static final double READOUT_CLEARANCE = GRADUATION;
+
+    /** Whether no reserved shape comes within the clearance of this pixel. */
+    private static boolean clearOf(List<java.awt.Shape> reserved, PixelPoint px) {
+        double c = READOUT_CLEARANCE;
+        for (java.awt.Shape shape : reserved) {
+            if (shape.intersects(px.x() - c, px.y() - c, 2.0 * c, 2.0 * c)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /** The page distance from the centre of the circle's point at this angle, or infinity off the page, below the horizon or under the page's own ink. */
     private static double distanceOnPage(double theta, double[] e1, double[] e2, double[] zenith,
                                          Projection projection, ViewportMapping mapping,
-                                         Rectangle2D paper, double cx, double cy) {
+                                         Rectangle2D paper, double cx, double cy,
+                                         List<java.awt.Shape> reserved) {
         double[] v = onCircle(theta, e1, e2);
         if (dot(v, zenith) <= 0.0) {
             return Double.MAX_VALUE;
         }
         PixelPoint px = projection.project(juranometria.sky.SkyFrame.toPosition(v))
                 .map(mapping::toPixel).orElse(null);
-        if (px == null || !paper.contains(px.x(), px.y())) {
+        if (px == null || !paper.contains(px.x(), px.y()) || !clearOf(reserved, px)) {
             return Double.MAX_VALUE;
         }
         return Math.hypot(px.x() - cx, px.y() - cy);

@@ -64,12 +64,26 @@ class ControllerStripLayoutTest {
         return found;
     }
 
+    /**
+     * Rows as bands: a group starts a new row when its top is at or below
+     * every group before it. Groups of unequal height share a row at
+     * unequal tops (the layout centres each in its row), which Linux
+     * fonts produced and a count of distinct tops mistook for two rows.
+     */
     private static int rows(JComponent strip) {
-        java.util.Set<Integer> tops = new java.util.TreeSet<>();
-        for (Component group : strip.getComponents()) {
-            tops.add(group.getY());
+        List<Component> groups = new ArrayList<>(List.of(strip.getComponents()));
+        groups.sort(java.util.Comparator.comparingInt(Component::getY));
+        int rows = 0;
+        int rowBottom = Integer.MIN_VALUE;
+        for (Component group : groups) {
+            if (group.getY() >= rowBottom) {
+                rows++;
+                rowBottom = group.getY() + group.getHeight();
+            } else {
+                rowBottom = Math.max(rowBottom, group.getY() + group.getHeight());
+            }
         }
-        return tops.size();
+        return rows;
     }
 
     @Test

@@ -146,6 +146,22 @@ the half, so the page says 84°). On the owner's
 wider page (about 2000 × 1070) the 80° ticks leave at 36° and the
 readout appears there.
 
+### Clear of the page's own ink (found on CI, 2026-11-01)
+
+With R-9 in place, CI's Linux fonts drew the title block wider than this
+desktop's, and on the zenith page the readout's stroke fell under it:
+the page's furniture paints over the reference layer, so the stroke was
+inked and then covered while the description still spoke it. The
+placement now stands **clear of the page's own ink**: a candidate point
+is refused where any reserved shape - a furniture box, a written name,
+a deep-sky glyph - comes within three pixels (`READOUT_CLEARANCE`, a
+ruled tick's half-length) of it, for the nearest point of R-2 as for the
+farthest point of R-9; the next clear point along the line stands in.
+The component decides the placement once, inside the reference layer
+against the same reserved ink the layer draws with, and speaks that one
+answer. On this desktop no measured page moved; the rule shows only
+where ink would have hidden the reading.
+
 ## As built (#675, stage 5)
 
 - **The module offers, the page decides.** `MeridianModule` adds one
