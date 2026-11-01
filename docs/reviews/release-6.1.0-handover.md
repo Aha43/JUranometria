@@ -54,7 +54,9 @@ about 130 MB below the cap.
 | Stage 2's visual ruling (2026-10-31) | #675 | "Lock Zoom we leave, I think accumulate is ok with stack 2 and I go with sparkles" |
 | #563, R-1 to R-8 (2026-10-31) | `meridian-readout.md`, *The ruling* | "Rule R-1 through R-8 as proposed, A to the degree": offered with the ticks while no ruled tick is on the page; the visible point nearest the centre; to the whole degree; a stroke half a ruled tick's; the figure through the production placement, refused alone; every surface and both languages, spoken; recomputed on every paint; nothing below the horizon, never at 90°, refused at the geographic pole |
 | R-9, the zenith at the centre (2026-10-31) | `meridian-readout.md`, *Amendment* | found at the Stage 5 checkpoint; offered the amendment or a rollback, the owner: "Your recommendation" - when the nearest point reads as the zenith's, the readout stands at the visible point farthest from the zenith, the south half first, 24 px inside the page's edge |
-| clear of the page's own ink (2026-11-01) | `meridian-readout.md`, *Clear of the page's own ink* | as built after CI's Linux fonts hid the stroke under the title block: a point within 3 px of any reserved shape is refused, for R-2's nearest point as for R-9's farthest; decided once in the reference layer and spoken from there. **Stands as built, for the owner's ruling** |
+| clear of the page's own ink (2026-11-01) | `meridian-readout.md`, *Clear of the page's own ink* | as built after CI's Linux fonts hid the stroke under the title block: a point within 3 px of any reserved shape is refused, for R-2's nearest point as for R-9's farthest; decided once in the reference layer and spoken from there. **Ruled by the owner on accepting this handover: stands as built** - "the contextual meridian readout appears only when it can be placed without obscuring the page's existing information" |
+| the heap (2026-11-01) | this document, section 8 | "Keep the evidence heap at 2 GiB for 6.1.0. Record the reduced margin as a limit ... Before the next road that materially grows evidence, measure again and make an explicit decision about raising the cap rather than waiting for a failure." |
+| the handover (2026-11-01) | #676 | "I accept the 6.1.0 handover at `40fd54ad`"; all seven gates on that head, then the PR, CI once and the pinned merge: "Merge #678 pinned to 40fd54ad" |
 | the gate plan for the road (2026-10-31) | chat | "I approve seven gates" - the final head, all seven, inventory 16, the eight Uranus and Neptune markers |
 | the reruns (2026-10-31, 2026-11-01) | chat | "Rerun all seven gates on 71c2536b"; "Rerun all seven gates on 31c87205"; "Run gates 1 and 7 on 5ae36317" (a test-only head, the analogue of the prose route); "Run all seven gates on f8ea4b87"; "Run all seven gates on the new head when it's pushed" |
 | the landing (2026-11-01) | #677 | "Merge #677 pinned to 438d0cc4" |
@@ -374,10 +376,11 @@ already do, recorded rather than claimed, on this handover's head.
   pauses unchanged, but the portable route's peak retention rose by
   about **257 MB** with this road's evidence - the 13 new readout files
   and the regenerated sheets - and now leaves about **130 MB** below the
-  2 GiB cap where 6.0.0 left about 400. The heap stays at 2 GiB for
-  6.1.0; whether to raise it before the next evidence-heavy road is the
-  owner's call, and is recorded here so the next gate 4 that runs out
-  is not a surprise.
+  2 GiB cap where 6.0.0 left about 400. **The owner's ruling**: the heap
+  stays at 2 GiB for 6.1.0, the reduced margin recorded as a limit;
+  before the next road that materially grows evidence, both routes are
+  measured again and raising the cap is decided explicitly rather than
+  after a failure.
 
 Then, as 6.0.0 was done: no `VERSION` change, tag or publication in
 this issue. Each of the following is a separate owner decision, asked
@@ -412,8 +415,10 @@ the one of this road argue for.
 
 ## 10. Still open after 6.1.0, and the road to 7.0.0
 
-The owner's ruling on *Clear of the page's own ink* (section 2) is the
-one thing this road leaves for a word. Open issues: #613, #617, #618,
+The owner ruled on *Clear of the page's own ink* and on the heap when
+accepting this handover (section 2); the heap's re-measurement before
+the next evidence-heavy road is the limit this release carries
+forward. Open issues: #613, #617, #618,
 #598, #594, #589, #571, #566, #564, #554, #553, #497, #417, #387, #373,
 #370, #362, #356, #355, #351, #339, #327, #326, #324, #295, #293, #282,
 and the Milky Way sprint #189-#192 with PR #199, blocked on licensing.

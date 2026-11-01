@@ -7,6 +7,8 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [6.1.0] - 2026-11-01
+
 **The controls where they belong (#674, #675).** The View menu is now
 the **Chart** menu, ordered by what a reader reaches for: Place and
 Time, Chart Options and the Inspector, Centre on coordinates, the

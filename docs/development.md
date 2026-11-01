@@ -385,7 +385,11 @@ asked:
   for the first time) the same cell moved again, wider: 201 pixels in
   each light image and 199 in each dark one, columns 206–232 of rows
   33–47; all eight sheet PNGs stayed pixel-identical and each of the
-  ten PDFs and SVGs differed by two bytes.
+  ten PDFs and SVGs differed by two bytes. At 6.1.0 (6.0→6.1) only the
+  last digit moved again: 127 pixels in each of the four images,
+  columns 222–231 of rows 33–47; all eight sheet PNGs stayed
+  pixel-identical and each of the ten PDFs and SVGs differed by one
+  byte.
 - **The articles.** Their footer names the release, and
   `scripts/build-articles.py` reads it from `VERSION` when the site is
   built rather than carrying a number - so there is nothing to
