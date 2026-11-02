@@ -400,13 +400,9 @@ public final class BookmarksPanel extends JPanel {
             return;
         }
         try {
-            if (!name.getText().strip().equals(folder.title())) {
-                library.rename(folder.id(), name.getText().strip());
-            }
+            // One change: the name and the place kept together, or neither.
             String into = ((AddBookmarkDialog.FolderChoice) where.getSelectedItem()).id();
-            if (!into.equals(parent)) {
-                library.move(folder.id(), into, Integer.MAX_VALUE);
-            }
+            library.renameAndMove(folder.id(), name.getText().strip(), into);
         } catch (IOException | IllegalArgumentException | IllegalStateException refused) {
             say(said.say("bookmark.refused.notsaved", refused.getMessage()));
         }
@@ -443,8 +439,10 @@ public final class BookmarksPanel extends JPanel {
             if (chosen.get() instanceof Node.Folder f) {
                 Object[] options = {said.say("bookmark.delete.folder.keep"),
                         said.say("bookmark.delete.folder.all"), said.say("bookmark.add.cancel.label")};
+                Library inside = new Library("", f.children());
                 int answer = asker.ask(this, said.say("bookmark.delete.folder.question", f.title(),
-                        f.children().size()), said.say("bookmark.delete.title"), options);
+                        inside.bookmarks().size(), inside.folders().size(), inside.kept().size()),
+                        said.say("bookmark.delete.title"), options);
                 if (answer == 0) {
                     library.removeFolder(f.id(), BookmarkLibrary.Contents.KEEP);
                 } else if (answer == 1) {

@@ -105,6 +105,33 @@ class DocumentBookmarkLibraryTest {
     }
 
     @Test
+    void anEditWithAMoveIsOneChangeKeptWholeOrNotAtAll() throws Exception {
+        DocumentBookmarkLibrary lib = open();
+        String a = lib.add(BookmarkLibrary.ROOT, 0, draft("A"));
+        String folderId = lib.addFolder(BookmarkLibrary.ROOT, 1, "Deep sky");
+        String inner = lib.addFolder(folderId, 0, "Nebulae");
+        String before = document();
+        DocumentBookmarkLibrary failing = open((from, to) -> {
+            throw new IOException("the move was refused");
+        });
+        assertThrows(IOException.class, () -> failing.updateAndMove(a, draft("A, renamed"), folderId));
+        assertThrows(IOException.class, () -> failing.renameAndMove(inner, "Galaxies", BookmarkLibrary.ROOT));
+        assertEquals(before, document(), "nothing of either change was written");
+        Library unchanged = ((LibraryState.Available) failing.state()).library();
+        assertEquals("A", ((Node.Bookmark) unchanged.find(a).orElseThrow()).title(), "nor adopted");
+        assertEquals("Nebulae", ((Node.Folder) unchanged.find(inner).orElseThrow()).title());
+
+        lib.updateAndMove(a, draft("A, renamed"), folderId);
+        lib.renameAndMove(inner, "Galaxies", BookmarkLibrary.ROOT);
+        Library after = ((LibraryState.Available) open().state()).library();
+        Node.Folder deep = (Node.Folder) after.find(folderId).orElseThrow();
+        assertEquals(List.of("A, renamed"), deep.children().stream().filter(n -> n instanceof Node.Bookmark)
+                .map(n -> ((Node.Bookmark) n).title()).toList(), "edited and moved, kept together");
+        assertEquals("Galaxies", ((Node.Folder) after.find(inner).orElseThrow()).title());
+        assertTrue(after.root().stream().anyMatch(n -> n.id().equals(inner)), "renamed and moved to the root");
+    }
+
+    @Test
     void anUnreadableDocumentIsKeptAndItsBackupOfferedOnlyOnRequest() throws Exception {
         DocumentBookmarkLibrary first = open();
         first.add(BookmarkLibrary.ROOT, 0, draft("A"));

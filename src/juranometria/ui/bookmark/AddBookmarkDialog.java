@@ -105,6 +105,7 @@ public final class AddBookmarkDialog extends JDialog {
         final JCheckBox time;
         final JTextField instant;
         final JCheckBox currentView;
+        final JCheckBox currentSubjects;
         final JRadioButton event;
         final JRadioButton observation;
         final JCheckBox place;
@@ -170,6 +171,15 @@ public final class AddBookmarkDialog extends JDialog {
                 c.gridy++;
                 form.add(currentView, c);
             }
+            currentSubjects = new JCheckBox(said.say("bookmark.edit.subjects.label",
+                    editing.map(e -> e.now().subjects().size()).orElse(0)));
+            currentSubjects.getAccessibleContext().setAccessibleName(said.say("bookmark.edit.subjects.a11y"));
+            Explain.control(currentSubjects, said.say("bookmark.edit.subjects.hover"),
+                    said.say("bookmark.edit.subjects.explain"));
+            if (editing.isPresent()) {
+                c.gridy++;
+                form.add(currentSubjects, c);
+            }
 
             for (Subject s : proposal.subjects()) {
                 subjects.addElement(s);
@@ -195,7 +205,7 @@ public final class AddBookmarkDialog extends JDialog {
                     ? "bookmark.add.subjects.none" : "bookmark.add.subjects.label"));
             subjectsLabel.setLabelFor(list);
             form.add(subjectsLabel, c);
-            if (!subjects.isEmpty()) {
+            if (!subjects.isEmpty() || editing.isPresent()) {
                 c.gridy++;
                 JPanel row = new JPanel(new BorderLayout(6, 0));
                 row.add(new JScrollPane(list), BorderLayout.CENTER);
@@ -224,10 +234,22 @@ public final class AddBookmarkDialog extends JDialog {
                 }
             });
             refreshPrimary(proposal.primary());
-            if (!subjects.isEmpty()) {
+            if (!subjects.isEmpty() || editing.isPresent()) {
                 c.gridwidth = 1;
                 labelled(form, c, "bookmark.add.primary", primary, letters);
             }
+            currentSubjects.addItemListener(e -> {
+                BookmarkCapture.Proposal from = currentSubjects.isSelected() && editing.isPresent()
+                        ? editing.get().now() : proposal;
+                subjects.clear();
+                for (Subject s : from.subjects()) {
+                    subjects.addElement(s);
+                }
+                refreshPrimary(from.primary());
+                if (!subjects.isEmpty()) {
+                    list.setSelectedIndex(0);
+                }
+            });
 
             c.gridx = 0;
             c.gridy++;
@@ -472,11 +494,8 @@ public final class AddBookmarkDialog extends JDialog {
             }
             try {
                 if (editing.isPresent()) {
-                    String id = editing.get().bookmark().id();
-                    library.update(id, draft.get());
-                    if (!into.id().equals(editing.get().parentId())) {
-                        library.move(id, into.id(), Integer.MAX_VALUE);
-                    }
+                    // One change: the content and the folder kept together, or neither.
+                    library.updateAndMove(editing.get().bookmark().id(), draft.get(), into.id());
                 } else {
                     library.add(into.id(), Integer.MAX_VALUE, draft.get());
                 }

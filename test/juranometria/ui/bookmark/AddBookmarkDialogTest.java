@@ -188,6 +188,33 @@ class AddBookmarkDialogTest {
     }
 
     @Test
+    void editCanTakeTheCurrentSelectionWithItsLeadAsTheMainObject() throws Exception {
+        InMemoryBookmarkLibrary library = new InMemoryBookmarkLibrary(Library.empty("t"));
+        AddBookmarkDialog.Content c = content(library, List.of("NGC 6888"), "NGC 6888");
+        SwingUtilities.invokeAndWait(c::add);
+        Node.Bookmark stored = only(library);
+        BookmarkCapture.Proposal now = BookmarkCapture.propose(VIEW, List.of("moon", "TYC 1800-2202-1"),
+                "TYC 1800-2202-1", OSLO);
+        SwingUtilities.invokeAndWait(() -> {
+            AddBookmarkDialog.Content e = new AddBookmarkDialog.Content(EN, library,
+                    new AddBookmarkDialog.Editing(stored, BookmarkLibrary.ROOT, now.view(), now), Subject::id);
+            e.currentSubjects.setSelected(true);
+            assertEquals(List.of("moon", "TYC 1800-2202-1"), java.util.Collections.list(e.subjects.elements())
+                    .stream().map(Subject::id).toList(), "the selection's members, in order");
+            assertEquals("TYC 1800-2202-1", ((Subject) e.primary.getSelectedItem()).id(), "its lead proposed");
+            e.currentSubjects.setSelected(false);
+            assertEquals(List.of("NGC 6888"), java.util.Collections.list(e.subjects.elements())
+                    .stream().map(Subject::id).toList(), "unticked: the saved objects back");
+            e.currentSubjects.setSelected(true);
+            e.add();
+        });
+        Node.Bookmark edited = only(library);
+        assertEquals(List.of("moon", "TYC 1800-2202-1"), edited.subjects().stream().map(Subject::id).toList());
+        assertEquals("TYC 1800-2202-1", edited.primary().orElseThrow().id());
+        assertEquals(stored.view(), edited.view(), "the view is not touched by the objects' choice");
+    }
+
+    @Test
     void theFolderChoiceListsTheRootAndEveryFolderByItsPath() throws Exception {
         InMemoryBookmarkLibrary library = new InMemoryBookmarkLibrary(Library.empty("t"));
         String events = library.addFolder(BookmarkLibrary.ROOT, 0, "Sky events");

@@ -66,6 +66,57 @@ abstract class TreeBookmarkLibrary implements BookmarkLibrary {
     }
 
     @Override
+    public void updateAndMove(String bookmarkId, Draft draft, String parentId) throws IOException {
+        Library library = available();
+        Library next = LibraryEdits.replace(library, bookmarkId, old -> {
+            if (!(old instanceof Node.Bookmark)) {
+                throw new IllegalArgumentException(bookmarkId + " is not a bookmark");
+            }
+            return bookmark(bookmarkId, draft);
+        });
+        if (!parentId.equals(parentOf(library, bookmarkId))) {
+            next = LibraryEdits.move(next, bookmarkId, parentId, Integer.MAX_VALUE);
+        }
+        adopt(next);
+    }
+
+    @Override
+    public void renameAndMove(String folderId, String title, String parentId) throws IOException {
+        Library library = available();
+        Library next = LibraryEdits.replace(library, folderId, old -> {
+            if (!(old instanceof Node.Folder f)) {
+                throw new IllegalArgumentException(folderId + " is not a folder");
+            }
+            return new Node.Folder(f.id(), title, f.children());
+        });
+        if (!parentId.equals(parentOf(library, folderId))) {
+            next = LibraryEdits.move(next, folderId, parentId, Integer.MAX_VALUE);
+        }
+        adopt(next);
+    }
+
+    /** The id of the folder holding an entry; the root's for a top-level one. */
+    static String parentOf(Library library, String id) {
+        return parentIn(library.root(), ROOT, id).orElseThrow(
+                () -> new IllegalArgumentException("no record " + id + " in the library"));
+    }
+
+    private static java.util.Optional<String> parentIn(List<Node> nodes, String parent, String id) {
+        for (Node n : nodes) {
+            if (n.id().equals(id)) {
+                return java.util.Optional.of(parent);
+            }
+            if (n instanceof Node.Folder f) {
+                java.util.Optional<String> inner = parentIn(f.children(), f.id(), id);
+                if (inner.isPresent()) {
+                    return inner;
+                }
+            }
+        }
+        return java.util.Optional.empty();
+    }
+
+    @Override
     public String addFolder(String parentId, int position, String title) throws IOException {
         String id = ids.get();
         adopt(LibraryEdits.insert(available(), parentId, position,

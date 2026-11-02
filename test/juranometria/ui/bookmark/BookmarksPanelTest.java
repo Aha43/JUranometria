@@ -141,6 +141,29 @@ class BookmarksPanelTest {
     }
 
     @Test
+    void theDeletionQuestionCountsEverythingInsideTheFolder() throws Exception {
+        InMemoryBookmarkLibrary library = new InMemoryBookmarkLibrary(Library.empty("t"));
+        String outer = library.addFolder(BookmarkLibrary.ROOT, 0, "Sky events");
+        library.add(outer, 0, draft("A", false));
+        String year = library.addFolder(outer, 1, "2026");
+        library.add(year, 0, draft("B", false));
+        String month = library.addFolder(year, 1, "November");
+        library.add(month, 0, draft("C", false));
+        BookmarksPanel p = panel(library, new Host());
+        List<String> asked = new ArrayList<>();
+        SwingUtilities.invokeAndWait(() -> {
+            p.asker = (parent, question, title, options) -> {
+                asked.add(question);
+                return 2;
+            };
+            p.select(outer);
+            p.deleteChosen();
+        });
+        assertEquals(List.of("Delete the folder Sky events? Counting every folder inside it, it holds"
+                + " 3 bookmarks, 2 folders and 0 records needing attention."), asked);
+    }
+
+    @Test
     void entriesMoveUpAndDownWithinTheirFolder() throws Exception {
         InMemoryBookmarkLibrary library = new InMemoryBookmarkLibrary(Library.empty("t"));
         library.add(BookmarkLibrary.ROOT, 0, draft("A", false));

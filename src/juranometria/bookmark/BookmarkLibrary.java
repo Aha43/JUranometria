@@ -31,6 +31,18 @@ public interface BookmarkLibrary {
     /** Replaces a bookmark's content; its place in the tree is unchanged. */
     void update(String bookmarkId, Draft draft) throws IOException;
 
+    /**
+     * Replaces a bookmark's content and, if the folder differs, moves it to
+     * the end of that folder - as one change: both are kept, or neither is.
+     */
+    void updateAndMove(String bookmarkId, Draft draft, String parentId) throws IOException;
+
+    /**
+     * Renames a folder and, if the parent differs, moves it to the end of
+     * that folder - as one change: both are kept, or neither is.
+     */
+    void renameAndMove(String folderId, String title, String parentId) throws IOException;
+
     /** Adds a folder; returns its id. */
     String addFolder(String parentId, int position, String title) throws IOException;
 
