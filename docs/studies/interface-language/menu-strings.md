@@ -40,7 +40,7 @@ open menu would cover the thing it explains.
 
 ![](menu-en-1-menus.png)
 
-Bar packed 892 × 471 px; widest popup 232 px.
+Bar packed 1093 × 471 px; widest popup 232 px.
 
 | channel | words |
 |---|---|
@@ -167,6 +167,14 @@ Bar packed 892 × 471 px; widest popup 232 px.
 | item hover \| Where Neptune, Triton and Nereid are, for the chart time and place |
 | item spoken name \| Neptune table |
 | item spoken description \| Opens a table of Neptune's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Triton and Nereid stand beside it - clear of Neptune, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Neptune and its moons are drawn on the chart by Neptune on the chart. |
+| menu label \| Bookmarks |
+| menu spoken name \| Bookmarks menu |
+| menu spoken description \| Saved views of the sky: adding the view you are looking at |
+| menu access letter (language) \| B |
+| item label \| Add Bookmark... |
+| item spoken name \| Add Bookmark |
+| item spoken description \| Saves the view you are looking at as a bookmark, with the objects, chart time and place you choose |
+| item accelerator (platform notation) \| ⌘D |
 | menu label \| Help |
 | menu spoken name \| Help menu |
 | menu spoken description \| Information about this application and what it is built on |
@@ -182,7 +190,7 @@ Bar packed 892 × 471 px; widest popup 232 px.
 
 ![](menu-en-2-checked.png)
 
-Bar packed 892 × 471 px; widest popup 232 px.
+Bar packed 1093 × 471 px; widest popup 232 px.
 
 | channel | words |
 |---|---|
@@ -309,6 +317,14 @@ Bar packed 892 × 471 px; widest popup 232 px.
 | item hover \| Where Neptune, Triton and Nereid are, for the chart time and place |
 | item spoken name \| Neptune table |
 | item spoken description \| Opens a table of Neptune's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Triton and Nereid stand beside it - clear of Neptune, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Neptune and its moons are drawn on the chart by Neptune on the chart. |
+| menu label \| Bookmarks |
+| menu spoken name \| Bookmarks menu |
+| menu spoken description \| Saved views of the sky: adding the view you are looking at |
+| menu access letter (language) \| B |
+| item label \| Add Bookmark... |
+| item spoken name \| Add Bookmark |
+| item spoken description \| Saves the view you are looking at as a bookmark, with the objects, chart time and place you choose |
+| item accelerator (platform notation) \| ⌘D |
 | menu label \| Help |
 | menu spoken name \| Help menu |
 | menu spoken description \| Information about this application and what it is built on |
@@ -324,7 +340,7 @@ Bar packed 892 × 471 px; widest popup 232 px.
 
 ![](menu-en-3-widest.png)
 
-Bar packed 892 × 471 px; widest popup 232 px.
+Bar packed 1093 × 471 px; widest popup 232 px.
 
 | channel | words |
 |---|---|
@@ -451,6 +467,14 @@ Bar packed 892 × 471 px; widest popup 232 px.
 | item hover \| Where Neptune, Triton and Nereid are, for the chart time and place |
 | item spoken name \| Neptune table |
 | item spoken description \| Opens a table of Neptune's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Triton and Nereid stand beside it - clear of Neptune, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Neptune and its moons are drawn on the chart by Neptune on the chart. |
+| menu label \| Bookmarks |
+| menu spoken name \| Bookmarks menu |
+| menu spoken description \| Saved views of the sky: adding the view you are looking at |
+| menu access letter (language) \| B |
+| item label \| Add Bookmark... |
+| item spoken name \| Add Bookmark |
+| item spoken description \| Saves the view you are looking at as a bookmark, with the objects, chart time and place you choose |
+| item accelerator (platform notation) \| ⌘D |
 | menu label \| Help |
 | menu spoken name \| Help menu |
 | menu spoken description \| Information about this application and what it is built on |
@@ -466,7 +490,7 @@ Bar packed 892 × 471 px; widest popup 232 px.
 
 ![](menu-en-4-narrowest.png)
 
-Bar packed 892 × 471 px; widest popup 232 px.
+Bar packed 1093 × 471 px; widest popup 232 px.
 
 | channel | words |
 |---|---|
@@ -593,6 +617,14 @@ Bar packed 892 × 471 px; widest popup 232 px.
 | item hover \| Where Neptune, Triton and Nereid are, for the chart time and place |
 | item spoken name \| Neptune table |
 | item spoken description \| Opens a table of Neptune's computed position, height, distance, size, illuminated fraction, phase angle, pole and tilt, and of where Triton and Nereid stand beside it - clear of Neptune, in front of it, behind it or in its shadow - for the chart time and place, at that instant or over a range of instants. The moons are computed for 2000 to 2100. Neptune and its moons are drawn on the chart by Neptune on the chart. |
+| menu label \| Bookmarks |
+| menu spoken name \| Bookmarks menu |
+| menu spoken description \| Saved views of the sky: adding the view you are looking at |
+| menu access letter (language) \| B |
+| item label \| Add Bookmark... |
+| item spoken name \| Add Bookmark |
+| item spoken description \| Saves the view you are looking at as a bookmark, with the objects, chart time and place you choose |
+| item accelerator (platform notation) \| ⌘D |
 | menu label \| Help |
 | menu spoken name \| Help menu |
 | menu spoken description \| Information about this application and what it is built on |
@@ -610,7 +642,7 @@ Bar packed 892 × 471 px; widest popup 232 px.
 
 ![](menu-nb-NO-5-menus.png)
 
-Bar packed 882 × 471 px; widest popup 229 px.
+Bar packed 1100 × 471 px; widest popup 229 px.
 
 | channel | words |
 |---|---|
@@ -736,6 +768,15 @@ Bar packed 882 × 471 px; widest popup 229 px.
 | item hover \| Hvor Neptun, Triton og Nereid er, for karttiden og stedet |
 | item spoken name \| Neptuntabell |
 | item spoken description \| Åpner en tabell over Neptuns beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Triton og Nereid står ved siden av - klar av Neptun, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Neptun og månene tegnes på kartet med Neptun på kartet. |
+| menu label \| Bokmerker |
+| menu spoken name \| Bokmerker-menyen |
+| menu spoken description \| Lagrede utsnitt av himmelen: å legge til utsnittet du ser på |
+| menu access letter (language) \| B |
+| item label \| Legg til bokmerke... |
+| item spoken name \| Legg til bokmerke |
+| item spoken description \| Lagrer utsnittet du ser på som et bokmerke, med objektene, karttiden og stedet du velger |
+| item accelerator (platform notation) \| ⌘D |
+| item access letter (language) \| L |
 | menu label \| Hjelp |
 | menu spoken name \| Hjelp-menyen |
 | menu spoken description \| Informasjon om dette programmet og hva det er bygd på |
@@ -751,7 +792,7 @@ Bar packed 882 × 471 px; widest popup 229 px.
 
 ![](menu-nb-NO-6-checked.png)
 
-Bar packed 882 × 471 px; widest popup 229 px.
+Bar packed 1100 × 471 px; widest popup 229 px.
 
 | channel | words |
 |---|---|
@@ -877,6 +918,15 @@ Bar packed 882 × 471 px; widest popup 229 px.
 | item hover \| Hvor Neptun, Triton og Nereid er, for karttiden og stedet |
 | item spoken name \| Neptuntabell |
 | item spoken description \| Åpner en tabell over Neptuns beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Triton og Nereid står ved siden av - klar av Neptun, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Neptun og månene tegnes på kartet med Neptun på kartet. |
+| menu label \| Bokmerker |
+| menu spoken name \| Bokmerker-menyen |
+| menu spoken description \| Lagrede utsnitt av himmelen: å legge til utsnittet du ser på |
+| menu access letter (language) \| B |
+| item label \| Legg til bokmerke... |
+| item spoken name \| Legg til bokmerke |
+| item spoken description \| Lagrer utsnittet du ser på som et bokmerke, med objektene, karttiden og stedet du velger |
+| item accelerator (platform notation) \| ⌘D |
+| item access letter (language) \| L |
 | menu label \| Hjelp |
 | menu spoken name \| Hjelp-menyen |
 | menu spoken description \| Informasjon om dette programmet og hva det er bygd på |
@@ -892,7 +942,7 @@ Bar packed 882 × 471 px; widest popup 229 px.
 
 ![](menu-nb-NO-7-widest.png)
 
-Bar packed 882 × 471 px; widest popup 229 px.
+Bar packed 1100 × 471 px; widest popup 229 px.
 
 | channel | words |
 |---|---|
@@ -1018,6 +1068,15 @@ Bar packed 882 × 471 px; widest popup 229 px.
 | item hover \| Hvor Neptun, Triton og Nereid er, for karttiden og stedet |
 | item spoken name \| Neptuntabell |
 | item spoken description \| Åpner en tabell over Neptuns beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Triton og Nereid står ved siden av - klar av Neptun, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Neptun og månene tegnes på kartet med Neptun på kartet. |
+| menu label \| Bokmerker |
+| menu spoken name \| Bokmerker-menyen |
+| menu spoken description \| Lagrede utsnitt av himmelen: å legge til utsnittet du ser på |
+| menu access letter (language) \| B |
+| item label \| Legg til bokmerke... |
+| item spoken name \| Legg til bokmerke |
+| item spoken description \| Lagrer utsnittet du ser på som et bokmerke, med objektene, karttiden og stedet du velger |
+| item accelerator (platform notation) \| ⌘D |
+| item access letter (language) \| L |
 | menu label \| Hjelp |
 | menu spoken name \| Hjelp-menyen |
 | menu spoken description \| Informasjon om dette programmet og hva det er bygd på |
@@ -1033,7 +1092,7 @@ Bar packed 882 × 471 px; widest popup 229 px.
 
 ![](menu-nb-NO-8-narrowest.png)
 
-Bar packed 882 × 471 px; widest popup 229 px.
+Bar packed 1100 × 471 px; widest popup 229 px.
 
 | channel | words |
 |---|---|
@@ -1159,6 +1218,15 @@ Bar packed 882 × 471 px; widest popup 229 px.
 | item hover \| Hvor Neptun, Triton og Nereid er, for karttiden og stedet |
 | item spoken name \| Neptuntabell |
 | item spoken description \| Åpner en tabell over Neptuns beregnede posisjon, høyde, avstand, størrelse, belyste andel, fasevinkel, pol og helning, og over hvor Triton og Nereid står ved siden av - klar av Neptun, foran, bak eller i skyggen - for karttiden og stedet, ved det tidspunktet eller over et tidsrom. Månene beregnes for 2000 til 2100. Neptun og månene tegnes på kartet med Neptun på kartet. |
+| menu label \| Bokmerker |
+| menu spoken name \| Bokmerker-menyen |
+| menu spoken description \| Lagrede utsnitt av himmelen: å legge til utsnittet du ser på |
+| menu access letter (language) \| B |
+| item label \| Legg til bokmerke... |
+| item spoken name \| Legg til bokmerke |
+| item spoken description \| Lagrer utsnittet du ser på som et bokmerke, med objektene, karttiden og stedet du velger |
+| item accelerator (platform notation) \| ⌘D |
+| item access letter (language) \| L |
 | menu label \| Hjelp |
 | menu spoken name \| Hjelp-menyen |
 | menu spoken description \| Informasjon om dette programmet og hva det er bygd på |

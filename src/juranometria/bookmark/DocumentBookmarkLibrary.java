@@ -64,17 +64,28 @@ public final class DocumentBookmarkLibrary extends TreeBookmarkLibrary {
         this.mover = mover;
     }
 
-    /** Opens the library in a folder, as the application's start does. */
-    public static DocumentBookmarkLibrary open(Path folder, String writtenBy) throws IOException {
+    /**
+     * Opens the library in a folder, as the application's start does.
+     * Never throws: a folder or document that cannot be read is an
+     * {@link LibraryState.Unreadable} library, so bookmarks can never stop
+     * the atlas from starting.
+     */
+    public static DocumentBookmarkLibrary open(Path folder, String writtenBy) {
         return open(folder, writtenBy, () -> UUID.randomUUID().toString(), Clock.systemUTC(),
                 DocumentBookmarkLibrary::atomicMove);
     }
 
     static DocumentBookmarkLibrary open(Path folder, String writtenBy, Supplier<String> ids,
-                                        Clock clock, Mover mover) throws IOException {
-        Files.deleteIfExists(folder.resolve(PART));
-        return new DocumentBookmarkLibrary(folder, writtenBy, ids, clock, mover,
-                read(folder, writtenBy));
+                                        Clock clock, Mover mover) {
+        LibraryState initial;
+        try {
+            Files.deleteIfExists(folder.resolve(PART));
+            initial = read(folder, writtenBy);
+        } catch (IOException | RuntimeException unreadable) {
+            initial = new LibraryState.Unreadable("the bookmark folder cannot be read: "
+                    + unreadable.getMessage(), Optional.empty());
+        }
+        return new DocumentBookmarkLibrary(folder, writtenBy, ids, clock, mover, initial);
     }
 
     private static LibraryState read(Path folder, String writtenBy) throws IOException {

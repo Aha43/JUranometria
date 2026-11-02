@@ -431,6 +431,21 @@ public final class AtlasToolbar extends JToolBar {
     }
 
     /**
+     * Add Bookmark... (#681): directly after Place and Time, in the same
+     * group - the chart's context, then saving it. Re-asserted focusable
+     * after it is added (#449).
+     */
+    public JButton attachAddBookmark(Runnable open) {
+        JButton button = controls.attachAddBookmark(open);
+        int at = controls.placeAndTime() != null
+                ? getComponentIndex(controls.placeAndTime()) + 1
+                : getComponentIndex(controls.home()) + 2;
+        add(button, at);
+        button.setFocusable(true);
+        return button;
+    }
+
+    /**
      * Controls (#675, stage 2): beside the Inspector's toggle, the two
      * window switches together; when the bar has no Inspector it takes
      * the Inspector's place before Accumulate. Re-asserted focusable

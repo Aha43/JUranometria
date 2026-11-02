@@ -196,3 +196,7 @@ a4a1f23f3eeface2	bookmark/BookmarkDocument.java	writtenBy	declared name used, bu
 df0c2548109a8d0e	bookmark/BookmarkDocument.java	id	declared name used, but never at a known sink	identifier	a key of the bookmark document (#681); no language changes it
 52541312e8fe66af	bookmark/BookmarkDocument.java	type	declared name used, but never at a known sink	identifier	a key of the bookmark document (#681); no language changes it
 67ed5d962691bfc9	bookmark/BookmarkLibrary.java	root	declared name used, but never at a known sink	identifier	the permanent root folder's id in the bookmark library (#681); the interface names the root in its own words
+af0cd4c12191440b	app/AppMenuBar.java	bookmarksMenu	declared name used, but never at a known sink	identifier	the Bookmarks menu's component name (#681); a stable key, no language changes it
+d90e057d3f317516	app/AppMenuBar.java	addBookmarkItem	declared name used, but never at a known sink	identifier	the Add Bookmark item's component name (#681); a stable key
+b8dcdf4c9159ce66	ui/bookmark/AddBookmarkDialog.java	bookmarkAdd	declared name used, but never at a known sink	identifier	the add dialog's Add button name (#681); a stable key
+4ffc24f9103bc1a8	ui/bookmark/BookmarkCapture.java	[a-z]+(\\.[a-z]+)*	declared name used, but never at a known sink	identifier	the pattern of the modules' body identities (#681); never shown

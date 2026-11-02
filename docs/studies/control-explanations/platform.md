@@ -28,6 +28,7 @@ Every one of them from the registry that binds it, so a tooltip cannot promise a
 | Zoom out | `⌃-` |
 | Chart toolbar | `⌃+⇧T` |
 | Centre on coordinates | `⌃L` |
+| Add bookmark | `⌃D` |
 | the chart's own keyboard | `⌃K` then a letter |
 
 ## Every explanation that names a key
@@ -36,6 +37,7 @@ Every one of them from the registry that binds it, so a tooltip cannot promise a
 |---|---|---|
 | Toolbar | (icon only) | Zoom in (<key:zoomIn>) |
 | Toolbar | (icon only) | Zoom out (<key:zoomOut>) |
+| Toolbar | (icon only) | Add Bookmark: save this view (<key:AddBookmarkDialog>) |
 | Toolbar | (icon only) | Show the Inspector: what the selected mark is (<key:inspector>) |
 | Chart controls | (icon only) | Zoom in (<key:zoomIn>) |
 | Chart controls | (icon only) | Zoom out (<key:zoomOut>) |
@@ -62,7 +64,7 @@ Every one of them from the registry that binds it, so a tooltip cannot promise a
 | Place and Time | Mathematical horizon | Draw where the sky meets a perfectly flat, transparent Earth (<prefix> then H) |
 | Inspector | (icon only) | Close Inspector (<key:inspector>) |
 
-**27 explanations** name a key on this platform. The report beside this one
+**28 explanations** name a key on this platform. The report beside this one
 holds the same sentences with the modifier reduced to a token, so that what
 is pinned is which control quotes which switch rather than what this
 desktop calls a key.

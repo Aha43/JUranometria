@@ -766,6 +766,33 @@ public final class JUranometriaMain {
             }
         };
         toolbar.attachPlaceAndTime(openPlaceAndTime);
+        // Bookmarks (#681, ruled on #497): the library is the local
+        // document in the system's own data folder, opened once; opening
+        // never fails the start - an unreadable or newer document is a
+        // state the dialog explains. Add Bookmark... proposes from the
+        // chart as it stands and adds only on the reader's Add.
+        juranometria.bookmark.BookmarkLibrary bookmarks =
+                juranometria.bookmark.DocumentBookmarkLibrary.open(
+                        juranometria.bookmark.BookmarkFolder.current(), AppInfo.version());
+        juranometria.search.LocalSearch bookmarkSearch = Atlas.search();
+        Runnable addBookmark = () -> {
+            juranometria.chart.WorkingSelection working = modules.workingSelection();
+            juranometria.ui.bookmark.BookmarkCapture.Proposal proposal =
+                    juranometria.ui.bookmark.BookmarkCapture.propose(controller.state(),
+                            working.members(), working.lead(), meridian.observer());
+            java.util.function.Function<juranometria.bookmark.Subject, String> names =
+                    juranometria.ui.bookmark.SubjectNames.of(pageWords, bookmarkSearch);
+            String suggested = proposal.primary().map(names)
+                    .orElseGet(() -> controller.state().targetLabel() != null
+                            ? controller.state().targetLabel()
+                            : juranometria.chart.SkyFormat.formatRa(controller.state().centre().raDegrees())
+                                    + ", " + juranometria.chart.SkyFormat.formatDec(
+                                            controller.state().centre().decDegrees()));
+            juranometria.ui.bookmark.AddBookmarkDialog.open(frame,
+                    juranometria.ui.language.InterfaceText.forLanguage(language.interfaceLanguage()),
+                    bookmarks, proposal, names, suggested);
+        };
+        toolbar.attachAddBookmark(addBookmark);
         toolbar.attachControls(toggleCompanion);
         // Built after the controls seam, because the menu
         // says its words in the same language the seam
@@ -945,6 +972,9 @@ public final class JUranometriaMain {
         // selection cleared as Search clears it, and the requested-position
         // cross left at the place until a search, a selection or Clear
         // selection ends it.
+        AppMenuBar.addBookmarks(frame.getJMenuBar(),
+                juranometria.ui.language.InterfaceText.forLanguage(
+                        language.interfaceLanguage()), addBookmark);
         AppMenuBar.addCentreOnCoordinates(frame.getJMenuBar(),
                 juranometria.ui.language.InterfaceText.forLanguage(
                         language.interfaceLanguage()),

@@ -64,6 +64,9 @@ The shipped catalogue, nothing typed.
 | Place and Time: where and when the chart is drawn for |
 | Place and Time |
 | Opens the window that sets your location and the instant the chart is drawn for; the same window as Chart's Place and Time... item opens |
+| Add Bookmark: save this view (⌘D) |
+| Add Bookmark |
+| Opens the window that saves the view you are looking at as a bookmark; the same window as the Bookmarks menu's Add Bookmark... item opens |
 | Show the Inspector: what the selected mark is (⌘I) |
 | Inspector |
 | Hidden; press to open the panel that identifies what you selected and lists what is on this page. |
@@ -112,6 +115,9 @@ The shipped catalogue. Every row is a catalogue identity pair and is not transla
 | Place and Time: where and when the chart is drawn for |
 | Place and Time |
 | Opens the window that sets your location and the instant the chart is drawn for; the same window as Chart's Place and Time... item opens |
+| Add Bookmark: save this view (⌘D) |
+| Add Bookmark |
+| Opens the window that saves the view you are looking at as a bookmark; the same window as the Bookmarks menu's Add Bookmark... item opens |
 | Show the Inspector: what the selected mark is (⌘I) |
 | Inspector |
 | Hidden; press to open the panel that identifies what you selected and lists what is on this page. |
@@ -176,6 +182,9 @@ The shipped catalogue. The item is disabled because there really is nothing to c
 | Place and Time: where and when the chart is drawn for |
 | Place and Time |
 | Opens the window that sets your location and the instant the chart is drawn for; the same window as Chart's Place and Time... item opens |
+| Add Bookmark: save this view (⌘D) |
+| Add Bookmark |
+| Opens the window that saves the view you are looking at as a bookmark; the same window as the Bookmarks menu's Add Bookmark... item opens |
 | Show the Inspector: what the selected mark is (⌘I) |
 | Inspector |
 | Hidden; press to open the panel that identifies what you selected and lists what is on this page. |
@@ -226,6 +235,9 @@ The shipped catalogue. The item is disabled because there really is nothing to c
 | Place and Time: where and when the chart is drawn for |
 | Place and Time |
 | Opens the window that sets your location and the instant the chart is drawn for; the same window as Chart's Place and Time... item opens |
+| Add Bookmark: save this view (⌘D) |
+| Add Bookmark |
+| Opens the window that saves the view you are looking at as a bookmark; the same window as the Bookmarks menu's Add Bookmark... item opens |
 | Show the Inspector: what the selected mark is (⌘I) |
 | Inspector |
 | Hidden; press to open the panel that identifies what you selected and lists what is on this page. |
@@ -278,6 +290,9 @@ The shipped catalogue, nothing typed.
 | Sted og tid: hvor og når kartet tegnes for |
 | Sted og tid |
 | Åpner vinduet der du velger stedet og tidspunktet kartet tegnes for; det samme vinduet som Kart-menyens Sted og tid... åpner |
+| Legg til bokmerke: lagre dette utsnittet (⌘D) |
+| Legg til bokmerke |
+| Åpner vinduet som lagrer utsnittet du ser på som et bokmerke; det samme vinduet som Bokmerker-menyens Legg til bokmerke... åpner |
 | Vis utforskeren: hva det valgte merket er (⌘I) |
 | Utforskeren |
 | Skjult; trykk for å åpne panelet som viser hva du har valgt og hva som finnes på denne siden |
@@ -326,6 +341,9 @@ The shipped catalogue. Every row is a catalogue identity pair and is not transla
 | Sted og tid: hvor og når kartet tegnes for |
 | Sted og tid |
 | Åpner vinduet der du velger stedet og tidspunktet kartet tegnes for; det samme vinduet som Kart-menyens Sted og tid... åpner |
+| Legg til bokmerke: lagre dette utsnittet (⌘D) |
+| Legg til bokmerke |
+| Åpner vinduet som lagrer utsnittet du ser på som et bokmerke; det samme vinduet som Bokmerker-menyens Legg til bokmerke... åpner |
 | Vis utforskeren: hva det valgte merket er (⌘I) |
 | Utforskeren |
 | Skjult; trykk for å åpne panelet som viser hva du har valgt og hva som finnes på denne siden |
@@ -390,6 +408,9 @@ The shipped catalogue. The item is disabled because there really is nothing to c
 | Sted og tid: hvor og når kartet tegnes for |
 | Sted og tid |
 | Åpner vinduet der du velger stedet og tidspunktet kartet tegnes for; det samme vinduet som Kart-menyens Sted og tid... åpner |
+| Legg til bokmerke: lagre dette utsnittet (⌘D) |
+| Legg til bokmerke |
+| Åpner vinduet som lagrer utsnittet du ser på som et bokmerke; det samme vinduet som Bokmerker-menyens Legg til bokmerke... åpner |
 | Vis utforskeren: hva det valgte merket er (⌘I) |
 | Utforskeren |
 | Skjult; trykk for å åpne panelet som viser hva du har valgt og hva som finnes på denne siden |
@@ -440,6 +461,9 @@ The shipped catalogue. The item is disabled because there really is nothing to c
 | Sted og tid: hvor og når kartet tegnes for |
 | Sted og tid |
 | Åpner vinduet der du velger stedet og tidspunktet kartet tegnes for; det samme vinduet som Kart-menyens Sted og tid... åpner |
+| Legg til bokmerke: lagre dette utsnittet (⌘D) |
+| Legg til bokmerke |
+| Åpner vinduet som lagrer utsnittet du ser på som et bokmerke; det samme vinduet som Bokmerker-menyens Legg til bokmerke... åpner |
 | Vis utforskeren: hva det valgte merket er (⌘I) |
 | Utforskeren |
 | Skjult; trykk for å åpne panelet som viser hva du har valgt og hva som finnes på denne siden |

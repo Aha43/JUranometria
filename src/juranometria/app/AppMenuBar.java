@@ -911,6 +911,62 @@ public final class AppMenuBar {
      * Returns the item, which the session then keeps in step with the
      * module, or null on a bar without the submenu.
      */
+    /** The Bookmarks menu's name, for tests (#681). */
+    public static final String BOOKMARKS_MENU = "bookmarksMenu";
+
+    /** Bookmarks > Add Bookmark...'s name, for tests (#681). */
+    public static final String ADD_BOOKMARK_ITEM = "addBookmarkItem";
+
+    /**
+     * Adds the top-level Bookmarks menu (#681, ruled on #497) between Solar
+     * System and Help, with Add Bookmark... on Command-D / Ctrl-D. The menu
+     * never mirrors the library's tree: the library lives in the Controller.
+     * Returns the menu, or null when there is nothing to add.
+     */
+    public static JMenu addBookmarks(javax.swing.JMenuBar bar,
+            juranometria.ui.language.InterfaceText said, Runnable addBookmark) {
+        if (addBookmark == null) {
+            return null;
+        }
+        juranometria.ui.language.MnemonicText letters =
+                juranometria.ui.language.MnemonicText.in(said);
+        JMenu menu = new JMenu(said.say("menu.bookmarks.label"));
+        menu.setName(BOOKMARKS_MENU);
+        letters.apply(menu, "menu.bookmarks.mnemonic");
+        menu.getAccessibleContext().setAccessibleName(said.say("menu.bookmarks.a11y"));
+        juranometria.ui.Explain.selfExplanatory(menu, said.say("menu.bookmarks.explain"));
+        JMenuItem add = new JMenuItem(said.say("menu.addBookmark.label"));
+        add.setName(ADD_BOOKMARK_ITEM);
+        letters.apply(add, "menu.addBookmark.mnemonic");
+        add.getAccessibleContext().setAccessibleName(said.say("menu.addBookmark.a11y"));
+        juranometria.ui.Explain.selfExplanatory(add, said.say("menu.addBookmark.explain"));
+        add.setAccelerator(juranometria.ui.Shortcuts.of(
+                juranometria.ui.Shortcuts.ADD_BOOKMARK).stroke());
+        add.addActionListener(event -> addBookmark.run());
+        menu.add(add);
+        // Before Help, the bar's last menu, wherever the bar ends.
+        int help = -1;
+        for (int i = 0; i < bar.getMenuCount(); i++) {
+            JMenu each = bar.getMenu(i);
+            if (each != null && said.say("menu.help.label").equals(each.getText())) {
+                help = i;
+            }
+        }
+        if (help < 0) {
+            bar.add(menu);
+        } else {
+            bar.add(menu, help);
+        }
+        bar.revalidate();
+        return menu;
+    }
+
+    /** The Bookmarks menu, or null when the bar has none (#681). */
+    public static JMenu bookmarksMenu(javax.swing.JMenuBar bar) {
+        JMenuItem found = named(bar, BOOKMARKS_MENU);
+        return found instanceof JMenu menu ? menu : null;
+    }
+
     /**
      * Adds Chart > Centre on coordinates... directly after the Inspector
      * (#623, ruling C-1; its place since #675), with its shortcut: the
