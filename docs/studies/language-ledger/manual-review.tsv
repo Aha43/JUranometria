@@ -200,3 +200,4 @@ af0cd4c12191440b	app/AppMenuBar.java	bookmarksMenu	declared name used, but never
 d90e057d3f317516	app/AppMenuBar.java	addBookmarkItem	declared name used, but never at a known sink	identifier	the Add Bookmark item's component name (#681); a stable key
 b8dcdf4c9159ce66	ui/bookmark/AddBookmarkDialog.java	bookmarkAdd	declared name used, but never at a known sink	identifier	the add dialog's Add button name (#681); a stable key
 4ffc24f9103bc1a8	ui/bookmark/BookmarkCapture.java	[a-z]+(\\.[a-z]+)*	declared name used, but never at a known sink	identifier	the pattern of the modules' body identities (#681); never shown
+abf350c18dc78690	ui/bookmark/BookmarksPanel.java	bookmarks	declared name used, but never at a known sink	identifier	the Bookmarks tab's stable id in the Controller (#681), under which the chosen tab is remembered; no language changes it

@@ -40,7 +40,7 @@ open menu would cover the thing it explains.
 
 ![](menu-en-1-menus.png)
 
-Bar packed 1093 × 471 px; widest popup 232 px.
+Bar packed 1109 × 471 px; widest popup 232 px.
 
 | channel | words |
 |---|---|
@@ -175,6 +175,10 @@ Bar packed 1093 × 471 px; widest popup 232 px.
 | item spoken name \| Add Bookmark |
 | item spoken description \| Saves the view you are looking at as a bookmark, with the objects, chart time and place you choose |
 | item accelerator (platform notation) \| ⌘D |
+| item label \| Show Bookmarks |
+| item spoken name \| Show Bookmarks |
+| item spoken description \| Opens the Controller at its Bookmarks tab, where your bookmarks are listed, opened and organised |
+| item accelerator (platform notation) \| ⌘+⇧B |
 | menu label \| Help |
 | menu spoken name \| Help menu |
 | menu spoken description \| Information about this application and what it is built on |
@@ -190,7 +194,7 @@ Bar packed 1093 × 471 px; widest popup 232 px.
 
 ![](menu-en-2-checked.png)
 
-Bar packed 1093 × 471 px; widest popup 232 px.
+Bar packed 1109 × 471 px; widest popup 232 px.
 
 | channel | words |
 |---|---|
@@ -325,6 +329,10 @@ Bar packed 1093 × 471 px; widest popup 232 px.
 | item spoken name \| Add Bookmark |
 | item spoken description \| Saves the view you are looking at as a bookmark, with the objects, chart time and place you choose |
 | item accelerator (platform notation) \| ⌘D |
+| item label \| Show Bookmarks |
+| item spoken name \| Show Bookmarks |
+| item spoken description \| Opens the Controller at its Bookmarks tab, where your bookmarks are listed, opened and organised |
+| item accelerator (platform notation) \| ⌘+⇧B |
 | menu label \| Help |
 | menu spoken name \| Help menu |
 | menu spoken description \| Information about this application and what it is built on |
@@ -340,7 +348,7 @@ Bar packed 1093 × 471 px; widest popup 232 px.
 
 ![](menu-en-3-widest.png)
 
-Bar packed 1093 × 471 px; widest popup 232 px.
+Bar packed 1109 × 471 px; widest popup 232 px.
 
 | channel | words |
 |---|---|
@@ -475,6 +483,10 @@ Bar packed 1093 × 471 px; widest popup 232 px.
 | item spoken name \| Add Bookmark |
 | item spoken description \| Saves the view you are looking at as a bookmark, with the objects, chart time and place you choose |
 | item accelerator (platform notation) \| ⌘D |
+| item label \| Show Bookmarks |
+| item spoken name \| Show Bookmarks |
+| item spoken description \| Opens the Controller at its Bookmarks tab, where your bookmarks are listed, opened and organised |
+| item accelerator (platform notation) \| ⌘+⇧B |
 | menu label \| Help |
 | menu spoken name \| Help menu |
 | menu spoken description \| Information about this application and what it is built on |
@@ -490,7 +502,7 @@ Bar packed 1093 × 471 px; widest popup 232 px.
 
 ![](menu-en-4-narrowest.png)
 
-Bar packed 1093 × 471 px; widest popup 232 px.
+Bar packed 1109 × 471 px; widest popup 232 px.
 
 | channel | words |
 |---|---|
@@ -625,6 +637,10 @@ Bar packed 1093 × 471 px; widest popup 232 px.
 | item spoken name \| Add Bookmark |
 | item spoken description \| Saves the view you are looking at as a bookmark, with the objects, chart time and place you choose |
 | item accelerator (platform notation) \| ⌘D |
+| item label \| Show Bookmarks |
+| item spoken name \| Show Bookmarks |
+| item spoken description \| Opens the Controller at its Bookmarks tab, where your bookmarks are listed, opened and organised |
+| item accelerator (platform notation) \| ⌘+⇧B |
 | menu label \| Help |
 | menu spoken name \| Help menu |
 | menu spoken description \| Information about this application and what it is built on |
@@ -777,6 +793,10 @@ Bar packed 1100 × 471 px; widest popup 229 px.
 | item spoken description \| Lagrer utsnittet du ser på som et bokmerke, med objektene, karttiden og stedet du velger |
 | item accelerator (platform notation) \| ⌘D |
 | item access letter (language) \| L |
+| item label \| Vis bokmerker |
+| item spoken name \| Vis bokmerker |
+| item spoken description \| Åpner Kontrolleren på Bokmerker-fanen, der bokmerkene dine står, åpnes og ordnes |
+| item accelerator (platform notation) \| ⌘+⇧B |
 | menu label \| Hjelp |
 | menu spoken name \| Hjelp-menyen |
 | menu spoken description \| Informasjon om dette programmet og hva det er bygd på |
@@ -927,6 +947,10 @@ Bar packed 1100 × 471 px; widest popup 229 px.
 | item spoken description \| Lagrer utsnittet du ser på som et bokmerke, med objektene, karttiden og stedet du velger |
 | item accelerator (platform notation) \| ⌘D |
 | item access letter (language) \| L |
+| item label \| Vis bokmerker |
+| item spoken name \| Vis bokmerker |
+| item spoken description \| Åpner Kontrolleren på Bokmerker-fanen, der bokmerkene dine står, åpnes og ordnes |
+| item accelerator (platform notation) \| ⌘+⇧B |
 | menu label \| Hjelp |
 | menu spoken name \| Hjelp-menyen |
 | menu spoken description \| Informasjon om dette programmet og hva det er bygd på |
@@ -1077,6 +1101,10 @@ Bar packed 1100 × 471 px; widest popup 229 px.
 | item spoken description \| Lagrer utsnittet du ser på som et bokmerke, med objektene, karttiden og stedet du velger |
 | item accelerator (platform notation) \| ⌘D |
 | item access letter (language) \| L |
+| item label \| Vis bokmerker |
+| item spoken name \| Vis bokmerker |
+| item spoken description \| Åpner Kontrolleren på Bokmerker-fanen, der bokmerkene dine står, åpnes og ordnes |
+| item accelerator (platform notation) \| ⌘+⇧B |
 | menu label \| Hjelp |
 | menu spoken name \| Hjelp-menyen |
 | menu spoken description \| Informasjon om dette programmet og hva det er bygd på |
@@ -1227,6 +1255,10 @@ Bar packed 1100 × 471 px; widest popup 229 px.
 | item spoken description \| Lagrer utsnittet du ser på som et bokmerke, med objektene, karttiden og stedet du velger |
 | item accelerator (platform notation) \| ⌘D |
 | item access letter (language) \| L |
+| item label \| Vis bokmerker |
+| item spoken name \| Vis bokmerker |
+| item spoken description \| Åpner Kontrolleren på Bokmerker-fanen, der bokmerkene dine står, åpnes og ordnes |
+| item accelerator (platform notation) \| ⌘+⇧B |
 | menu label \| Hjelp |
 | menu spoken name \| Hjelp-menyen |
 | menu spoken description \| Informasjon om dette programmet og hva det er bygd på |

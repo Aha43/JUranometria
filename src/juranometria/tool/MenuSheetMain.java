@@ -270,7 +270,7 @@ public final class MenuSheetMain {
                 // Bookmarks (#681), the top-level menu the application adds
                 // before Help once the bar is built.
                 AppMenuBar.addBookmarks(bar[0],
-                        juranometria.ui.language.InterfaceText.forLanguage(language), () -> { });
+                        juranometria.ui.language.InterfaceText.forLanguage(language), () -> { }, () -> { });
 
                 JCheckBoxMenuItem inspector = AppMenuBar.inspectorItem(bar[0]);
                 if (inspector != null) {

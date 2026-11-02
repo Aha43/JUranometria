@@ -65,8 +65,6 @@ public final class AddBookmarkDialog extends JDialog {
     /** The Add button's name, for journeys. */
     public static final String ADD = "bookmarkAdd";
 
-    private static final DateTimeFormatter WHEN =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm 'UTC'", Locale.ROOT).withZone(ZoneOffset.UTC);
 
     private AddBookmarkDialog(Window owner, InterfaceText said, Content content) {
         super(owner, said.say("bookmark.add.title"), ModalityType.APPLICATION_MODAL);
@@ -105,6 +103,8 @@ public final class AddBookmarkDialog extends JDialog {
         final JList<Subject> list;
         final JComboBox<Object> primary;
         final JCheckBox time;
+        final JTextField instant;
+        final JCheckBox currentView;
         final JRadioButton event;
         final JRadioButton observation;
         final JCheckBox place;
@@ -112,13 +112,29 @@ public final class AddBookmarkDialog extends JDialog {
         final JButton add;
         final JLabel status;
         private Runnable done = () -> { };
+        private final Optional<Editing> editing;
 
+        /** Add: the proposal from the chart as it stands. */
         public Content(InterfaceText said, BookmarkLibrary library, BookmarkCapture.Proposal proposal,
                        Function<Subject, String> nameOf, String suggestedTitle) {
+            this(said, library, proposal, nameOf, suggestedTitle, Optional.empty());
+        }
+
+        /** Edit: a stored bookmark, its folder, and the chart's view and context now. */
+        public Content(InterfaceText said, BookmarkLibrary library, Editing editing,
+                       Function<Subject, String> nameOf) {
+            this(said, library, editing.proposal(), nameOf, editing.bookmark().title(),
+                    Optional.of(editing));
+        }
+
+        private Content(InterfaceText said, BookmarkLibrary library, BookmarkCapture.Proposal proposal,
+                        Function<Subject, String> nameOf, String suggestedTitle,
+                        Optional<Editing> editing) {
             super(new BorderLayout(0, 10));
             this.said = said;
             this.library = library;
             this.proposal = proposal;
+            this.editing = editing;
             MnemonicText letters = MnemonicText.in(said);
             setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
             JPanel form = new JPanel(new GridBagLayout());
@@ -143,6 +159,17 @@ public final class AddBookmarkDialog extends JDialog {
                             + juranometria.chart.SkyFormat.formatDec(proposal.view().decDegrees()),
                     field(proposal.view().fieldWidthDegrees())));
             form.add(view, c);
+            currentView = new JCheckBox(said.say("bookmark.edit.view.label",
+                    editing.map(e -> juranometria.chart.SkyFormat.formatRa(e.currentView().raDegrees()) + ", "
+                            + juranometria.chart.SkyFormat.formatDec(e.currentView().decDegrees())).orElse(""),
+                    editing.map(e -> field(e.currentView().fieldWidthDegrees())).orElse("")));
+            currentView.getAccessibleContext().setAccessibleName(said.say("bookmark.edit.view.a11y"));
+            Explain.control(currentView, said.say("bookmark.edit.view.hover"),
+                    said.say("bookmark.edit.view.explain"));
+            if (editing.isPresent()) {
+                c.gridy++;
+                form.add(currentView, c);
+            }
 
             for (Subject s : proposal.subjects()) {
                 subjects.addElement(s);
@@ -207,14 +234,20 @@ public final class AddBookmarkDialog extends JDialog {
             c.gridwidth = 2;
             form.add(new JSeparator(), c);
 
-            time = new JCheckBox(said.say("bookmark.add.time.label", WHEN.format(proposal.instant())),
-                    proposal.timeTicked());
+            time = new JCheckBox(said.say("bookmark.add.time.label"), proposal.timeTicked());
             letters.apply(time, "bookmark.add.time.mnemonic");
-            time.getAccessibleContext().setAccessibleName(said.say("bookmark.add.time.a11y",
-                    WHEN.format(proposal.instant())));
+            time.getAccessibleContext().setAccessibleName(said.say("bookmark.add.time.a11y"));
             Explain.control(time, said.say("bookmark.add.time.hover"), said.say("bookmark.add.time.explain"));
+            instant = new JTextField(TYPED.format(proposal.instant()), 17);
+            instant.getAccessibleContext().setAccessibleName(said.say("bookmark.add.instant.a11y"));
+            Explain.control(instant, said.say("bookmark.add.instant.hover"),
+                    said.say("bookmark.add.instant.explain"));
+            JPanel timeRow = new JPanel(new FlowLayout(FlowLayout.LEADING, 6, 0));
+            timeRow.add(time);
+            timeRow.add(instant);
+            timeRow.add(new JLabel("UTC"));
             c.gridy++;
-            form.add(time, c);
+            form.add(timeRow, c);
             event = new JRadioButton(said.say("bookmark.add.time.event"), true);
             observation = new JRadioButton(said.say("bookmark.add.time.observation"));
             ButtonGroup purpose = new ButtonGroup();
@@ -263,7 +296,7 @@ public final class AddBookmarkDialog extends JDialog {
             add(form, BorderLayout.CENTER);
 
             status = new JLabel(" ");
-            add = new JButton(said.say("bookmark.add.ok.label"));
+            add = new JButton(said.say(editing.isPresent() ? "bookmark.edit.ok.label" : "bookmark.add.ok.label"));
             add.setName(ADD);
             add.getAccessibleContext().setAccessibleName(said.say("bookmark.add.ok.a11y"));
             Explain.control(add, said.say("bookmark.add.ok.hover"), said.say("bookmark.add.ok.explain"));
@@ -279,6 +312,21 @@ public final class AddBookmarkDialog extends JDialog {
             buttons.add(add);
             foot.add(buttons, BorderLayout.EAST);
             add(foot, BorderLayout.SOUTH);
+            editing.ifPresent(e -> {
+                Node.Bookmark b = e.bookmark();
+                b.time().ifPresent(t -> {
+                    observation.setSelected(t.purpose() == ChartTime.Purpose.OBSERVATION);
+                    event.setSelected(t.purpose() == ChartTime.Purpose.EVENT);
+                });
+                place.setSelected(b.place().isPresent());
+                note.setText(b.note().orElse(""));
+                for (int i = 0; i < folder.getItemCount(); i++) {
+                    if (folder.getItemAt(i).id().equals(e.parentId())) {
+                        folder.setSelectedIndex(i);
+                    }
+                }
+            });
+            purposeFollows();
             refuseIfUnavailable();
         }
 
@@ -355,6 +403,7 @@ public final class AddBookmarkDialog extends JDialog {
         private void purposeFollows() {
             event.setEnabled(time.isSelected());
             observation.setEnabled(time.isSelected());
+            instant.setEnabled(time.isSelected());
         }
 
         private void refuseIfUnavailable() {
@@ -374,14 +423,35 @@ public final class AddBookmarkDialog extends JDialog {
             status.getAccessibleContext().setAccessibleName(sentence);
         }
 
+        /** The draft the dialog would save now, or empty with a reason said; package-visible for tests. */
+        Optional<BookmarkLibrary.Draft> draftOrRefuse() {
+            java.time.Instant typed = proposal.instant();
+            if (time.isSelected()) {
+                typed = parseInstant(instant.getText().strip());
+                if (typed == null) {
+                    say(said.say("bookmark.refused.time"));
+                    return Optional.empty();
+                }
+            }
+            juranometria.bookmark.SavedView view = editing.isPresent() && currentView.isSelected()
+                    ? editing.get().currentView() : proposal.view();
+            BookmarkCapture.Proposal at = new BookmarkCapture.Proposal(view, proposal.subjects(),
+                    proposal.primary(), typed, proposal.timeTicked(), proposal.place());
+            return Optional.of(draftFrom(at));
+        }
+
         /** The draft the dialog would add now; package-visible for tests. */
         BookmarkLibrary.Draft draft() {
+            return draftOrRefuse().orElseThrow();
+        }
+
+        private BookmarkLibrary.Draft draftFrom(BookmarkCapture.Proposal at) {
             List<Subject> ordered = new ArrayList<>();
             for (int i = 0; i < subjects.size(); i++) {
                 ordered.add(subjects.get(i));
             }
             Object chosen = primary.getSelectedItem();
-            return BookmarkCapture.draft(proposal, title.getText(), ordered,
+            return BookmarkCapture.draft(at, title.getText(), ordered,
                     chosen instanceof Subject s ? Optional.of(s) : Optional.empty(),
                     time.isSelected(),
                     observation.isSelected() ? ChartTime.Purpose.OBSERVATION : ChartTime.Purpose.EVENT,
@@ -396,13 +466,69 @@ public final class AddBookmarkDialog extends JDialog {
                 return;
             }
             FolderChoice into = (FolderChoice) folder.getSelectedItem();
+            Optional<BookmarkLibrary.Draft> draft = draftOrRefuse();
+            if (draft.isEmpty()) {
+                return;
+            }
             try {
-                library.add(into.id(), Integer.MAX_VALUE, draft());
+                if (editing.isPresent()) {
+                    String id = editing.get().bookmark().id();
+                    library.update(id, draft.get());
+                    if (!into.id().equals(editing.get().parentId())) {
+                        library.move(id, into.id(), Integer.MAX_VALUE);
+                    }
+                } else {
+                    library.add(into.id(), Integer.MAX_VALUE, draft.get());
+                }
                 done.run();
             } catch (IOException | IllegalStateException | IllegalArgumentException refused) {
                 say(said.say("bookmark.refused.notsaved", refused.getMessage()));
             }
         }
+    }
+
+    /**
+     * A stored bookmark being edited: where it stands, and the chart's view
+     * and context now - for *Use the current view* and for the time and
+     * place a bookmark without them would offer.
+     */
+    public record Editing(Node.Bookmark bookmark, String parentId,
+                          juranometria.bookmark.SavedView currentView, BookmarkCapture.Proposal now) {
+
+        BookmarkCapture.Proposal proposal() {
+            Node.Bookmark b = bookmark;
+            return new BookmarkCapture.Proposal(b.view(), b.subjects(), b.primary(),
+                    b.time().map(juranometria.bookmark.ChartTime::instant).orElse(now.instant()),
+                    b.time().isPresent(), b.place().orElse(now.place()));
+        }
+    }
+
+    /** Opens the dialog editing a stored bookmark. */
+    public static void edit(Window owner, InterfaceText said, BookmarkLibrary library, Editing editing,
+                            Function<Subject, String> nameOf) {
+        AddBookmarkDialog dialog = new AddBookmarkDialog(owner, said,
+                new Content(said, library, editing, nameOf));
+        dialog.setTitle(said.say("bookmark.edit.title"));
+        dialog.getAccessibleContext().setAccessibleName(said.say("bookmark.edit.title"));
+        dialog.setVisible(true);
+    }
+
+    /** The typed shape of a chart time: Place and Time's own, in UTC. */
+    static final DateTimeFormatter TYPED = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss", Locale.ROOT)
+            .withResolverStyle(java.time.format.ResolverStyle.STRICT).withZone(ZoneOffset.UTC);
+    private static final DateTimeFormatter TYPED_SHORT = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm", Locale.ROOT)
+            .withResolverStyle(java.time.format.ResolverStyle.STRICT).withZone(ZoneOffset.UTC);
+
+    /** The stated shape, with or without seconds, in UTC; null otherwise. */
+    static java.time.Instant parseInstant(String text) {
+        for (DateTimeFormatter format : new DateTimeFormatter[] {TYPED, TYPED_SHORT}) {
+            try {
+                return java.time.Instant.from(format.parse(text));
+            } catch (java.time.format.DateTimeParseException other) {
+                // the other shape may fit
+            }
+        }
+        return null;
     }
 
     /** A folder the bookmark can go into, shown with its path. */

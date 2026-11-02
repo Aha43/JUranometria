@@ -925,6 +925,17 @@ public final class AppMenuBar {
      */
     public static JMenu addBookmarks(javax.swing.JMenuBar bar,
             juranometria.ui.language.InterfaceText said, Runnable addBookmark) {
+        return addBookmarks(bar, said, addBookmark, null);
+    }
+
+    /**
+     * The Bookmarks menu with Show Bookmarks as well (#681 stage 3): it opens
+     * the Controller if it is closed and chooses its Bookmarks tab, on
+     * Shift-Command-B / Shift-Ctrl-B (ruled C-6).
+     */
+    public static JMenu addBookmarks(javax.swing.JMenuBar bar,
+            juranometria.ui.language.InterfaceText said, Runnable addBookmark,
+            Runnable showBookmarks) {
         if (addBookmark == null) {
             return null;
         }
@@ -944,6 +955,16 @@ public final class AppMenuBar {
                 juranometria.ui.Shortcuts.ADD_BOOKMARK).stroke());
         add.addActionListener(event -> addBookmark.run());
         menu.add(add);
+        if (showBookmarks != null) {
+            JMenuItem show = new JMenuItem(said.say("menu.showBookmarks.label"));
+            letters.apply(show, "menu.showBookmarks.mnemonic");
+            show.getAccessibleContext().setAccessibleName(said.say("menu.showBookmarks.a11y"));
+            juranometria.ui.Explain.selfExplanatory(show, said.say("menu.showBookmarks.explain"));
+            show.setAccelerator(juranometria.ui.Shortcuts.of(
+                    juranometria.ui.Shortcuts.SHOW_BOOKMARKS).stroke());
+            show.addActionListener(event -> showBookmarks.run());
+            menu.add(show);
+        }
         // Before Help, the bar's last menu, wherever the bar ends.
         int help = -1;
         for (int i = 0; i < bar.getMenuCount(); i++) {

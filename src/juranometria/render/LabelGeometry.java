@@ -120,11 +120,13 @@ public final class LabelGeometry {
                 .thenComparing(Star::id));
         List<LabelPlacement.Request> asked = new ArrayList<>();
         for (Star star : stars) {
-            if (star.magnitude() > scene.limitingMagnitude()) {
-                continue;
-            }
             boolean target = scene.targetIdentity() != null
                     && scene.targetIdentity().equals(star.id());
+            // A target fainter than the limit is drawn (#681, ruled C-3 on
+            // #497), so it is named as a target within the limit is.
+            if (star.magnitude() > scene.limitingMagnitude() && !target) {
+                continue;
+            }
             String text = target
                     ? StarLabelPolicy.guaranteedLabelFor(star)
                     : policy.qualifying(star).text(options.starNames(),
@@ -187,11 +189,13 @@ public final class LabelGeometry {
                 .thenComparing(Star::id));
         List<LabelPlacement.Request> asked = new ArrayList<>();
         for (Star star : stars) {
-            if (star.magnitude() > scene.limitingMagnitude()) {
-                continue;
-            }
             boolean target = scene.targetIdentity() != null
                     && scene.targetIdentity().equals(star.id());
+            // A target fainter than the limit is drawn (#681, ruled C-3 on
+            // #497), so it is named as a target within the limit is.
+            if (star.magnitude() > scene.limitingMagnitude() && !target) {
+                continue;
+            }
             if (target || policy.qualifying(star).text(options.starNames(),
                     options.bayerLetters(), options.flamsteedNumbers()) != null) {
                 continue;

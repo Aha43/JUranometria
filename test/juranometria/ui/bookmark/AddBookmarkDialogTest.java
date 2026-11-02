@@ -67,7 +67,7 @@ class AddBookmarkDialogTest {
             c.whenDone(() -> closed.set(true));
             assertEquals("Suggested", c.title.getText());
             assertTrue(c.time.isSelected(), "C-4: the Moon pre-ticks the time");
-            assertTrue(c.time.getText().contains("2026-11-24 11:54 UTC"), "the instant written out");
+            assertEquals("2026-11-24 11:54:00", c.instant.getText(), "the chart's instant, editable, in UTC");
             assertFalse(c.place.isSelected(), "the place is never pre-ticked");
             assertTrue(c.place.getText().contains("59.913°"));
             c.list.setSelectedIndex(1);
@@ -122,6 +122,69 @@ class AddBookmarkDialogTest {
             assertFalse(refused.add.isEnabled());
             assertEquals(EN.say("bookmark.refused.newer"), refused.status.getText());
         });
+    }
+
+    @Test
+    void anExactTimeCanBeTypedAndAMalformedOneIsRefused() throws Exception {
+        InMemoryBookmarkLibrary library = new InMemoryBookmarkLibrary(Library.empty("t"));
+        AddBookmarkDialog.Content c = content(library, List.of("NGC 6888"), "NGC 6888");
+        SwingUtilities.invokeAndWait(() -> {
+            assertFalse(c.time.isSelected(), "a deep-sky object alone: unticked");
+            assertFalse(c.instant.isEnabled(), "the field follows the box");
+            c.time.setSelected(true);
+            c.observation.setSelected(true);
+            c.instant.setText("2026-11-02 21:03");
+            c.add();
+        });
+        Node.Bookmark saved = only(library);
+        assertEquals(Instant.parse("2026-11-02T21:03:00Z"), saved.time().orElseThrow().instant(),
+                "the camera's time, typed in UTC");
+        assertEquals(ChartTime.Purpose.OBSERVATION, saved.time().orElseThrow().purpose());
+        AddBookmarkDialog.Content bad = content(library, List.of(), null);
+        SwingUtilities.invokeAndWait(() -> {
+            bad.time.setSelected(true);
+            bad.instant.setText("2. november 21:03");
+            bad.add();
+            assertEquals(EN.say("bookmark.refused.time"), bad.status.getText());
+        });
+        assertEquals(1, ((LibraryState.Available) library.state()).library().bookmarks().size());
+    }
+
+    @Test
+    void editingKeepsTheBookmarkInPlaceAndMovesItOnlyWhenTheFolderChanges() throws Exception {
+        InMemoryBookmarkLibrary library = new InMemoryBookmarkLibrary(Library.empty("t"));
+        AddBookmarkDialog.Content c = content(library, List.of("NGC 6888"), "NGC 6888");
+        SwingUtilities.invokeAndWait(c::add);
+        String deep = library.addFolder(BookmarkLibrary.ROOT, 1, "Deep sky");
+        Node.Bookmark stored = only(library);
+        BookmarkCapture.Proposal now = BookmarkCapture.propose(new ChartViewState(
+                new SkyPosition(10, 20), 24.0, 8.0, null, null), List.of(), null, OSLO);
+        AddBookmarkDialog.Content[] e = new AddBookmarkDialog.Content[1];
+        SwingUtilities.invokeAndWait(() -> {
+            e[0] = new AddBookmarkDialog.Content(EN, library, new AddBookmarkDialog.Editing(stored,
+                    BookmarkLibrary.ROOT, now.view(), now), Subject::id);
+            assertEquals("Suggested", e[0].title.getText());
+            assertEquals(EN.say("bookmark.edit.ok.label"), e[0].add.getText());
+            e[0].title.setText("Crescent Nebula");
+            e[0].time.setSelected(true);
+            e[0].observation.setSelected(true);
+            e[0].instant.setText("2026-11-02 20:56:48");
+            e[0].note.setText("First time with the Seestar 50");
+            for (int i = 0; i < e[0].folder.getItemCount(); i++) {
+                if (e[0].folder.getItemAt(i).id().equals(deep)) {
+                    e[0].folder.setSelectedIndex(i);
+                }
+            }
+            e[0].add();
+        });
+        Library after = ((LibraryState.Available) library.state()).library();
+        Node.Folder moved = (Node.Folder) after.find(deep).orElseThrow();
+        Node.Bookmark edited = (Node.Bookmark) moved.children().get(0);
+        assertEquals(stored.id(), edited.id(), "the same bookmark");
+        assertEquals("Crescent Nebula", edited.title());
+        assertEquals(stored.view(), edited.view(), "the view kept unless the current one is chosen");
+        assertEquals(Instant.parse("2026-11-02T20:56:48Z"), edited.time().orElseThrow().instant());
+        assertEquals("First time with the Seestar 50", edited.note().orElseThrow());
     }
 
     @Test

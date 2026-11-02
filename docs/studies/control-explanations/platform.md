@@ -29,6 +29,7 @@ Every one of them from the registry that binds it, so a tooltip cannot promise a
 | Chart toolbar | `⌃+⇧T` |
 | Centre on coordinates | `⌃L` |
 | Add bookmark | `⌃D` |
+| Show bookmarks | `⌃+⇧B` |
 | the chart's own keyboard | `⌃K` then a letter |
 
 ## Every explanation that names a key
