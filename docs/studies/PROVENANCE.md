@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**927 promoted artifacts.**
+**942 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -143,6 +143,21 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/black-sky/seam-24-paper.png` | `2b5ea2b3681b4f8563e3e33bda74912c44ddc6bad8dc847b795fff5908bf6fda` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/black-sky/sparse-08-black.png` | `586d9853c9d8d992deb12c12b561eead1ccc3c86f6f010232c6c3c2b99ce38ee` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/black-sky/sparse-08-paper.png` | `f29f03b46ac564a0579b195db50d5b2525824e208c16c90a862828585b8deec0` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/bookmarks/bookmarks-en-1-menu.png` | `d9b9c7e5d778d5bdf4beb77a47092c235040854c6459804576fd3b3f9dd55918` | 2026-11-02 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/bookmarks/bookmarks-en-2-add-event.png` | `78b59f358ceee558513268e6c0e6e7f4e30eb98d0c1ccfb0c99f058588037718` | 2026-11-02 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/bookmarks/bookmarks-en-3-add-timeless.png` | `0833787f21aa35db2538b7aa24f346535fe74357126702cc5901af3ffd079317` | 2026-11-02 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/bookmarks/bookmarks-en-4-library.png` | `c5a4f17f39fed50c0e631ec3d040e87444e7570552ca39af032bedfbd336ae40` | 2026-11-02 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/bookmarks/bookmarks-en-5-library-dark.png` | `6ef08256763ff90baa0392ce6a7c215f18a476fe494977b637d2f9574d555113` | 2026-11-02 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/bookmarks/bookmarks-en-6-restore.png` | `6e64d0ef87cda05a769fc5dfb07c478110b9d16bd38df2889bbd45e7bc1ea3b2` | 2026-11-02 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/bookmarks/bookmarks-en-7-unreadable.png` | `01c96ca677cb4a97a25349fbf5ba5b78d4a67e6b6d294722e4b8c84c625bc90d` | 2026-11-02 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/bookmarks/bookmarks-nb-NO-1-menu.png` | `acf55ce8abf4f0b4c0d4b9137aeea257c543e110c00c8bc1ac429476cda3a397` | 2026-11-02 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/bookmarks/bookmarks-nb-NO-2-add-event.png` | `52d2296cb3f242264dbc9d2adc61e3e58f33062004f0fca3f42646fd654ba4bf` | 2026-11-02 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/bookmarks/bookmarks-nb-NO-3-add-timeless.png` | `34843f7f4c543ab69da7f468b894074638fc023c435d5780e19821c32ba6bff2` | 2026-11-02 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/bookmarks/bookmarks-nb-NO-4-library.png` | `6ed99286e66ef65edc45a876fae2829222745ff746ffb29649e9ec7d44b015a1` | 2026-11-02 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/bookmarks/bookmarks-nb-NO-5-library-dark.png` | `b0b769019553841cb405e82a67fe2954f1d9cac1e0c3bc1ac5dc1282f5227f75` | 2026-11-02 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/bookmarks/bookmarks-nb-NO-6-restore.png` | `54c4e4aabc80d356ae9b008d7012374a31cdcc3f90a2db40a16aebe3ca5f7712` | 2026-11-02 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/bookmarks/bookmarks-nb-NO-7-unreadable.png` | `b2f9f645858ccf6c80b917dca6b4a92763dff919a99e11b5af74aed66a40d483` | 2026-11-02 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/bookmarks/examples/library.json` | `c4a400c7ee08c1ecc67bed26fb50f7e3001c31d159f351e347f516946b1e7cb3` | 2026-11-02 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/chart-furniture/crux-18-with-key.png` | `394f069d7b5ae942fb5bdfe93b0f744b4000d439ab0ba0eee643a2478876e3a5` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/chart-furniture/crux-18-without-key.png` | `bb1bcfc21f715d2a1953d0361cb2dd57fb18400fb54c86f28e7fafef6e1b4187` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/chart-furniture/m31-08-mag4-with-key.png` | `3a48e29decbe832285f88d0074f197db4116697b56ef89c38be3cf0e098414e3` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
