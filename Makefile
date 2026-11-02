@@ -48,7 +48,7 @@ JAR   := $(JDK_BIN)jar
 REQUIRED_LIBS := 	$(LIB_DIR)/flatlaf-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/flatlaf-extras-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/jsvg-$(JSVG_VERSION).jar
 JUNIT_JAR := $(TEST_LIB_DIR)/junit-platform-console-standalone-$(JUNIT_VERSION).jar
 
-.PHONY: all help clean classes jar app run run-log test classify below-horizon-study globe-study globe-frame-study globe-density-study globe-furniture-study globe-grid-study globe-grid-fade-study globe-limb-study globe-family-study globe-name-study globe-pointing-study globe-module-study globe-export-study globe-drag-study chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study on-this-page-study wider-field-study chart-sheet-study overview-study overview-ink-study figure-anchor-study label-study released-text toggle-shortcut-study control-explanation-study sky-language-study evidence-contracts-ci evidence-provenance icons check-libs check-jdk dist app-image
+.PHONY: all help clean classes bookmarks-study jar app run run-log test classify below-horizon-study globe-study globe-frame-study globe-density-study globe-furniture-study globe-grid-study globe-grid-fade-study globe-limb-study globe-family-study globe-name-study globe-pointing-study globe-module-study globe-export-study globe-drag-study chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study on-this-page-study wider-field-study chart-sheet-study overview-study overview-ink-study figure-anchor-study label-study released-text toggle-shortcut-study control-explanation-study sky-language-study evidence-contracts-ci evidence-provenance icons check-libs check-jdk dist app-image
 
 all: app
 
@@ -113,6 +113,7 @@ help:
 	@echo "  saturn-on-the-chart-study  Saturn's figure on production pages (issue #579)"
 	@echo "  meridian-ticks-study   The meridian's graduation on production pages, three densities, the bodies invariant (issue #515)"
 	@echo "  meridian-readout-study One altitude readout on the meridian at narrow fields, the candidates mocked up (issue #563)"
+	@echo "  bookmarks-study   Bookmarks as saved views: schema, round trips, restoration, recovery and sketches (issue #497)"
 	@echo "  pan-study         Measure the Sprint 8 grab-to-pan geometry and costs"
 	@echo "  chart-options-study  Render the Sprint 12 chart-options candidates"
 	@echo "  star-identity-study  Measure and render the Sprint 13 star-identity candidates"
@@ -1168,6 +1169,12 @@ meridian-ticks-study: classes
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.MeridianTicksStudyMain \
 		> docs/studies/meridian-ticks/measurements.md
 	@echo "written to docs/studies/meridian-ticks/measurements.md"
+
+bookmarks-study: classes
+	mkdir -p docs/studies/bookmarks
+	$(JAVA) -Djava.awt.headless=true -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.BookmarkStudyMain \
+		> docs/studies/bookmarks/measurements.md
+	@echo "written to docs/studies/bookmarks/measurements.md"
 
 meridian-readout-study: classes
 	mkdir -p docs/studies/meridian-readout

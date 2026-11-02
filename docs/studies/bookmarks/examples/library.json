@@ -1,0 +1,218 @@
+{
+  "format": "juranometria-bookmarks",
+  "version": 1,
+  "writtenBy": "6.2.0-study",
+  "root": [
+    {
+      "type": "bookmark",
+      "id": "ba88d0fa-76ac-3f74-8a37-cf64b6e3c657",
+      "title": "Orion's sword, wide",
+      "view": {
+        "ra": 83.818667,
+        "dec": -5.389667,
+        "field": 12
+      }
+    },
+    {
+      "type": "folder",
+      "id": "f6228b0b-3107-31b3-bd0b-27982070ae0b",
+      "title": "Deep sky",
+      "children": [
+        {
+          "type": "bookmark",
+          "id": "50f4bbed-d155-319e-9863-ce13b98f10a9",
+          "title": "M33",
+          "view": {
+            "ra": 23.462042,
+            "dec": 30.660222,
+            "field": 2
+          },
+          "subjects": [
+            {
+              "kind": "deep-sky",
+              "id": "NGC 598"
+            }
+          ],
+          "primary": {
+            "kind": "deep-sky",
+            "id": "NGC 598"
+          }
+        },
+        {
+          "type": "bookmark",
+          "id": "7dec2bcd-a205-343f-9c12-4cda5d073efb",
+          "title": "Andromeda to Triangulum field",
+          "view": {
+            "ra": 10.684708,
+            "dec": 41.26875,
+            "field": 24
+          },
+          "subjects": [
+            {
+              "kind": "deep-sky",
+              "id": "NGC 598"
+            }
+          ],
+          "note": "Binocular sweep; works any clear autumn night."
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "id": "32ad7e9a-7387-3579-8bca-cf3b17def643",
+      "title": "Sky events",
+      "children": [
+        {
+          "type": "bookmark",
+          "id": "8b8c6778-532b-33e0-a68a-ded8135e161d",
+          "title": "The Moon with Venus",
+          "view": {
+            "ra": 186.579218,
+            "dec": -7.057127,
+            "field": 8
+          },
+          "subjects": [
+            {
+              "kind": "body",
+              "id": "moon"
+            },
+            {
+              "kind": "body",
+              "id": "venus"
+            }
+          ],
+          "primary": {
+            "kind": "body",
+            "id": "moon"
+          },
+          "time": {
+            "instant": "2026-08-16T05:44:00Z",
+            "purpose": "event"
+          }
+        },
+        {
+          "type": "bookmark",
+          "id": "48368364-60a1-3876-9e86-80209e6f8175",
+          "title": "The Moon at Alcyone",
+          "view": {
+            "ra": 56.893713,
+            "dec": 24.029342,
+            "field": 2
+          },
+          "subjects": [
+            {
+              "kind": "body",
+              "id": "moon"
+            },
+            {
+              "kind": "star",
+              "id": "TYC 1800-2202-1"
+            }
+          ],
+          "primary": {
+            "kind": "body",
+            "id": "moon"
+          },
+          "time": {
+            "instant": "2026-11-24T11:54:00Z",
+            "purpose": "event"
+          },
+          "place": {
+            "latitude": 59.913,
+            "eastLongitude": 10.752
+          }
+        },
+        {
+          "type": "bookmark",
+          "id": "23e931d1-2aa2-35be-aed5-7f2ecee9155b",
+          "title": "Venus crossing the Sun, 2012",
+          "view": {
+            "ra": 74.325877,
+            "dec": 22.805242,
+            "field": 1
+          },
+          "subjects": [
+            {
+              "kind": "body",
+              "id": "venus"
+            },
+            {
+              "kind": "body",
+              "id": "sun"
+            }
+          ],
+          "primary": {
+            "kind": "body",
+            "id": "venus"
+          },
+          "time": {
+            "instant": "2012-06-06T01:00:00Z",
+            "purpose": "event"
+          },
+          "note": "The last transit of Venus until 2117."
+        },
+        {
+          "type": "bookmark",
+          "id": "99a8708f-2f91-3cf1-bae4-b8ad8dc50c0e",
+          "title": "Jupiter with Io and Europa",
+          "view": {
+            "ra": 121.841119,
+            "dec": 20.663808,
+            "field": 0.25
+          },
+          "subjects": [
+            {
+              "kind": "body",
+              "id": "jovian.jupiter"
+            },
+            {
+              "kind": "body",
+              "id": "jovian.io"
+            },
+            {
+              "kind": "body",
+              "id": "jovian.europa"
+            }
+          ],
+          "primary": {
+            "kind": "body",
+            "id": "jovian.jupiter"
+          },
+          "time": {
+            "instant": "2026-06-29T23:57:00Z",
+            "purpose": "event"
+          }
+        }
+      ]
+    },
+    {
+      "type": "bookmark",
+      "id": "805f746f-a30f-39b4-bb9e-6fa7bf47b28d",
+      "title": "Moon from the balcony",
+      "view": {
+        "ra": 178.731001,
+        "dec": -3.12235,
+        "field": 4
+      },
+      "subjects": [
+        {
+          "kind": "body",
+          "id": "moon"
+        }
+      ],
+      "primary": {
+        "kind": "body",
+        "id": "moon"
+      },
+      "time": {
+        "instant": "2026-06-21T21:55:00Z",
+        "purpose": "observation"
+      },
+      "place": {
+        "latitude": 59.913,
+        "eastLongitude": 10.752
+      },
+      "note": "Første kvarter, klar himmel; Copernicus tydelig på terminatoren."
+    }
+  ]
+}
