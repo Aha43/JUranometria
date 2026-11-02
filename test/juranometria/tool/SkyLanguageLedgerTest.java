@@ -51,7 +51,10 @@ class SkyLanguageLedgerTest {
         // #675 stage 2 adds seven more in ChartControls: four icon file
         // names, two button names and the Controls button's two states,
         // every one a key the language files resolve - 166 at that head.
-        assertTrue(unresolved.size() < 170,
+        // #681 (bookmarks) adds the document's keys and the library's root
+        // id, then the menu, toolbar and Controller names its stages need:
+        // 170 at stage 1, the bound raised once for the whole road.
+        assertTrue(unresolved.size() < 190,
                 "and the boundary stays small enough to read: "
                         + unresolved.size());
     }

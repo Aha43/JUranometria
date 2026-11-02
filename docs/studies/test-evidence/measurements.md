@@ -217,11 +217,12 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 - juranometria/app/StartupJourneyTest.java: menu-shortcut-mask
 - juranometria/app/ViewReportLiveTest.java: os-name
 - juranometria/app/ZoomShortcutsTest.java: menu-shortcut-mask
+- juranometria/bookmark/DocumentBookmarkLibraryTest.java: named-look-and-feel
 - juranometria/ui/ChartKeyboardWiringTest.java: menu-shortcut-mask
 - juranometria/ui/CoordinateGridJourneyTest.java: menu-shortcut-mask
 - juranometria/ui/DirectZoomJourneyTest.java: menu-shortcut-mask
 
-**11 files** name a look and feel, a shortcut mask or an operating system.
+**12 files** name a look and feel, a shortcut mask or an operating system.
 
 ## Event-thread traffic, counted not judged
 
