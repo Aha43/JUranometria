@@ -6,8 +6,10 @@ owner ruled the product semantics on 2026-11-02 (#497, comment
 objects stands beside it. This record is the study that ruling asked
 for: it measures what the rulings need from the atlas as it is at
 `6223cdab` (v6.1.0), proposes the exact schema, persistence, interface
-and implementation split, and names the few choices still open. It stops
-for the owner's checkpoint before any production code.
+and implementation split, and names the few choices still open. It stopped
+for the owner's checkpoint before any production code; **the owner ruled
+C-1 to C-8 on 2026-11-02 (section 16)**, amending C-2 and adopting the
+alternative in C-3, and the sections below are brought to that ruling.
 
 The measurements are `docs/studies/bookmarks/measurements.md`, written by
 `make bookmarks-study` (`juranometria.tool.BookmarkStudyMain`), with the
@@ -133,12 +135,13 @@ place, stored time and primary:
 - Place and time go through the existing route every other surface uses
   (`MeridianModule.observer(…)` → `ChartContextHolder.install`), built from
   the current observer so that an absent part is left exactly as it was.
-- **Choice C-2 (place).** Opening a bookmark with a place installs it as
-  the chart's place. Recommended: it is also remembered as the reader's
-  place, as an edit in Place and Time is (`PlaceStore`), because the atlas
-  has one place and a chart showing Svalbard while the stored place says
-  Oslo would be two answers. The details panel states the place before
-  opening.
+- **C-2 (place), as ruled.** Opening a bookmark with a place installs it
+  as the chart's current place and does **not** write it to `PlaceStore`:
+  the reader's persisted startup place changes only by an explicit Place
+  and Time edit. The chart still has one current place; the stored default
+  for a later session is not a second chart answer. (A later *Remember this
+  place* action could be offered; opening a bookmark never does it.) The
+  details panel states the place before opening.
 - **Making subjects visible** (ruling 2: "may be made visible"):
   - a Solar System body's switch is turned on if it is off, and remembered,
     exactly as *Centre on chart* already does (`CentreOnChart.centre`) - a
@@ -146,12 +149,15 @@ place, stored time and primary:
   - a deep-sky primary opens as the page's named target (`recenter` with its
     label and identity), which the renderer already draws whatever the
     family switches say;
+  - **a star primary receives the same single-target privilege (C-3, as
+    ruled)**: that one star is drawn as the page's target even when it is
+    fainter than the reader's limit, without raising the limit or revealing
+    any other faint star - a rendering change of its own, built with the
+    opening in stage 3;
   - a non-primary deep-sky object hidden by the current Chart Options, and a
-    star fainter than the reader's limit, are **not** forced: that would be
-    restoring appearance (ruling 2). The details list them as "hidden by your
-    current Chart Options" or "fainter than your limit". **Choice C-3**:
-    accept this, or extend the target privilege to a star primary (a
-    rendering change of its own).
+    non-primary star fainter than the reader's limit, are **not** forced:
+    that would be restoring appearance (ruling 2). The details list them as
+    "hidden by your current Chart Options" or "fainter than your limit".
 - **The primary resolves by identity**, against the catalogue and the
   module bodies, not against the page inventory: `PageContents.find` only
   sees what is on the page, and a shorter window can leave a primary just
@@ -349,9 +355,10 @@ keys appended at the end of both language files (the pinned line of
 | `ChartViewController` | no `setState`; `recenter(…field…)` clamps the limit | open through `recenter`, as measured |
 | closer-field offer | `recenter` accepts 0.5° / 0.25° unasked | ask the offer; else 1°, stated |
 | `ChartContextHolder` | installs only on the event thread, refused while held | one install of the combined observer |
-| `PlaceStore` | install does not save the place | C-2 |
+| `PlaceStore` | install does not save the place | as ruled (C-2): opening never saves it |
 | `WorkingSelection` / `LeadSelection` | the lead resolves through the page inventory only | resolve the primary by identity first |
 | Solar System switches | turning one on is remembered | as *Centre on chart* (C-3) |
+| renderer, star target | stars have no target privilege today (`ChartRenderer` draws a star only within the limit) | the star primary's single-target privilege (C-3) |
 | `SearchNavigation` target privilege | dropped by any pan | the deep-sky primary's visibility lasts until the reader moves the page, as a search's does |
 | Controller tabs | `companion.tabs.explain` says "Two tabs" | rewritten for three |
 | language ledger | 166 of a bound of 170 | about seven new identifiers: raise the bound with the reason, or derive names from classes |
@@ -438,3 +445,27 @@ head the owner rules, not on this proposal head (the gate-economy rule).
 - **C-8** one integrated implementation issue in four stages, one PR, then
   a handover issue (recommended).
 - And the gate plan for the ruled study head (section 14).
+
+## 16. The ruling
+
+The owner's ruling of 2026-11-02 on #497, recorded as given:
+
+> - C-1: accept JSON with the application's own small strict reader and canonical writer, with no new dependency.
+> - C-2: amend the recommendation. Opening a bookmark with a stored place applies that place to the current chart context but does not write it to `PlaceStore` or change the reader's persisted startup place. Only an explicit Place and Time edit changes that lasting preference. The chart still has one current place; the stored default for a later session is not a second chart answer.
+> - C-3: accept the proposed visibility rules, with the star-primary alternative adopted. A star primary receives the same single-target visibility privilege as a deep-sky primary, without raising the general magnitude limit or revealing other faint stars. Non-primary subjects hidden by current settings are reported and not forced. Solar System switches behave as proposed.
+> - C-4: accept the visible, pre-ticked Include chart time box as event time exactly when at least one Solar System subject is included, with the explanatory sentence and the ability to untick it. Place remains unticked by default.
+> - C-5: accept the normal per-system user-data locations and a hidden system-property override, with no interface setting.
+> - C-6: accept Shift-Command-B / Shift-Ctrl-B for Show Bookmarks.
+> - C-7: accept Tabler `bookmark-plus`. The one SVG download from the already used Tabler v3.46.0 source is approved within the stated size, destination and MIT terms. Stop rather than substitute if the named icon is absent.
+> - C-8: accept one integrated implementation issue and PR in the proposed four stages, with focused development checks and the visible unqualified candidates at stages 2, 3 and 4, followed by one final qualification and a separate 6.2.0 handover.
+
+The owner's reasons, in brief: a bookmark's place is a temporary context,
+not the reader's lasting default; and a primary subject should be
+visible - a valid bookmark of a faint double star must not open centred and
+selected with its main subject invisible.
+
+For this study head: gates 1 and 3-7 once, gate 2 skipped for the stated
+causal reason (no interface photograph changed; the registered sketches
+are checked by gates 3 and 4); CI once; then the pinned merge of the
+study. No production implementation before that landing. The icon is
+fetched in stage 2, not here.
