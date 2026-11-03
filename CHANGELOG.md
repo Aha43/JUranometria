@@ -7,6 +7,8 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [6.2.0] - 2026-11-03
+
 **Bookmark the sky (#497, #681).** A bookmark saves the chart's view
 and, by your choice, the objects on it in your order with one main
 object, the chart time (as an event's or an observation's), the place,

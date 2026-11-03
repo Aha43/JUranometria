@@ -389,7 +389,10 @@ asked:
   last digit moved again: 127 pixels in each of the four images,
   columns 222–231 of rows 33–47; all eight sheet PNGs stayed
   pixel-identical and each of the ten PDFs and SVGs differed by one
-  byte.
+  byte. At 6.2.0 (6.1→6.2) the last digit moved once more: 108 pixels
+  in each of the four images, columns 222–231 of rows 33–46; the eight
+  sheet PNGs stayed pixel-identical and each of the ten PDFs and SVGs
+  differed by one byte.
 - **The articles.** Their footer names the release, and
   `scripts/build-articles.py` reads it from `VERSION` when the site is
   built rather than carrying a number - so there is nothing to
