@@ -205,7 +205,7 @@ make import-solar-system                   # verifies the pins, proves the excer
   all-sky coverage, keeping the current field width.
 - **Point at anything to ask what it is.** Click a star or a
   deep-sky symbol and the **Inspector** - the toolbar's list button,
-  or View → Inspector - names it:
+  or Chart → Inspector - names it:
   designations, magnitude with its band, size and orientation where
   the catalogue records them - and plainly *"not recorded"* where it
   does not, which for deep-sky objects is often. Where several marks
@@ -235,7 +235,7 @@ make import-solar-system                   # verifies the pins, proves the excer
   page. `Clear marks` removes them all. Marks are working notes for
   the page you are on: they are pruned when you move away, and
   nothing is remembered between sessions.
-- **Find your own sky on the fixed chart.** **View → Place and
+- **Find your own sky on the fixed chart.** **Chart → Place and
   Time…** takes a latitude, an east-positive longitude (the label
   says which way it counts — west is negative), and one frozen
   instant in UTC. Switch on any of three reference lines and the
@@ -270,7 +270,7 @@ make import-solar-system                   # verifies the pins, proves the excer
   and the switches deliberately are not, so every session begins
   with the ordinary chart and no stale saved clock can masquerade
   as now.
-- **Ask where the Sun is.** **View → Sun…** shows, for the place and
+- **Ask where the Sun is.** **Solar System → Sun…** shows, for the place and
   instant set in Place and Time, the Sun's right ascension and
   declination in the chart's own J2000 frame, its ecliptic longitude,
   its altitude and azimuth above the mathematical horizon (without
@@ -281,13 +281,26 @@ make import-solar-system                   # verifies the pins, proves the excer
   leap-second record, held to JPL Horizons, and work offline; the
   table says when its clock correction is estimated. Nothing is drawn
   on the chart yet.
+- **Keep a view to come back to.** **Bookmarks → Add Bookmark…**
+  (⌘/Ctrl-D, or the bookmark button on the toolbar) saves the page's
+  centre and field and, if you choose, the objects on it with one main
+  object, the chart time, your place and a note. **Bookmarks → Show
+  Bookmarks** (⇧⌘/Ctrl-B) lists them in the Controller's Bookmarks tab,
+  in folders you make; choosing one shows its details, and opening it
+  is explicit. Opening restores the view and draws the main object as
+  the page's target, but never changes your remembered place, your
+  magnitude limit or your Chart Options, and it says plainly what
+  became of each object. The library is one local file in your data
+  folder; **Library → Export Bookmarks…** and **Restore from File…**
+  carry it between machines, and a restore keeps the previous library
+  beside it.
 - **Reset view** returns to the default M31 centre, 8° field, and
   stars to V 8.0, clearing the search.
 - The readout on the right and the chart's title block always state the
   active field width and magnitude limit.
 
-The menu bar stays out of the way: **View** carries Zoom In/Zoom Out
-with their platform shortcuts, and **View → Chart Options…** lets the
+The menu bar stays out of the way: **Chart** carries Zoom In/Zoom Out
+with their platform shortcuts, and **Chart → Chart Options…** lets the
 reader choose the chart's content and labels, in four tabs:
 
 - **Deep sky** — deep-sky objects as a whole, then each of the five

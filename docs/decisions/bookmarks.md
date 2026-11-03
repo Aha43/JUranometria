@@ -469,3 +469,42 @@ causal reason (no interface photograph changed; the registered sketches
 are checked by gates 3 and 4); CI once; then the pinned merge of the
 study. No production implementation before that landing. The icon is
 fetched in stage 2, not here.
+
+## 17. As built
+
+Built by #681 in the four ruled stages and landed through #682 as main
+`ae7260ce` (2026-11-03); the 6.2.0 handover
+(`docs/reviews/release-6.2.0-handover.md`) records the stages, the
+checkpoints and the runs. Where the build differs from the proposal
+above, the build is the record:
+
+- **The library's states** are *available* (possibly holding records
+  needing attention), *newer* (written by a later JUranometria: never
+  reinterpreted, never written, adding and editing refused) and
+  *unreadable* (kept unchanged, with a last-known-good backup offered
+  when one reads as usable) - §7's sketch named them *available*,
+  *read-only* and *unavailable*.
+- **The service** keeps §7's operations, with `removeBookmark` built as
+  `remove`, and adds two found at the stage-3 review: `updateAndMove`
+  and `renameAndMove`, each one next library kept by one write, so an
+  edit that also moves a record is never half applied.
+- **The files kept beside the document are stamped**: a restore keeps the
+  current library as `bookmarks-before-restore-<stamp>.json` (§8 named
+  it without a stamp), so a second restore never overwrites the first
+  one's keeping; recovering from the backup keeps the damaged document
+  as `bookmarks-unreadable-<stamp>.json`. Restore is refused over a
+  newer library and allowed over an unreadable one.
+- **The chart time is editable** in Add and Edit, as a UTC instant
+  (`uuuu-MM-dd HH:mm[:ss]`), so an observation's exact time can be typed;
+  asked for by the owner at the stage-2 checkpoint. A malformed time is
+  refused with words.
+- **Edit offers *Use the current selection instead***, beside *Use the
+  current view instead*: the chart's selection in its order, its lead
+  proposed as the main object; unticked, the saved objects return.
+- **The folder deletion question counts the whole nested scope**:
+  bookmarks, folders and records needing attention through every folder
+  inside.
+- **The star primary's privilege (C-3)** is drawn in `ChartRenderer`,
+  placed in `LabelGeometry` and counted visible in `PageInventory`, as a
+  deep-sky target already was; no other star is revealed and the limit
+  is not raised.

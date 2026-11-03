@@ -7,6 +7,27 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Bookmark the sky (#497, #681).** A bookmark saves the chart's view
+and, by your choice, the objects on it in your order with one main
+object, the chart time (as an event's or an observation's), the place,
+and a note. **Bookmarks → Add Bookmark…** (⌘/Ctrl-D, or the toolbar's
+bookmark button) proposes them from the page and your selection; the
+time is pre-ticked only when a Solar System object is included, and
+the dialog says why. **Bookmarks → Show Bookmarks** (⇧⌘/Ctrl-B) opens
+the Controller's new Bookmarks tab: your folders, the details of a
+bookmark without moving the chart, Open, Edit, Delete and New Folder.
+Opening restores the view, applies a stored place and time to this
+chart only (your remembered place is not changed), turns on a Solar
+System object, draws the main object as the page's target - a star
+fainter than your limit included, with no other star revealed - and
+says what became of each object; your magnitude limit and Chart
+Options are left as they are. The whole library exports to a file and
+restores from one, checked first and replaced only on your yes, with
+the previous library kept beside it. One local file in your own data
+folder, written safely with a backup; an unreadable file is never
+overwritten, and one from a newer JUranometria is never written. Ruled
+in `docs/decisions/bookmarks.md` from the study that measured it.
+
 ## [6.1.0] - 2026-11-01
 
 **The controls where they belong (#674, #675).** The View menu is now
