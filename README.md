@@ -281,6 +281,19 @@ make import-solar-system                   # verifies the pins, proves the excer
   leap-second record, held to JPL Horizons, and work offline; the
   table says when its clock correction is estimated. Nothing is drawn
   on the chart yet.
+- **Keep a view to come back to.** **Bookmarks → Add Bookmark…**
+  (⌘/Ctrl-D, or the bookmark button on the toolbar) saves the page's
+  centre and field and, if you choose, the objects on it with one main
+  object, the chart time, your place and a note. **Bookmarks → Show
+  Bookmarks** (⇧⌘/Ctrl-B) lists them in the Controller's Bookmarks tab,
+  in folders you make; choosing one shows its details, and opening it
+  is explicit. Opening restores the view and draws the main object as
+  the page's target, but never changes your remembered place, your
+  magnitude limit or your Chart Options, and it says plainly what
+  became of each object. The library is one local file in your data
+  folder; **Library → Export Bookmarks…** and **Restore from File…**
+  carry it between machines, and a restore keeps the previous library
+  beside it.
 - **Reset view** returns to the default M31 centre, 8° field, and
   stars to V 8.0, clearing the search.
 - The readout on the right and the chart's title block always state the
