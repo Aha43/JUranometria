@@ -42,8 +42,8 @@ As the unreleased changelog states it:
   is never written. In both languages (*Bokmerker*).
 
 Not a reader's change: the evidence-contract heap at 2 GiB is measured
-again in section 8; it passes with room, and for the first time the
-portable route ran one short Full GC.
+again in section 8; it passes, the cap stays, and for the first time
+the portable route ran one short Full GC.
 
 ## 2. Every ruling of the road, as recorded
 
@@ -60,6 +60,9 @@ portable route ran one short Full GC.
 | the Norwegian words (2026-11-03) | #681 | the owner read the Norwegian half of `bookmarks-strings.md` in full: "Looks good" |
 | the final gate plan (2026-11-03) | chat | "Accept stage 4, run all seven gates"; then the PR, CI once and a stop for the pinned merge |
 | the landing (2026-11-03) | #682; `landing-682.md` | "Merge #682 pinned to 25dd7119" |
+| the handover (2026-11-03) | #683 | the content accepted "subject to one amendment before qualification": the five stale README routes corrected on this head - *Chart → Inspector*, *Chart → Place and Time…*, *Solar System → Sun…*, the Chart menu carrying Zoom In and Zoom Out, *Chart → Chart Options…* - rather than deferred into the version bump; then all seven gates once, the application closed and the pointer parked, a gate-1 capture refusal of the #362 family handled by the established precedent and never rerun into green, any other failure stopping the run; the PR, CI once and a stop for the pinned merge |
+| the heap (2026-11-03) | #683; section 8 | "Keep the evidence heap at 2 GiB for 6.2.0. Record the portable route's single 25 ms full collection and the reduced headroom, but do not raise the cap merely because one fragmentation collection occurred. Measure it again before the next evidence-heavy road." |
+| the #681 close-out (2026-11-03) | #683 | the fully merged #681 branch closed out: containment and cleanliness verified, every record kept, then its worktree and local and remote branches removed |
 
 ## 3. The owner's checkpoints and verdicts
 
@@ -225,6 +228,7 @@ on its first run.
 |---|---|---|
 | the study's evidence contracts under `-Xlog:gc*` (`heap-497-study`, 2026-11-02) | both routes **breached** on all fourteen study sketches, which did not reproduce across the contract's two runs in one process: the sketches were built before the application theme was first applied | the theme applied before each sketch is built and the default font restored; both routes rerun clean (`j497-devcheck/evidence-contracts-2.log`, `-ci-2.log`); the heap figures of the breached runs kept as valid measurements, the work being the same and full length (`j497-devcheck/README.md`) |
 | this handover's first heap invocation (`heap-683-ae7260ce`, 2026-11-03) | stopped at once: the build step named a make target that does not exist (`compile`); nothing was measured | rerun with the right target (`classes`) into the same record |
+| this handover's pre-flight on `1969cc6d` (`j683-preflight`, 2026-11-03) | the full suite **failed one test**: the Place and Time sheet's capture refused, its window settling at 326 px where 420 was established - the #362 capture-refusal family, the same kind of transition as #657's - with 49 desktop-focus aborts and none unexplained; the gate 6 and 7 replays exact and clean | not rerun; the refusal's record kept with the pre-flight; the owner's gate plan for the amended head states how gate 1 treats that family |
 | development checks during the stages | each found by a focused or full-suite check before any gate request: the tool's study test shadowing the production document test of the same name in the test runner (renamed `BookmarkDocumentFormatTest`); duplicate test ids from a per-open counter (one shared counter); the language ledger's bound (raised once for the road, 170 → 190, with its reason); new `doClick` calls (replaced by package-visible methods); the control-explanation test and four photographers learning the new menu; the companion's tab pins from two tabs to three; the test-evidence hand-off count re-quoted (1 132, 1 153, 1 156, 1 161); "1 bookmarks" (choice patterns); the Library button clipped at 360 px (moved to its own row); a would-be 25th unpaired look-and-feel photographer (the bookmark sheet restores the look and feel) | each fixed before the stage's candidate or the gate request |
 
 Gate 1's aborts were 12 on both runs; every record's list of unexplained
@@ -357,13 +361,13 @@ the canonical route (`make evidence-contracts`) finished in **18.6 min**
   measure. The one Full GC is a different signal: the large rendered
   images are now numerous enough that G1 can run out of contiguous
   regions under a 2 GiB cap. It cost 25 ms and changed no output.
-  **For the owner's decision**: keep 2 GiB for 6.2.0 and record the
-  first Full GC beside the 6.1.0 limit (recommended - both routes pass,
-  the pause is negligible, and nothing in 6.2.0 adds evidence after this
-  measurement); or raise the cap to 3 GiB in this handover's head, the
-  three `evidence-contracts` targets' `-Xmx2g` in the Makefile, which
-  gates 3 and 4 and CI all run through, measured again before
-  qualification.
+  **The owner's ruling** (2026-11-03): the heap stays at 2 GiB for
+  6.2.0 - the measured peak is below the previous portable peak, and a
+  short collection caused by fragmentation is not by itself an
+  out-of-memory warning. The single 25 ms full collection and the
+  reduced headroom are recorded here as the limit this release carries
+  forward, beside 6.1.0's; both routes are measured again before the
+  next evidence-heavy road.
 
 Then, as 6.1.0 was done: no `VERSION` change, tag or publication in this
 issue. Each of the following is a separate owner decision, asked for in
@@ -397,12 +401,11 @@ preference key or existing shortcut.
 
 ## 10. Still open after 6.2.0
 
-One finding of this handover, for the owner: the README's *Using the
-atlas* section still gives five pre-6.1 routes under **View** (Inspector,
-Place and Time, Sun, Zoom, Chart Options), which 6.1.0 moved to the
-Chart and Solar System menus; the 6.1.0 road corrected only one README
-line. This handover adds the bookmarks bullet and leaves those lines as
-they are, for a prose correction the owner may route with the release.
+The README's *Using the atlas* section gave five pre-6.1 routes under
+**View** (Inspector, Place and Time, Sun, Zoom, Chart Options), which
+6.1.0 had moved to the Chart and Solar System menus; found by this
+handover and, on the owner's amendment, corrected on its head, so the
+version bump carries no unrelated documentation repair.
 
 Open issues: #613, #617, #618, #598, #594, #589, #571, #566, #564,
 #554, #553, #417, #387, #373, #370, #362, #356, #355, #351, #339, #327,
