@@ -201,9 +201,18 @@ public final class DocumentBookmarkLibrary extends TreeBookmarkLibrary {
         };
     }
 
+    /**
+     * Replaces the library with a validated source. Allowed on an available
+     * library and on an unreadable one - a restore from an export is a way
+     * back from a damaged document, which is kept, as the current document
+     * always is, beside the library. Refused for a newer document, which is
+     * never written.
+     */
     @Override
     public Path restoreFrom(Path source) throws IOException {
-        available();
+        if (!(state instanceof LibraryState.Available) && !(state instanceof LibraryState.Unreadable)) {
+            throw new IllegalStateException("the bookmark library cannot be changed now: " + state);
+        }
         if (!(BookmarkDocument.read(Files.readString(source, StandardCharsets.UTF_8))
                 instanceof BookmarkDocument.Usable u)) {
             throw new IOException("not a restorable bookmark library: " + source);
@@ -214,7 +223,7 @@ public final class DocumentBookmarkLibrary extends TreeBookmarkLibrary {
         if (Files.exists(document)) {
             Files.copy(document, kept, StandardCopyOption.REPLACE_EXISTING);
         } else {
-            Files.writeString(kept, BookmarkDocument.text(available()), StandardCharsets.UTF_8);
+            Files.writeString(kept, BookmarkDocument.text(Library.empty(writtenBy)), StandardCharsets.UTF_8);
         }
         Library restored = new Library(writtenBy, u.library().root());
         write(BookmarkDocument.text(restored));

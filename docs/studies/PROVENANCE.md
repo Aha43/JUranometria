@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**942 promoted artifacts.**
+**950 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -315,6 +315,14 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/interface-language/about-nb-NO-6-notices-light.png` | `9ba22416a2697ad4b5b6976d7564979a5b8447ede04c4ba3418a7b9fd8798738` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/about-nb-NO-7-compact-dark.png` | `cf21d20dda1edec174956497b43d3a19d6438353ddb3a5f546f85729dfdc99bd` | 2026-11-01 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/about-nb-NO-8-notices-dark.png` | `ea0c15fabba7c1e765ea4746cdc6a937e6e87a4937bc429bb6007773d2021d7f` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/bookmarks-en-1-library.png` | `48bd413c9a543ba8013fa4b58b71f93a06dd049be951013fc5b142eb8e1c96a7` | 2026-11-03 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/bookmarks-en-2-add.png` | `7cfb795138b32343657113a8f699deebb707e9bab96f02449ec89c7934135835` | 2026-11-03 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/bookmarks-en-3-edit.png` | `41fc3e57457e3c7c346bb223fc5a310047ec753851e50582d4d92e9c6c4db277` | 2026-11-03 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/bookmarks-en-4-unreadable.png` | `7978d0cef168914c18e4bf6c92c1ed948552f1a1f0dcc604f322ca32a55457f9` | 2026-11-03 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/bookmarks-nb-NO-1-library.png` | `3bed74dbcc9738188262659d926a68c97ef27c561fec6ad7375f2ddf263d4dc8` | 2026-11-03 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/bookmarks-nb-NO-2-add.png` | `12653f33761bf30722a3eac65f55c479813378be1a837831c96fc4d85d0afbe5` | 2026-11-03 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/bookmarks-nb-NO-3-edit.png` | `98bfbe156dd056f2cedd1185fc0f352d07772504a9947e12839e70686445de3c` | 2026-11-03 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/bookmarks-nb-NO-4-unreadable.png` | `b08f32938419b6d194a5877a924052a353ad2218cf5118e4f32aae20b173c1a0` | 2026-11-03 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/chartkeyboard-en-1-all-off-light.png` | `2ff1dbda15f16f921c0961dc8344046e63a24adb9ea4b84ea6aa7d7d2ca87137` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/chartkeyboard-en-2-all-on-light.png` | `ddc3ce7c5efef05a53aeea1111179d2100b3ff9d10ed37a0be73b5e19e67f850` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/chartkeyboard-en-3-deepsky-off-light.png` | `1a7a9a49dd6e85eb6c48990f4789411a6e3aa280651acdb732c1d02d8d380343` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |

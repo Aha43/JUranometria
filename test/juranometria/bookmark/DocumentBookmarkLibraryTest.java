@@ -151,6 +151,24 @@ class DocumentBookmarkLibraryTest {
     }
 
     @Test
+    void aRestoreFromAFileRecoversAnUnreadableDocumentAndKeepsIt(@TempDir Path elsewhere) throws Exception {
+        DocumentBookmarkLibrary lib = open();
+        lib.add(BookmarkLibrary.ROOT, 0, draft("A"));
+        Path exported = elsewhere.resolve("export.json");
+        lib.exportTo(exported);
+        Files.writeString(folder.resolve("bookmarks.json"), "not json");
+        DocumentBookmarkLibrary damaged = open();
+        assertInstanceOf(LibraryState.Unreadable.class, damaged.state());
+        Path kept = damaged.restoreFrom(exported);
+        assertEquals("not json", Files.readString(kept), "the damaged document kept");
+        assertEquals(1, bookmarks(damaged));
+        Files.writeString(folder.resolve("bookmarks.json"),
+                document().replace("\"version\": 1", "\"version\": 2"));
+        DocumentBookmarkLibrary newer = open();
+        assertThrows(IllegalStateException.class, () -> newer.restoreFrom(exported), "a newer document is never written");
+    }
+
+    @Test
     void anUnreadableDocumentWithoutABackupOffersNothing() throws Exception {
         Files.createDirectories(folder);
         Files.writeString(folder.resolve("bookmarks.json"), "not json");

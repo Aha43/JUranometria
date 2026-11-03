@@ -51,6 +51,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Bookmarks | JButton | New Folder... | Make a folder here | Makes a new folder in the chosen folder, or beside the chosen bookmark. | hovered |
 | Bookmarks | JButton | Move up | Move the chosen entry one place up | Moves the chosen bookmark or folder one place earlier in its folder; nothing it holds c... | hovered |
 | Bookmarks | JButton | Move down | Move the chosen entry one place down | Moves the chosen bookmark or folder one place later in its folder; nothing it holds cha... | hovered |
+| Bookmarks | JButton | Library | Export or restore the whole library | Opens the library menu: Export Bookmarks... writes every bookmark to a file you choose;... | hovered |
 | Menu bar | JMenu | File | &mdash; | Exporting the chart and changing application settings | self-explanatory |
 | Menu bar | JMenuItem | Export Chart Sheet... | &mdash; | Exports this chart as an SVG, PDF or PNG sheet | self-explanatory |
 | Menu bar | JMenuItem | Settings... | &mdash; | Opens the window for appearance and for the languages used by the application and chart | self-explanatory |
@@ -185,7 +186,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 
 ## The audit
 
-**168 operable controls** across 19 surfaces: **108** hovered, **12** dynamic, **48** left to their own visible words, **0 undecided**.
+**169 operable controls** across 19 surfaces: **109** hovered, **12** dynamic, **48** left to their own visible words, **0 undecided**.
 
 **0** say the same words twice - a tooltip read back as a description. The seam refuses it, so this is zero or a finding.
 

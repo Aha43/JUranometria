@@ -88,8 +88,10 @@ public final class BookmarksPanel extends JPanel {
     final JButton newFolder;
     final JButton up;
     final JButton down;
+    final JButton libraryMenu;
     private final JPanel body;
     private final JPanel unavailable;
+    private final JPanel south;
 
     public BookmarksPanel(InterfaceText said, BookmarkLibrary library, Host host,
                           Function<Subject, String> nameOf) {
@@ -140,7 +142,8 @@ public final class BookmarksPanel extends JPanel {
         newFolder = button("bookmark.newFolder", this::newFolder);
         up = button("bookmark.up", () -> shift(-1));
         down = button("bookmark.down", () -> shift(1));
-        JPanel actions = new JPanel(new GridLayout(2, 1, 0, 4));
+        libraryMenu = button("bookmark.library", this::showLibraryMenu);
+        JPanel actions = new JPanel(new GridLayout(3, 1, 0, 4));
         JPanel first = new JPanel(new FlowLayout(FlowLayout.LEADING, 4, 0));
         first.add(open);
         first.add(edit);
@@ -149,10 +152,15 @@ public final class BookmarksPanel extends JPanel {
         second.add(newFolder);
         second.add(up);
         second.add(down);
+        // The library's own actions on a row of their own, so the
+        // Controller's narrow width never hides them.
+        JPanel third = new JPanel(new FlowLayout(FlowLayout.LEADING, 4, 0));
+        third.add(libraryMenu);
         actions.add(first);
         actions.add(second);
+        actions.add(third);
 
-        JPanel south = new JPanel();
+        south = new JPanel();
         south.setLayout(new BoxLayout(south, BoxLayout.Y_AXIS));
         detailsBox.setAlignmentX(Component.LEFT_ALIGNMENT);
         message.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -211,25 +219,156 @@ public final class BookmarksPanel extends JPanel {
                 if (chosenId != null) {
                     select(chosenId);
                 }
+                if (message.getParent() != south) {
+                    south.add(message, 1);
+                }
                 add(body, BorderLayout.CENTER);
             }
-            case LibraryState.Newer n -> showUnavailable(said.say("bookmark.state.newer"));
-            case LibraryState.Unreadable u -> showUnavailable(said.say("bookmark.state.unreadable"));
+            case LibraryState.Newer n -> showUnavailable(said.say("bookmark.state.newer"), List.of());
+            case LibraryState.Unreadable u -> {
+                List<JButton> ways = new ArrayList<>();
+                u.backup().ifPresent(offer -> ways.add(button("bookmark.recover", () -> recover(offer))));
+                ways.add(button("bookmark.restore", this::restoreFromFile));
+                showUnavailable(said.say("bookmark.state.unreadable")
+                        + u.backup().map(offer -> " " + said.say("bookmark.state.backup",
+                                offer.bookmarks(), offer.folders(), WHEN.format(offer.written()))).orElse(""), ways);
+            }
         }
         chosenChanged();
         revalidate();
         repaint();
     }
 
-    private void showUnavailable(String sentence) {
+    private void showUnavailable(String sentence, List<JButton> ways) {
         unavailable.removeAll();
         JTextArea words = new JTextArea(sentence);
         words.setEditable(false);
         words.setLineWrap(true);
         words.setWrapStyleWord(true);
         words.setOpaque(false);
+        words.getAccessibleContext().setAccessibleName(sentence);
         unavailable.add(words, BorderLayout.NORTH);
+        JPanel row = new JPanel(new FlowLayout(FlowLayout.LEADING, 4, 4));
+        for (JButton way : ways) {
+            row.add(way);
+        }
+        unavailable.add(row, BorderLayout.CENTER);
+        unavailable.add(message, BorderLayout.SOUTH);
         add(unavailable, BorderLayout.CENTER);
+    }
+
+    /** How a file is chosen: the system's chooser, or a test's answer. */
+    interface Chooser {
+        /** A file to write the export to, starting from a suggested name; empty if cancelled. */
+        Optional<java.nio.file.Path> save(Component parent, String suggested);
+
+        /** A file to restore from; empty if cancelled. */
+        Optional<java.nio.file.Path> open(Component parent);
+    }
+
+    Chooser chooser = new Chooser() {
+        @Override
+        public Optional<java.nio.file.Path> save(Component parent, String suggested) {
+            javax.swing.JFileChooser c = new javax.swing.JFileChooser();
+            c.setDialogTitle(said.say("bookmark.export.title"));
+            c.setSelectedFile(new java.io.File(suggested));
+            return c.showSaveDialog(parent) == javax.swing.JFileChooser.APPROVE_OPTION
+                    ? Optional.of(c.getSelectedFile().toPath()) : Optional.empty();
+        }
+
+        @Override
+        public Optional<java.nio.file.Path> open(Component parent) {
+            javax.swing.JFileChooser c = new javax.swing.JFileChooser();
+            c.setDialogTitle(said.say("bookmark.restore.title"));
+            return c.showOpenDialog(parent) == javax.swing.JFileChooser.APPROVE_OPTION
+                    ? Optional.of(c.getSelectedFile().toPath()) : Optional.empty();
+        }
+    };
+
+    /** The clock that dates an export's suggested name. */
+    java.time.Clock clock = java.time.Clock.systemUTC();
+
+    private void showLibraryMenu() {
+        javax.swing.JPopupMenu menu = new javax.swing.JPopupMenu();
+        javax.swing.JMenuItem export = new javax.swing.JMenuItem(said.say("bookmark.export.label"));
+        export.getAccessibleContext().setAccessibleName(said.say("bookmark.export.a11y"));
+        Explain.selfExplanatory(export, said.say("bookmark.export.explain"));
+        export.addActionListener(e -> exportLibrary());
+        javax.swing.JMenuItem restore = new javax.swing.JMenuItem(said.say("bookmark.restore.label"));
+        restore.getAccessibleContext().setAccessibleName(said.say("bookmark.restore.a11y"));
+        Explain.selfExplanatory(restore, said.say("bookmark.restore.explain"));
+        restore.addActionListener(e -> restoreFromFile());
+        menu.add(export);
+        menu.add(restore);
+        menu.show(libraryMenu, 0, libraryMenu.getHeight());
+    }
+
+    /** Exports the whole library to a chosen file; asks before replacing one. */
+    void exportLibrary() {
+        if (!(library.state() instanceof LibraryState.Available a)) {
+            return;
+        }
+        String suggested = said.say("bookmark.export.name",
+                java.time.LocalDate.ofInstant(clock.instant(), ZoneOffset.UTC).toString());
+        Optional<java.nio.file.Path> to = chooser.save(this, suggested);
+        if (to.isEmpty()) {
+            return;
+        }
+        if (java.nio.file.Files.exists(to.get())) {
+            Object[] options = {said.say("bookmark.export.replace"), said.say("bookmark.add.cancel.label")};
+            if (asker.ask(this, said.say("bookmark.export.exists", to.get().getFileName()),
+                    said.say("bookmark.export.title"), options) != 0) {
+                return;
+            }
+        }
+        try {
+            library.exportTo(to.get());
+            say(said.say("bookmark.export.done", a.library().bookmarks().size(),
+                    a.library().folders().size(), to.get().getFileName()));
+        } catch (java.io.IOException | RuntimeException refused) {
+            say(said.say("bookmark.export.failed", refused.getMessage()));
+        }
+    }
+
+    /** Restores the library from a chosen file, after a summary and the reader's yes. */
+    void restoreFromFile() {
+        Optional<java.nio.file.Path> from = chooser.open(this);
+        if (from.isEmpty()) {
+            return;
+        }
+        try {
+            BookmarkLibrary.RestoreSummary summary = library.inspect(from.get());
+            if (summary instanceof BookmarkLibrary.RestoreSummary.Refused refused) {
+                say(said.say("bookmark.restore.refused", from.get().getFileName(), refused.reason()));
+                return;
+            }
+            BookmarkLibrary.RestoreSummary.Restorable r = (BookmarkLibrary.RestoreSummary.Restorable) summary;
+            String question = said.say("bookmark.restore.question", from.get().getFileName(),
+                    r.bookmarks(), r.folders(), r.needingAttention(),
+                    r.writtenBy().isBlank() ? "?" : r.writtenBy());
+            Object[] options = {said.say("bookmark.restore.replace"), said.say("bookmark.add.cancel.label")};
+            if (asker.ask(this, question, said.say("bookmark.restore.title"), options) != 0) {
+                return;
+            }
+            java.nio.file.Path kept = library.restoreFrom(from.get());
+            say(said.say("bookmark.restore.done", r.bookmarks(), kept.getFileName()));
+        } catch (java.io.IOException | RuntimeException refused) {
+            say(said.say("bookmark.restore.failed", refused.getMessage()));
+        }
+    }
+
+    private void recover(LibraryState.BackupOffer offer) {
+        Object[] options = {said.say("bookmark.recover.yes"), said.say("bookmark.add.cancel.label")};
+        if (asker.ask(this, said.say("bookmark.recover.question", offer.bookmarks(), offer.folders(),
+                WHEN.format(offer.written())), said.say("bookmark.recover.title"), options) != 0) {
+            return;
+        }
+        try {
+            library.recoverFromBackup();
+            say(said.say("bookmark.recover.done"));
+        } catch (java.io.IOException | RuntimeException refused) {
+            say(said.say("bookmark.restore.failed", refused.getMessage()));
+        }
     }
 
     private static void fill(DefaultMutableTreeNode parent, List<Node> nodes) {
@@ -252,6 +391,11 @@ public final class BookmarksPanel extends JPanel {
             }
         }
         return out;
+    }
+
+    /** Chooses an entry, for photographs and studies. */
+    public void selectForStudy(String id) {
+        select(id);
     }
 
     /** Chooses the entry with this id, opening the folders above it. */
@@ -288,6 +432,7 @@ public final class BookmarksPanel extends JPanel {
                 || chosen.orElse(null) instanceof Node.Folder));
         delete.setEnabled(available && chosen.isPresent());
         newFolder.setEnabled(available);
+        libraryMenu.setEnabled(available);
         up.setEnabled(available && chosen.isPresent());
         down.setEnabled(available && chosen.isPresent());
         details.setText(chosen.map(this::describe).orElse(said.say("bookmark.details.none")));

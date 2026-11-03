@@ -178,6 +178,131 @@ class BookmarksPanelTest {
                 .stream().map(Node.Bookmark::title).toList());
     }
 
+    private static BookmarksPanel.Chooser choosing(Path save, Path open) {
+        return new BookmarksPanel.Chooser() {
+            @Override
+            public Optional<Path> save(java.awt.Component parent, String suggested) {
+                return Optional.ofNullable(save);
+            }
+
+            @Override
+            public Optional<Path> open(java.awt.Component parent) {
+                return Optional.ofNullable(open);
+            }
+        };
+    }
+
+    @Test
+    void exportWritesTheWholeLibraryAndRestoreReplacesItOnlyOnYesKeepingThePrevious() throws Exception {
+        Path home = folder.resolve("home");
+        DocumentBookmarkLibrary library = DocumentBookmarkLibrary.open(home, "t");
+        library.addFolder(BookmarkLibrary.ROOT, 0, "Sky events");
+        library.add(BookmarkLibrary.ROOT, 1, draft("Crescent", true));
+        Path exported = folder.resolve("export.json");
+        BookmarksPanel p = panel(library, new Host());
+        List<String> asked = new ArrayList<>();
+        SwingUtilities.invokeAndWait(() -> {
+            p.chooser = choosing(exported, exported);
+            p.asker = (parent, question, title, options) -> {
+                asked.add(question);
+                return 0;
+            };
+            p.exportLibrary();
+            assertTrue(p.message.getAccessibleContext().getAccessibleName()
+                    .contains("Exported 1 bookmark in 1 folder to export.json"));
+        });
+        String document = Files.readString(home.resolve("bookmarks.json"));
+        assertEquals(document, Files.readString(exported), "the export is the library's own document");
+        assertTrue(asked.isEmpty(), "no question for a new file");
+
+        library.add(BookmarkLibrary.ROOT, 2, draft("Later", false));
+        String before = Files.readString(home.resolve("bookmarks.json"));
+        SwingUtilities.invokeAndWait(() -> {
+            p.asker = (parent, question, title, options) -> {
+                asked.add(question);
+                return 1;
+            };
+            p.restoreFromFile();
+        });
+        assertEquals(before, Files.readString(home.resolve("bookmarks.json")), "Cancel replaces nothing");
+        assertTrue(asked.get(0).contains("It holds 1 bookmark in 1 folder, and 0 records needing attention"),
+                "the summary is shown before anything changes: " + asked.get(0));
+        SwingUtilities.invokeAndWait(() -> {
+            p.asker = (parent, question, title, options) -> 0;
+            p.restoreFromFile();
+        });
+        assertEquals(Files.readString(exported), Files.readString(home.resolve("bookmarks.json")),
+                "restored byte for byte");
+        try (var kept = Files.list(home)) {
+            Path previous = kept.filter(f -> f.getFileName().toString().startsWith("bookmarks-before-restore-"))
+                    .findFirst().orElseThrow();
+            assertEquals(before, Files.readString(previous), "the previous library kept beside it");
+        }
+    }
+
+    @Test
+    void aFileThatCannotBeRestoredIsRefusedWithWordsAndNothingChanges() throws Exception {
+        InMemoryBookmarkLibrary library = new InMemoryBookmarkLibrary(Library.empty("t"));
+        library.add(BookmarkLibrary.ROOT, 0, draft("A", false));
+        Path foreign = folder.resolve("other.json");
+        Files.writeString(foreign, "{\"bookmarks\": []}");
+        BookmarksPanel p = panel(library, new Host());
+        SwingUtilities.invokeAndWait(() -> {
+            p.chooser = choosing(null, foreign);
+            p.asker = (parent, question, title, options) -> {
+                throw new AssertionError("nothing to ask about a file that cannot be restored");
+            };
+            p.restoreFromFile();
+            assertTrue(p.message.getAccessibleContext().getAccessibleName().startsWith("other.json cannot be restored"));
+        });
+        assertEquals(1, ((LibraryState.Available) library.state()).library().bookmarks().size());
+    }
+
+    @Test
+    void anUnreadableDocumentOffersItsBackupAndRecoversOnlyOnYes() throws Exception {
+        Path home = folder.resolve("damaged");
+        DocumentBookmarkLibrary first = DocumentBookmarkLibrary.open(home, "t");
+        first.add(BookmarkLibrary.ROOT, 0, draft("A", false));
+        first.add(BookmarkLibrary.ROOT, 1, draft("B", false));
+        Files.writeString(home.resolve("bookmarks.json"), "{ damaged");
+        DocumentBookmarkLibrary library = DocumentBookmarkLibrary.open(home, "t");
+        BookmarksPanel p = panel(library, new Host());
+        List<String> asked = new ArrayList<>();
+        SwingUtilities.invokeAndWait(() -> {
+            JButtonFinder found = new JButtonFinder(p, EN.say("bookmark.recover.label"));
+            assertTrue(found.button != null, "Restore Backup is offered");
+            p.asker = (parent, question, title, options) -> {
+                asked.add(question);
+                return 0;
+            };
+            found.button.getActionListeners()[0].actionPerformed(null);
+        });
+        assertTrue(asked.get(0).contains("holding 1 bookmark in 0 folders"), asked.get(0));
+        assertTrue(library.state() instanceof LibraryState.Available);
+        assertEquals("{ damaged", Files.list(home).filter(f -> f.getFileName().toString()
+                .startsWith("bookmarks-unreadable-")).findFirst().map(f -> {
+                    try {
+                        return Files.readString(f);
+                    } catch (java.io.IOException e) {
+                        throw new IllegalStateException(e);
+                    }
+                }).orElseThrow(), "the damaged file kept");
+    }
+
+    private static final class JButtonFinder {
+        javax.swing.JButton button;
+
+        JButtonFinder(java.awt.Container in, String text) {
+            for (java.awt.Component c : in.getComponents()) {
+                if (c instanceof javax.swing.JButton b && text.equals(b.getText())) {
+                    button = b;
+                } else if (c instanceof java.awt.Container inner && button == null) {
+                    button = new JButtonFinder(inner, text).button;
+                }
+            }
+        }
+    }
+
     @Test
     void aNewerLibraryIsSaidToBeSoAndNothingCanBeDone() throws Exception {
         Files.writeString(folder.resolve("bookmarks.json"),
