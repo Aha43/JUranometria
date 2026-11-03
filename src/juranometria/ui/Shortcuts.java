@@ -60,6 +60,21 @@ public final class Shortcuts {
             juranometria.ui.coordinates.CoordinatesDialog.class.getSimpleName();
 
     /**
+     * Bookmarks > Add Bookmark... (#681, ruled on #497: Command-D /
+     * Ctrl-D, the browsers' own key). Named by the dialog it opens, so the
+     * id adds no string the language ledger would have to review.
+     */
+    public static final String ADD_BOOKMARK =
+            juranometria.ui.bookmark.AddBookmarkDialog.class.getSimpleName();
+
+    /**
+     * Bookmarks > Show Bookmarks (#681, ruled C-6 on #497: Shift-Command-B /
+     * Shift-Ctrl-B). Named by the tab it shows.
+     */
+    public static final String SHOW_BOOKMARKS =
+            juranometria.ui.bookmark.BookmarksPanel.class.getSimpleName();
+
+    /**
      * One keystroke the application answers.
      *
      * @param id what the application calls it
@@ -102,7 +117,12 @@ public final class Shortcuts {
                     KeyStroke.getKeyStroke(KeyEvent.VK_T,
                             menuMask() | InputEvent.SHIFT_DOWN_MASK)),
             new Shortcut(COORDINATES, "Centre on coordinates",
-                    KeyStroke.getKeyStroke(KeyEvent.VK_L, menuMask())));
+                    KeyStroke.getKeyStroke(KeyEvent.VK_L, menuMask())),
+            new Shortcut(ADD_BOOKMARK, "Add bookmark",
+                    KeyStroke.getKeyStroke(KeyEvent.VK_D, menuMask())),
+            new Shortcut(SHOW_BOOKMARKS, "Show bookmarks",
+                    KeyStroke.getKeyStroke(KeyEvent.VK_B,
+                            menuMask() | InputEvent.SHIFT_DOWN_MASK)));
 
     /** Every keystroke the application binds, in menu order. */
     public static List<Shortcut> all() {

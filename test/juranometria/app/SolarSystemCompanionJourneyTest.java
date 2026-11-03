@@ -60,8 +60,9 @@ class SolarSystemCompanionJourneyTest {
                     // Chart controls, Place and Time and Emphasis (#525) - the
                     // order ruled on #674 (#675, stage 3).
                     juranometria.ui.companion.CompanionTabs tabs = companion.tabs();
-                    assertEquals(List.of(juranometria.ui.companion.CompanionTabs.CHART, "solarsystem"),
-                            tabs.ids());
+                    // And Bookmarks, the permanent third tab (#681, ruled on #497).
+                    assertEquals(List.of(juranometria.ui.companion.CompanionTabs.CHART, "solarsystem",
+                            juranometria.ui.bookmark.BookmarksPanel.TAB), tabs.ids());
                     assertEquals(juranometria.ui.companion.CompanionTabs.CHART, tabs.chosen(),
                             "a fresh profile opens Chart");
                     List<CompanionSection> sections = companion.sections();
@@ -424,8 +425,8 @@ class SolarSystemCompanionJourneyTest {
                     drain();
                     SwingUtilities.invokeAndWait(() -> companion.showCompanion(true));
                     drain();
-                    assertTrue(tabs == companion.tabs() && tabs.getTabCount() == 2,
-                            "one strip, two tabs, however often it is shown");
+                    assertTrue(tabs == companion.tabs() && tabs.getTabCount() == 3,
+                            "one strip, three tabs, however often it is shown");
                     assertEquals("solarsystem", tabs.chosen(), "still on Solar System");
                 })));
     }

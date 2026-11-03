@@ -203,6 +203,12 @@ public final class ChartControls {
     public static final String ACCUMULATE_ICON = "stack-2";
     public static final String EMPHASIS_ICON = "sparkles";
 
+    /** Add Bookmark... (#681, ruled C-7 on #497): Tabler v3.46.0 outline. */
+    public static final String ADD_BOOKMARK_ICON = "bookmark-plus";
+
+    /** The Add Bookmark button's name, for tests and journeys. */
+    public static final String ADD_BOOKMARK = "addBookmark";
+
     /** The Place and Time button's name, for tests and journeys. */
     public static final String PLACE_AND_TIME = "placeAndTime";
 
@@ -211,6 +217,32 @@ public final class ChartControls {
 
     private JButton placeAndTime;
     private JToggleButton controlsButton;
+    private JButton addBookmark;
+
+    /**
+     * Add Bookmark... (#681): an icon-only button opening the same dialog
+     * as the Bookmarks menu's item, its tooltip naming the key. Attached
+     * once. Returns the button.
+     */
+    public JButton attachAddBookmark(Runnable open) {
+        if (open == null) {
+            throw new IllegalArgumentException("Add Bookmark needs its dialog");
+        }
+        if (addBookmark != null) {
+            throw new IllegalStateException("Add Bookmark is attached once");
+        }
+        addBookmark = iconButton(ADD_BOOKMARK_ICON,
+                said.say("toolbar.addBookmark.a11y"),
+                shortcuts.withKeystroke(said.say("toolbar.addBookmark.hover"), Shortcuts.ADD_BOOKMARK),
+                said.say("toolbar.addBookmark.explain"), open);
+        addBookmark.setName(ADD_BOOKMARK);
+        return addBookmark;
+    }
+
+    /** The Add Bookmark button, or null before it is attached. */
+    public JButton addBookmark() {
+        return addBookmark;
+    }
 
     /**
      * Place and Time (#675, stage 2): an icon-only button opening the

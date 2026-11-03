@@ -340,6 +340,7 @@ public final class ControlExplanationStudyMain {
         // Place and Time and Controls (#675, stage 2), attached as the
         // application attaches them, so their words are audited too.
         toolbar.attachPlaceAndTime(() -> { });
+        toolbar.attachAddBookmark(() -> { });
         toolbar.attachControls(() -> { });
         surfaces.put("Toolbar", toolbar);
         juranometria.ui.ChartControls chartControls =
@@ -359,10 +360,46 @@ public final class ControlExplanationStudyMain {
                 new juranometria.ui.ChartComponent(Atlas.assembler(),
                         juranometria.ui.language.PageText.in(english)),
                 english).inController());
-        surfaces.put("Menu bar", AppMenuBar.create(navigation, () -> { },
+        javax.swing.JMenuBar menuBar = AppMenuBar.create(navigation, () -> { },
                 () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
                 () -> { }, () -> { }, () -> { }, () -> { }, () -> { }, () -> { },
-                () -> { }, () -> { }, english));
+                () -> { }, () -> { }, english);
+        // The Bookmarks menu (#681), which the application adds before Help.
+        AppMenuBar.addBookmarks(menuBar, english, () -> { }, () -> { });
+        // The Bookmarks tab (#681 stage 3), holding one bookmark and one folder
+        // so that every action's explanation is inventoried.
+        juranometria.bookmark.InMemoryBookmarkLibrary studyLibrary =
+                new juranometria.bookmark.InMemoryBookmarkLibrary(juranometria.bookmark.Library.empty("study"));
+        try {
+            studyLibrary.addFolder(juranometria.bookmark.BookmarkLibrary.ROOT, 0, "Deep sky");
+        } catch (java.io.IOException inMemory) {
+            throw new IllegalStateException(inMemory);
+        }
+        surfaces.put("Bookmarks", new juranometria.ui.bookmark.BookmarksPanel(english, studyLibrary,
+                new juranometria.ui.bookmark.BookmarksPanel.Host() {
+                    @Override
+                    public juranometria.ui.bookmark.BookmarkOpener.Report open(
+                            juranometria.bookmark.Node.Bookmark bookmark) {
+                        throw new IllegalStateException("the audit opens nothing");
+                    }
+
+                    @Override
+                    public juranometria.ui.bookmark.BookmarkCapture.Proposal now() {
+                        throw new IllegalStateException("the audit edits nothing");
+                    }
+                }, juranometria.bookmark.Subject::id));
+        surfaces.put("Menu bar", menuBar);
+        // Add Bookmark... (#681): the dialog's content over an empty
+        // in-memory library, proposing the Moon at a stated instant, so the
+        // time box, its purposes and its reason are all inventoried.
+        surfaces.put("Add Bookmark", new juranometria.ui.bookmark.AddBookmarkDialog.Content(english,
+                new juranometria.bookmark.InMemoryBookmarkLibrary(
+                        juranometria.bookmark.Library.empty("study")),
+                juranometria.ui.bookmark.BookmarkCapture.propose(
+                        juranometria.chart.ChartViewState.DEFAULT, java.util.List.of("moon"), "moon",
+                        new juranometria.sky.Observer(59.913, 10.752,
+                                java.time.Instant.parse("2026-03-20T21:33:00Z"))),
+                juranometria.bookmark.Subject::id, "M31"));
         // With the ecliptic's switch (#675), so the Ecliptic box's own
         // explanation is inventoried with the rest of the checklist's.
         surfaces.put("Chart Options",

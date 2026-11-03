@@ -1,0 +1,244 @@
+package juranometria.ui.bookmark;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.SwingUtilities;
+
+import org.junit.jupiter.api.Test;
+
+import juranometria.app.AppMenuBar;
+import juranometria.bookmark.BookmarkLibrary;
+import juranometria.bookmark.ChartTime;
+import juranometria.bookmark.InMemoryBookmarkLibrary;
+import juranometria.bookmark.Library;
+import juranometria.bookmark.LibraryState;
+import juranometria.bookmark.Node;
+import juranometria.bookmark.Subject;
+import juranometria.chart.ChartViewState;
+import juranometria.chart.SkyPosition;
+import juranometria.sky.Observer;
+import juranometria.ui.Shortcuts;
+import juranometria.ui.language.InterfaceText;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+/**
+ * Add Bookmark... (#681 stage 2): the dialog's content on an in-memory
+ * library - it shows every proposed value, saves only on Add, keeps the
+ * reader's order and choice of primary, refuses a blank title and an
+ * unavailable library with words - and the Bookmarks menu with its key.
+ */
+class AddBookmarkDialogTest {
+
+    private static final InterfaceText EN = InterfaceText.forLanguage("en");
+    private static final Observer OSLO = new Observer(59.913, 10.752,
+            Instant.parse("2026-11-24T11:54:00Z"));
+    private static final ChartViewState VIEW = new ChartViewState(
+            new SkyPosition(56.893713, 24.029342), 2.0, 8.0, null, null);
+
+    private static AddBookmarkDialog.Content content(BookmarkLibrary library, List<String> members,
+                                                     String lead) throws Exception {
+        AddBookmarkDialog.Content[] made = new AddBookmarkDialog.Content[1];
+        SwingUtilities.invokeAndWait(() -> made[0] = new AddBookmarkDialog.Content(EN, library,
+                BookmarkCapture.propose(VIEW, members, lead, OSLO), Subject::id, "Suggested"));
+        return made[0];
+    }
+
+    private static Node.Bookmark only(BookmarkLibrary library) {
+        List<Node.Bookmark> all = ((LibraryState.Available) library.state()).library().bookmarks();
+        assertEquals(1, all.size());
+        return all.get(0);
+    }
+
+    @Test
+    void addSavesTheProposalWithTheExplicitChoicesAsShown() throws Exception {
+        InMemoryBookmarkLibrary library = new InMemoryBookmarkLibrary(Library.empty("t"));
+        AddBookmarkDialog.Content c = content(library, List.of("TYC 1800-2202-1", "moon"), "moon");
+        AtomicBoolean closed = new AtomicBoolean();
+        SwingUtilities.invokeAndWait(() -> {
+            c.whenDone(() -> closed.set(true));
+            assertEquals("Suggested", c.title.getText());
+            assertTrue(c.time.isSelected(), "C-4: the Moon pre-ticks the time");
+            assertEquals("2026-11-24 11:54:00", c.instant.getText(), "the chart's instant, editable, in UTC");
+            assertFalse(c.place.isSelected(), "the place is never pre-ticked");
+            assertTrue(c.place.getText().contains("59.913°"));
+            c.list.setSelectedIndex(1);
+            c.list.clearSelection();
+            c.add();
+        });
+        assertTrue(closed.get(), "Add closes the window");
+        Node.Bookmark saved = only(library);
+        assertEquals(List.of("TYC 1800-2202-1", "moon"), saved.subjects().stream().map(Subject::id).toList());
+        assertEquals("moon", saved.primary().orElseThrow().id());
+        assertEquals(ChartTime.Purpose.EVENT, saved.time().orElseThrow().purpose());
+        assertTrue(saved.place().isEmpty());
+    }
+
+    @Test
+    void theReadersOrderUntickingAndNoneAreKept() throws Exception {
+        InMemoryBookmarkLibrary library = new InMemoryBookmarkLibrary(Library.empty("t"));
+        AddBookmarkDialog.Content c = content(library, List.of("moon", "venus"), "moon");
+        SwingUtilities.invokeAndWait(() -> {
+            c.list.setSelectedIndex(1);
+            c.shift(-1);
+            c.primary.setSelectedIndex(0);
+            c.time.setSelected(false);
+            assertFalse(c.event.isEnabled(), "the purpose follows the box");
+            c.add();
+        });
+        Node.Bookmark saved = only(library);
+        assertEquals(List.of("venus", "moon"), saved.subjects().stream().map(Subject::id).toList());
+        assertTrue(saved.primary().isEmpty(), "None: no primary");
+        assertTrue(saved.time().isEmpty(), "unticked: no time");
+    }
+
+    @org.junit.jupiter.api.io.TempDir
+    java.nio.file.Path folder;
+
+    @Test
+    void aBlankTitleAndAnUnavailableLibraryAreRefusedWithWords() throws Exception {
+        InMemoryBookmarkLibrary library = new InMemoryBookmarkLibrary(Library.empty("t"));
+        AddBookmarkDialog.Content c = content(library, List.of(), null);
+        SwingUtilities.invokeAndWait(() -> {
+            c.title.setText("  ");
+            c.add();
+            assertEquals(EN.say("bookmark.refused.title"), c.status.getText());
+        });
+        assertTrue(((LibraryState.Available) library.state()).library().bookmarks().isEmpty());
+
+        java.nio.file.Files.writeString(folder.resolve("bookmarks.json"),
+                "{\"format\": \"juranometria-bookmarks\", \"version\": 2, \"writtenBy\": \"9.0.0\", \"root\": []}");
+        BookmarkLibrary newer = juranometria.bookmark.DocumentBookmarkLibrary.open(folder, "t");
+        AddBookmarkDialog.Content refused = content(newer, List.of(), null);
+        SwingUtilities.invokeAndWait(() -> {
+            assertFalse(refused.add.isEnabled());
+            assertEquals(EN.say("bookmark.refused.newer"), refused.status.getText());
+        });
+    }
+
+    @Test
+    void anExactTimeCanBeTypedAndAMalformedOneIsRefused() throws Exception {
+        InMemoryBookmarkLibrary library = new InMemoryBookmarkLibrary(Library.empty("t"));
+        AddBookmarkDialog.Content c = content(library, List.of("NGC 6888"), "NGC 6888");
+        SwingUtilities.invokeAndWait(() -> {
+            assertFalse(c.time.isSelected(), "a deep-sky object alone: unticked");
+            assertFalse(c.instant.isEnabled(), "the field follows the box");
+            c.time.setSelected(true);
+            c.observation.setSelected(true);
+            c.instant.setText("2026-11-02 21:03");
+            c.add();
+        });
+        Node.Bookmark saved = only(library);
+        assertEquals(Instant.parse("2026-11-02T21:03:00Z"), saved.time().orElseThrow().instant(),
+                "the camera's time, typed in UTC");
+        assertEquals(ChartTime.Purpose.OBSERVATION, saved.time().orElseThrow().purpose());
+        AddBookmarkDialog.Content bad = content(library, List.of(), null);
+        SwingUtilities.invokeAndWait(() -> {
+            bad.time.setSelected(true);
+            bad.instant.setText("2. november 21:03");
+            bad.add();
+            assertEquals(EN.say("bookmark.refused.time"), bad.status.getText());
+        });
+        assertEquals(1, ((LibraryState.Available) library.state()).library().bookmarks().size());
+    }
+
+    @Test
+    void editingKeepsTheBookmarkInPlaceAndMovesItOnlyWhenTheFolderChanges() throws Exception {
+        InMemoryBookmarkLibrary library = new InMemoryBookmarkLibrary(Library.empty("t"));
+        AddBookmarkDialog.Content c = content(library, List.of("NGC 6888"), "NGC 6888");
+        SwingUtilities.invokeAndWait(c::add);
+        String deep = library.addFolder(BookmarkLibrary.ROOT, 1, "Deep sky");
+        Node.Bookmark stored = only(library);
+        BookmarkCapture.Proposal now = BookmarkCapture.propose(new ChartViewState(
+                new SkyPosition(10, 20), 24.0, 8.0, null, null), List.of(), null, OSLO);
+        AddBookmarkDialog.Content[] e = new AddBookmarkDialog.Content[1];
+        SwingUtilities.invokeAndWait(() -> {
+            e[0] = new AddBookmarkDialog.Content(EN, library, new AddBookmarkDialog.Editing(stored,
+                    BookmarkLibrary.ROOT, now.view(), now), Subject::id);
+            assertEquals("Suggested", e[0].title.getText());
+            assertEquals(EN.say("bookmark.edit.ok.label"), e[0].add.getText());
+            e[0].title.setText("Crescent Nebula");
+            e[0].time.setSelected(true);
+            e[0].observation.setSelected(true);
+            e[0].instant.setText("2026-11-02 20:56:48");
+            e[0].note.setText("First time with the Seestar 50");
+            for (int i = 0; i < e[0].folder.getItemCount(); i++) {
+                if (e[0].folder.getItemAt(i).id().equals(deep)) {
+                    e[0].folder.setSelectedIndex(i);
+                }
+            }
+            e[0].add();
+        });
+        Library after = ((LibraryState.Available) library.state()).library();
+        Node.Folder moved = (Node.Folder) after.find(deep).orElseThrow();
+        Node.Bookmark edited = (Node.Bookmark) moved.children().get(0);
+        assertEquals(stored.id(), edited.id(), "the same bookmark");
+        assertEquals("Crescent Nebula", edited.title());
+        assertEquals(stored.view(), edited.view(), "the view kept unless the current one is chosen");
+        assertEquals(Instant.parse("2026-11-02T20:56:48Z"), edited.time().orElseThrow().instant());
+        assertEquals("First time with the Seestar 50", edited.note().orElseThrow());
+    }
+
+    @Test
+    void editCanTakeTheCurrentSelectionWithItsLeadAsTheMainObject() throws Exception {
+        InMemoryBookmarkLibrary library = new InMemoryBookmarkLibrary(Library.empty("t"));
+        AddBookmarkDialog.Content c = content(library, List.of("NGC 6888"), "NGC 6888");
+        SwingUtilities.invokeAndWait(c::add);
+        Node.Bookmark stored = only(library);
+        BookmarkCapture.Proposal now = BookmarkCapture.propose(VIEW, List.of("moon", "TYC 1800-2202-1"),
+                "TYC 1800-2202-1", OSLO);
+        SwingUtilities.invokeAndWait(() -> {
+            AddBookmarkDialog.Content e = new AddBookmarkDialog.Content(EN, library,
+                    new AddBookmarkDialog.Editing(stored, BookmarkLibrary.ROOT, now.view(), now), Subject::id);
+            e.currentSubjects.setSelected(true);
+            assertEquals(List.of("moon", "TYC 1800-2202-1"), java.util.Collections.list(e.subjects.elements())
+                    .stream().map(Subject::id).toList(), "the selection's members, in order");
+            assertEquals("TYC 1800-2202-1", ((Subject) e.primary.getSelectedItem()).id(), "its lead proposed");
+            e.currentSubjects.setSelected(false);
+            assertEquals(List.of("NGC 6888"), java.util.Collections.list(e.subjects.elements())
+                    .stream().map(Subject::id).toList(), "unticked: the saved objects back");
+            e.currentSubjects.setSelected(true);
+            e.add();
+        });
+        Node.Bookmark edited = only(library);
+        assertEquals(List.of("moon", "TYC 1800-2202-1"), edited.subjects().stream().map(Subject::id).toList());
+        assertEquals("TYC 1800-2202-1", edited.primary().orElseThrow().id());
+        assertEquals(stored.view(), edited.view(), "the view is not touched by the objects' choice");
+    }
+
+    @Test
+    void theFolderChoiceListsTheRootAndEveryFolderByItsPath() throws Exception {
+        InMemoryBookmarkLibrary library = new InMemoryBookmarkLibrary(Library.empty("t"));
+        String events = library.addFolder(BookmarkLibrary.ROOT, 0, "Sky events");
+        library.addFolder(events, 0, "2026");
+        List<String> shown = AddBookmarkDialog.folders(library, EN).stream()
+                .map(AddBookmarkDialog.FolderChoice::shown).toList();
+        assertEquals(List.of("Bookmarks", "Bookmarks ▸ Sky events", "Bookmarks ▸ Sky events ▸ 2026"), shown);
+    }
+
+    @Test
+    void theBookmarksMenuStandsBeforeHelpWithCommandD() throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            JMenuBar bar = new JMenuBar();
+            bar.add(new JMenu(EN.say("menu.view.label")));
+            bar.add(new JMenu(EN.say("menu.help.label")));
+            JMenu menu = AppMenuBar.addBookmarks(bar, EN, () -> { });
+            assertNotNull(menu);
+            assertEquals(1, bar.getComponentIndex(menu), "between the rest and Help");
+            assertEquals('B', menu.getMnemonic());
+            JMenuItem add = menu.getItem(0);
+            assertEquals(AppMenuBar.ADD_BOOKMARK_ITEM, add.getName());
+            assertEquals(Shortcuts.of(Shortcuts.ADD_BOOKMARK).stroke(), add.getAccelerator());
+            assertEquals(1, add.getActionListeners().length, "the item opens the dialog");
+        });
+        assertEquals(java.awt.event.KeyEvent.VK_D, Shortcuts.of(Shortcuts.ADD_BOOKMARK).stroke().getKeyCode());
+    }
+}

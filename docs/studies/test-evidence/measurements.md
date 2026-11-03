@@ -99,6 +99,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 |---|---|---|
 | src/juranometria/tool/AboutSheetMain.java | look-and-feel | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/BookmarkStudyMain.java | look-and-feel, default-font | protected-locally |
+| src/juranometria/tool/BookmarksSheetMain.java | look-and-feel, default-font | protected-locally |
 | src/juranometria/tool/ChartKeyboardSheetMain.java | look-and-feel, preferences | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/ChartOptionsCompanionStudyMain.java | look-and-feel, default-font, preferences | protected-locally |
 | src/juranometria/tool/ChartOptionsSheetMain.java | look-and-feel, preferences | UNPROTECTED: look-and-feel |
@@ -133,7 +134,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | src/juranometria/tool/WorkingSelectionMockupMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/app/PackagedAcceptanceMain.java | look-and-feel, locale, preferences | protected-locally |
 
-**35 evidence executables** touch process-wide state; 24 carry an unpaired touch.
+**36 evidence executables** touch process-wide state; 24 carry an unpaired touch.
 
 ## Display-dependent tests, their premises and their routes
 
@@ -217,27 +218,28 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 - juranometria/app/StartupJourneyTest.java: menu-shortcut-mask
 - juranometria/app/ViewReportLiveTest.java: os-name
 - juranometria/app/ZoomShortcutsTest.java: menu-shortcut-mask
+- juranometria/bookmark/DocumentBookmarkLibraryTest.java: named-look-and-feel
 - juranometria/ui/ChartKeyboardWiringTest.java: menu-shortcut-mask
 - juranometria/ui/CoordinateGridJourneyTest.java: menu-shortcut-mask
 - juranometria/ui/DirectZoomJourneyTest.java: menu-shortcut-mask
 
-**11 files** name a look and feel, a shortcut mask or an operating system.
+**12 files** name a look and feel, a shortcut mask or an operating system.
 
 ## Event-thread traffic, counted not judged
 
 Whether a particular read happens on the event thread is control flow, which text cannot decide; issue #220 proved the cost of guessing, three times. What can be counted is the traffic:
 
 - reads of live chart state (currentScene, pageOffsetY, navigation.state): **478** across the suite
-- explicit event-thread hand-offs (invokeAndWait): **1126**
+- explicit event-thread hand-offs (invokeAndWait): **1161**
 
 ## Generated evidence, classified
 
 | class | the contract | files |
 |---|---|---|
-| deterministic-report | regenerates byte-for-byte on the same tree | 192 |
+| deterministic-report | regenerates byte-for-byte on the same tree | 193 |
 | byte-exact-fixture | committed data with provenance; never regenerated casually | 397 |
 | captured-evidence | an operating-system screenshot, digest-pinned; a re-capture is a provenance event | 13 |
-| renderer-drawn | byte-reproducible per machine; production ink, no widgets | 942 |
+| renderer-drawn | byte-reproducible per machine; production ink, no widgets | 950 |
 | widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 186 |
 | session-photograph | a packed window on a display; drifts between desktop sessions | 3 |
 

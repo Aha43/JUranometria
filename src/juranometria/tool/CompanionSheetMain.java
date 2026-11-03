@@ -329,6 +329,25 @@ public final class CompanionSheetMain {
                 // chooses that tab.
                 window[0].addTab("solarsystem", words.say("companion.tab.solarsystem"),
                         solarSection.inController(companionStore, words));
+                // Bookmarks (#681): the permanent third tab, over an empty
+                // in-memory library, so the strip reads as the application's.
+                window[0].addTab(juranometria.ui.bookmark.BookmarksPanel.TAB,
+                        words.say("companion.tab.bookmarks"),
+                        new juranometria.ui.bookmark.BookmarksPanel(words,
+                                new juranometria.bookmark.InMemoryBookmarkLibrary(
+                                        juranometria.bookmark.Library.empty("study")),
+                                new juranometria.ui.bookmark.BookmarksPanel.Host() {
+                                    @Override
+                                    public juranometria.ui.bookmark.BookmarkOpener.Report open(
+                                            juranometria.bookmark.Node.Bookmark bookmark) {
+                                        throw new IllegalStateException("a photograph opens nothing");
+                                    }
+
+                                    @Override
+                                    public juranometria.ui.bookmark.BookmarkCapture.Proposal now() {
+                                        throw new IllegalStateException("a photograph edits nothing");
+                                    }
+                                }, juranometria.bookmark.Subject::id));
                 if (state.solarSystemOpen()) {
                     window[0].tabs().choose("solarsystem");
                     if (!state.jupiterOpen()) {

@@ -27,9 +27,10 @@ arrangement at its frozen instant.
 | shown | hovered | spoken as | read out |
 |---|---|---|---|
 | JUranometria Controller | — | JUranometria Controller | Controls you can keep beside the chart while you read it |
-| — | — | Controller tabs | Two tabs: the chart's controls, and the Solar System's bodies. Choosing a tab computes nothing; the tab last chosen is remembered. |
+| — | — | Controller tabs | Three tabs: the chart's controls, the Solar System's bodies, and your bookmarks. Choosing a tab computes nothing; the tab last chosen is remembered. |
 | ▾ Chart | — | Chart | — |
 | Solar System | — | Solar System | — |
+| Bookmarks | — | Bookmarks | — |
 | ▾ Chart controls | Show or hide this section | Chart controls, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | — | Zoom in (⌘=) | Zoom in | Shows a narrower field, with fainter stars on it |
 | — | Zoom out (⌘-) | Zoom out | Shows a wider field, with fewer stars on it |
@@ -85,9 +86,10 @@ arrangement at its frozen instant.
 | shown | hovered | spoken as | read out |
 |---|---|---|---|
 | JUranometria Controller | — | JUranometria Controller | Controls you can keep beside the chart while you read it |
-| — | — | Controller tabs | Two tabs: the chart's controls, and the Solar System's bodies. Choosing a tab computes nothing; the tab last chosen is remembered. |
+| — | — | Controller tabs | Three tabs: the chart's controls, the Solar System's bodies, and your bookmarks. Choosing a tab computes nothing; the tab last chosen is remembered. |
 | ▾ Chart | — | Chart | — |
 | Solar System | — | Solar System | — |
+| Bookmarks | — | Bookmarks | — |
 | ▾ Chart controls | Show or hide this section | Chart controls, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | — | Zoom in (⌘=) | Zoom in | Shows a narrower field, with fainter stars on it |
 | — | Zoom out (⌘-) | Zoom out | Shows a wider field, with fewer stars on it |
@@ -143,9 +145,10 @@ arrangement at its frozen instant.
 | shown | hovered | spoken as | read out |
 |---|---|---|---|
 | JUranometria Controller | — | JUranometria Controller | Controls you can keep beside the chart while you read it |
-| — | — | Controller tabs | Two tabs: the chart's controls, and the Solar System's bodies. Choosing a tab computes nothing; the tab last chosen is remembered. |
+| — | — | Controller tabs | Three tabs: the chart's controls, the Solar System's bodies, and your bookmarks. Choosing a tab computes nothing; the tab last chosen is remembered. |
 | ▾ Chart | — | Chart | — |
 | Solar System | — | Solar System | — |
+| Bookmarks | — | Bookmarks | — |
 | ▾ Chart controls | Show or hide this section | Chart controls, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | — | Zoom in (⌘=) | Zoom in | Shows a narrower field, with fainter stars on it |
 | — | Zoom out (⌘-) | Zoom out | Shows a wider field, with fewer stars on it |
@@ -185,9 +188,10 @@ arrangement at its frozen instant.
 | shown | hovered | spoken as | read out |
 |---|---|---|---|
 | JUranometria Controller | — | JUranometria Controller | Controls you can keep beside the chart while you read it |
-| — | — | Controller tabs | Two tabs: the chart's controls, and the Solar System's bodies. Choosing a tab computes nothing; the tab last chosen is remembered. |
+| — | — | Controller tabs | Three tabs: the chart's controls, the Solar System's bodies, and your bookmarks. Choosing a tab computes nothing; the tab last chosen is remembered. |
 | ▾ Chart | — | Chart | — |
 | Solar System | — | Solar System | — |
+| Bookmarks | — | Bookmarks | — |
 | ▾ Chart controls | Show or hide this section | Chart controls, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | — | Zoom in (⌘=) | Zoom in | Shows a narrower field, with fainter stars on it |
 | — | Zoom out (⌘-) | Zoom out | Shows a wider field, with fewer stars on it |
@@ -244,9 +248,10 @@ arrangement at its frozen instant.
 | shown | hovered | spoken as | read out |
 |---|---|---|---|
 | JUranometria Controller | — | JUranometria Controller | Controls you can keep beside the chart while you read it |
-| — | — | Controller tabs | Two tabs: the chart's controls, and the Solar System's bodies. Choosing a tab computes nothing; the tab last chosen is remembered. |
+| — | — | Controller tabs | Three tabs: the chart's controls, the Solar System's bodies, and your bookmarks. Choosing a tab computes nothing; the tab last chosen is remembered. |
 | ▾ Chart | — | Chart | — |
 | Solar System | — | Solar System | — |
+| Bookmarks | — | Bookmarks | — |
 | ▾ Chart controls | Show or hide this section | Chart controls, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | — | Zoom in (⌘=) | Zoom in | Shows a narrower field, with fainter stars on it |
 | — | Zoom out (⌘-) | Zoom out | Shows a wider field, with fewer stars on it |
@@ -303,9 +308,10 @@ arrangement at its frozen instant.
 | shown | hovered | spoken as | read out |
 |---|---|---|---|
 | JUranometria Controller | — | JUranometria Controller | Controls you can keep beside the chart while you read it |
-| — | — | Controller tabs | Two tabs: the chart's controls, and the Solar System's bodies. Choosing a tab computes nothing; the tab last chosen is remembered. |
+| — | — | Controller tabs | Three tabs: the chart's controls, the Solar System's bodies, and your bookmarks. Choosing a tab computes nothing; the tab last chosen is remembered. |
 | Chart | — | Chart | — |
 | ▾ Solar System | — | Solar System | — |
+| Bookmarks | — | Bookmarks | — |
 | Chart time: 2026-03-20 21:33:00 UTC | — | Chart time: 2026-03-20 21:33:00 UTC | — |
 | Update to now | Reads the clock once and freezes the chart at that instant | Update to now | Freezes the chart at the present moment. The clock is read once; nothing moves afterwards. |
 | ▾ Sun | Show or hide this section | Sun, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
@@ -348,9 +354,10 @@ arrangement at its frozen instant.
 | shown | hovered | spoken as | read out |
 |---|---|---|---|
 | JUranometria Controller | — | JUranometria Controller | Controls you can keep beside the chart while you read it |
-| — | — | Controller tabs | Two tabs: the chart's controls, and the Solar System's bodies. Choosing a tab computes nothing; the tab last chosen is remembered. |
+| — | — | Controller tabs | Three tabs: the chart's controls, the Solar System's bodies, and your bookmarks. Choosing a tab computes nothing; the tab last chosen is remembered. |
 | Chart | — | Chart | — |
 | ▾ Solar System | — | Solar System | — |
+| Bookmarks | — | Bookmarks | — |
 | Chart time: 2026-03-20 21:33:00 UTC | — | Chart time: 2026-03-20 21:33:00 UTC | — |
 | Update to now | Reads the clock once and freezes the chart at that instant | Update to now | Freezes the chart at the present moment. The clock is read once; nothing moves afterwards. |
 | ▸ Sun | Show or hide this section | Sun, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
@@ -375,9 +382,10 @@ arrangement at its frozen instant.
 | shown | hovered | spoken as | read out |
 |---|---|---|---|
 | JUranometria Controller | — | JUranometria Controller | Controls you can keep beside the chart while you read it |
-| — | — | Controller tabs | Two tabs: the chart's controls, and the Solar System's bodies. Choosing a tab computes nothing; the tab last chosen is remembered. |
+| — | — | Controller tabs | Three tabs: the chart's controls, the Solar System's bodies, and your bookmarks. Choosing a tab computes nothing; the tab last chosen is remembered. |
 | ▾ Chart | — | Chart | — |
 | Solar System | — | Solar System | — |
+| Bookmarks | — | Bookmarks | — |
 | ▾ Chart controls | Show or hide this section | Chart controls, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | — | Zoom in (⌘=) | Zoom in | Shows a narrower field, with fainter stars on it |
 | — | Zoom out (⌘-) | Zoom out | Shows a wider field, with fewer stars on it |
@@ -427,9 +435,10 @@ arrangement at its frozen instant.
 | shown | hovered | spoken as | read out |
 |---|---|---|---|
 | JUranometria Kontroller | — | JUranometria Kontroller | Kontroller du kan ha ved siden av kartet mens du leser det |
-| — | — | Kontrollerens faner | To faner: kartets kontroller, og solsystemets himmellegemer. Å velge en fane beregner ingenting; fanen som sist ble valgt, huskes. |
+| — | — | Kontrollerens faner | Tre faner: kartets kontroller, solsystemets himmellegemer og bokmerkene dine. Å velge en fane beregner ingenting; fanen som sist ble valgt, huskes. |
 | ▾ Kart | — | Kart | — |
 | Solsystemet | — | Solsystemet | — |
+| Bokmerker | — | Bokmerker | — |
 | ▾ Kartkontroller | Vis eller skjul denne delen | Kartkontroller, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | — | Zoom inn (⌘=) | Zoom inn | Viser et smalere synsfelt med svakere stjerner |
 | — | Zoom ut (⌘-) | Zoom ut | Viser et større synsfelt med færre stjerner |
@@ -485,9 +494,10 @@ arrangement at its frozen instant.
 | shown | hovered | spoken as | read out |
 |---|---|---|---|
 | JUranometria Kontroller | — | JUranometria Kontroller | Kontroller du kan ha ved siden av kartet mens du leser det |
-| — | — | Kontrollerens faner | To faner: kartets kontroller, og solsystemets himmellegemer. Å velge en fane beregner ingenting; fanen som sist ble valgt, huskes. |
+| — | — | Kontrollerens faner | Tre faner: kartets kontroller, solsystemets himmellegemer og bokmerkene dine. Å velge en fane beregner ingenting; fanen som sist ble valgt, huskes. |
 | ▾ Kart | — | Kart | — |
 | Solsystemet | — | Solsystemet | — |
+| Bokmerker | — | Bokmerker | — |
 | ▾ Kartkontroller | Vis eller skjul denne delen | Kartkontroller, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | — | Zoom inn (⌘=) | Zoom inn | Viser et smalere synsfelt med svakere stjerner |
 | — | Zoom ut (⌘-) | Zoom ut | Viser et større synsfelt med færre stjerner |
@@ -543,9 +553,10 @@ arrangement at its frozen instant.
 | shown | hovered | spoken as | read out |
 |---|---|---|---|
 | JUranometria Kontroller | — | JUranometria Kontroller | Kontroller du kan ha ved siden av kartet mens du leser det |
-| — | — | Kontrollerens faner | To faner: kartets kontroller, og solsystemets himmellegemer. Å velge en fane beregner ingenting; fanen som sist ble valgt, huskes. |
+| — | — | Kontrollerens faner | Tre faner: kartets kontroller, solsystemets himmellegemer og bokmerkene dine. Å velge en fane beregner ingenting; fanen som sist ble valgt, huskes. |
 | ▾ Kart | — | Kart | — |
 | Solsystemet | — | Solsystemet | — |
+| Bokmerker | — | Bokmerker | — |
 | ▾ Kartkontroller | Vis eller skjul denne delen | Kartkontroller, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | — | Zoom inn (⌘=) | Zoom inn | Viser et smalere synsfelt med svakere stjerner |
 | — | Zoom ut (⌘-) | Zoom ut | Viser et større synsfelt med færre stjerner |
@@ -585,9 +596,10 @@ arrangement at its frozen instant.
 | shown | hovered | spoken as | read out |
 |---|---|---|---|
 | JUranometria Kontroller | — | JUranometria Kontroller | Kontroller du kan ha ved siden av kartet mens du leser det |
-| — | — | Kontrollerens faner | To faner: kartets kontroller, og solsystemets himmellegemer. Å velge en fane beregner ingenting; fanen som sist ble valgt, huskes. |
+| — | — | Kontrollerens faner | Tre faner: kartets kontroller, solsystemets himmellegemer og bokmerkene dine. Å velge en fane beregner ingenting; fanen som sist ble valgt, huskes. |
 | ▾ Kart | — | Kart | — |
 | Solsystemet | — | Solsystemet | — |
+| Bokmerker | — | Bokmerker | — |
 | ▾ Kartkontroller | Vis eller skjul denne delen | Kartkontroller, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | — | Zoom inn (⌘=) | Zoom inn | Viser et smalere synsfelt med svakere stjerner |
 | — | Zoom ut (⌘-) | Zoom ut | Viser et større synsfelt med færre stjerner |
@@ -644,9 +656,10 @@ arrangement at its frozen instant.
 | shown | hovered | spoken as | read out |
 |---|---|---|---|
 | JUranometria Kontroller | — | JUranometria Kontroller | Kontroller du kan ha ved siden av kartet mens du leser det |
-| — | — | Kontrollerens faner | To faner: kartets kontroller, og solsystemets himmellegemer. Å velge en fane beregner ingenting; fanen som sist ble valgt, huskes. |
+| — | — | Kontrollerens faner | Tre faner: kartets kontroller, solsystemets himmellegemer og bokmerkene dine. Å velge en fane beregner ingenting; fanen som sist ble valgt, huskes. |
 | ▾ Kart | — | Kart | — |
 | Solsystemet | — | Solsystemet | — |
+| Bokmerker | — | Bokmerker | — |
 | ▾ Kartkontroller | Vis eller skjul denne delen | Kartkontroller, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | — | Zoom inn (⌘=) | Zoom inn | Viser et smalere synsfelt med svakere stjerner |
 | — | Zoom ut (⌘-) | Zoom ut | Viser et større synsfelt med færre stjerner |
@@ -703,9 +716,10 @@ arrangement at its frozen instant.
 | shown | hovered | spoken as | read out |
 |---|---|---|---|
 | JUranometria Kontroller | — | JUranometria Kontroller | Kontroller du kan ha ved siden av kartet mens du leser det |
-| — | — | Kontrollerens faner | To faner: kartets kontroller, og solsystemets himmellegemer. Å velge en fane beregner ingenting; fanen som sist ble valgt, huskes. |
+| — | — | Kontrollerens faner | Tre faner: kartets kontroller, solsystemets himmellegemer og bokmerkene dine. Å velge en fane beregner ingenting; fanen som sist ble valgt, huskes. |
 | Kart | — | Kart | — |
 | ▾ Solsystemet | — | Solsystemet | — |
+| Bokmerker | — | Bokmerker | — |
 | Karttid: 2026-03-20 21:33:00 UTC | — | Karttid: 2026-03-20 21:33:00 UTC | — |
 | Oppdater til nå | Les klokken én gang og sett kartets tidspunkt til nå | Oppdater til nå | Tegner kartet for tidspunktet nå. Klokken leses én gang; tiden går ikke videre etterpå. |
 | ▾ Solen | Vis eller skjul denne delen | Solen, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
@@ -748,9 +762,10 @@ arrangement at its frozen instant.
 | shown | hovered | spoken as | read out |
 |---|---|---|---|
 | JUranometria Kontroller | — | JUranometria Kontroller | Kontroller du kan ha ved siden av kartet mens du leser det |
-| — | — | Kontrollerens faner | To faner: kartets kontroller, og solsystemets himmellegemer. Å velge en fane beregner ingenting; fanen som sist ble valgt, huskes. |
+| — | — | Kontrollerens faner | Tre faner: kartets kontroller, solsystemets himmellegemer og bokmerkene dine. Å velge en fane beregner ingenting; fanen som sist ble valgt, huskes. |
 | Kart | — | Kart | — |
 | ▾ Solsystemet | — | Solsystemet | — |
+| Bokmerker | — | Bokmerker | — |
 | Karttid: 2026-03-20 21:33:00 UTC | — | Karttid: 2026-03-20 21:33:00 UTC | — |
 | Oppdater til nå | Les klokken én gang og sett kartets tidspunkt til nå | Oppdater til nå | Tegner kartet for tidspunktet nå. Klokken leses én gang; tiden går ikke videre etterpå. |
 | ▸ Solen | Vis eller skjul denne delen | Solen, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
@@ -775,9 +790,10 @@ arrangement at its frozen instant.
 | shown | hovered | spoken as | read out |
 |---|---|---|---|
 | JUranometria Kontroller | — | JUranometria Kontroller | Kontroller du kan ha ved siden av kartet mens du leser det |
-| — | — | Kontrollerens faner | To faner: kartets kontroller, og solsystemets himmellegemer. Å velge en fane beregner ingenting; fanen som sist ble valgt, huskes. |
+| — | — | Kontrollerens faner | Tre faner: kartets kontroller, solsystemets himmellegemer og bokmerkene dine. Å velge en fane beregner ingenting; fanen som sist ble valgt, huskes. |
 | ▾ Kart | — | Kart | — |
 | Solsystemet | — | Solsystemet | — |
+| Bokmerker | — | Bokmerker | — |
 | ▾ Kartkontroller | Vis eller skjul denne delen | Kartkontroller, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | — | Zoom inn (⌘=) | Zoom inn | Viser et smalere synsfelt med svakere stjerner |
 | — | Zoom ut (⌘-) | Zoom ut | Viser et større synsfelt med færre stjerner |

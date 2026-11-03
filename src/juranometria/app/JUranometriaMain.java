@@ -766,6 +766,72 @@ public final class JUranometriaMain {
             }
         };
         toolbar.attachPlaceAndTime(openPlaceAndTime);
+        // Bookmarks (#681, ruled on #497): the library is the local
+        // document in the system's own data folder, opened once; opening
+        // never fails the start - an unreadable or newer document is a
+        // state the dialog explains. Add Bookmark... proposes from the
+        // chart as it stands and adds only on the reader's Add.
+        juranometria.bookmark.BookmarkLibrary bookmarks =
+                juranometria.bookmark.DocumentBookmarkLibrary.open(
+                        juranometria.bookmark.BookmarkFolder.current(), AppInfo.version());
+        juranometria.search.LocalSearch bookmarkSearch = Atlas.search();
+        Runnable addBookmark = () -> {
+            juranometria.chart.WorkingSelection working = modules.workingSelection();
+            juranometria.ui.bookmark.BookmarkCapture.Proposal proposal =
+                    juranometria.ui.bookmark.BookmarkCapture.propose(controller.state(),
+                            working.members(), working.lead(), meridian.observer());
+            java.util.function.Function<juranometria.bookmark.Subject, String> names =
+                    juranometria.ui.bookmark.SubjectNames.of(pageWords, bookmarkSearch);
+            String suggested = proposal.primary().map(names)
+                    .orElseGet(() -> controller.state().targetLabel() != null
+                            ? controller.state().targetLabel()
+                            : juranometria.chart.SkyFormat.formatRa(controller.state().centre().raDegrees())
+                                    + ", " + juranometria.chart.SkyFormat.formatDec(
+                                            controller.state().centre().decDegrees()));
+            juranometria.ui.bookmark.AddBookmarkDialog.open(frame,
+                    juranometria.ui.language.InterfaceText.forLanguage(language.interfaceLanguage()),
+                    bookmarks, proposal, names, suggested);
+        };
+        toolbar.attachAddBookmark(addBookmark);
+        // The Bookmarks tab and opening (#681 stage 3): opened through the
+        // atlas's own routes - one context installation (never PlaceStore),
+        // the subjects' Solar System switches, recenter with the primary as
+        // the named target, a paint, then the primary as the selection.
+        java.util.Map<String, juranometria.ui.solar.BodyOnChart> bodySwitches = java.util.Map.of(
+                "sun", sunLayer, "moon", moonLayer, "venus", venusLayer, "mercury", mercuryLayer,
+                "jovian.jupiter", jupiterLayer, "saturn", saturnLayer, "mars", marsLayer,
+                "uranus", uranusLayer, "neptune", neptuneLayer);
+        java.util.function.Function<juranometria.bookmark.Subject, java.util.Optional<String>> catalogued =
+                subject -> bookmarkSearch.search(subject.id()).stream()
+                        .filter(result -> result.identity().equals(subject.id()))
+                        .map(juranometria.search.SearchResult::label).findFirst();
+        juranometria.ui.bookmark.BookmarkOpener opener = new juranometria.ui.bookmark.BookmarkOpener(
+                controller, meridian, modules.workingSelection(), modules::inventory,
+                () -> chart.paintImmediately(0, 0, chart.getWidth(), chart.getHeight()),
+                chart::offersCloserField, bodySwitches, catalogued);
+        juranometria.ui.bookmark.BookmarksPanel bookmarksPanel = new juranometria.ui.bookmark.BookmarksPanel(
+                companionWords, bookmarks, new juranometria.ui.bookmark.BookmarksPanel.Host() {
+                    @Override
+                    public juranometria.ui.bookmark.BookmarkOpener.Report open(
+                            juranometria.bookmark.Node.Bookmark bookmark) {
+                        return opener.open(bookmark);
+                    }
+
+                    @Override
+                    public juranometria.ui.bookmark.BookmarkCapture.Proposal now() {
+                        juranometria.chart.WorkingSelection working = modules.workingSelection();
+                        return juranometria.ui.bookmark.BookmarkCapture.propose(controller.state(),
+                                working.members(), working.lead(), meridian.observer());
+                    }
+                }, juranometria.ui.bookmark.SubjectNames.of(pageWords, bookmarkSearch));
+        companion.addTab(juranometria.ui.bookmark.BookmarksPanel.TAB,
+                companionWords.say("companion.tab.bookmarks"), bookmarksPanel);
+        Runnable showBookmarks = () -> {
+            if (!companion.isVisible()) {
+                companion.showCompanion(true);
+            }
+            companion.tabs().choose(juranometria.ui.bookmark.BookmarksPanel.TAB);
+        };
         toolbar.attachControls(toggleCompanion);
         // Built after the controls seam, because the menu
         // says its words in the same language the seam
@@ -945,6 +1011,9 @@ public final class JUranometriaMain {
         // selection cleared as Search clears it, and the requested-position
         // cross left at the place until a search, a selection or Clear
         // selection ends it.
+        AppMenuBar.addBookmarks(frame.getJMenuBar(),
+                juranometria.ui.language.InterfaceText.forLanguage(
+                        language.interfaceLanguage()), addBookmark, showBookmarks);
         AppMenuBar.addCentreOnCoordinates(frame.getJMenuBar(),
                 juranometria.ui.language.InterfaceText.forLanguage(
                         language.interfaceLanguage()),

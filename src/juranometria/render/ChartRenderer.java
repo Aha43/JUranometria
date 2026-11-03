@@ -415,8 +415,12 @@ public final class ChartRenderer {
                 new GeographyDetailPolicy(
                         scene.viewport().fieldWidthDegrees()));
         for (Star star : scene.stars()) {
+            // The page's named target is drawn whatever the limit (#681,
+            // ruled C-3 on #497): a star primary has the single-target
+            // privilege a deep-sky target has, without raising the limit
+            // for any other star.
             if (star.magnitude() > scene.limitingMagnitude()
-                    && !anchors.holds(star)) {
+                    && !anchors.holds(star) && !star.id().equals(scene.targetIdentity())) {
                 continue;
             }
             projection.project(star.position()).ifPresent(plane -> {

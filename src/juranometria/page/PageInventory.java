@@ -218,9 +218,13 @@ public final class PageInventory {
         return PageVisibility.DRAWN;
     }
 
-    /** A star is drawn when the page's magnitude limit admits it. */
+    /**
+     * A star is drawn when the page's magnitude limit admits it, or when
+     * it is the page's named target (#681, ruled C-3 on #497).
+     */
     private static PageVisibility visibilityOf(ChartScene scene, Star star) {
         return star.magnitude() > scene.limitingMagnitude()
+                && !star.id().equals(scene.targetIdentity())
                 ? PageVisibility.BELOW_LIMIT : PageVisibility.DRAWN;
     }
 

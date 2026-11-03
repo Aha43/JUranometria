@@ -192,3 +192,12 @@ eca567947e8b1ce1	app/AppMenuBar.java	solarSystemMenu	declared name used, but nev
 041b17d2b25a7590	ui/ReferenceInk.java	.inFront	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 0047df4d742f3dc1	ui/ReferenceInk.java	.partlyShadowed	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
 13f435fa064d37f2	ui/ReferenceInk.java	.shadowed	declared name used, but never at a known sink	identifier	a stable key, path or stored value; no language changes it
+a4a1f23f3eeface2	bookmark/BookmarkDocument.java	writtenBy	declared name used, but never at a known sink	identifier	a key of the bookmark document (#681); no language changes it
+df0c2548109a8d0e	bookmark/BookmarkDocument.java	id	declared name used, but never at a known sink	identifier	a key of the bookmark document (#681); no language changes it
+52541312e8fe66af	bookmark/BookmarkDocument.java	type	declared name used, but never at a known sink	identifier	a key of the bookmark document (#681); no language changes it
+67ed5d962691bfc9	bookmark/BookmarkLibrary.java	root	declared name used, but never at a known sink	identifier	the permanent root folder's id in the bookmark library (#681); the interface names the root in its own words
+af0cd4c12191440b	app/AppMenuBar.java	bookmarksMenu	declared name used, but never at a known sink	identifier	the Bookmarks menu's component name (#681); a stable key, no language changes it
+d90e057d3f317516	app/AppMenuBar.java	addBookmarkItem	declared name used, but never at a known sink	identifier	the Add Bookmark item's component name (#681); a stable key
+b8dcdf4c9159ce66	ui/bookmark/AddBookmarkDialog.java	bookmarkAdd	declared name used, but never at a known sink	identifier	the add dialog's Add button name (#681); a stable key
+4ffc24f9103bc1a8	ui/bookmark/BookmarkCapture.java	[a-z]+(\\.[a-z]+)*	declared name used, but never at a known sink	identifier	the pattern of the modules' body identities (#681); never shown
+abf350c18dc78690	ui/bookmark/BookmarksPanel.java	bookmarks	declared name used, but never at a known sink	identifier	the Bookmarks tab's stable id in the Controller (#681), under which the chosen tab is remembered; no language changes it

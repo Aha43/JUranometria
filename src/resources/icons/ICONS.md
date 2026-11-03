@@ -27,6 +27,7 @@ Icons bundled:
 | `adjustments-horizontal.svg` | Toolbar: show or hide the Controller (#675) |
 | `stack-2.svg` | Toolbar and Controller: Accumulate selection (#675) |
 | `sparkles.svg` | Toolbar and Controller: Emphasis (#675) |
+| `bookmark-plus.svg` | Toolbar: Add Bookmark… (#681; fetched 2026-11-02, 469 bytes, sha256 71fea9dc55178bd5d454288552fb3f31b87aa38c86d21b8094ee209c8d9dfa68) |
 
 Add an icon only when a real action needs it: add the name to the
 script's `ICONS` list, re-run the script, and record it here.

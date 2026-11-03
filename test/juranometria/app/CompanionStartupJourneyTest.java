@@ -82,8 +82,8 @@ class CompanionStartupJourneyTest {
                         // groups as first introduced, and a box pressed in
                         // it is what the Chart Options dialog then shows.
                         assertEquals(List.of(juranometria.ui.companion.CompanionTabs.CHART,
-                                "solarsystem"), companion.tabs().ids(),
-                                "Chart, then Solar System");
+                                "solarsystem", juranometria.ui.bookmark.BookmarksPanel.TAB),
+                                companion.tabs().ids(), "Chart, then Solar System, then Bookmarks (#681)");
                         assertEquals(juranometria.ui.companion.CompanionTabs.CHART,
                                 companion.tabs().chosen(), "a fresh profile opens Chart");
                         assertEquals(List.of("Chart", "Solar System"),

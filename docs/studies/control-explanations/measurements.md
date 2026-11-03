@@ -21,6 +21,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Toolbar | JButton | (icon only) | Unavailable: V 8.0 is the faintest magnitude limit | Unavailable: V 8.0 is the faintest magnitude limit the atlas draws | dynamic |
 | Toolbar | JButton | (icon only) | Reset view: back to the atlas's first page | Returns the chart to where every reader begins, and clears the search; what the chart d... | hovered |
 | Toolbar | JButton | (icon only) | Place and Time: where and when the chart is drawn for | Opens the window that sets your location and the instant the chart is drawn for; the sa... | hovered |
+| Toolbar | JButton | (icon only) | Add Bookmark: save this view (<key:AddBookmarkDialog>) | Opens the window that saves the view you are looking at as a bookmark; the same window ... | hovered |
 | Toolbar | JToggleButton | (icon only) | Show the Inspector: what the selected mark is (<key:inspector>) | Hidden; press to open the panel that identifies what you selected and lists what is on ... | dynamic |
 | Toolbar | JToggleButton | (icon only) | Show the Controller: the chart's controls beside the chart | Hidden; press to open the JUranometria Controller window, which keeps the chart's contr... | hovered |
 | Toolbar | JToggleButton | (icon only) | When on, choosing objects adds them to the working selection and choosing them again re... | Off, each object you choose replaces the working selection; on, it is added to it, and ... | hovered |
@@ -43,6 +44,14 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Emphasis | JCheckBox | Constellation figures | &mdash; | Raises it on the chart - Constellation figures - until it is unchecked, Normal is chose... | self-explanatory |
 | Emphasis | JCheckBox | Solar System labels | &mdash; | Raises it on the chart - Solar System labels - until it is unchecked, Normal is chosen,... | self-explanatory |
 | Emphasis | JButton | Normal | &mdash; | Settles every raised structure at once, so the chart returns to its ordinary design. | self-explanatory |
+| Bookmarks | JTextArea | (read-only text) | &mdash; | What the chosen bookmark holds: its view, objects, time, place and note. | self-explanatory |
+| Bookmarks | JButton | Open | Show this bookmark on the chart | Opens the chosen bookmark: its view, and its saved time and place if it has them; its m... | hovered |
+| Bookmarks | JButton | Edit... | Change the chosen bookmark or folder | Changes the chosen bookmark's title, folder, objects, main object, time, place or note,... | hovered |
+| Bookmarks | JButton | Delete... | Delete the chosen entry, after asking | Deletes the chosen bookmark or folder after asking. Deleting a folder keeps what it hol... | hovered |
+| Bookmarks | JButton | New Folder... | Make a folder here | Makes a new folder in the chosen folder, or beside the chosen bookmark. | hovered |
+| Bookmarks | JButton | Move up | Move the chosen entry one place up | Moves the chosen bookmark or folder one place earlier in its folder; nothing it holds c... | hovered |
+| Bookmarks | JButton | Move down | Move the chosen entry one place down | Moves the chosen bookmark or folder one place later in its folder; nothing it holds cha... | hovered |
+| Bookmarks | JButton | Library | Export or restore the whole library | Opens the library menu: Export Bookmarks... writes every bookmark to a file you choose;... | hovered |
 | Menu bar | JMenu | File | &mdash; | Exporting the chart and changing application settings | self-explanatory |
 | Menu bar | JMenuItem | Export Chart Sheet... | &mdash; | Exports this chart as an SVG, PDF or PNG sheet | self-explanatory |
 | Menu bar | JMenuItem | Settings... | &mdash; | Opens the window for appearance and for the languages used by the application and chart | self-explanatory |
@@ -59,9 +68,27 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Menu bar | JCheckBoxMenuItem | Moon on the chart | &mdash; | Shows or hides the Moon on the chart, drawn at its true size where it stands for the ch... | self-explanatory |
 | Menu bar | JMenuItem | Sun... | Where the Sun is, for the chart time and place | Opens a table of the Sun's computed position, height above the horizon, distance and ap... | hovered |
 | Menu bar | JMenuItem | Moon... | Where the Moon is, for the chart time and place | Opens a table of the Moon's computed position, height above the horizon, distance, appa... | hovered |
+| Menu bar | JMenu | Bookmarks | &mdash; | Saved views of the sky: adding the view you are looking at | self-explanatory |
+| Menu bar | JMenuItem | Add Bookmark... | &mdash; | Saves the view you are looking at as a bookmark, with the objects, chart time and place... | self-explanatory |
+| Menu bar | JMenuItem | Show Bookmarks | &mdash; | Opens the Controller at its Bookmarks tab, where your bookmarks are listed, opened and ... | self-explanatory |
 | Menu bar | JMenu | Help | &mdash; | Information about this application and what it is built on | self-explanatory |
 | Menu bar | JMenuItem | Copy View Report | Copies a text description of this view, including the observing place and instant from ... | Copies a text description of this view to the clipboard, including the observing place ... | hovered |
 | Menu bar | JMenuItem | About JUranometria | &mdash; | Opens the window with the application's name, version and the software and data it is b... | self-explanatory |
+| Add Bookmark | JTextField | (a field) | The bookmark's name, in your own words | The name the bookmark is listed under. It is your text and is kept as you type it. | hovered |
+| Add Bookmark | JComboBox | (Folder) | Where the bookmark is kept | The folder the bookmark is added to, at its end; Bookmarks itself is the top of the lib... | hovered |
+| Add Bookmark | JList | (Objects in the bookmark) | The selected objects, in the order you want them | The objects saved with the bookmark, from your selection, in your order. Move them up o... | hovered |
+| Add Bookmark | JButton | Move up | Move the chosen object one place up | Moves the chosen object one place earlier in the bookmark's order. | hovered |
+| Add Bookmark | JButton | Move down | Move the chosen object one place down | Moves the chosen object one place later in the bookmark's order. | hovered |
+| Add Bookmark | JButton | Remove | Leave the chosen object out of the bookmark | Leaves the chosen object out of the bookmark; the chart's selection is not changed. | hovered |
+| Add Bookmark | JComboBox | (Main object) | The object selected when the bookmark opens | The one object selected when the bookmark opens, or None to leave the selection as it i... | hovered |
+| Add Bookmark | JCheckBox | Include chart time | Save this chart time with the bookmark | Ticked, the bookmark sets the chart to exactly this instant when it opens; unticked, it... | hovered |
+| Add Bookmark | JTextField | (a field) | The instant to keep, in UTC: year-month-day hour:minute:second | The chart's time is proposed; type another to keep, such as your camera's time of an ob... | hovered |
+| Add Bookmark | JRadioButton | Event time | The instant belongs to what the sky shows | The instant is part of the configuration itself, such as a conjunction, an occultation ... | hovered |
+| Add Bookmark | JRadioButton | Observation time | The instant is when you observed | The instant is the time of your own observation, confirmed by you. | hovered |
+| Add Bookmark | JCheckBox | Include place: latitude 59.913°, longitude 10.752° east | Save this place with the bookmark | Ticked, the bookmark sets the chart's place when it opens, for that session only; your ... | hovered |
+| Add Bookmark | JTextArea | (a field) | Your own note, kept with the bookmark | An optional note in your own words, kept exactly as you write it. | hovered |
+| Add Bookmark | JButton | Cancel | &mdash; | Closes this window without saving a bookmark. | self-explanatory |
+| Add Bookmark | JButton | Add | Save the bookmark | Saves the bookmark to your library and closes this window. | hovered |
 | Chart Options | JTabbedPane | Deep sky, Stars, Constellations, Chart | &mdash; | Four groups of choices: deep sky, stars, constellations and chart elements. | self-explanatory |
 | Chart Options | FlatScrollableTabButton | (icon only) | Show later tabs | The tab titles do not all fit in the window; this brings the rest into view. | hovered |
 | Chart Options | FlatScrollableTabButton | (icon only) | Show earlier tabs | The tab titles do not all fit in the window; this brings the rest into view. | hovered |
@@ -159,7 +186,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 
 ## The audit
 
-**142 operable controls** across 17 surfaces: **87** hovered, **12** dynamic, **43** left to their own visible words, **0 undecided**.
+**169 operable controls** across 19 surfaces: **109** hovered, **12** dynamic, **48** left to their own visible words, **0 undecided**.
 
 **0** say the same words twice - a tooltip read back as a description. The seam refuses it, so this is zero or a finding.
 

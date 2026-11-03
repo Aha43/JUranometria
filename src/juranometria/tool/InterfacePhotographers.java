@@ -94,6 +94,11 @@ public final class InterfacePhotographers {
         GENERATORS.put("PageLanguageSheetMain",
                 new Photographer("page-language-strings.md",
                         SheetCapture.Kind.FIXED_CANVAS));
+        // The bookmark surfaces (#681): the tab, the add and edit dialogs and
+        // the unreadable state, each on a canvas of its own width.
+        GENERATORS.put("BookmarksSheetMain",
+                new Photographer("bookmarks-strings.md",
+                        SheetCapture.Kind.FIXED_CANVAS));
     }
 
     /** Every photographer, by simple class name, in registry order. */
