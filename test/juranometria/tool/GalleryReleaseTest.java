@@ -63,7 +63,9 @@ class GalleryReleaseTest {
                     // 6.0.0 likewise.
                     "5.5.0",
                     // 6.1.0 likewise.
-                    "6.0.0");
+                    "6.0.0",
+                    // 6.2.0 likewise.
+                    "6.1.0");
 
     /** The chart-sheet study: SVG metadata, PDF producer, PNG text. */
     private static final Path SHEETS =
