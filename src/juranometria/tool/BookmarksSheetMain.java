@@ -107,12 +107,12 @@ public final class BookmarksSheetMain {
                 and the questions and reports the surfaces ask and give in
                 dialogs of their own.
 
-                **Norsk bokmål — new, awaiting review.** Every Norwegian
-                word on these surfaces was written for #681 and has not yet
-                been read by a person who reads the language; it is put to
-                the owner at the stage 4 checkpoint. The manifest's
-                *reviewed* status covers the interface as it stood before
-                these surfaces, not these words.
+                **Norsk bokmål — reviewed.** Every Norwegian word on these
+                surfaces was written for #681 and read in full by the owner,
+                who reads the language, at the stage 4 checkpoint on
+                2026-11-03 ("Looks good"; no changes asked). This is
+                linguistic judgement, not corroboration against a source:
+                these are original words written for this application.
 
                 """);
         Path scratch = Files.createTempDirectory("bookmark-sheets");
