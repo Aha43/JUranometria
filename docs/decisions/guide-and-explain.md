@@ -363,3 +363,35 @@ again before #692's evidence lands.
   failure and the 49 aborts as described in §9.
 
 No gate and no CI has run on this head.
+
+## 11. The ruling
+
+The owner's ruling of 2026-11-04 on #690, recorded as given: "Rule C-1
+through C-16 as recommended, run gates 1 and 3-7".
+
+So, as §4, §5 and §7 recommend:
+
+- **Pointer navigation:**
+  - The modes are Free, Horizontal only, Vertical only and Locked (C-1).
+  - Shift, read at the press of a free drag, keeps that one drag to its dominant axis, decided once (C-2).
+  - The modes apply to every projection, to mouse and trackpad press-drag alike. The wheel is untouched and no keyboard panning is added (C-3).
+  - Free at every launch, not stored, and Lock zoom unchanged (C-4).
+  - A Controller section after Chart controls, plus a spoken sentence and a view-report line when the mode is not Free. No toolbar button, menu item or shortcut (C-5).
+  - The words in both languages are as drafted, the Norwegian included (C-6).
+- **The selected-object box:**
+  - It is called *Selected object* / *Valgt objekt*, is on by default, and has its own store. It appears in Chart Options → Chart and in the Controller (C-7).
+  - It describes the working selection's lead while that lead is on the page. An additive click on empty sky keeps the box on the lead (C-8).
+  - The facts are bounded, with no size or phase in version one (C-9).
+  - A selected body gets a selection ring (C-10).
+  - This box prefers the upper left, amending ruling 3 on #556 for this box only (C-11).
+  - Clean chart hides the box, amending its "touches nothing else" ruling (C-12).
+  - The lead's mark travels to paper with the box (C-13).
+  - It is built on one sealed `SelectedObjectFacts`, shared with the Inspector, with no free text (C-14).
+- **What is left for later:**
+  - The Inspector's English-only type line and bare Bayer letter are left for a later issue (C-15).
+- **The stages:**
+  - #691, then #692, each with unqualified candidates, and one final seven-gate qualification in #693 (C-16).
+- **For this study head:**
+  - Gates 1 and 3-7 once, with gate 2 skipped for the stated causal reason.
+  - Then CI once and the pinned merge of the study.
+  - No production implementation before that landing.
