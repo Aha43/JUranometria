@@ -220,7 +220,7 @@ public final class GuideAndExplainStudyMain {
                 + " a hand's wobble of ±" + fmt0(WOBBLE_PX) + " px across it - solved one by"
                 + " one against the press-time grab exactly as production's drag solves them."
                 + " *Grab off target* is how far the grabbed sky ends from the pixel the mode"
-                + " asked for. *Probe* is a star that stood " + fmt0(PROBE_OFFSET_PX) + " px"
+                + " asked for, to the hundredth of a pixel. *Probe* is a star that stood " + fmt0(PROBE_OFFSET_PX) + " px"
                 + " above the press: how far it ends up moved vertically, and horizontally, on"
                 + " the page. *Modifier* is a free drag with the proposed modifier held: the"
                 + " axis is decided at the first movement of at least " + fmt0(THRESHOLD_PX)
@@ -785,8 +785,8 @@ public final class GuideAndExplainStudyMain {
         p("### " + c.name());
         p("");
         p(c.caption() + (fallbackNote.isEmpty() ? "" : " " + fallbackNote)
-                + (box.isEmpty() ? " No box." : " The box stands in the "
-                        + box.get().placed().corner().token().replace('-', ' ') + ".")
+                + (box.isEmpty() ? " No box." : " A box is drawn; its corner depends on"
+                        + " this desktop's fonts and stands in `platform.md`.")
                 + (chart.pageOffsetY() > 0 ? " The page is "
                         + chart.currentScene().viewport().heightPx() + " px tall in a "
                         + c.height() + " px window." : ""));
@@ -1369,8 +1369,13 @@ public final class GuideAndExplainStudyMain {
         return s.equals("-0.000") ? "0.000" : s;
     }
 
-    /** A residual that should be nothing, shown as nothing when it is. */
+    /**
+     * A residual that should be nothing, to the hundredth of a pixel: its
+     * last digits are the platform's floating point (CI's Linux runner
+     * read 1e-4 px where this desktop read nothing), not a fact of the rule.
+     */
     private static String small(double v) {
-        return v < 1e-6 ? "0" : String.format(Locale.ROOT, "%.1e", v);
+        String s = String.format(Locale.ROOT, "%.2f", v);
+        return s.equals("-0.00") ? "0.00" : s;
     }
 }

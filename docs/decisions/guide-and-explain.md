@@ -145,12 +145,15 @@ yielding, speech and paper are production's; the words are the study's.
   often are.)
 - **Off the page and back.** With M 42 selected and the page panned to RA
   120°, the box and the ring are gone; panned back, both return.
-- **Placement under today's rule** puts the box in the lower right on
-  ordinary pages, the upper right on a 520 px window (the lower right meets
-  the title block), and the upper left only when the magnitude key holds
-  the upper right. On the 600 × 1900 letterboxed page the English box
-  stands in the lower right and the Norwegian in the upper right: the
-  Norwegian page's lower right does not clear its other furniture.
+- **Placement under today's rule depends on the desktop's fonts**, which
+  size the title block and the box. On this desktop (`platform.md`) the box
+  stands in the lower right on ordinary pages, in the upper right on a
+  520 px window (the lower right meets the title block), and in the upper
+  left only when the magnitude key holds the upper right. On the 600 ×
+  1900 letterboxed page the English box stands in the lower right and the
+  Norwegian in the upper right here, and CI's Linux fonts swap the two
+  (the first CI run on #694). The portable report therefore says only
+  whether a box is drawn; its corner is the platform record's.
 - **Paper.** Exported to A4 with the working selection, the sheet carries
   the box and the ring; the SVG holds the heading as text. Exported as
   today's default (no working selection), the box travels but the ring

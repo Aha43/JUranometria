@@ -4,60 +4,60 @@ Sprint 57, issue #690, road #689. A measured study: it changes no production beh
 
 ## 1. Pointer navigation, through the production solver
 
-Each gesture starts at the page centre of a 900 × 700 px page and passes 20 waypoints - the straight line to its end with a hand's wobble of ±12 px across it - solved one by one against the press-time grab exactly as production's drag solves them. *Grab off target* is how far the grabbed sky ends from the pixel the mode asked for. *Probe* is a star that stood 200 px above the press: how far it ends up moved vertically, and horizontally, on the page. *Modifier* is a free drag with the proposed modifier held: the axis is decided at the first movement of at least 4 px, from its larger component, and kept for that drag.
+Each gesture starts at the page centre of a 900 × 700 px page and passes 20 waypoints - the straight line to its end with a hand's wobble of ±12 px across it - solved one by one against the press-time grab exactly as production's drag solves them. *Grab off target* is how far the grabbed sky ends from the pixel the mode asked for, to the hundredth of a pixel. *Probe* is a star that stood 200 px above the press: how far it ends up moved vertically, and horizontally, on the page. *Modifier* is a free drag with the proposed modifier held: the axis is decided at the first movement of at least 4 px, from its larger component, and kept for that drag.
 
 | page | gesture | mode | Δα (°) | Δδ (°) | grab off target (px) | probe ↕ (px) | probe ↔ (px) | solves | held at a pole | refused |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| m42-8 | mostly across | free | 1.788 | 0.264 | 0 | 29.9 | 200.6 | 20 | 0 | 0 |
-| m42-8 | mostly across | horizontal | 1.788 | -0.003 | 0 | -0.1 | 200.6 | 20 | 0 | 0 |
-| m42-8 | mostly across | vertical | 0.000 | 0.267 | 0 | 30.0 | 0.0 | 20 | 0 | 0 |
-| m42-8 | mostly across | locked | 0.000 | 0.000 | 0 | 0.0 | 0.0 | 0 | 0 | 0 |
-| m42-8 | mostly across | modifier (horizontal) | 1.788 | -0.003 | 0 | -0.1 | 200.6 | 20 | 0 | 0 |
-| m42-8 | mostly up | free | 0.179 | -1.602 | 0 | -180.3 | 20.1 | 20 | 0 | 0 |
-| m42-8 | mostly up | horizontal | 0.179 | 0.000 | 0 | 0.0 | 20.1 | 20 | 0 | 0 |
-| m42-8 | mostly up | vertical | 0.000 | -1.602 | 0 | -180.3 | 0.0 | 20 | 0 | 0 |
-| m42-8 | mostly up | locked | 0.000 | 0.000 | 0 | 0.0 | 0.0 | 0 | 0 | 0 |
-| m42-8 | mostly up | modifier (vertical) | 0.000 | -1.602 | 0 | -180.3 | 0.0 | 20 | 0 | 0 |
-| dec60-8 | mostly across | free | 3.562 | 0.315 | 0 | 30.2 | 189.2 | 20 | 0 | 0 |
-| dec60-8 | mostly across | horizontal | 3.562 | 0.048 | 0 | 0.2 | 189.2 | 20 | 0 | 0 |
-| dec60-8 | mostly across | vertical | 0.000 | 0.267 | 0 | 30.0 | 0.0 | 20 | 0 | 0 |
-| dec60-8 | mostly across | locked | 0.000 | 0.000 | 0 | 0.0 | 0.0 | 0 | 0 | 0 |
-| dec60-8 | mostly across | modifier (horizontal) | 3.562 | 0.048 | 0 | 0.2 | 189.2 | 20 | 0 | 0 |
-| dec60-8 | mostly up | free | 0.356 | -1.602 | 0 | -180.3 | 18.9 | 20 | 0 | 0 |
-| dec60-8 | mostly up | horizontal | 0.356 | 0.000 | 0 | 0.0 | 18.9 | 20 | 0 | 0 |
-| dec60-8 | mostly up | vertical | 0.000 | -1.602 | 0 | -180.3 | 0.0 | 20 | 0 | 0 |
-| dec60-8 | mostly up | locked | 0.000 | 0.000 | 0 | 0.0 | 0.0 | 0 | 0 | 0 |
-| dec60-8 | mostly up | modifier (vertical) | 0.000 | -1.602 | 0 | -180.3 | 0.0 | 20 | 0 | 0 |
-| polar-8 | mostly across | free | 20.880 | 0.594 | 0 | 43.0 | 128.9 | 20 | 0 | 0 |
-| polar-8 | mostly across | horizontal | 20.880 | 0.327 | 0 | 13.0 | 128.9 | 20 | 0 | 0 |
-| polar-8 | mostly across | vertical | 0.000 | 0.267 | 0 | 30.0 | 0.0 | 20 | 0 | 0 |
-| polar-8 | mostly across | locked | 0.000 | 0.000 | 0 | 0.0 | 0.0 | 0 | 0 | 0 |
-| polar-8 | mostly across | modifier (horizontal) | 20.880 | 0.327 | 0 | 13.0 | 128.9 | 20 | 0 | 0 |
-| polar-8 | mostly up | free | 2.043 | -1.599 | 0 | -180.2 | 12.9 | 20 | 0 | 0 |
-| polar-8 | mostly up | horizontal | 2.044 | 0.003 | 0 | 0.1 | 12.9 | 20 | 0 | 0 |
-| polar-8 | mostly up | vertical | 0.000 | -1.602 | 0 | -180.3 | 0.0 | 20 | 0 | 0 |
-| polar-8 | mostly up | locked | 0.000 | 0.000 | 0 | 0.0 | 0.0 | 0 | 0 | 0 |
-| polar-8 | mostly up | modifier (vertical) | 0.000 | -1.602 | 0 | -180.3 | 0.0 | 20 | 0 | 0 |
-| overview-60 | mostly across | free | 17.847 | 3.473 | 0 | 33.1 | 155.6 | 20 | 0 | 0 |
-| overview-60 | mostly across | horizontal | 17.853 | 1.398 | 0 | 2.6 | 156.3 | 20 | 0 | 0 |
-| overview-60 | mostly across | vertical | 0.000 | 2.047 | 0 | 30.4 | 0.0 | 20 | 0 | 0 |
-| overview-60 | mostly across | locked | 0.000 | 0.000 | 0 | 0.0 | 0.0 | 0 | 0 | 0 |
-| overview-60 | mostly across | modifier (horizontal) | 17.853 | 1.398 | 0 | 2.6 | 156.3 | 20 | 0 | 0 |
-| overview-60 | mostly up | free | 1.761 | -12.224 | 0 | -184.9 | 16.1 | 20 | 0 | 0 |
-| overview-60 | mostly up | horizontal | 1.781 | 0.014 | 0 | 0.0 | 15.7 | 20 | 0 | 0 |
-| overview-60 | mostly up | vertical | 0.000 | -12.235 | 0 | -184.9 | 0.0 | 20 | 0 | 0 |
-| overview-60 | mostly up | locked | 0.000 | 0.000 | 0 | 0.0 | 0.0 | 0 | 0 | 0 |
-| overview-60 | mostly up | modifier (vertical) | 0.000 | -12.235 | 0 | -184.9 | 0.0 | 20 | 0 | 0 |
-| globe-180 | mostly across | free | 55.979 | 23.386 | 0 | 90.2 | 48.0 | 20 | 0 | 0 |
-| globe-180 | mostly across | horizontal | 55.979 | 16.305 | 0 | 55.2 | 48.0 | 20 | 0 | 0 |
-| globe-180 | mostly across | vertical | 0.000 | 5.465 | 0 | 24.1 | 0.0 | 20 | 0 | 0 |
-| globe-180 | mostly across | locked | 0.000 | 0.000 | 0 | 0.0 | 0.0 | 0 | 0 | 0 |
-| globe-180 | mostly across | modifier (horizontal) | 55.979 | 16.305 | 0 | 55.2 | 48.0 | 20 | 0 | 0 |
-| globe-180 | mostly up | free | 4.754 | -34.833 | 0 | -103.2 | 4.8 | 20 | 0 | 0 |
-| globe-180 | mostly up | horizontal | 4.754 | 0.097 | 0 | 0.3 | 4.8 | 20 | 0 | 0 |
-| globe-180 | mostly up | vertical | 0.000 | -34.850 | 0 | -103.2 | 0.0 | 20 | 0 | 0 |
-| globe-180 | mostly up | locked | 0.000 | 0.000 | 0 | 0.0 | 0.0 | 0 | 0 | 0 |
-| globe-180 | mostly up | modifier (vertical) | 0.000 | -34.850 | 0 | -103.2 | 0.0 | 20 | 0 | 0 |
+| m42-8 | mostly across | free | 1.788 | 0.264 | 0.00 | 29.9 | 200.6 | 20 | 0 | 0 |
+| m42-8 | mostly across | horizontal | 1.788 | -0.003 | 0.00 | -0.1 | 200.6 | 20 | 0 | 0 |
+| m42-8 | mostly across | vertical | 0.000 | 0.267 | 0.00 | 30.0 | 0.0 | 20 | 0 | 0 |
+| m42-8 | mostly across | locked | 0.000 | 0.000 | 0.00 | 0.0 | 0.0 | 0 | 0 | 0 |
+| m42-8 | mostly across | modifier (horizontal) | 1.788 | -0.003 | 0.00 | -0.1 | 200.6 | 20 | 0 | 0 |
+| m42-8 | mostly up | free | 0.179 | -1.602 | 0.00 | -180.3 | 20.1 | 20 | 0 | 0 |
+| m42-8 | mostly up | horizontal | 0.179 | 0.000 | 0.00 | 0.0 | 20.1 | 20 | 0 | 0 |
+| m42-8 | mostly up | vertical | 0.000 | -1.602 | 0.00 | -180.3 | 0.0 | 20 | 0 | 0 |
+| m42-8 | mostly up | locked | 0.000 | 0.000 | 0.00 | 0.0 | 0.0 | 0 | 0 | 0 |
+| m42-8 | mostly up | modifier (vertical) | 0.000 | -1.602 | 0.00 | -180.3 | 0.0 | 20 | 0 | 0 |
+| dec60-8 | mostly across | free | 3.562 | 0.315 | 0.00 | 30.2 | 189.2 | 20 | 0 | 0 |
+| dec60-8 | mostly across | horizontal | 3.562 | 0.048 | 0.00 | 0.2 | 189.2 | 20 | 0 | 0 |
+| dec60-8 | mostly across | vertical | 0.000 | 0.267 | 0.00 | 30.0 | 0.0 | 20 | 0 | 0 |
+| dec60-8 | mostly across | locked | 0.000 | 0.000 | 0.00 | 0.0 | 0.0 | 0 | 0 | 0 |
+| dec60-8 | mostly across | modifier (horizontal) | 3.562 | 0.048 | 0.00 | 0.2 | 189.2 | 20 | 0 | 0 |
+| dec60-8 | mostly up | free | 0.356 | -1.602 | 0.00 | -180.3 | 18.9 | 20 | 0 | 0 |
+| dec60-8 | mostly up | horizontal | 0.356 | 0.000 | 0.00 | 0.0 | 18.9 | 20 | 0 | 0 |
+| dec60-8 | mostly up | vertical | 0.000 | -1.602 | 0.00 | -180.3 | 0.0 | 20 | 0 | 0 |
+| dec60-8 | mostly up | locked | 0.000 | 0.000 | 0.00 | 0.0 | 0.0 | 0 | 0 | 0 |
+| dec60-8 | mostly up | modifier (vertical) | 0.000 | -1.602 | 0.00 | -180.3 | 0.0 | 20 | 0 | 0 |
+| polar-8 | mostly across | free | 20.880 | 0.594 | 0.00 | 43.0 | 128.9 | 20 | 0 | 0 |
+| polar-8 | mostly across | horizontal | 20.880 | 0.327 | 0.00 | 13.0 | 128.9 | 20 | 0 | 0 |
+| polar-8 | mostly across | vertical | 0.000 | 0.267 | 0.00 | 30.0 | 0.0 | 20 | 0 | 0 |
+| polar-8 | mostly across | locked | 0.000 | 0.000 | 0.00 | 0.0 | 0.0 | 0 | 0 | 0 |
+| polar-8 | mostly across | modifier (horizontal) | 20.880 | 0.327 | 0.00 | 13.0 | 128.9 | 20 | 0 | 0 |
+| polar-8 | mostly up | free | 2.043 | -1.599 | 0.00 | -180.2 | 12.9 | 20 | 0 | 0 |
+| polar-8 | mostly up | horizontal | 2.044 | 0.003 | 0.00 | 0.1 | 12.9 | 20 | 0 | 0 |
+| polar-8 | mostly up | vertical | 0.000 | -1.602 | 0.00 | -180.3 | 0.0 | 20 | 0 | 0 |
+| polar-8 | mostly up | locked | 0.000 | 0.000 | 0.00 | 0.0 | 0.0 | 0 | 0 | 0 |
+| polar-8 | mostly up | modifier (vertical) | 0.000 | -1.602 | 0.00 | -180.3 | 0.0 | 20 | 0 | 0 |
+| overview-60 | mostly across | free | 17.847 | 3.473 | 0.00 | 33.1 | 155.6 | 20 | 0 | 0 |
+| overview-60 | mostly across | horizontal | 17.853 | 1.398 | 0.00 | 2.6 | 156.3 | 20 | 0 | 0 |
+| overview-60 | mostly across | vertical | 0.000 | 2.047 | 0.00 | 30.4 | 0.0 | 20 | 0 | 0 |
+| overview-60 | mostly across | locked | 0.000 | 0.000 | 0.00 | 0.0 | 0.0 | 0 | 0 | 0 |
+| overview-60 | mostly across | modifier (horizontal) | 17.853 | 1.398 | 0.00 | 2.6 | 156.3 | 20 | 0 | 0 |
+| overview-60 | mostly up | free | 1.761 | -12.224 | 0.00 | -184.9 | 16.1 | 20 | 0 | 0 |
+| overview-60 | mostly up | horizontal | 1.781 | 0.014 | 0.00 | 0.0 | 15.7 | 20 | 0 | 0 |
+| overview-60 | mostly up | vertical | 0.000 | -12.235 | 0.00 | -184.9 | 0.0 | 20 | 0 | 0 |
+| overview-60 | mostly up | locked | 0.000 | 0.000 | 0.00 | 0.0 | 0.0 | 0 | 0 | 0 |
+| overview-60 | mostly up | modifier (vertical) | 0.000 | -12.235 | 0.00 | -184.9 | 0.0 | 20 | 0 | 0 |
+| globe-180 | mostly across | free | 55.979 | 23.386 | 0.00 | 90.2 | 48.0 | 20 | 0 | 0 |
+| globe-180 | mostly across | horizontal | 55.979 | 16.305 | 0.00 | 55.2 | 48.0 | 20 | 0 | 0 |
+| globe-180 | mostly across | vertical | 0.000 | 5.465 | 0.00 | 24.1 | 0.0 | 20 | 0 | 0 |
+| globe-180 | mostly across | locked | 0.000 | 0.000 | 0.00 | 0.0 | 0.0 | 0 | 0 | 0 |
+| globe-180 | mostly across | modifier (horizontal) | 55.979 | 16.305 | 0.00 | 55.2 | 48.0 | 20 | 0 | 0 |
+| globe-180 | mostly up | free | 4.754 | -34.833 | 0.00 | -103.2 | 4.8 | 20 | 0 | 0 |
+| globe-180 | mostly up | horizontal | 4.754 | 0.097 | 0.00 | 0.3 | 4.8 | 20 | 0 | 0 |
+| globe-180 | mostly up | vertical | 0.000 | -34.850 | 0.00 | -103.2 | 0.0 | 20 | 0 | 0 |
+| globe-180 | mostly up | locked | 0.000 | 0.000 | 0.00 | 0.0 | 0.0 | 0 | 0 | 0 |
+| globe-180 | mostly up | modifier (vertical) | 0.000 | -34.850 | 0.00 | -103.2 | 0.0 | 20 | 0 | 0 |
 
 Read across a row: under *horizontal* the grabbed sky stays exactly on the press row (the wobble is gone), yet the probe star 200 px above it still moves up or down the page wherever the page's north-up grid is not parallel to the screen's rows - most at the polar page, the overview and the globe. A horizontal-only drag keeps a *screen row*, never a parallel of declination, and never the ecliptic or the equator. *Locked* never pans. *Held at a pole* counts waypoints the solver held to its feasibility boundary near a pole - the production rule, unchanged by any mode.
 
@@ -142,7 +142,7 @@ The rule each page follows, as proposed: a box appears exactly when the subject 
 
 ### star-named-8
 
-A named star: Betelgeuse at 8°. The box stands in the lower right.
+A named star: Betelgeuse at 8°. A box is drawn; its corner depends on this desktop's fonts and stands in `platform.md`.
 
 ![](star-named-8.png)
 
@@ -153,7 +153,7 @@ A named star: Betelgeuse at 8°. The box stands in the lower right.
 
 ### star-named-8-nb
 
-The same in Norwegian. The box stands in the lower right.
+The same in Norwegian. A box is drawn; its corner depends on this desktop's fonts and stands in `platform.md`.
 
 ![](star-named-8-nb.png)
 
@@ -164,7 +164,7 @@ The same in Norwegian. The box stands in the lower right.
 
 ### star-catalogue-4
 
-A star with a catalogue identity only: the brightest such star on Betelgeuse's 4° page. (TYC 128-1551-2.) The box stands in the lower right.
+A star with a catalogue identity only: the brightest such star on Betelgeuse's 4° page. (TYC 128-1551-2.) A box is drawn; its corner depends on this desktop's fonts and stands in `platform.md`.
 
 ![](star-catalogue-4.png)
 
@@ -174,7 +174,7 @@ A star with a catalogue identity only: the brightest such star on Betelgeuse's 4
 
 ### deep-sky-8
 
-A deep-sky object: M 42 at 8°. The box stands in the lower right.
+A deep-sky object: M 42 at 8°. A box is drawn; its corner depends on this desktop's fonts and stands in `platform.md`.
 
 ![](deep-sky-8.png)
 
@@ -185,7 +185,7 @@ A deep-sky object: M 42 at 8°. The box stands in the lower right.
 
 ### deep-sky-8-nb
 
-The same in Norwegian. The box stands in the lower right.
+The same in Norwegian. A box is drawn; its corner depends on this desktop's fonts and stands in `platform.md`.
 
 ![](deep-sky-8-nb.png)
 
@@ -196,7 +196,7 @@ The same in Norwegian. The box stands in the lower right.
 
 ### deep-sky-8-black
 
-The same on the black sky. The box stands in the lower right.
+The same on the black sky. A box is drawn; its corner depends on this desktop's fonts and stands in `platform.md`.
 
 ![](deep-sky-8-black.png)
 
@@ -207,7 +207,7 @@ The same on the black sky. The box stands in the lower right.
 
 ### refused-label
 
-A deep-sky object whose label the page refuses (star labels are almost never refused; deep-sky labels often are): the first page of 8 tried (the Pleiades at 2° and 4°, then Betelgeuse, Antares and Deneb at 18° and at 36°) with such an object - 2° at RA 56.869°, Dec 24.105°. (Mel022.) The box stands in the lower right.
+A deep-sky object whose label the page refuses (star labels are almost never refused; deep-sky labels often are): the first page of 8 tried (the Pleiades at 2° and 4°, then Betelgeuse, Antares and Deneb at 18° and at 36°) with such an object - 2° at RA 56.869°, Dec 24.105°. (Mel022.) A box is drawn; its corner depends on this desktop's fonts and stands in `platform.md`.
 
 ![](refused-label.png)
 
@@ -218,7 +218,7 @@ A deep-sky object whose label the page refuses (star labels are almost never ref
 
 ### narrow-8
 
-Narrow: M 42 in a 520 px window. The box stands in the upper right.
+Narrow: M 42 in a 520 px window. A box is drawn; its corner depends on this desktop's fonts and stands in `platform.md`.
 
 ![](narrow-8.png)
 
@@ -229,7 +229,7 @@ Narrow: M 42 in a 520 px window. The box stands in the upper right.
 
 ### narrow-8-nb
 
-The same in Norwegian. The box stands in the upper right.
+The same in Norwegian. A box is drawn; its corner depends on this desktop's fonts and stands in `platform.md`.
 
 ![](narrow-8-nb.png)
 
@@ -240,7 +240,7 @@ The same in Norwegian. The box stands in the upper right.
 
 ### narrow-key-8
 
-Narrow with the magnitude key on. The box stands in the upper left.
+Narrow with the magnitude key on. A box is drawn; its corner depends on this desktop's fonts and stands in `platform.md`.
 
 ![](narrow-key-8.png)
 
@@ -251,7 +251,7 @@ Narrow with the magnitude key on. The box stands in the upper left.
 
 ### wide-60
 
-Wide: M 42 on the 60° overview. The box stands in the lower right.
+Wide: M 42 on the 60° overview. A box is drawn; its corner depends on this desktop's fonts and stands in `platform.md`.
 
 ![](wide-60.png)
 
@@ -262,7 +262,7 @@ Wide: M 42 on the 60° overview. The box stands in the lower right.
 
 ### globe-180
 
-The celestial globe, M 42 selected. The box stands in the lower right.
+The celestial globe, M 42 selected. A box is drawn; its corner depends on this desktop's fonts and stands in `platform.md`.
 
 ![](globe-180.png)
 
@@ -273,7 +273,7 @@ The celestial globe, M 42 selected. The box stands in the lower right.
 
 ### letterbox-120
 
-Letterboxed: a 120° page in a 600 × 1900 window. The box stands in the lower right. The page is 1697 px tall in a 1900 px window.
+Letterboxed: a 120° page in a 600 × 1900 window. A box is drawn; its corner depends on this desktop's fonts and stands in `platform.md`. The page is 1697 px tall in a 1900 px window.
 
 ![](letterbox-120.png)
 
@@ -284,7 +284,7 @@ Letterboxed: a 120° page in a 600 × 1900 window. The box stands in the lower r
 
 ### letterbox-120-nb
 
-The same in Norwegian. The box stands in the upper right. The page is 1697 px tall in a 1900 px window.
+The same in Norwegian. A box is drawn; its corner depends on this desktop's fonts and stands in `platform.md`. The page is 1697 px tall in a 1900 px window.
 
 ![](letterbox-120-nb.png)
 
@@ -303,7 +303,7 @@ The subject NGC 1976 is not on this page.
 
 ### back-on-page-8
 
-Panned back: the box returns with the subject. The box stands in the lower right.
+Panned back: the box returns with the subject. A box is drawn; its corner depends on this desktop's fonts and stands in `platform.md`.
 
 ![](back-on-page-8.png)
 
@@ -314,7 +314,7 @@ Panned back: the box returns with the subject. The box stands in the lower right
 
 ### moon-chart-time
 
-The Moon at chart time, at 3°. The box stands in the lower right.
+The Moon at chart time, at 3°. A box is drawn; its corner depends on this desktop's fonts and stands in `platform.md`.
 
 ![](moon-chart-time.png)
 
@@ -324,7 +324,7 @@ The Moon at chart time, at 3°. The box stands in the lower right.
 
 ### venus-chart-time
 
-Venus at chart time, at 3°. The box stands in the lower right.
+Venus at chart time, at 3°. A box is drawn; its corner depends on this desktop's fonts and stands in `platform.md`.
 
 ![](venus-chart-time.png)
 
@@ -334,7 +334,7 @@ Venus at chart time, at 3°. The box stands in the lower right.
 
 ### below-horizon
 
-A body below the drawn horizon, with the mathematical horizon on: the first of sun, moon, venus, mercury, mars standing below it at the instant - moon. The box stands in the lower right.
+A body below the drawn horizon, with the mathematical horizon on: the first of sun, moon, venus, mercury, mars standing below it at the instant - moon. A box is drawn; its corner depends on this desktop's fonts and stands in `platform.md`.
 
 ![](below-horizon.png)
 
