@@ -111,6 +111,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | src/juranometria/tool/EclipticCandidateStudyMain.java | default-font | UNPROTECTED: default-font |
 | src/juranometria/tool/EclipticControlStudyMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/tool/ExportSheetDialogSheetMain.java | look-and-feel | UNPROTECTED: look-and-feel |
+| src/juranometria/tool/GuideAndExplainStudyMain.java | look-and-feel, default-font | protected-locally |
 | src/juranometria/tool/InspectorSheetMain.java | look-and-feel, preferences | UNPROTECTED: look-and-feel |
 | src/juranometria/tool/JovianContractStudyMain.java | look-and-feel, default-font | protected-locally |
 | src/juranometria/tool/MenuSheetMain.java | look-and-feel, preferences | UNPROTECTED: look-and-feel |
@@ -134,7 +135,7 @@ The study mains and the packaged acceptance are single-JVM runs: a look and feel
 | src/juranometria/tool/WorkingSelectionMockupMain.java | look-and-feel, default-font | UNPROTECTED: look-and-feel, default-font |
 | src/juranometria/app/PackagedAcceptanceMain.java | look-and-feel, locale, preferences | protected-locally |
 
-**36 evidence executables** touch process-wide state; 24 carry an unpaired touch.
+**37 evidence executables** touch process-wide state; 24 carry an unpaired touch.
 
 ## Display-dependent tests, their premises and their routes
 
@@ -236,10 +237,10 @@ Whether a particular read happens on the event thread is control flow, which tex
 
 | class | the contract | files |
 |---|---|---|
-| deterministic-report | regenerates byte-for-byte on the same tree | 193 |
+| deterministic-report | regenerates byte-for-byte on the same tree | 195 |
 | byte-exact-fixture | committed data with provenance; never regenerated casually | 397 |
 | captured-evidence | an operating-system screenshot, digest-pinned; a re-capture is a provenance event | 13 |
-| renderer-drawn | byte-reproducible per machine; production ink, no widgets | 950 |
+| renderer-drawn | byte-reproducible per machine; production ink, no widgets | 976 |
 | widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 186 |
 | session-photograph | a packed window on a display; drifts between desktop sessions | 3 |
 
