@@ -369,6 +369,9 @@ public final class CompanionSheetMain {
                                 // The ecliptic's switch (#675): the Chart group
                                 // shows the Ecliptic box a reader gets.
                                 juranometria.ui.ecliptic.EclipticSession.of(new juranometria.ecliptic.EclipticModule(), juranometria.ui.ecliptic.EclipticStore.forNode(node)),
+                                // The selected-object box's switch (#692).
+                                new juranometria.ui.selection.SelectedObjectSwitch(
+                                        juranometria.ui.selection.SelectedObjectStore.forNode(node)),
                                 words).inCompanion(companionStore,
                                 words));
                 // Sections by name, not by position (#675 reordered them).

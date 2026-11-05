@@ -198,12 +198,29 @@ public final class ExportSheetSession {
                 request.workingSelection()
                         ? SheetInk.working(chart, working.members(),
                                 working.lead(), options.options())
-                        : ChartRenderer.ReferenceLayer.NONE,
+                        : leadWithItsBox(chart, working, options),
                 request, destination, replace, said, emphasized,
                 // The modules' furniture, as paper carries it (#259,
                 // ruling 6 on #556): no control, the frozen-instant
                 // sentence in its place, and a sentence for the file.
                 chart.paperFurniture()));
+    }
+
+    /**
+     * The lead's mark alone, when the selected-object box is on the page
+     * and so travels to the sheet (#692, ruled C-13 on #690): box and mark
+     * together on paper as on the screen, whatever the working-selection
+     * choice; the rest of the set travels only when asked.
+     */
+    private static ChartRenderer.ReferenceLayer leadWithItsBox(ChartComponent chart,
+            WorkingSelection working, ChartOptionsController options) {
+        boolean boxDrawn = chart.renderedFurniture().stream().anyMatch(drawn ->
+                drawn.placed().furniture().key().endsWith(
+                        "/" + juranometria.ui.selection.SelectedObjectFacts.IDENTITY));
+        String lead = working.lead();
+        return boxDrawn && lead != null
+                ? SheetInk.working(chart, java.util.List.of(lead), lead, options.options())
+                : ChartRenderer.ReferenceLayer.NONE;
     }
 
     /**

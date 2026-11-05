@@ -1166,7 +1166,7 @@ said.say("inspector.tab.page.explain"));
      * with a catalogue.
      */
     static String magnitudeValue(double magnitude) {
-        return String.format(Locale.ROOT, "%.2f", magnitude);
+        return juranometria.ui.selection.SelectedObjectFacts.magnitudeValue(magnitude);
     }
 
     /** The extent and orientation, or the fact that neither is known. */
@@ -1250,8 +1250,7 @@ said.say("inspector.tab.page.explain"));
     }
 
     private static java.util.Optional<String> messierName(DeepSkyObject dso) {
-        return dso.aliases().stream().filter(a -> a.startsWith("M "))
-                .findFirst();
+        return juranometria.ui.selection.SelectedObjectFacts.messierName(dso);
     }
 
     private String nameOf(ChartScene scene, Selection.Object candidate) {
@@ -1342,16 +1341,9 @@ said.say("inspector.tab.page.explain"));
         }
     }
 
+    /** One place, one way: the formatting the selected-object box shares (#692). */
     private static String coordinates(SkyPosition position) {
-        double hours = position.raDegrees() / 15.0;
-        int h = (int) hours;
-        double minutes = (hours - h) * 60.0;
-        char sign = position.decDegrees() < 0 ? '−' : '+';
-        double absolute = Math.abs(position.decDegrees());
-        int d = (int) absolute;
-        int m = (int) Math.round((absolute - d) * 60.0);
-        return String.format(Locale.ROOT, "%dh %04.1fm   %c%d° %02d′",
-                h, minutes, sign, d, m);
+        return juranometria.ui.selection.SelectedObjectFacts.coordinates(position);
     }
 
     /** The panel, wrapped so callers need not know its type. */

@@ -34,8 +34,24 @@ import java.util.List;
  *     gains while the box is drawn on it
  */
 public record Furniture(String identity, String heading, List<String> lines,
-                        Action action, String spoken, String described) {
+                        Action action, String spoken, String described,
+                        boolean upperLeftFirst) {
 
+    /**
+     * A box in the chart's ruled corner order (ruling 3 on #556): every
+     * box before #692.
+     */
+    public Furniture(String identity, String heading, List<String> lines,
+                     Action action, String spoken, String described) {
+        this(identity, heading, lines, action, spoken, described, false);
+    }
+
+    /**
+     * @param upperLeftFirst the box asks for the upper left first, then the
+     *     upper right, then the lower right, and is placed after every box
+     *     in the ruled order (#692, ruling C-11 on #690: the selected-object
+     *     box alone)
+     */
     public Furniture {
         if (identity == null || identity.isBlank()) {
             throw new IllegalArgumentException(

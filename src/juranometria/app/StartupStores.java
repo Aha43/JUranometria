@@ -52,7 +52,37 @@ record StartupStores(AppearanceStore appearance,
                      juranometria.ui.ZoomLockStore zoomLock,
                      juranometria.ui.companion.CompanionStore companion,
                      juranometria.ui.ChartChromeStore chartChrome,
-                     juranometria.ui.ChartWindowStore chartWindow) {
+                     juranometria.ui.ChartWindowStore chartWindow,
+                     juranometria.ui.selection.SelectedObjectStore selectedObject) {
+
+    /**
+     * Every store but the selected-object box's (#692), which then
+     * remembers nothing between processes - each start before #692.
+     */
+    StartupStores(AppearanceStore appearance,
+                  ChartOptionsStore chartOptions,
+                  SkyLanguageStore language,
+                  PlaceStore place,
+                  EclipticStore ecliptic,
+                  juranometria.ui.solar.SunChartStore sunChart,
+                  juranometria.ui.solar.MercuryChartStore mercuryChart,
+                  juranometria.ui.solar.VenusChartStore venusChart,
+                  juranometria.ui.solar.MoonChartStore moonChart,
+                  juranometria.ui.solar.JovianChartStore jovianChart,
+                  juranometria.ui.solar.SaturnChartStore saturnChart,
+                  juranometria.ui.solar.MarsChartStore marsChart,
+                  juranometria.ui.solar.UranusChartStore uranusChart,
+                  juranometria.ui.solar.NeptuneChartStore neptuneChart,
+                  juranometria.ui.ZoomLockStore zoomLock,
+                  juranometria.ui.companion.CompanionStore companion,
+                  juranometria.ui.ChartChromeStore chartChrome,
+                  juranometria.ui.ChartWindowStore chartWindow) {
+        this(appearance, chartOptions, language, place, ecliptic, sunChart,
+                mercuryChart, venusChart, moonChart, jovianChart, saturnChart,
+                marsChart, uranusChart, neptuneChart, zoomLock, companion,
+                chartChrome, chartWindow,
+                juranometria.ui.selection.SelectedObjectStore.inMemory());
+    }
 
     StartupStores {
         require(appearance, "appearance");
@@ -73,6 +103,7 @@ record StartupStores(AppearanceStore appearance,
         require(companion, "companion window");
         require(chartChrome, "chart chrome");
         require(chartWindow, "chart window");
+        require(selectedObject, "selected-object box");
     }
 
     /**
@@ -97,7 +128,8 @@ record StartupStores(AppearanceStore appearance,
                 juranometria.ui.ZoomLockStore.user(),
                 juranometria.ui.companion.CompanionStore.user(),
                 juranometria.ui.ChartChromeStore.user(),
-                juranometria.ui.ChartWindowStore.user());
+                juranometria.ui.ChartWindowStore.user(),
+                juranometria.ui.selection.SelectedObjectStore.user());
     }
 
     private static void require(Object store, String what) {

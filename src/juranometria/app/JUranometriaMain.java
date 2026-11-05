@@ -310,6 +310,19 @@ public final class JUranometriaMain {
         juranometria.ui.ecliptic.EclipticSession.Switch eclipticSwitch =
                 juranometria.ui.ecliptic.EclipticSession.of(ecliptic,
                         eclipticStore);
+        // The selected-object box (#692, ruled C-7 to C-14 on #690): the
+        // last selected object explained on the chart, on by default and
+        // remembered in a store of its own; one switch for both Chart
+        // Options hosts.
+        juranometria.ui.selection.SelectedObjectSwitch selectedObjectSwitch =
+                new juranometria.ui.selection.SelectedObjectSwitch(stores.selectedObject());
+        juranometria.ui.selection.SelectedObjectBox selectedObjectBox =
+                modules.attach(new juranometria.ui.selection.SelectedObjectBox(
+                        selectedObjectSwitch,
+                        identity -> chart.renderedBodies().stream().anyMatch(body ->
+                                body.identity().equals(identity) && body.belowHorizon()),
+                        juranometria.ui.language.InterfaceText.forLanguage(
+                                language.interfaceLanguage())));
         inspector.showPageView(onThisPage.panel());
         inspector.onClose(chart::requestFocusInWindow);
         // One switch, three ways to reach it: the toolbar button, the
@@ -754,7 +767,7 @@ public final class JUranometriaMain {
                 new ChartOptionsControls(chartOptions,
                         () -> ChartOptionsDialog.restoreConfirmed(companion,
                                 companionWords),
-                        eclipticSwitch,
+                        eclipticSwitch, selectedObjectSwitch,
                         companionWords).inCompanion(companionStore,
                         companionWords));
         // Place and Time and the Controller's switch (#675, stage 2): one
@@ -859,7 +872,7 @@ public final class JUranometriaMain {
                             com.formdev.flatlaf.FlatLaf.updateUI();
                         }, language, Atlas.names(), interfaces),
                 () -> ChartOptionsDialog.open(frame, chartOptions,
-                        eclipticSwitch,
+                        eclipticSwitch, selectedObjectSwitch,
                         juranometria.ui.language.InterfaceText.forLanguage(
                                 language.interfaceLanguage())),
                 () -> AboutDialog.open(frame,
@@ -1137,14 +1150,19 @@ public final class JUranometriaMain {
             public void componentShown(java.awt.event.ComponentEvent event) {
                 toolbarItem.setSelected(true);
                 chromeStore.saveToolbarShown(true);
+                selectedObjectBox.chromeShown(true);
             }
 
             @Override
             public void componentHidden(java.awt.event.ComponentEvent event) {
                 toolbarItem.setSelected(false);
                 chromeStore.saveToolbarShown(false);
+                // Clean chart hides the selected-object box with the
+                // toolbar and restores it with it (#692, C-12).
+                selectedObjectBox.chromeShown(false);
             }
         });
+        selectedObjectBox.chromeShown(toolbar.isVisible());
         javax.swing.JCheckBoxMenuItem inspectorItem =
                 AppMenuBar.inspectorItem(frame.getJMenuBar());
         if (inspectorItem != null) {

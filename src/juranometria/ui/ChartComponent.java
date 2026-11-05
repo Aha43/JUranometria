@@ -688,7 +688,8 @@ public final class ChartComponent extends JComponent {
             juranometria.module.Furniture box = owned.furniture();
             boxes.add(new juranometria.render.ChartFurniture(owned.key(),
                     box.heading(), box.lines(),
-                    box.action() == null ? null : box.action().label()));
+                    box.action() == null ? null : box.action().label(),
+                    box.upperLeftFirst()));
         }
         return java.util.List.copyOf(boxes);
     }
@@ -710,7 +711,7 @@ public final class ChartComponent extends JComponent {
             }
             boxes.add(new juranometria.sheet.ChartSheet.Furnished(
                     new juranometria.render.ChartFurniture(owned.key(), box.heading(),
-                            lines, null),
+                            lines, null, box.upperLeftFirst()),
                     box.described()));
         }
         return java.util.List.copyOf(boxes);
@@ -1378,6 +1379,14 @@ public final class ChartComponent extends JComponent {
             // never both treatments for one object.
             for (String member : selected) {
                 renderer.drawSelectionHighlight(g2, scene, drawn, member);
+                // A selected body gets the ring too (#692, C-10).
+                for (ReferenceInk.BodyPlacement body : drawnBodies) {
+                    if (body.identity().equals(member)) {
+                        juranometria.render.ChartRenderer.drawBodySelectionHighlight(g2,
+                                body.centre().x(), body.centre().y(), body.disc(),
+                                chartOptions.palette());
+                    }
+                }
             }
             // After the chart, never inside it: working crosses are
             // an interaction overlay and not catalogue symbols, so

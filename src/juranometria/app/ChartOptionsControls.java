@@ -40,6 +40,8 @@ public final class ChartOptionsControls {
 
     /** The Ecliptic box's name (#675), for tests and journeys to find. */
     public static final String ECLIPTIC_BOX = "eclipticBox";
+    /** The Selected object box's component name (#692). */
+    public static final String SELECTED_OBJECT_BOX = "selectedObjectBox";
 
     /** One subject: a stable id, its title in the host's language, its column. */
     public record Subject(String id, String title, JComponent column) {
@@ -50,6 +52,8 @@ public final class ChartOptionsControls {
     private final ChartOptionsController.Subscription following;
     private final JCheckBox eclipticBox;
     private final Runnable eclipticFollowing;
+    private final JCheckBox selectedObjectBox;
+    private final Runnable selectedObjectFollowing;
 
     /**
      * @param restoreConfirmed asked before Restore Defaults is applied;
@@ -71,6 +75,20 @@ public final class ChartOptionsControls {
     public ChartOptionsControls(ChartOptionsController controller,
                                 BooleanSupplier restoreConfirmed,
                                 juranometria.ui.ecliptic.EclipticSession.Switch ecliptic,
+                                juranometria.ui.language.InterfaceText said) {
+        this(controller, restoreConfirmed, ecliptic, null, said);
+    }
+
+    /**
+     * The same, with the selected-object box's switch (#692, ruled C-7 on
+     * #690): the Chart checklist then carries a Selected object box after
+     * the title block, which drives the switch and follows it; the switch's
+     * own store is the one persisted authority. Null leaves the box out.
+     */
+    public ChartOptionsControls(ChartOptionsController controller,
+                                BooleanSupplier restoreConfirmed,
+                                juranometria.ui.ecliptic.EclipticSession.Switch ecliptic,
+                                juranometria.ui.selection.SelectedObjectSwitch selectedObject,
                                 juranometria.ui.language.InterfaceText said) {
         ChartOptions initial = controller.options();
 
@@ -183,6 +201,31 @@ public final class ChartOptionsControls {
         }
         eclipticBox = eclipticBox_;
         eclipticFollowing = eclipticFollowing_;
+        // The selected-object box (#692): like the ecliptic's, a switch of
+        // its own outside the chart options, remembered by its own store.
+        JCheckBox selectedBox_ = null;
+        Runnable selectedFollowing_ = () -> { };
+        if (selectedObject != null) {
+            // No chart-keyboard letter: none was ruled for this box (#692),
+            // so its explanation promises no key, as every other box's
+            // promises its own.
+            JCheckBox box = new JCheckBox(said.say("chartoptions.selectedObject.label"),
+                    selectedObject.showing());
+            box.setMnemonic('j');
+            box.setOpaque(false);
+            box.setAlignmentX(0.0f);
+            box.getAccessibleContext().setAccessibleName(
+                    said.say("chartoptions.selectedObject.a11y"));
+            juranometria.ui.Explain.control(box,
+                    said.say("chartoptions.selectedObject.hover"),
+                    said.say("chartoptions.selectedObject.explain"));
+            box.setName(SELECTED_OBJECT_BOX);
+            box.addActionListener(event -> selectedObject.toggle());
+            selectedFollowing_ = selectedObject.follow(box::setSelected);
+            selectedBox_ = box;
+        }
+        selectedObjectBox = selectedBox_;
+        selectedObjectFollowing = selectedFollowing_;
 
         // Each box and the switch it is: its keyboard id, the one
         // registry both routes read.
@@ -248,11 +291,8 @@ public final class ChartOptionsControls {
                         marked(ChartOptionsDialog.column(figures, boundaries,
                                 names))),
                 new Subject("chart", said.say("chartoptions.tab.chart"),
-                        marked(ChartOptionsDialog.column(eclipticBox == null
-                                ? new JComponent[] {grid, titleBlock,
-                                        magnitudeKey, blackSky}
-                                : new JComponent[] {grid, eclipticBox,
-                                        titleBlock, magnitudeKey, blackSky}))));
+                        marked(ChartOptionsDialog.column(chartColumn(grid, eclipticBox,
+                                titleBlock, selectedObjectBox, magnitudeKey, blackSky)))));
 
         restoreDefaults = new JButton(said.say("chartoptions.defaults.label"));
         restoreDefaults.setMnemonic('R');
@@ -269,6 +309,12 @@ public final class ChartOptionsControls {
                 controller.restoreDefaults();
             }
         });
+    }
+
+    /** The Chart checklist in its order, leaving out a switch a host does not carry. */
+    private static JComponent[] chartColumn(JComponent... boxes) {
+        return java.util.Arrays.stream(boxes).filter(java.util.Objects::nonNull)
+                .toArray(JComponent[]::new);
     }
 
     private static JComponent marked(JComponent column) {
@@ -323,6 +369,7 @@ public final class ChartOptionsControls {
             } else if (shown[0]) {
                 following.cancel();
                 eclipticFollowing.run();
+                selectedObjectFollowing.run();
             }
         });
     }
@@ -376,5 +423,11 @@ public final class ChartOptionsControls {
     public void release() {
         following.cancel();
         eclipticFollowing.run();
+        selectedObjectFollowing.run();
+    }
+
+    /** The Selected object box (#692), or null when built without its switch. */
+    public JCheckBox selectedObjectBox() {
+        return selectedObjectBox;
     }
 }

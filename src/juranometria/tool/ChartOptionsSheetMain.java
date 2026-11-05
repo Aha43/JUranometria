@@ -124,7 +124,11 @@ public final class ChartOptionsSheetMain {
                             language, new juranometria.app
                                     .ChartOptionsController(juranometria.app
                                     .ChartOptionsStore.forNode(node)),
-                            juranometria.ui.ecliptic.EclipticSession.of(new juranometria.ecliptic.EclipticModule(), juranometria.ui.ecliptic.EclipticStore.forNode(node)));
+                            juranometria.ui.ecliptic.EclipticSession.of(new juranometria.ecliptic.EclipticModule(), juranometria.ui.ecliptic.EclipticStore.forNode(node)),
+                            // And the selected-object box's switch (#692),
+                            // on by default as a reader first gets it.
+                            new juranometria.ui.selection.SelectedObjectSwitch(
+                                    juranometria.ui.selection.SelectedObjectStore.forNode(node)));
                 });
                 SwingUtilities.invokeAndWait(() -> { });
                 JComponent content =

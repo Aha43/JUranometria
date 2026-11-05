@@ -412,8 +412,13 @@ class PlaceAndTimeFurnitureTest {
         for (Class<?> type : List.of(Furniture.class, Furniture.Action.class)) {
             for (var component : type.getRecordComponents()) {
                 Class<?> carried = component.getType();
+                // One ruled preference is meaning too (#692, C-11 on #690):
+                // the selected-object box asks for the upper left first;
+                // the chart still owns every corner, size and fallback.
+                boolean preference = carried == boolean.class
+                        && component.getName().equals("upperLeftFirst");
                 assertTrue(carried == String.class || carried == List.class
-                                || carried == Furniture.Action.class,
+                                || carried == Furniture.Action.class || preference,
                         type.getSimpleName() + "." + component.getName()
                                 + " carries " + carried.getName()
                                 + ": furniture is meaning and text, never a graphics"
