@@ -42,6 +42,12 @@ arrangement at its frozen instant.
 | — | When on, choosing objects adds them to the working selection and choosing them again removes them, instead of replacing the selection. The platform's add-to-selection modifier always works. | Accumulate selection | Off, each object you choose replaces the working selection; on, it is added to it, and choosing it again takes it out. Holding the platform's add-to-selection modifier does the same whether this is on or off. |
 | — | Find an object or J2000 coordinates, e.g. M 31, NGC 224, TYC 2801-2090-1, or 0:42:44 +41:16:09 | Search the atlas | Type a Messier or NGC number, a star's catalogue identity, or a J2000 right ascension and declination, then press Enter; the chart goes there and marks an object it finds |
 | Field 8° · Stars to V 8.0 | — | Field 8° · Stars to V 8.0 | — |
+| ▾ Pointer navigation | Show or hide this section | Pointer navigation, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
+| Free | — | Free | A drag moves the chart in any direction, as it always has. |
+| Horizontal only | — | Horizontal only | A drag moves the page only across the screen, whatever the lines in the sky do. |
+| Vertical only | — | Vertical only | A drag moves the page only up and down the screen, whatever the lines in the sky do. |
+| Locked | — | Locked | Dragging does not move the chart; clicking still selects. |
+| Dragging moves the page across or up and down the screen, not along a line in the sky. Hold Shift while you drag to keep that one drag to its main direction. | — | Dragging moves the page across or up and down the screen, not along a line in the sky. Hold Shift while you drag to keep that one drag to its main direction. | — |
 | ▾ Place and Time | Show or hide this section | Place and Time, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | Latitude | — | Latitude | — |
 | 59.913 | Degrees north of the equator, e.g. 59.913; south is negative, -90 to 90 | Latitude | Degrees north of the equator, negative south, -90 to 90 |
@@ -101,6 +107,12 @@ arrangement at its frozen instant.
 | — | When on, choosing objects adds them to the working selection and choosing them again removes them, instead of replacing the selection. The platform's add-to-selection modifier always works. | Accumulate selection | Off, each object you choose replaces the working selection; on, it is added to it, and choosing it again takes it out. Holding the platform's add-to-selection modifier does the same whether this is on or off. |
 | — | Find an object or J2000 coordinates, e.g. M 31, NGC 224, TYC 2801-2090-1, or 0:42:44 +41:16:09 | Search the atlas | Type a Messier or NGC number, a star's catalogue identity, or a J2000 right ascension and declination, then press Enter; the chart goes there and marks an object it finds |
 | Field 8° · Stars to V 8.0 | — | Field 8° · Stars to V 8.0 | — |
+| ▾ Pointer navigation | Show or hide this section | Pointer navigation, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
+| Free | — | Free | A drag moves the chart in any direction, as it always has. |
+| Horizontal only | — | Horizontal only | A drag moves the page only across the screen, whatever the lines in the sky do. |
+| Vertical only | — | Vertical only | A drag moves the page only up and down the screen, whatever the lines in the sky do. |
+| Locked | — | Locked | Dragging does not move the chart; clicking still selects. |
+| Dragging moves the page across or up and down the screen, not along a line in the sky. Hold Shift while you drag to keep that one drag to its main direction. | — | Dragging moves the page across or up and down the screen, not along a line in the sky. Hold Shift while you drag to keep that one drag to its main direction. | — |
 | ▾ Place and Time | Show or hide this section | Place and Time, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | Latitude | — | Latitude | — |
 | 59.913 | Degrees north of the equator, e.g. 59.913; south is negative, -90 to 90 | Latitude | Degrees north of the equator, negative south, -90 to 90 |
@@ -160,6 +172,12 @@ arrangement at its frozen instant.
 | — | When on, choosing objects adds them to the working selection and choosing them again removes them, instead of replacing the selection. The platform's add-to-selection modifier always works. | Accumulate selection | Off, each object you choose replaces the working selection; on, it is added to it, and choosing it again takes it out. Holding the platform's add-to-selection modifier does the same whether this is on or off. |
 | — | Find an object or J2000 coordinates, e.g. M 31, NGC 224, TYC 2801-2090-1, or 0:42:44 +41:16:09 | Search the atlas | Type a Messier or NGC number, a star's catalogue identity, or a J2000 right ascension and declination, then press Enter; the chart goes there and marks an object it finds |
 | Field 8° · Stars to V 8.0 | — | Field 8° · Stars to V 8.0 | — |
+| ▾ Pointer navigation | Show or hide this section | Pointer navigation, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
+| Free | — | Free | A drag moves the chart in any direction, as it always has. |
+| Horizontal only | — | Horizontal only | A drag moves the page only across the screen, whatever the lines in the sky do. |
+| Vertical only | — | Vertical only | A drag moves the page only up and down the screen, whatever the lines in the sky do. |
+| Locked | — | Locked | Dragging does not move the chart; clicking still selects. |
+| Dragging moves the page across or up and down the screen, not along a line in the sky. Hold Shift while you drag to keep that one drag to its main direction. | — | Dragging moves the page across or up and down the screen, not along a line in the sky. Hold Shift while you drag to keep that one drag to its main direction. | — |
 | ▸ Place and Time | Show or hide this section | Place and Time, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Emphasis | Show or hide this section | Emphasis, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▾ Chart Options | Show or hide this section | Chart Options, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
@@ -203,6 +221,12 @@ arrangement at its frozen instant.
 | — | When on, choosing objects adds them to the working selection and choosing them again removes them, instead of replacing the selection. The platform's add-to-selection modifier always works. | Accumulate selection | Off, each object you choose replaces the working selection; on, it is added to it, and choosing it again takes it out. Holding the platform's add-to-selection modifier does the same whether this is on or off. |
 | — | Find an object or J2000 coordinates, e.g. M 31, NGC 224, TYC 2801-2090-1, or 0:42:44 +41:16:09 | Search the atlas | Type a Messier or NGC number, a star's catalogue identity, or a J2000 right ascension and declination, then press Enter; the chart goes there and marks an object it finds |
 | Field 8° · Stars to V 8.0 | — | Field 8° · Stars to V 8.0 | — |
+| ▾ Pointer navigation | Show or hide this section | Pointer navigation, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
+| Free | — | Free | A drag moves the chart in any direction, as it always has. |
+| Horizontal only | — | Horizontal only | A drag moves the page only across the screen, whatever the lines in the sky do. |
+| Vertical only | — | Vertical only | A drag moves the page only up and down the screen, whatever the lines in the sky do. |
+| Locked | — | Locked | Dragging does not move the chart; clicking still selects. |
+| Dragging moves the page across or up and down the screen, not along a line in the sky. Hold Shift while you drag to keep that one drag to its main direction. | — | Dragging moves the page across or up and down the screen, not along a line in the sky. Hold Shift while you drag to keep that one drag to its main direction. | — |
 | ▾ Place and Time | Show or hide this section | Place and Time, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | Latitude | — | Latitude | — |
 | 59.913 | Degrees north of the equator, e.g. 59.913; south is negative, -90 to 90 | Latitude | Latitude must be between −90° and 90°. Kept 59.913. |
@@ -263,6 +287,12 @@ arrangement at its frozen instant.
 | — | When on, choosing objects adds them to the working selection and choosing them again removes them, instead of replacing the selection. The platform's add-to-selection modifier always works. | Accumulate selection | Off, each object you choose replaces the working selection; on, it is added to it, and choosing it again takes it out. Holding the platform's add-to-selection modifier does the same whether this is on or off. |
 | — | Find an object or J2000 coordinates, e.g. M 31, NGC 224, TYC 2801-2090-1, or 0:42:44 +41:16:09 | Search the atlas | Type a Messier or NGC number, a star's catalogue identity, or a J2000 right ascension and declination, then press Enter; the chart goes there and marks an object it finds |
 | Field 8° · Stars to V 8.0 | — | Field 8° · Stars to V 8.0 | — |
+| ▾ Pointer navigation | Show or hide this section | Pointer navigation, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
+| Free | — | Free | A drag moves the chart in any direction, as it always has. |
+| Horizontal only | — | Horizontal only | A drag moves the page only across the screen, whatever the lines in the sky do. |
+| Vertical only | — | Vertical only | A drag moves the page only up and down the screen, whatever the lines in the sky do. |
+| Locked | — | Locked | Dragging does not move the chart; clicking still selects. |
+| Dragging moves the page across or up and down the screen, not along a line in the sky. Hold Shift while you drag to keep that one drag to its main direction. | — | Dragging moves the page across or up and down the screen, not along a line in the sky. Hold Shift while you drag to keep that one drag to its main direction. | — |
 | ▸ Place and Time | Show or hide this section | Place and Time, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Emphasis | Show or hide this section | Emphasis, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▾ Chart Options | Show or hide this section | Chart Options, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
@@ -397,6 +427,12 @@ arrangement at its frozen instant.
 | — | When on, choosing objects adds them to the working selection and choosing them again removes them, instead of replacing the selection. The platform's add-to-selection modifier always works. | Accumulate selection | Off, each object you choose replaces the working selection; on, it is added to it, and choosing it again takes it out. Holding the platform's add-to-selection modifier does the same whether this is on or off. |
 | — | Find an object or J2000 coordinates, e.g. M 31, NGC 224, TYC 2801-2090-1, or 0:42:44 +41:16:09 | Search the atlas | Type a Messier or NGC number, a star's catalogue identity, or a J2000 right ascension and declination, then press Enter; the chart goes there and marks an object it finds |
 | Field 8° · Stars to V 8.0 | — | Field 8° · Stars to V 8.0 | — |
+| ▾ Pointer navigation | Show or hide this section | Pointer navigation, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
+| Free | — | Free | A drag moves the chart in any direction, as it always has. |
+| Horizontal only | — | Horizontal only | A drag moves the page only across the screen, whatever the lines in the sky do. |
+| Vertical only | — | Vertical only | A drag moves the page only up and down the screen, whatever the lines in the sky do. |
+| Locked | — | Locked | Dragging does not move the chart; clicking still selects. |
+| Dragging moves the page across or up and down the screen, not along a line in the sky. Hold Shift while you drag to keep that one drag to its main direction. | — | Dragging moves the page across or up and down the screen, not along a line in the sky. Hold Shift while you drag to keep that one drag to its main direction. | — |
 | ▸ Place and Time | Show or hide this section | Place and Time, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▾ Emphasis | Show or hide this section | Emphasis, expanded | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | Meridian | — | Meridian | Raises it on the chart - Meridian - until it is unchecked, Normal is chosen, or it can no longer be drawn; the same choice as the toolbars Emphasis. Nothing is remembered after the atlas closes. |
@@ -450,6 +486,12 @@ arrangement at its frozen instant.
 | — | Når denne er på, legges objektene du velger til i arbeidsutvalget. Velger du et objekt på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker alltid. | Samle opp valgte objekter | Når denne er av, erstatter hvert nytt objekt arbeidsutvalget. Når den er på, legges objektet til; velger du det på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker i begge tilfeller. |
 | — | Finn et objekt eller J2000-koordinater, f.eks. M 31, NGC 224, TYC 2801-2090-1 eller 0:42:44 +41:16:09 | Søk i atlaset | Skriv et Messier- eller NGC-nummer, en stjernes katalogidentitet eller en J2000-rektascensjon og -deklinasjon, og trykk Enter. Kartet flyttes dit, og et objekt det finner, markeres. |
 | Synsfelt 8° · Stjerner til V 8.0 | — | Synsfelt 8° · Stjerner til V 8.0 | — |
+| ▾ Navigering med pekeren | Vis eller skjul denne delen | Navigering med pekeren, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
+| Fri | — | Fri | Et drag flytter kartet i alle retninger, slik det alltid har gjort. |
+| Bare vannrett | — | Bare vannrett | Et drag flytter siden bare bortover på skjermen, uansett hvordan linjene på himmelen går. |
+| Bare loddrett | — | Bare loddrett | Et drag flytter siden bare opp og ned på skjermen, uansett hvordan linjene på himmelen går. |
+| Låst | — | Låst | Å dra flytter ikke kartet; et klikk velger fortsatt. |
+| Når du drar, flyttes siden bortover eller opp og ned på skjermen, ikke langs en linje på himmelen. Hold Skift mens du drar for å holde det ene draget i hovedretningen. | — | Når du drar, flyttes siden bortover eller opp og ned på skjermen, ikke langs en linje på himmelen. Hold Skift mens du drar for å holde det ene draget i hovedretningen. | — |
 | ▾ Sted og tid | Vis eller skjul denne delen | Sted og tid, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | Breddegrad | — | Breddegrad | — |
 | 59.913 | Grader nord for ekvator, f.eks. 59.913; sørlige breddegrader er negative, -90 til 90 | Breddegrad | Grader nord for ekvator; sørlige breddegrader er negative, -90 til 90 |
@@ -509,6 +551,12 @@ arrangement at its frozen instant.
 | — | Når denne er på, legges objektene du velger til i arbeidsutvalget. Velger du et objekt på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker alltid. | Samle opp valgte objekter | Når denne er av, erstatter hvert nytt objekt arbeidsutvalget. Når den er på, legges objektet til; velger du det på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker i begge tilfeller. |
 | — | Finn et objekt eller J2000-koordinater, f.eks. M 31, NGC 224, TYC 2801-2090-1 eller 0:42:44 +41:16:09 | Søk i atlaset | Skriv et Messier- eller NGC-nummer, en stjernes katalogidentitet eller en J2000-rektascensjon og -deklinasjon, og trykk Enter. Kartet flyttes dit, og et objekt det finner, markeres. |
 | Synsfelt 8° · Stjerner til V 8.0 | — | Synsfelt 8° · Stjerner til V 8.0 | — |
+| ▾ Navigering med pekeren | Vis eller skjul denne delen | Navigering med pekeren, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
+| Fri | — | Fri | Et drag flytter kartet i alle retninger, slik det alltid har gjort. |
+| Bare vannrett | — | Bare vannrett | Et drag flytter siden bare bortover på skjermen, uansett hvordan linjene på himmelen går. |
+| Bare loddrett | — | Bare loddrett | Et drag flytter siden bare opp og ned på skjermen, uansett hvordan linjene på himmelen går. |
+| Låst | — | Låst | Å dra flytter ikke kartet; et klikk velger fortsatt. |
+| Når du drar, flyttes siden bortover eller opp og ned på skjermen, ikke langs en linje på himmelen. Hold Skift mens du drar for å holde det ene draget i hovedretningen. | — | Når du drar, flyttes siden bortover eller opp og ned på skjermen, ikke langs en linje på himmelen. Hold Skift mens du drar for å holde det ene draget i hovedretningen. | — |
 | ▾ Sted og tid | Vis eller skjul denne delen | Sted og tid, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | Breddegrad | — | Breddegrad | — |
 | 59.913 | Grader nord for ekvator, f.eks. 59.913; sørlige breddegrader er negative, -90 til 90 | Breddegrad | Grader nord for ekvator; sørlige breddegrader er negative, -90 til 90 |
@@ -568,6 +616,12 @@ arrangement at its frozen instant.
 | — | Når denne er på, legges objektene du velger til i arbeidsutvalget. Velger du et objekt på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker alltid. | Samle opp valgte objekter | Når denne er av, erstatter hvert nytt objekt arbeidsutvalget. Når den er på, legges objektet til; velger du det på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker i begge tilfeller. |
 | — | Finn et objekt eller J2000-koordinater, f.eks. M 31, NGC 224, TYC 2801-2090-1 eller 0:42:44 +41:16:09 | Søk i atlaset | Skriv et Messier- eller NGC-nummer, en stjernes katalogidentitet eller en J2000-rektascensjon og -deklinasjon, og trykk Enter. Kartet flyttes dit, og et objekt det finner, markeres. |
 | Synsfelt 8° · Stjerner til V 8.0 | — | Synsfelt 8° · Stjerner til V 8.0 | — |
+| ▾ Navigering med pekeren | Vis eller skjul denne delen | Navigering med pekeren, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
+| Fri | — | Fri | Et drag flytter kartet i alle retninger, slik det alltid har gjort. |
+| Bare vannrett | — | Bare vannrett | Et drag flytter siden bare bortover på skjermen, uansett hvordan linjene på himmelen går. |
+| Bare loddrett | — | Bare loddrett | Et drag flytter siden bare opp og ned på skjermen, uansett hvordan linjene på himmelen går. |
+| Låst | — | Låst | Å dra flytter ikke kartet; et klikk velger fortsatt. |
+| Når du drar, flyttes siden bortover eller opp og ned på skjermen, ikke langs en linje på himmelen. Hold Skift mens du drar for å holde det ene draget i hovedretningen. | — | Når du drar, flyttes siden bortover eller opp og ned på skjermen, ikke langs en linje på himmelen. Hold Skift mens du drar for å holde det ene draget i hovedretningen. | — |
 | ▸ Sted og tid | Vis eller skjul denne delen | Sted og tid, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Fremheving | Vis eller skjul denne delen | Fremheving, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▾ Kartvalg | Vis eller skjul denne delen | Kartvalg, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
@@ -611,6 +665,12 @@ arrangement at its frozen instant.
 | — | Når denne er på, legges objektene du velger til i arbeidsutvalget. Velger du et objekt på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker alltid. | Samle opp valgte objekter | Når denne er av, erstatter hvert nytt objekt arbeidsutvalget. Når den er på, legges objektet til; velger du det på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker i begge tilfeller. |
 | — | Finn et objekt eller J2000-koordinater, f.eks. M 31, NGC 224, TYC 2801-2090-1 eller 0:42:44 +41:16:09 | Søk i atlaset | Skriv et Messier- eller NGC-nummer, en stjernes katalogidentitet eller en J2000-rektascensjon og -deklinasjon, og trykk Enter. Kartet flyttes dit, og et objekt det finner, markeres. |
 | Synsfelt 8° · Stjerner til V 8.0 | — | Synsfelt 8° · Stjerner til V 8.0 | — |
+| ▾ Navigering med pekeren | Vis eller skjul denne delen | Navigering med pekeren, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
+| Fri | — | Fri | Et drag flytter kartet i alle retninger, slik det alltid har gjort. |
+| Bare vannrett | — | Bare vannrett | Et drag flytter siden bare bortover på skjermen, uansett hvordan linjene på himmelen går. |
+| Bare loddrett | — | Bare loddrett | Et drag flytter siden bare opp og ned på skjermen, uansett hvordan linjene på himmelen går. |
+| Låst | — | Låst | Å dra flytter ikke kartet; et klikk velger fortsatt. |
+| Når du drar, flyttes siden bortover eller opp og ned på skjermen, ikke langs en linje på himmelen. Hold Skift mens du drar for å holde det ene draget i hovedretningen. | — | Når du drar, flyttes siden bortover eller opp og ned på skjermen, ikke langs en linje på himmelen. Hold Skift mens du drar for å holde det ene draget i hovedretningen. | — |
 | ▾ Sted og tid | Vis eller skjul denne delen | Sted og tid, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | Breddegrad | — | Breddegrad | — |
 | 59.913 | Grader nord for ekvator, f.eks. 59.913; sørlige breddegrader er negative, -90 til 90 | Breddegrad | Breddegraden må ligge mellom −90° og 90°. Beholdt 59.913. |
@@ -671,6 +731,12 @@ arrangement at its frozen instant.
 | — | Når denne er på, legges objektene du velger til i arbeidsutvalget. Velger du et objekt på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker alltid. | Samle opp valgte objekter | Når denne er av, erstatter hvert nytt objekt arbeidsutvalget. Når den er på, legges objektet til; velger du det på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker i begge tilfeller. |
 | — | Finn et objekt eller J2000-koordinater, f.eks. M 31, NGC 224, TYC 2801-2090-1 eller 0:42:44 +41:16:09 | Søk i atlaset | Skriv et Messier- eller NGC-nummer, en stjernes katalogidentitet eller en J2000-rektascensjon og -deklinasjon, og trykk Enter. Kartet flyttes dit, og et objekt det finner, markeres. |
 | Synsfelt 8° · Stjerner til V 8.0 | — | Synsfelt 8° · Stjerner til V 8.0 | — |
+| ▾ Navigering med pekeren | Vis eller skjul denne delen | Navigering med pekeren, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
+| Fri | — | Fri | Et drag flytter kartet i alle retninger, slik det alltid har gjort. |
+| Bare vannrett | — | Bare vannrett | Et drag flytter siden bare bortover på skjermen, uansett hvordan linjene på himmelen går. |
+| Bare loddrett | — | Bare loddrett | Et drag flytter siden bare opp og ned på skjermen, uansett hvordan linjene på himmelen går. |
+| Låst | — | Låst | Å dra flytter ikke kartet; et klikk velger fortsatt. |
+| Når du drar, flyttes siden bortover eller opp og ned på skjermen, ikke langs en linje på himmelen. Hold Skift mens du drar for å holde det ene draget i hovedretningen. | — | Når du drar, flyttes siden bortover eller opp og ned på skjermen, ikke langs en linje på himmelen. Hold Skift mens du drar for å holde det ene draget i hovedretningen. | — |
 | ▸ Sted og tid | Vis eller skjul denne delen | Sted og tid, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Fremheving | Vis eller skjul denne delen | Fremheving, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▾ Kartvalg | Vis eller skjul denne delen | Kartvalg, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
@@ -805,6 +871,12 @@ arrangement at its frozen instant.
 | — | Når denne er på, legges objektene du velger til i arbeidsutvalget. Velger du et objekt på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker alltid. | Samle opp valgte objekter | Når denne er av, erstatter hvert nytt objekt arbeidsutvalget. Når den er på, legges objektet til; velger du det på nytt, tas det ut. Plattformens tast for å legge til i utvalget virker i begge tilfeller. |
 | — | Finn et objekt eller J2000-koordinater, f.eks. M 31, NGC 224, TYC 2801-2090-1 eller 0:42:44 +41:16:09 | Søk i atlaset | Skriv et Messier- eller NGC-nummer, en stjernes katalogidentitet eller en J2000-rektascensjon og -deklinasjon, og trykk Enter. Kartet flyttes dit, og et objekt det finner, markeres. |
 | Synsfelt 8° · Stjerner til V 8.0 | — | Synsfelt 8° · Stjerner til V 8.0 | — |
+| ▾ Navigering med pekeren | Vis eller skjul denne delen | Navigering med pekeren, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
+| Fri | — | Fri | Et drag flytter kartet i alle retninger, slik det alltid har gjort. |
+| Bare vannrett | — | Bare vannrett | Et drag flytter siden bare bortover på skjermen, uansett hvordan linjene på himmelen går. |
+| Bare loddrett | — | Bare loddrett | Et drag flytter siden bare opp og ned på skjermen, uansett hvordan linjene på himmelen går. |
+| Låst | — | Låst | Å dra flytter ikke kartet; et klikk velger fortsatt. |
+| Når du drar, flyttes siden bortover eller opp og ned på skjermen, ikke langs en linje på himmelen. Hold Skift mens du drar for å holde det ene draget i hovedretningen. | — | Når du drar, flyttes siden bortover eller opp og ned på skjermen, ikke langs en linje på himmelen. Hold Skift mens du drar for å holde det ene draget i hovedretningen. | — |
 | ▸ Sted og tid | Vis eller skjul denne delen | Sted og tid, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▾ Fremheving | Vis eller skjul denne delen | Fremheving, utvidet | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | Meridianen | — | Meridianen | Løfter den fram på kartet - Meridianen - til avkrysningen fjernes, Normal velges eller den ikke lenger kan tegnes; samme valg som Fremheving i verktøylinjen. Ingenting huskes etter at atlaset lukkes. |

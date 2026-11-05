@@ -39,6 +39,7 @@ public final class PanInteraction extends MouseAdapter {
 
     private final ChartComponent chart;
     private final ChartViewController controller;
+    private final PointerDrag drag;
     private final Cursor openHand;
     private final Cursor closedHand;
 
@@ -46,22 +47,42 @@ public final class PanInteraction extends MouseAdapter {
     private Point pressPoint;
     private SkyPosition grabbed;
     private boolean dragging;
+    /**
+     * The mode this gesture uses, read at the press (#691, C-2): a mode
+     * chosen mid-drag, or Shift pressed or released mid-drag, changes
+     * nothing until the next press.
+     */
+    private PointerDrag.Mode gestureMode = PointerDrag.Mode.FREE;
+    /** Shift was held at the press of a free drag: its axis is decided at the threshold. */
+    private boolean axisPending;
 
-    private PanInteraction(ChartComponent chart, ChartViewController controller) {
+    private PanInteraction(ChartComponent chart, ChartViewController controller,
+                           PointerDrag drag) {
         this.chart = chart;
         this.controller = controller;
+        this.drag = drag;
         this.openHand = handCursor(false);
         this.closedHand = handCursor(true);
     }
 
-    /** Installs grab-to-pan on the chart. */
+    /** Installs grab-to-pan on the chart, free as it always was. */
     public static PanInteraction install(ChartComponent chart,
                                          ChartViewController controller) {
-        if (chart == null || controller == null) {
+        return install(chart, controller, new PointerDrag());
+    }
+
+    /**
+     * Installs grab-to-pan on the chart, each drag constrained as
+     * {@code drag} says at its press (#691).
+     */
+    public static PanInteraction install(ChartComponent chart,
+                                         ChartViewController controller,
+                                         PointerDrag drag) {
+        if (chart == null || controller == null || drag == null) {
             throw new IllegalArgumentException(
-                    "chart and controller are required");
+                    "chart, controller and pointer drag are required");
         }
-        PanInteraction interaction = new PanInteraction(chart, controller);
+        PanInteraction interaction = new PanInteraction(chart, controller, drag);
         chart.addMouseListener(interaction);
         chart.addMouseMotionListener(interaction);
         // The cancellation contract: a gesture whose release the chart
@@ -96,6 +117,10 @@ public final class PanInteraction extends MouseAdapter {
         // page is in the same language as the page (#350).
         chart.getAccessibleContext().setAccessibleDescription(
                 chart.words().chartInstructions());
+        // A constrained or locked drag is said with the page (#691, C-5);
+        // free says nothing, so the released page's words are unchanged.
+        drag.onChange(mode -> chart.setPointerNote(
+                chart.words().pointerDragNote(mode.token())));
         return interaction;
     }
 
@@ -121,6 +146,11 @@ public final class PanInteraction extends MouseAdapter {
         // Nothing to grab where there is no sky. A press on the paper
         // around a globe's limb is not a drag that goes wrong later;
         // it is a press on nothing (#301).
+        // Locked (#691, C-1): no drag pans. The press is still the
+        // click's, which the selection interaction answers on release.
+        if (drag.mode() == PointerDrag.Mode.LOCKED) {
+            return;
+        }
         var under = skyUnder(event.getPoint());
         if (under.isEmpty()) {
             return;
@@ -128,6 +158,8 @@ public final class PanInteraction extends MouseAdapter {
         pressPoint = event.getPoint();
         grabbed = under.get();
         dragging = false;
+        gestureMode = drag.mode();
+        axisPending = gestureMode == PointerDrag.Mode.FREE && event.isShiftDown();
     }
 
     @Override
@@ -141,16 +173,30 @@ public final class PanInteraction extends MouseAdapter {
             }
             dragging = true;
             chart.setCursor(closedHand);
+            if (axisPending) {
+                // Shift held at the press: this drag keeps to the axis of
+                // its first real movement, decided once (C-2).
+                gestureMode = PointerDrag.modeFor(PointerDrag.dominant(
+                        pagePixel(pressPoint), pagePixel(event.getPoint())));
+                axisPending = false;
+            }
         }
         var scene = chart.scene();
         if (scene == null) {
             return;
         }
+        // The pixel the grabbed sky stands under: the pointer's, or its
+        // column on the press row, or its row on the press column - a
+        // statement about the screen, never about the sky (#691).
+        var pixel = PointerDrag.target(gestureMode, pagePixel(pressPoint),
+                pagePixel(event.getPoint()));
+        if (pixel.isEmpty()) {
+            return;
+        }
         // planeFromPixel depends on page size and field only - both fixed
         // during a gesture - so the press-time grab plus the current
         // pointer fully determine the solve, whatever the centre now is.
-        PlanePoint target = PanSolver.planeFromPixel(scene.viewport(),
-                pagePixel(event.getPoint()));
+        PlanePoint target = PanSolver.planeFromPixel(scene.viewport(), pixel.get());
         controller.pan(grabbed, target);
     }
 
@@ -197,7 +243,9 @@ public final class PanInteraction extends MouseAdapter {
      * reads as broken rather than as inert (review of PR #337).
      */
     private void updateHoverCursor(Point point) {
-        chart.setCursor(skyUnder(point).isPresent()
+        // Locked offers no grab, so no hand (#691, C-1).
+        chart.setCursor(drag.mode() != PointerDrag.Mode.LOCKED
+                && skyUnder(point).isPresent()
                 ? openHand : Cursor.getDefaultCursor());
     }
 

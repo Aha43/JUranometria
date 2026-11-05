@@ -238,6 +238,12 @@ public final class CompanionSheetMain {
                 window[0].addSection("chartcontrols",
                         words.say("chartcontrols.title"),
                         chrome.companionControls(chart).inCompanion());
+                // Pointer navigation directly after Chart controls (#691,
+                // ruled on #690), open the first time, Free chosen.
+                window[0].addSection("pointernavigation",
+                        words.say("pointer.title"),
+                        new juranometria.ui.PointerNavigationPanel(
+                                new juranometria.ui.PointerDrag(), words));
                 // Place and Time directly after Chart controls, then
                 // Emphasis (#525) introduced collapsed over the same chart:
                 // the application's order since #675 (stage 3).

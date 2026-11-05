@@ -53,6 +53,14 @@ public interface PageWords {
     /** How a reader is told they can move and scale the chart. */
     String chartInstructions();
 
+    /**
+     * What the page says about a constrained or locked pointer drag
+     * (#691), by the view report's token: empty for {@code free}.
+     */
+    default String pointerDragNote(String modeToken) {
+        return "";
+    }
+
     // ---- the title block, drawn on the page --------------------
 
     /**

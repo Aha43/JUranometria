@@ -104,6 +104,11 @@ public final class PageText implements PageWords {
     }
 
     @Override
+    public String pointerDragNote(String modeToken) {
+        return "free".equals(modeToken) ? "" : said.say(STEM + "pointer." + modeToken);
+    }
+
+    @Override
     public String titleCentre(String centreRa, String centreDec) {
         return said.say(STEM + "title.centre", centreRa, centreDec);
     }

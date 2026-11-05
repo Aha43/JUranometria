@@ -212,7 +212,10 @@ public final class JUranometriaMain {
         // why the decision is asked here rather than folded into
         // options state that owns no navigation.
         TargetRetirement.connect(chartOptions, chart, controller);
-        juranometria.ui.PanInteraction.install(chart, controller);
+        // Pointer navigation (#691, ruled on #690): how a drag may move the
+        // chart, the session's alone - Free at every launch, never stored.
+        juranometria.ui.PointerDrag pointerDrag = new juranometria.ui.PointerDrag();
+        juranometria.ui.PanInteraction.install(chart, controller, pointerDrag);
         // The zoom lock (Sprint 38, issue #428): one state for the
         // wheel, the toolbar's toggle and the remembered choice,
         // restored before the reader can turn a wheel, and saved on
@@ -401,6 +404,12 @@ public final class JUranometriaMain {
         companion.addSection("chartcontrols",
                 companionWords.say("chartcontrols.title"),
                 chartControls.inCompanion());
+        // Pointer navigation directly after Chart controls (#691, C-5):
+        // open the first time, its open or closed state remembered as
+        // every section's is; the choice itself is never stored.
+        companion.addSection("pointernavigation",
+                companionWords.say("pointer.title"),
+                new juranometria.ui.PointerNavigationPanel(pointerDrag, companionWords));
         // Place and Time directly after Chart controls (#675, stage 3,
         // ruled on #674): the chart's own context next to its controls.
         companion.addSection("placeandtime",
@@ -880,7 +889,8 @@ public final class JUranometriaMain {
                         () -> ViewReport.snapshot(chart, language, meridian,
                                 ecliptic, selection,
                                 modules.workingSelection(),
-                                System::getProperty),
+                                System::getProperty)
+                                .withPointerDrag(pointerDrag.mode().token()),
                         CopyViewReport.SYSTEM,
                         reason -> {
                             juranometria.ui.language.InterfaceText said =

@@ -302,7 +302,7 @@ public final class ChartComponent extends JComponent {
         scene = assembler.assemble(viewState, getWidth(), pageHeight);
         assembledWidth = getWidth();
         assembledHeight = getHeight();
-        getAccessibleContext().setAccessibleDescription(describe(scene));
+        getAccessibleContext().setAccessibleDescription(withPointerNote(describedBase = describe(scene)));
         // Consumers that describe the page - the inspector - need to
         // know it changed, because what the page can say about the
         // selection changes with it (issue #170).
@@ -482,6 +482,35 @@ public final class ChartComponent extends JComponent {
                     .append(words.bodyState(moon.state())).append('.');
         }
         return said.toString();
+    }
+
+    /**
+     * What the page says about how a drag moves it (#691, C-5): nothing
+     * while the drag is free, a sentence while it is constrained or locked.
+     */
+    private String pointerNote = "";
+
+    /**
+     * Sets the sentence the page adds about the pointer drag, empty for a
+     * free drag, and says it at once.
+     */
+    public void setPointerNote(String note) {
+        pointerNote = note == null ? "" : note;
+        if (describedBase != null) {
+            getAccessibleContext().setAccessibleDescription(withPointerNote(describedBase));
+        }
+    }
+
+    /** The current pointer sentence, or empty; for tests and the report. */
+    public String pointerNote() {
+        return pointerNote;
+    }
+
+    /** The page's own description, before the pointer sentence; null until a page is drawn. */
+    private String describedBase;
+
+    private String withPointerNote(String description) {
+        return pointerNote.isEmpty() ? description : description + " " + pointerNote;
     }
 
     private String describe(ChartScene scene) {
@@ -1336,12 +1365,12 @@ public final class ChartComponent extends JComponent {
             // accessibility exists to prevent.
             // A moon of Mars the page leaves undrawn is still given (#606,
             // R-3 and R-4 on #605): behind Mars, or too close to tell apart.
-            getAccessibleContext().setAccessibleDescription(withFurniture(
+            getAccessibleContext().setAccessibleDescription(withPointerNote(describedBase = withFurniture(
                     withUnseenMoons(withBodies(withReadout(withDirections(describe(scene),
                             spokenDirections),
                             readout, words), drawnBodies, words),
                             ReferenceInk.unseenMoons(juranometria.project.DrawnPage.of(scene),
-                                    overlays.collect()), words), drawnFurniture));
+                                    overlays.collect()), words), drawnFurniture)));
             // One ring per selected drawn member (issue #261): the
             // renderer draws nothing for an identity the page does
             // not draw, so an on-page undrawn member is left to its

@@ -566,6 +566,7 @@ public final class PackagedAcceptanceMain {
         moonOnTheChartJourney();
         solarSystemSheetJourney();
         zoomLockJourney();
+        pointerNavigationJourney();
         companionJourney();
         controllerTabsJourney();
         occurrenceJourney();
@@ -3091,6 +3092,119 @@ public final class PackagedAcceptanceMain {
         System.out.println("zoom lock OK (locked, the wheel and trackpad leave the"
                 + " field and centre; the toolbar still zooms; unlocked, the wheel"
                 + " zooms; the choice round-trips through the runtime's preferences)");
+    }
+
+    /**
+     * Pointer navigation in the packaged image (#691, ruled on #690): the
+     * Controller's section chooses the session's mode; a horizontal-only
+     * drag keeps the grabbed sky on the press row, a locked drag moves
+     * nothing, and a Shift-held free drag keeps to its first axis - each
+     * through the production drag and real mouse events.
+     */
+    private static void pointerNavigationJourney() throws Exception {
+        ChartViewController controller = new ChartViewController();
+        juranometria.ui.PointerDrag drag = new juranometria.ui.PointerDrag();
+        juranometria.ui.ChartComponent[] chart = new juranometria.ui.ChartComponent[1];
+        juranometria.ui.PointerNavigationPanel[] panel =
+                new juranometria.ui.PointerNavigationPanel[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            chart[0] = new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
+            juranometria.ui.PanInteraction.install(chart[0], controller, drag);
+            controller.onChange(chart[0]::setViewState);
+            chart[0].setSize(900, 700);
+            panel[0] = new juranometria.ui.PointerNavigationPanel(drag,
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+        });
+        javax.swing.SwingUtilities.invokeAndWait(() -> { });
+        require(drag.mode() == juranometria.ui.PointerDrag.Mode.FREE, "the session starts free");
+        javax.swing.JRadioButton horizontal = (javax.swing.JRadioButton) named(panel[0],
+                juranometria.ui.PointerNavigationPanel.NAME_PREFIX + "horizontal");
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            horizontal.setSelected(true);
+            for (var listener : horizontal.getActionListeners()) {
+                listener.actionPerformed(new java.awt.event.ActionEvent(horizontal,
+                        java.awt.event.ActionEvent.ACTION_PERFORMED, ""));
+            }
+        });
+        require(drag.mode() == juranometria.ui.PointerDrag.Mode.HORIZONTAL,
+                "the Controller's choice sets the mode");
+        juranometria.chart.SkyPosition grabbed = skyAtPixel(chart[0], controller, 450, 350);
+        pointer(chart[0], java.awt.event.MouseEvent.MOUSE_PRESSED, 450, 350, false);
+        pointer(chart[0], java.awt.event.MouseEvent.MOUSE_DRAGGED, 530, 372, false);
+        pointer(chart[0], java.awt.event.MouseEvent.MOUSE_DRAGGED, 600, 400, false);
+        pointer(chart[0], java.awt.event.MouseEvent.MOUSE_RELEASED, 600, 400, false);
+        juranometria.project.PixelPoint at = pixelOfSky(chart[0], grabbed);
+        require(Math.hypot(at.x() - 600, at.y() - 350) < 1e-3,
+                "horizontal only: the grabbed sky stands on the press row, at " + at);
+        require(chart[0].getAccessibleContext().getAccessibleDescription()
+                        .endsWith("Dragging keeps to horizontal movement on the screen."),
+                "the page says the constraint");
+        javax.swing.SwingUtilities.invokeAndWait(() ->
+                drag.choose(juranometria.ui.PointerDrag.Mode.LOCKED));
+        juranometria.chart.ChartViewState before = controller.state();
+        pointer(chart[0], java.awt.event.MouseEvent.MOUSE_PRESSED, 450, 350, false);
+        pointer(chart[0], java.awt.event.MouseEvent.MOUSE_DRAGGED, 560, 430, false);
+        pointer(chart[0], java.awt.event.MouseEvent.MOUSE_RELEASED, 560, 430, false);
+        require(controller.state().equals(before), "locked: the chart did not move");
+        javax.swing.SwingUtilities.invokeAndWait(() ->
+                drag.choose(juranometria.ui.PointerDrag.Mode.FREE));
+        juranometria.chart.SkyPosition held = skyAtPixel(chart[0], controller, 450, 350);
+        pointer(chart[0], java.awt.event.MouseEvent.MOUSE_PRESSED, 450, 350, true);
+        pointer(chart[0], java.awt.event.MouseEvent.MOUSE_DRAGGED, 452, 343, true);
+        pointer(chart[0], java.awt.event.MouseEvent.MOUSE_DRAGGED, 520, 230, false);
+        pointer(chart[0], java.awt.event.MouseEvent.MOUSE_RELEASED, 520, 230, false);
+        juranometria.project.PixelPoint kept = pixelOfSky(chart[0], held);
+        require(Math.hypot(kept.x() - 450, kept.y() - 230) < 1e-3,
+                "Shift held at the press: the drag keeps to its first axis, at " + kept);
+        require(drag.mode() == juranometria.ui.PointerDrag.Mode.FREE, "no mode left behind");
+        System.out.println("pointer navigation OK (the Controller's choice sets the session's"
+                + " mode; horizontal only keeps the grabbed sky on the press row and the page"
+                + " says so; locked moves nothing; a Shift-held free drag keeps to its first"
+                + " axis and leaves no mode behind)");
+    }
+
+    private static java.awt.Component named(java.awt.Container root, String name) {
+        for (java.awt.Component c : root.getComponents()) {
+            if (name.equals(c.getName())) {
+                return c;
+            }
+            if (c instanceof java.awt.Container inner) {
+                java.awt.Component found = named(inner, name);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
+    }
+
+    private static juranometria.chart.SkyPosition skyAtPixel(
+            juranometria.ui.ChartComponent chart, ChartViewController controller, int x, int y) {
+        return juranometria.project.PanSolver.skyFromPlane(controller.state().projection(),
+                controller.state().centre(), juranometria.project.PanSolver.planeFromPixel(
+                        chart.currentScene().viewport(), new juranometria.project.PixelPoint(x, y)));
+    }
+
+    private static juranometria.project.PixelPoint pixelOfSky(
+            juranometria.ui.ChartComponent chart, juranometria.chart.SkyPosition sky) {
+        var viewport = chart.currentScene().viewport();
+        var projection = juranometria.project.Projections.of(viewport.projection(),
+                viewport.centre());
+        return new juranometria.project.ViewportMapping(viewport, projection)
+                .toPixel(projection.project(sky).orElseThrow());
+    }
+
+    private static void pointer(juranometria.ui.ChartComponent chart, int id, int x, int y,
+                                boolean shift) throws Exception {
+        int button = id == java.awt.event.MouseEvent.MOUSE_MOVED
+                ? java.awt.event.MouseEvent.NOBUTTON : java.awt.event.MouseEvent.BUTTON1;
+        int mods = (button == java.awt.event.MouseEvent.BUTTON1
+                ? java.awt.event.InputEvent.BUTTON1_DOWN_MASK : 0)
+                | (shift ? java.awt.event.InputEvent.SHIFT_DOWN_MASK : 0);
+        javax.swing.SwingUtilities.invokeAndWait(() -> chart.dispatchEvent(
+                new java.awt.event.MouseEvent(chart, id, System.nanoTime() / 1_000_000, mods,
+                        x, y, 1, false, button)));
+        javax.swing.SwingUtilities.invokeAndWait(() -> { });
     }
 
     private static void wheel(juranometria.ui.ChartComponent chart, double rotation)
