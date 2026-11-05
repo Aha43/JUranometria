@@ -294,6 +294,18 @@ make import-solar-system                   # verifies the pins, proves the excer
   folder; **Library → Export Bookmarks…** and **Restore from File…**
   carry it between machines, and a restore keeps the previous library
   beside it.
+- **Guide a drag.** **Controls → Chart → Pointer navigation** keeps a
+  drag to the screen's rows (Horizontal only) or columns (Vertical
+  only), or stops dragging from moving the chart at all (Locked) while
+  a click still selects; holding **Shift** as you press a free drag
+  keeps that one drag to the direction it starts in. The rule is about
+  the screen, not a line in the sky, and every launch starts Free.
+- **See what you clicked.** The last selected object is described in a
+  small box in the upper left of the chart - name, designation,
+  magnitude or chart time, position - beside its selection ring, for as
+  long as it is on the page; the box hides with the toolbar and travels
+  to exported sheets. **Chart → Chart Options… → Chart → Selected object
+  box** turns it off and on.
 - **Reset view** returns to the default M31 centre, 8° field, and
   stars to V 8.0, clearing the search.
 - The readout on the right and the chart's title block always state the

@@ -398,3 +398,30 @@ So, as §4, §5 and §7 recommend:
   - Gates 1 and 3-7 once, with gate 2 skipped for the stated causal reason.
   - Then CI once and the pinned merge of the study.
   - No production implementation before that landing.
+
+## 12. As built
+
+Built by #691 and #692 on one integrated branch and handed over in #693
+(`docs/reviews/release-6.3.0-handover.md`, which records the contracts
+as built, the checkpoints and the runs). Where the build differs from
+or sharpens the proposal above, the build is the record:
+
+- **The mode is read at the press** in `PanInteraction`; a Shift-held
+  free drag decides its axis at the first movement of at least 4 px,
+  production's own click threshold (`>=`, not `>`).
+- **The view report's `pointer-drag:` line stands after `furniture:`**,
+  not after the working set, so no existing line's neighbours move.
+- **The page's pointer sentence** is added to the page's description by
+  the chart (`ChartComponent.setPointerNote`), because the description is
+  rebuilt on every paint.
+- **The box's facts come from the page inventory entry of the lead**,
+  whose presence is what "belongs on the page" means; a body's
+  below-horizon line reads the placement the page painted.
+- **The Selected object box has no chart-keyboard letter.** Every other
+  Chart Options box has one; none was ruled here, and the owner did not
+  take up the question at the #692 checkpoint.
+- **The furniture test admits one named preference**, `upperLeftFirst`;
+  furniture otherwise still carries meaning and text only.
+- **The #690 study's body pages carry production's ring** since #692; the
+  study's body-mark sketch no longer draws its own.
+

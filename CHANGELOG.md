@@ -7,6 +7,26 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Pointer navigation (#689, #691).** Controls → Chart → Pointer
+navigation offers Free, Horizontal only, Vertical only and Locked. A
+constrained drag keeps the grabbed sky on the screen row, or column,
+where you pressed - a rule about the screen, not a line in the sky -
+and Locked lets no drag move the chart while a click still selects.
+Hold Shift as you press a free drag to keep that one drag to the
+direction of its first movement. Every launch starts Free and nothing
+is stored; Lock zoom is unchanged.
+
+**The selected object, explained on the chart (#692).** Click a star,
+a deep-sky object, the Moon or a planet and a small box in the upper
+left says what it is - its name and designation, its magnitude or its
+chart time, its position, and whether it stands below a drawn horizon -
+while the selection ring, now around a selected body too, marks it.
+Only the last selected object is described; the box leaves the page
+with it and returns with it, hides with the toolbar, and travels to
+every exported sheet with its ring. Chart Options → Chart → Selected
+object box, on by default. Ruled in `docs/decisions/guide-and-explain.md`
+from the study that measured both.
+
 ## [6.2.0] - 2026-11-03
 
 **Bookmark the sky (#497, #681).** A bookmark saves the chart's view
