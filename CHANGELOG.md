@@ -7,6 +7,8 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [6.3.0] - 2026-11-05
+
 **Pointer navigation (#689, #691).** Controls → Chart → Pointer
 navigation offers Free, Horizontal only, Vertical only and Locked. A
 constrained drag keeps the grabbed sky on the screen row, or column,
