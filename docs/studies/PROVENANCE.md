@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**950 promoted artifacts.**
+**976 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -307,6 +307,32 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/gallery/place-and-time-zenith.png` | `4f50707e9f8e78cc429df7ba74e9e82b09134c5e76902bac317b69b4d7ebc249` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/gallery/sun-and-moon-crescent.png` | `b3b05987db7cda875a97581c8ea1af5cf00ab61183139ff812296c935dc571e4` | 2026-10-01 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/gallery/sun-and-moon-horizon.png` | `525e202d43309184d52a0495252370f4306925777f099f468df185374f27a9ba` | 2026-10-25 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/guide-and-explain/back-on-page-8.png` | `7c861bc88d85a78050dbd454d6ab79666cc9a4db438d15ec95ffe53f815e5b02` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/guide-and-explain/below-horizon.png` | `896999740a170a25f17579c6584a7d49a1bc2907d0ecd119b7a6db6914d8fbf1` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/guide-and-explain/deep-sky-8-black.png` | `679fc2f40532752ecea42c105d1d8242185a5de8d2cda221333f9894a5e76af8` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/guide-and-explain/deep-sky-8-nb.png` | `c0f40cefccdec018c472aaad3b346129f842b27c94e1cca223542df3c63a7a0a` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/guide-and-explain/deep-sky-8.png` | `7c861bc88d85a78050dbd454d6ab79666cc9a4db438d15ec95ffe53f815e5b02` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/guide-and-explain/globe-180.png` | `244913852a567fb935076ae2081ee5093f683ffaf923999a1df0947ea987db7b` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/guide-and-explain/letterbox-120-nb.png` | `56d87b21fce05803cbeebf8a99031c90b89d37cd9ee5be2532424bdb1ed2dd44` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/guide-and-explain/letterbox-120.png` | `2a2075ef8eac63f3ff29c194b3573385f2025c8e634353e28c8a53539516b39d` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/guide-and-explain/moon-chart-time.png` | `edd91c6e50300b8b68043e3fe0b89a228f50db4c86ee69e0ebe0a6493f015d87` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/guide-and-explain/narrow-8-nb.png` | `5717957cd4ea0dce893b9d1869082d8ff908d364f0d1b2cf6d29b768700bfcc5` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/guide-and-explain/narrow-8.png` | `ccffba93b50095d3638852e2ee2eacdce6af4547060b9475592b21699e457fe3` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/guide-and-explain/narrow-key-8.png` | `dfd1f333f6d32d0769add157767624dd277659dcca531caf6ebfbc13501da880` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/guide-and-explain/off-page-8.png` | `43450b6eb084b0f90c4db20cf36b49efad8a6429a6c41c2e1576b8efc1962d28` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/guide-and-explain/pointer-navigation-en-dark.png` | `95386b413756b461ee6d99fd1ab8c5aebd142dc456415b646aeb08625d6e5161` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/guide-and-explain/pointer-navigation-en-light.png` | `5e3df4b1042ee5db9e0bfa358e1f7fe3a58d6045b4e7aa4df8f06ed524ed6a6b` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/guide-and-explain/pointer-navigation-nb-NO-dark.png` | `07a3bb19ecac27e728901220c8d98add42837ece85019b649eac327faa50f4ec` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/guide-and-explain/pointer-navigation-nb-NO-light.png` | `b1ef30b9e9a79820f48bf390b8bf33b6cc67a2958b84a7f91f56576f80077edf` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/guide-and-explain/refused-label.png` | `b9376d9dd65546f97ddddf65ccb1f5cd102a9834c811b3a342c688ab87f8ba1f` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/guide-and-explain/sheet-a4.png` | `99c15ecef94ffda02abd987ba87a37623651e6078ed9e665b1aa2093c9e9c369` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/guide-and-explain/sketch-body-mark.png` | `e9d240098ce2a4900627ca7978b261088145d2017afb4caafa53adf49b9a259f` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/guide-and-explain/sketch-upper-left-8.png` | `6c3e2056abc0cf3d524644848eecc2ca3edd15bad565b27738a182b3429698fa` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/guide-and-explain/star-catalogue-4.png` | `571afba1942935f3ac864c30603f05183c678b64556302e8de7deaddfa2762b0` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/guide-and-explain/star-named-8-nb.png` | `0ede8d9c3770ec518f9764cc65e3a63c690bccb509d33b497af1ac460cd79ed0` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/guide-and-explain/star-named-8.png` | `d019bbe15caf7a585e3453e988d73ee0fd096cd1771fa3f443fbd911e92e7624` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/guide-and-explain/venus-chart-time.png` | `991d35df2fa8f028395e2e46d43cd99bbfccbb864cd77cdbdcbcbc6bc62784c9` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/guide-and-explain/wide-60.png` | `6acdc6fcffd2e57f576f94a9781dc1f33dc50ee713afd9dd6cd781de1c2a8e57` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/about-en-1-compact-light.png` | `68fee448a867bfadd3f0ba268d8a28522300f8925418d0f0f9cf0a966772cf26` | 2026-11-03 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/about-en-2-notices-light.png` | `4e77229c21ad64603fe5c22e3f4d70f9824ebbceeaa199465fe06411bf808914` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/about-en-3-compact-dark.png` | `4acdeda30b00bedf199145558fa97a3b18a9e9cfb77e92908771e8de96fecf27` | 2026-11-03 | Mac OS X aarch64, Java 21.0.12.1 | various |

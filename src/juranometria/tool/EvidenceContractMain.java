@@ -220,6 +220,9 @@ public final class EvidenceContractMain {
         // Bookmarks (#497): the measured architecture and interface study.
         REPORT_MAINS.put("juranometria.tool.BookmarkStudyMain",
                 "docs/studies/bookmarks/measurements.md");
+        // Guide the chart and explain the selection (#690): the measured study.
+        REPORT_MAINS.put("juranometria.tool.GuideAndExplainStudyMain",
+                "docs/studies/guide-and-explain/measurements.md");
         // The Mercury pack study (#528) is not registered, as the Venus one is
         // not: both read the gitignored de440s.bsp and pck00011.tpc, which the CI
         // runner does not hold; `make mercury-pack-study` reproduces the report
@@ -475,6 +478,8 @@ public final class EvidenceContractMain {
                 "docs/studies/meridian-readout/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.BookmarkStudyMain",
                 "docs/studies/bookmarks/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.GuideAndExplainStudyMain",
+                "docs/studies/guide-and-explain/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.JupiterOnTheChartStudyMain",
                 "docs/studies/jupiter-on-the-chart/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.SolarSystemLabelsStudyMain",
@@ -680,6 +685,10 @@ public final class EvidenceContractMain {
             // Bookmarks (#497): the proposed surfaces, drawn from unwired
             // components in both languages.
             "juranometria.tool.BookmarkStudyMain",
+            // Guide the chart and explain the selection (#690): production
+            // pages carrying the study's box, the drag modes' section
+            // sketched, in both languages.
+            "juranometria.tool.GuideAndExplainStudyMain",
             // Jupiter and the Galilean moons on the chart (issue #486):
             // production pages composed by the component with the Jovian
             // module attached.
