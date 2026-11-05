@@ -392,7 +392,10 @@ asked:
   byte. At 6.2.0 (6.1→6.2) the last digit moved once more: 108 pixels
   in each of the four images, columns 222–231 of rows 33–46; the eight
   sheet PNGs stayed pixel-identical and each of the ten PDFs and SVGs
-  differed by one byte.
+  differed by one byte. At 6.3.0 (6.2→6.3) the last digit moved once more: 104
+  pixels in each of the four images, columns 222–232 of rows 33–47; the
+  eight sheet PNGs stayed pixel-identical and each of the ten PDFs and
+  SVGs differed by one byte.
 - **The articles.** Their footer names the release, and
   `scripts/build-articles.py` reads it from `VERSION` when the site is
   built rather than carrying a number - so there is nothing to
