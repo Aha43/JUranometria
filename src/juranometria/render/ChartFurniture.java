@@ -20,7 +20,12 @@ import java.util.List;
  *     carries no control, and its honest sentence comes as a line
  */
 public record ChartFurniture(String key, String heading, List<String> lines,
-                             String action) {
+                             String action, boolean upperLeftFirst) {
+
+    /** A box in the ruled corner order: every box before #692. */
+    public ChartFurniture(String key, String heading, List<String> lines, String action) {
+        this(key, heading, lines, action, false);
+    }
 
     public ChartFurniture {
         if (key == null || key.isBlank()) {

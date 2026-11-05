@@ -115,6 +115,13 @@ public final class ChartOptionsDialog extends JDialog {
     private ChartOptionsDialog(Frame owner, ChartOptionsController controller,
                                juranometria.ui.ecliptic.EclipticSession.Switch ecliptic,
                                juranometria.ui.language.InterfaceText said) {
+        this(owner, controller, ecliptic, null, said);
+    }
+
+    private ChartOptionsDialog(Frame owner, ChartOptionsController controller,
+                               juranometria.ui.ecliptic.EclipticSession.Switch ecliptic,
+                               juranometria.ui.selection.SelectedObjectSwitch selectedObject,
+                               juranometria.ui.language.InterfaceText said) {
         super(owner, said.say("chartoptions.title"), false);
         getAccessibleContext().setAccessibleName(
                 said.say("chartoptions.title"));
@@ -127,7 +134,7 @@ public final class ChartOptionsDialog extends JDialog {
         // the keyboard's included (reproduced on #442).
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setContentPane(content(controller, this::dispose,
-                () -> restoreConfirmed(this, said), ecliptic, said));
+                () -> restoreConfirmed(this, said), ecliptic, selectedObject, said));
         getRootPane().registerKeyboardAction(event -> dispose(),
                 javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
@@ -155,12 +162,20 @@ public final class ChartOptionsDialog extends JDialog {
     public static void open(Frame owner, ChartOptionsController controller,
                             juranometria.ui.ecliptic.EclipticSession.Switch ecliptic,
                             juranometria.ui.language.InterfaceText said) {
+        open(owner, controller, ecliptic, null, said);
+    }
+
+    /** The same, with the selected-object box's switch (#692). Null leaves it out. */
+    public static void open(Frame owner, ChartOptionsController controller,
+                            juranometria.ui.ecliptic.EclipticSession.Switch ecliptic,
+                            juranometria.ui.selection.SelectedObjectSwitch selectedObject,
+                            juranometria.ui.language.InterfaceText said) {
         if (current != null && current.isDisplayable()) {
             current.toFront();
             current.requestFocus();
             return;
         }
-        current = new ChartOptionsDialog(owner, controller, ecliptic, said);
+        current = new ChartOptionsDialog(owner, controller, ecliptic, selectedObject, said);
         current.setVisible(true);
     }
 
@@ -216,11 +231,21 @@ public final class ChartOptionsDialog extends JDialog {
                               java.util.function.BooleanSupplier restoreConfirmed,
                               juranometria.ui.ecliptic.EclipticSession.Switch ecliptic,
                               juranometria.ui.language.InterfaceText said) {
+        return content(controller, close, restoreConfirmed, ecliptic, null, said);
+    }
+
+    /** The same, with the selected-object box's switch too (#692). */
+    static JComponent content(ChartOptionsController controller,
+                              Runnable close,
+                              java.util.function.BooleanSupplier restoreConfirmed,
+                              juranometria.ui.ecliptic.EclipticSession.Switch ecliptic,
+                              juranometria.ui.selection.SelectedObjectSwitch selectedObject,
+                              juranometria.ui.language.InterfaceText said) {
         // The controls are ChartOptionsControls' - the same class the
         // companion holds (#443); this dialog is one host of them, its
         // tabs and its Close the only things that are its own.
-        ChartOptionsControls controls =
-                new ChartOptionsControls(controller, restoreConfirmed, ecliptic, said);
+        ChartOptionsControls controls = new ChartOptionsControls(controller,
+                restoreConfirmed, ecliptic, selectedObject, said);
         JPanel panel = new JPanel(new BorderLayout());
         controls.releaseWith(panel);
 
@@ -496,8 +521,16 @@ public final class ChartOptionsDialog extends JDialog {
     public static ChartOptionsDialog packedForStudy(Frame owner,
             String interfaceLanguage, ChartOptionsController controller,
             juranometria.ui.ecliptic.EclipticSession.Switch ecliptic) {
+        return packedForStudy(owner, interfaceLanguage, controller, ecliptic, null);
+    }
+
+    /** The same, with the selected-object box's switch, as the reader gets it (#692). */
+    public static ChartOptionsDialog packedForStudy(Frame owner,
+            String interfaceLanguage, ChartOptionsController controller,
+            juranometria.ui.ecliptic.EclipticSession.Switch ecliptic,
+            juranometria.ui.selection.SelectedObjectSwitch selectedObject) {
         ChartOptionsDialog dialog = new ChartOptionsDialog(owner,
-                controller, ecliptic,
+                controller, ecliptic, selectedObject,
                 juranometria.ui.language.InterfaceText.forLanguage(
                         interfaceLanguage));
         settle(dialog);

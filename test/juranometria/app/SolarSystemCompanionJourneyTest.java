@@ -66,10 +66,13 @@ class SolarSystemCompanionJourneyTest {
                     assertEquals(juranometria.ui.companion.CompanionTabs.CHART, tabs.chosen(),
                             "a fresh profile opens Chart");
                     List<CompanionSection> sections = companion.sections();
-                    assertEquals("section.emphasis", sections.get(2).getName(),
-                            "Emphasis is the Chart tab's third section (#525, moved in #675)");
-                    assertEquals("section.chartoptions", sections.get(3).getName(),
-                            "Chart Options is the Chart tab's fourth section");
+                    assertEquals("section.pointernavigation", sections.get(1).getName(),
+                            "Pointer navigation is the Chart tab's second section (#691)");
+                    assertEquals("section.emphasis", sections.get(3).getName(),
+                            "Emphasis is the Chart tab's fourth section (#525, moved in #675,"
+                                    + " after Pointer navigation in #691)");
+                    assertEquals("section.chartoptions", sections.get(4).getName(),
+                            "Chart Options is the Chart tab's fifth section");
                     JComponent content = tabs.content("solarsystem");
                     assertFalse(content.isShowing(), "not shown until its tab is chosen");
                     assertNull(find(companion.getContentPane(), "section.solarsystem"),

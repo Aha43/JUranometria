@@ -238,6 +238,12 @@ public final class CompanionSheetMain {
                 window[0].addSection("chartcontrols",
                         words.say("chartcontrols.title"),
                         chrome.companionControls(chart).inCompanion());
+                // Pointer navigation directly after Chart controls (#691,
+                // ruled on #690), open the first time, Free chosen.
+                window[0].addSection("pointernavigation",
+                        words.say("pointer.title"),
+                        new juranometria.ui.PointerNavigationPanel(
+                                new juranometria.ui.PointerDrag(), words));
                 // Place and Time directly after Chart controls, then
                 // Emphasis (#525) introduced collapsed over the same chart:
                 // the application's order since #675 (stage 3).
@@ -363,6 +369,9 @@ public final class CompanionSheetMain {
                                 // The ecliptic's switch (#675): the Chart group
                                 // shows the Ecliptic box a reader gets.
                                 juranometria.ui.ecliptic.EclipticSession.of(new juranometria.ecliptic.EclipticModule(), juranometria.ui.ecliptic.EclipticStore.forNode(node)),
+                                // The selected-object box's switch (#692).
+                                new juranometria.ui.selection.SelectedObjectSwitch(
+                                        juranometria.ui.selection.SelectedObjectStore.forNode(node)),
                                 words).inCompanion(companionStore,
                                 words));
                 // Sections by name, not by position (#675 reordered them).

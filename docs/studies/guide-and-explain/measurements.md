@@ -347,7 +347,7 @@ A body below the drawn horizon, with the mathematical horizon on: the first of s
 
 A constellation is not a selection: `Selection` holds stars, deep-sky objects, empty sky and Solar System occurrences, and no constellation kind, so no constellation box is drawn. Planetary moons are drawn but not selectable, so none is described either.
 
-## 6. Two sketches of what the proposal adds
+## 6. Two sketches of what the proposal adds (built since in #692)
 
 Marked as sketches: each is a production page carrying no box of the study's, with the study's own drawing over it, so the labels beneath do not yield as production's would.
 
@@ -359,7 +359,7 @@ Sketch: the box preferring the upper left, Betelgeuse at 8°.
 
 ### sketch-body-mark
 
-Sketch: the ordinary selection ring around a selected body, which production does not draw today - Venus at 3°, the box in the upper left.
+Sketch: the box in the upper left beside a selected body - Venus at 3°. The selection ring around the body, which this sketch once drew itself, is production's own since #692 (ruling C-10).
 
 ![](sketch-body-mark.png)
 

@@ -50,7 +50,7 @@ public final class ViewReport {
             Selection selection,
             List<String> workingSet, String workingLead,
             String osName, String osVersion, String osArch,
-            String javaVersion, List<String> furniture) {
+            String javaVersion, List<String> furniture, String pointerDrag) {
 
         public Snapshot {
             emphasis = emphasis == null ? Set.of() : Set.copyOf(emphasis);
@@ -58,6 +58,45 @@ public final class ViewReport {
             workingSet = workingSet == null ? List.of()
                     : List.copyOf(workingSet);
             furniture = furniture == null ? List.of() : List.copyOf(furniture);
+            // Free is the drag every report before #691 described: no line.
+            pointerDrag = pointerDrag == null || pointerDrag.equals("free") ? null
+                    : pointerDrag;
+        }
+
+        /** A state with the drag free - every report before #691. */
+        public Snapshot(String version, ChartViewState view,
+                        int chartWidthPx, int chartHeightPx,
+                        int pageWidthPx, int pageHeightPx,
+                        int pageOffsetXPx, int pageOffsetYPx,
+                        Scale displayScale,
+                        ChartOptions chosen, ChartOptions drawn,
+                        String interfaceLanguage,
+                        String skyLanguageChosen, String skyLanguageOnChart,
+                        Set<ChartStructure> emphasis,
+                        List<String> modules,
+                        PlaceAndTime placeAndTime,
+                        Boolean eclipticShowing,
+                        Selection selection,
+                        List<String> workingSet, String workingLead,
+                        String osName, String osVersion, String osArch,
+                        String javaVersion, List<String> furniture) {
+            this(version, view, chartWidthPx, chartHeightPx, pageWidthPx,
+                    pageHeightPx, pageOffsetXPx, pageOffsetYPx, displayScale,
+                    chosen, drawn, interfaceLanguage, skyLanguageChosen,
+                    skyLanguageOnChart, emphasis, modules, placeAndTime,
+                    eclipticShowing, selection, workingSet, workingLead, osName,
+                    osVersion, osArch, javaVersion, furniture, null);
+        }
+
+        /** The same state with the pointer drag's mode, by its token (#691). */
+        public Snapshot withPointerDrag(String mode) {
+            return new Snapshot(version, view, chartWidthPx, chartHeightPx,
+                    pageWidthPx, pageHeightPx, pageOffsetXPx, pageOffsetYPx,
+                    displayScale, chosen, drawn, interfaceLanguage,
+                    skyLanguageChosen, skyLanguageOnChart, emphasis, modules,
+                    placeAndTime, eclipticShowing, selection, workingSet,
+                    workingLead, osName, osVersion, osArch, javaVersion,
+                    furniture, mode);
         }
 
         /** A state with no module furniture drawn - every report before #259. */
@@ -224,6 +263,11 @@ public final class ViewReport {
         // (#259, ruling 7 on #556).
         lines.add("furniture: " + (s.furniture().isEmpty() ? "none"
                 : String.join(", ", s.furniture())));
+        // A constrained or locked pointer drag (#691, C-5); free is absent,
+        // so no report a reader has already taken changes.
+        if (s.pointerDrag() != null) {
+            lines.add("pointer-drag: " + s.pointerDrag());
+        }
         if (s.placeAndTime() != null) {
             PlaceAndTime place = s.placeAndTime();
             lines.add("observer-lines: meridian " + onOff(place.meridian())

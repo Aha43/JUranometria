@@ -2919,7 +2919,20 @@ public final class ChartRenderer {
         int pageWidth = scene.viewport().widthPx();
         int pageHeight = scene.viewport().heightPx();
         java.util.List<ChartFurniture.Placed> placed = new java.util.ArrayList<>();
+        // A box that asks for the upper left first is placed after every
+        // box in the ruled order, so none of theirs moves (#692, C-11).
+        java.util.List<ChartFurniture> ordered = new java.util.ArrayList<>();
         for (ChartFurniture box : offered) {
+            if (!box.upperLeftFirst()) {
+                ordered.add(box);
+            }
+        }
+        for (ChartFurniture box : offered) {
+            if (box.upperLeftFirst()) {
+                ordered.add(box);
+            }
+        }
+        for (ChartFurniture box : ordered) {
             int lineHeight = metrics.getHeight();
             int textWidth = bold.stringWidth(box.heading());
             for (String line : box.lines()) {
@@ -2936,7 +2949,8 @@ public final class ChartRenderer {
                     || boxHeight + 2 * TITLE_MARGIN_PX > pageHeight) {
                 continue;
             }
-            for (ChartFurniture.Corner corner : ChartFurniture.Corner.values()) {
+            for (ChartFurniture.Corner corner : box.upperLeftFirst()
+                    ? UPPER_LEFT_FIRST : ChartFurniture.Corner.values()) {
                 if (corner == ChartFurniture.Corner.UPPER_RIGHT && key != null) {
                     continue;
                 }
@@ -2973,6 +2987,34 @@ public final class ChartRenderer {
             }
         }
         return java.util.List.copyOf(placed);
+    }
+
+    /** The corners a box asking for the upper left first tries, in order (#692, C-11). */
+    private static final ChartFurniture.Corner[] UPPER_LEFT_FIRST = {
+            ChartFurniture.Corner.UPPER_LEFT, ChartFurniture.Corner.UPPER_RIGHT,
+            ChartFurniture.Corner.LOWER_RIGHT};
+
+    /**
+     * The selection ring around a selected Solar System body (#692, C-10
+     * on #690): the ring the catalogue's marks get, in the same ink and
+     * stroke, just clear of the body's drawn disc or symbol, so box and
+     * mark always appear together.
+     */
+    public static void drawBodySelectionHighlight(Graphics2D g, double centreX,
+                                                  double centreY, java.awt.Shape disc,
+                                                  ChartPalette palette) {
+        java.awt.geom.Rectangle2D bounds = disc.getBounds2D();
+        double r = Math.max(Math.max(bounds.getWidth(), bounds.getHeight()) / 2.0 + 5.0, 7.0);
+        Graphics2D g2 = (Graphics2D) g.create();
+        try {
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(palette.selectionInk());
+            g2.setStroke(SELECTION_STROKE);
+            g2.draw(new Ellipse2D.Double(centreX - r, centreY - r, 2.0 * r, 2.0 * r));
+        } finally {
+            g2.dispose();
+        }
     }
 
     /** Draws each placed box of furniture, opaque, in the title block's face and ink. */

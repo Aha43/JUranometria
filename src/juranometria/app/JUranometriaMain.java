@@ -212,7 +212,10 @@ public final class JUranometriaMain {
         // why the decision is asked here rather than folded into
         // options state that owns no navigation.
         TargetRetirement.connect(chartOptions, chart, controller);
-        juranometria.ui.PanInteraction.install(chart, controller);
+        // Pointer navigation (#691, ruled on #690): how a drag may move the
+        // chart, the session's alone - Free at every launch, never stored.
+        juranometria.ui.PointerDrag pointerDrag = new juranometria.ui.PointerDrag();
+        juranometria.ui.PanInteraction.install(chart, controller, pointerDrag);
         // The zoom lock (Sprint 38, issue #428): one state for the
         // wheel, the toolbar's toggle and the remembered choice,
         // restored before the reader can turn a wheel, and saved on
@@ -307,6 +310,19 @@ public final class JUranometriaMain {
         juranometria.ui.ecliptic.EclipticSession.Switch eclipticSwitch =
                 juranometria.ui.ecliptic.EclipticSession.of(ecliptic,
                         eclipticStore);
+        // The selected-object box (#692, ruled C-7 to C-14 on #690): the
+        // last selected object explained on the chart, on by default and
+        // remembered in a store of its own; one switch for both Chart
+        // Options hosts.
+        juranometria.ui.selection.SelectedObjectSwitch selectedObjectSwitch =
+                new juranometria.ui.selection.SelectedObjectSwitch(stores.selectedObject());
+        juranometria.ui.selection.SelectedObjectBox selectedObjectBox =
+                modules.attach(new juranometria.ui.selection.SelectedObjectBox(
+                        selectedObjectSwitch,
+                        identity -> chart.renderedBodies().stream().anyMatch(body ->
+                                body.identity().equals(identity) && body.belowHorizon()),
+                        juranometria.ui.language.InterfaceText.forLanguage(
+                                language.interfaceLanguage())));
         inspector.showPageView(onThisPage.panel());
         inspector.onClose(chart::requestFocusInWindow);
         // One switch, three ways to reach it: the toolbar button, the
@@ -401,6 +417,12 @@ public final class JUranometriaMain {
         companion.addSection("chartcontrols",
                 companionWords.say("chartcontrols.title"),
                 chartControls.inCompanion());
+        // Pointer navigation directly after Chart controls (#691, C-5):
+        // open the first time, its open or closed state remembered as
+        // every section's is; the choice itself is never stored.
+        companion.addSection("pointernavigation",
+                companionWords.say("pointer.title"),
+                new juranometria.ui.PointerNavigationPanel(pointerDrag, companionWords));
         // Place and Time directly after Chart controls (#675, stage 3,
         // ruled on #674): the chart's own context next to its controls.
         companion.addSection("placeandtime",
@@ -745,7 +767,7 @@ public final class JUranometriaMain {
                 new ChartOptionsControls(chartOptions,
                         () -> ChartOptionsDialog.restoreConfirmed(companion,
                                 companionWords),
-                        eclipticSwitch,
+                        eclipticSwitch, selectedObjectSwitch,
                         companionWords).inCompanion(companionStore,
                         companionWords));
         // Place and Time and the Controller's switch (#675, stage 2): one
@@ -850,7 +872,7 @@ public final class JUranometriaMain {
                             com.formdev.flatlaf.FlatLaf.updateUI();
                         }, language, Atlas.names(), interfaces),
                 () -> ChartOptionsDialog.open(frame, chartOptions,
-                        eclipticSwitch,
+                        eclipticSwitch, selectedObjectSwitch,
                         juranometria.ui.language.InterfaceText.forLanguage(
                                 language.interfaceLanguage())),
                 () -> AboutDialog.open(frame,
@@ -880,7 +902,8 @@ public final class JUranometriaMain {
                         () -> ViewReport.snapshot(chart, language, meridian,
                                 ecliptic, selection,
                                 modules.workingSelection(),
-                                System::getProperty),
+                                System::getProperty)
+                                .withPointerDrag(pointerDrag.mode().token()),
                         CopyViewReport.SYSTEM,
                         reason -> {
                             juranometria.ui.language.InterfaceText said =
@@ -1127,14 +1150,19 @@ public final class JUranometriaMain {
             public void componentShown(java.awt.event.ComponentEvent event) {
                 toolbarItem.setSelected(true);
                 chromeStore.saveToolbarShown(true);
+                selectedObjectBox.chromeShown(true);
             }
 
             @Override
             public void componentHidden(java.awt.event.ComponentEvent event) {
                 toolbarItem.setSelected(false);
                 chromeStore.saveToolbarShown(false);
+                // Clean chart hides the selected-object box with the
+                // toolbar and restores it with it (#692, C-12).
+                selectedObjectBox.chromeShown(false);
             }
         });
+        selectedObjectBox.chromeShown(toolbar.isVisible());
         javax.swing.JCheckBoxMenuItem inspectorItem =
                 AppMenuBar.inspectorItem(frame.getJMenuBar());
         if (inspectorItem != null) {

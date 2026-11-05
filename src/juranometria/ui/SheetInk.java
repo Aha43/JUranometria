@@ -113,8 +113,18 @@ public final class SheetInk {
         ChartRenderer renderer = new ChartRenderer(
                 juranometria.chart.StarSizePolicy.DEFAULT, chart.words());
         return (g, scene, reserved) -> {
+            java.util.List<ReferenceInk.BodyPlacement> bodies = ReferenceInk.bodyPlacements(
+                    juranometria.project.DrawnPage.of(scene), chart.overlays().collect(),
+                    ChartPalette.WHITE_PAPER, chart.words(), reserved);
             for (String member : members) {
                 renderer.drawSelectionHighlight(g, scene, onPaper, member);
+                // A selected body's ring travels with it (#692, C-10).
+                for (ReferenceInk.BodyPlacement body : bodies) {
+                    if (body.identity().equals(member)) {
+                        ChartRenderer.drawBodySelectionHighlight(g, body.centre().x(),
+                                body.centre().y(), body.disc(), ChartPalette.WHITE_PAPER);
+                    }
+                }
             }
             WorkingCrossInk.paint(g, juranometria.project.DrawnPage.of(scene), chart.overlays().collect(),
                     leadIdentity, ChartPalette.WHITE_PAPER);

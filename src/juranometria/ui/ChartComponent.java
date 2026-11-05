@@ -302,7 +302,7 @@ public final class ChartComponent extends JComponent {
         scene = assembler.assemble(viewState, getWidth(), pageHeight);
         assembledWidth = getWidth();
         assembledHeight = getHeight();
-        getAccessibleContext().setAccessibleDescription(describe(scene));
+        getAccessibleContext().setAccessibleDescription(withPointerNote(describedBase = describe(scene)));
         // Consumers that describe the page - the inspector - need to
         // know it changed, because what the page can say about the
         // selection changes with it (issue #170).
@@ -484,6 +484,35 @@ public final class ChartComponent extends JComponent {
         return said.toString();
     }
 
+    /**
+     * What the page says about how a drag moves it (#691, C-5): nothing
+     * while the drag is free, a sentence while it is constrained or locked.
+     */
+    private String pointerNote = "";
+
+    /**
+     * Sets the sentence the page adds about the pointer drag, empty for a
+     * free drag, and says it at once.
+     */
+    public void setPointerNote(String note) {
+        pointerNote = note == null ? "" : note;
+        if (describedBase != null) {
+            getAccessibleContext().setAccessibleDescription(withPointerNote(describedBase));
+        }
+    }
+
+    /** The current pointer sentence, or empty; for tests and the report. */
+    public String pointerNote() {
+        return pointerNote;
+    }
+
+    /** The page's own description, before the pointer sentence; null until a page is drawn. */
+    private String describedBase;
+
+    private String withPointerNote(String description) {
+        return pointerNote.isEmpty() ? description : description + " " + pointerNote;
+    }
+
     private String describe(ChartScene scene) {
         // One source for what a page says it is, shared with the
         // title block and the exported sheet (#301), and now in one
@@ -659,7 +688,8 @@ public final class ChartComponent extends JComponent {
             juranometria.module.Furniture box = owned.furniture();
             boxes.add(new juranometria.render.ChartFurniture(owned.key(),
                     box.heading(), box.lines(),
-                    box.action() == null ? null : box.action().label()));
+                    box.action() == null ? null : box.action().label(),
+                    box.upperLeftFirst()));
         }
         return java.util.List.copyOf(boxes);
     }
@@ -681,7 +711,7 @@ public final class ChartComponent extends JComponent {
             }
             boxes.add(new juranometria.sheet.ChartSheet.Furnished(
                     new juranometria.render.ChartFurniture(owned.key(), box.heading(),
-                            lines, null),
+                            lines, null, box.upperLeftFirst()),
                     box.described()));
         }
         return java.util.List.copyOf(boxes);
@@ -1336,12 +1366,12 @@ public final class ChartComponent extends JComponent {
             // accessibility exists to prevent.
             // A moon of Mars the page leaves undrawn is still given (#606,
             // R-3 and R-4 on #605): behind Mars, or too close to tell apart.
-            getAccessibleContext().setAccessibleDescription(withFurniture(
+            getAccessibleContext().setAccessibleDescription(withPointerNote(describedBase = withFurniture(
                     withUnseenMoons(withBodies(withReadout(withDirections(describe(scene),
                             spokenDirections),
                             readout, words), drawnBodies, words),
                             ReferenceInk.unseenMoons(juranometria.project.DrawnPage.of(scene),
-                                    overlays.collect()), words), drawnFurniture));
+                                    overlays.collect()), words), drawnFurniture)));
             // One ring per selected drawn member (issue #261): the
             // renderer draws nothing for an identity the page does
             // not draw, so an on-page undrawn member is left to its
@@ -1349,6 +1379,14 @@ public final class ChartComponent extends JComponent {
             // never both treatments for one object.
             for (String member : selected) {
                 renderer.drawSelectionHighlight(g2, scene, drawn, member);
+                // A selected body gets the ring too (#692, C-10).
+                for (ReferenceInk.BodyPlacement body : drawnBodies) {
+                    if (body.identity().equals(member)) {
+                        juranometria.render.ChartRenderer.drawBodySelectionHighlight(g2,
+                                body.centre().x(), body.centre().y(), body.disc(),
+                                chartOptions.palette());
+                    }
+                }
             }
             // After the chart, never inside it: working crosses are
             // an interaction overlay and not catalogue symbols, so

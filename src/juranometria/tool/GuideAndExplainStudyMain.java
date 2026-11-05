@@ -1017,7 +1017,7 @@ public final class GuideAndExplainStudyMain {
     // Part 6: two sketches of what production cannot do yet
 
     private static void sketches(Observer oslo, SolarSystemService service) throws Exception {
-        p("## 6. Two sketches of what the proposal adds");
+        p("## 6. Two sketches of what the proposal adds (built since in #692)");
         p("");
         p("Marked as sketches: each is a production page carrying no box of the study's,"
                 + " with the study's own drawing over it, so the labels beneath do not yield as"
@@ -1029,9 +1029,10 @@ public final class GuideAndExplainStudyMain {
                         + " left, Betelgeuse at 8°.", new ChartViewState(
                         find("Betelgeuse").position(), 8.0, 8.0), WIDTH, HEIGHT, EN,
                         ChartPalette.WHITE_PAPER, false, "Betelgeuse", false, false),
-                new BoxCase("sketch-body-mark", "Sketch: the ordinary selection ring around a"
-                        + " selected body, which production does not draw today - Venus at"
-                        + " 3°, the box in the upper left.", null, WIDTH, HEIGHT, EN,
+                new BoxCase("sketch-body-mark", "Sketch: the box in the upper left beside a"
+                        + " selected body - Venus at 3°. The selection ring around the body,"
+                        + " which this sketch once drew itself, is production's own since #692"
+                        + " (ruling C-10).", null, WIDTH, HEIGHT, EN,
                         ChartPalette.WHITE_PAPER, false, "venus", true, false))) {
             Object[] made = onEdt(() -> build(c, oslo, service));
             ChartComponent chart = (ChartComponent) made[0];
@@ -1047,20 +1048,8 @@ public final class GuideAndExplainStudyMain {
                 try {
                     chart.paint(g);
                     drawSketchBox(g, chart, box[0], c.palette());
-                    if (c.bodies()) {
-                        chart.renderedBodies().stream()
-                                .filter(b -> b.identity().equals(identity)).findFirst()
-                                .ifPresent(b -> {
-                                    var r = b.disc().getBounds2D();
-                                    double radius = Math.max(r.getWidth(), r.getHeight()) / 2.0
-                                            + 5.0;
-                                    g.setColor(new Color(0xB0, 0x30, 0x30));
-                                    g.setStroke(new BasicStroke(1.5f));
-                                    g.draw(new java.awt.geom.Ellipse2D.Double(
-                                            b.centre().x() - radius, b.centre().y() - radius,
-                                            2 * radius, 2 * radius));
-                                });
-                    }
+                    // Since #692 production rings a selected body itself; the
+                    // sketch adds no second ring.
                 } finally {
                     g.dispose();
                 }

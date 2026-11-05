@@ -89,23 +89,29 @@ class CompanionStartupJourneyTest {
                         assertEquals(List.of("Chart", "Solar System"),
                                 List.of(companion.tabs().getTitleAt(0),
                                         companion.tabs().getTitleAt(1)));
-                        assertEquals(4, companion.sections().size(),
-                                "on Chart: Chart controls, Place and Time, Emphasis"
+                        assertEquals(5, companion.sections().size(),
+                                "on Chart: Chart controls, Pointer navigation (#691,"
+                                        + " ruled on #690), Place and Time, Emphasis"
                                         + " (#525), then Chart Options - the order"
                                         + " ruled on #674 (#675, stage 3)");
                         assertEquals("Chart controls, expanded",
                                 companion.sections().get(0).heading()
                                         .getAccessibleContext().getAccessibleName());
-                        assertEquals("Place and Time, expanded",
+                        assertEquals("Pointer navigation, expanded",
                                 companion.sections().get(1).heading()
                                         .getAccessibleContext().getAccessibleName(),
-                                "Place and Time directly after Chart controls");
-                        assertEquals("Emphasis, collapsed",
+                                "Pointer navigation directly after Chart controls, open"
+                                        + " the first time (#691, C-5)");
+                        assertEquals("Place and Time, expanded",
                                 companion.sections().get(2).heading()
+                                        .getAccessibleContext().getAccessibleName(),
+                                "Place and Time after it");
+                        assertEquals("Emphasis, collapsed",
+                                companion.sections().get(3).heading()
                                         .getAccessibleContext().getAccessibleName(),
                                 "Emphasis is introduced collapsed");
                         assertEquals("Chart Options, expanded",
-                                companion.sections().get(3).heading()
+                                companion.sections().get(4).heading()
                                         .getAccessibleContext().getAccessibleName());
                         assertFalse(((javax.swing.AbstractButton) named(
                                 companion.getContentPane(),

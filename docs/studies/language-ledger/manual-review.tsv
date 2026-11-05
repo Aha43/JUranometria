@@ -201,3 +201,7 @@ d90e057d3f317516	app/AppMenuBar.java	addBookmarkItem	declared name used, but nev
 b8dcdf4c9159ce66	ui/bookmark/AddBookmarkDialog.java	bookmarkAdd	declared name used, but never at a known sink	identifier	the add dialog's Add button name (#681); a stable key
 4ffc24f9103bc1a8	ui/bookmark/BookmarkCapture.java	[a-z]+(\\.[a-z]+)*	declared name used, but never at a known sink	identifier	the pattern of the modules' body identities (#681); never shown
 abf350c18dc78690	ui/bookmark/BookmarksPanel.java	bookmarks	declared name used, but never at a known sink	identifier	the Bookmarks tab's stable id in the Controller (#681), under which the chosen tab is remembered; no language changes it
+0e936f93ebe25141	ui/PointerNavigationPanel.java	pointerDrag-	declared name used, but never at a known sink	identifier	the prefix of the Pointer navigation choices' component names (#691); a stable key, no language changes it
+10ba06e58bfb712a	app/ChartOptionsControls.java	selectedObjectBox	declared name used, but never at a known sink	identifier	the Selected object box's component name in Chart Options (#692); a stable key
+beb4783ca3144e04	ui/selection/SelectedObjectFacts.java	selected-object	declared name used, but never at a known sink	identifier	the selected-object box's furniture identity on the page and in the view report (#692); never shown as words
+4226939ed66b42da	ui/selection/SelectedObjectStore.java	selectedObjectBox	declared name used, but never at a known sink	identifier	the preference key remembering whether the selected-object box is shown (#692); never shown
