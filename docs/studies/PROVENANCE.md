@@ -325,7 +325,7 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/guide-and-explain/pointer-navigation-nb-NO-dark.png` | `07a3bb19ecac27e728901220c8d98add42837ece85019b649eac327faa50f4ec` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/guide-and-explain/pointer-navigation-nb-NO-light.png` | `b1ef30b9e9a79820f48bf390b8bf33b6cc67a2958b84a7f91f56576f80077edf` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/guide-and-explain/refused-label.png` | `b9376d9dd65546f97ddddf65ccb1f5cd102a9834c811b3a342c688ab87f8ba1f` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/guide-and-explain/sheet-a4.png` | `99c15ecef94ffda02abd987ba87a37623651e6078ed9e665b1aa2093c9e9c369` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/guide-and-explain/sheet-a4.png` | `af422b233a7b6f3e4d79e8d19a0c85da08071c0578a2483a177bc390797026f6` | 2026-11-05 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/guide-and-explain/sketch-body-mark.png` | `b0f5d43832b100cd1871c331c3fc1a07978a0361d8c9ea319b30835fca0e3c0e` | 2026-11-05 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/guide-and-explain/sketch-upper-left-8.png` | `6c3e2056abc0cf3d524644848eecc2ca3edd15bad565b27738a182b3429698fa` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/guide-and-explain/star-catalogue-4.png` | `571afba1942935f3ac864c30603f05183c678b64556302e8de7deaddfa2762b0` | 2026-11-04 | Mac OS X aarch64, Java 21.0.12.1 | various |
