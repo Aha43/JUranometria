@@ -3248,7 +3248,7 @@ public final class PackagedAcceptanceMain {
                 withFigures.add(mark.star().id());
             }
         }
-        int hidden = ViewReport.figureEndpointsBelowLimit(chart[0]);
+        int hidden = endpointsInOpenSky(chart[0], renderer);
         require(hidden > 0, "complete figures reach stars beyond V 4 on the 120° page");
         juranometria.render.ChartOptions o = chart[0].chartOptions();
         javax.swing.SwingUtilities.invokeAndWait(() -> chart[0].setChartOptions(
@@ -3266,13 +3266,13 @@ public final class PackagedAcceptanceMain {
             }
         }
         require(withoutFigures.equals(withFigures), "the figures change only the lines");
-        require(ViewReport.figureEndpointsBelowLimit(chart[0]) == 0, "no figures, no count");
+        require(endpointsInOpenSky(chart[0], renderer) == 0, "no figures, no count");
         javax.swing.SwingUtilities.invokeAndWait(() -> {
             chart[0].setChartOptions(o);
             chart[0].setViewState(new ChartViewState(new SkyPosition(83.0, 0.0), 120.0, 7.0));
         });
         paintHeadless(chart[0]);
-        require(ViewReport.figureEndpointsBelowLimit(chart[0]) == 0,
+        require(endpointsInOpenSky(chart[0], renderer) == 0,
                 "raising the limit to V 7 admits every endpoint");
         System.out.println("dogfooding OK (keep one section open: the box is the remembered"
                 + " choice, opening collapses only its own group's siblings as stored"
@@ -3280,6 +3280,14 @@ public final class PackagedAcceptanceMain {
                 + " star is beyond the limit, " + hidden + " endpoints in open sky are counted"
                 + " for the report, figures off draw the same " + withFigures.size()
                 + " stars, V 7 admits every endpoint)");
+    }
+
+    /** The view report's count, asked of its one source, the page's drawn marks. */
+    private static int endpointsInOpenSky(juranometria.ui.ChartComponent chart,
+                                          juranometria.render.ChartRenderer renderer) {
+        return juranometria.render.FigureEndpoints.belowLimit(chart.currentScene(),
+                chart.drawnOptions(), renderer.drawnMarks(chart.currentScene(),
+                        chart.drawnOptions()));
     }
 
     private static java.awt.Component named(java.awt.Container root, String name) {

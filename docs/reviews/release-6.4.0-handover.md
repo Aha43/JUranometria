@@ -137,6 +137,7 @@ rerun into green. No gate has run on this road yet.
 | #571's heap-logged contracts (`heap-571-candidate`) | canonical breached on 9 promoted structure-emphasis pages (the generator had been rerun but the pages not copied from `build/emphasis-study`); portable OK | re-promoted; both contracts then OK (`contracts-571`, `contracts-ci-571`) |
 | #571's full suite on the candidate (`suite-3`) | 0 of 2 675 failed, 49 desktop-focus aborts, none unexplained | - |
 | #571's interface evidence (`gate2-2`) | 9 of 9 | - |
+| #700's pre-flight on `12841a1c` (`j698-devcheck/preflight.txt`) | dist and provenance replays OK, both contracts OK; the full suite failed 1 of 2 675 (12 aborts): `RenderingClosureTest` - the new journey called `ViewReport` from `PackagedAcceptanceMain`, which is in the rendering closure, and pulled the report into it | the journey asks `FigureEndpoints` directly, the report's own source; the pre-flight repeated on the corrected head |
 | superseded: #307's figure-anchor rule | `docs/studies/figure-anchors/` held as committed with its superseded status at its head; its generator, test and make target removed | the record of the old rule |
 | superseded: #571's earlier proposal to omit a segment with an excluded endpoint | replaced by the owner's amended direction before any measurement | not measured or built |
 
@@ -145,6 +146,9 @@ Lessons this road adds:
 - **a promoted study directory needs its copy step** after its generator
   reruns; a contract breach on a promoted page means the copy, not the
   drawing;
+- **`PackagedAcceptanceMain` is in the rendering closure**: a journey may
+  reach only what the closure admits, so it asks a report's source, not
+  the report;
 - **a rule that changes which stars are drawn moves every page that
   draws figures**, across studies that never mention figures; regenerate
   by the contract's list, not by grep.
@@ -222,7 +226,7 @@ both accepted candidates took one day.
   own group's siblings as stored collapses, off reopens nothing, a
   restart reads it back), then the 120° Orion page at V 4 through the
   production component (no drawn star beyond V 4; 75 endpoints counted
-  for the view report; figures off draw the same 139 stars and count
+  by the view report's counter, `FigureEndpoints`; figures off draw the same 139 stars and count
   none; V 7 admits every endpoint). Passed in the app image built on
   this tree (`app-image-3`).
 - **The final qualification** of the integrated head, for the owner's
