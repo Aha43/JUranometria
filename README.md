@@ -180,7 +180,10 @@ make import-solar-system                   # verifies the pins, proves the excer
   with the whole of Orion named around it. The 8° and closer pages
   stay exactly as before. (Line figures follow the IAU/Sky & Telescope
   chart convention; stick figures are not an IAU standard - the
-  boundaries and names are.)
+  boundaries and names are.) The stellar limit is absolute: figures are
+  drawn complete, so a line may end in open sky where its star is
+  fainter than the limit, and raising the limit shows that star like
+  any other.
 - **Grab to pan**: press anywhere on the paper and drag - the sky
   position under the pointer follows the hand exactly, at every field,
   across RA 0, and honestly near the poles (a north-up chart lets a
@@ -306,6 +309,11 @@ make import-solar-system                   # verifies the pins, proves the excer
   long as it is on the page; the box hides with the toolbar and travels
   to exported sheets. **Chart → Chart Options… → Chart → Selected object
   box** turns it off and on.
+- **Keep the Controller short.** **Keep one section open**, at the foot
+  of the Controller, makes opening a section close the others on the
+  same tab - the Chart tab and the Solar System tab each keep their own
+  one open section. It is off until you turn it on and is remembered;
+  turning it off reopens nothing.
 - **Reset view** returns to the default M31 centre, 8° field, and
   stars to V 8.0, clearing the search.
 - The readout on the right and the chart's title block always state the

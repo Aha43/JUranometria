@@ -223,6 +223,9 @@ public final class EvidenceContractMain {
         // Guide the chart and explain the selection (#690): the measured study.
         REPORT_MAINS.put("juranometria.tool.GuideAndExplainStudyMain",
                 "docs/studies/guide-and-explain/measurements.md");
+        // Complete figures under an absolute stellar limit (#571): the measured pages.
+        REPORT_MAINS.put("juranometria.tool.CompleteFiguresStudyMain",
+                "docs/studies/complete-figures/measurements.md");
         // The Mercury pack study (#528) is not registered, as the Venus one is
         // not: both read the gitignored de440s.bsp and pck00011.tpc, which the CI
         // runner does not hold; `make mercury-pack-study` reproduces the report
@@ -334,10 +337,9 @@ public final class EvidenceContractMain {
         // renderer drew, with labels and its own stroke policy.
         REPORT_MAINS.put("juranometria.tool.OverviewInkStudyMain",
                 "docs/studies/overview-ink/measurements.md");
-        // What that density was doing to the constellation figures,
-        // found by looking at a page rather than by any test (#307).
-        REPORT_MAINS.put("juranometria.tool.FigureAnchorStudyMain",
-                "docs/studies/figure-anchors/measurements.md");
+        // The #307 figure-anchor study is the historical record of a rule
+        // #571 superseded: its main is gone and its report and platform
+        // record are held as committed, their status stated at their head.
         // The celestial-globe gate (#301). Its decision document
         // cites these eleven studies, and until the review of PR #336
         // none of them was run here: a green contract said nothing
@@ -532,8 +534,6 @@ public final class EvidenceContractMain {
                 "docs/studies/chart-sheet/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.overview.OverviewStudyMain",
                 "docs/studies/overview-projection/platform.md");
-        PLATFORM_REPORTS.put("juranometria.tool.FigureAnchorStudyMain",
-                "docs/studies/figure-anchors/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.WiderFieldStudyMain",
                 "docs/studies/wider-field/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.labels.LabelStudyMain",
@@ -689,6 +689,9 @@ public final class EvidenceContractMain {
             // pages carrying the study's box, the drag modes' section
             // sketched, in both languages.
             "juranometria.tool.GuideAndExplainStudyMain",
+            // Complete figures under an absolute stellar limit (#571):
+            // production pages painted as built and as proposed.
+            "juranometria.tool.CompleteFiguresStudyMain",
             // Jupiter and the Galilean moons on the chart (issue #486):
             // production pages composed by the component with the Jovian
             // module attached.

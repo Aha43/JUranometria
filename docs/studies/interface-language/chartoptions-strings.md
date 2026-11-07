@@ -55,7 +55,7 @@ because nobody looks at them.
 
 | shown | hovered | spoken as | read out |
 |---|---|---|---|
-| Constellation figures | The joined stick figures of the constellations. Shortcut: ⌘K then F. | Constellation figures | The joined stick figures of the constellations. Switch it here or from the chart with ⌘K then F. |
+| Constellation figures | The joined stick figures of the constellations. Complete figure lines may reach stars fainter than the stellar limit; raise the limit to show them. Shortcut: ⌘K then F. | Constellation figures | The joined stick figures of the constellations. Complete figure lines may reach stars fainter than the stellar limit; raise the limit to show them. Switch it here or from the chart with ⌘K then F. |
 | Constellation boundaries | The IAU boundaries, precessed from B1875. Shortcut: ⌘K then B. | Constellation boundaries | The IAU boundaries, precessed from B1875. Switch it here or from the chart with ⌘K then B. |
 | Constellation names | The figure's name, drawn where the figure is. Shortcut: ⌘K then N. | Constellation names | The figure's name, drawn where the figure is. Switch it here or from the chart with ⌘K then N. Requires constellation figures to be on. |
 
@@ -121,7 +121,7 @@ because nobody looks at them.
 
 | shown | hovered | spoken as | read out |
 |---|---|---|---|
-| Stjernebildefigurer | Strekfigurene som binder sammen stjernene i stjernebildene. Snarvei: ⌘K deretter F. | Stjernebildefigurer | Strekfigurene som binder sammen stjernene i stjernebildene. Slå det av eller på her eller fra kartet med ⌘K deretter F. |
+| Stjernebildefigurer | Strekfigurene som binder sammen stjernene i stjernebildene. Hele figurlinjer kan nå stjerner som er svakere enn grensemagnituden; øk grensen for å vise dem. Snarvei: ⌘K deretter F. | Stjernebildefigurer | Strekfigurene som binder sammen stjernene i stjernebildene. Hele figurlinjer kan nå stjerner som er svakere enn grensemagnituden; øk grensen for å vise dem. Slå det av eller på her eller fra kartet med ⌘K deretter F. |
 | Stjernebildegrenser | IAUs grenser, presesjonsjustert fra B1875. Snarvei: ⌘K deretter B. | Stjernebildegrenser | IAUs grenser, presesjonsjustert fra B1875. Slå det av eller på her eller fra kartet med ⌘K deretter B. |
 | Stjernebildenavn | Navnet på stjernebildet, plassert ved figuren. Snarvei: ⌘K deretter N. | Stjernebildenavn | Navnet på stjernebildet, plassert ved figuren. Slå det av eller på her eller fra kartet med ⌘K deretter N. Stjernebildefigurer må være slått på. |
 

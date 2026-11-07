@@ -567,6 +567,7 @@ public final class PackagedAcceptanceMain {
         solarSystemSheetJourney();
         zoomLockJourney();
         pointerNavigationJourney();
+        dogfoodingJourney();
         companionJourney();
         controllerTabsJourney();
         occurrenceJourney();
@@ -3161,6 +3162,132 @@ public final class PackagedAcceptanceMain {
                 + " mode; horizontal only keeps the grabbed sky on the press row and the page"
                 + " says so; locked moves nothing; a Shift-held free drag keeps to its first"
                 + " axis and leaves no mode behind)");
+    }
+
+    /**
+     * Both dogfooding findings of road #698 in the packaged image (#700):
+     * the Controller's Keep one section open (#699) - its box is the
+     * remembered choice, opening a section collapses only its own group's
+     * siblings as ordinary stored collapses, and turning it off reopens
+     * nothing - and complete figures under an absolute stellar limit
+     * (#571) - on the 120° page at V 4 no drawn star is fainter than the
+     * limit, the figures switched off draw the same stars, the view report
+     * counts the endpoints left in open sky, and raising the limit admits
+     * them.
+     */
+    private static void dogfoodingJourney() throws Exception {
+        Preferences scratch = Preferences.userRoot()
+                .node("juranometria-packaged-one-open-" + System.nanoTime());
+        try {
+            juranometria.ui.language.InterfaceText said =
+                    juranometria.ui.language.InterfaceText.forLanguage("en");
+            juranometria.ui.companion.CompanionStore store =
+                    juranometria.ui.companion.CompanionStore.forNode(scratch);
+            java.util.List<juranometria.ui.companion.CompanionSection> chartTab =
+                    new java.util.ArrayList<>();
+            java.util.List<juranometria.ui.companion.CompanionSection> solarTab =
+                    new java.util.ArrayList<>();
+            juranometria.ui.companion.OneSectionOpen[] one =
+                    new juranometria.ui.companion.OneSectionOpen[1];
+            javax.swing.JCheckBox[] box = new javax.swing.JCheckBox[1];
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                for (int i = 0; i < 3; i++) {
+                    chartTab.add(juranometria.ui.companion.CompanionSection.remembered(
+                            "c" + i, "Chart " + i, new javax.swing.JLabel("c"), said, store,
+                            i != 0));
+                    solarTab.add(juranometria.ui.companion.CompanionSection.remembered(
+                            "s" + i, "Body " + i, new javax.swing.JLabel("s"), said, store,
+                            i != 1));
+                }
+                one[0] = new juranometria.ui.companion.OneSectionOpen(store);
+                one[0].govern(chartTab);
+                one[0].govern(solarTab);
+                box[0] = one[0].checkBox(said);
+            });
+            require(!box[0].isSelected() && !one[0].on(), "a fresh profile keeps sections independent");
+            javax.swing.SwingUtilities.invokeAndWait(() -> {
+                box[0].setSelected(true);
+                for (var listener : box[0].getActionListeners()) {
+                    listener.actionPerformed(new java.awt.event.ActionEvent(box[0],
+                            java.awt.event.ActionEvent.ACTION_PERFORMED, ""));
+                }
+                chartTab.get(2).setExpanded(true);
+            });
+            require(!chartTab.get(0).expanded() && !chartTab.get(1).expanded()
+                            && chartTab.get(2).expanded(),
+                    "on: opening a Chart section collapses its siblings");
+            require(solarTab.get(1).expanded(), "and the Solar System tab keeps its own");
+            require(store.collapsed("c0", false), "an automatic collapse is an ordinary stored one");
+            javax.swing.SwingUtilities.invokeAndWait(() -> one[0].setOn(false));
+            require(!chartTab.get(0).expanded(), "off: nothing is reopened");
+            javax.swing.SwingUtilities.invokeAndWait(() -> one[0].setOn(true));
+            scratch.flush();
+            require(new juranometria.ui.companion.OneSectionOpen(
+                            juranometria.ui.companion.CompanionStore.forNode(scratch)).on(),
+                    "a restart reads the choice back");
+        } finally {
+            scratch.removeNode();
+        }
+
+        juranometria.ui.ChartComponent[] chart = new juranometria.ui.ChartComponent[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            chart[0] = new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
+            chart[0].setSize(900, 700);
+            chart[0].setViewState(new ChartViewState(new SkyPosition(83.0, 0.0), 120.0, 4.0));
+        });
+        paintHeadless(chart[0]);
+        juranometria.render.ChartRenderer renderer = new juranometria.render.ChartRenderer(
+                juranometria.chart.StarSizePolicy.DEFAULT, ENGLISH_PAGE);
+        juranometria.chart.ChartScene scene = chart[0].currentScene();
+        java.util.Set<String> withFigures = new java.util.HashSet<>();
+        for (var mark : renderer.drawnMarks(scene, chart[0].drawnOptions())) {
+            if (mark.star() != null) {
+                require(mark.star().magnitude() <= 4.0,
+                        "the limit is absolute: " + mark.star().id() + " V "
+                                + mark.star().magnitude());
+                withFigures.add(mark.star().id());
+            }
+        }
+        int hidden = endpointsInOpenSky(chart[0], renderer);
+        require(hidden > 0, "complete figures reach stars beyond V 4 on the 120° page");
+        juranometria.render.ChartOptions o = chart[0].chartOptions();
+        javax.swing.SwingUtilities.invokeAndWait(() -> chart[0].setChartOptions(
+                new juranometria.render.ChartOptions(o.deepSkyObjects(), o.deepSkyLabels(),
+                        false, o.constellationBoundaries(), o.constellationNames(),
+                        o.starNames(), o.bayerLetters(), o.flamsteedNumbers(),
+                        o.equatorialGrid(), o.titleBlock(), o.magnitudeKey(), o.galaxies(),
+                        o.openClusters(), o.globularClusters(), o.nebulae(),
+                        o.planetaryNebulae(), o.palette())));
+        paintHeadless(chart[0]);
+        java.util.Set<String> withoutFigures = new java.util.HashSet<>();
+        for (var mark : renderer.drawnMarks(chart[0].currentScene(), chart[0].drawnOptions())) {
+            if (mark.star() != null) {
+                withoutFigures.add(mark.star().id());
+            }
+        }
+        require(withoutFigures.equals(withFigures), "the figures change only the lines");
+        require(endpointsInOpenSky(chart[0], renderer) == 0, "no figures, no count");
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            chart[0].setChartOptions(o);
+            chart[0].setViewState(new ChartViewState(new SkyPosition(83.0, 0.0), 120.0, 7.0));
+        });
+        paintHeadless(chart[0]);
+        require(endpointsInOpenSky(chart[0], renderer) == 0,
+                "raising the limit to V 7 admits every endpoint");
+        System.out.println("dogfooding OK (keep one section open: the box is the remembered"
+                + " choice, opening collapses only its own group's siblings as stored"
+                + " collapses, off reopens nothing; complete figures: at 120° and V 4 no drawn"
+                + " star is beyond the limit, " + hidden + " endpoints in open sky are counted"
+                + " for the report, figures off draw the same " + withFigures.size()
+                + " stars, V 7 admits every endpoint)");
+    }
+
+    /** The view report's count, asked of its one source, the page's drawn marks. */
+    private static int endpointsInOpenSky(juranometria.ui.ChartComponent chart,
+                                          juranometria.render.ChartRenderer renderer) {
+        return juranometria.render.FigureEndpoints.belowLimit(chart.currentScene(),
+                chart.drawnOptions(), renderer.drawnMarks(chart.currentScene(),
+                        chart.drawnOptions()));
     }
 
     private static java.awt.Component named(java.awt.Container root, String name) {

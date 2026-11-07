@@ -754,9 +754,10 @@ public final class JUranometriaMain {
         // The tab opens with the instant the chart is frozen at and Update
         // to now (#259, ruling 9 on #556).
         solarSection.showChartInstant(observerNow, placeAndTimeChanges, updateToNow);
+        javax.swing.JComponent solarGroups =
+                solarSection.inController(companionStore, companionWords);
         companion.addTab(juranometria.ui.solar.SolarSystemSection.ID,
-                companionWords.say("companion.tab.solarsystem"),
-                solarSection.inController(companionStore, companionWords));
+                companionWords.say("companion.tab.solarsystem"), solarGroups);
         shutdown.onShutdown(solarSection::release);
         // Chart Options (#443, ruled on #442), third on the Chart tab
         // since #507 (fourth section since #458): the same controls
@@ -770,6 +771,22 @@ public final class JUranometriaMain {
                         eclipticSwitch, selectedObjectSwitch,
                         companionWords).inCompanion(companionStore,
                         companionWords));
+        // Keep one section open (#699, road #698): one global choice in a
+        // slim row under the tabs, governing the Chart tab's sections and
+        // the Solar System tab's body groups each on its own; Chart
+        // Options' nested groups are not governed. Off until chosen.
+        juranometria.ui.companion.OneSectionOpen oneSectionOpen =
+                new juranometria.ui.companion.OneSectionOpen(companionStore);
+        oneSectionOpen.govern(companion.sections());
+        java.util.List<juranometria.ui.companion.CompanionSection> bodyGroups =
+                new java.util.ArrayList<>();
+        for (java.awt.Component child : solarGroups.getComponents()) {
+            if (child instanceof juranometria.ui.companion.CompanionSection group) {
+                bodyGroups.add(group);
+            }
+        }
+        oneSectionOpen.govern(bodyGroups);
+        companion.setFooter(oneSectionOpen.checkBox(companionWords));
         // Place and Time and the Controller's switch (#675, stage 2): one
         // opener and one toggle each, handed to the Chart menu's item and
         // to the toolbar's icon-only button alike, so the two routes are
@@ -903,7 +920,9 @@ public final class JUranometriaMain {
                                 ecliptic, selection,
                                 modules.workingSelection(),
                                 System::getProperty)
-                                .withPointerDrag(pointerDrag.mode().token()),
+                                .withPointerDrag(pointerDrag.mode().token())
+                                .withFigureEndpointsBelowLimit(
+                                        ViewReport.figureEndpointsBelowLimit(chart)),
                         CopyViewReport.SYSTEM,
                         reason -> {
                             juranometria.ui.language.InterfaceText said =

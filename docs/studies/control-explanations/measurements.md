@@ -36,6 +36,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Chart controls | JToggleButton | (icon only) | Show the Inspector: what the selected mark is (<key:inspector>) | Hidden; press to open the panel that identifies what you selected and lists what is on ... | dynamic |
 | Chart controls | JToggleButton | (icon only) | When on, choosing objects adds them to the working selection and choosing them again re... | Off, each object you choose replaces the working selection; on, it is added to it, and ... | hovered |
 | Chart controls | SearchField | (a field) | Find an object or J2000 coordinates, e.g. M 31, NGC 224, TYC 2801-2090-1, or 0:42:44 +4... | Type a Messier or NGC number, a star's catalogue identity, or a J2000 right ascension a... | hovered |
+| Keep one section open | JCheckBox | Keep one section open | Opening a section closes the others on its tab | On the Chart and Solar System tabs, opening a section closes the other sections there; ... | hovered |
 | Pointer navigation | JRadioButton | Free | &mdash; | A drag moves the chart in any direction, as it always has. | self-explanatory |
 | Pointer navigation | JRadioButton | Horizontal only | &mdash; | A drag moves the page only across the screen, whatever the lines in the sky do. | self-explanatory |
 | Pointer navigation | JRadioButton | Vertical only | &mdash; | A drag moves the page only up and down the screen, whatever the lines in the sky do. | self-explanatory |
@@ -108,7 +109,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Chart Options | JCheckBox | Bayer letters | Greek and Latin Bayer designations such as alpha Orionis. Shortcut: <prefix> then Y. | Greek and Latin Bayer designations such as alpha Orionis. Switch it here or from the ch... | hovered |
 | Chart Options | JCheckBox | Flamsteed numbers | Flamsteed catalogue numbers on the regional charts. Shortcut: <prefix> then M. | Flamsteed catalogue numbers on the regional charts. Switch it here or from the chart wi... | hovered |
 | Chart Options | JCheckBox | All star identities where they fit | Every star name, letter and number that fits, beside the usual labels | Writes every name, Bayer letter and Flamsteed number the star catalogue knows for the s... | hovered |
-| Chart Options | JCheckBox | Constellation figures | The joined stick figures of the constellations. Shortcut: <prefix> then F. | The joined stick figures of the constellations. Switch it here or from the chart with <... | hovered |
+| Chart Options | JCheckBox | Constellation figures | The joined stick figures of the constellations. Complete figure lines may reach stars f... | The joined stick figures of the constellations. Complete figure lines may reach stars f... | hovered |
 | Chart Options | JCheckBox | Constellation boundaries | The IAU boundaries, precessed from B1875. Shortcut: <prefix> then B. | The IAU boundaries, precessed from B1875. Switch it here or from the chart with <prefix... | hovered |
 | Chart Options | JCheckBox | Constellation names | The figure's name, drawn where the figure is. Shortcut: <prefix> then N. | The figure's name, drawn where the figure is. Switch it here or from the chart with <pr... | hovered |
 | Chart Options | JCheckBox | Equatorial coordinate grid | ICRS/J2000 right-ascension and declination grid lines with coordinate labels. Shortcut:... | ICRS/J2000 right-ascension and declination grid lines with coordinate labels. Switch it... | hovered |
@@ -190,7 +191,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 
 ## The audit
 
-**173 operable controls** across 20 surfaces: **109** hovered, **12** dynamic, **52** left to their own visible words, **0 undecided**.
+**174 operable controls** across 21 surfaces: **110** hovered, **12** dynamic, **52** left to their own visible words, **0 undecided**.
 
 **0** say the same words twice - a tooltip read back as a description. The seam refuses it, so this is zero or a finding.
 

@@ -1,3 +1,10 @@
+> **Status: historical record of a superseded rule.** #571 (ruled 2026-11-07,
+> `docs/decisions/complete-figures.md`) removed the figure-anchor exception
+> this study measured: the stellar limit is now absolute and figure lines may
+> end at stars it excludes. This report is held as committed, unchanged below
+> this note; its generator is gone. Current behaviour is measured in
+> `docs/studies/complete-figures/measurements.md`.
+
 # Constellation figures and the overview's magnitude limit
 
 What this file is: the measurement behind issue #307, which was found by

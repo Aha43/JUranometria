@@ -32,35 +32,35 @@ sagittarius, with the paper's edge as the boundary:
     family            asked  attributed omitted   rank  in disc crosses outside
     STAR                 36          36       0      1       36       0       0
     DEEP_SKY              1           1       0      0        1       0       0
-    CONSTELLATION         9           9       0      3        9       0       0
+    CONSTELLATION         9           9       0      4        9       0       0
   limb:
     family            asked  attributed omitted   rank  in disc crosses outside
     STAR                 50          50       0      1       30      15       5
-    CONSTELLATION        23          23       0      3        8      15       0
+    CONSTELLATION        23          23       0      3        7      16       0
   whole disc:
     family            asked  attributed omitted   rank  in disc crosses outside
     STAR                150         150       0      1      130      15       5
     DEEP_SKY              1           1       0      0        1       0       0
-    CONSTELLATION        58          58       0      3       41      17       0
+    CONSTELLATION        58          58       0      4       40      18       0
 
 sagittarius, as production places them, with the limb as the boundary:
   centre:
     family            asked  attributed omitted   rank  in disc crosses outside
     STAR                 36          36       0      1       36       0       0
     DEEP_SKY              1           1       0      0        1       0       0
-    CONSTELLATION         9           9       0      3        9       0       0
+    CONSTELLATION         9           9       0      4        9       0       0
   limb:
     family            asked  attributed omitted   rank  in disc crosses outside
     STAR                 50          50       0      2       50       0       0
-    CONSTELLATION        23          15       8      7       15       0       0
+    CONSTELLATION        23          15       8      6       15       0       0
     omitted labels were refused by: PAGE_EDGE 8, OWNERSHIP 8
   whole disc:
     family            asked  attributed omitted   rank  in disc crosses outside
     STAR                150         150       0      1      150       0       0
     DEEP_SKY              1           1       0      0        1       0       0
-    CONSTELLATION        58          50       8      4       50       0       0
+    CONSTELLATION        58          50       8      5       50       0       0
     omitted labels were refused by: PAGE_EDGE 8, OWNERSHIP 8
-  of the labels the paper placed: 162 stayed where they were, 39 moved, 8 became omissions
+  of the labels the paper placed: 160 stayed where they were, 41 moved, 8 became omissions
 
 orion, with the paper's edge as the boundary:
   centre:
@@ -70,14 +70,14 @@ orion, with the paper's edge as the boundary:
     CONSTELLATION         6           6       0      9        6       0       0
   limb:
     family            asked  attributed omitted   rank  in disc crosses outside
-    STAR                 48          48       0      2       28      13       7
+    STAR                 48          48       0      2       29      12       7
     DEEP_SKY              1           1       0      0        0       1       0
-    CONSTELLATION        22          22       0      5        8      14       0
+    CONSTELLATION        22          22       0      6        7      15       0
   whole disc:
     family            asked  attributed omitted   rank  in disc crosses outside
-    STAR                127         127       0      2      106      14       7
+    STAR                127         127       0      1      107      13       7
     DEEP_SKY              5           5       0      0        4       1       0
-    CONSTELLATION        49          49       0      7       35      14       0
+    CONSTELLATION        49          49       0      6       34      15       0
 
 orion, as production places them, with the limb as the boundary:
   centre:
@@ -97,4 +97,4 @@ orion, as production places them, with the limb as the boundary:
     DEEP_SKY              5           5       0      1        5       0       0
     CONSTELLATION        49          40       9      7       40       0       0
     omitted labels were refused by: PAGE_EDGE 9, OWNERSHIP 9
-  of the labels the paper placed: 138 stayed where they were, 34 moved, 9 became omissions
+  of the labels the paper placed: 137 stayed where they were, 35 moved, 9 became omissions

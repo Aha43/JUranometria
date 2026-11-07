@@ -25,7 +25,7 @@ in their head.
 | Bayer letters | `Y` | — | Greek and Latin Bayer designations such as alpha Orionis.... |
 | Flamsteed numbers | `F` | — | Flamsteed catalogue numbers on the regional charts. Short... |
 | All star identities where they fit | `A` | — | Every star name, letter and number that fits, beside the ... |
-| Constellation figures | `F` | — | The joined stick figures of the constellations. Shortcut:... |
+| Constellation figures | `F` | — | The joined stick figures of the constellations. Complete ... |
 | Constellation boundaries | `B` | — | The IAU boundaries, precessed from B1875. Shortcut: <pref... |
 | Constellation names | `N` | Constellation figures | The figure's name, drawn where the figure is. Shortcut: <... |
 | Equatorial coordinate grid | `E` | — | ICRS/J2000 right-ascension and declination grid lines wit... |

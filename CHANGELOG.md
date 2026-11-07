@@ -7,6 +7,29 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Keep one Controller section open (#698, #699).** A slim row at the
+foot of the Controller offers *Keep one section open*: while it is on,
+opening a section collapses the others in its group - the Chart tab's
+sections, and the Solar System tab's body groups, each on its own - so
+each tab keeps its one open section. Turning it on keeps the section
+you are working in, otherwise the one opened last, otherwise the first;
+turning it off reopens nothing. Off until you choose it, and
+remembered; opening a Solar System group still computes nothing.
+
+**Complete figures under an absolute stellar limit (#571).** The
+stellar magnitude limit now means exactly what the magnitude key says:
+no star fainter than the limit is drawn, named or selectable, at any
+field, apart from the page's own named target, as before. Constellation figures stay complete, so a line may end in open
+sky where its star is fainter than the limit; raising the limit shows
+that star through the ordinary stellar path. This replaces #307's
+figure anchors, which kept such stars drawn wherever figures were - so
+zooming from 12° to 8° no longer removes stars the wider page had kept.
+Turning figures on or off changes only the lines. The view report
+counts the endpoints left in open sky (`figure-endpoints-below-limit`)
+when there are any, and the figure option's explanation says it, in
+both languages. Ruled in `docs/decisions/complete-figures.md` from the
+measured pages.
+
 ## [6.3.0] - 2026-11-05
 
 **Pointer navigation (#689, #691).** Controls → Chart → Pointer

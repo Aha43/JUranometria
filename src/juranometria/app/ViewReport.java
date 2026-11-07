@@ -50,7 +50,8 @@ public final class ViewReport {
             Selection selection,
             List<String> workingSet, String workingLead,
             String osName, String osVersion, String osArch,
-            String javaVersion, List<String> furniture, String pointerDrag) {
+            String javaVersion, List<String> furniture, String pointerDrag,
+            int figureEndpointsBelowLimit) {
 
         public Snapshot {
             emphasis = emphasis == null ? Set.of() : Set.copyOf(emphasis);
@@ -85,7 +86,7 @@ public final class ViewReport {
                     chosen, drawn, interfaceLanguage, skyLanguageChosen,
                     skyLanguageOnChart, emphasis, modules, placeAndTime,
                     eclipticShowing, selection, workingSet, workingLead, osName,
-                    osVersion, osArch, javaVersion, furniture, null);
+                    osVersion, osArch, javaVersion, furniture, null, 0);
         }
 
         /** The same state with the pointer drag's mode, by its token (#691). */
@@ -96,7 +97,18 @@ public final class ViewReport {
                     skyLanguageChosen, skyLanguageOnChart, emphasis, modules,
                     placeAndTime, eclipticShowing, selection, workingSet,
                     workingLead, osName, osVersion, osArch, javaVersion,
-                    furniture, mode);
+                    furniture, mode, figureEndpointsBelowLimit);
+        }
+
+        /** The same state with its count of figure endpoints the limit hides (#571). */
+        public Snapshot withFigureEndpointsBelowLimit(int count) {
+            return new Snapshot(version, view, chartWidthPx, chartHeightPx,
+                    pageWidthPx, pageHeightPx, pageOffsetXPx, pageOffsetYPx,
+                    displayScale, chosen, drawn, interfaceLanguage,
+                    skyLanguageChosen, skyLanguageOnChart, emphasis, modules,
+                    placeAndTime, eclipticShowing, selection, workingSet,
+                    workingLead, osName, osVersion, osArch, javaVersion,
+                    furniture, pointerDrag, count);
         }
 
         /** A state with no module furniture drawn - every report before #259. */
@@ -152,6 +164,19 @@ public final class ViewReport {
      */
     static final List<String> MACHINE_FACTS =
             List.of("os.name", "os.version", "os.arch", "java.version");
+
+    /** How many figure endpoints this page leaves in open sky under its limit (#571). */
+    static int figureEndpointsBelowLimit(juranometria.ui.ChartComponent chart) {
+        juranometria.chart.ChartScene scene = chart.currentScene();
+        if (scene == null) {
+            return 0;
+        }
+        ChartOptions drawn = chart.drawnOptions();
+        return juranometria.render.FigureEndpoints.belowLimit(scene, drawn,
+                new juranometria.render.ChartRenderer(
+                        juranometria.chart.StarSizePolicy.DEFAULT, chart.words())
+                        .drawnMarks(scene, drawn));
+    }
 
     /**
      * The live state, read from each value's one production owner at
@@ -267,6 +292,11 @@ public final class ViewReport {
         // so no report a reader has already taken changes.
         if (s.pointerDrag() != null) {
             lines.add("pointer-drag: " + s.pointerDrag());
+        }
+        // Figure lines reaching stars the limit excludes (#571, ruled D-4):
+        // here and nowhere else, and absent when there are none.
+        if (s.figureEndpointsBelowLimit() > 0) {
+            lines.add("figure-endpoints-below-limit: " + s.figureEndpointsBelowLimit());
         }
         if (s.placeAndTime() != null) {
             PlaceAndTime place = s.placeAndTime();
