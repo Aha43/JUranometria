@@ -290,7 +290,7 @@ taken for:
 | chart furniture | the key is drawn, one box for every page, under a twentieth of the paper | the box's size and the ink it covers |
 | chart sheets | the paper, the shape and label counts | the encoded file sizes |
 | overview projections | each candidate agrees, and a round trip returns, within 1e-9 | the residues themselves |
-| figure anchors | every figure endpoint has a node | how many the title block covers |
+| figure anchors (historical since #571, held as committed) | every figure endpoint had a node | how many the title block covered |
 | wider field | the mark and ink digests, which are arithmetic | the pixel digest |
 | label placement | the corpus, and the stability budget met | the whole collision census |
 
@@ -383,8 +383,8 @@ aborts — a run count, not a claim of eliminated intermittence.
 Text cannot decide whether a read runs on the event thread — that
 is control flow, and #220 proved the cost of guessing, three times
 (the journey's mark derivation, its page offset, and finally its
-own premise capture). The measurements count the traffic: **478
-reads of live chart state** against **1187 explicit hand-offs**
+own premise capture). The measurements count the traffic: **476
+reads of live chart state** against **1183 explicit hand-offs**
 suite-wide (requoted for the #261 reader-surface tests, which read
 scenes and marks under the same one-hand-off discipline; for #275's
 closing journey, which reads the page's own objects and takes its

@@ -405,22 +405,16 @@ public final class ChartRenderer {
         }
         deepSky.sort(stackingOrder());
         marks.addAll(deepSky);
-        // The page's own limit, excepting the stars its figures are
-        // drawn to (issue #307). A limit says how crowded the page
-        // should be; it does not get to decide which stars a
-        // constellation is made of, and on the overview's brighter
-        // defaults it was removing them - lines drawn to nodes that
-        // were not there.
-        FigureAnchors anchors = FigureAnchors.of(scene, options,
-                new GeographyDetailPolicy(
-                        scene.viewport().fieldWidthDegrees()));
+        // The page's own limit is absolute (#571, amending #307): a star
+        // fainter than it has no mark, whatever a figure line reaches. The
+        // figures are drawn complete from their stored geometry regardless.
         for (Star star : scene.stars()) {
             // The page's named target is drawn whatever the limit (#681,
             // ruled C-3 on #497): a star primary has the single-target
             // privilege a deep-sky target has, without raising the limit
             // for any other star.
             if (star.magnitude() > scene.limitingMagnitude()
-                    && !anchors.holds(star) && !star.id().equals(scene.targetIdentity())) {
+                    && !star.id().equals(scene.targetIdentity())) {
                 continue;
             }
             projection.project(star.position()).ifPresent(plane -> {

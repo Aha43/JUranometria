@@ -14,6 +14,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ViewReportPointerDragTest {
 
     @Test
+    void hiddenFigureEndpointsAreALineOnlyWhenThereAreAny() {
+        assertFalse(ViewReport.format(ViewReportTest.rich()).contains("figure-endpoints"));
+        String report = ViewReport.format(
+                ViewReportTest.rich().withFigureEndpointsBelowLimit(76));
+        assertTrue(report.contains("\nfigure-endpoints-below-limit: 76\n"), "#571, D-4");
+    }
+
+    @Test
     void aFreeDragAddsNoLine() {
         String before = ViewReport.format(ViewReportTest.rich());
         String free = ViewReport.format(ViewReportTest.rich().withPointerDrag("free"));

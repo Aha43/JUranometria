@@ -53,7 +53,7 @@ Every one of them from the registry that binds it, so a tooltip cannot promise a
 | Chart Options | Star names | Traditional proper names such as Betelgeuse. Shortcut: <prefix> then S. |
 | Chart Options | Bayer letters | Greek and Latin Bayer designations such as alpha Orionis. Shortcut: <prefix> then Y. |
 | Chart Options | Flamsteed numbers | Flamsteed catalogue numbers on the regional charts. Shortcut: <prefix> then M. |
-| Chart Options | Constellation figures | The joined stick figures of the constellations. Shortcut: <prefix> then F. |
+| Chart Options | Constellation figures | The joined stick figures of the constellations. Complete figure lines may reach stars f... |
 | Chart Options | Constellation boundaries | The IAU boundaries, precessed from B1875. Shortcut: <prefix> then B. |
 | Chart Options | Constellation names | The figure's name, drawn where the figure is. Shortcut: <prefix> then N. |
 | Chart Options | Equatorial coordinate grid | ICRS/J2000 right-ascension and declination grid lines with coordinate labels. Shortcut:... |

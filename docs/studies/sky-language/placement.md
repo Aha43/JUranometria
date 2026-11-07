@@ -81,12 +81,12 @@ Limiting magnitude **V 4.0**, which is the limit this rung arrives with (`ChartV
 |---|---|---|---|---|
 | `Aql` | Aquila | Ørnen | renamed in place | candidate 0 |
 | `Aqr` | Aquarius | Vannmannen | renamed in place | candidate 5 |
-| `Ara` | Ara | Alteret | renamed in place | candidate 4 |
+| `Ara` | Ara | Alteret | renamed in place | candidate 3 |
 | `Boo` | Boötes | Oksedriveren | moved | candidate 2 to 10, 20 px |
-| `Cap` | Capricornus | Steinbukken | renamed in place | candidate 4 |
+| `Cap` | Capricornus | Steinbukken | renamed in place | candidate 0 |
 | `Cen` | Centaurus | Kentauren | renamed in place | candidate 10 |
 | `Cir` | Circinus | Passeren | renamed in place | candidate 3 |
-| `CrA` | Corona Australis | Sørlige krone | moved | candidate 6 to 9, 63 px |
+| `CrA` | Corona Australis | Sørlige krone | renamed in place | candidate 1 |
 | `Del` | Delphinus | Delfinen | renamed in place | candidate 5 |
 | `Equ` | Equuleus | Føllet | renamed in place | candidate 0 |
 | `Gru` | Grus | Tranen | renamed in place | candidate 3 |
@@ -96,15 +96,15 @@ Limiting magnitude **V 4.0**, which is the limit this rung arrives with (`ChartV
 | `Lib` | Libra | Vekten | renamed in place | candidate 0 |
 | `Lup` | Lupus | Ulven | renamed in place | candidate 2 |
 | `Mic` | Microscopium | Mikroskopet | renamed in place | candidate 0 |
-| `Nor` | Norma | Vinkelhaken | moved | candidate 1 to 9, 20 px |
+| `Nor` | Norma | Vinkelhaken | renamed in place | candidate 0 |
 | `Oph` | Ophiuchus | Slangebæreren | moved | candidate 4 to 5, 57 px |
 | `Pav` | Pavo | Påfuglen | renamed in place | candidate 1 |
-| `PsA` | Piscis Austrinus | Sørlige fisk | moved | candidate 3 to 2, 45 px |
+| `PsA` | Piscis Austrinus | Sørlige fisk | renamed in place | candidate 0 |
 | `Sco` | Scorpius | Skorpionen | moved | candidate 13 to 4, 85 px |
 | `Sct` | Scutum | Skjoldet | renamed in place | candidate 3 |
 | `Ser` | Serpens | Slangen | renamed in place | candidate 0 |
-| `Sge` | Sagitta | Pilen | moved | candidate 9 to 1, 20 px |
-| `Sgr` | Sagittarius | Skytten | moved | candidate 6 to 9, 63 px |
+| `Sge` | Sagitta | Pilen | renamed in place | candidate 5 |
+| `Sgr` | Sagittarius | Skytten | renamed in place | candidate 12 |
 | `Tel` | Telescopium | Teleskopet | renamed in place | candidate 5 |
 | `TrA` | Triangulum Australe | Sørlige triangel | renamed in place | candidate 10 |
 | `Vir` | Virgo | Jomfruen | renamed in place | candidate 0 |
@@ -125,16 +125,16 @@ Limiting magnitude **V 4.0**, which is the limit this rung arrives with (`ChartV
 | `Cet` | Cetus | Hvalen | renamed in place | candidate 0 |
 | `Cnc` | Cancer | Krepsen | renamed in place | candidate 5 |
 | `Col` | Columba | Duen | moved | candidate 5 to 2, 45 px |
-| `Eri` | Eridanus | Floden | renamed in place | candidate 2 |
+| `Eri` | Eridanus | Floden | renamed in place | candidate 0 |
 | `For` | Fornax | Smelteovnen | renamed in place | candidate 0 |
 | `Gem` | Gemini | Tvillingene | renamed in place | candidate 0 |
 | `Hor` | Horologium | Uret | moved | candidate 10 to 2, 20 px |
 | `Hya` | Hydra | Vannslangen | renamed in place | candidate 0 |
 | `Lep` | Lepus | Haren | renamed in place | candidate 7 |
 | `Lyn` | Lynx | Gaupen | moved | candidate 6 to 5, 40 px |
-| `Mon` | Monoceros | Enhjørningen | renamed in place | candidate 4 |
-| `Psc` | Pisces | Fiskene | renamed in place | candidate 4 |
-| `Pup` | Puppis | Akterstavnen | moved | candidate 0 to 2, 20 px |
+| `Mon` | Monoceros | Enhjørningen | renamed in place | candidate 0 |
+| `Psc` | Pisces | Fiskene | renamed in place | candidate 0 |
+| `Pup` | Puppis | Akterstavnen | renamed in place | candidate 0 |
 | `Pyx` | Pyxis | Kompasset | renamed in place | candidate 3 |
 | `Tau` | Taurus | Tyren | renamed in place | candidate 9 |
 | `Tri` | Triangulum | Triangelet | renamed in place | candidate 1 |
@@ -155,7 +155,7 @@ Limiting magnitude **V 5.0**, which is the limit this rung arrives with (`ChartV
 | `Cen` | Centaurus | Kentauren | renamed in place | candidate 10 |
 | `Cha` | Chamaeleon | Kameleonen | renamed in place | candidate 10 |
 | `Cir` | Circinus | Passeren | renamed in place | candidate 4 |
-| `CrA` | Corona Australis | Sørlige krone | moved | candidate 0 to 1, 20 px |
+| `CrA` | Corona Australis | Sørlige krone | renamed in place | candidate 6 |
 | `CrB` | Corona Borealis | Nordlige krone | renamed in place | candidate 10 |
 | `Cru` | Crux | Sydkorset | moved | candidate 1 to 0, 20 px |
 | `Crv` | Corvus | Ravnen | renamed in place | candidate 4 |
@@ -172,7 +172,7 @@ Limiting magnitude **V 5.0**, which is the limit this rung arrives with (`ChartV
 | `Lib` | Libra | Vekten | renamed in place | candidate 3 |
 | `Lup` | Lupus | Ulven | renamed in place | candidate 14 |
 | `Lyr` | Lyra | Lyren | moved | candidate 8 to 2, 28 px |
-| `Mic` | Microscopium | Mikroskopet | moved | candidate 1 to 0, 20 px |
+| `Mic` | Microscopium | Mikroskopet | renamed in place | candidate 0 |
 | `Mus` | Musca | Fluen | renamed in place | candidate 2 |
 | `Nor` | Norma | Vinkelhaken | moved | candidate 0 to 2, 20 px |
 | `Oct` | Octans | Oktanten | renamed in place | candidate 0 |
@@ -205,7 +205,7 @@ Limiting magnitude **V 5.0**, which is the limit this rung arrives with (`ChartV
 | `Aur` | Auriga | Kusken | renamed in place | candidate 14 |
 | `CMa` | Canis Major | Store hund | renamed in place | candidate 9 |
 | `CMi` | Canis Minor | Lille hund | moved | candidate 10 to 9, 80 px |
-| `Cae` | Caelum | Gravstikken | moved | candidate 10 to 0, 40 px |
+| `Cae` | Caelum | Gravstikken | renamed in place | candidate 0 |
 | `Cam` | Camelopardalis | Sjiraffen | moved | candidate 8 to 16, 20 px |
 | `Car` | Carina | Kjølen | renamed in place | candidate 11 |
 | `Cet` | Cetus | Hvalen | renamed in place | candidate 2 |
@@ -215,7 +215,7 @@ Limiting magnitude **V 5.0**, which is the limit this rung arrives with (`ChartV
 | `Eri` | Eridanus | Floden | moved | candidate 6 to 4, 40 px |
 | `For` | Fornax | Smelteovnen | moved | candidate 0 to 5, 28 px |
 | `Gem` | Gemini | Tvillingene | moved | candidate 0 to 3, 28 px |
-| `Hor` | Horologium | Uret | moved | candidate 7 to 0, 20 px |
+| `Hor` | Horologium | Uret | moved | candidate 4 to 0, 28 px |
 | `Hya` | Hydra | Vannslangen | moved | candidate 11 to 13, 80 px |
 | `Hyi` | Hydrus | Sørlige vannslange | moved | candidate 3 to 4, 40 px |
 | `LMi` | Leo Minor | Lille løve | renamed in place | candidate 9 |
@@ -224,7 +224,7 @@ Limiting magnitude **V 5.0**, which is the limit this rung arrives with (`ChartV
 | `Lyn` | Lynx | Gaupen | renamed in place | candidate 0 |
 | `Men` | Mensa | Taffelberget | moved | candidate 10 to 0, 40 px |
 | `Mon` | Monoceros | Enhjørningen | moved | candidate 4 to 16, 63 px |
-| `Phe` | Phoenix | Føniks | moved | candidate 4 to 7, 20 px |
+| `Phe` | Phoenix | Føniks | moved | candidate 10 to 7, 45 px |
 | `Pic` | Pictor | Maleren | moved | candidate 1 to 4, 45 px |
 | `Psc` | Pisces | Fiskene | renamed in place | candidate 0 |
 | `Pup` | Puppis | Akterstavnen | moved | candidate 9 to 4, 63 px |
@@ -361,7 +361,7 @@ Limiting magnitude **V 5.0**, which is the limit this rung arrives with (`ChartV
 | `Aqr` | Aquarius | Vannmannen | moved | candidate 16 to 6, 28 px |
 | `Ara` | Ara | Alteret | renamed in place | candidate 5 |
 | `CMa` | Canis Major | Store hund | renamed in place | candidate 11 |
-| `Cae` | Caelum | Gravstikken | renamed in place | candidate 5 |
+| `Cae` | Caelum | Gravstikken | moved | candidate 2 to 5, 45 px |
 | `Cap` | Capricornus | Steinbukken | renamed in place | candidate 16 |
 | `Car` | Carina | Kjølen | renamed in place | candidate 12 |
 | `Cen` | Centaurus | Kentauren | renamed in place | candidate 14 |
@@ -373,13 +373,13 @@ Limiting magnitude **V 5.0**, which is the limit this rung arrives with (`ChartV
 | `Crt` | Crater | Begeret | renamed in place | candidate 9 |
 | `Cru` | Crux | Sydkorset | renamed in place | candidate 6 |
 | `Crv` | Corvus | Ravnen | renamed in place | candidate 9 |
-| `Dor` | Dorado | Gullfisken | renamed in place | candidate 6 |
+| `Dor` | Dorado | Gullfisken | moved | candidate 12 to 6, 63 px |
 | `Eri` | Eridanus | Floden | moved | candidate 14 to 0, 57 px |
 | `For` | Fornax | Smelteovnen | moved | candidate 9 to 1, 20 px |
 | `Gru` | Grus | Tranen | renamed in place | candidate 9 |
-| `Hor` | Horologium | Uret | moved | candidate 2 to 0, 20 px |
+| `Hor` | Horologium | Uret | renamed in place | candidate 0 |
 | `Hya` | Hydra | Vannslangen | moved | candidate 4 to 8, 45 px |
-| `Hyi` | Hydrus | Sørlige vannslange | moved | candidate 15 to 11, 40 px |
+| `Hyi` | Hydrus | Sørlige vannslange | moved | candidate 12 to 11, 80 px |
 | `Ind` | Indus | Inderen | renamed in place | candidate 7 |
 | `Lep` | Lepus | Haren | renamed in place | candidate 3 |
 | `Lib` | Libra | Vekten | moved | candidate 6 to 4, 40 px |
@@ -416,10 +416,10 @@ Limiting magnitude **V 4.0**, which is the limit this rung arrives with (`ChartV
 | id | Latin | Norwegian | outcome | detail |
 |---|---|---|---|---|
 | `Aql` | Aquila | Ørnen | renamed in place | candidate 2 |
-| `Aqr` | Aquarius | Vannmannen | renamed in place | candidate 3 |
+| `Aqr` | Aquarius | Vannmannen | renamed in place | candidate 0 |
 | `Ari` | Aries | Væren | renamed in place | candidate 0 |
 | `Aur` | Auriga | Kusken | renamed in place | candidate 0 |
-| `Cap` | Capricornus | Steinbukken | renamed in place | candidate 3 |
+| `Cap` | Capricornus | Steinbukken | renamed in place | candidate 0 |
 | `Cas` | Cassiopeia | Kassiopeia | renamed in place | candidate 3 |
 | `Cep` | Cepheus | Kefeus | renamed in place | candidate 0 |
 | `Cet` | Cetus | Hvalen | renamed in place | candidate 0 |
@@ -427,13 +427,13 @@ Limiting magnitude **V 4.0**, which is the limit this rung arrives with (`ChartV
 | `Del` | Delphinus | Delfinen | renamed in place | candidate 5 |
 | `Equ` | Equuleus | Føllet | renamed in place | candidate 0 |
 | `Eri` | Eridanus | Floden | renamed in place | candidate 0 |
-| `Lac` | Lacerta | Øglen | moved | candidate 9 to 2, 60 px |
+| `Lac` | Lacerta | Øglen | renamed in place | candidate 0 |
 | `Lyr` | Lyra | Lyren | renamed in place | candidate 2 |
 | `Psc` | Pisces | Fiskene | renamed in place | candidate 0 |
 | `Sge` | Sagitta | Pilen | moved | candidate 10 to 2, 20 px |
 | `Tau` | Taurus | Tyren | renamed in place | candidate 0 |
 | `Tri` | Triangulum | Triangelet | renamed in place | candidate 0 |
-| `Vul` | Vulpecula | Reven | moved | candidate 1 to 0, 20 px |
+| `Vul` | Vulpecula | Reven | renamed in place | candidate 0 |
 
 ## the north pole, 120 degrees
 
@@ -443,21 +443,21 @@ Limiting magnitude **V 4.0**, which is the limit this rung arrives with (`ChartV
 |---|---|---|---|---|
 | `Aur` | Auriga | Kusken | renamed in place | candidate 0 |
 | `Boo` | Boötes | Oksedriveren | renamed in place | candidate 0 |
-| `Cam` | Camelopardalis | Sjiraffen | renamed in place | candidate 3 |
+| `Cam` | Camelopardalis | Sjiraffen | renamed in place | candidate 0 |
 | `Cas` | Cassiopeia | Kassiopeia | renamed in place | candidate 3 |
 | `Cep` | Cepheus | Kefeus | renamed in place | candidate 0 |
 | `Cnc` | Cancer | Krepsen | renamed in place | candidate 5 |
-| `CrB` | Corona Borealis | Nordlige krone | renamed in place | candidate 14 |
+| `CrB` | Corona Borealis | Nordlige krone | renamed in place | candidate 6 |
 | `Cyg` | Cygnus | Svanen | renamed in place | candidate 0 |
 | `Dra` | Draco | Dragen | renamed in place | candidate 0 |
-| `Gem` | Gemini | Tvillingene | moved | candidate 3 to 5, 40 px |
+| `Gem` | Gemini | Tvillingene | renamed in place | candidate 3 |
 | `Her` | Hercules | Herkules | renamed in place | candidate 5 |
-| `Lac` | Lacerta | Øglen | moved | candidate 5 to 3, 40 px |
+| `Lac` | Lacerta | Øglen | renamed in place | candidate 0 |
 | `Lyn` | Lynx | Gaupen | renamed in place | candidate 0 |
-| `Lyr` | Lyra | Lyren | renamed in place | candidate 1 |
+| `Lyr` | Lyra | Lyren | renamed in place | candidate 0 |
 | `UMa` | Ursa Major | Store bjørn | renamed in place | candidate 5 |
-| `UMi` | Ursa Minor | Lille bjørn | renamed in place | candidate 3 |
-| `Vul` | Vulpecula | Reven | renamed in place | candidate 6 |
+| `UMi` | Ursa Minor | Lille bjørn | renamed in place | candidate 0 |
+| `Vul` | Vulpecula | Reven | renamed in place | candidate 0 |
 
 ## the south pole, 120 degrees
 
@@ -465,28 +465,28 @@ Limiting magnitude **V 4.0**, which is the limit this rung arrives with (`ChartV
 
 | id | Latin | Norwegian | outcome | detail |
 |---|---|---|---|---|
-| `Aps` | Apus | Paradisfuglen | moved | candidate 2 to 5, 45 px |
+| `Aps` | Apus | Paradisfuglen | moved | candidate 2 to 0, 20 px |
 | `Ara` | Ara | Alteret | renamed in place | candidate 10 |
 | `CMa` | Canis Major | Store hund | renamed in place | candidate 11 |
-| `Cae` | Caelum | Gravstikken | renamed in place | candidate 5 |
+| `Cae` | Caelum | Gravstikken | renamed in place | candidate 0 |
 | `Car` | Carina | Kjølen | renamed in place | candidate 4 |
 | `Cen` | Centaurus | Kentauren | renamed in place | candidate 0 |
-| `Cha` | Chamaeleon | Kameleonen | renamed in place | candidate 7 |
+| `Cha` | Chamaeleon | Kameleonen | renamed in place | candidate 0 |
 | `Cir` | Circinus | Passeren | renamed in place | candidate 1 |
 | `Col` | Columba | Duen | moved | candidate 5 to 3, 40 px |
-| `CrA` | Corona Australis | Sørlige krone | moved | candidate 14 to 13, 80 px |
-| `Cru` | Crux | Sydkorset | moved | candidate 0 to 2, 20 px |
-| `Dor` | Dorado | Gullfisken | moved | candidate 1 to 3, 20 px |
+| `CrA` | Corona Australis | Sørlige krone | moved | candidate 5 to 2, 45 px |
+| `Cru` | Crux | Sydkorset | moved | candidate 0 to 10, 40 px |
+| `Dor` | Dorado | Gullfisken | renamed in place | candidate 0 |
 | `Eri` | Eridanus | Floden | renamed in place | candidate 0 |
-| `For` | Fornax | Smelteovnen | moved | candidate 2 to 10, 20 px |
+| `For` | Fornax | Smelteovnen | renamed in place | candidate 0 |
 | `Gru` | Grus | Tranen | renamed in place | candidate 9 |
 | `Hor` | Horologium | Uret | renamed in place | candidate 0 |
 | `Hyi` | Hydrus | Sørlige vannslange | moved | candidate 0 to 6, 28 px |
-| `Ind` | Indus | Inderen | renamed in place | candidate 1 |
+| `Ind` | Indus | Inderen | renamed in place | candidate 0 |
 | `Lib` | Libra | Vekten | renamed in place | candidate 0 |
 | `Lup` | Lupus | Ulven | renamed in place | candidate 3 |
 | `Men` | Mensa | Taffelberget | moved | candidate 1 to 13, 45 px |
-| `Mic` | Microscopium | Mikroskopet | renamed in place | candidate 3 |
+| `Mic` | Microscopium | Mikroskopet | renamed in place | candidate 0 |
 | `Mus` | Musca | Fluen | renamed in place | candidate 10 |
 | `Nor` | Norma | Vinkelhaken | renamed in place | candidate 0 |
 | `Oct` | Octans | Oktanten | renamed in place | candidate 0 |
@@ -496,14 +496,14 @@ Limiting magnitude **V 4.0**, which is the limit this rung arrives with (`ChartV
 | `Pic` | Pictor | Maleren | renamed in place | candidate 0 |
 | `Pup` | Puppis | Akterstavnen | renamed in place | candidate 0 |
 | `Pyx` | Pyxis | Kompasset | moved | candidate 2 to 3, 45 px |
-| `Ret` | Reticulum | Nettet | moved | candidate 9 to 0, 40 px |
+| `Ret` | Reticulum | Nettet | moved | candidate 2 to 0, 20 px |
 | `Sco` | Scorpius | Skorpionen | renamed in place | candidate 3 |
 | `Sgr` | Sagittarius | Skytten | moved | candidate 2 to 0, 20 px |
 | `Tel` | Telescopium | Teleskopet | renamed in place | candidate 5 |
-| `TrA` | Triangulum Australe | Sørlige triangel | moved | candidate 4 to 10, 28 px |
+| `TrA` | Triangulum Australe | Sørlige triangel | moved | candidate 4 to 3, 40 px |
 | `Tuc` | Tucana | Tukanen | renamed in place | candidate 0 |
 | `Vel` | Vela | Seilet | renamed in place | candidate 0 |
-| `Vol` | Volans | Flygefisken | moved | candidate 16 to 10, 57 px |
+| `Vol` | Volans | Flygefisken | renamed in place | candidate 0 |
 
 
 ## What the Norwegian names cost, in total
@@ -512,14 +512,14 @@ These are **placement observations across 17 pages**, not distinct constellation
 
 | outcome | observations |
 |---|---|
-| renamed in place (no cost) | 226 |
-| moved | 118 |
+| renamed in place (no cost) | 241 |
+| moved | 103 |
 | omitted in one language | 11 |
 | identical in both languages | 22 |
 
 **Unique constellation identities affected** (moved, omitted or renamed at least once): 85 of 88.
 
-Closest any written name comes to the page edge, measured from its whole box: 2.6 px (Ant on Orion, 120 degrees).
+Closest any written name comes to the page edge, measured from its whole box: 2.0 px (Vul on the north pole, 120 degrees).
 
 ## Attachment
 
@@ -569,7 +569,7 @@ Measured: 366 labels. Not measurable: 0 (premise: the constellation, or every ri
 - `Mon` on the south pole, 180 degrees: 7.9 px from its own figure, 0.0 px from `CMa` (margin -7.9 px)
 - `Ser` on the south pole, 180 degrees: 3.1 px from its own figure, 0.0 px from `Oph` (margin -3.1 px)
 - `Vir` on the south pole, 180 degrees: 4.2 px from its own figure, 0.0 px from `Hya` (margin -4.2 px)
-- `CrA` on the south pole, 120 degrees: 1.9 px from its own figure, 0.0 px from `Sgr` (margin -1.9 px)
+- `Cru` on the south pole, 120 degrees: 0.6 px from its own figure, 0.1 px from `Cen` (margin -0.4 px)
 
 ### Why the metric changed
 

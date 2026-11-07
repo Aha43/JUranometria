@@ -1,3 +1,6 @@
+> **Status: historical record of a superseded rule (#571).** Held as committed;
+> see `docs/studies/figure-anchors/measurements.md`.
+
 # Figure anchors, counted on one machine
 
 Sprint 30, issue #307; classified in Sprint 31, issue #315.

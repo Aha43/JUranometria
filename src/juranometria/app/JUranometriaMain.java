@@ -920,7 +920,9 @@ public final class JUranometriaMain {
                                 ecliptic, selection,
                                 modules.workingSelection(),
                                 System::getProperty)
-                                .withPointerDrag(pointerDrag.mode().token()),
+                                .withPointerDrag(pointerDrag.mode().token())
+                                .withFigureEndpointsBelowLimit(
+                                        ViewReport.figureEndpointsBelowLimit(chart)),
                         CopyViewReport.SYSTEM,
                         reason -> {
                             juranometria.ui.language.InterfaceText said =

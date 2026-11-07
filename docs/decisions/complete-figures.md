@@ -108,3 +108,17 @@ As the owner's direction states it, with these specifics:
 - **D-7 Gates.** Implementation with focused development checks and an
   unqualified candidate; this study and the build qualified once in #700's
   integrated run. Recommended.
+
+## 5. The ruling
+
+The owner's ruling of 2026-11-07 on #571, recorded as given:
+
+> I accept the measured result and rule D-1 through D-7 as recommended.
+> Adopt complete constellation figure geometry with an absolute stellar magnitude limit and no figure-anchor exception. A line may end at the true position of a star whose mark is excluded by the selected limit.
+> A hidden endpoint receives no mark, notation, identity, selection target or special interactive state. Raising the stellar limit reveals it through the ordinary stellar pipeline. Turning constellation figures on or off changes only the figure lines.
+> Keep the hidden-endpoint count off the chart and out of speech. Include it only in the view report when non-zero. Add the proposed bilingual explanation that complete figure lines may reach stars fainter than the stellar limit and that raising the limit shows them.
+> Keep #307's study as the historical record of the superseded rule, with its status made explicit. Build #571 using focused development checks, stop with an unqualified packaged candidate for my hands-on verdict, and qualify the accepted integrated result once under #700.
+
+The owner's reasons, in brief: the geometry stays recognizable, an endpoint
+in open sky says something true, one press of + restores almost every node,
+the key becomes true, and zooming no longer removes privileged stars.

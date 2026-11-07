@@ -48,7 +48,7 @@ JAR   := $(JDK_BIN)jar
 REQUIRED_LIBS := 	$(LIB_DIR)/flatlaf-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/flatlaf-extras-$(FLATLAF_VERSION).jar 	$(LIB_DIR)/jsvg-$(JSVG_VERSION).jar
 JUNIT_JAR := $(TEST_LIB_DIR)/junit-platform-console-standalone-$(JUNIT_VERSION).jar
 
-.PHONY: all help clean classes bookmarks-study guide-and-explain-study complete-figures-study jar app run run-log test classify below-horizon-study globe-study globe-frame-study globe-density-study globe-furniture-study globe-grid-study globe-grid-fade-study globe-limb-study globe-family-study globe-name-study globe-pointing-study globe-module-study globe-export-study globe-drag-study chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study on-this-page-study wider-field-study chart-sheet-study overview-study overview-ink-study figure-anchor-study label-study released-text toggle-shortcut-study control-explanation-study sky-language-study evidence-contracts-ci evidence-provenance icons check-libs check-jdk dist app-image
+.PHONY: all help clean classes bookmarks-study guide-and-explain-study complete-figures-study jar app run run-log test classify below-horizon-study globe-study globe-frame-study globe-density-study globe-furniture-study globe-grid-study globe-grid-fade-study globe-limb-study globe-family-study globe-name-study globe-pointing-study globe-module-study globe-export-study globe-drag-study chart-image constellation-study identify-study furniture-study deep-sky-study deep-sky-occlusion-study application-mark-study on-this-page-study wider-field-study chart-sheet-study overview-study overview-ink-study label-study released-text toggle-shortcut-study control-explanation-study sky-language-study evidence-contracts-ci evidence-provenance icons check-libs check-jdk dist app-image
 
 all: app
 
@@ -115,7 +115,7 @@ help:
 	@echo "  meridian-readout-study One altitude readout on the meridian at narrow fields, the candidates mocked up (issue #563)"
 	@echo "  bookmarks-study   Bookmarks as saved views: schema, round trips, restoration, recovery and sketches (issue #497)"
 	@echo "  guide-and-explain-study  Constrained pointer dragging and the selected-object box, measured (issue #690)"
-	@echo "  complete-figures-study  Complete constellation figures under an absolute stellar limit, measured (issue #571)"
+	@echo "  complete-figures-study  Complete constellation figures under an absolute stellar limit, as built (issue #571)"
 	@echo "  pan-study         Measure the Sprint 8 grab-to-pan geometry and costs"
 	@echo "  chart-options-study  Render the Sprint 12 chart-options candidates"
 	@echo "  star-identity-study  Measure and render the Sprint 13 star-identity candidates"
@@ -124,7 +124,6 @@ help:
 	@echo "  bayer-study       Measure and render the Sprint 17 Bayer-Flamsteed candidates"
 	@echo "  overview-study    Measure and render the Sprint 30 overview-projection candidates"
 	@echo "  overview-ink-study  Measure overview ink on pages the production renderer drew"
-	@echo "  figure-anchor-study Measure constellation figures against the magnitude limit"
 	@echo "  label-study  Measure how labels share a page"
 	@echo "  globe-study       Draw the Sprint 32 celestial-globe candidate hemispheres"
 	@echo "  globe-frame-study Compare how much of the page the globe disc fills"
@@ -644,11 +643,6 @@ label-study: classes
 	@mkdir -p docs/studies/label-placement
 	@$(JAVA) -Djava.awt.headless=true -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.labels.LabelStudyMain > docs/studies/label-placement/measurements.md
 	@echo "written to docs/studies/label-placement/measurements.md"
-
-figure-anchor-study: classes
-	@echo "  constellation figures against the magnitude limit"
-	@$(JAVA) -Djava.awt.headless=true -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.FigureAnchorStudyMain > docs/studies/figure-anchors/measurements.md
-	@echo "written to docs/studies/figure-anchors/measurements.md"
 
 control-explanation-study: classes
 	@echo "  what every control says about itself"

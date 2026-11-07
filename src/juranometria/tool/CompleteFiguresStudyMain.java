@@ -6,10 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
@@ -29,30 +27,22 @@ import juranometria.render.ChartHitTest;
 import juranometria.render.ChartOptions;
 import juranometria.render.ChartRenderer;
 import juranometria.render.ChartStructure;
-import juranometria.render.FigureAnchors;
+import juranometria.render.FigureEndpoints;
 import juranometria.ui.language.InterfaceText;
 import juranometria.ui.language.PageText;
 
 /**
  * Complete constellation figures under an absolute stellar limit (#571,
- * road #698; the owner's amended direction of 2026-11-07): measured on
- * real 60°, 90°, 120° and globe pages before any production change.
+ * road #698, ruled D-1 to D-7, docs/decisions/complete-figures.md): the rule
+ * as built, measured on real 60°, 90°, 120° and globe pages.
  *
- * <p>Every page is painted by the production renderer twice. <b>As
- * built</b> is today's page: the stars a visible figure is drawn to are
- * kept however faint (#307's anchor exception). <b>As proposed</b> is the
- * same page with every star fainter than the page's limit taken out of
- * the scene before it is painted - so the renderer, its anchor rule and
- * its figure lines unchanged, nothing faint can be kept, and the lines,
- * which are drawn from the stored figure geometry and not from stars,
- * stay complete. That is exactly the proposed rule, drawn without a
- * production change.
- *
- * <p>Counted on each page: the figure endpoints on the paper and which
- * have a star drawn at them; the segments with one and with two hidden
- * endpoints; the faint stars kept today and the faintest of them; the
- * drawn stars standing within reach of a hidden endpoint, which a reader
- * might take for its node; and what a click at a hidden endpoint selects.
+ * <p>Every page is painted by the production renderer. Counted on each: the
+ * figure endpoints on the paper and which have a star drawn at them; the
+ * segments with one and with two hidden endpoints; the drawn stars within
+ * reach of a hidden endpoint, which a reader might take for its node; what a
+ * click at a hidden endpoint selects; and the view report's own count. The
+ * pre-#571 figures are stated as history, cited to the commit that measured
+ * them.
  */
 public final class CompleteFiguresStudyMain {
 
@@ -75,8 +65,7 @@ public final class CompleteFiguresStudyMain {
 
     /** What one painting of a page found. */
     private record Count(int endpoints, int withStar, int oneHidden, int twoHidden,
-                         int keptFaint, double faintestKept, int mistakable,
-                         int clickSelectsStar, double brightestDrawnLimitBreach) {
+                         int keptFaint, int mistakable, int clickSelectsStar, int reported) {
     }
 
     public static void main(String[] args) throws Exception {
@@ -85,21 +74,20 @@ public final class CompleteFiguresStudyMain {
         System.setProperty("java.awt.headless", "true");
         p("# Complete figures under an absolute stellar limit: the measurements");
         p("");
-        p("Sprint 58, issue #571, road #698 - the owner's amended direction of 2026-11-07:"
-                + " *complete constellation figures; absolute stellar magnitude limit; no"
-                + " exceptional anchor stars.* No production behaviour changes. Each page is"
-                + " painted by the production renderer **as built** (today: a star a visible"
-                + " figure is drawn to is kept however faint, #307) and **as proposed** (the"
-                + " same page with every star fainter than its limit removed from the scene"
-                + " before painting, so nothing faint can be kept while the figure lines,"
-                + " drawn from the stored geometry, stay complete). Regenerate with `make"
+        p("Sprint 58, issue #571, road #698, ruled D-1 to D-7"
+                + " (`docs/decisions/complete-figures.md`): *complete constellation figures;"
+                + " absolute stellar magnitude limit; no exceptional anchor stars.* Every page is"
+                + " painted by the production renderer. Regenerate with `make"
                 + " complete-figures-study`.");
         p("");
         p("A *hidden endpoint* is a figure endpoint on the paper with no star drawn at it."
                 + " *Mistakable* counts hidden endpoints with an unrelated drawn star within "
                 + fmt0(MISTAKEN_PX) + " px, which a reader might take for the node. *Click"
                 + " selects a star* counts hidden endpoints where a click, through the"
-                + " production hit test, selects a star.");
+                + " production hit test, selects a star, which only an ordinary drawn star within"
+                + " reach can do. *Report* is the view report's"
+                + " `figure-endpoints-below-limit` count, which leaves out endpoints under the"
+                + " page's frame and those with no star in the pack.");
         p("");
         List<Page> pages = List.of(
                 new Page("orion-60", "Orion on the 60° overview, at its default limit.",
@@ -117,74 +105,47 @@ public final class CompleteFiguresStudyMain {
                 new Page("globe", "The celestial globe over Orion, at its default limit.",
                         new SkyPosition(83.0, 0.0), 180.0,
                         ChartViewState.defaultMagnitudeFor(180.0)));
-        p("## 1. The pages, as built and as proposed");
+        p("## 1. The pages");
         p("");
-        p("| page | limit | endpoints on paper | with a star, as built | with a star, as proposed"
-                + " | segments with one / two hidden ends | faint stars kept today (faintest) |"
-                + " mistakable | click selects a star, as built / as proposed |");
+        p("| page | limit | endpoints on paper | with a star | segments with one / two hidden"
+                + " ends | stars drawn beyond the limit | mistakable | click selects a star |"
+                + " report |");
         p("|---|---:|---:|---:|---:|---:|---:|---:|---:|");
-        Map<String, Count[]> all = new LinkedHashMap<>();
         for (Page page : pages) {
-            ChartScene built = assemble(page.centre(), page.field(), page.limit());
-            ChartScene proposed = withinLimit(built);
-            Count asBuilt = count(built, built);
-            Count asProposed = count(proposed, built);
-            all.put(page.name(), new Count[] {asBuilt, asProposed});
-            write(paint(built, ChartOptions.DEFAULTS, ChartRenderer.ReferenceLayer.NONE, Set.of()),
-                    page.name() + "-built.png");
-            write(paint(proposed, ChartOptions.DEFAULTS, ChartRenderer.ReferenceLayer.NONE,
-                    Set.of()), page.name() + "-proposed.png");
-            p("| " + page.name() + " | V " + fmt1(page.limit()) + " | " + asBuilt.endpoints()
-                    + " | " + asBuilt.withStar() + " | " + asProposed.withStar() + " | "
-                    + asProposed.oneHidden() + " / " + asProposed.twoHidden() + " | "
-                    + asBuilt.keptFaint() + (asBuilt.keptFaint() == 0 ? ""
-                            : " (V " + fmt2(asBuilt.faintestKept()) + ")") + " | "
-                    + asProposed.mistakable() + " | " + asBuilt.clickSelectsStar() + " / "
-                    + asProposed.clickSelectsStar() + " |");
+            ChartScene scene = assemble(page.centre(), page.field(), page.limit());
+            Count c = count(scene);
+            write(paint(scene, ChartOptions.DEFAULTS, ChartRenderer.ReferenceLayer.NONE,
+                    Set.of()), page.name() + ".png");
+            p("| " + page.name() + " | V " + fmt1(page.limit()) + " | " + c.endpoints() + " | "
+                    + c.withStar() + " | " + c.oneHidden() + " / " + c.twoHidden() + " | "
+                    + c.keptFaint() + " | " + c.mistakable() + " | " + c.clickSelectsStar()
+                    + " | " + c.reported() + " |");
         }
         p("");
+        p("Before #571 the same pages kept every such star, however faint: 43 on Orion at 90°"
+                + " (to V 4.88), 76 on Orion at 120° (to V 6.54), 58 on Ursa Major at 120° (to"
+                + " V 6.58) and 22 on the globe (to V 6.54), each selectable by a click. Those"
+                + " paintings stand side by side in this report at commit `f593dd5a`.");
+        p("");
         for (Page page : pages) {
-            Count[] c = all.get(page.name());
             p("### " + page.name());
             p("");
-            p(page.caption() + " As built, " + c[0].keptFaint() + " star"
-                    + (c[0].keptFaint() == 1 ? " is" : "s are") + " drawn fainter than the page's"
-                    + " limit of V " + fmt1(page.limit()) + " because a figure ends on "
-                    + (c[0].keptFaint() == 1 ? "it" : "them") + "; as proposed, none is, and "
-                    + (c[1].endpoints() - c[1].withStar()) + " endpoints show the line meeting"
-                    + " the sky with no node.");
+            p(page.caption());
             p("");
-            p("| as built | as proposed |");
-            p("|---|---|");
-            p("| ![](" + page.name() + "-built.png) | ![](" + page.name() + "-proposed.png) |");
+            p("![](" + page.name() + ".png)");
             p("");
         }
         progressive();
         emphasisAndHorizon();
         speechKeyAndPaper();
-        p("## 7. What the proposal changes, and does not");
-        p("");
-        p("- **The magnitude limit becomes literally true**: as proposed, no drawn star on any"
-                + " page above is fainter than its limit (section 6), and the magnitude key's"
-                + " promise holds.");
-        p("- **The figure lines do not move**: they are drawn from the stored figure geometry;"
-                + " both paintings carry the same lines.");
-        p("- **A hidden endpoint is nothing to click**: as built, a click there selects the"
-                + " kept faint star; as proposed, it selects no star (table, last column), unless"
-                + " an ordinary drawn star is itself within reach.");
-        p("- **Raising the limit admits each node through the ordinary stellar path**, mark,"
-                + " identity and label policy alike (section 2).");
-        p("- **Turning figures off changes only the lines**: as proposed, the star population is"
-                + " the same with figures on or off; as built, turning figures off drops the kept"
-                + " faint stars.");
-        p("");
+        figuresOnAndOff();
         System.out.print(PlatformEvidence.portable(REPORT.toString()));
         System.out.flush();
     }
 
     /** Section 2: pressing + reveals nodes through the ordinary stellar path. */
     private static void progressive() throws Exception {
-        p("## 2. Raising the limit, as proposed");
+        p("## 2. Raising the limit");
         p("");
         p("Orion at 120°, the reader pressing **+** from V 4 to V 7: each step admits stars"
                 + " through the ordinary stellar path, and endpoints gain their nodes.");
@@ -195,8 +156,8 @@ public final class CompleteFiguresStudyMain {
         StringBuilder head = new StringBuilder("|");
         StringBuilder rule = new StringBuilder("|");
         for (double limit : new double[] {4.0, 5.0, 6.0, 7.0}) {
-            ChartScene proposed = withinLimit(assemble(new SkyPosition(83.0, 0.0), 120.0, limit));
-            Count c = count(proposed, proposed);
+            ChartScene proposed = assemble(new SkyPosition(83.0, 0.0), 120.0, limit);
+            Count c = count(proposed);
             p("| V " + fmt1(limit) + " | " + c.withStar() + " | " + (c.endpoints() - c.withStar())
                     + " |");
             String name = "raising-v" + (int) limit + ".png";
@@ -215,9 +176,9 @@ public final class CompleteFiguresStudyMain {
 
     /** Section 3 and 4: the figures raised by Emphasis, and a horizon subduing the page. */
     private static void emphasisAndHorizon() throws Exception {
-        ChartScene proposed = withinLimit(assemble(new SkyPosition(83.0, 0.0), 90.0,
-                ChartViewState.defaultMagnitudeFor(90.0)));
-        p("## 3. Emphasis on the figures, as proposed");
+        ChartScene proposed = assemble(new SkyPosition(83.0, 0.0), 90.0,
+                ChartViewState.defaultMagnitudeFor(90.0));
+        p("## 3. Emphasis on the figures");
         p("");
         p("Orion at 90° with the constellation figures raised by Emphasis: the raised lines"
                 + " reach the hidden endpoints exactly as the ordinary lines do.");
@@ -226,7 +187,7 @@ public final class CompleteFiguresStudyMain {
                 Set.of(ChartStructure.CONSTELLATION_FIGURES)), "emphasis-90.png");
         p("![](emphasis-90.png)");
         p("");
-        p("## 4. Below a horizon, as proposed");
+        p("## 4. Below a horizon");
         p("");
         SkyPosition zenith = new SkyPosition(83.0, 60.0);
         p("Orion at 90° with Subdue below horizon on, the zenith placed at RA 83°, Dec +60° (a"
@@ -242,53 +203,72 @@ public final class CompleteFiguresStudyMain {
 
     /** Sections 5 and 6: what the page says, the magnitude key, and paper. */
     private static void speechKeyAndPaper() throws Exception {
-        ChartScene built = assemble(new SkyPosition(83.0, 0.0), 120.0,
+        ChartScene scene = assemble(new SkyPosition(83.0, 0.0), 120.0,
                 ChartViewState.defaultMagnitudeFor(120.0));
-        ChartScene proposed = withinLimit(built);
         p("## 5. What the page says");
         p("");
-        String saidBuilt = DrawnPage.of(built).describe(EN);
-        String saidProposed = DrawnPage.of(proposed).describe(EN);
-        p("The page's spoken description, as built and as proposed, is "
-                + (saidBuilt.equals(saidProposed) ? "the same" : "different") + ": \""
-                + saidProposed + "\" Neither names the figures' hidden endpoints; whether the"
-                + " page should say how many there are is the owner's question (decision record,"
-                + " choice D-4).");
+        p("The page's spoken description names the limit and not the stars: \""
+                + DrawnPage.of(scene).describe(EN) + "\" Hidden endpoints are not spoken (D-4);"
+                + " the count stands only in the view report, when it is not zero.");
         p("");
-        p("## 6. The magnitude key and paper, as proposed");
+        p("## 6. The magnitude key and paper");
         p("");
-        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, EN);
-        double faintestBuilt = 0.0;
-        for (var mark : renderer.drawnMarks(built, ChartOptions.DEFAULTS)) {
+        double faintest = 0.0;
+        for (var mark : new ChartRenderer(StarSizePolicy.DEFAULT, EN)
+                .drawnMarks(scene, ChartOptions.DEFAULTS)) {
             if (mark.star() != null) {
-                faintestBuilt = Math.max(faintestBuilt, mark.star().magnitude());
+                faintest = Math.max(faintest, mark.star().magnitude());
             }
         }
-        double faintestProposed = 0.0;
-        for (var mark : renderer.drawnMarks(proposed, ChartOptions.DEFAULTS)) {
-            if (mark.star() != null) {
-                faintestProposed = Math.max(faintestProposed, mark.star().magnitude());
-            }
-        }
-        p("Orion at 120°, limit V " + fmt1(built.limitingMagnitude()) + ": the faintest drawn"
-                + " star is V " + fmt2(faintestBuilt) + " as built and V " + fmt2(faintestProposed)
-                + " as proposed - within the limit the key states.");
+        p("Orion at 120°, limit V " + fmt1(scene.limitingMagnitude()) + ": the faintest drawn"
+                + " star is V " + fmt2(faintest) + " - within the limit the key states.");
         p("");
-        write(paint(proposed, withKey(), ChartRenderer.ReferenceLayer.NONE, Set.of()),
+        write(paint(scene, withKey(), ChartRenderer.ReferenceLayer.NONE, Set.of()),
                 "key-120.png");
         p("![](key-120.png)");
         p("");
         juranometria.sheet.SheetRecording sheet = juranometria.sheet.ChartSheet.record(
-                (state, w, h) -> withinLimit(Atlas.assembler().assemble(state, w, h)),
+                Atlas.assembler()::assemble,
                 new ChartViewState(new SkyPosition(83.0, 0.0), 120.0,
                         ChartViewState.defaultMagnitudeFor(120.0)),
                 ChartOptions.DEFAULTS, ChartRenderer.ReferenceLayer.NONE,
                 juranometria.sheet.PaperSize.A4, EN);
         Files.write(DIR.resolve("sheet-a4.png"), juranometria.sheet.SheetWriters.write(sheet,
                 juranometria.sheet.SheetFormat.PNG, 96));
-        p("The same page on A4, as proposed: the lines complete, no star beyond the limit.");
+        p("The same page on A4: the lines complete, no star beyond the limit.");
         p("");
         p("![](sheet-a4.png)");
+        p("");
+    }
+
+    /** Section 7: figures on or off changes only the lines. */
+    private static void figuresOnAndOff() {
+        ChartScene scene = assemble(new SkyPosition(83.0, 0.0), 120.0,
+                ChartViewState.defaultMagnitudeFor(120.0));
+        ChartOptions o = ChartOptions.DEFAULTS;
+        ChartOptions off = new ChartOptions(o.deepSkyObjects(), o.deepSkyLabels(),
+                false, o.constellationBoundaries(), o.constellationNames(), o.starNames(),
+                o.bayerLetters(), o.flamsteedNumbers(), o.equatorialGrid(), o.titleBlock(),
+                o.magnitudeKey(), o.galaxies(), o.openClusters(), o.globularClusters(),
+                o.nebulae(), o.planetaryNebulae(), o.palette());
+        ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, EN);
+        Set<String> on = new HashSet<>();
+        Set<String> without = new HashSet<>();
+        for (var mark : renderer.drawnMarks(scene, o)) {
+            if (mark.star() != null) {
+                on.add(mark.star().id());
+            }
+        }
+        for (var mark : renderer.drawnMarks(scene, off)) {
+            if (mark.star() != null) {
+                without.add(mark.star().id());
+            }
+        }
+        p("## 7. Figures on and off");
+        p("");
+        p("Orion at 120°: the stars drawn with the figures on and off are "
+                + (on.equals(without) ? "the same " + on.size() + " stars"
+                        : "**different**") + "; switching the figures changes only the lines.");
         p("");
     }
 
@@ -297,24 +277,8 @@ public final class CompleteFiguresStudyMain {
                 HEIGHT);
     }
 
-    /** The same scene with every star fainter than its limit removed: the proposed rule. */
-    private static ChartScene withinLimit(ChartScene scene) {
-        List<Star> kept = new ArrayList<>();
-        for (Star star : scene.stars()) {
-            if (star.magnitude() <= scene.limitingMagnitude()
-                    || star.id().equals(scene.targetIdentity())) {
-                kept.add(star);
-            }
-        }
-        return new ChartScene(scene.viewport(), kept, scene.deepSkyObjects(), scene.title(),
-                scene.limitingMagnitude(), scene.targetIdentity(), scene.geography());
-    }
-
-    /**
-     * Counts one painting: {@code scene} is what is painted, {@code full} the
-     * as-built scene its faint kept stars are counted from.
-     */
-    private static Count count(ChartScene scene, ChartScene full) {
+    /** Counts one painted page. */
+    private static Count count(ChartScene scene) {
         ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, EN);
         List<ChartRenderer.DrawnMark> marks = renderer.drawnMarks(scene, ChartOptions.DEFAULTS);
         List<ChartRenderer.DrawnMark> stars = marks.stream()
@@ -371,15 +335,12 @@ public final class CompleteFiguresStudyMain {
                 twoHidden++;
             }
         }
-        // What a click at each endpoint not drawn in the proposal would select here.
-        ChartScene proposed = withinLimit(full);
-        List<ChartRenderer.DrawnMark> proposedStars = renderer.drawnMarks(proposed,
-                ChartOptions.DEFAULTS).stream().filter(m -> m.star() != null).toList();
+        // What a click at each hidden endpoint selects.
         Set<String> clicked = new HashSet<>();
-        for (GeoSegment segment : full.geography().figureSegments()) {
+        for (GeoSegment segment : scene.geography().figureSegments()) {
             for (SkyPosition end : List.of(segment.from(), segment.to())) {
                 var plane = projection.project(end);
-                if (plane.isEmpty() || nodeAt(proposedStars, end)) {
+                if (plane.isEmpty() || nodeAt(stars, end)) {
                     continue;
                 }
                 PixelPoint at = mapping.toPixel(plane.get());
@@ -393,28 +354,25 @@ public final class CompleteFiguresStudyMain {
                 }
             }
         }
-        int keptFaint = 0;
-        double faintest = 0.0;
-        double breach = 0.0;
+        int beyond = 0;
         for (ChartRenderer.DrawnMark m : stars) {
             if (m.star().magnitude() > scene.limitingMagnitude()
                     && !m.star().id().equals(scene.targetIdentity())) {
-                keptFaint++;
-                faintest = Math.max(faintest, m.star().magnitude());
+                beyond++;
             }
         }
-        return new Count(endpoints, withStar, oneHidden, twoHidden, keptFaint, faintest,
-                mistakable, clickStar, breach);
+        return new Count(endpoints, withStar, oneHidden, twoHidden, beyond, mistakable,
+                clickStar, FigureEndpoints.belowLimit(scene, ChartOptions.DEFAULTS, marks));
     }
 
-    /** Whether a drawn star is the endpoint's own, by the production tolerance (#307). */
+    /** Whether a drawn star is the endpoint's own, by the measured tolerance (#307). */
     private static boolean nodeAt(List<ChartRenderer.DrawnMark> stars, SkyPosition end) {
         for (ChartRenderer.DrawnMark m : stars) {
             SkyPosition at = m.star().position();
             double dRa = Math.abs(at.raDegrees() - end.raDegrees());
             dRa = Math.min(dRa, 360.0 - dRa) * Math.cos(Math.toRadians(end.decDegrees()));
             double dDec = at.decDegrees() - end.decDegrees();
-            if (Math.hypot(dRa, dDec) <= FigureAnchors.SAME_STAR_DEGREES) {
+            if (Math.hypot(dRa, dDec) <= FigureEndpoints.SAME_STAR_DEGREES) {
                 return true;
             }
         }
