@@ -7,6 +7,8 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [6.4.0] - 2026-11-07
+
 **Keep one Controller section open (#698, #699).** A slim row at the
 foot of the Controller offers *Keep one section open*: while it is on,
 opening a section collapses the others in its group - the Chart tab's
