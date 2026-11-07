@@ -223,6 +223,9 @@ public final class EvidenceContractMain {
         // Guide the chart and explain the selection (#690): the measured study.
         REPORT_MAINS.put("juranometria.tool.GuideAndExplainStudyMain",
                 "docs/studies/guide-and-explain/measurements.md");
+        // Complete figures under an absolute stellar limit (#571): the measured pages.
+        REPORT_MAINS.put("juranometria.tool.CompleteFiguresStudyMain",
+                "docs/studies/complete-figures/measurements.md");
         // The Mercury pack study (#528) is not registered, as the Venus one is
         // not: both read the gitignored de440s.bsp and pck00011.tpc, which the CI
         // runner does not hold; `make mercury-pack-study` reproduces the report
@@ -689,6 +692,9 @@ public final class EvidenceContractMain {
             // pages carrying the study's box, the drag modes' section
             // sketched, in both languages.
             "juranometria.tool.GuideAndExplainStudyMain",
+            // Complete figures under an absolute stellar limit (#571):
+            // production pages painted as built and as proposed.
+            "juranometria.tool.CompleteFiguresStudyMain",
             // Jupiter and the Galilean moons on the chart (issue #486):
             // production pages composed by the component with the Jovian
             // module attached.

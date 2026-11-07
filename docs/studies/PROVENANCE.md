@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**976 promoted artifacts.**
+**994 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -239,6 +239,24 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/closer-fields/venus-crescent-0.25.png` | `af1110815c9895f0f878df943dc716d3bfbf9ffcef1a62fb8f79b6d3d5a787a8` | 2026-10-16 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/closer-fields/venus-crescent-0.5.png` | `35b37b4dcfd87ed44941879c793448b1c735bc1a1ed0f9b1ffb5518f7c4485b1` | 2026-10-16 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/closer-fields/venus-crescent-1.png` | `0f9dc55f0ac7a7800f711c3da08fcb7c9ad5714631d34a4809f5ab3b5a0ff763` | 2026-10-16 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/complete-figures/below-horizon-90.png` | `bb6cc86bc858d2285f2090a0bb6b0770e5ee9fc11df3bc977409f544b582598a` | 2026-11-07 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/complete-figures/emphasis-90.png` | `9bf03afbdecc9a974c61ea29d0d1e2b240ff4c4da46dbc74becd277689ad5932` | 2026-11-07 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/complete-figures/globe-built.png` | `1427e2a5fa27ac1800ad74912bf016c3ae9b99b09544b91ebfef29cb99b3106f` | 2026-11-07 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/complete-figures/globe-proposed.png` | `a64e232d0385a292ef3f0d07dbf1a3be6a7304cf6df5d3193aee541a399d05b8` | 2026-11-07 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/complete-figures/key-120.png` | `0f9bdc9c6b4625f0cfb820be826711e1d79148db2e3476fb7d8a7f26fcabda06` | 2026-11-07 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/complete-figures/orion-120-built.png` | `8130bf82be8ac849ef16fcde8abd252e7f52b7c1cf49d6f9eb03a96393732acf` | 2026-11-07 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/complete-figures/orion-120-proposed.png` | `2f67203e36d9a8cb5c19657fd8ff67c850262b1cd5013b10eb1c58399a68f23d` | 2026-11-07 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/complete-figures/orion-60-built.png` | `97dfcc0181798df351639057cc523548d39b924db2cac279f486c758e5ae189c` | 2026-11-07 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/complete-figures/orion-60-proposed.png` | `97dfcc0181798df351639057cc523548d39b924db2cac279f486c758e5ae189c` | 2026-11-07 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/complete-figures/orion-90-built.png` | `23589defba2b50018f3e4d7ae0656d5d004632970fbdcaa9b0eda666b49de4f4` | 2026-11-07 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/complete-figures/orion-90-proposed.png` | `d6af57ecb287c16d4f5a950695c26a7ae38e6afe4260742635e40efdf72edb92` | 2026-11-07 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/complete-figures/raising-v4.png` | `2f67203e36d9a8cb5c19657fd8ff67c850262b1cd5013b10eb1c58399a68f23d` | 2026-11-07 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/complete-figures/raising-v5.png` | `bd4aad9e3eca97d6d7dbd77e73b344437ae27265473cff5ef5d12e6da1efc25f` | 2026-11-07 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/complete-figures/raising-v6.png` | `7a9c26dccb0be120fd9ffa19aaa65481c1dd407afdb93cfdcc88dadc5db3b46f` | 2026-11-07 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/complete-figures/raising-v7.png` | `078921d22720d64aa77a045ee0b6d66b57f3b4af27762fe698a9126d0a84d64b` | 2026-11-07 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/complete-figures/sheet-a4.png` | `f185769f9c5892b0257d141dda8cbf78e5ea002060f700977274fcc44a2883c5` | 2026-11-07 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/complete-figures/ursa-major-120-built.png` | `877c61aa694a8fcfd54374daea97f6c314b336005e20da5593b7f2754ef5492d` | 2026-11-07 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/complete-figures/ursa-major-120-proposed.png` | `57533071545a3b8bf0598f2fb8e8f3c28fd7da9378a542b04a152e3c8a9d3f56` | 2026-11-07 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/constellation-geography/m31-08deg.png` | `1fdcb615bee8f69e0c88992372bd73b6768330b53cbc0fccd210ee2722ea0ff9` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | ConstellationStudyMain |
 | `docs/studies/constellation-geography/m31-24deg.png` | `0a8b34cbc6afa22ff25321cc66969ff7ea1d15d399fdeadf00a6def2fee6f460` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | ConstellationStudyMain |
 | `docs/studies/constellation-geography/m42-08deg.png` | `26c31f94a5a64d8091e4d67d15934ea6ec2416d759b2e0bbfaeb57d268291442` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | ConstellationStudyMain |
