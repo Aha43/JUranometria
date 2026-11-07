@@ -122,3 +122,32 @@ The owner's ruling of 2026-11-07 on #571, recorded as given:
 The owner's reasons, in brief: the geometry stays recognizable, an endpoint
 in open sky says something true, one press of + restores almost every node,
 the key becomes true, and zooming no longer removes privileged stars.
+
+## 6. As built
+
+Built at `256ec5f0` and accepted by the owner from the packaged candidate
+on 2026-11-07 ("Works well").
+
+- `ChartRenderer` draws a star exactly when it is within the page's limit,
+  or is the page's named target (#681). `FigureAnchors`, its study
+  generator, its test and its make target are removed.
+- Figure segments are drawn from the stored geometry, unchanged. The hit
+  test, labels and page inventory read the drawn marks, so a hidden
+  endpoint has no target, name or entry.
+- `FigureEndpoints.belowLimit` counts the endpoints on the page's paper
+  that have an excluded star and no drawn star, matched by position at
+  #307's 0.01°; it is zero when figures are off or the field draws none.
+  The view report states `figure-endpoints-below-limit: N` after the
+  `pointer-drag:` block only when N is not zero. The chart and speech
+  never state it.
+- The explanation of *Constellation figures* gains the ruled sentence in
+  both languages.
+- `docs/studies/figure-anchors/` is held as committed, with its
+  superseded status at its head; `docs/studies/complete-figures/`
+  (`make complete-figures-study`) now measures the rule as built, and the
+  before-and-after pages stay at `f593dd5a`.
+- The measured visual cost on the rule as built: Orion at 120° and V 4
+  leaves 75 endpoints in open sky on its paper (76 in the table, which
+  also counts one under the frame), 4 at V 5, 1 at V 6, none at V 7; the
+  same 139 stars are drawn with figures on and off.
+- The packaged acceptance proves it as `dogfooding OK`, with #699.
