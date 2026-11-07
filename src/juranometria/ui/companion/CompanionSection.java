@@ -26,6 +26,9 @@ public final class CompanionSection extends JPanel {
     private final JComponent content;
     private final String title;
     private final InterfaceText said;
+    private final Consumer<Boolean> changed;
+    private final java.util.List<Consumer<CompanionSection>> openedListeners =
+            new java.util.ArrayList<>();
 
     CompanionSection(String id, String title, JComponent content,
                      InterfaceText said, boolean collapsed,
@@ -34,6 +37,7 @@ public final class CompanionSection extends JPanel {
         this.title = title;
         this.content = content;
         this.said = said;
+        this.changed = changed;
         setName("section." + id);
         heading = new JToggleButton(title, !collapsed);
         heading.setName("heading." + id);
@@ -48,11 +52,7 @@ public final class CompanionSection extends JPanel {
         juranometria.ui.Explain.control(heading,
                 said.say("companion.section.hover"),
                 said.say("companion.section.explain"));
-        heading.addActionListener(event -> {
-            boolean open = heading.isSelected();
-            open(open);
-            changed.accept(!open);
-        });
+        heading.addActionListener(event -> apply(heading.isSelected()));
         add(heading, BorderLayout.NORTH);
         add(content, BorderLayout.CENTER);
         open(!collapsed);
@@ -94,6 +94,37 @@ public final class CompanionSection extends JPanel {
                         : "companion.section.collapsed", title));
         revalidate();
         repaint();
+    }
+
+    /**
+     * Opens or collapses the section as its heading would (#699): the same
+     * stored collapse, the same spoken state, and the same notice to
+     * whoever governs it, so an application action and a reader's press
+     * obey one rule. Does nothing when it is already so.
+     */
+    public void setExpanded(boolean open) {
+        if (open == expanded()) {
+            return;
+        }
+        heading.setSelected(open);
+        apply(open);
+    }
+
+    /** Told each time the section is opened, by its heading or {@link #setExpanded}. */
+    public void onOpened(Consumer<CompanionSection> listener) {
+        if (listener != null) {
+            openedListeners.add(listener);
+        }
+    }
+
+    private void apply(boolean open) {
+        open(open);
+        changed.accept(!open);
+        if (open) {
+            for (Consumer<CompanionSection> listener : java.util.List.copyOf(openedListeners)) {
+                listener.accept(this);
+            }
+        }
     }
 
     /** Whether the section is open. */

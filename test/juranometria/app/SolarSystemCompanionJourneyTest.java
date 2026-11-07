@@ -46,6 +46,58 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class SolarSystemCompanionJourneyTest {
 
     @Test
+    void keepingOneSectionOpenGovernsEachTabAloneAndComputesNothing() throws Exception {
+        Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
+                "the real application opens a window");
+        SwingSession.restoring(() -> SwingSession.scratchPreferences(
+                "juranometria-699-oneopen", node -> {
+                    // The reader turned it on in an earlier session (#699).
+                    node.put("companion.oneOpen", "true");
+                    run(node, frame -> {
+                        CompanionWindow companion = companionOf(frame);
+                        SwingUtilities.invokeAndWait(() -> companion.showCompanion(true));
+                        drain();
+                        javax.swing.JCheckBox box = (javax.swing.JCheckBox) named(
+                                companion.getContentPane(),
+                                juranometria.ui.companion.OneSectionOpen.BOX);
+                        assertTrue(box.isSelected(), "the slim row says it is on");
+                        List<CompanionSection> chart = companion.sections();
+                        assertEquals(1, chart.stream().filter(CompanionSection::expanded).count(),
+                                "the Chart tab starts at one open section");
+                        CompanionSection options = chart.get(4);
+                        reveal(options.heading());
+                        ReaderInput.click(options.heading());
+                        drain();
+                        assertTrue(options.expanded());
+                        assertEquals(1, chart.stream().filter(CompanionSection::expanded).count(),
+                                "opening Chart Options closed the others");
+
+                        juranometria.ui.companion.CompanionTabs tabs = companion.tabs();
+                        ReaderInput.chooseTab(tabs, "Solar System");
+                        drain();
+                        JComponent content = tabs.content("solarsystem");
+                        AbstractButton sunHeading = (AbstractButton) named(content,
+                                "heading.solarsystem.sun");
+                        AbstractButton moonHeading = (AbstractButton) named(content,
+                                "heading.solarsystem.moon");
+                        assertTrue(sunHeading.isSelected(), "the Sun, its tab's one open group");
+                        reveal(moonHeading);
+                        ReaderInput.click(moonHeading);
+                        drain();
+                        assertTrue(moonHeading.isSelected(), "the Moon opened");
+                        assertFalse(sunHeading.isSelected(), "and the Sun closed");
+                        assertNull(find(content, "moonCard"), "opening computed nothing");
+                        assertNull(find(content, "sunCard"), "nor did closing");
+
+                        ReaderInput.chooseTab(tabs, "Chart");
+                        drain();
+                        assertTrue(options.expanded(),
+                                "the Chart tab kept its own open section across the switch");
+                    });
+                }));
+    }
+
+    @Test
     void theSectionRevealsAndComputesOnlyWhenAsked() throws Exception {
         Assumptions.assumeFalse(java.awt.GraphicsEnvironment.isHeadless(),
                 "the real application opens a window");

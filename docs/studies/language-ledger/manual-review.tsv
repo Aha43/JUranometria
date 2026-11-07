@@ -205,3 +205,4 @@ abf350c18dc78690	ui/bookmark/BookmarksPanel.java	bookmarks	declared name used, b
 10ba06e58bfb712a	app/ChartOptionsControls.java	selectedObjectBox	declared name used, but never at a known sink	identifier	the Selected object box's component name in Chart Options (#692); a stable key
 beb4783ca3144e04	ui/selection/SelectedObjectFacts.java	selected-object	declared name used, but never at a known sink	identifier	the selected-object box's furniture identity on the page and in the view report (#692); never shown as words
 4226939ed66b42da	ui/selection/SelectedObjectStore.java	selectedObjectBox	declared name used, but never at a known sink	identifier	the preference key remembering whether the selected-object box is shown (#692); never shown
+fdc8a1212133a3ac	ui/companion/OneSectionOpen.java	oneSectionOpen	declared name used, but never at a known sink	identifier	the Keep one section open box's component name in the Controller (#699); a stable key

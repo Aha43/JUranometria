@@ -355,6 +355,9 @@ public final class ControlExplanationStudyMain {
                 juranometria.ui.language.PageText.in(english)));
         surfaces.put("Chart controls", chartControls.inCompanion());
         // The Controller's Pointer navigation section (#691, ruled on #690).
+        // The Controller's slim row (#699): Keep one section open.
+        surfaces.put("Keep one section open", new juranometria.ui.companion.OneSectionOpen(
+                juranometria.ui.companion.CompanionStore.inMemory()).checkBox(english));
         surfaces.put("Pointer navigation", new juranometria.ui.PointerNavigationPanel(
                 new juranometria.ui.PointerDrag(), english));
         // The Controller's Emphasis group (#525): one box per choice of

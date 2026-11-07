@@ -85,6 +85,7 @@ arrangement at its frozen instant.
 | Stellar-magnitude key | A key in the upper right showing the circle size the chart draws for three visual magnitudes, including this page's limit. Shortcut: ⌘K then J. | Stellar-magnitude key | A key in the upper right showing the circle size the chart draws for three visual magnitudes, including this page's limit. Switch it here or from the chart with ⌘K then J. |
 | Black sky | White stars and restrained light ink on a black ground, instead of the white-paper chart; a chart choice, independent of the application's light or dark appearance. Shortcut: ⌘K then K. | Black sky | White stars and restrained light ink on a black ground, instead of the white-paper chart; a chart choice, independent of the application's light or dark appearance. Switch it here or from the chart with ⌘K then K. |
 | Restore Defaults | Return to the atlas defaults: every layer and deep-sky family in this window on, the title block on, the magnitude key off, and the chart on white paper. You are asked first. | Restore Defaults | Returns every choice in this window to the atlas defaults, on the chart at once and remembered. Because nothing takes it back, you are asked first. |
+| Keep one section open | Opening a section closes the others on its tab | Keep one section open | On the Chart and Solar System tabs, opening a section closes the other sections there; each tab keeps its own open section, and the groups inside Chart Options are not affected. Turning it off reopens nothing. Remembered. |
 
 ### dark
 
@@ -151,6 +152,7 @@ arrangement at its frozen instant.
 | Stellar-magnitude key | A key in the upper right showing the circle size the chart draws for three visual magnitudes, including this page's limit. Shortcut: ⌘K then J. | Stellar-magnitude key | A key in the upper right showing the circle size the chart draws for three visual magnitudes, including this page's limit. Switch it here or from the chart with ⌘K then J. |
 | Black sky | White stars and restrained light ink on a black ground, instead of the white-paper chart; a chart choice, independent of the application's light or dark appearance. Shortcut: ⌘K then K. | Black sky | White stars and restrained light ink on a black ground, instead of the white-paper chart; a chart choice, independent of the application's light or dark appearance. Switch it here or from the chart with ⌘K then K. |
 | Restore Defaults | Return to the atlas defaults: every layer and deep-sky family in this window on, the title block on, the magnitude key off, and the chart on white paper. You are asked first. | Restore Defaults | Returns every choice in this window to the atlas defaults, on the chart at once and remembered. Because nothing takes it back, you are asked first. |
+| Keep one section open | Opening a section closes the others on its tab | Keep one section open | On the Chart and Solar System tabs, opening a section closes the other sections there; each tab keeps its own open section, and the groups inside Chart Options are not affected. Turning it off reopens nothing. Remembered. |
 
 ### collapsed
 
@@ -201,6 +203,7 @@ arrangement at its frozen instant.
 | Stellar-magnitude key | A key in the upper right showing the circle size the chart draws for three visual magnitudes, including this page's limit. Shortcut: ⌘K then J. | Stellar-magnitude key | A key in the upper right showing the circle size the chart draws for three visual magnitudes, including this page's limit. Switch it here or from the chart with ⌘K then J. |
 | Black sky | White stars and restrained light ink on a black ground, instead of the white-paper chart; a chart choice, independent of the application's light or dark appearance. Shortcut: ⌘K then K. | Black sky | White stars and restrained light ink on a black ground, instead of the white-paper chart; a chart choice, independent of the application's light or dark appearance. Switch it here or from the chart with ⌘K then K. |
 | Restore Defaults | Return to the atlas defaults: every layer and deep-sky family in this window on, the title block on, the magnitude key off, and the chart on white paper. You are asked first. | Restore Defaults | Returns every choice in this window to the atlas defaults, on the chart at once and remembered. Because nothing takes it back, you are asked first. |
+| Keep one section open | Opening a section closes the others on its tab | Keep one section open | On the Chart and Solar System tabs, opening a section closes the other sections there; each tab keeps its own open section, and the groups inside Chart Options are not affected. Turning it off reopens nothing. Remembered. |
 
 ### refused
 
@@ -268,6 +271,7 @@ arrangement at its frozen instant.
 | Stellar-magnitude key | A key in the upper right showing the circle size the chart draws for three visual magnitudes, including this page's limit. Shortcut: ⌘K then J. | Stellar-magnitude key | A key in the upper right showing the circle size the chart draws for three visual magnitudes, including this page's limit. Switch it here or from the chart with ⌘K then J. |
 | Black sky | White stars and restrained light ink on a black ground, instead of the white-paper chart; a chart choice, independent of the application's light or dark appearance. Shortcut: ⌘K then K. | Black sky | White stars and restrained light ink on a black ground, instead of the white-paper chart; a chart choice, independent of the application's light or dark appearance. Switch it here or from the chart with ⌘K then K. |
 | Restore Defaults | Return to the atlas defaults: every layer and deep-sky family in this window on, the title block on, the magnitude key off, and the chart on white paper. You are asked first. | Restore Defaults | Returns every choice in this window to the atlas defaults, on the chart at once and remembered. Because nothing takes it back, you are asked first. |
+| Keep one section open | Opening a section closes the others on its tab | Keep one section open | On the Chart and Solar System tabs, opening a section closes the other sections there; each tab keeps its own open section, and the groups inside Chart Options are not affected. Turning it off reopens nothing. Remembered. |
 
 ### deep-sky-open
 
@@ -335,6 +339,7 @@ arrangement at its frozen instant.
 | Stellar-magnitude key | A key in the upper right showing the circle size the chart draws for three visual magnitudes, including this page's limit. Shortcut: ⌘K then J. | Stellar-magnitude key | A key in the upper right showing the circle size the chart draws for three visual magnitudes, including this page's limit. Switch it here or from the chart with ⌘K then J. |
 | Black sky | White stars and restrained light ink on a black ground, instead of the white-paper chart; a chart choice, independent of the application's light or dark appearance. Shortcut: ⌘K then K. | Black sky | White stars and restrained light ink on a black ground, instead of the white-paper chart; a chart choice, independent of the application's light or dark appearance. Switch it here or from the chart with ⌘K then K. |
 | Restore Defaults | Return to the atlas defaults: every layer and deep-sky family in this window on, the title block on, the magnitude key off, and the chart on white paper. You are asked first. | Restore Defaults | Returns every choice in this window to the atlas defaults, on the chart at once and remembered. Because nothing takes it back, you are asked first. |
+| Keep one section open | Opening a section closes the others on its tab | Keep one section open | On the Chart and Solar System tabs, opening a section closes the other sections there; each tab keeps its own open section, and the groups inside Chart Options are not affected. Turning it off reopens nothing. Remembered. |
 
 ### solar-system-open
 
@@ -381,6 +386,7 @@ arrangement at its frozen instant.
 | ▸ Saturn | Show or hide this section | Saturn, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Uranus | Show or hide this section | Uranus, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Neptune | Show or hide this section | Neptune, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
+| Keep one section open | Opening a section closes the others on its tab | Keep one section open | On the Chart and Solar System tabs, opening a section closes the other sections there; each tab keeps its own open section, and the groups inside Chart Options are not affected. Turning it off reopens nothing. Remembered. |
 
 ### jupiter-open
 
@@ -409,6 +415,7 @@ arrangement at its frozen instant.
 | ▸ Saturn | Show or hide this section | Saturn, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Uranus | Show or hide this section | Uranus, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
 | ▸ Neptune | Show or hide this section | Neptune, collapsed | A hidden section keeps everything it is set to; whether it is hidden is remembered. |
+| Keep one section open | Opening a section closes the others on its tab | Keep one section open | On the Chart and Solar System tabs, opening a section closes the other sections there; each tab keeps its own open section, and the groups inside Chart Options are not affected. Turning it off reopens nothing. Remembered. |
 
 ### emphasis-open
 
@@ -467,6 +474,7 @@ arrangement at its frozen instant.
 | Stellar-magnitude key | A key in the upper right showing the circle size the chart draws for three visual magnitudes, including this page's limit. Shortcut: ⌘K then J. | Stellar-magnitude key | A key in the upper right showing the circle size the chart draws for three visual magnitudes, including this page's limit. Switch it here or from the chart with ⌘K then J. |
 | Black sky | White stars and restrained light ink on a black ground, instead of the white-paper chart; a chart choice, independent of the application's light or dark appearance. Shortcut: ⌘K then K. | Black sky | White stars and restrained light ink on a black ground, instead of the white-paper chart; a chart choice, independent of the application's light or dark appearance. Switch it here or from the chart with ⌘K then K. |
 | Restore Defaults | Return to the atlas defaults: every layer and deep-sky family in this window on, the title block on, the magnitude key off, and the chart on white paper. You are asked first. | Restore Defaults | Returns every choice in this window to the atlas defaults, on the chart at once and remembered. Because nothing takes it back, you are asked first. |
+| Keep one section open | Opening a section closes the others on its tab | Keep one section open | On the Chart and Solar System tabs, opening a section closes the other sections there; each tab keeps its own open section, and the groups inside Chart Options are not affected. Turning it off reopens nothing. Remembered. |
 
 ## Norsk bokmål (`nb-NO`)
 
@@ -535,6 +543,7 @@ arrangement at its frozen instant.
 | Magnitudeforklaring | En forklaring oppe til høyre som viser sirkelstørrelsen kartet tegner for tre visuelle magnituder, deriblant grensen for denne siden. Snarvei: ⌘K deretter J. | Magnitudeforklaring | En forklaring oppe til høyre som viser sirkelstørrelsen kartet tegner for tre visuelle magnituder, deriblant grensen for denne siden. Slå det av eller på her eller fra kartet med ⌘K deretter J. |
 | Svart himmel | Hvite stjerner og dempet, lyst blekk på svart bunn i stedet for kartet på hvitt papir; et kartvalg, uavhengig av om programmet har lyst eller mørkt utseende. Snarvei: ⌘K deretter K. | Svart himmel | Hvite stjerner og dempet, lyst blekk på svart bunn i stedet for kartet på hvitt papir; et kartvalg, uavhengig av om programmet har lyst eller mørkt utseende. Slå det av eller på her eller fra kartet med ⌘K deretter K. |
 | Gjenopprett standardvalg | Gå tilbake til atlasets standardvalg: alle lag og dyphimmelfamilier i dette vinduet på, tittelfeltet på, magnitudeforklaringen av og kartet på hvitt papir. Du blir spurt først. | Gjenopprett standardvalg | Setter alle valgene i vinduet tilbake til atlasets standardvalg, på kartet med en gang og husket. Fordi ingenting angrer det, blir du spurt først. |
+| Hold én seksjon åpen | Når du åpner en seksjon, lukkes de andre på samme fane | Hold én seksjon åpen | På fanene Kart og Solsystemet lukkes de andre seksjonene der når du åpner én; hver fane beholder sin egen åpne seksjon, og gruppene i Kartvalg påvirkes ikke. Når valget slås av, åpnes ingenting igjen. Valget huskes. |
 
 ### dark
 
@@ -601,6 +610,7 @@ arrangement at its frozen instant.
 | Magnitudeforklaring | En forklaring oppe til høyre som viser sirkelstørrelsen kartet tegner for tre visuelle magnituder, deriblant grensen for denne siden. Snarvei: ⌘K deretter J. | Magnitudeforklaring | En forklaring oppe til høyre som viser sirkelstørrelsen kartet tegner for tre visuelle magnituder, deriblant grensen for denne siden. Slå det av eller på her eller fra kartet med ⌘K deretter J. |
 | Svart himmel | Hvite stjerner og dempet, lyst blekk på svart bunn i stedet for kartet på hvitt papir; et kartvalg, uavhengig av om programmet har lyst eller mørkt utseende. Snarvei: ⌘K deretter K. | Svart himmel | Hvite stjerner og dempet, lyst blekk på svart bunn i stedet for kartet på hvitt papir; et kartvalg, uavhengig av om programmet har lyst eller mørkt utseende. Slå det av eller på her eller fra kartet med ⌘K deretter K. |
 | Gjenopprett standardvalg | Gå tilbake til atlasets standardvalg: alle lag og dyphimmelfamilier i dette vinduet på, tittelfeltet på, magnitudeforklaringen av og kartet på hvitt papir. Du blir spurt først. | Gjenopprett standardvalg | Setter alle valgene i vinduet tilbake til atlasets standardvalg, på kartet med en gang og husket. Fordi ingenting angrer det, blir du spurt først. |
+| Hold én seksjon åpen | Når du åpner en seksjon, lukkes de andre på samme fane | Hold én seksjon åpen | På fanene Kart og Solsystemet lukkes de andre seksjonene der når du åpner én; hver fane beholder sin egen åpne seksjon, og gruppene i Kartvalg påvirkes ikke. Når valget slås av, åpnes ingenting igjen. Valget huskes. |
 
 ### collapsed
 
@@ -651,6 +661,7 @@ arrangement at its frozen instant.
 | Magnitudeforklaring | En forklaring oppe til høyre som viser sirkelstørrelsen kartet tegner for tre visuelle magnituder, deriblant grensen for denne siden. Snarvei: ⌘K deretter J. | Magnitudeforklaring | En forklaring oppe til høyre som viser sirkelstørrelsen kartet tegner for tre visuelle magnituder, deriblant grensen for denne siden. Slå det av eller på her eller fra kartet med ⌘K deretter J. |
 | Svart himmel | Hvite stjerner og dempet, lyst blekk på svart bunn i stedet for kartet på hvitt papir; et kartvalg, uavhengig av om programmet har lyst eller mørkt utseende. Snarvei: ⌘K deretter K. | Svart himmel | Hvite stjerner og dempet, lyst blekk på svart bunn i stedet for kartet på hvitt papir; et kartvalg, uavhengig av om programmet har lyst eller mørkt utseende. Slå det av eller på her eller fra kartet med ⌘K deretter K. |
 | Gjenopprett standardvalg | Gå tilbake til atlasets standardvalg: alle lag og dyphimmelfamilier i dette vinduet på, tittelfeltet på, magnitudeforklaringen av og kartet på hvitt papir. Du blir spurt først. | Gjenopprett standardvalg | Setter alle valgene i vinduet tilbake til atlasets standardvalg, på kartet med en gang og husket. Fordi ingenting angrer det, blir du spurt først. |
+| Hold én seksjon åpen | Når du åpner en seksjon, lukkes de andre på samme fane | Hold én seksjon åpen | På fanene Kart og Solsystemet lukkes de andre seksjonene der når du åpner én; hver fane beholder sin egen åpne seksjon, og gruppene i Kartvalg påvirkes ikke. Når valget slås av, åpnes ingenting igjen. Valget huskes. |
 
 ### refused
 
@@ -718,6 +729,7 @@ arrangement at its frozen instant.
 | Magnitudeforklaring | En forklaring oppe til høyre som viser sirkelstørrelsen kartet tegner for tre visuelle magnituder, deriblant grensen for denne siden. Snarvei: ⌘K deretter J. | Magnitudeforklaring | En forklaring oppe til høyre som viser sirkelstørrelsen kartet tegner for tre visuelle magnituder, deriblant grensen for denne siden. Slå det av eller på her eller fra kartet med ⌘K deretter J. |
 | Svart himmel | Hvite stjerner og dempet, lyst blekk på svart bunn i stedet for kartet på hvitt papir; et kartvalg, uavhengig av om programmet har lyst eller mørkt utseende. Snarvei: ⌘K deretter K. | Svart himmel | Hvite stjerner og dempet, lyst blekk på svart bunn i stedet for kartet på hvitt papir; et kartvalg, uavhengig av om programmet har lyst eller mørkt utseende. Slå det av eller på her eller fra kartet med ⌘K deretter K. |
 | Gjenopprett standardvalg | Gå tilbake til atlasets standardvalg: alle lag og dyphimmelfamilier i dette vinduet på, tittelfeltet på, magnitudeforklaringen av og kartet på hvitt papir. Du blir spurt først. | Gjenopprett standardvalg | Setter alle valgene i vinduet tilbake til atlasets standardvalg, på kartet med en gang og husket. Fordi ingenting angrer det, blir du spurt først. |
+| Hold én seksjon åpen | Når du åpner en seksjon, lukkes de andre på samme fane | Hold én seksjon åpen | På fanene Kart og Solsystemet lukkes de andre seksjonene der når du åpner én; hver fane beholder sin egen åpne seksjon, og gruppene i Kartvalg påvirkes ikke. Når valget slås av, åpnes ingenting igjen. Valget huskes. |
 
 ### deep-sky-open
 
@@ -785,6 +797,7 @@ arrangement at its frozen instant.
 | Magnitudeforklaring | En forklaring oppe til høyre som viser sirkelstørrelsen kartet tegner for tre visuelle magnituder, deriblant grensen for denne siden. Snarvei: ⌘K deretter J. | Magnitudeforklaring | En forklaring oppe til høyre som viser sirkelstørrelsen kartet tegner for tre visuelle magnituder, deriblant grensen for denne siden. Slå det av eller på her eller fra kartet med ⌘K deretter J. |
 | Svart himmel | Hvite stjerner og dempet, lyst blekk på svart bunn i stedet for kartet på hvitt papir; et kartvalg, uavhengig av om programmet har lyst eller mørkt utseende. Snarvei: ⌘K deretter K. | Svart himmel | Hvite stjerner og dempet, lyst blekk på svart bunn i stedet for kartet på hvitt papir; et kartvalg, uavhengig av om programmet har lyst eller mørkt utseende. Slå det av eller på her eller fra kartet med ⌘K deretter K. |
 | Gjenopprett standardvalg | Gå tilbake til atlasets standardvalg: alle lag og dyphimmelfamilier i dette vinduet på, tittelfeltet på, magnitudeforklaringen av og kartet på hvitt papir. Du blir spurt først. | Gjenopprett standardvalg | Setter alle valgene i vinduet tilbake til atlasets standardvalg, på kartet med en gang og husket. Fordi ingenting angrer det, blir du spurt først. |
+| Hold én seksjon åpen | Når du åpner en seksjon, lukkes de andre på samme fane | Hold én seksjon åpen | På fanene Kart og Solsystemet lukkes de andre seksjonene der når du åpner én; hver fane beholder sin egen åpne seksjon, og gruppene i Kartvalg påvirkes ikke. Når valget slås av, åpnes ingenting igjen. Valget huskes. |
 
 ### solar-system-open
 
@@ -831,6 +844,7 @@ arrangement at its frozen instant.
 | ▸ Saturn | Vis eller skjul denne delen | Saturn, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Uranus | Vis eller skjul denne delen | Uranus, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Neptun | Vis eller skjul denne delen | Neptun, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
+| Hold én seksjon åpen | Når du åpner en seksjon, lukkes de andre på samme fane | Hold én seksjon åpen | På fanene Kart og Solsystemet lukkes de andre seksjonene der når du åpner én; hver fane beholder sin egen åpne seksjon, og gruppene i Kartvalg påvirkes ikke. Når valget slås av, åpnes ingenting igjen. Valget huskes. |
 
 ### jupiter-open
 
@@ -859,6 +873,7 @@ arrangement at its frozen instant.
 | ▸ Saturn | Vis eller skjul denne delen | Saturn, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Uranus | Vis eller skjul denne delen | Uranus, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
 | ▸ Neptun | Vis eller skjul denne delen | Neptun, skjult | En skjult del beholder alt den er satt til, og det huskes om den er skjult. |
+| Hold én seksjon åpen | Når du åpner en seksjon, lukkes de andre på samme fane | Hold én seksjon åpen | På fanene Kart og Solsystemet lukkes de andre seksjonene der når du åpner én; hver fane beholder sin egen åpne seksjon, og gruppene i Kartvalg påvirkes ikke. Når valget slås av, åpnes ingenting igjen. Valget huskes. |
 
 ### emphasis-open
 
@@ -917,4 +932,5 @@ arrangement at its frozen instant.
 | Magnitudeforklaring | En forklaring oppe til høyre som viser sirkelstørrelsen kartet tegner for tre visuelle magnituder, deriblant grensen for denne siden. Snarvei: ⌘K deretter J. | Magnitudeforklaring | En forklaring oppe til høyre som viser sirkelstørrelsen kartet tegner for tre visuelle magnituder, deriblant grensen for denne siden. Slå det av eller på her eller fra kartet med ⌘K deretter J. |
 | Svart himmel | Hvite stjerner og dempet, lyst blekk på svart bunn i stedet for kartet på hvitt papir; et kartvalg, uavhengig av om programmet har lyst eller mørkt utseende. Snarvei: ⌘K deretter K. | Svart himmel | Hvite stjerner og dempet, lyst blekk på svart bunn i stedet for kartet på hvitt papir; et kartvalg, uavhengig av om programmet har lyst eller mørkt utseende. Slå det av eller på her eller fra kartet med ⌘K deretter K. |
 | Gjenopprett standardvalg | Gå tilbake til atlasets standardvalg: alle lag og dyphimmelfamilier i dette vinduet på, tittelfeltet på, magnitudeforklaringen av og kartet på hvitt papir. Du blir spurt først. | Gjenopprett standardvalg | Setter alle valgene i vinduet tilbake til atlasets standardvalg, på kartet med en gang og husket. Fordi ingenting angrer det, blir du spurt først. |
+| Hold én seksjon åpen | Når du åpner en seksjon, lukkes de andre på samme fane | Hold én seksjon åpen | På fanene Kart og Solsystemet lukkes de andre seksjonene der når du åpner én; hver fane beholder sin egen åpne seksjon, og gruppene i Kartvalg påvirkes ikke. Når valget slås av, åpnes ingenting igjen. Valget huskes. |
 

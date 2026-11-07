@@ -374,6 +374,10 @@ public final class CompanionSheetMain {
                                         juranometria.ui.selection.SelectedObjectStore.forNode(node)),
                                 words).inCompanion(companionStore,
                                 words));
+                // The slim row under the tabs (#699): Keep one section open,
+                // off as a reader first gets it.
+                window[0].setFooter(new juranometria.ui.companion.OneSectionOpen(
+                        companionStore).checkBox(words));
                 // Sections by name, not by position (#675 reordered them).
                 if (state.collapsed()) {
                     section(window[0], "placeandtime").heading().doClick();

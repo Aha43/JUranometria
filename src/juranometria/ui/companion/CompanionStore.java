@@ -49,6 +49,68 @@ public interface CompanionStore {
 
     void saveTab(String id);
 
+    /**
+     * Whether the Controller keeps one section open (#699): one global
+     * choice, off until a reader turns it on.
+     */
+    default boolean oneOpen() {
+        return false;
+    }
+
+    /** Remembers the one-section choice. */
+    default void saveOneOpen(boolean on) {
+    }
+
+    /** A store remembering nothing between processes; for studies and tests. */
+    static CompanionStore inMemory() {
+        return new CompanionStore() {
+            private Rectangle kept;
+            private final java.util.Map<String, Boolean> collapsed = new java.util.HashMap<>();
+            private String tab;
+            private boolean oneOpen;
+
+            @Override
+            public Optional<Rectangle> bounds() {
+                return Optional.ofNullable(kept);
+            }
+
+            @Override
+            public void saveBounds(Rectangle bounds) {
+                kept = bounds;
+            }
+
+            @Override
+            public boolean collapsed(String section, boolean ifNeverChosen) {
+                return collapsed.getOrDefault(section, ifNeverChosen);
+            }
+
+            @Override
+            public void saveCollapsed(String section, boolean value) {
+                collapsed.put(section, value);
+            }
+
+            @Override
+            public Optional<String> tab() {
+                return Optional.ofNullable(tab);
+            }
+
+            @Override
+            public void saveTab(String id) {
+                tab = id;
+            }
+
+            @Override
+            public boolean oneOpen() {
+                return oneOpen;
+            }
+
+            @Override
+            public void saveOneOpen(boolean on) {
+                oneOpen = on;
+            }
+        };
+    }
+
     /** The reader's own store, beside the application's other preferences. */
     static CompanionStore user() {
         return forNode(Preferences.userRoot().node("juranometria"));
@@ -105,6 +167,16 @@ public interface CompanionStore {
             @Override
             public void saveTab(String id) {
                 node.put("companion.tab", id);
+            }
+
+            @Override
+            public boolean oneOpen() {
+                return "true".equals(node.get("companion.oneOpen", null));
+            }
+
+            @Override
+            public void saveOneOpen(boolean on) {
+                node.put("companion.oneOpen", Boolean.toString(on));
             }
         };
     }

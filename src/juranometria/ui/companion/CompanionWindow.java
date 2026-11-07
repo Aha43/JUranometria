@@ -123,6 +123,19 @@ public final class CompanionWindow extends JDialog {
         return section;
     }
 
+    /**
+     * A slim row under the tabs, for a choice that governs the whole
+     * Controller (#699: Keep one section open).
+     */
+    public void setFooter(JComponent footer) {
+        footer.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                javax.swing.BorderFactory.createMatteBorder(1, 0, 0, 0,
+                        javax.swing.UIManager.getColor("Separator.foreground")),
+                javax.swing.BorderFactory.createEmptyBorder(2, 8, 2, 8)));
+        getContentPane().add(footer, BorderLayout.SOUTH);
+        updateMinimum();
+    }
+
     /** The Chart tab's sections, in order. */
     public List<CompanionSection> sections() {
         return tabs.sections();
