@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**1011 promoted artifacts.**
+**1021 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -1033,5 +1033,15 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/venus-on-the-chart/transit-2012-1.png` | `d4566c85e05225f7cdf20ae337b8935fe905568ce1dcacb6e998ae4112de2df5` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/venus-on-the-chart/transit-2012-6.png` | `536d9052dd245ee1e792fc3a8885e31f6cf6cdc617ebb1d144527fea202e385e` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/venus-on-the-chart/transit-2012-8.png` | `0d3ad976e2483dd5341fc0ec3ebb1fb93217c10fd461561e27aff76769691b2a` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/whole-sky/evening-en-black.png` | `33d990ee611111aed429c723719210c45e23ccee9f11339f9c9bf222f9638e8c` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/whole-sky/evening-en-white-laptop.png` | `d6a696abd9bd7e4f81c72c818201f9d76e7c9ecf14865ddb82ceab1adde8cd9b` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/whole-sky/evening-en-white-subdue-off.png` | `f7f11ca74e26c5a6f7d5503b987f21fe208b7bf492535007c52d80bd5daf5dca` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/whole-sky/evening-en-white.png` | `72e3b80e267f5f5821d4a09d0427028a83bfb62df5b190f604c3724b84029207` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/whole-sky/evening-nb-black.png` | `8cffe5b3688fec4cf8531e7c61a7eaf3ba280cd7ad1fe7212a89d3fbf423d422` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/whole-sky/evening-nb-white.png` | `141d0e69c4f41d10ec104aaa770f2a3f3ed8d829365342a795ede36a98fe093e` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/whole-sky/gathering-en-white.png` | `cf5db2ea781aa8b01868dbd107a4193b0cede3a7f26ec7cc0a61c5232e2e3e18` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/whole-sky/journey-1-whole-sky.png` | `72e3b80e267f5f5821d4a09d0427028a83bfb62df5b190f604c3724b84029207` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/whole-sky/journey-2-open-here.png` | `56582770d572ae4cccc9abbc18bd04fb2b4e8d6631d7db7702831006e08ae228` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/whole-sky/spread-en-white.png` | `80b665287d41acdafda67ee14068d318b75a4f1bd3c0a7d1d33fbf40bfd0ca58` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/working-selection/decided-members.png` | `2db34e7aa922b3f75c0cd4c8903c2620b24a7f83d92608ee6ae1a9775c32c527` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/working-selection/today-two-leads.png` | `306cf50272170cbcbbb50e8385789143b59b5fb43ee98081f248eb08be7f80f0` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |

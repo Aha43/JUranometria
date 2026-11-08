@@ -296,6 +296,16 @@ public final class SceneAssembler {
         if (state.targetLabel() != null) {
             return state.targetLabel();
         }
+        // The whole sky has no centre worth naming as a place (#687,
+        // R-12). Its language-free subject is its central ecliptic
+        // longitude in notation; the words a page is drawn with say
+        // "Whole sky" wherever a reader is told, and the exported
+        // file's name is built from this.
+        if (state.wholeSky()) {
+            return String.format(java.util.Locale.ROOT, "λ %.1f°",
+                    juranometria.sky.Ecliptic.toEcliptic(state.centre())
+                            .longitudeDegrees());
+        }
         return juranometria.chart.SkyFormat.formatRa(state.centre().raDegrees())
                 + ", " + juranometria.chart.SkyFormat.formatDec(state.centre().decDegrees());
     }

@@ -35,7 +35,17 @@ public enum ChartProjection {
      * (docs/decisions/celestial-globe.md). It draws the widest rung
      * and nothing else.
      */
-    ORTHOGRAPHIC("orthographic");
+    ORTHOGRAPHIC("orthographic"),
+
+    /**
+     * The whole sky at one chart time (#687, ruled on #686;
+     * docs/decisions/all-sky-projection.md): equal-area, ecliptic
+     * horizontal, centred on the observer's zenith longitude, with a
+     * seam opposite. It draws the one whole-sky width and nothing
+     * else, and that width is not a rung: the mode is entered and
+     * left by an explicit control, never by zooming.
+     */
+    HAMMER("hammer");
 
     private final String displayName;
 
@@ -77,12 +87,29 @@ public enum ChartProjection {
      * need the second one did not exist yet.
      */
     public static ChartProjection forField(double fieldWidthDegrees) {
+        if (fieldWidthDegrees == WHOLE_SKY_DEGREES) {
+            return HAMMER;
+        }
         if (fieldWidthDegrees >= WHOLE_HEMISPHERE_DEGREES) {
             return ORTHOGRAPHIC;
         }
         return fieldWidthDegrees > WIDEST_TANGENT_FIELD_DEGREES
                 ? STEREOGRAPHIC : GNOMONIC;
     }
+
+    /**
+     * The width that is the whole sky, and the only one the Hammer
+     * projection draws (#687).
+     *
+     * <p>Not a rung. The ladder ends at the hemisphere, and no zoom
+     * step reaches this width or leaves it: the whole-sky view is an
+     * explicit mode a reader enters and leaves by one control
+     * (docs/decisions/all-sky-projection.md, R-9 and R-13). The number
+     * is here so that a state, a viewport and a projection can agree
+     * on what a whole-sky page is without any of them being told
+     * twice - 360 degrees of longitude across the middle line.
+     */
+    public static final double WHOLE_SKY_DEGREES = 360.0;
 
     /**
      * The field that is a whole hemisphere, and the only one the

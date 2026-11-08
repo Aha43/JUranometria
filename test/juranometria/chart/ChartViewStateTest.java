@@ -248,8 +248,8 @@ class ChartViewStateTest {
         // The globe did not open the ladder; it added one rung to it.
         // A field is a step or it is nothing, and the steps are the
         // ones above.
-        for (double wider : new double[] {181.0, 200.0, 270.0, 360.0,
-                Double.MAX_VALUE}) {
+        for (double wider : new double[] {181.0, 200.0, 270.0, 359.0,
+                361.0, Double.MAX_VALUE}) {
             IllegalArgumentException refused = assertThrows(
                     IllegalArgumentException.class,
                     () -> new ChartViewState(
@@ -258,6 +258,15 @@ class ChartViewStateTest {
             assertTrue(refused.getMessage().contains("supported step"),
                     refused.getMessage());
         }
+        // The whole sky's own width is accepted, and is the whole sky
+        // (#687): not a rung the ladder reaches, a page the Hammer
+        // projection draws.
+        ChartViewState whole = new ChartViewState(new SkyPosition(266.0, -28.0),
+                juranometria.chart.ChartProjection.WHOLE_SKY_DEGREES, 5.0);
+        assertTrue(whole.wholeSky(), "360 degrees is the whole sky");
+        assertEquals(juranometria.chart.ChartProjection.HAMMER, whole.projection());
+        assertFalse(whole.canZoomIn() || whole.canZoomOut(),
+                "and the ladder does not walk from it");
         // And the sky does not wrap around to a narrower page either.
         assertThrows(IllegalArgumentException.class,
                 () -> new ChartViewState(new SkyPosition(0.0, 0.0),

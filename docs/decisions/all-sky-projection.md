@@ -1,7 +1,8 @@
 # The whole sky at one chart time (#686)
 
-**Status: ruled by the owner on 2026-11-08 (§7); the study is not yet
-qualified or landed.** Nothing here is built. Production behaviour is unchanged except for one study door,
+**Status: ruled by the owner on 2026-11-08 (§7) and built by #687 (§8),
+as an unqualified candidate for the owner's hands.** The study (§1-§6) is
+history; §7 is the ruling; §8 is what was built to it. Production behaviour is unchanged except for one study door,
 approved by the owner on 2026-11-08 and removed by #687 whatever the ruling.
 
 Road #703. Evidence: `make all-sky-study` writes
@@ -412,3 +413,73 @@ production's ordinary sentences, which are false on this page. M§4's column
 names map longitude explicitly.
 
 **Order.** #687 begins only after this ruled study has qualified and landed.
+
+## 8. As built (#687)
+
+Built on main `c6c7b102` to §7, as an unqualified packaged candidate; the
+evidence is `docs/studies/whole-sky/` (`make whole-sky-study`), every page a
+production chart entered through the Whole sky switch.
+
+**Architecture A, exactly.** The one `Projection` interface gained four
+statements, each with the azimuthal answer as its default so no existing
+projection changes a byte: `outline()` (a `PlaneOutline`: unbounded, a disc,
+or the whole sky's ellipse), `mayJoin(from, to)` (the seam as a join rule:
+always true for the azimuthal three), `greatCirclesAreConics()` (false for the
+one projection without conics), and `wholeSphere()` (the orientation token and
+the central longitude a whole-sky page states). `GreatCirclePage.clip` takes a
+sampled route for a projection that says its great circles are not conics -
+1,440 samples, broken by the join rule, refined to the seam by bisection,
+drawn as `CurveRun.Polyline` - and the conic route for every other, so the
+#298 seam's "exact forms, no sampling" stands wherever an exact form exists;
+`docs/decisions/overview-projection.md` records the amendment. `PageRegion`
+carries an elliptical limb and the conic clipping refuses it loudly. The three
+joining passes (figures and boundaries, the grid, the sampled curves) ask the
+join rule; a split figure's name is anchored on the part holding more of its
+ink (`ChartRenderer.FigureAnchor`), with one part - and bit-identical sums -
+on every azimuthal page. `BelowHorizon` reads the sampled horizon's own
+chords. The modules were not touched.
+
+**The kind and the mode.** `ChartProjection.HAMMER` draws
+`ChartProjection.WHOLE_SKY_DEGREES` (360) and nothing else; that width is not a
+rung, `forField` names it only for exactly 360, and `ChartViewState.wholeSky`
+builds the state about a centre on the ecliptic (`HammerProjection.centreFor`).
+`HammerProjection` is the one projection that knows the ecliptic frame, through
+`sky.Ecliptic`, so the middle line and the drawn ecliptic cannot disagree. The
+`ChartViewController` keeps the ordinary view while the whole sky is shown,
+restores it exactly on leaving, treats every recentre from the whole sky as
+Open here into that view's field (R-8), refuses pan and pointer zoom (R-9), and
+moves the central meridian when the observer changes (R-4).
+`juranometria.ui.WholeSkySession` is the one switch: the toolbar's toggle, the
+Controller's, the Chart menu's item and a whole-sky bookmark all run it;
+nothing stores it (R-10).
+
+**Words (R-12).** `page.wholeSky.*` in both languages: the ruled title line,
+the central-longitude facts line, the spoken sentence and the sheet
+description; `page.projection.hammer`. The title block, speech, the sheet's
+metadata and file name, the view report (`field-degrees: whole-sky`,
+`view`, `orientation`, `central-meridian`, `central-longitude-degrees`) and the
+toolbar readout all branch on `wholeSphere()`; none repeats the ordinary
+Centre or Field claims. The language-free scene title is the central longitude
+in notation (`λ 65.0°`).
+
+**Refusals said.** Zoom in and out explain themselves on the whole sky; the
+Inspector's Centre here is Open here; On this page shows its refusal sentence
+(R-14); the meridian's altitude readout is not placed.
+
+**Bookmarks (R-11, B-2).** `SavedView` has a whole-sky form written as
+`"view": {"mode": "whole-sky"}` and nothing else; such a record needs its
+chart time and place or is kept as needing attention; the add dialog ticks and
+holds both; opening enters the whole sky after the stored time and place are
+the chart's; every ordinary bookmark is written byte for byte as before.
+
+**The study of §1-§6** is held as history: its door and generator are gone,
+its reports say so at their head, its pages keep their provenance.
+
+**Measured on the candidate** (`docs/studies/whole-sky/measurements.md`):
+nine of nine bodies on every page; the zenith on the central meridian at
+37.7-68.6 degrees from the centre; every reference circle one run with ends on
+the outline to 1e-9; no figure or grid piece across the page and no name
+stranded; line subdue disagreeing with the true horizon on under 0.5 per cent
+of the sky; Open here landing 0.000000 degrees from Saturn at the 60-degree
+field left. Not exercised: the exported sheet drawn end to end (its words are
+held), keyboard focus of the toggle, and a Milky Way (no production ink).

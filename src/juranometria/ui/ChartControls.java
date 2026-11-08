@@ -55,6 +55,9 @@ public final class ChartControls {
     /** The component name the zoom lock carries, for tests (#428). */
     public static final String ZOOM_LOCK = "zoomLock";
 
+    /** The component name the Whole sky toggle carries, for tests (#687). */
+    public static final String WHOLE_SKY = "wholeSky";
+
     private final InterfaceText said;
     private final ShortcutText shortcuts;
     private final ChartViewController controller;
@@ -69,6 +72,7 @@ public final class ChartControls {
     private JToggleButton inspectorButton;
     private JToggleButton accumulate;
     private JToggleButton zoomLock;
+    private JToggleButton wholeSky;
     private JButton emphasis;
 
     /**
@@ -242,6 +246,41 @@ public final class ChartControls {
     /** The Add Bookmark button, or null before it is attached. */
     public JButton addBookmark() {
         return addBookmark;
+    }
+
+    /**
+     * Whole sky (#687, ruled R-13 on #686): one explicit, checked toggle
+     * that enters and leaves the whole-sky view - never a projection
+     * chooser, never inferred from the field. It asks the shared
+     * session and shows what the controller holds, so every host and
+     * the menu agree. Attached once, before a host lays out. Returns
+     * the toggle.
+     */
+    public JToggleButton attachWholeSky(WholeSkySession session) {
+        if (session == null) {
+            throw new IllegalArgumentException("Whole sky needs its session");
+        }
+        if (wholeSky != null) {
+            throw new IllegalStateException("Whole sky is attached once");
+        }
+        wholeSky = new JToggleButton(said.say("toolbar.wholeSky.label"), session.on());
+        wholeSky.setName(WHOLE_SKY);
+        wholeSky.setFocusable(true);
+        wholeSky.getAccessibleContext().setAccessibleName(
+                said.say("toolbar.wholeSky.a11y"));
+        Explain.control(wholeSky, said.say("toolbar.wholeSky.hover"),
+                said.say("toolbar.wholeSky.explain"));
+        wholeSky.addActionListener(event -> {
+            session.set(wholeSky.isSelected());
+            wholeSky.setSelected(session.on());
+        });
+        session.onChange(wholeSky::setSelected);
+        return wholeSky;
+    }
+
+    /** The Whole sky toggle, or null before the application attached it. */
+    public JToggleButton wholeSky() {
+        return wholeSky;
     }
 
     /**
@@ -448,6 +487,9 @@ public final class ChartControls {
         if (zoomLock != null) {
             zoom.add(zoomLock);
         }
+        if (wholeSky != null) {
+            zoom.add(wholeSky);
+        }
         zoom.addSeparator();
         strip.add(zoom);
         JToolBar magnitude = row();
@@ -594,11 +636,16 @@ public final class ChartControls {
         // handed over already written. A language places them; none
         // re-formats them, so a decimal point cannot become a comma
         // in a magnitude (#350).
-        String field = juranometria.chart.FieldWidthText.whole(
-                state.fieldWidthDegrees());
         String limit = String.format(Locale.ROOT, "%.1f",
                 state.limitingMagnitude());
-        readout.setText(said.say("toolbar.readout", field, limit));
+        if (state.wholeSky()) {
+            // No field to read out (#687, R-12).
+            readout.setText(said.say("toolbar.readout.wholeSky", limit));
+        } else {
+            String field = juranometria.chart.FieldWidthText.whole(
+                    state.fieldWidthDegrees());
+            readout.setText(said.say("toolbar.readout", field, limit));
+        }
 
         say(zoomOut, "toolbar.zoomOut", Shortcuts.ZOOM_OUT,
                 controller.canZoomOut() ? state.zoomOut() : null, state);
@@ -650,7 +697,11 @@ public final class ChartControls {
         String hovered = shortcuts.withKeystroke(
                 said.say(stem + ".hover"), id);
         String heard = said.say(stem + ".explain");
-        if (next == null) {
+        if (state.wholeSky()) {
+            // Refused on the whole sky, and said so (#687, R-9): zoom
+            // never enters or leaves this view.
+            heard = said.say(stem + ".wholeSky.unavailable");
+        } else if (next == null) {
             // At the floor, or a closer field short of the closest, zoom
             // in is not at the end of anything: a closer field is offered
             // where Mercury, Venus, Mars, Jupiter, Saturn, Uranus or Neptune is on the page, and here is not (#544, #579, #606, #638).

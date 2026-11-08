@@ -7,6 +7,22 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**The whole sky at one chart time (#687, ruled on #686).** A *Whole sky*
+toggle on the toolbar, in the Controller and in the Chart menu shows the
+entire sky at the Place and Time instant as one equal-area map: Hammer
+projection, ecliptic north up, ecliptic longitude increasing left at
+centre, the central meridian at the zenith's ecliptic longitude, every
+Solar System body you have switched on above or below the horizon. The
+page states what it is - never a centre as a place or a radial field -
+on the chart, aloud, in the exported sheet and in the view report. Zoom
+and pan are unavailable in it and say so; *Open here* on a selected
+object or position returns to the ordinary chart centred there at the
+field you left; Reset view returns to the first page; On this page is
+unavailable in it and points to Open here. A whole-sky view can be
+bookmarked, with its chart time and place; existing bookmarks are
+unchanged. Nothing about the mode is remembered between sessions. Every
+existing page is drawn exactly as before. *Unqualified candidate.*
+
 ## [6.4.0] - 2026-11-07
 
 **Keep one Controller section open (#698, #699).** A slim row at the

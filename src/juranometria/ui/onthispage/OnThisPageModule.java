@@ -129,8 +129,16 @@ public final class OnThisPageModule implements ChartModule {
      * off-page, in the Inspector's working-set section.
      */
     private void pageChanged(PageContents page) {
-        if (table != null) {
-            table.pageChanged(page);
+        if (table == null) {
+            return;
         }
+        // Refused on the whole sky (#687, ruled R-14 on #686): a list of
+        // the entire sky is not the regional table On this page
+        // promises. The reader is told to Open here and ask again.
+        if (services.viewState().wholeSky()) {
+            table.refused(said.say("onthispage.wholeSky.refused"));
+            return;
+        }
+        table.pageChanged(page);
     }
 }

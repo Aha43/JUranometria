@@ -235,6 +235,16 @@ class ProjectionStrategyTest {
             assertFalse(runs.isEmpty(),
                     kind + " draws the celestial equator across a"
                             + " chart centred on it");
+            if (!Projections.of(kind, ORION).greatCirclesAreConics()) {
+                // The whole sky (#687): no conic, so the sampled route
+                // draws it, broken at the seam - a polyline, never a
+                // conic substituted for one.
+                for (CurveRun run : runs) {
+                    assertTrue(run instanceof CurveRun.Polyline,
+                            kind + " draws it by the sampled route");
+                }
+                continue;
+            }
             assertTrue(runs.get(0) instanceof CurveRun.Segment,
                     kind + " draws it straight, because it runs through"
                             + " the page centre");
@@ -270,9 +280,16 @@ class ProjectionStrategyTest {
             ViewportMapping mapping = new ViewportMapping(viewport, juranometria.project.Projections.of(viewport.projection(), viewport.centre()));
             // Half the field east of the centre, which is half the
             // page across - and east is left, so it lands on the
-            // left edge whichever projection scaled it.
-            PlanePoint halfway = projection
-                    .project(new SkyPosition(ORION.raDegrees() + 30.0, 0.0))
+            // left edge whichever projection scaled it. The whole sky
+            // (#687) states its one radial law along its middle line,
+            // the ecliptic, so there the point is half the field along
+            // the ecliptic from the central meridian.
+            SkyPosition halfTheField = projection
+                    instanceof juranometria.project.HammerProjection hammer
+                    ? juranometria.sky.Ecliptic.toEquatorial(
+                            hammer.centralLongitudeDegrees() + 30.0, 0.0)
+                    : new SkyPosition(ORION.raDegrees() + 30.0, 0.0);
+            PlanePoint halfway = projection.project(halfTheField)
                     .orElseThrow();
             PixelPoint edge = mapping.toPixel(halfway);
             assertEquals(0.0, edge.x(), 1.0e-9,

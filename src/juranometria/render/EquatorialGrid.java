@@ -412,6 +412,13 @@ public final class EquatorialGrid {
         var projection = page.projection();
         var mapping = new ViewportMapping(page);
         double centreRa = viewport.centre().raDegrees();
+        // The whole sphere (#687): every meridian and every parallel
+        // is on the page, and there is no boundary to walk - its
+        // outline is not a circle about the centre, and both poles are
+        // on it.
+        if (projection.wholeSphere().isPresent()) {
+            return new SkyBounds(centreRa, 180.0, true, -89.99, 89.99);
+        }
         double decMin = 90.0;
         double decMax = -90.0;
         double maxDelta = 0.0;
@@ -490,6 +497,15 @@ public final class EquatorialGrid {
                 continue;
             }
             PixelPoint pixel = mapping.toPixel(plane.get());
+            if (previous != null && !projection.mayJoin(previousSky, sky)) {
+                // Across the seam (#687, R-5): both samples are drawn,
+                // on their own sides, and the chord between them is
+                // not. The curve starts again here.
+                current = flush(pieces, current);
+                previous = pixel;
+                previousSky = sky;
+                continue;
+            }
             if (previous != null) {
                 var chord = new java.awt.geom.Line2D.Double(
                         previous.x(), previous.y(), pixel.x(), pixel.y());

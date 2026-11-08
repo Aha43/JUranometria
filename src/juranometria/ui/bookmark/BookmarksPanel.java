@@ -447,10 +447,12 @@ public final class BookmarksPanel extends JPanel {
             case Node.Bookmark b -> {
                 List<String> lines = new ArrayList<>();
                 lines.add(b.title());
-                lines.add(said.say("bookmark.details.view",
-                        juranometria.chart.SkyFormat.formatRa(b.view().raDegrees()) + ", "
-                                + juranometria.chart.SkyFormat.formatDec(b.view().decDegrees()),
-                        field(b.view().fieldWidthDegrees())));
+                lines.add(b.view().wholeSky()
+                        ? said.say("bookmark.view.wholeSky")
+                        : said.say("bookmark.details.view",
+                                juranometria.chart.SkyFormat.formatRa(b.view().raDegrees()) + ", "
+                                        + juranometria.chart.SkyFormat.formatDec(b.view().decDegrees()),
+                                field(b.view().fieldWidthDegrees())));
                 if (!b.subjects().isEmpty()) {
                     List<String> names = new ArrayList<>();
                     for (Subject s : b.subjects()) {

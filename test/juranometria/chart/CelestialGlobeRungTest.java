@@ -9,6 +9,7 @@ import juranometria.render.ChartOptions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -76,13 +77,24 @@ class CelestialGlobeRungTest {
 
     @Test
     void theAtlasShipsExactlyThreeProjections() {
+        // Three the ladder reaches from the eyepiece outward, and a
+        // fourth (#687) no rung reaches: the whole sky, entered by its
+        // own control at its own width.
         assertEquals(
                 java.util.List.of(ChartProjection.GNOMONIC,
                         ChartProjection.STEREOGRAPHIC,
-                        ChartProjection.ORTHOGRAPHIC),
+                        ChartProjection.ORTHOGRAPHIC,
+                        ChartProjection.HAMMER),
                 java.util.List.of(ChartProjection.values()),
-                "three production projections, in the order the ladder"
-                        + " reaches them from the eyepiece outward");
+                "the ladder's three in the order it reaches them, then"
+                        + " the whole sky");
+        assertEquals(ChartProjection.HAMMER,
+                ChartProjection.forField(ChartProjection.WHOLE_SKY_DEGREES),
+                "the whole sky's width is the Hammer projection's");
+        for (double field : ChartViewState.fieldWidthSteps()) {
+            assertNotEquals(ChartProjection.HAMMER, ChartProjection.forField(field),
+                    field + " degrees is a rung, and no rung is the whole sky");
+        }
         for (ChartProjection kind : ChartProjection.values()) {
             var projection = Projections.of(kind, SAGITTARIUS);
             assertEquals(kind.displayName(), projection.name(),

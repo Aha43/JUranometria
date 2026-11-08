@@ -112,10 +112,19 @@ public final class ViewportMapping {
         // is sized by the rule every other page in the atlas uses.
         boolean wholeObject = bounded
                 && half >= projection.limitDegrees();
+        // The whole sky is a bounded object too (#687): its outline is
+        // an ellipse, placed on the paper by the same frame fraction
+        // the globe uses, fitted by whichever of its two extents the
+        // paper limits first. The globe's own expression is kept
+        // exactly as it was written, so no hemisphere moves by a bit.
         this.pixelsPerPlaneUnit = wholeObject
-                ? globeFrame() * Math.min(viewport.widthPx(),
-                        viewport.heightPx()) / 2.0
-                        / projection.visiblePlaneRadius()
+                ? (projection.outline() instanceof PlaneOutline.Ellipse e
+                        ? globeFrame() * Math.min(
+                                viewport.widthPx() / (2.0 * e.halfWidth()),
+                                viewport.heightPx() / (2.0 * e.halfHeight()))
+                        : globeFrame() * Math.min(viewport.widthPx(),
+                                viewport.heightPx()) / 2.0
+                                / projection.visiblePlaneRadius())
                 : viewport.widthPx() / (2.0 * halfRadius);
     }
 
@@ -355,6 +364,16 @@ public final class ViewportMapping {
     /** The region this mapping draws into, limb and all. */
     public PageRegion regionFor(ChartViewport viewport,
                                 Projection projection) {
+        // The shape of the sky, asked as a shape (#687). A disc keeps
+        // the radius arithmetic it always had; an ellipse carries both
+        // half-extents to the region, whose conic clipping refuses it
+        // and whose sampled route never needs it.
+        if (projection.outline() instanceof PlaneOutline.Ellipse e) {
+            return PageRegion.withinEllipse(0, 0, viewport.widthPx(),
+                    viewport.heightPx(), centreX, centreY,
+                    e.halfWidth() * pixelsPerPlaneUnit,
+                    e.halfHeight() * pixelsPerPlaneUnit);
+        }
         double visible = projection.visiblePlaneRadius();
         return Double.isFinite(visible)
                 ? PageRegion.within(0, 0, viewport.widthPx(),

@@ -176,6 +176,40 @@ class PageTextTest {
             }
 
             @Override
+            public String wholeSkySubject() {
+                return EN.wholeSkySubject();
+            }
+
+            @Override
+            public String wholeSkyTitleLine(String projection) {
+                return EN.wholeSkyTitleLine(projection);
+            }
+
+            @Override
+            public String wholeSkyTitleFacts(String centralLongitude,
+                                             String magnitude) {
+                return EN.wholeSkyTitleFacts(centralLongitude, magnitude);
+            }
+
+            @Override
+            public String wholeSkySpokenPage(String projection,
+                                             String centralLongitude,
+                                             String magnitude) {
+                return EN.wholeSkySpokenPage(projection, centralLongitude,
+                        magnitude);
+            }
+
+            @Override
+            public String wholeSkySheetDescription(String projection,
+                                                   String centralLongitude,
+                                                   String magnitude,
+                                                   String paper,
+                                                   String ground) {
+                return EN.wholeSkySheetDescription(projection,
+                        centralLongitude, magnitude, paper, ground);
+            }
+
+            @Override
             public String magnitudeKeyHeading() {
                 return EN.magnitudeKeyHeading();
             }

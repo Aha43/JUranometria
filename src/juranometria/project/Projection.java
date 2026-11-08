@@ -158,6 +158,99 @@ public interface Projection {
      * curved across a hemisphere and plainly straight across a
      * telescope field. Turning it into ink belongs to the curve seam
      * (issue #298).
+     *
+     * <p>Asked only of a projection whose great circles are conics
+     * ({@link #greatCirclesAreConics}); the others are sampled by the
+     * curve seam and are never asked.
      */
     Optional<PlaneConic> greatCircle(SkyPosition pole);
+
+    // ---- what the whole-sky view widened (#687, architecture A) ----
+    //
+    // Three things the #686 study measured the azimuthal shape of this
+    // interface could not say, each added as exactly one statement
+    // with the azimuthal answer as its default, so that no projection
+    // the atlas already draws changes a byte
+    // (docs/decisions/all-sky-projection.md, section 3).
+
+    /**
+     * The shape of the sky on the plane.
+     *
+     * <p>{@link #visiblePlaneRadius} keeps answering how far ink may
+     * reach; this says what shape it stops at. A disc of that radius
+     * for every projection with a limb, no edge for every chart
+     * projection - and an ellipse for the whole sky, which a radius
+     * cannot describe.
+     */
+    default PlaneOutline outline() {
+        return PlaneOutline.of(visiblePlaneRadius());
+    }
+
+    /**
+     * Whether two positions may be joined by a drawn piece.
+     *
+     * <p>Every azimuthal projection answers yes: a position is either
+     * on the plane or not, and two that are may be joined. A projection
+     * with a seam has a second answer - both positions are on the
+     * plane, but the short way between them crosses the cut, and a
+     * piece drawn between them would run straight across the page.
+     * Every pass that joins consecutive points asks this before it
+     * does (the figures, the boundaries, the grid, the sampled curve
+     * route, the inventory's outline), and never hides a point to get
+     * a break: a position is always drawn, on its own side (R-5).
+     */
+    default boolean mayJoin(SkyPosition from, SkyPosition to) {
+        return true;
+    }
+
+    /**
+     * Whether every great circle of this projection is a conic on its
+     * plane, so that {@link #greatCircle} is the exact route.
+     *
+     * <p>True for the three azimuthal projections, which the #298 gate
+     * measured over 108 real pages. False for the whole sky, where a
+     * great circle is a transcendental curve: the curve seam then
+     * samples it, breaks it at the seam by {@link #mayJoin}, and
+     * draws it as a polyline - the one amendment architecture A makes
+     * to the seam's no-sampling rule, and only for projections that
+     * say so here.
+     */
+    default boolean greatCirclesAreConics() {
+        return true;
+    }
+
+    /**
+     * What a projection showing the entire sphere states about itself,
+     * or empty for every page that shows part of the sky.
+     *
+     * <p>A whole-sky page has no centre worth naming as a place and no
+     * radial field; what it has is an orientation - which great circle
+     * runs straight across its middle - and a central longitude in
+     * that frame. The title block, speech, the exported sheet and the
+     * view report read these from here rather than inventing them.
+     */
+    default Optional<WholeSphere> wholeSphere() {
+        return Optional.empty();
+    }
+
+    /**
+     * The whole-sky statement: {@code orientation} is the frame's
+     * token ({@code ecliptic}), {@code centralLongitudeDegrees} the
+     * longitude in that frame on the central meridian, in
+     * {@code [0, 360)}.
+     */
+    record WholeSphere(String orientation, double centralLongitudeDegrees) {
+        public WholeSphere {
+            if (orientation == null || orientation.isBlank()) {
+                throw new IllegalArgumentException(
+                        "a whole-sky page names its orientation");
+            }
+            if (!(centralLongitudeDegrees >= 0.0
+                    && centralLongitudeDegrees < 360.0)) {
+                throw new IllegalArgumentException(
+                        "a central longitude is in [0, 360): "
+                                + centralLongitudeDegrees);
+            }
+        }
+    }
 }

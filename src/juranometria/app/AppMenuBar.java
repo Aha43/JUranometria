@@ -1028,6 +1028,53 @@ public final class AppMenuBar {
         view.insert(item, after + 1);
         return item;
     }
+    /**
+     * Whole sky (#687, ruled R-13 on #686): the Chart menu's checked
+     * item for the same switch the toolbar's toggle runs, after Centre
+     * on coordinates. Returns the item, or null on a bar without the
+     * Chart menu.
+     */
+    public static javax.swing.JCheckBoxMenuItem addWholeSky(javax.swing.JMenuBar bar,
+            juranometria.ui.language.InterfaceText said,
+            juranometria.ui.WholeSkySession session) {
+        JMenu view = null;
+        for (int i = 0; i < bar.getMenuCount(); i++) {
+            JMenu menu = bar.getMenu(i);
+            if (menu != null && said.say("menu.view.label").equals(menu.getText())) {
+                view = menu;
+            }
+        }
+        if (view == null || session == null) {
+            return null;
+        }
+        javax.swing.JCheckBoxMenuItem item = new javax.swing.JCheckBoxMenuItem(
+                said.say("menu.wholeSky.label"), session.on());
+        item.setName(WHOLE_SKY_ITEM);
+        juranometria.ui.language.MnemonicText.in(said).apply(item, "menu.wholeSky.mnemonic");
+        item.getAccessibleContext().setAccessibleName(said.say("menu.wholeSky.a11y"));
+        juranometria.ui.Explain.selfExplanatory(item, said.say("menu.wholeSky.explain"));
+        item.addActionListener(event -> {
+            session.set(item.isSelected());
+            item.setSelected(session.on());
+        });
+        session.onChange(item::setSelected);
+        // After Centre on coordinates, whose group it shares; failing
+        // that, after the Inspector.
+        int after = -1;
+        for (int i = 0; i < view.getMenuComponentCount(); i++) {
+            if (view.getMenuComponent(i) instanceof JMenuItem existing
+                    && ("centreOnCoordinatesItem".equals(existing.getName())
+                            || (after < 0 && INSPECTOR_ITEM.equals(existing.getName())))) {
+                after = i;
+            }
+        }
+        view.insert(item, after + 1);
+        return item;
+    }
+
+    /** The Whole sky item's name, for tests and journeys (#687). */
+    public static final String WHOLE_SKY_ITEM = "wholeSkyItem";
+
     public static javax.swing.JCheckBoxMenuItem addSaturnOnChart(javax.swing.JMenuBar bar,
             juranometria.ui.language.InterfaceText said, Runnable toggleSaturnOnChart) {
         JMenu solar = solarSystemMenu(bar);

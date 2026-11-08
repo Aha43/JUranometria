@@ -143,7 +143,9 @@ public sealed interface PlaneCurve {
                 // And then to the limb, which cuts the same run a
                 // second time. A line meets a circle at the roots of
                 // one quadratic, so this is exact and samples
-                // nothing.
+                // nothing. A circle only (#687): an elliptical limb
+                // is refused, not drawn through.
+                region.requireCircularLimb();
                 double offsetX = fromX - region.limbX();
                 double offsetY = fromY - region.limbY();
                 double aa = dx * dx + dy * dy;
@@ -240,6 +242,7 @@ public sealed interface PlaneCurve {
             if (!region.bounded()) {
                 return List.of();
             }
+            region.requireCircularLimb();
             double apartX = region.limbX() - centreX;
             double apartY = region.limbY() - centreY;
             double apart = Math.hypot(apartX, apartY);
@@ -503,6 +506,7 @@ public sealed interface PlaneCurve {
             if (!region.bounded()) {
                 return;
             }
+            region.requireCircularLimb();
             double apart = Math.hypot(centreX - region.limbX(),
                     centreY - region.limbY());
             double outermost = apart + maxRadius;

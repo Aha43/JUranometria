@@ -286,6 +286,18 @@ public final class BelowHorizon {
         List<double[]> out = new ArrayList<>();
         for (juranometria.project.CurveRun run : juranometria.project.GreatCirclePage.clip(
                 page.projection(), mapping, region, zenithPosition)) {
+            if (run instanceof juranometria.project.CurveRun.Polyline polyline) {
+                // The sampled route's own chords (#687): the horizon as
+                // drawn, broken at the seam, so the region below it is
+                // bounded by the line the reader sees.
+                java.util.List<juranometria.project.PixelPoint> points = polyline.points();
+                for (int i = 0; i < polyline.chords(); i++) {
+                    juranometria.project.PixelPoint a = points.get(i);
+                    juranometria.project.PixelPoint b = points.get((i + 1) % points.size());
+                    out.add(new double[] {a.x(), a.y(), b.x(), b.y()});
+                }
+                continue;
+            }
             int n = run instanceof juranometria.project.CurveRun.Segment ? 1 : CHORDS;
             juranometria.project.PixelPoint was = run.at(0.0);
             for (int i = 1; i <= n; i++) {
