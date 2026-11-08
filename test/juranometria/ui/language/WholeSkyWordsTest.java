@@ -33,11 +33,12 @@ class WholeSkyWordsTest {
                 + " mot venstre i midten", NB.wholeSkyTitleLine(NB.projection("hammer")));
         assertEquals("Whole sky", EN.wholeSkySubject());
         assertEquals("Hele himmelen", NB.wholeSkySubject());
-        String facts = EN.wholeSkyTitleFacts("65.0", "5.0");
-        assertTrue(facts.contains("65.0°") && facts.contains("V 5.0"), facts);
-        assertTrue(facts.toLowerCase().contains("zenith"), "the central-meridian rule: " + facts);
-        String nb = NB.wholeSkyTitleFacts("65.0", "5.0");
-        assertTrue(nb.contains("65.0°") && nb.contains("V 5.0") && nb.contains("senit"), nb);
+        // The whole line, in both languages: a prefix pin let the fragment
+        // "..., the zenith's" / "..., senits" pass to the owner's hands.
+        assertEquals("Central meridian: zenith's ecliptic longitude 65.0° · Stars to V 5.0",
+                EN.wholeSkyTitleFacts("65.0", "5.0"));
+        assertEquals("Sentralmeridian: senits ekliptiske lengde 65.0° · Stjerner til V 5.0",
+                NB.wholeSkyTitleFacts("65.0", "5.0"));
     }
 
     @Test
@@ -48,13 +49,15 @@ class WholeSkyWordsTest {
         String spoken = page.describe(EN);
         assertTrue(spoken.startsWith("Whole sky. Hammer projection, ecliptic north up,"
                 + " ecliptic longitude increases left at centre."), spoken);
-        assertTrue(spoken.contains("Central meridian at ecliptic longitude 65.0 degrees"), spoken);
-        assertTrue(spoken.contains("Stars to V 5.0"), spoken);
+        assertTrue(spoken.contains("Central meridian at the zenith's ecliptic longitude,"
+                + " 65.0 degrees. Stars to V 5.0."), spoken);
         assertFalse(spoken.contains("ICRS") || spoken.contains("Field ")
                 || spoken.contains("Centre RA"), "no ordinary claim: " + spoken);
         String norsk = page.describe(NB);
         assertTrue(norsk.startsWith("Hele himmelen. Hammer-projeksjon, ekliptisk nord opp,"
                 + " ekliptisk lengde øker mot venstre i midten."), norsk);
+        assertTrue(norsk.contains("Sentralmeridian ved senits ekliptiske lengde, 65.0 grader."
+                + " Stjerner til V 5.0."), norsk);
         assertFalse(norsk.contains("Sentrum RA") || norsk.contains("Felt "), norsk);
         assertEquals("65.0", DrawnPage.centralLongitudeText(
                 page.projection().wholeSphere().orElseThrow()));
@@ -67,7 +70,11 @@ class WholeSkyWordsTest {
                 "A4 landscape", "white-paper");
         assertTrue(sheet.startsWith("Whole sky. Hammer, ecliptic north up, ecliptic longitude"
                 + " increases left at centre."), sheet);
-        assertTrue(sheet.contains("65.0 degrees") && sheet.contains("V 5.0")
-                && sheet.contains("A4 landscape") && sheet.contains("white-paper"), sheet);
+        assertTrue(sheet.contains(" Central meridian at the zenith's ecliptic longitude,"
+                + " 65.0 degrees. Stars to V 5.0. A4 landscape. Ground: white-paper."), sheet);
+        String norsk = NB.wholeSkySheetDescription("Hammer", "65.0", "5.0",
+                "A4 i liggende format", "svart himmel");
+        assertTrue(norsk.contains(" Sentralmeridian ved senits ekliptiske lengde, 65.0 grader."
+                + " Stjerner til V 5.0. A4 i liggende format. Bakgrunn: svart himmel."), norsk);
     }
 }
