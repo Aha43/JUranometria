@@ -68,8 +68,8 @@ class WholeSkyPageTest {
                 "jovian.jupiter", "saturn", "uranus", "neptune")), drawn, "nine of nine");
         String spoken = page.chart().getAccessibleContext().getAccessibleDescription();
         assertTrue(spoken.startsWith("Whole sky. Hammer projection, ecliptic north up,"
-                + " ecliptic longitude increases left at centre. Central meridian at ecliptic"
-                + " longitude 65.0 degrees"), spoken);
+                + " ecliptic longitude increases left at centre. Central meridian at the"
+                + " zenith's ecliptic longitude, 65.0 degrees. Stars to V 5.0."), spoken);
         assertTrue(spoken.contains("Sun (below the horizon)"), spoken);
         ChartScene scene = page.chart().currentScene();
         List<String> title = new ChartRenderer(StarSizePolicy.DEFAULT, page.words())
@@ -77,7 +77,7 @@ class WholeSkyPageTest {
         assertEquals(2, title.size(), title.toString());
         assertEquals("Whole sky · Hammer · ecliptic north up · ecliptic longitude increases"
                 + " left at centre", title.get(0));
-        assertTrue(title.get(1).startsWith("Central meridian: ecliptic longitude 65.0°"),
+        assertEquals("Central meridian: zenith's ecliptic longitude 65.0° · Stars to V 5.0",
                 title.get(1));
         for (String line : title) {
             assertFalse(line.contains("ICRS") || line.contains("Field"), line);
@@ -238,7 +238,7 @@ class WholeSkyPageTest {
                 .titleBlockLines(norsk.chart().currentScene());
         assertEquals("Hele himmelen · Hammer · ekliptisk nord opp · ekliptisk lengde øker"
                 + " mot venstre i midten", title.get(0));
-        assertTrue(title.get(1).startsWith("Sentralmeridian: ekliptisk lengde 65.0°"),
+        assertEquals("Sentralmeridian: senits ekliptiske lengde 65.0° · Stjerner til V 5.0",
                 title.get(1));
         assertEquals(9, norsk.chart().renderedBodies().size());
         assertEquals(norsk.said().say("onthispage.wholeSky.refused"),

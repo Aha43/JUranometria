@@ -407,6 +407,12 @@ this section governs.
   a meridian meets the outline, Dec figures at a parallel's crossing of the
   central meridian; sparse; never across the seam. Body names at the seam
   stand as built (§8): the owner withheld acceptance only on the notation.
+  **Accepted as built at the owner's second hands-on (2026-11-08)**, together
+  with the seam-label rule: "the numbered graticule now feels deliberately
+  quiet and complete." The same look found the central-meridian wording
+  fragmentary (*Central meridian: ecliptic longitude 65.0°, the zenith's*) in
+  the title, speech and sheet description of both languages; corrected to
+  whole sentences before the final packaged verdict (§8, Words).
 - **Architecture A.** The existing projection interface is extended with an
   outline, a join rule and a non-conic sampled-curve route. The existing
   modules remain the single source of astronomical ink. Existing azimuthal
@@ -461,7 +467,12 @@ nothing stores it (R-10).
 
 **Words (R-12).** `page.wholeSky.*` in both languages: the ruled title line,
 the central-longitude facts line, the spoken sentence and the sheet
-description; `page.projection.hammer`. The title block, speech, the sheet's
+description; `page.projection.hammer`. The central meridian is stated as a
+whole clause, never as trailing fragments (owner, second hands-on 2026-11-08):
+on the chart *Central meridian: zenith's ecliptic longitude 65.0° · Stars to V
+5.0* / *Sentralmeridian: senits ekliptiske lengde 65.0° · Stjerner til V 5.0*;
+aloud and in the sheet *Central meridian at the zenith's ecliptic longitude,
+65.0 degrees.* / *Sentralmeridian ved senits ekliptiske lengde, 65.0 grader.* The title block, speech, the sheet's
 metadata and file name, the view report (`field-degrees: whole-sky`,
 `view`, `orientation`, `central-meridian`, `central-longitude-degrees`) and the
 toolbar readout all branch on `wholeSphere()`; none repeats the ordinary
