@@ -180,6 +180,11 @@ public final class EquatorialGrid {
         double sampleStep = viewport.fieldWidthDegrees() / 180.0;
         SkyBounds bounds = boundsFor(page);
         java.awt.FontMetrics metrics = labelMetrics();
+        // The whole sky (#687, R-15): its edges are the outline, not
+        // the frame, so its notation rule is the outline's. Null on
+        // every other page, which keeps the frame's rule to the byte.
+        java.awt.geom.Ellipse2D outline = projection.wholeSphere().isPresent()
+                ? outlineOf(projection, mapping) : null;
 
         List<List<PixelPoint>> meridians = new ArrayList<>();
         List<Label> labels = new ArrayList<>();
@@ -200,13 +205,19 @@ public final class EquatorialGrid {
                 continue;
             }
             final double lo = decLo;
+            List<PixelPoint> seamEnds = new ArrayList<>();
             List<List<PixelPoint>> pieces = sampleCurve(
                     step -> new SkyPosition(normalizeRa(ra),
                             lo + step * decSpan),
                     Math.max(2, (int) Math.ceil(decSpan / sampleStep)),
-                    projection, mapping, viewport, samples, worstError);
+                    projection, mapping, viewport, samples, worstError,
+                    seamEnds);
             meridians.addAll(pieces);
-            if (!pieces.isEmpty()) {
+            if (outline != null) {
+                suppressed += outlineFigures(seamEnds,
+                        raLabel(ra, spec.raStepDegrees()), outline, viewport,
+                        metrics, labels, furniture);
+            } else if (!pieces.isEmpty()) {
                 Label label = edgeLabel(pieces, raLabel(ra, spec.raStepDegrees()), viewport, true);
                 if (label != null) {
                     if (!fitsPaper(label, metrics, viewport)
@@ -244,9 +255,14 @@ public final class EquatorialGrid {
                     step -> new SkyPosition(
                             normalizeRa(raStart + step * raSpan), parallelDec),
                     Math.max(2, (int) Math.ceil(raSpan / sampleStep)),
-                    projection, mapping, viewport, samples, worstError);
+                    projection, mapping, viewport, samples, worstError,
+                    new ArrayList<>());
             parallels.addAll(pieces);
-            if (!pieces.isEmpty()) {
+            if (outline != null) {
+                suppressed += centralFigure(pieces,
+                        decLabel(parallelDec, spec.decStepDegrees()), outline,
+                        metrics, labels, furniture);
+            } else if (!pieces.isEmpty()) {
                 String notation = decLabel(parallelDec,
                         spec.decStepDegrees());
                 Label label = edgeLabel(pieces, notation, viewport, false);
@@ -481,7 +497,7 @@ public final class EquatorialGrid {
     private static List<List<PixelPoint>> sampleCurve(
             CurvePoint curve, int steps, Projection projection,
             ViewportMapping mapping, ChartViewport viewport,
-            int[] samples, double[] worstError) {
+            int[] samples, double[] worstError, List<PixelPoint> seamEnds) {
         List<List<PixelPoint>> pieces = new ArrayList<>();
         List<PixelPoint> current = new ArrayList<>();
         PixelPoint previous = null;
@@ -500,8 +516,54 @@ public final class EquatorialGrid {
             if (previous != null && !projection.mayJoin(previousSky, sky)) {
                 // Across the seam (#687, R-5): both samples are drawn,
                 // on their own sides, and the chord between them is
-                // not. The curve starts again here.
-                current = flush(pieces, current);
+                // not. The curve ends and starts again at the seam
+                // itself - both ends refined to it by bisection on the
+                // join rule, as the sampled curve route refines its
+                // runs - so the drawn curve reaches the outline and
+                // its notation has a point to stand beside (R-15).
+                double near = (double) (i - 1) / steps;
+                double far = (double) i / steps;
+                SkyPosition nearSky = previousSky;
+                SkyPosition farSky = sky;
+                for (int b = 0; b < SEAM_BISECTIONS; b++) {
+                    double mid = (near + far) / 2.0;
+                    SkyPosition midSky = curve.at(mid);
+                    if (projection.mayJoin(previousSky, midSky)) {
+                        near = mid;
+                        nearSky = midSky;
+                    } else {
+                        far = mid;
+                        farSky = midSky;
+                    }
+                }
+                var nearPlane = projection.project(nearSky);
+                var farPlane = projection.project(farSky);
+                if (nearPlane.isPresent() && farPlane.isPresent()) {
+                    PixelPoint nearEnd = mapping.toPixel(nearPlane.get());
+                    PixelPoint farStart = mapping.toPixel(farPlane.get());
+                    if (current.isEmpty()) {
+                        current.add(previous);
+                    }
+                    current.add(nearEnd);
+                    current = flush(pieces, current);
+                    current.add(farStart);
+                    current.add(pixel);
+                    // A seam end is where the curve left the sky by
+                    // one edge to come back by the other. Where the
+                    // two refined ends coincide, the curve passed
+                    // through a point both sides share - an ecliptic
+                    // pole, where the join rule's two longitudes are
+                    // half a turn apart - and never left the sky, so
+                    // there is no edge to name it at. (The 6h and 18h
+                    // meridians run through the ecliptic poles.)
+                    if (Math.hypot(farStart.x() - nearEnd.x(),
+                            farStart.y() - nearEnd.y()) > 1e-6) {
+                        seamEnds.add(nearEnd);
+                        seamEnds.add(farStart);
+                    }
+                } else {
+                    current = flush(pieces, current);
+                }
                 previous = pixel;
                 previousSky = sky;
                 continue;
@@ -833,12 +895,178 @@ public final class EquatorialGrid {
     private static boolean overlapsAccepted(Candidate candidate,
                                             java.awt.FontMetrics metrics,
                                             List<Label> accepted) {
+        return overlapsAccepted(candidate.bounds(), metrics, accepted);
+    }
+
+    private static boolean overlapsAccepted(java.awt.geom.Rectangle2D bounds,
+                                            java.awt.FontMetrics metrics,
+                                            List<Label> accepted) {
         for (Label other : accepted) {
-            if (candidate.bounds().intersects(labelBounds(other, metrics))) {
+            if (bounds.intersects(labelBounds(other, metrics))) {
                 return true;
             }
         }
         return false;
+    }
+
+    // ---------------------------------------------- the whole sky (#687)
+
+    /**
+     * Bisection steps that refine a seam end to the seam: the
+     * sampled curve route's count, for the same reason - the
+     * parameter interval halves forty times, far below a pixel.
+     */
+    static final int SEAM_BISECTIONS = 40;
+
+    /** How far a whole-sky figure stands from the point it names. */
+    static final double OUTLINE_GAP_PX = 4.0;
+
+    /**
+     * The whole sky's outline in page pixels (#687): the ellipse the
+     * projection states, where the mapping draws it - the renderer's
+     * sky clip, asked here so the notation can keep to one side of
+     * it. Loud if a whole-sky projection ever states anything else,
+     * because the rules below are written for an ellipse.
+     */
+    public static java.awt.geom.Ellipse2D outlineOf(Projection projection,
+                                                    ViewportMapping mapping) {
+        PixelPoint middle = mapping.toPixel(
+                new juranometria.project.PlanePoint(0.0, 0.0));
+        if (projection.outline()
+                instanceof juranometria.project.PlaneOutline.Ellipse e) {
+            double across = mapping.pixelsPerPlaneUnit() * e.halfWidth();
+            double down = mapping.pixelsPerPlaneUnit() * e.halfHeight();
+            return new java.awt.geom.Ellipse2D.Double(middle.x() - across,
+                    middle.y() - down, 2.0 * across, 2.0 * down);
+        }
+        throw new IllegalStateException(
+                "a whole-sky page whose outline is not an ellipse: "
+                        + projection.name());
+    }
+
+    private static java.awt.geom.Ellipse2D grown(java.awt.geom.Ellipse2D e,
+                                                 double byPx) {
+        return new java.awt.geom.Ellipse2D.Double(e.getX() - byPx,
+                e.getY() - byPx, e.getWidth() + 2.0 * byPx,
+                e.getHeight() + 2.0 * byPx);
+    }
+
+    /**
+     * RA figures on the whole sky (#687, R-15). A meridian is named
+     * where it meets the outline, which is only ever at the seam -
+     * on both edges, since both edges are the one seam - and the
+     * figure stands on the paper just outside the outline, as an
+     * ordinary page's figures stand at its frame: outward along the
+     * outline's normal at the point, its box wholly beyond the
+     * tangent there, so that the outline - convex - cannot reach it.
+     * (Beside the point, at the same height, it would be cut by the
+     * outline's bulge wherever the outline is flat, which is where
+     * the meridians meet it: the seam runs near the south celestial
+     * pole.) Refused independently: a figure whose box would touch
+     * the outline, leave the paper, meet furniture or another figure
+     * is not placed, and the meridian stays unnamed there. A meridian
+     * that never reaches the seam has no figure. Nothing straddles
+     * the seam, by construction: the figure is outside the sky.
+     * Adds what it accepts; answers how many it refused.
+     */
+    private static int outlineFigures(List<PixelPoint> seamEnds,
+                                      String notation,
+                                      java.awt.geom.Ellipse2D outline,
+                                      ChartViewport viewport,
+                                      java.awt.FontMetrics metrics,
+                                      List<Label> accepted,
+                                      java.awt.Rectangle... furniture) {
+        int refused = 0;
+        java.awt.geom.Ellipse2D clear = grown(outline, 1.0);
+        double a = outline.getWidth() / 2.0;
+        double b = outline.getHeight() / 2.0;
+        double boxWidth = metrics.stringWidth(notation) + 2.0;
+        double boxHeight = metrics.getHeight();
+        for (PixelPoint end : seamEnds) {
+            // The outward normal of x^2/a^2 + y^2/b^2 = 1 at the point.
+            double nx = (end.x() - outline.getCenterX()) / (a * a);
+            double ny = (end.y() - outline.getCenterY()) / (b * b);
+            double length = Math.hypot(nx, ny);
+            if (length < 1e-12) {
+                refused++;
+                continue;
+            }
+            nx /= length;
+            ny /= length;
+            // The box's half-extent along the normal: its centre sits
+            // that much plus the gap beyond the point, and no part of
+            // it is nearer the tangent than the gap.
+            double reach = Math.abs(nx) * boxWidth / 2.0
+                    + Math.abs(ny) * boxHeight / 2.0;
+            double centreX = end.x() + nx * (OUTLINE_GAP_PX + reach);
+            double centreY = end.y() + ny * (OUTLINE_GAP_PX + reach);
+            Label label = new Label(notation, centreX - boxWidth / 2.0 + 1.0,
+                    centreY - boxHeight / 2.0 + metrics.getAscent());
+            java.awt.geom.Rectangle2D box = labelBounds(label, metrics);
+            if (clear.intersects(box)
+                    || !fitsPaper(label, metrics, viewport)
+                    || intersectsFurniture(label, metrics, furniture)
+                    || overlapsAccepted(box, metrics, accepted)) {
+                refused++;
+            } else {
+                accepted.add(label);
+            }
+        }
+        return refused;
+    }
+
+    /**
+     * Dec figures on the whole sky (#687, R-15). A parallel is named
+     * where it crosses the page's central meridian - the crossing
+     * nearest the middle line when it has two, so the figure stands
+     * where the parallel is read and not in the crowd about the
+     * pole - with the figure above and to the right of the crossing,
+     * inside the sky, as a parallel's figure sits above its line at
+     * the left edge of an ordinary page. A parallel that never
+     * crosses the central meridian (both its crossings of that great
+     * circle fall on the seam's half) stays unnamed; a figure whose
+     * box would reach the outline, meet furniture or another figure
+     * is refused. The central meridian is far from the seam, so the
+     * figure never straddles it. Answers how many it refused.
+     */
+    private static int centralFigure(List<List<PixelPoint>> pieces,
+                                     String notation,
+                                     java.awt.geom.Ellipse2D outline,
+                                     java.awt.FontMetrics metrics,
+                                     List<Label> accepted,
+                                     java.awt.Rectangle... furniture) {
+        double middleX = outline.getCenterX();
+        double middleY = outline.getCenterY();
+        Double crossingY = null;
+        for (List<PixelPoint> piece : pieces) {
+            for (int i = 1; i < piece.size(); i++) {
+                PixelPoint a = piece.get(i - 1);
+                PixelPoint b = piece.get(i);
+                if (Math.min(a.x(), b.x()) > middleX
+                        || Math.max(a.x(), b.x()) < middleX
+                        || Math.abs(b.x() - a.x()) < 1e-9) {
+                    continue;
+                }
+                double t = (middleX - a.x()) / (b.x() - a.x());
+                double y = a.y() + t * (b.y() - a.y());
+                if (crossingY == null
+                        || Math.abs(y - middleY) < Math.abs(crossingY - middleY)) {
+                    crossingY = y;
+                }
+            }
+        }
+        if (crossingY == null) {
+            return 0;
+        }
+        Label label = new Label(notation, middleX + 3.0, crossingY - 3.0);
+        java.awt.geom.Rectangle2D box = labelBounds(label, metrics);
+        if (!grown(outline, -1.0).contains(box)
+                || intersectsFurniture(label, metrics, furniture)
+                || overlapsAccepted(box, metrics, accepted)) {
+            return 1;
+        }
+        accepted.add(label);
+        return 0;
     }
 
     private static boolean intersectsFurniture(Label label,

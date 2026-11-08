@@ -401,6 +401,12 @@ this section governs.
   complete-sky inventory is not the regional table that action promises. The
   explanation directs the reader to Open here, and then On this page in the
   resulting ordinary chart.
+- **R-15 Grid notation** (ruled on #687, 2026-11-08, after the owner's
+  hands-on testing of the unnumbered candidate). The whole-sky graticule
+  carries outline-aware notation that refuses independently: RA figures where
+  a meridian meets the outline, Dec figures at a parallel's crossing of the
+  central meridian; sparse; never across the seam. Body names at the seam
+  stand as built (§8): the owner withheld acceptance only on the notation.
 - **Architecture A.** The existing projection interface is extended with an
   outline, a join rule and a non-conic sampled-curve route. The existing
   modules remain the single source of astronomical ink. Existing azimuthal
@@ -466,6 +472,26 @@ in notation (`λ 65.0°`).
 Inspector's Centre here is Open here; On this page shows its refusal sentence
 (R-14); the meridian's altitude readout is not placed.
 
+**Grid notation (R-15).** `EquatorialGrid` keeps the frame's rules to the byte
+and, when the projection states the whole sphere, applies the outline's
+instead. The grid's own seam ends are refined to the seam by bisection on the
+join rule (as the sampled curve route refines its runs), so every curve the
+seam cuts reaches the outline and has a point to be named at. An RA figure
+stands on the paper where a meridian meets the outline - only ever at the
+seam, and on both edges, since both are the one seam - placed outward along
+the outline's normal with its box wholly beyond the tangent there, which the
+convex outline cannot reach; beside the point at the same height it would be
+cut wherever the outline is flat, and that is where the meridians meet it,
+because the seam runs near the south celestial pole. A Dec figure stands
+inside the sky, above and right of its parallel's crossing of the central
+meridian - the crossing nearest the middle line when there are two - and a
+parallel whose crossings both fall on the seam's half stays unnamed. Each
+figure refuses independently: the outline, the paper's edge, furniture, another
+figure. A meridian through an ecliptic pole (6h, 18h) is not named there: the
+curve never left the sky. The sky labels yield to the figures as they always
+have. Body names at the seam stand as built: a body within a name's width of
+the seam keeps its mark, selectable and spoken, and its name is refused.
+
 **Bookmarks (R-11, B-2).** `SavedView` has a whole-sky form written as
 `"view": {"mode": "whole-sky"}` and nothing else; such a record needs its
 chart time and place or is kept as needing attention; the add dialog ticks and
@@ -481,5 +507,9 @@ nine of nine bodies on every page; the zenith on the central meridian at
 the outline to 1e-9; no figure or grid piece across the page and no name
 stranded; line subdue disagreeing with the true horizon on under 0.5 per cent
 of the sky; Open here landing 0.000000 degrees from Saturn at the 60-degree
-field left. Not exercised: the exported sheet drawn end to end (its words are
+field left. The graticule (R-15): every piece end the seam made lies on the
+outline to 1e-9 and the ends off it are exactly two per curve; no figure's box
+reaches the outline; on this machine's fonts the monitor pages carry 10 RA and
+10 Dec figures and the laptop page 8 and 10, two RA figures yielding to the
+title block (`platform.md`). Not exercised: the exported sheet drawn end to end (its words are
 held), keyboard focus of the toggle, and a Milky Way (no production ink).

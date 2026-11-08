@@ -157,7 +157,9 @@ public final class WholeSkyStudyMain {
     /** What one page measured. */
     record Measured(double centralLongitude, double zenithLatitude, double zenithFromCentre,
                     Map<String, ReferenceInk.BodyPlacement> bodies, List<String> stranded,
-                    int namedConstellations, int figureJumps, int gridJumps, int gridLabels,
+                    int namedConstellations, int figureJumps, int gridJumps, int gridRaFigures,
+                    int gridDecFigures, int gridFiguresOnOutline, int gridCurves,
+                    int gridEndsOnOutline, int gridEndsOffOutline,
                     double subdueDisagreement, List<String> title, String spoken,
                     List<Curve> curves, long paintMillis) {
     }
@@ -191,8 +193,8 @@ public final class WholeSkyStudyMain {
                 + " reproduce on no machine.");
         plat("");
         plat("| page | bodies named | names refused | constellation names anchored | stranded"
-                + " | grid labels |");
-        plat("|---|---|---|---|---|---|");
+                + " | RA figures | Dec figures |");
+        plat("|---|---|---|---|---|---|---|");
 
         List<Drawn> drawn = new ArrayList<>();
         for (Spec spec : specs()) {
@@ -203,10 +205,10 @@ public final class WholeSkyStudyMain {
             List<String> refused = d.measured().bodies().values().stream()
                     .filter(b -> b.box() == null).map(ReferenceInk.BodyPlacement::identity)
                     .sorted().toList();
-            plat(f("| `%s` | %d | %s | %d | %d | %d |", spec.name(), named,
+            plat(f("| `%s` | %d | %s | %d | %d | %d | %d |", spec.name(), named,
                     refused.isEmpty() ? "-" : String.join(", ", refused),
                     d.measured().namedConstellations(), d.measured().stranded().size(),
-                    d.measured().gridLabels()));
+                    d.measured().gridRaFigures(), d.measured().gridDecFigures()));
             System.err.printf(Locale.ROOT, "%s painted in %d ms%n", spec.name(),
                     d.measured().paintMillis());
         }
@@ -294,10 +296,49 @@ public final class WholeSkyStudyMain {
                 }
             }
         }
+        ViewportMapping mapping = new ViewportMapping(drawnPage);
+
+        // The graticule's notation (R-15): how many figures of each
+        // kind, whether any box reaches the outline (none may: an RA
+        // figure is wholly outside it, a Dec figure wholly inside),
+        // and the grid's own seam ends - every piece end is either on
+        // the outline to 1e-9 or one of a curve's two sampling ends.
+        java.awt.geom.Ellipse2D outline = EquatorialGrid.outlineOf(projection, mapping);
+        java.awt.FontMetrics gridMetrics = EquatorialGrid.labelMetrics();
+        int gridRa = 0;
+        int gridDec = 0;
+        int gridOnOutline = 0;
+        for (EquatorialGrid.Label label : grid.labels()) {
+            java.awt.geom.Rectangle2D box = EquatorialGrid.labelBounds(label, gridMetrics);
+            if (label.text().contains("h")) {
+                gridRa++;
+            } else {
+                gridDec++;
+            }
+            if (outline.intersects(box) && !outline.contains(box)) {
+                gridOnOutline++;
+            }
+        }
+        int endsOn = 0;
+        int endsOff = 0;
+        for (List<List<PixelPoint>> family : List.of(grid.meridians(), grid.parallels())) {
+            for (List<PixelPoint> run : family) {
+                for (PixelPoint end : List.of(run.get(0), run.get(run.size() - 1))) {
+                    double ex = (end.x() - outline.getCenterX()) / (outline.getWidth() / 2.0);
+                    double ey = (end.y() - outline.getCenterY()) / (outline.getHeight() / 2.0);
+                    if (Math.abs(ex * ex + ey * ey - 1.0) < 1e-9) {
+                        endsOn++;
+                    } else {
+                        endsOff++;
+                    }
+                }
+            }
+        }
+        int gridCurves = (int) Math.round(360.0 / grid.spec().raStepDegrees())
+                + 2 * (int) Math.floor(89.5 / grid.spec().decStepDegrees()) + 1;
 
         // The sampled route's curves: the ecliptic, the equator, the
         // horizon and the meridian, as the reference layer asks for them.
-        ViewportMapping mapping = new ViewportMapping(drawnPage);
         PageRegion region = mapping.regionFor(scene.viewport(), projection);
         List<Curve> curves = new ArrayList<>();
         curves.add(curve("ecliptic", projection, mapping, region, Ecliptic.POLE));
@@ -331,7 +372,8 @@ public final class WholeSkyStudyMain {
         }
         return new Measured(whole.centralLongitudeDegrees(), zenithEcliptic.latitudeDegrees(),
                 projection.centre().separationDegrees(zenith), bodies, stranded, named,
-                figureJumps, gridJumps, grid.labels().size(), disagreement,
+                figureJumps, gridJumps, gridRa, gridDec, gridOnOutline, gridCurves, endsOn,
+                endsOff, disagreement,
                 renderer.titleBlockLines(scene),
                 page.chart().getAccessibleContext().getAccessibleDescription(), curves,
                 paintMillis);
@@ -383,6 +425,10 @@ public final class WholeSkyStudyMain {
         p("| R-12 words | the ruled sentence and the central longitude; no Centre or Field claim | section 7 |");
         p("| R-13 one toggle | Whole sky on the toolbar, the Controller and the Chart menu, over one `WholeSkySession` | `ChartControls`, `AppMenuBar` |");
         p("| R-14 On this page | refused in the mode, pointing to Open here | `WholeSkyPageTest` |");
+        p("| R-15 grid notation | outline-aware, refusing independently: RA figures on the paper"
+                + " where a meridian meets the outline, outward along its normal; Dec figures"
+                + " inside the sky where a parallel crosses the central meridian; none on the"
+                + " outline, none across the seam | section 5, `WholeSkyGridTest` |");
         p("| architecture A | one `Projection` interface, widened by an outline, a join rule, a sampled curve route and a whole-sphere statement; the modules unchanged | `HammerProjectionTest` |");
         p("");
     }
@@ -487,6 +533,28 @@ public final class WholeSkyStudyMain {
                     d.measured().gridJumps(), d.measured().namedConstellations(),
                     d.measured().stranded().isEmpty() ? "none"
                             : String.join(", ", d.measured().stranded())));
+        }
+        p("");
+        p("**The graticule and its notation (R-15).** The grid's own seam ends are refined to"
+                + " the outline by bisection on the join rule, so every piece end is either on the"
+                + " outline to 1e-9 or one of its curve's two sampling ends (a meridian's pole"
+                + " ends, a parallel's start and stop at 0h): the ends off the outline are"
+                + " exactly two per curve. The notation is outline-aware and refuses"
+                + " independently - an RA figure stands on the paper outward along the outline's"
+                + " normal where a meridian meets it, which is only ever at the seam; a Dec figure"
+                + " stands inside the sky where a parallel crosses the central meridian; a figure"
+                + " whose box would reach the outline, the paper's edge, furniture or another"
+                + " figure is not placed. No figure's box reaches the outline, so none straddles"
+                + " the seam. The counts of figures placed depend on this machine's fonts and are"
+                + " in `platform.md`; what is pinned here is the geometry.");
+        p("");
+        p("| page | grid curves | piece ends on the outline | ends off the outline"
+                + " | figures reaching the outline |");
+        p("|---|---|---|---|---|");
+        for (Drawn d : drawn) {
+            p(f("| `%s` | %d | %d | %d (two per curve) | %d |", d.spec().name(),
+                    d.measured().gridCurves(), d.measured().gridEndsOnOutline(),
+                    d.measured().gridEndsOffOutline(), d.measured().gridFiguresOnOutline()));
         }
         p("");
     }

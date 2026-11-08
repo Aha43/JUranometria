@@ -20,6 +20,7 @@ Sprint 59, issue #687, road #703; ruled on #686 on 2026-11-08 (`docs/decisions/a
 | R-12 words | the ruled sentence and the central longitude; no Centre or Field claim | section 7 |
 | R-13 one toggle | Whole sky on the toolbar, the Controller and the Chart menu, over one `WholeSkySession` | `ChartControls`, `AppMenuBar` |
 | R-14 On this page | refused in the mode, pointing to Open here | `WholeSkyPageTest` |
+| R-15 grid notation | outline-aware, refusing independently: RA figures on the paper where a meridian meets the outline, outward along its normal; Dec figures inside the sky where a parallel crosses the central meridian; none on the outline, none across the seam | section 5, `WholeSkyGridTest` |
 | architecture A | one `Projection` interface, widened by an outline, a join rule, a sampled curve route and a whole-sphere statement; the modules unchanged | `HammerProjectionTest` |
 
 ## 2. Cases
@@ -139,6 +140,19 @@ Each reference great circle as the curve seam draws it on the whole sky: the num
 | `evening-en-white-subdue-off` | 0 | 0 | 88 | none |
 | `gathering-en-white` | 0 | 0 | 88 | none |
 | `spread-en-white` | 0 | 0 | 88 | none |
+
+**The graticule and its notation (R-15).** The grid's own seam ends are refined to the outline by bisection on the join rule, so every piece end is either on the outline to 1e-9 or one of its curve's two sampling ends (a meridian's pole ends, a parallel's start and stop at 0h): the ends off the outline are exactly two per curve. The notation is outline-aware and refuses independently - an RA figure stands on the paper outward along the outline's normal where a meridian meets it, which is only ever at the seam; a Dec figure stands inside the sky where a parallel crosses the central meridian; a figure whose box would reach the outline, the paper's edge, furniture or another figure is not placed. No figure's box reaches the outline, so none straddles the seam. The counts of figures placed depend on this machine's fonts and are in `platform.md`; what is pinned here is the geometry.
+
+| page | grid curves | piece ends on the outline | ends off the outline | figures reaching the outline |
+|---|---|---|---|---|
+| `evening-en-white` | 23 | 34 | 46 (two per curve) | 0 |
+| `evening-nb-black` | 23 | 34 | 46 (two per curve) | 0 |
+| `evening-en-black` | 23 | 34 | 46 (two per curve) | 0 |
+| `evening-nb-white` | 23 | 34 | 46 (two per curve) | 0 |
+| `evening-en-white-laptop` | 23 | 34 | 46 (two per curve) | 0 |
+| `evening-en-white-subdue-off` | 23 | 34 | 46 (two per curve) | 0 |
+| `gathering-en-white` | 23 | 30 | 46 (two per curve) | 0 |
+| `spread-en-white` | 23 | 34 | 46 (two per curve) | 0 |
 
 ## 6. Subdue below horizon (R-7)
 

@@ -97,6 +97,7 @@ class WholeSkyPageTest {
     @Test
     void theSeamStrandsNoNameAndCutsNoFigureOrGridLineAcrossThePage() {
         ChartScene scene = page.chart().currentScene();
+        DrawnPage drawn = DrawnPage.of(scene);
         ChartOptions options = page.chart().drawnOptions();
         ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, page.words());
         double jump = 0.4 * W;
@@ -134,6 +135,25 @@ class WholeSkyPageTest {
         assertTrue(grid.parallels().size() >= 10 && grid.meridians().size() >= 10,
                 "the whole graticule: " + grid.meridians().size() + " meridian pieces, "
                         + grid.parallels().size() + " parallel pieces");
+        // And its notation (R-15), as the page places it with its
+        // furniture reserved: figures of both kinds, each wholly on
+        // its side of the outline, so none straddles the seam.
+        java.awt.geom.Ellipse2D outline = EquatorialGrid.outlineOf(drawn.projection(),
+                new juranometria.project.ViewportMapping(drawn));
+        java.awt.FontMetrics gridMetrics = EquatorialGrid.labelMetrics();
+        int ra = 0;
+        int dec = 0;
+        for (EquatorialGrid.Label label : grid.labels()) {
+            java.awt.geom.Rectangle2D box = EquatorialGrid.labelBounds(label, gridMetrics);
+            if (label.text().contains("h")) {
+                ra++;
+                assertFalse(outline.intersects(box), "an RA figure on the paper: " + label);
+            } else {
+                dec++;
+                assertTrue(outline.contains(box), "a Dec figure inside the sky: " + label);
+            }
+        }
+        assertTrue(ra >= 4 && dec >= 5, "numbered on both axes: " + ra + " RA, " + dec + " Dec");
     }
 
     @Test

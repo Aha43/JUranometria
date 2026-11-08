@@ -20,8 +20,10 @@ object or position returns to the ordinary chart centred there at the
 field you left; Reset view returns to the first page; On this page is
 unavailable in it and points to Open here. A whole-sky view can be
 bookmarked, with its chart time and place; existing bookmarks are
-unchanged. Nothing about the mode is remembered between sessions. Every
-existing page is drawn exactly as before. *Unqualified candidate.*
+unchanged. Nothing about the mode is remembered between sessions. The
+graticule is numbered sparsely at the map's outline and along its central
+meridian, each figure placed only where it fits whole. Every existing page
+is drawn exactly as before. *Unqualified candidate.*
 
 ## [6.4.0] - 2026-11-07
 
