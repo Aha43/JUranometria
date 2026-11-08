@@ -20,10 +20,32 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**989 promoted artifacts.**
+**1011 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
+| `docs/studies/all-sky/case-gathering-hammer-ecliptic.png` | `832caa3f82d94f2644ff6a6dd9fd997213e974c8b1a8c99ff6749965463f924a` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/all-sky/case-gathering-hammer-equatorial.png` | `aba4f44fe7be51df0d016b87ee30b591863a16c247a1f140c38c85f9e19250bb` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/all-sky/case-spread-hammer-ecliptic.png` | `569d4e2f5e98842689758515fae6f80f4a90e7cf8dc79567f66549d9d92c7015` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/all-sky/case-spread-hammer-equatorial.png` | `143827644a713196991c0f9f988a435f1f501098ff9d3148e72c72363afb0e01` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/all-sky/ground-hammer-ecliptic-black-nb.png` | `8fbc0faa625c14100612ce1a5e5723a11f49561fb449c818f0502fd77b59d0e5` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/all-sky/ground-mollweide-equatorial-black-nb.png` | `ccd601375203083d52f76204d3c46a8f2ac6df62957a887dfb20b5b660c9f9e1` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/all-sky/journey-detail-body.png` | `82a4a04735096afe435990e6eeee211d388a8cd2cc211b6bfd001675f87dbe23` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/all-sky/journey-detail-position.png` | `21c30b2432f933d3affd056c8f8543d86d9dd96218e884b8a91b9d2a1436bc26` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/all-sky/laptop-hammer-ecliptic.png` | `a55e050b8e7e2a5da768b7893690e1cef0c8af78f535ab1966a9444faffe9e12` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/all-sky/laptop-hammer-equatorial.png` | `de0932080b5ee92c3d29fd9adecd34a2e57b5ed92205f60caefa459a1bf1ff1a` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/all-sky/matrix-equirectangular-ecliptic.png` | `7b036468934be87e79726b9acfe6bd7a87e1303f54650974f1c3819de7eec64c` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/all-sky/matrix-equirectangular-equatorial.png` | `31021630b00f45d7ace3beb4ead9d233b7549e45cb3e57a47674785d2202a501` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/all-sky/matrix-hammer-ecliptic.png` | `34eae48f1cb0075293bfecae7ad1abbd92835ad5ad6e7f00b5f2aa233e0455a0` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/all-sky/matrix-hammer-equatorial.png` | `6734bf06a8dcc86f1dc2d433ee6e1daeb220726389de19b381242d75f08539e2` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/all-sky/matrix-mollweide-ecliptic.png` | `b8eea8f22bf0a57eac3b9f55449cb0bd5fdebb1c6ec5afc630245c1905893646` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/all-sky/matrix-mollweide-equatorial.png` | `2bbc9874ef06ca14376c09c1838780b8e0c971a6b70e393066fc2cd8aaa93548` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/all-sky/meridian-anti-sun.png` | `0ac784b216ed5c77ca25b86e05d0b652b40d51980750c8e4b4f51932f2117bd9` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/all-sky/meridian-chart-centre.png` | `c7966ef14b650f831138e09007653659e0cb65badd1ac4d93baec455a2f18389` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/all-sky/meridian-fixed.png` | `d8805496df725774b446767220178a06e1f6b9458b99cbfce08b3fc031f22bc8` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/all-sky/meridian-observer-meridian.png` | `34eae48f1cb0075293bfecae7ad1abbd92835ad5ad6e7f00b5f2aa233e0455a0` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/all-sky/meridian-observer-zenith.png` | `b69c029aa76d8ff4884c42604f1b6fde721ea3c5c52f1483bef1d819c10d7ad2` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/all-sky/subdue-off-hammer-ecliptic.png` | `47e66829c37d3cbdbc2741f412edd73dafcd3e012cccdd18b4188c17d0893d11` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/all-star-identities/aries-8-all.png` | `e97fd38a0bfb041cd886623a3280c4f7234c8329d7158b15a5104f4a68cb1924` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/all-star-identities/aries-8-released.png` | `443c7d0bfb7f4701a4aaac9e2ab2b632687eb11f6062999dbe8270f8bf79dc49` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/all-star-identities/cygnus-8-all.png` | `53b1bcec88f1e351cb18715f21d40cf72bd9385c355be31d95527bb5037ce1e6` | 2026-10-18 | Mac OS X aarch64, Java 21.0.12.1 | various |
