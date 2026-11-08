@@ -179,16 +179,7 @@ Spoken: "Hele himmelen. Hammer-projeksjon, ekliptisk nord opp, ekliptisk lengde 
 
 Exported sheet description: "Hele himmelen. Hammer, ekliptisk nord opp, ekliptisk lengde øker mot venstre i midten. Sentralmeridian ved ekliptisk lengde 65.0 grader, senits. Stjerner til V 5.0. A4 i liggende format, 297.0 x 210.0 mm, marger på 12.7 mm, kart 271.6 x 184.6 mm. Bakgrunn: svart himmel."
 
-The view report's lines for the view (the machine's own lines omitted):
-
-```text
-field-degrees: whole-sky
-projection: hammer
-view: whole-sky
-orientation: ecliptic-horizontal
-central-meridian: zenith-ecliptic-longitude
-central-longitude-degrees: 64.965878
-```
+The view report's whole-sky lines (`field-degrees: whole-sky`, `view`, `orientation`, `central-meridian`, `central-longitude-degrees`) are held by `WholeSkyPageTest`; the report is a text feature outside the rendering closure and is not drawn here.
 
 ## 8. A whole-sky bookmark (R-11, B-2)
 
@@ -264,5 +255,5 @@ Leaving the whole sky without choosing restores the ordinary page exactly: true 
 
 ## 11. Cost
 
-Draw times and the heap peak are this machine's and are in `platform.md`.
+Draw times per page and the heap peak are printed to standard error by the run, and pinned nowhere: the #686 study measured 8 s and 0.95 GB for 20 candidate pages on the owner's machine, and the evidence heap limit is re-measured before any evidence-heavy road (`juranometria-heap-limit`).
 

@@ -185,12 +185,14 @@ public final class WholeSkyStudyMain {
         PlatformEvidence.preface(platform,
                 "The whole sky at one chart time (#687) - platform record",
                 "Sprint 59, issue #687.");
-        plat("Counts of placed text and the run's cost on this machine, from"
-                + " `make whole-sky-study`. Held to reproducing here, not pinned to bytes.");
+        plat("Counts of placed text on this machine's fonts, from `make whole-sky-study`."
+                + " Held to reproducing here, not pinned to bytes. The run's time and heap"
+                + " are printed to standard error and recorded nowhere, because they"
+                + " reproduce on no machine.");
         plat("");
         plat("| page | bodies named | names refused | constellation names anchored | stranded"
-                + " | grid labels | paint ms |");
-        plat("|---|---|---|---|---|---|---|");
+                + " | grid labels |");
+        plat("|---|---|---|---|---|---|");
 
         List<Drawn> drawn = new ArrayList<>();
         for (Spec spec : specs()) {
@@ -201,10 +203,12 @@ public final class WholeSkyStudyMain {
             List<String> refused = d.measured().bodies().values().stream()
                     .filter(b -> b.box() == null).map(ReferenceInk.BodyPlacement::identity)
                     .sorted().toList();
-            plat(f("| `%s` | %d | %s | %d | %d | %d | %d |", spec.name(), named,
+            plat(f("| `%s` | %d | %s | %d | %d | %d |", spec.name(), named,
                     refused.isEmpty() ? "-" : String.join(", ", refused),
                     d.measured().namedConstellations(), d.measured().stranded().size(),
-                    d.measured().gridLabels(), d.measured().paintMillis()));
+                    d.measured().gridLabels()));
+            System.err.printf(Locale.ROOT, "%s painted in %d ms%n", spec.name(),
+                    d.measured().paintMillis());
         }
 
         rulingSection(drawn);
@@ -633,12 +637,15 @@ public final class WholeSkyStudyMain {
                 peak += pool.getPeakUsage().getUsed();
             }
         }
-        plat("");
-        plat(f("Heap peak over the run: %.2f GB (the sum of the heap pools' peak usage).",
-                peak / 1e9));
+        System.err.printf(Locale.ROOT,
+                "heap peak over the run: %.2f GB (the sum of the heap pools' peak usage)%n",
+                peak / 1e9);
         p("## 11. Cost");
         p("");
-        p("Draw times and the heap peak are this machine's and are in `platform.md`.");
+        p("Draw times per page and the heap peak are printed to standard error by the run,"
+                + " and pinned nowhere: the #686 study measured 8 s and 0.95 GB for 20"
+                + " candidate pages on the owner's machine, and the evidence heap limit is"
+                + " re-measured before any evidence-heavy road (`juranometria-heap-limit`).");
         p("");
     }
 

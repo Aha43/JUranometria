@@ -16,17 +16,15 @@ never across two - the portable half of this study is the document beside it.
 
 Recorded on: `Mac OS X 27.0.1/aarch64/Homebrew 21.0.12.1`
 
-Counts of placed text and the run's cost on this machine, from `make whole-sky-study`. Held to reproducing here, not pinned to bytes.
+Counts of placed text on this machine's fonts, from `make whole-sky-study`. Held to reproducing here, not pinned to bytes. The run's time and heap are printed to standard error and recorded nowhere, because they reproduce on no machine.
 
-| page | bodies named | names refused | constellation names anchored | stranded | grid labels | paint ms |
-|---|---|---|---|---|---|---|
-| `evening-en-white` | 7 | mercury, sun | 88 | 0 | 0 | 1218 |
-| `evening-nb-black` | 7 | mercury, sun | 88 | 0 | 0 | 394 |
-| `evening-en-black` | 7 | mercury, sun | 88 | 0 | 0 | 297 |
-| `evening-nb-white` | 7 | mercury, sun | 88 | 0 | 0 | 257 |
-| `evening-en-white-laptop` | 5 | mercury, sun, uranus, venus | 88 | 0 | 0 | 333 |
-| `evening-en-white-subdue-off` | 9 | - | 88 | 0 | 0 | 230 |
-| `gathering-en-white` | 4 | moon, neptune, saturn, uranus, venus | 88 | 0 | 0 | 247 |
-| `spread-en-white` | 6 | jovian.jupiter, sun, venus | 88 | 0 | 0 | 258 |
-
-Heap peak over the run: 0.81 GB (the sum of the heap pools' peak usage).
+| page | bodies named | names refused | constellation names anchored | stranded | grid labels |
+|---|---|---|---|---|---|
+| `evening-en-white` | 7 | mercury, sun | 88 | 0 | 0 |
+| `evening-nb-black` | 7 | mercury, sun | 88 | 0 | 0 |
+| `evening-en-black` | 7 | mercury, sun | 88 | 0 | 0 |
+| `evening-nb-white` | 7 | mercury, sun | 88 | 0 | 0 |
+| `evening-en-white-laptop` | 5 | mercury, sun, uranus, venus | 88 | 0 | 0 |
+| `evening-en-white-subdue-off` | 9 | - | 88 | 0 | 0 |
+| `gathering-en-white` | 4 | moon, neptune, saturn, uranus, venus | 88 | 0 | 0 |
+| `spread-en-white` | 6 | jovian.jupiter, sun, venus | 88 | 0 | 0 |
