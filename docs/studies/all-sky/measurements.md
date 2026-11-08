@@ -49,6 +49,8 @@ The maps are drawn as the sky is seen from inside the sphere, as every page of t
 
 So the production title's *Celestial north up · celestial east left* is exact at the centre of an equatorial map and nowhere else on any candidate. On an ecliptic-horizontal map it is not exact even at the centre: there the up direction is *ecliptic* north, and celestial north leans from it by up to the obliquity, depending on the central longitude. Toward the edges of either orientation local north turns far from page-up. An ecliptic map therefore needs its own orientation sentence, and any map needs one that says it is true at the centre. This is the map's own orientation statement; it claims nothing about #697.
 
+The ruled sentence (R-12) is the one the table's first column measures on the ecliptic candidates: *ecliptic north up · ecliptic longitude increases left at centre* (nb: *ekliptisk nord opp · ekliptisk lengde øker mot venstre i midten*).
+
 ## 5. Pages drawn
 
 Production ink through the study door; study ink only for the outline, ecliptic, equator line and horizon. Stars to V 5.0, Oslo.

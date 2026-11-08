@@ -295,7 +295,7 @@ rewritten*, and every other record stays usable
 §7, which supersedes this draft).
 - Draft title line at the checkpoint: *Whole sky · Hammer · ecliptic north up ·
   east left at the centre*. "East left" was ambiguous on an ecliptic map; the
-  ruling replaces it. The study's draft reader names (`AllSkyStudyWords`) are
+  ruling replaces it with *ecliptic longitude increases left at centre* (§7). The study's draft reader names (`AllSkyStudyWords`) are
   drafts only.
 - The study pages and their speech still carry the ordinary chart's *Centre ...
   (ICRS J2000)* and *Field 180.0 degrees wide* lines (M§10). Both are false: the
@@ -308,8 +308,9 @@ rewritten*, and every other record stays usable
   central-meridian rule and its longitude, chart time and observer.
 - Speech already lists every body with its horizon state (M§10). Export states
   the same.
-- Norwegian: *Hele himmelen · Hammer · ekliptisk nord opp · øst til venstre i
-  midten* (draft).
+- Norwegian draft at the checkpoint: *Hele himmelen · Hammer · ekliptisk nord
+  opp · øst til venstre i midten*, superseded by §7's *ekliptisk lengde øker
+  mot venstre i midten*.
 
 **R-13 The control.** One explicit, bilingual toggle, *Whole sky* / *Hele
 himmelen*, on the chart's view controls and its menu. It is never a projection
@@ -324,8 +325,8 @@ resulting ordinary chart.
 
 Every candidate is drawn as the sky is seen from inside, like every page of the
 atlas: 10 degrees east of the centre lands left, 10 degrees north lands up
-(M§4, held by computation; on an ecliptic map "east" there is increasing
-ecliptic longitude). The orientation sentence is the map's own, and this
+(M§4, held by computation; on an ecliptic map this is the ruled clause:
+ecliptic longitude increases left at centre). The orientation sentence is the map's own, and this
 study makes no claim about #697.
 
 ## 6. Cost of #687 if admitted as recommended
@@ -384,12 +385,13 @@ this section governs.
   is retained.
 - **R-12** The whole-sky chart never repeats the ordinary chart's radial
   *Centre ... ICRS J2000* or *Field 180°* claims. It states the central
-  ecliptic longitude explicitly. The title wording is equivalent to:
-  - en: *Whole sky · Hammer · ecliptic north up · increasing ecliptic longitude
+  ecliptic longitude explicitly. The ruled vocabulary for the title line:
+  - en: *Whole sky · Hammer · ecliptic north up · ecliptic longitude increases
     left at centre*;
-  - nb (draft for the owner's check, to be held exact in #687): *Hele himmelen
-    · Hammer · ekliptisk nord opp · økende ekliptisk lengde mot venstre i
-    midten*.
+  - nb: *Hele himmelen · Hammer · ekliptisk nord opp · ekliptisk lengde øker
+    mot venstre i midten*.
+  - The orientation clause is what M§4 measures: on every ecliptic candidate,
+    10 degrees of increasing ecliptic longitude from the centre lands left.
   - The report, speech and export also state the projection, the orientation,
     the central-meridian rule and its longitude, the chart time and the
     observer.

@@ -324,6 +324,11 @@ public final class AllSkyStudyMain {
                 + " true at the centre. This is the map's own orientation statement; it claims"
                 + " nothing about #697.");
         p("");
+        p("The ruled sentence (R-12) is the one the table's first column measures on the"
+                + " ecliptic candidates: *ecliptic north up · ecliptic longitude increases left at"
+                + " centre* (nb: *ekliptisk nord opp · ekliptisk lengde øker mot venstre i"
+                + " midten*).");
+        p("");
     }
 
     /** Angle of local celestial north from page-up at a position, in degrees (0 = up). */
