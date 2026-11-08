@@ -115,8 +115,8 @@ public final class AllSkyStudyMain {
 
         List<Spec> specs = specs();
         List<Drawn> drawn = new ArrayList<>();
-        plat("# All-sky projection study (#686) - platform record");
-        plat("");
+        juranometria.tool.PlatformEvidence.preface(PLATFORM,
+                "All-sky projection study (#686) - platform record", "Sprint 59, issue #686.");
         plat("Counts of ink and placed text on this machine's fonts, from `make all-sky-study`."
                 + " Held to reproducing here, not pinned to bytes.");
         plat("");
@@ -139,7 +139,7 @@ public final class AllSkyStudyMain {
         horizonSection(cases);
         seamSection(drawn);
         journey(cases.get("evening"), services, chartCentre);
-        Files.writeString(OUT.resolve("platform.md"), PLATFORM.toString());
+        juranometria.tool.PlatformEvidence.write(PLATFORM, OUT.resolve("platform.md").toString());
     }
 
     // ------------------------------------------------------------------ sources

@@ -1,5 +1,21 @@
 # All-sky projection study (#686) - platform record
 
+Sprint 59, issue #686.
+
+**This is one machine's answer.** What is written here is what the desktop
+this was generated on calls things and binds; another desktop answers differently
+and is not wrong. The contract holds it to reproducing within an environment,
+never across two - the portable half of this study is the document beside it.
+
+| the machine | |
+|---|---|
+| operating system | Mac OS X |
+| architecture | aarch64 |
+| Java | 21.0.12.1 |
+| headless | true |
+
+Recorded on: `Mac OS X 27.0.1/aarch64/Homebrew 21.0.12.1`
+
 Counts of ink and placed text on this machine's fonts, from `make all-sky-study`. Held to reproducing here, not pinned to bytes.
 
 | page | bodies drawn | body names placed | names refused | stars drawn | stars hidden in the seam sliver | figure jumps across the seam | grid jumps across the seam |
