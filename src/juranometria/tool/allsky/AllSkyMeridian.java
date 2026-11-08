@@ -15,8 +15,8 @@ import juranometria.sky.Observer;
  * <li>{@link #OBSERVER_MERIDIAN}: the longitude where the map's middle
  * line crosses the observer's upper meridian - local sidereal time in
  * the equatorial orientation, the culminating ecliptic point (the
- * midheaven) in the ecliptic one - so the observer's sky sits in the
- * middle of the map;</li>
+ * midheaven) in the ecliptic one - so the observer's meridian is the
+ * central meridian;</li>
  * <li>{@link #ANTI_SUN}: the longitude opposite the Sun, so the night
  * side of the sky is central and the Sun is always on the seam;</li>
  * <li>{@link #FIXED}: a fixed convention, longitude zero - 0h right
@@ -33,8 +33,10 @@ public enum AllSkyMeridian {
 
     /**
      * A variant of the observer's candidate, measured because the
-     * midheaven leaves the zenith off-centre on an ecliptic map: the
-     * map longitude of the zenith itself. In the equatorial orientation
+     * midheaven leaves the zenith off the central meridian on an ecliptic
+     * map: the map longitude of the zenith itself. It puts the zenith on
+     * the central meridian, not at the map's centre: the zenith keeps its
+     * latitude (the owner's ruling on R-4). In the equatorial orientation
      * it is the observer's meridian exactly (both are local sidereal
      * time).
      */

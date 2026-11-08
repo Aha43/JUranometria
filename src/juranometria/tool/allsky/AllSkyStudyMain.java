@@ -55,9 +55,11 @@ public final class AllSkyStudyMain {
     static final int LAPTOP_H = 720;
     static final double LIMIT = 5.0;
 
-    private static final PrintStream OUTSTREAM = new PrintStream(System.out, true,
-            StandardCharsets.UTF_8);
-    private static final StringBuilder PLATFORM = new StringBuilder();
+    // Per run, set at the top of main: the evidence contract runs this main
+    // twice in one JVM with System.out captured, so neither may be fixed at
+    // class load.
+    private static PrintStream OUTSTREAM;
+    private static StringBuilder PLATFORM;
 
     private static void p(String s) {
         OUTSTREAM.println(s);
@@ -84,6 +86,8 @@ public final class AllSkyStudyMain {
     }
 
     public static void main(String[] args) throws Exception {
+        OUTSTREAM = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+        PLATFORM = new StringBuilder();
         Files.createDirectories(OUT);
         AllSkyComposition.Services services = new AllSkyComposition.Services();
         AllSkyCases finder = new AllSkyCases(services);
@@ -283,7 +287,7 @@ public final class AllSkyStudyMain {
                 + " the atlas is: celestial east to the left of north. Held by computation on"
                 + " the plane (x positive east is drawn leftward by the production mapping):");
         p("");
-        p("| form | orientation | 10 deg east of centre lands | 10 deg north lands | tilt of celestial north at the centre (worst central longitude) | widest tilt of local north from page-up over the map |");
+        p("| form | orientation | 10 deg of increasing map longitude (right ascension, or ecliptic longitude) from centre lands | 10 deg of map latitude north lands | tilt of celestial north at the centre (worst central longitude) | widest tilt of local north from page-up over the map |");
         p("|---|---|---|---|---|---|");
         for (AllSkyForm form : AllSkyForm.values()) {
             for (AllSkyOrientation o : AllSkyOrientation.values()) {
@@ -623,11 +627,15 @@ public final class AllSkyStudyMain {
         p("For each case and orientation: the central longitude each candidate chooses, the"
                 + " body nearest the seam and how far from it (degrees of longitude; under "
                 + AllSkyProjection.SEAM_SLIVER_DEGREES + " the body is split by the seam), and"
-                + " where the observer's zenith lands (longitude from centre). The chart centre"
+                + " where the observer's zenith lands: its longitude from the central meridian,"
+                + " its latitude in the map's orientation, and its great-circle distance from the"
+                + " map's geometric centre (the central meridian on the middle line). A candidate"
+                + " that follows the zenith's longitude puts the zenith on the central meridian,"
+                + " not at the centre, unless its latitude is zero. The chart centre"
                 + " candidate uses the atlas's default chart (" + chartCentre + ").");
         p("");
-        p("| case | orientation | candidate | central longitude | nearest body to seam | its seam distance | zenith longitude from centre |");
-        p("|---|---|---|---|---|---|---|");
+        p("| case | orientation | candidate | central longitude | nearest body to seam | its seam distance | zenith longitude from centre | zenith latitude | zenith distance from centre |");
+        p("|---|---|---|---|---|---|---|---|---|");
         for (AllSkyCases.Case c : cases.values()) {
             Observer o = AllSkyCases.oslo(c.instant());
             Map<String, AllSkyCases.Seen> seen = finder.bodies(o);
@@ -645,9 +653,10 @@ public final class AllSkyStudyMain {
                             nearest = s.identity();
                         }
                     }
-                    p(f("| %s | %s | %s | %.2f | %s | %.1f | %+.1f |", c.id(),
+                    p(f("| %s | %s | %s | %.2f | %s | %.1f | %+.1f | %+.1f | %.1f |", c.id(),
                             orientation.displayName(), m.displayName(), map.centralLongitudeDegrees(),
-                            nearest, d, map.offsetDegrees(zenith)));
+                            nearest, d, map.offsetDegrees(zenith), orientation.toMap(zenith)[1],
+                            map.centre().separationDegrees(zenith)));
                 }
             }
         }
@@ -762,7 +771,11 @@ public final class AllSkyStudyMain {
             }
         }
         p("");
-        p("Spoken page descriptions as production composes them (first page of each form):");
+        p("Spoken page descriptions as production composes them (first page of each form)."
+                + " They are recorded as found, not as proposed: the ordinary chart's"
+                + " *Centre ... (ICRS J2000)*, *Field 180.0 degrees wide* and *Celestial north is"
+                + " up, and celestial east is left* are false on a whole-sky page, which has no"
+                + " radial field and whose central longitude is ecliptic (ruling R-12).");
         p("");
         for (Drawn d : drawn) {
             if (d.spec().name().startsWith("matrix-") && d.spec().orientation() == AllSkyOrientation.ECLIPTIC) {

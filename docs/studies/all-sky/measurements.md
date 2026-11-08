@@ -38,7 +38,7 @@ Angular deformation along the map's middle line and toward its edge, in degrees 
 
 The maps are drawn as the sky is seen from inside the sphere, as every page of the atlas is: celestial east to the left of north. Held by computation on the plane (x positive east is drawn leftward by the production mapping):
 
-| form | orientation | 10 deg east of centre lands | 10 deg north lands | tilt of celestial north at the centre (worst central longitude) | widest tilt of local north from page-up over the map |
+| form | orientation | 10 deg of increasing map longitude (right ascension, or ecliptic longitude) from centre lands | 10 deg of map latitude north lands | tilt of celestial north at the centre (worst central longitude) | widest tilt of local north from page-up over the map |
 |---|---|---|---|---|---|
 | Hammer | equatorial | left | up | 0.0 deg | 84 deg |
 | Hammer | ecliptic | left | up | 23.4 deg | 158 deg |
@@ -134,40 +134,40 @@ Each body as the production modules contribute it at each case's instant: map po
 
 ## 8. The four central-meridian candidates
 
-For each case and orientation: the central longitude each candidate chooses, the body nearest the seam and how far from it (degrees of longitude; under 1.0 the body is split by the seam), and where the observer's zenith lands (longitude from centre). The chart centre candidate uses the atlas's default chart (SkyPosition[raDegrees=10.684708, decDegrees=41.26875]).
+For each case and orientation: the central longitude each candidate chooses, the body nearest the seam and how far from it (degrees of longitude; under 1.0 the body is split by the seam), and where the observer's zenith lands: its longitude from the central meridian, its latitude in the map's orientation, and its great-circle distance from the map's geometric centre (the central meridian on the middle line). A candidate that follows the zenith's longitude puts the zenith on the central meridian, not at the centre, unless its latitude is zero. The chart centre candidate uses the atlas's default chart (SkyPosition[raDegrees=10.684708, decDegrees=41.26875]).
 
-| case | orientation | candidate | central longitude | nearest body to seam | its seam distance | zenith longitude from centre |
-|---|---|---|---|---|---|---|
-| evening | equatorial | chart centre | 10.68 | venus | 26.1 | +39.1 |
-| evening | equatorial | observer's meridian | 50.28 | venus | 13.5 | -0.5 |
-| evening | equatorial | observer's zenith | 49.74 | venus | 13.0 | +0.0 |
-| evening | equatorial | opposite the Sun | 82.95 | sun | 0.0 | -33.2 |
-| evening | equatorial | fixed (longitude 0) | 0.00 | mars | 20.9 | +49.7 |
-| evening | ecliptic | chart centre | 27.85 | venus | 10.3 | +37.1 |
-| evening | ecliptic | observer's meridian | 52.68 | venus | 14.5 | +12.3 |
-| evening | ecliptic | observer's zenith | 64.97 | mercury | 9.2 | +0.0 |
-| evening | ecliptic | opposite the Sun | 83.53 | sun | 0.0 | -18.6 |
-| evening | ecliptic | fixed (longitude 0) | 0.00 | mars | 23.7 | +65.0 |
-| gathering | equatorial | chart centre | 10.68 | mars | 44.0 | -147.3 |
-| gathering | equatorial | observer's meridian | 223.54 | sun | 11.6 | -0.2 |
-| gathering | equatorial | observer's zenith | 223.37 | sun | 11.4 | +0.0 |
-| gathering | equatorial | opposite the Sun | 211.95 | sun | 0.0 | +11.4 |
-| gathering | equatorial | fixed (longitude 0) | 0.00 | mars | 33.3 | -136.6 |
-| gathering | ecliptic | chart centre | 27.85 | moon | 54.6 | +147.5 |
-| gathering | ecliptic | observer's meridian | 226.01 | sun | 11.8 | -50.7 |
-| gathering | ecliptic | observer's zenith | 175.31 | neptune | 9.5 | +0.0 |
-| gathering | ecliptic | opposite the Sun | 214.20 | sun | 0.0 | -38.9 |
-| gathering | ecliptic | fixed (longitude 0) | 0.00 | mars | 36.5 | +175.3 |
-| spread | equatorial | chart centre | 10.68 | mars | 5.4 | +102.3 |
-| spread | equatorial | observer's meridian | 113.66 | sun | 10.1 | -0.6 |
-| spread | equatorial | observer's zenith | 113.02 | sun | 9.5 | +0.0 |
-| spread | equatorial | opposite the Sun | 103.57 | sun | 0.0 | +9.5 |
-| spread | equatorial | fixed (longitude 0) | 0.00 | mars | 5.2 | +113.0 |
-| spread | ecliptic | chart centre | 27.85 | jovian.jupiter | 3.1 | +76.5 |
-| spread | ecliptic | observer's meridian | 111.90 | sun | 9.4 | -7.6 |
-| spread | ecliptic | observer's zenith | 104.31 | sun | 1.8 | +0.0 |
-| spread | ecliptic | opposite the Sun | 102.49 | sun | 0.0 | +1.8 |
-| spread | ecliptic | fixed (longitude 0) | 0.00 | mars | 4.6 | +104.3 |
+| case | orientation | candidate | central longitude | nearest body to seam | its seam distance | zenith longitude from centre | zenith latitude | zenith distance from centre |
+|---|---|---|---|---|---|---|---|---|
+| evening | equatorial | chart centre | 10.68 | venus | 26.1 | +39.1 | +59.8 | 67.0 |
+| evening | equatorial | observer's meridian | 50.28 | venus | 13.5 | -0.5 | +59.8 | 59.8 |
+| evening | equatorial | observer's zenith | 49.74 | venus | 13.0 | +0.0 | +59.8 | 59.8 |
+| evening | equatorial | opposite the Sun | 82.95 | sun | 0.0 | -33.2 | +59.8 | 65.1 |
+| evening | equatorial | fixed (longitude 0) | 0.00 | mars | 20.9 | +49.7 | +59.8 | 71.0 |
+| evening | ecliptic | chart centre | 27.85 | venus | 10.3 | +37.1 | +39.8 | 52.2 |
+| evening | ecliptic | observer's meridian | 52.68 | venus | 14.5 | +12.3 | +39.8 | 41.4 |
+| evening | ecliptic | observer's zenith | 64.97 | mercury | 9.2 | +0.0 | +39.8 | 39.8 |
+| evening | ecliptic | opposite the Sun | 83.53 | sun | 0.0 | -18.6 | +39.8 | 43.3 |
+| evening | ecliptic | fixed (longitude 0) | 0.00 | mars | 23.7 | +65.0 | +39.8 | 71.0 |
+| gathering | equatorial | chart centre | 10.68 | mars | 44.0 | -147.3 | +60.0 | 114.9 |
+| gathering | equatorial | observer's meridian | 223.54 | sun | 11.6 | -0.2 | +60.0 | 60.0 |
+| gathering | equatorial | observer's zenith | 223.37 | sun | 11.4 | +0.0 | +60.0 | 60.0 |
+| gathering | equatorial | opposite the Sun | 211.95 | sun | 0.0 | +11.4 | +60.0 | 60.7 |
+| gathering | equatorial | fixed (longitude 0) | 0.00 | mars | 33.3 | -136.6 | +60.0 | 111.3 |
+| gathering | ecliptic | chart centre | 27.85 | moon | 54.6 | +147.5 | +68.6 | 107.9 |
+| gathering | ecliptic | observer's meridian | 226.01 | sun | 11.8 | -50.7 | +68.6 | 76.7 |
+| gathering | ecliptic | observer's zenith | 175.31 | neptune | 9.5 | +0.0 | +68.6 | 68.6 |
+| gathering | ecliptic | opposite the Sun | 214.20 | sun | 0.0 | -38.9 | +68.6 | 73.5 |
+| gathering | ecliptic | fixed (longitude 0) | 0.00 | mars | 36.5 | +175.3 | +68.6 | 111.3 |
+| spread | equatorial | chart centre | 10.68 | mars | 5.4 | +102.3 | +60.0 | 96.1 |
+| spread | equatorial | observer's meridian | 113.66 | sun | 10.1 | -0.6 | +60.0 | 60.0 |
+| spread | equatorial | observer's zenith | 113.02 | sun | 9.5 | +0.0 | +60.0 | 60.0 |
+| spread | equatorial | opposite the Sun | 103.57 | sun | 0.0 | +9.5 | +60.0 | 60.4 |
+| spread | equatorial | fixed (longitude 0) | 0.00 | mars | 5.2 | +113.0 | +60.0 | 101.3 |
+| spread | ecliptic | chart centre | 27.85 | jovian.jupiter | 3.1 | +76.5 | +37.7 | 79.3 |
+| spread | ecliptic | observer's meridian | 111.90 | sun | 9.4 | -7.6 | +37.7 | 38.3 |
+| spread | ecliptic | observer's zenith | 104.31 | sun | 1.8 | +0.0 | +37.7 | 37.7 |
+| spread | ecliptic | opposite the Sun | 102.49 | sun | 0.0 | +1.8 | +37.7 | 37.7 |
+| spread | ecliptic | fixed (longitude 0) | 0.00 | mars | 4.6 | +104.3 | +37.7 | 101.3 |
 
 ## 9. The winding horizon and Subdue below horizon
 
@@ -270,7 +270,7 @@ Subdue below horizon on line ink. Production tones each mark and label by its ow
 | `case-spread-hammer-equatorial` | 22.4% of the sky |
 | `case-spread-hammer-ecliptic` | 36.6% of the sky |
 
-Spoken page descriptions as production composes them (first page of each form):
+Spoken page descriptions as production composes them (first page of each form). They are recorded as found, not as proposed: the ordinary chart's *Centre ... (ICRS J2000)*, *Field 180.0 degrees wide* and *Celestial north is up, and celestial east is left* are false on a whole-sky page, which has no radial field and whose central longitude is ecliptic (ruling R-12).
 
 - `matrix-hammer-ecliptic`: "3h 21.1m, +18° 26′. Centre RA 50.2764, Dec +18.4415 (ICRS J2000). Field 180.0 degrees wide, Hammer whole-sky projection. Stars to V 5.0. Celestial north is up, and celestial east is left. East on your horizon. North on your horizon. South on your horizon. West on your horizon. Neptune (a cartographic symbol, not Neptune's apparent diameter). Uranus (a cartographic symbol, not Uranus's apparent diameter). Saturn (a cartographic symbol, not Saturn's apparent diameter). Jupiter (a cartographic symbol, not Jupiter's apparent diameter). Mercury (below the horizon) (a cartographic symbol, not Mercury's apparent diameter). Mars (a cartographic symbol, not Mars's apparent diameter). Sun (below the horizon). Venus (below the horizon) (a cartographic symbol, not Venus's apparent diameter). Moon. Phobos, too close to tell apart at this field, not drawn. Deimos, too close to tell apart at this field, not drawn. Miranda, too close to tell apart at this field, not drawn. Ariel, too close to tell apart at this field, not drawn. Umbriel, too close to tell apart at this field, not drawn. Titania, too close to tell apart at this field, not drawn. Oberon, too close to tell apart at this field, not drawn."
 - `matrix-mollweide-ecliptic`: "3h 21.1m, +18° 26′. Centre RA 50.2764, Dec +18.4415 (ICRS J2000). Field 180.0 degrees wide, Mollweide whole-sky projection. Stars to V 5.0. Celestial north is up, and celestial east is left. East on your horizon. North on your horizon. South on your horizon. West on your horizon. Neptune (a cartographic symbol, not Neptune's apparent diameter). Uranus (a cartographic symbol, not Uranus's apparent diameter). Saturn (a cartographic symbol, not Saturn's apparent diameter). Jupiter (a cartographic symbol, not Jupiter's apparent diameter). Mercury (below the horizon) (a cartographic symbol, not Mercury's apparent diameter). Mars (a cartographic symbol, not Mars's apparent diameter). Sun (below the horizon). Venus (below the horizon) (a cartographic symbol, not Venus's apparent diameter). Moon. Phobos, too close to tell apart at this field, not drawn. Deimos, too close to tell apart at this field, not drawn. Miranda, too close to tell apart at this field, not drawn. Ariel, too close to tell apart at this field, not drawn. Umbriel, too close to tell apart at this field, not drawn. Titania, too close to tell apart at this field, not drawn. Oberon, too close to tell apart at this field, not drawn."

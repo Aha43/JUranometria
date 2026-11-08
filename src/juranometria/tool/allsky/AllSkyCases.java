@@ -181,13 +181,4 @@ public final class AllSkyCases {
                 String.format(java.util.Locale.ROOT, "largest gap %.1f degrees", spreadGap)));
         return cases;
     }
-
-    public static void main(String[] args) {
-        long t0 = System.nanoTime();
-        AllSkyCases finder = new AllSkyCases(new AllSkyComposition.Services());
-        for (Case c : finder.find()) {
-            System.out.println(c);
-        }
-        System.out.printf("%.1f s%n", (System.nanoTime() - t0) / 1e9);
-    }
 }

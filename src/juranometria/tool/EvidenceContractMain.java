@@ -226,6 +226,10 @@ public final class EvidenceContractMain {
         // Complete figures under an absolute stellar limit (#571): the measured pages.
         REPORT_MAINS.put("juranometria.tool.CompleteFiguresStudyMain",
                 "docs/studies/complete-figures/measurements.md");
+        // The whole sky at one chart time (#686): candidate whole-sky maps
+        // drawn by production ink through the study door.
+        REPORT_MAINS.put("juranometria.tool.allsky.AllSkyStudyMain",
+                "docs/studies/all-sky/measurements.md");
         // The Mercury pack study (#528) is not registered, as the Venus one is
         // not: both read the gitignored de440s.bsp and pck00011.tpc, which the CI
         // runner does not hold; `make mercury-pack-study` reproduces the report
@@ -482,6 +486,8 @@ public final class EvidenceContractMain {
                 "docs/studies/bookmarks/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.GuideAndExplainStudyMain",
                 "docs/studies/guide-and-explain/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.allsky.AllSkyStudyMain",
+                "docs/studies/all-sky/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.JupiterOnTheChartStudyMain",
                 "docs/studies/jupiter-on-the-chart/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.SolarSystemLabelsStudyMain",
@@ -692,6 +698,9 @@ public final class EvidenceContractMain {
             // Complete figures under an absolute stellar limit (#571):
             // production pages painted as built and as proposed.
             "juranometria.tool.CompleteFiguresStudyMain",
+            // The whole sky at one chart time (#686): production ink on
+            // candidate whole-sky maps, through the study door #687 removes.
+            "juranometria.tool.allsky.AllSkyStudyMain",
             // Jupiter and the Galilean moons on the chart (issue #486):
             // production pages composed by the component with the Jovian
             // module attached.
