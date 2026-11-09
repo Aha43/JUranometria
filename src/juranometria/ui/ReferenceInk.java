@@ -1102,6 +1102,21 @@ public final class ReferenceInk {
                     segment.start().y(), segment.end().x(),
                     segment.end().y());
         }
+        if (run instanceof CurveRun.Polyline polyline) {
+            // The sampled route's word (#687): chords between its
+            // points, closed back to the first when it came all the
+            // way round.
+            java.awt.geom.Path2D.Double path = new java.awt.geom.Path2D.Double();
+            java.util.List<PixelPoint> points = polyline.points();
+            path.moveTo(points.get(0).x(), points.get(0).y());
+            for (int i = 1; i < points.size(); i++) {
+                path.lineTo(points.get(i).x(), points.get(i).y());
+            }
+            if (polyline.closed()) {
+                path.closePath();
+            }
+            return path;
+        }
         CurveRun.Arc arc = (CurveRun.Arc) run;
         // Java2D measures its arcs anticlockwise from the positive x
         // axis, and a page's y runs down, so the same angles arrive
@@ -1379,12 +1394,15 @@ public final class ReferenceInk {
      * four).
      */
     static java.awt.Shape skyOf(PageRegion region, Rectangle2D paper) {
+        // The limb's two half-extents (#687): equal on a globe, where
+        // this draws the circle it always drew, and the whole sky's
+        // ellipse otherwise.
         return region.bounded()
                 ? new Ellipse2D.Double(
                         region.limbX() - region.limbRadius(),
-                        region.limbY() - region.limbRadius(),
+                        region.limbY() - region.limbRadiusAcross(),
                         2.0 * region.limbRadius(),
-                        2.0 * region.limbRadius())
+                        2.0 * region.limbRadiusAcross())
                 : paper;
     }
 
@@ -3084,6 +3102,12 @@ public final class ReferenceInk {
     public static java.util.Optional<ReadoutPlacement> altitudeReadout(DrawnPage page,
             List<OverlayRegistry.Owned> contributions, List<java.awt.Shape> reserved) {
         Projection projection = page.projection();
+        // Refused on the whole sky (#687, R-9): a whole-sky page is not
+        // read along the meridian, and a reading at "the visible point
+        // nearest the page centre" would name a point of no interest.
+        if (projection.wholeSphere().isPresent()) {
+            return java.util.Optional.empty();
+        }
         ViewportMapping mapping = new ViewportMapping(page);
         Rectangle2D paper = ChartRenderer.paperOf(page.scene());
         double cx = paper.getCenterX();

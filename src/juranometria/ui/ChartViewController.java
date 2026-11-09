@@ -34,6 +34,15 @@ public final class ChartViewController {
     private Predicate<ChartViewState> closerOffer = candidate -> false;
     private final List<Runnable> availabilityListeners = new ArrayList<>();
 
+    /**
+     * The ordinary view the reader left for the whole sky (#687, R-8):
+     * kept exactly while the whole-sky page is shown, so leaving it
+     * without choosing restores the previous page, and Open here opens
+     * the ordinary chart at the field this one has. Null on an ordinary
+     * page.
+     */
+    private ChartViewState ordinaryBefore;
+
     /** A controller that accepts every state; for tests without coverage. */
     public ChartViewController() {
         this(anyState -> true);
@@ -151,27 +160,90 @@ public final class ChartViewController {
         update(state.increaseMagnitudeLimit());
     }
 
-    /** Moves the chart centre anonymously; the chart titles by position. */
+    /**
+     * Moves the chart centre anonymously; the chart titles by position.
+     *
+     * <p>From the whole sky this is <em>Open here</em> (#687, R-8): the
+     * ordinary chart the reader left, centred on the chosen position at
+     * the field it had. Every recentre leaves the whole sky this way,
+     * which is also why Centre on chart and Centre on zenith do.
+     */
     public void recenter(juranometria.chart.SkyPosition centre) {
-        update(state.recenteredAt(centre));
+        update(ordinary().recenteredAt(centre));
     }
 
     /** Recentres on a named target whose label titles the chart. */
     public void recenter(juranometria.chart.SkyPosition centre, String targetLabel,
                          String targetIdentity) {
-        update(state.recenteredAt(centre, targetLabel, targetIdentity));
+        update(ordinary().recenteredAt(centre, targetLabel, targetIdentity));
     }
 
     /** Anonymous recenter with a field change in one notification. */
     public void recenter(juranometria.chart.SkyPosition centre, double fieldWidthDegrees) {
-        update(state.recenteredAt(centre).withFieldWidth(fieldWidthDegrees));
+        update(ordinary().recenteredAt(centre).withFieldWidth(fieldWidthDegrees));
     }
 
     /** Named-target recenter with a field change in one notification. */
     public void recenter(juranometria.chart.SkyPosition centre, double fieldWidthDegrees,
                          String targetLabel, String targetIdentity) {
-        update(state.recenteredAt(centre, targetLabel, targetIdentity)
+        update(ordinary().recenteredAt(centre, targetLabel, targetIdentity)
                 .withFieldWidth(fieldWidthDegrees));
+    }
+
+    /** The ordinary view a transition starts from: this one, or the one the whole sky left. */
+    private ChartViewState ordinary() {
+        return state.wholeSky() ? ordinaryBefore : state;
+    }
+
+    // ---- the whole sky (#687, ruled on #686) ------------------------
+
+    /** Whether the chart shows the whole sky. */
+    public boolean wholeSky() {
+        return state.wholeSky();
+    }
+
+    /**
+     * Enters the whole sky about a centre on the ecliptic (R-1 to R-4):
+     * the ordinary view is kept to return to, and the limit is the
+     * brighter of the reader's and the whole sky's own. Already on the
+     * whole sky, this moves its central meridian instead.
+     */
+    public void enterWholeSky(juranometria.chart.SkyPosition centreOnTheEcliptic) {
+        if (state.wholeSky()) {
+            followObserver(centreOnTheEcliptic);
+            return;
+        }
+        ChartViewState before = state;
+        ChartViewState whole = ChartViewState.wholeSky(centreOnTheEcliptic,
+                state.limitingMagnitude());
+        if (!isViewValid.test(whole)) {
+            return;
+        }
+        ordinaryBefore = before;
+        update(whole);
+    }
+
+    /**
+     * The central meridian follows the observer (R-4): chart time or
+     * place changed while the whole sky is shown. Nothing on an ordinary
+     * page.
+     */
+    public void followObserver(juranometria.chart.SkyPosition centreOnTheEcliptic) {
+        if (!state.wholeSky()) {
+            return;
+        }
+        update(state.wholeSkyAbout(centreOnTheEcliptic));
+    }
+
+    /**
+     * Leaves the whole sky without choosing: the ordinary view the
+     * reader left, exactly as it was (R-8). Nothing on an ordinary page.
+     */
+    public void leaveWholeSky() {
+        if (!state.wholeSky()) {
+            return;
+        }
+        update(ordinaryBefore);
     }
 
     /**
@@ -218,6 +290,11 @@ public final class ChartViewController {
 
     public boolean pan(juranometria.chart.SkyPosition grabbed,
                        juranometria.project.PlanePoint target) {
+        // Refused on the whole sky (#687, R-9): its central meridian
+        // follows the observer, not the hand.
+        if (state.wholeSky()) {
+            return false;
+        }
         juranometria.project.PanSolver.PanSolution solution =
                 juranometria.project.PanSolver.solveCentre(
                         state.projection(), grabbed, target,
@@ -277,6 +354,11 @@ public final class ChartViewController {
     public PointerZoomOutcome zoomAt(juranometria.project.PlanePoint pointer,
                                      boolean zoomIn, int widthPx,
                                      int heightPx) {
+        // Refused on the whole sky (#687, R-9): zoom never enters or
+        // leaves it, and the wheel visibly does nothing.
+        if (state.wholeSky()) {
+            return PointerZoomOutcome.AT_BOUND;
+        }
         // At the floor or a closer field, zoom in is the closer step
         // (#544), offered only where a supported body lies on the page
         // this pointer's step would display - asked of that page below,
@@ -545,6 +627,11 @@ public final class ChartViewController {
             return;
         }
         state = next;
+        // The view to return to is kept only while the whole sky is
+        // shown; an ordinary page is its own place.
+        if (!next.wholeSky()) {
+            ordinaryBefore = null;
+        }
         for (Consumer<ChartViewState> listener : listeners) {
             listener.accept(next);
         }

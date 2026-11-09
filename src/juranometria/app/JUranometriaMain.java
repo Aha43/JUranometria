@@ -286,6 +286,18 @@ public final class JUranometriaMain {
         chart.setSubdueBelowHorizon(() -> meridian.attached() && meridian.subduing()
                 ? new juranometria.sky.LocalSky(meridian.observer()).zenith() : null);
         meridian.onChange(chart::repaint);
+        // The whole sky (#687, ruled on #686): one switch for the
+        // toolbar's toggle, the Controller's, the Chart menu's item and
+        // a whole-sky bookmark, over the controller's one state. Its
+        // central meridian follows the chart's observer (R-4), so a
+        // change of Place and Time moves it; nothing about it is stored
+        // (R-10). The Inspector's centre button becomes Open here on it
+        // (R-8).
+        juranometria.ui.WholeSkySession wholeSky =
+                new juranometria.ui.WholeSkySession(controller,
+                        () -> meridian.attached() ? meridian.observer() : null);
+        meridian.onChange(wholeSky::observerChanged);
+        controller.onChange(state -> inspector.setOpenHere(state.wholeSky()));
         // Update to now (#259, rulings 4 and 7 on #556): one action, one
         // clock read per activation, and every route below runs this
         // same instance - the chart's Place and Time box, the chart
@@ -411,6 +423,7 @@ public final class JUranometriaMain {
         // working selection under the same mode.
         juranometria.ui.ChartControls chartControls =
                 controls.companionControls(chart);
+        chartControls.attachWholeSky(wholeSky);
         chartControls.search().setSelectionModel(selection);
         chartControls.search().setWorkingSelection(modules.workingSelection(),
                 modules.selectionMode());
@@ -456,6 +469,7 @@ public final class JUranometriaMain {
         // The reader's transient emphasis control (#361): the chart
         // is the truth it reads, and nothing about it is persisted.
         toolbar.attachEmphasis(chart);
+        toolbar.attachWholeSky(wholeSky);
         // The bar's visibility (Sprint 41, issue #450, ruled on #449):
         // the reader's choice, restored before the window is packed so
         // a hidden bar never flashes, and saved on every change. Hiding
@@ -847,7 +861,7 @@ public final class JUranometriaMain {
         juranometria.ui.bookmark.BookmarkOpener opener = new juranometria.ui.bookmark.BookmarkOpener(
                 controller, meridian, modules.workingSelection(), modules::inventory,
                 () -> chart.paintImmediately(0, 0, chart.getWidth(), chart.getHeight()),
-                chart::offersCloserField, bodySwitches, catalogued);
+                chart::offersCloserField, bodySwitches, catalogued, wholeSky::enter);
         juranometria.ui.bookmark.BookmarksPanel bookmarksPanel = new juranometria.ui.bookmark.BookmarksPanel(
                 companionWords, bookmarks, new juranometria.ui.bookmark.BookmarksPanel.Host() {
                     @Override
@@ -1090,6 +1104,9 @@ public final class JUranometriaMain {
         modules.workingSelection().onChange(change -> chart.setRequestedPosition(null));
         // View > Solar System > Saturn on the chart (#579), directly after
         // Jupiter and moons on the chart: the Saturn module's switch.
+        AppMenuBar.addWholeSky(frame.getJMenuBar(),
+                juranometria.ui.language.InterfaceText.forLanguage(
+                        language.interfaceLanguage()), wholeSky);
         javax.swing.JCheckBoxMenuItem saturnOnChartItem = AppMenuBar.addSaturnOnChart(
                 frame.getJMenuBar(),
                 juranometria.ui.language.InterfaceText.forLanguage(

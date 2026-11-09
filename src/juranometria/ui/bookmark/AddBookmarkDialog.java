@@ -155,15 +155,19 @@ public final class AddBookmarkDialog extends JDialog {
             c.gridx = 0;
             c.gridy++;
             c.gridwidth = 2;
-            JLabel view = new JLabel(said.say("bookmark.add.view",
-                    juranometria.chart.SkyFormat.formatRa(proposal.view().raDegrees()) + ", "
-                            + juranometria.chart.SkyFormat.formatDec(proposal.view().decDegrees()),
-                    field(proposal.view().fieldWidthDegrees())));
+            JLabel view = new JLabel(proposal.view().wholeSky()
+                    ? said.say("bookmark.view.wholeSky")
+                    : said.say("bookmark.add.view",
+                            juranometria.chart.SkyFormat.formatRa(proposal.view().raDegrees()) + ", "
+                                    + juranometria.chart.SkyFormat.formatDec(proposal.view().decDegrees()),
+                            field(proposal.view().fieldWidthDegrees())));
             form.add(view, c);
-            currentView = new JCheckBox(said.say("bookmark.edit.view.label",
-                    editing.map(e -> juranometria.chart.SkyFormat.formatRa(e.currentView().raDegrees()) + ", "
-                            + juranometria.chart.SkyFormat.formatDec(e.currentView().decDegrees())).orElse(""),
-                    editing.map(e -> field(e.currentView().fieldWidthDegrees())).orElse("")));
+            currentView = new JCheckBox(editing.map(e -> e.currentView().wholeSky()).orElse(false)
+                    ? said.say("bookmark.view.wholeSky")
+                    : said.say("bookmark.edit.view.label",
+                            editing.map(e -> juranometria.chart.SkyFormat.formatRa(e.currentView().raDegrees()) + ", "
+                                    + juranometria.chart.SkyFormat.formatDec(e.currentView().decDegrees())).orElse(""),
+                            editing.map(e -> field(e.currentView().fieldWidthDegrees())).orElse("")));
             currentView.getAccessibleContext().setAccessibleName(said.say("bookmark.edit.view.a11y"));
             Explain.control(currentView, said.say("bookmark.edit.view.hover"),
                     said.say("bookmark.edit.view.explain"));
@@ -298,6 +302,19 @@ public final class AddBookmarkDialog extends JDialog {
             place = new JCheckBox(said.say("bookmark.add.place.label", lat, lon), false);
             letters.apply(place, "bookmark.add.place.mnemonic");
             place.getAccessibleContext().setAccessibleName(said.say("bookmark.add.place.a11y", lat, lon));
+            if (proposal.wholeSky()) {
+                // A whole-sky bookmark keeps both (#687, R-11): the boxes
+                // are ticked and held, and the reason is said.
+                time.setSelected(true);
+                time.setEnabled(false);
+                place.setSelected(true);
+                place.setEnabled(false);
+                purposeFollows();
+                Explain.control(place, said.say("bookmark.add.wholeSky.required"),
+                        said.say("bookmark.add.wholeSky.required"));
+                Explain.control(time, said.say("bookmark.add.wholeSky.required"),
+                        said.say("bookmark.add.wholeSky.required"));
+            }
             Explain.control(place, said.say("bookmark.add.place.hover"), said.say("bookmark.add.place.explain"));
             c.gridy++;
             form.add(place, c);

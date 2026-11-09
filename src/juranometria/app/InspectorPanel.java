@@ -233,6 +233,7 @@ public final class InspectorPanel extends JPanel {
         centreHere.setAlignmentX(0.0f);
         centreHere.addActionListener(event -> centreOn.accept(
                 selection.selection()));
+        setOpenHere(false);
         transitHere.setName("inspectorTransit");
         transitHere.getAccessibleContext().setAccessibleName(
                 said.say("inspector.transit.a11y"));
@@ -484,6 +485,22 @@ said.say("inspector.tab.page.explain"));
      * it has - an object the reader panned away from is no longer
      * described as though it were still in front of them.
      */
+    /**
+     * What the centre button is on this page (#687, R-8): Centre here
+     * on an ordinary chart; Open here on the whole sky, where the same
+     * press leaves for the ordinary chart centred on the object at the
+     * field the reader left. The action is the controller's recentre
+     * either way; only the words change, because the thing done does.
+     */
+    public void setOpenHere(boolean openHere) {
+        String stem = openHere ? "inspector.openHere" : "inspector.centre";
+        centreHere.setText(said.say(stem + ".label"));
+        centreHere.getAccessibleContext().setAccessibleName(
+                said.say(stem + ".a11y"));
+        juranometria.ui.Explain.dynamic(centreHere,
+                said.say(stem + ".hover"), said.say(stem + ".explain"));
+    }
+
     public void refresh() {
         show(new SelectionModel.Change(selection.selection(),
                 selection.candidates(), selection.currentIndex()));

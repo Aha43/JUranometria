@@ -572,6 +572,11 @@ public final class OnThisPageTable extends JPanel {
         return clearMarks;
     }
 
+    /** What the table says in place of rows - an empty page's sentence, or a refusal (#687) - or empty. */
+    public String emptyLine() {
+        return empty.isVisible() && wrapping.get(empty) != null ? wrapping.get(empty) : "";
+    }
+
     /** What the counted line says, or empty when there is none. */
     public String countedLine() {
         return counted.isVisible()
@@ -584,6 +589,29 @@ public final class OnThisPageTable extends JPanel {
      * A new page. The rows are rebuilt from the inventory the chart
      * already holds - no catalogue query, and none while painting.
      */
+    /**
+     * The table refused, with the reason said in place of its rows
+     * (#687, R-14): on the whole sky the inventory of the entire sky
+     * is not the regional table this promises. The buttons go grey
+     * and say why; the marks are untouched.
+     */
+    public void refused(String sentence) {
+        following = true;
+        wrapping.put(counted, null);
+        counted.setVisible(false);
+        model.replaceWith(List.of());
+        heading.setText(said.say("onthispage.heading"));
+        wrapping.put(empty, sentence);
+        empty.setVisible(true);
+        scroll.setVisible(false);
+        sizeColumns();
+        rewrap();
+        following = false;
+        rangeSnapshotMembers = null;
+        pendingGesture = null;
+        sayWhatTheMarksAllow(false, true);
+    }
+
     public void pageChanged(PageContents page) {
         List<Row> rows = rowsOf(page);
         // Rebuilding the model empties the table's selection, and

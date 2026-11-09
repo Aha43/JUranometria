@@ -98,6 +98,19 @@ docs/studies/coordinate-grid/):
   the shared production `ChartRenderer.titleBlockBounds` is
   suppressed (measured: 0–3 per page, counted with the containment
   suppressions in the study report).
+- **On the whole sky** (#687; R-15 in `all-sky-projection.md`) the
+  page's edges are the outline, not the frame, and the notation rule
+  is the outline's: an RA figure where a meridian meets the outline
+  (only ever at the seam, on both edges), standing on the paper
+  outward along the outline's normal; a Dec figure where a parallel
+  crosses the central meridian, inside the sky, above and right of
+  the crossing — the crossing nearest the middle line when there are
+  two. Each refuses independently (the outline, the paper, furniture,
+  another figure); the seam's ends are refined to the outline by
+  bisection so the curves reach it and the figures have a point to
+  name; a meridian through an ecliptic pole is not named there. Every
+  frame-edge rule above is untouched: the branch is the projection's
+  whole-sphere statement.
 
 ## Visual hierarchy
 

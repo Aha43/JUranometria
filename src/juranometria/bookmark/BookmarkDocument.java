@@ -173,6 +173,13 @@ public final class BookmarkDocument {
                 why.add("a note that is not text");
             }
         }
+        // A whole-sky bookmark keeps its chart time and place (#687,
+        // R-11): both derive the page, and a record without them could
+        // not be opened as it was saved.
+        if (view.isPresent() && view.get().wholeSky()
+                && (time.isEmpty() || place.isEmpty())) {
+            why.add("a whole-sky bookmark without its chart time and place");
+        }
         if (!why.isEmpty() || view.isEmpty()) {
             return new Node.Kept(id, item, why);
         }
@@ -201,7 +208,22 @@ public final class BookmarkDocument {
             return Optional.empty();
         }
         Map<String, Json.Value> m = o.members();
-        unknownKeys(m, Set.of("ra", "dec", "field"), why);
+        unknownKeys(m, Set.of("ra", "dec", "field", "mode"), why);
+        if (m.containsKey("mode")) {
+            // The whole sky (#687, B-2): the one optional member, and
+            // the only one such a view carries.
+            Optional<String> mode = text(m, "mode");
+            boolean good = true;
+            if (mode.isEmpty() || !mode.get().equals(SavedView.WHOLE_SKY_MODE)) {
+                why.add("a view whose mode is not \"" + SavedView.WHOLE_SKY_MODE + "\"");
+                good = false;
+            }
+            if (m.containsKey("ra") || m.containsKey("dec") || m.containsKey("field")) {
+                why.add("a whole-sky view with a centre or a field");
+                good = false;
+            }
+            return good ? Optional.of(SavedView.wholeSkyView()) : Optional.empty();
+        }
         Optional<Double> ra = number(m, "ra");
         Optional<Double> dec = number(m, "dec");
         Optional<Double> field = number(m, "field");
@@ -308,9 +330,15 @@ public final class BookmarkDocument {
                 m.put("id", new Json.Str(b.id()));
                 m.put("title", new Json.Str(b.title()));
                 Map<String, Json.Value> v = new LinkedHashMap<>();
-                v.put("ra", Json.Num.of(b.view().raDegrees()));
-                v.put("dec", Json.Num.of(b.view().decDegrees()));
-                v.put("field", Json.Num.of(b.view().fieldWidthDegrees()));
+                if (b.view().wholeSky()) {
+                    // The one optional member (#687, B-2); no centre
+                    // and no field are written, because none is stored.
+                    v.put("mode", new Json.Str(SavedView.WHOLE_SKY_MODE));
+                } else {
+                    v.put("ra", Json.Num.of(b.view().raDegrees()));
+                    v.put("dec", Json.Num.of(b.view().decDegrees()));
+                    v.put("field", Json.Num.of(b.view().fieldWidthDegrees()));
+                }
                 m.put("view", new Json.Obj(v));
                 if (!b.subjects().isEmpty()) {
                     List<Json.Value> s = new ArrayList<>();

@@ -155,6 +155,38 @@ public interface PageWords {
                 magnitude, false);
     }
 
+    // ---- the whole sky (#687, ruled R-12 on #686) ---------------
+    //
+    // A whole-sky page never repeats the ordinary chart's radial
+    // "Centre ... ICRS J2000" or "Field ..." claims: it has no centre
+    // worth naming as a place and no radial field. It states its
+    // projection, its orientation, and its central ecliptic longitude.
+
+    /** What the page is about: "Whole sky", as a subject line. */
+    String wholeSkySubject();
+
+    /**
+     * The title block's first line: the ruled sentence, with the
+     * projection's reader name in it - "Whole sky · Hammer · ecliptic
+     * north up · ecliptic longitude increases left at centre".
+     */
+    String wholeSkyTitleLine(String projection);
+
+    /**
+     * The title block's facts: the central meridian's ecliptic
+     * longitude (the zenith's, formatted) and the magnitude limit.
+     */
+    String wholeSkyTitleFacts(String centralLongitude, String magnitude);
+
+    /** The whole page, spoken. */
+    String wholeSkySpokenPage(String projection, String centralLongitude,
+                              String magnitude);
+
+    /** The exported file's description of a whole-sky page. */
+    String wholeSkySheetDescription(String projection, String centralLongitude,
+                                    String magnitude, String paper,
+                                    String ground);
+
     // ---- what an exported file says about itself ---------------
 
     /**

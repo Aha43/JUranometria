@@ -55,8 +55,17 @@ class ProjectionCarriedThroughTest {
 
     private static ChartScene sceneDrawnBy(ChartProjection kind,
                                            double field) {
+        // The whole sky (#687) is drawn about a point of the ecliptic -
+        // its central meridian is a longitude, not a place - so its
+        // page is centred on the ecliptic at Orion's longitude; every
+        // other kind is centred on Orion itself.
+        SkyPosition centre = kind == ChartProjection.HAMMER
+                ? juranometria.project.HammerProjection.centreFor(
+                        juranometria.sky.Ecliptic.toEcliptic(ORION).longitudeDegrees())
+                : ORION;
         return Atlas.assembler().assemble(
-                new ChartViewState(ORION, field, 6.0, null, null, kind),
+                new ChartViewState(centre, field, kind == ChartProjection.HAMMER ? 5.0 : 6.0,
+                        null, null, kind),
                 900, 700);
     }
 
@@ -217,6 +226,19 @@ class ProjectionCarriedThroughTest {
                 assertEquals(projection.limitDegrees(), corner,
                         kind + ": a bounded page is useful to its own"
                                 + " edge, where the sky stops");
+                if (projection.outline()
+                        instanceof juranometria.project.PlaneOutline.Ellipse) {
+                    // The whole sky (#687) is bounded without collapsing:
+                    // equal-area, its scale along the middle line stays
+                    // finite and positive to the seam, about seven tenths
+                    // of the centre's. An ellipse is not a sphere's edge.
+                    double ratio = radialScaleAt(projection, corner - 0.01)
+                            / radialScaleAt(projection, 1.0e-4);
+                    assertTrue(ratio > 0.5 && ratio < 1.0,
+                            kind + ": its scale stays finite to the seam: "
+                                    + ratio);
+                    continue;
+                }
                 // Measured just inside the limb, because at the limb
                 // itself the outward difference has no sky to land
                 // on: the scale does not grow toward a bound here, it
@@ -365,6 +387,7 @@ class ProjectionCarriedThroughTest {
             case GNOMONIC -> SHEET;
             case STEREOGRAPHIC -> OVERVIEW;
             case ORTHOGRAPHIC -> 180.0;
+            case HAMMER -> ChartProjection.WHOLE_SKY_DEGREES;
         };
     }
 
@@ -413,10 +436,11 @@ class ProjectionCarriedThroughTest {
                     checked++;
                 }
             }
-            assertTrue(checked >= (kind == ChartProjection.ORTHOGRAPHIC
-                            ? 12 : 25),
+            boolean boundedKind = Double.isFinite(
+                    projection.visiblePlaneRadius());
+            assertTrue(checked >= (boundedKind ? 12 : 25),
                     kind + ": a grid of pointings: " + checked);
-            if (kind == ChartProjection.ORTHOGRAPHIC) {
+            if (boundedKind) {
                 assertTrue(checked < 25,
                         "and some of that grid is paper rather than"
                                 + " sky, which is what a bounded page"
@@ -434,6 +458,12 @@ class ProjectionCarriedThroughTest {
         // field changes. Held by the promise itself rather than by
         // the formula.
         for (ChartProjection kind : ChartProjection.values()) {
+            if (kind == ChartProjection.HAMMER) {
+                // The whole sky (#687) draws one width and refuses
+                // zoom (R-9): there is no second field to scale to and
+                // nothing for a pointer to keep under itself.
+                continue;
+            }
             Projection projection = Projections.of(kind, ORION);
             double from = 24.0;
             double to = 12.0;

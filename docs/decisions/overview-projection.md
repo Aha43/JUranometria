@@ -342,7 +342,14 @@ round-trip sky → plane → sky to within 3.3e-13 degrees.
 
 ### The projected-curve vocabulary
 
-Three words, all exact, no sampling:
+Three words, all exact, no sampling - for every projection whose great
+circles are conics. **Amended by #687** (docs/decisions/all-sky-projection.md,
+architecture A): the whole sky's Hammer projection has no conic for a great
+circle, says so through `Projection.greatCirclesAreConics()`, and takes a
+fourth word, the sampled `CurveRun.Polyline`, broken at its seam by
+`Projection.mayJoin` and refined to the seam. The three exact words and the
+rule against sampling them stand unchanged for the three azimuthal
+projections, which the interface evidence gate holds byte for byte.
 
 | word | what takes it |
 |---|---|

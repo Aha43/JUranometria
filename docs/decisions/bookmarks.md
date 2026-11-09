@@ -104,6 +104,13 @@ subject    = { "kind": "star" | "deep-sky" | "body", "id": <atlas identity> }
   examples, section 4).
 - **No defaults are written**: an absent `subjects`, `primary`, `time`,
   `place` or `note` means none.
+- **The whole sky** (#687, ruled R-11 on #686, option B-2): a whole-sky
+  bookmark's view is `{ "mode": "whole-sky" }` and nothing else - no centre
+  and no field, because both derive from the bookmark's chart time and
+  place, which such a bookmark must carry (a record without them needs
+  attention). The version stays 1; an older atlas keeps the record exactly
+  as needing attention (an unknown field), and every ordinary bookmark is
+  written byte for byte as before.
 - **Choice C-1 (format).** The application bundles no JSON today: the only
   reader is the tool-only `MiniJson`, kept out of the application by an
   architecture note since Sprint 1 ("no general-purpose JSON dependency").

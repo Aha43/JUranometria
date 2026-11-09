@@ -255,12 +255,26 @@ public final class ViewReport {
         lines.add(String.format(Locale.ROOT,
                 "centre-degrees: RA %.6f; Dec %+.6f",
                 view.centre().raDegrees(), view.centre().decDegrees()));
-        lines.add("field-degrees: " + exact(view.fieldWidthDegrees()));
+        // The whole sky has no radial field (#687, R-12): the report
+        // says so, and states the orientation, the central-meridian
+        // rule and its longitude instead. Every ordinary report is
+        // unchanged.
+        lines.add("field-degrees: " + (view.wholeSky() ? "whole-sky"
+                : exact(view.fieldWidthDegrees())));
         // The report names a closer field (#544, ruled on #539, ruling
         // 5); on the ladder the line is absent, so no report a reader
         // has already taken changes.
         lines.addAll(closerFieldLine(view).stream().toList());
         lines.add("projection: " + token(view.projection().name()));
+        if (view.wholeSky()) {
+            lines.add("view: whole-sky");
+            lines.add("orientation: ecliptic-horizontal");
+            lines.add("central-meridian: zenith-ecliptic-longitude");
+            lines.add(String.format(Locale.ROOT,
+                    "central-longitude-degrees: %.6f",
+                    juranometria.sky.Ecliptic.toEcliptic(view.centre())
+                            .longitudeDegrees()));
+        }
         // What the page is about, and what the reader explicitly
         // navigated to: two facts, never collapsed into one.
         lines.add("page-subject: " + nullToNone(view.targetLabel()));

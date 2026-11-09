@@ -75,6 +75,12 @@ public final class ZoomInteraction implements MouseWheelListener {
             return;
         }
         event.consume();
+        if (controller.state().wholeSky()) {
+            // The whole sky (#687, R-9): the wheel visibly does nothing,
+            // and nothing is banked for later.
+            accumulated = 0.0;
+            return;
+        }
         if (lock.locked()) {
             // Locked: the wheel visibly does nothing, and nothing is
             // banked for later.

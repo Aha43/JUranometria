@@ -409,6 +409,22 @@ public final class AtlasToolbar extends JToolBar {
         emphasis.setFocusable(true);
     }
 
+    /**
+     * Whole sky (#687, ruled R-13 on #686): beside the zoom controls it
+     * refuses - after the zoom lock, or after Zoom out on a bar without
+     * one - so the control that leaves the ladder stands with the
+     * ladder's. Re-asserted focusable after it is added (#449).
+     */
+    public javax.swing.JToggleButton attachWholeSky(WholeSkySession session) {
+        javax.swing.JToggleButton button = controls.attachWholeSky(session);
+        int at = controls.zoomLock() != null
+                ? getComponentIndex(controls.zoomLock()) + 1
+                : getComponentIndex(controls.zoomOut()) + 1;
+        add(button, at);
+        button.setFocusable(true);
+        return button;
+    }
+
     /** The installed control; package-visible for its contracts. */
     JButton emphasisButton() {
         return controls.emphasis();

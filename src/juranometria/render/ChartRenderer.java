@@ -876,10 +876,20 @@ public final class ChartRenderer {
         if (!Double.isFinite(projection.visiblePlaneRadius())) {
             return paper;
         }
-        double radius = mapping.pixelsPerPlaneUnit()
-                * projection.visiblePlaneRadius();
         PixelPoint middle = mapping.toPixel(
                 new juranometria.project.PlanePoint(0.0, 0.0));
+        // The shape of the sky, asked as a shape (#687): the whole
+        // sky ends at an ellipse, which no radius could say. A disc
+        // keeps the arithmetic it always had.
+        if (projection.outline()
+                instanceof juranometria.project.PlaneOutline.Ellipse e) {
+            double across = mapping.pixelsPerPlaneUnit() * e.halfWidth();
+            double down = mapping.pixelsPerPlaneUnit() * e.halfHeight();
+            return new java.awt.geom.Ellipse2D.Double(middle.x() - across,
+                    middle.y() - down, 2.0 * across, 2.0 * down);
+        }
+        double radius = mapping.pixelsPerPlaneUnit()
+                * projection.visiblePlaneRadius();
         return new java.awt.geom.Ellipse2D.Double(middle.x() - radius,
                 middle.y() - radius, 2.0 * radius, 2.0 * radius);
     }
@@ -927,7 +937,7 @@ public final class ChartRenderer {
                     palette.figureInk(), OUTLINE_STROKE);
             g.setColor(figures.color());
             g.setStroke(figures.stroke());
-            java.util.Map<String, double[]> visibleInk =
+            java.util.Map<String, FigureAnchor> visibleInk =
                     new java.util.LinkedHashMap<>();
             g.setClip(sky);
             // Split at the horizon plane (#615, ruling P-X); the anchors
@@ -982,7 +992,7 @@ public final class ChartRenderer {
         Projection projection = drawnBy(scene);
         java.util.Map<String, java.util.List<java.awt.geom.Line2D>> pieces =
                 new java.util.LinkedHashMap<>();
-        java.util.Map<String, double[]> anchors =
+        java.util.Map<String, FigureAnchor> anchors =
                 new java.util.LinkedHashMap<>();
         for (GeoSegment segment : scene.geography().figureSegments()) {
             drawnPieces(segment, scene, projection, mapping,
@@ -1001,11 +1011,9 @@ public final class ChartRenderer {
                 path.moveTo(piece.getX1(), piece.getY1());
                 path.lineTo(piece.getX2(), piece.getY2());
             }
-            double[] sum = anchors.get(entry.getKey());
+            FigureAnchor anchor = anchors.get(entry.getKey());
             ink.put(entry.getKey(), new FigureInk(entry.getKey(), path,
-                    sum == null || sum[2] == 0.0 ? null
-                            : new PixelPoint(sum[0] / sum[2],
-                                    sum[1] / sum[2])));
+                    anchor == null ? null : anchor.point()));
         }
         return java.util.Map.copyOf(ink);
     }
@@ -1019,31 +1027,101 @@ public final class ChartRenderer {
     }
 
     /**
+     * Where a constellation's name is anchored: the mean of its drawn
+     * pieces' midpoints, the renderer's rule since #313 - taken over
+     * the part of the figure that holds the most ink when a seam
+     * splits it (#687, R-5).
+     *
+     * <p>A piece joins the first part whose pieces the projection may
+     * join it to ({@link Projection#mayJoin}). On every azimuthal
+     * projection that is always the first part, so there is one part,
+     * one sum in piece order and one mean - the arithmetic the rule
+     * has always done, bit for bit. On the whole sky a figure the seam
+     * cuts has pieces at both edges of the map; without this its name
+     * landed on the mean of the two, in the middle of the page, on
+     * nothing (the #686 study counted two to six such names a page).
+     */
+    static final class FigureAnchor {
+        private final java.util.List<Part> parts = new java.util.ArrayList<>();
+
+        private static final class Part {
+            final SkyPosition representative;
+            double sumX;
+            double sumY;
+            double count;
+            double length;
+
+            Part(SkyPosition representative) {
+                this.representative = representative;
+            }
+        }
+
+        void add(Projection projection, SkyPosition at, PixelPoint from,
+                 PixelPoint to) {
+            Part part = null;
+            for (Part candidate : parts) {
+                if (projection.mayJoin(candidate.representative, at)) {
+                    part = candidate;
+                    break;
+                }
+            }
+            if (part == null) {
+                part = new Part(at);
+                parts.add(part);
+            }
+            part.sumX += (from.x() + to.x()) / 2.0;
+            part.sumY += (from.y() + to.y()) / 2.0;
+            part.count += 1.0;
+            part.length += Math.hypot(to.x() - from.x(), to.y() - from.y());
+        }
+
+        /** The anchor, or null when no piece was drawn. */
+        PixelPoint point() {
+            Part most = null;
+            for (Part part : parts) {
+                if (most == null || part.length > most.length) {
+                    most = part;
+                }
+            }
+            return most == null || most.count == 0.0 ? null
+                    : new PixelPoint(most.sumX / most.count,
+                            most.sumY / most.count);
+        }
+    }
+
+    /**
      * The pieces one segment is drawn in, and its share of the name's
      * anchor - the single walk that both {@link #drawGeographySegment}
      * and {@link #figureInk} take, so what is drawn and what is
      * published are the same pieces.
+     *
+     * <p>A piece is drawn between consecutive samples that both land
+     * on the plane, that the projection may join (#687: never across
+     * a seam), and that touch the paper.
      */
     private static void drawnPieces(GeoSegment segment, ChartScene scene,
                                     Projection projection,
                                     ViewportMapping mapping,
                                     java.util.List<java.awt.geom.Line2D> into,
-                                    java.util.Map<String, double[]> anchors) {
+                                    java.util.Map<String, FigureAnchor> anchors) {
         int width = scene.viewport().widthPx();
         int height = scene.viewport().heightPx();
         int steps = Math.max(1, (int) Math.ceil(
                 separationDegrees(segment.from(), segment.to())
                         / GEOGRAPHY_STEP_DEGREES));
         PixelPoint previous = null;
+        SkyPosition previousSky = null;
         for (int i = 0; i <= steps; i++) {
-            var plane = projection.project(
-                    slerp(segment.from(), segment.to(), (double) i / steps));
+            SkyPosition sky = slerp(segment.from(), segment.to(),
+                    (double) i / steps);
+            var plane = projection.project(sky);
             if (plane.isEmpty()) {
                 previous = null;
+                previousSky = null;
                 continue;
             }
             PixelPoint pixel = mapping.toPixel(plane.get());
-            if (previous != null) {
+            if (previous != null && projection.mayJoin(previousSky, sky)) {
                 java.awt.geom.Line2D.Double piece =
                         new java.awt.geom.Line2D.Double(previous.x(),
                                 previous.y(), pixel.x(), pixel.y());
@@ -1053,16 +1131,14 @@ public final class ChartRenderer {
                         // Created only when a piece is drawn: a
                         // constellation whose figure leaves no ink on
                         // this page has no entry, and is not named.
-                        double[] sum = anchors.computeIfAbsent(
-                                segment.constellationId(),
-                                key -> new double[3]);
-                        sum[0] += (previous.x() + pixel.x()) / 2.0;
-                        sum[1] += (previous.y() + pixel.y()) / 2.0;
-                        sum[2] += 1.0;
+                        anchors.computeIfAbsent(segment.constellationId(),
+                                key -> new FigureAnchor())
+                                .add(projection, sky, previous, pixel);
                     }
                 }
             }
             previous = pixel;
+            previousSky = sky;
         }
     }
 
@@ -1070,7 +1146,7 @@ public final class ChartRenderer {
                                              ChartScene scene,
                                              Projection projection,
                                              ViewportMapping mapping,
-                                             java.util.Map<String, double[]> visibleInk) {
+                                             java.util.Map<String, FigureAnchor> visibleInk) {
         // The same walk the published ink takes, so a policy asking
         // what a figure covers is told about the pieces this draws
         // and not about a reconstruction of them.
@@ -2552,12 +2628,35 @@ public final class ChartRenderer {
      * formatted here with {@code Locale.ROOT} and handed over as
      * text, so no language can turn a magnitude limit into 6,0.
      */
+    /**
+     * The title block's lines as this page carries them, before any
+     * wrapping: published so a study or a test can hold the page to its
+     * words without rasterising them (#687).
+     */
+    public java.util.List<String> titleBlockLines(ChartScene scene) {
+        return java.util.List.of(titleLines(scene, drawnBy(scene).name()));
+    }
+
     private String[] titleLines(ChartScene scene, String projectionId) {
         double field = scene.viewport().fieldWidthDegrees();
         String fieldText = juranometria.chart.FieldWidthText.title(field);
         String limit = String.format(Locale.ROOT, "%.1f",
                 scene.limitingMagnitude());
         String projection = words.projection(projectionId);
+        // The whole sky's own two lines (#687, R-12): the ruled
+        // sentence, and the central ecliptic longitude. Never the
+        // ordinary Centre or Field lines, which would be false here.
+        java.util.Optional<juranometria.project.Projection.WholeSphere> whole =
+                page(scene).projection().wholeSphere();
+        if (whole.isPresent()) {
+            String line = words.wholeSkyTitleLine(projection);
+            String facts = words.wholeSkyTitleFacts(
+                    DrawnPage.centralLongitudeText(whole.get()), limit);
+            String note = titleNote.apply(scene);
+            return note == null
+                    ? new String[] {line, facts}
+                    : new String[] {line, facts, note};
+        }
         // A closer field is called one (#544, ruled on #539, ruling 5):
         // its own whole pattern, not a word glued onto the ladder's.
         String facts = field < juranometria.chart.ChartViewState

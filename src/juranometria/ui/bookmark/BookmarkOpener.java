@@ -94,6 +94,7 @@ public final class BookmarkOpener {
     private final Predicate<ChartViewState> closerOffered;
     private final Map<String, BodyOnChart> switches;
     private final Function<Subject, Optional<String>> catalogueLabel;
+    private final Runnable enterWholeSky;
 
     /**
      * @param switches       each planet's or luminary's on-the-chart switch, by its body identity
@@ -103,6 +104,23 @@ public final class BookmarkOpener {
                           WorkingSelection working, Supplier<PageContents> page, Runnable paintNow,
                           Predicate<ChartViewState> closerOffered, Map<String, BodyOnChart> switches,
                           Function<Subject, Optional<String>> catalogueLabel) {
+        this(controller, meridian, working, page, paintNow, closerOffered, switches,
+                catalogueLabel, null);
+    }
+
+    /**
+     * The same, able to open a whole-sky bookmark (#687, R-11).
+     *
+     * @param enterWholeSky the whole-sky switch's entry, run after the
+     *     bookmark's time and place are the chart's; null refuses such a
+     *     bookmark loudly
+     */
+    public BookmarkOpener(ChartViewController controller, MeridianModule meridian,
+                          WorkingSelection working, Supplier<PageContents> page, Runnable paintNow,
+                          Predicate<ChartViewState> closerOffered, Map<String, BodyOnChart> switches,
+                          Function<Subject, Optional<String>> catalogueLabel,
+                          Runnable enterWholeSky) {
+        this.enterWholeSky = enterWholeSky;
         this.controller = controller;
         this.meridian = meridian;
         this.working = working;
@@ -144,9 +162,19 @@ public final class BookmarkOpener {
         }
 
         // 3. The view, through recenter; the primary as the named target.
+        // A whole-sky bookmark enters the whole sky at the time and place
+        // just installed (#687, R-11); it has no centre to recentre on.
+        boolean closerRefused = false;
+        if (bookmark.view().wholeSky()) {
+            if (enterWholeSky == null) {
+                throw new IllegalStateException(
+                        "a whole-sky bookmark needs the whole-sky switch to open");
+            }
+            enterWholeSky.run();
+            return finish(bookmark, closerRefused, switchedOn);
+        }
         SkyPosition centre = new SkyPosition(bookmark.view().raDegrees(), bookmark.view().decDegrees());
         double field = bookmark.view().fieldWidthDegrees();
-        boolean closerRefused = false;
         if (field < ChartViewState.normalMinimumFieldDegrees()) {
             ChartViewState candidate = new ChartViewState(centre, field,
                     controller.state().limitingMagnitude(), null, null);
@@ -165,6 +193,12 @@ public final class BookmarkOpener {
             controller.recenter(centre, field);
         }
 
+        return finish(bookmark, closerRefused, switchedOn);
+    }
+
+    /** Steps 4 and 5: the paint, the primary, and the report. */
+    private Report finish(Node.Bookmark bookmark, boolean closerRefused, List<String> switchedOn) {
+        Optional<Subject> primary = bookmark.primary();
         // 4. Paint, so the restored instant's bodies are on the page; then the primary.
         paintNow.run();
         PageContents contents = page.get();

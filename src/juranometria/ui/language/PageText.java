@@ -156,6 +156,36 @@ public final class PageText implements PageWords {
     }
 
     @Override
+    public String wholeSkySubject() {
+        return said.say(STEM + "wholeSky.subject");
+    }
+
+    @Override
+    public String wholeSkyTitleLine(String projection) {
+        return said.say(STEM + "wholeSky.title", projection);
+    }
+
+    @Override
+    public String wholeSkyTitleFacts(String centralLongitude, String magnitude) {
+        return said.say(STEM + "wholeSky.facts", centralLongitude, magnitude);
+    }
+
+    @Override
+    public String wholeSkySpokenPage(String projection, String centralLongitude,
+                                     String magnitude) {
+        return said.say(STEM + "wholeSky.spoken", projection, centralLongitude,
+                magnitude);
+    }
+
+    @Override
+    public String wholeSkySheetDescription(String projection, String centralLongitude,
+                                           String magnitude, String paper,
+                                           String ground) {
+        return said.say(STEM + "wholeSky.sheet.description", projection,
+                centralLongitude, magnitude, paper, ground);
+    }
+
+    @Override
     public String magnitudeKeyHeading() {
         return said.say(STEM + "magnitudeKey.heading");
     }

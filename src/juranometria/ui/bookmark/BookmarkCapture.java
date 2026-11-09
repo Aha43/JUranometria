@@ -47,6 +47,14 @@ public final class BookmarkCapture {
         public boolean hasBody() {
             return subjects.stream().anyMatch(s -> s.kind() == Subject.Kind.BODY);
         }
+
+        /**
+         * Whether the view is the whole sky (#687, R-11): then the
+         * chart time and the place are both kept, and the boxes say so.
+         */
+        public boolean wholeSky() {
+            return view.wholeSky();
+        }
     }
 
     private BookmarkCapture() {
@@ -61,8 +69,13 @@ public final class BookmarkCapture {
         }
         Optional<Subject> primary = lead == null ? Optional.empty() : Optional.of(subject(lead));
         boolean body = subjects.stream().anyMatch(s -> s.kind() == Subject.Kind.BODY);
-        return new Proposal(new SavedView(view.centre().raDegrees(), view.centre().decDegrees(),
-                view.fieldWidthDegrees()), subjects, primary, observer.instant(), body,
+        // The whole sky stores no centre or field, and keeps its time
+        // and place (#687, R-11): the time box starts ticked.
+        SavedView saved = view.wholeSky() ? SavedView.wholeSkyView()
+                : new SavedView(view.centre().raDegrees(), view.centre().decDegrees(),
+                        view.fieldWidthDegrees());
+        return new Proposal(saved, subjects, primary, observer.instant(),
+                body || view.wholeSky(),
                 new Place(observer.latitudeDegrees(), observer.eastLongitudeDegrees()));
     }
 
@@ -95,9 +108,12 @@ public final class BookmarkCapture {
             throw new IllegalArgumentException("a bookmark needs a title");
         }
         Optional<Subject> kept = primary.filter(subjects::contains);
+        // A whole-sky bookmark keeps both, whatever the boxes say (#687).
+        boolean time = includeTime || proposal.wholeSky();
+        boolean where = includePlace || proposal.wholeSky();
         return new BookmarkLibrary.Draft(title.strip(), proposal.view(), subjects, kept,
-                includeTime ? Optional.of(new ChartTime(proposal.instant(), purpose)) : Optional.empty(),
-                includePlace ? Optional.of(proposal.place()) : Optional.empty(),
+                time ? Optional.of(new ChartTime(proposal.instant(), purpose)) : Optional.empty(),
+                where ? Optional.of(proposal.place()) : Optional.empty(),
                 note == null || note.isBlank() ? Optional.empty() : Optional.of(note));
     }
 }

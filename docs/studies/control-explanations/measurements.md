@@ -183,7 +183,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Inspector | JButton | M 31 | Show the facts for M 31 | Makes this member the lead and shows its facts here. Membership is unchanged. | hovered |
 | Inspector | JButton | ✕ | Remove M 31 from the working selection | Takes M 31 out of the working selection. The rest stay, and the page does not move. | hovered |
 | Inspector | JButton | Clear selection | Remove every working mark | Empties the whole working selection. The page and your place in it are left alone. | hovered |
-| Inspector | JButton | Centre here | Centre the chart on the selected object | Moves the page so the object shown here sits at the centre; nothing about what the char... | hovered |
+| Inspector | JButton | Centre here | Centre the chart on the selected object | Moves the page so the object shown here sits at the centre; nothing about what the char... | dynamic |
 | Inspector | JButton | Set chart time to its next meridian transit | Move the chart time forward to the next upper culmination of the selected object | Sets the chart time to the next instant, at or after the chart time now, when the selec... | hovered |
 | On this page | JTable | (Objects on this page) | &mdash; | Choose rows to mark them on the chart. Marking does not move the page. | self-explanatory |
 | On this page | JButton | Centre here | Choose a row's mark first, and this centres the chart on it | Unavailable until a row is marked: mark one and this moves the page to it | dynamic |
@@ -191,7 +191,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 
 ## The audit
 
-**174 operable controls** across 21 surfaces: **110** hovered, **12** dynamic, **52** left to their own visible words, **0 undecided**.
+**174 operable controls** across 21 surfaces: **109** hovered, **13** dynamic, **52** left to their own visible words, **0 undecided**.
 
 **0** say the same words twice - a tooltip read back as a description. The seam refuses it, so this is zero or a finding.
 

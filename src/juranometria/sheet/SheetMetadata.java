@@ -134,6 +134,22 @@ public record SheetMetadata(String title, String description,
                 String.format(Locale.ROOT, "%.1f", paper.chartWideMm()),
                 String.format(Locale.ROOT, "%.1f", paper.chartHighMm()));
         String ground = words.ground(options.palette().storedAs());
+        // The whole sky's sheet says what its page says (#687, R-12):
+        // its projection, its orientation and its central longitude,
+        // never a centre as a place or a radial field.
+        java.util.Optional<juranometria.project.Projection.WholeSphere> whole =
+                page.projection().wholeSphere();
+        if (whole.isPresent()) {
+            String wholeSubject = words.wholeSkySubject();
+            return new SheetMetadata(
+                    words.sheetTitle(AppInfo.NAME, wholeSubject),
+                    words.wholeSkySheetDescription(projection,
+                            juranometria.project.DrawnPage
+                                    .centralLongitudeText(whole.get()),
+                            limit, paperText, ground),
+                    words.producedBy(AppInfo.NAME + " " + AppInfo.version(),
+                            AppInfo.REPO_URL));
+        }
         // A closer field's sheet says what the screen says (#544).
         String description = fieldWidthDegrees
                 < juranometria.chart.ChartViewState.normalMinimumFieldDegrees()

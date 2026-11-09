@@ -14,10 +14,20 @@ package juranometria.project;
  * has no projection; curves did not, because a curve is drawn from
  * its own equation and the only thing clipping it was the rectangle
  * (docs/decisions/overview-projection.md).
+ *
+ * <p>Since #687 the limb may be an ellipse (the whole sky under the
+ * Hammer projection): {@code limbRadius} is its half-width along the
+ * page's x and {@code limbRadiusAcross} its half-height along y, and
+ * a circle is the case where the two are equal. The conic clipping in
+ * {@link PlaneCurve} cuts only against a circular limb - an ellipse
+ * meeting an ellipse is a quartic this vocabulary does not have - and
+ * says so loudly rather than drawing through an edge it never looked
+ * at; a projection with an elliptical outline routes every curve
+ * through the sampled route, whose points are sky by construction.
  */
 public record PageRegion(double minX, double minY, double maxX,
                          double maxY, double limbX, double limbY,
-                         double limbRadius) {
+                         double limbRadius, double limbRadiusAcross) {
 
     public PageRegion {
         // Every edge a real pixel. Width and height alone let an
@@ -59,13 +69,24 @@ public record PageRegion(double minX, double minY, double maxX,
                     "a limb is a circle with a radius: " + limbX + ","
                             + limbY + " r " + limbRadius);
         }
+        // Both half-extents are finite or both infinite: a limb that
+        // ends the sky in one direction and not the other is no shape
+        // this vocabulary has.
+        if (Double.isNaN(limbRadiusAcross) || limbRadiusAcross <= 0.0
+                || Double.isFinite(limbRadius)
+                        != Double.isFinite(limbRadiusAcross)) {
+            throw new IllegalArgumentException(
+                    "a limb's two half-extents are both finite or both"
+                            + " infinite: " + limbRadius + " by "
+                            + limbRadiusAcross);
+        }
     }
 
     /** A page with no edge to the sky: every chart projection. */
     public static PageRegion paper(double minX, double minY,
                                    double maxX, double maxY) {
         return new PageRegion(minX, minY, maxX, maxY, 0.0, 0.0,
-                Double.POSITIVE_INFINITY);
+                Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
     }
 
     /**
@@ -89,7 +110,28 @@ public record PageRegion(double minX, double minY, double maxX,
                             + " page with no limb is paper(): " + limbRadius);
         }
         return new PageRegion(minX, minY, maxX, maxY, limbX, limbY,
-                limbRadius);
+                limbRadius, limbRadius);
+    }
+
+    /**
+     * A page whose sky ends at an ellipse (#687): the whole sky, half
+     * {@code limbRadius} wide along x and {@code limbRadiusAcross}
+     * high along y, about the limb's centre.
+     */
+    public static PageRegion withinEllipse(double minX, double minY,
+                                           double maxX, double maxY,
+                                           double limbX, double limbY,
+                                           double limbRadius,
+                                           double limbRadiusAcross) {
+        if (!Double.isFinite(limbRadius)
+                || !Double.isFinite(limbRadiusAcross)) {
+            throw new IllegalArgumentException(
+                    "a page bounded by an ellipse needs two real"
+                            + " half-extents: " + limbRadius + " by "
+                            + limbRadiusAcross);
+        }
+        return new PageRegion(minX, minY, maxX, maxY, limbX, limbY,
+                limbRadius, limbRadiusAcross);
     }
 
     /** Whether the sky itself stops somewhere on this page. */
@@ -97,12 +139,47 @@ public record PageRegion(double minX, double minY, double maxX,
         return Double.isFinite(limbRadius);
     }
 
+    /**
+     * Whether the limb, if any, is a circle - the one limb the conic
+     * clipping can cut against.
+     */
+    public boolean circularLimb() {
+        return !bounded() || limbRadius == limbRadiusAcross;
+    }
+
+    /**
+     * The conic clipping's own guard (#687): refuses, rather than
+     * silently ignoring, a limb it cannot cut.
+     */
+    void requireCircularLimb() {
+        if (!circularLimb()) {
+            throw new IllegalStateException(String.format(
+                    java.util.Locale.ROOT,
+                    "this page's sky ends at an ellipse %.3f by %.3f and"
+                            + " the conic clipping cuts only against a"
+                            + " circular limb: a projection with such an"
+                            + " outline routes its curves through the"
+                            + " sampled route (Projection"
+                            + ".greatCirclesAreConics)",
+                    limbRadius, limbRadiusAcross));
+        }
+    }
+
     public boolean contains(double x, double y) {
         if (x < minX || x > maxX || y < minY || y > maxY) {
             return false;
         }
-        return !bounded()
-                || Math.hypot(x - limbX, y - limbY) <= limbRadius;
+        if (!bounded()) {
+            return true;
+        }
+        if (limbRadius == limbRadiusAcross) {
+            // The circle's own test, exactly as it has always been
+            // written, so no hemisphere page moves by a bit.
+            return Math.hypot(x - limbX, y - limbY) <= limbRadius;
+        }
+        double across = (x - limbX) / limbRadius;
+        double down = (y - limbY) / limbRadiusAcross;
+        return across * across + down * down <= 1.0;
     }
 
     /** Half the diagonal: how far this page reaches from its middle. */

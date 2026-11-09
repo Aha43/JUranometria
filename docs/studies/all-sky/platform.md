@@ -1,3 +1,7 @@
+> **Status: historical record.** The study's generator and its study door
+> are gone (#687); this platform record is held as committed, unchanged below
+> this note. The view as built is measured in `docs/studies/whole-sky/`.
+
 # All-sky projection study (#686) - platform record
 
 Sprint 59, issue #686.

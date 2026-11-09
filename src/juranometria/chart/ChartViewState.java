@@ -115,8 +115,12 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
             throw new IllegalArgumentException(
                     "projection must not be null");
         }
+        // The whole sky (#687) stands at its own width, which is not
+        // a step: the ladder never walks there, and only wholeSky()
+        // builds such a state.
         if (indexOf(FIELD_WIDTH_STEPS, fieldWidthDegrees) < 0
-                && indexOf(CLOSER_FIELD_STEPS, fieldWidthDegrees) < 0) {
+                && indexOf(CLOSER_FIELD_STEPS, fieldWidthDegrees) < 0
+                && fieldWidthDegrees != ChartProjection.WHOLE_SKY_DEGREES) {
             throw new IllegalArgumentException(
                     "field width is not a supported step: " + fieldWidthDegrees);
         }
@@ -231,16 +235,47 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
     }
 
     /**
+     * Whether this page is the whole sky (#687): drawn by the Hammer
+     * projection at the one width that is not a rung. Zoom and pan
+     * are refused here (R-9), and the page is left through
+     * {@link #withFieldWidth}, {@link #reset()} or the controller's
+     * own return to the ordinary chart.
+     */
+    public boolean wholeSky() {
+        return projection == ChartProjection.HAMMER;
+    }
+
+    /**
+     * The whole sky about a centre on the ecliptic (#687, R-1 to R-4):
+     * the Hammer projection at {@link ChartProjection#WHOLE_SKY_DEGREES},
+     * untargeted, at the brighter of the reader's limit and the
+     * width's own (V 5.0, the globe's measured limit, which the whole
+     * sky inherits: about 1,620 stars on the page). The centre's
+     * ecliptic longitude is the central meridian's; a caller builds it
+     * with {@code HammerProjection.centreFor}, so the page is centred
+     * where it says it is.
+     */
+    public static ChartViewState wholeSky(SkyPosition centreOnTheEcliptic,
+                                          double limitingMagnitude) {
+        return new ChartViewState(centreOnTheEcliptic,
+                ChartProjection.WHOLE_SKY_DEGREES,
+                Math.min(limitingMagnitude,
+                        defaultMagnitudeFor(ChartProjection.WHOLE_SKY_DEGREES)),
+                null, null, ChartProjection.HAMMER);
+    }
+
+    /**
      * The ladder's own zoom: false at the floor and at every closer
      * field. A closer field is reached through {@link #closerStep()},
-     * not by walking the ladder.
+     * not by walking the ladder. Never from the whole sky (R-9).
      */
     public boolean canZoomIn() {
-        return !closerField() && fieldWidthIndex() < FIELD_WIDTH_STEPS.length - 1;
+        return !wholeSky() && !closerField()
+                && fieldWidthIndex() < FIELD_WIDTH_STEPS.length - 1;
     }
 
     public boolean canZoomOut() {
-        return closerField() || fieldWidthIndex() > 0;
+        return !wholeSky() && (closerField() || fieldWidthIndex() > 0);
     }
 
     /**
@@ -340,8 +375,33 @@ public record ChartViewState(SkyPosition centre, double fieldWidthDegrees,
         if (newCentre == null) {
             throw new IllegalArgumentException("centre must not be null");
         }
+        // A whole-sky page has no centre a reader moves: its central
+        // meridian follows the observer (R-4), and leaving it is the
+        // controller's return to the ordinary chart (R-8). A recentre
+        // that kept the Hammer projection about an arbitrary position
+        // would be a page drawn about one place and named another.
+        if (wholeSky()) {
+            throw new IllegalStateException("a whole-sky page is not"
+                    + " recentred: it is left for the ordinary chart,"
+                    + " or its central meridian follows the observer");
+        }
         return new ChartViewState(newCentre, fieldWidthDegrees, limitingMagnitude,
                 newTargetLabel, newTargetIdentity, projection);
+    }
+
+    /**
+     * The whole sky about another centre on the ecliptic (#687, R-4):
+     * the central meridian following the observer's zenith as chart
+     * time or place changes. Only from a whole-sky state, and only to
+     * another; everything but the centre is kept.
+     */
+    public ChartViewState wholeSkyAbout(SkyPosition centreOnTheEcliptic) {
+        if (!wholeSky()) {
+            throw new IllegalStateException(
+                    "only a whole-sky page follows the observer this way");
+        }
+        return new ChartViewState(centreOnTheEcliptic, fieldWidthDegrees,
+                limitingMagnitude, null, null, projection);
     }
 
     /**

@@ -29,6 +29,11 @@ public final class SheetFileName {
         String subject = state.targetLabel() != null
                 ? state.targetLabel() : scene.title();
         String slug = slug(subject);
+        // The whole sky has no field to name the file by (#687).
+        if (state.wholeSky()) {
+            return String.format(Locale.ROOT, "juranometria-whole-sky%s.%s",
+                    slug.isEmpty() ? "" : "-" + slug, format.extension());
+        }
         return String.format(Locale.ROOT, "juranometria-%s%sdeg.%s",
                 slug.isEmpty() ? "" : slug + "-",
                 juranometria.chart.FieldWidthText.whole(

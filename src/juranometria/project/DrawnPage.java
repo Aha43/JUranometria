@@ -146,14 +146,22 @@ public record DrawnPage(ChartScene scene, Projection projection) {
             throw new IllegalArgumentException("a page says what it is"
                     + " in some language (#350)");
         }
+        String limit = String.format(Locale.ROOT, "%.1f",
+                scene.limitingMagnitude());
+        // The whole sky says what it is in its own sentence (#687,
+        // R-12): no centre as a place, no radial field.
+        java.util.Optional<Projection.WholeSphere> whole =
+                projection.wholeSphere();
+        if (whole.isPresent()) {
+            return words.wholeSkySpokenPage(words.projection(projectionName()),
+                    centralLongitudeText(whole.get()), limit);
+        }
         String ra = String.format(Locale.ROOT, "%.4f",
                 scene.viewport().centre().raDegrees());
         String dec = String.format(Locale.ROOT, "%+.4f",
                 scene.viewport().centre().decDegrees());
         String field = juranometria.chart.FieldWidthText.title(
                 scene.viewport().fieldWidthDegrees());
-        String limit = String.format(Locale.ROOT, "%.1f",
-                scene.limitingMagnitude());
         // A closer field is called one aloud too (#544).
         if (scene.viewport().fieldWidthDegrees()
                 < juranometria.chart.ChartViewState.normalMinimumFieldDegrees()) {
@@ -184,4 +192,15 @@ public record DrawnPage(ChartScene scene, Projection projection) {
     // It was appended to the description with a space, which is a
     // language deciding where a clause goes; `page.spoken.bounded`
     // is now a complete sentence of its own.
+
+    /**
+     * The central ecliptic longitude as the page writes it (#687):
+     * one decimal, {@code Locale.ROOT}, handed to every language as
+     * text. The title block, speech and the exported sheet all read
+     * it from here so the three cannot round differently.
+     */
+    public static String centralLongitudeText(Projection.WholeSphere whole) {
+        return String.format(Locale.ROOT, "%.1f",
+                whole.centralLongitudeDegrees());
+    }
 }

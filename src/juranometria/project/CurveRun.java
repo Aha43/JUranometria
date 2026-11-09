@@ -175,4 +175,92 @@ public sealed interface CurveRun {
             return radiusAlong == radiusAcross;
         }
     }
+
+    /**
+     * A sampled run: consecutive points joined by straight chords
+     * (#687, architecture A).
+     *
+     * <p>The one word the curve seam gained for projections whose
+     * great circles are not conics. The seam's #298 rule - exact
+     * forms, no sampling - stands for every projection that has an
+     * exact form; this is the stated exception for the one that does
+     * not, and {@link Projection#greatCirclesAreConics} is where a
+     * projection says which it is. A polyline is never substituted
+     * for a conic.
+     *
+     * <p>{@code closed} is a run that came all the way round without
+     * meeting a seam or an edge: its last point joins its first and it
+     * has no ends for a name to hang on. An open run's ends are its
+     * first and last points, which lie where the curve left the page
+     * or met the seam.
+     */
+    record Polyline(java.util.List<PixelPoint> points, boolean closed)
+            implements CurveRun {
+
+        public Polyline {
+            if (points == null || points.size() < 2) {
+                throw new IllegalArgumentException(
+                        "a sampled run joins at least two points");
+            }
+            for (PixelPoint point : points) {
+                if (point == null || !Double.isFinite(point.x())
+                        || !Double.isFinite(point.y())) {
+                    throw new IllegalArgumentException(
+                            "a run passes through pixels: " + point);
+                }
+            }
+            points = java.util.List.copyOf(points);
+        }
+
+        @Override
+        public Optional<PixelPoint> from() {
+            return closed ? Optional.empty() : Optional.of(points.get(0));
+        }
+
+        @Override
+        public Optional<PixelPoint> to() {
+            return closed ? Optional.empty()
+                    : Optional.of(points.get(points.size() - 1));
+        }
+
+        /** The number of chords: one fewer than the points, or as many when closed. */
+        public int chords() {
+            return closed ? points.size() : points.size() - 1;
+        }
+
+        /**
+         * A point along the run by arc length: the fraction of the
+         * chords' total length walked from the first point. A closed
+         * run's walk ends where it began.
+         */
+        @Override
+        public PixelPoint at(double fraction) {
+            int chords = chords();
+            double total = 0.0;
+            double[] lengths = new double[chords];
+            for (int i = 0; i < chords; i++) {
+                PixelPoint a = points.get(i);
+                PixelPoint b = points.get((i + 1) % points.size());
+                lengths[i] = Math.hypot(b.x() - a.x(), b.y() - a.y());
+                total += lengths[i];
+            }
+            if (total == 0.0) {
+                return points.get(0);
+            }
+            double wanted = Math.max(0.0, Math.min(1.0, fraction)) * total;
+            double walked = 0.0;
+            for (int i = 0; i < chords; i++) {
+                if (walked + lengths[i] >= wanted || i == chords - 1) {
+                    PixelPoint a = points.get(i);
+                    PixelPoint b = points.get((i + 1) % points.size());
+                    double along = lengths[i] == 0.0 ? 0.0
+                            : (wanted - walked) / lengths[i];
+                    return new PixelPoint(a.x() + (b.x() - a.x()) * along,
+                            a.y() + (b.y() - a.y()) * along);
+                }
+                walked += lengths[i];
+            }
+            return points.get(points.size() - 1);
+        }
+    }
 }
