@@ -30,6 +30,7 @@ import juranometria.render.ChartStructure;
 import juranometria.render.EquatorialGrid;
 import juranometria.sky.LocalSky;
 import juranometria.sky.Observer;
+import juranometria.tool.WholeSkyBoundary;
 import juranometria.tool.WholeSkyComposition;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -168,6 +169,90 @@ class WholeSkyPageTest {
             }
         }
         assertTrue(ra >= 4 && dec >= 5, "numbered on both axes: " + ra + " RA, " + dec + " Dec");
+    }
+
+    /**
+     * Where the central-meridian rule runs out (#709). The central
+     * meridian is the zenith's ecliptic longitude, which is undefined at
+     * an ecliptic pole. The page still composes there and a hair either
+     * side - it once failed to paint, a cardinal point on the equinox
+     * being refused - and still holds what it promises whatever
+     * longitude rounding chose: the zenith on the central meridian,
+     * every body, every reference circle finite with no chord across
+     * the page, the quieted region the true side of the horizon, and
+     * the title its two lines. From a billionth of a degree out the
+     * longitude is the zenith's own, opposite on opposite sides of the
+     * pole. And when the pole is on the observer's meridian, that
+     * meridian is the central meridian and the seam: on the centre
+     * line or on the outline, nowhere else.
+     */
+    @Test
+    void thePageHoldsWithTheZenithAtAndAroundAnEclipticPole() throws Exception {
+        Instant when = OSLO_EVENING.instant();
+        for (SkyPosition pole : List.of(WholeSkyBoundary.NORTH_POLE,
+                WholeSkyBoundary.SOUTH_POLE)) {
+            Observer at = WholeSkyBoundary.observerUnder(pole, when);
+            assertTrue(new LocalSky(at).zenith().separationDegrees(pole) < 1e-11,
+                    "the zenith is the pole to rounding");
+            double[][] steps = {{0.0, 0.0}, {1e-12, 0.0}, {-1e-12, 0.0}, {0.0, 1e-12},
+                    {0.0, -1e-12}, {0.0, 1e-9}, {0.0, -1e-9}, {0.1, 0.0}, {-1.0, 0.0}};
+            double[] eastAndWest = new double[2];
+            for (double[] step : steps) {
+                String where = "the zenith " + step[0] + " in latitude and " + step[1]
+                        + " in longitude from the pole at declination " + pole.decDegrees();
+                Observer observer = new Observer(at.latitudeDegrees() + step[0],
+                        at.eastLongitudeDegrees() + step[1], when);
+                WholeSkyComposition.Page composed = WholeSkyComposition.paint(
+                        new WholeSkyComposition.Ask(observer, ChartPalette.WHITE_PAPER, "en",
+                                8.0, true, true, 60.0, W, H), SERVICES);
+                WholeSkyBoundary.Held[] measured = new WholeSkyBoundary.Held[1];
+                javax.swing.SwingUtilities.invokeAndWait(() -> measured[0] =
+                        WholeSkyBoundary.measure(composed, W, H));
+                WholeSkyBoundary.Held held = measured[0];
+                assertTrue(held.centralLongitudeDegrees() >= 0.0
+                        && held.centralLongitudeDegrees() < 360.0,
+                        "a central longitude, with " + where);
+                assertTrue(Math.abs(held.zenithOffCentralMeridianPx()) < 1e-6,
+                        "the zenith is on the central meridian (R-4), with " + where + ": "
+                                + held.zenithOffCentralMeridianPx());
+                assertEquals(9, held.bodies(), "every body, with " + where);
+                held.circles().forEach((name, circle) -> {
+                    assertTrue(circle.finite(), "the " + name + " is finite, with " + where);
+                    assertTrue(circle.longestChordPx() < 8.0, "no chord of the " + name
+                            + " crosses the page, with " + where + ": "
+                            + circle.longestChordPx());
+                });
+                assertEquals(1, held.circles().get("ecliptic").runs(),
+                        "the ecliptic is one run, with " + where);
+                assertEquals(1, held.circles().get("celestial equator").runs(),
+                        "the equator is one run, with " + where);
+                assertTrue(held.subdueDisagreement() < 0.005,
+                        "the quieted region is the true side of the horizon, with " + where
+                                + ": " + held.subdueDisagreement());
+                assertEquals(2, held.title().size(), "the title's two lines, with " + where);
+                assertTrue(held.title().get(1).matches(
+                        "Central meridian: zenith's ecliptic longitude \\d+\\.\\d°"
+                                + " · Stars to V 5\\.0"),
+                        "the central longitude is stated, with " + where + ": "
+                                + held.title().get(1));
+                if (Math.abs(step[0]) > 1e-10) {
+                    assertEquals(0, held.meridianPointsAstray(),
+                            "a meridian through the pole is the central meridian and the"
+                                    + " seam, with " + where);
+                }
+                if (step[1] == 1e-9) {
+                    eastAndWest[0] = held.centralLongitudeDegrees();
+                } else if (step[1] == -1e-9) {
+                    eastAndWest[1] = held.centralLongitudeDegrees();
+                }
+            }
+            double apart = Math.abs(((eastAndWest[0] - eastAndWest[1]) % 360.0 + 540.0)
+                    % 360.0 - 180.0);
+            assertTrue(Math.abs(apart - 180.0) < 0.1,
+                    "a billionth of a degree either side of the pole the central longitude is"
+                            + " the zenith's own, a half turn apart: " + eastAndWest[0]
+                            + " and " + eastAndWest[1]);
+        }
     }
 
     @Test

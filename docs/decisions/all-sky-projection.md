@@ -524,3 +524,62 @@ reaches the outline; on this machine's fonts the monitor pages carry 10 RA and
 10 Dec figures and the laptop page 8 and 10, two RA figures yielding to the
 title block (`platform.md`). Not exercised: the exported sheet drawn end to end (its words are
 held), keyboard focus of the toggle, and a Milky Way (no production ink).
+
+## 9. The ecliptic poles and high latitudes (#709)
+
+R-4 makes the central meridian the ecliptic longitude of the zenith. That
+longitude is undefined at an ecliptic pole and turns fast near one, and
+every case of §1-§8 is Oslo. #709 measured the production page there
+before the reader article qualified; the measurements are section 12 of
+`docs/studies/whole-sky/measurements.md`, held by `WholeSkyPageTest`
+through `juranometria.tool.WholeSkyBoundary`.
+
+**One correction, and it was not the whole sky's.** With the zenith at an
+ecliptic pole the horizon is the ecliptic, and the east or west point is
+the equinox at right ascension 0h. `LocalSky.positionOf` wrapped a
+negative right ascension by adding a turn; within 2.84e-14 degrees below
+zero that sum is exactly 360.0, which is not a right ascension, and the
+meridian module's cardinal points threw, so the page did not paint. No
+projection is involved: the code is #359's and the same observer failed
+on an ordinary chart. It now wraps with `SkyFrame.normalise`, which never
+lands on 360, and is held at the function (`LocalSkyTest`), because which
+observer's rounding lands in that window differs between machines.
+`SkyFootprint.at` carried the same wrap and has the same guard.
+
+**At the pole the rule does not pick a meridian, and nothing else
+fails.** Within about 1e-12 degrees of a pole the central longitude is
+decided by rounding. Every meridian passes through the pole, so every
+choice is a whole-sky map with the zenith on its central meridian: R-4
+holds and determines nothing. On every boundary page - at each pole and
+1e-12, 1e-9, 0.001, 0.1 and 1 degree from it - the page paints, the
+zenith is drawn on the central meridian, all nine bodies are on it, the
+reference circles are finite with no chord across the page, and the
+quieted region is the true side of the horizon. From 1e-9 degrees out the
+central longitude is the zenith's own. No fallback was added, because
+none was needed and none was ruled.
+
+**A meridian along the seam.** When the ecliptic pole is on the
+observer's meridian, that meridian is the central meridian and, for its
+other half, the seam itself. It is drawn on the outline, in as many runs
+as rounding puts its samples on one edge or the other. R-5's "a great
+circle is cut exactly once" and the as-built report's one run with its
+ends on the outline describe a circle that crosses the seam; this one
+lies along it.
+
+**What R-4 does at high latitude, measured and not ruled.** Through one
+sidereal day the central meridian goes all the way round only
+equatorward of the critical latitude, the J2000 ecliptic pole's
+declination of date (66.5588 at the measured instant), and it does not
+turn evenly: at Oslo its fastest turn is 1.09 degrees per minute against
+a mean of about a quarter of a degree. At latitude 66 the fastest turn is 10.5
+degrees per minute and a quarter turn takes 11 minutes; at 66.5, 97.4
+degrees per minute and 71 seconds. Poleward of the critical latitude the
+central meridian swings and returns - 158 degrees at latitude 67, 119 at
+70, 52 at 80 - about ecliptic longitude 90 in the north and 270 in the
+south, so the seam stays in one half of the ecliptic and that half is
+never in the middle of the map. Each page is a correct whole-sky map;
+what the latitude changes is how the map moves with chart time. Whether
+R-4 stands as ruled at these latitudes, with this stated, or is amended
+is the owner's ruling; the one alternative §4 measured is the midheaven,
+defined at every latitude, which left the zenith up to 51 degrees of
+longitude off the central meridian at Oslo.

@@ -271,3 +271,59 @@ Leaving the whole sky without choosing restores the ordinary page exactly: true 
 
 Draw times per page and the heap peak are printed to standard error by the run, and pinned nowhere: the #686 study measured 8 s and 0.95 GB for 20 candidate pages on the owner's machine, and the evidence heap limit is re-measured before any evidence-heavy road (`juranometria-heap-limit`).
 
+## 12. The zenith at and near an ecliptic pole (#709)
+
+The central meridian is the zenith's ecliptic longitude (R-4), which is undefined at an ecliptic pole and turns fast near one. Each row is the production page composed for an observer whose zenith stands where the row says, at 2026-12-15T21:00:00Z: at the pole to rounding (`WholeSkyBoundary.observerUnder`), or a step from it in latitude or in east longitude. Within about 1e-12 degrees of the pole the longitude is decided by rounding and is not printed: every meridian passes through the pole, so any choice is a correct map, and the rule does not pick one. `yes` means, column by column: the zenith is drawn within a millionth of a pixel of the central meridian; the ecliptic, the celestial equator, the horizon and the observer's meridian are finite with no chord between samples over 8 px; the ecliptic and the equator are one run each; the region below the drawn horizon disagrees with the true side of it on under 0.5 per cent of the sky, sampled off the middle line; and, where a determined step in latitude keeps the pole on the observer's meridian, every point of that meridian is on the central meridian's line or on the outline.
+
+| pole | the zenith stands | paints | central longitude | bodies | zenith on the central meridian | circles finite, no long chord | ecliptic and equator in one run each | Subdue true | meridian on the central line and the outline |
+|---|---|---|---|---|---|---|---|---|---|
+| north | at the pole | yes | decided by rounding | 9 | yes | yes | yes | yes | - |
+| north | 1e-12 in latitude | yes | decided by rounding | 9 | yes | yes | yes | yes | - |
+| north | -1e-12 in latitude | yes | decided by rounding | 9 | yes | yes | yes | yes | - |
+| north | 1e-12 in longitude | yes | decided by rounding | 9 | yes | yes | yes | yes | - |
+| north | -1e-12 in longitude | yes | decided by rounding | 9 | yes | yes | yes | yes | - |
+| north | 1e-9 in latitude | yes | 89.6 | 9 | yes | yes | yes | yes | yes |
+| north | -1e-9 in latitude | yes | 269.6 | 9 | yes | yes | yes | yes | yes |
+| north | 1e-9 in longitude | yes | 359.6 | 9 | yes | yes | yes | yes | - |
+| north | -1e-9 in longitude | yes | 179.6 | 9 | yes | yes | yes | yes | - |
+| north | 0.001 in latitude | yes | 89.6 | 9 | yes | yes | yes | yes | yes |
+| north | 0.1 in latitude | yes | 89.6 | 9 | yes | yes | yes | yes | yes |
+| north | -1 in latitude | yes | 269.6 | 9 | yes | yes | yes | yes | yes |
+| south | at the pole | yes | decided by rounding | 9 | yes | yes | yes | yes | - |
+| south | 1e-12 in latitude | yes | decided by rounding | 9 | yes | yes | yes | yes | - |
+| south | -1e-12 in latitude | yes | decided by rounding | 9 | yes | yes | yes | yes | - |
+| south | 1e-12 in longitude | yes | decided by rounding | 9 | yes | yes | yes | yes | - |
+| south | -1e-12 in longitude | yes | decided by rounding | 9 | yes | yes | yes | yes | - |
+| south | 1e-9 in latitude | yes | 89.6 | 9 | yes | yes | yes | yes | yes |
+| south | -1e-9 in latitude | yes | 269.6 | 9 | yes | yes | yes | yes | yes |
+| south | 1e-9 in longitude | yes | 179.6 | 9 | yes | yes | yes | yes | - |
+| south | -1e-9 in longitude | yes | 359.6 | 9 | yes | yes | yes | yes | - |
+| south | 0.001 in latitude | yes | 89.6 | 9 | yes | yes | yes | yes | yes |
+| south | 0.1 in latitude | yes | 89.6 | 9 | yes | yes | yes | yes | yes |
+| south | -1 in latitude | yes | 269.6 | 9 | yes | yes | yes | yes | yes |
+
+- `pole-north.png`: the page with the zenith 1e-9 degrees of east longitude from the north ecliptic pole. The horizon lies on the ecliptic, and the northern ecliptic hemisphere is the sky above it.
+
+When the observer's meridian passes through the map's pole - the latitude rows - half of it is the central meridian and the other half is the seam itself. It is drawn on the outline, in as many runs as rounding puts its samples on one edge or the other; the count is not pinned. Section 5's one run with its ends on the outline describes a circle that crosses the seam, not one that lies along it.
+
+**The same rule through one sidereal day, by latitude.** East longitude 10.75, from 2026-12-15T21:00:00Z, the zenith's ecliptic longitude every second of chart time. The critical latitude, where the zenith passes through the pole, is the J2000 ecliptic pole's declination of date: 66.5588 at this instant. Equatorward of it the central meridian goes all the way round, unevenly; poleward of it the central meridian swings and returns.
+
+| latitude | zenith nearest its ecliptic pole | the central meridian | fastest turn, degrees per minute | shortest time for a quarter turn |
+|---|---|---|---|---|
+| 0 | 66.56 degrees | goes all the way round | 0.27 | 339 min |
+| 30 | 36.56 degrees | goes all the way round | 0.36 | 262 min |
+| 59.91 | 6.65 degrees | goes all the way round | 1.09 | 97 min |
+| 65 | 1.56 degrees | goes all the way round | 3.89 | 29 min |
+| 66 | 0.56 degrees | goes all the way round | 10.5 | 11 min |
+| 66.5 | 0.06 degrees | goes all the way round | 97.4 | 71 s |
+| 66.6 | 0.04 degrees | swings 173 degrees and back, about longitude 90 | 138 | 50 s |
+| 67 | 0.44 degrees | swings 158 degrees and back, about longitude 90 | 12.7 | 9 min |
+| 68 | 1.44 degrees | swings 141 degrees and back, about longitude 90 | 3.73 | 32 min |
+| 70 | 3.44 degrees | swings 119 degrees and back, about longitude 90 | 1.43 | 89 min |
+| 75 | 8.44 degrees | swings 81 degrees and back, about longitude 90 | 0.44 | never turns a quarter |
+| 80 | 13.44 degrees | swings 52 degrees and back, about longitude 90 | 0.19 | never turns a quarter |
+| -66.5 | 0.06 degrees | goes all the way round | 97.4 | 71 s |
+| -67 | 0.44 degrees | swings 158 degrees and back, about longitude 270 | 12.7 | 9 min |
+
+Every one of these pages is a whole-sky map with the zenith on its central meridian. What the latitude changes is how the map moves with chart time: near a polar circle it turns a quarter in minutes or less once a day, and poleward of the circle the seam stays in one half of the ecliptic.
+
