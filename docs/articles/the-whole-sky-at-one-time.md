@@ -55,6 +55,9 @@ deep-sky symbols, the grid, the ecliptic, the horizon with its cardinal
 points and the zenith. Outside the ellipse there is nothing. The page
 says so aloud: *outside the elliptical outline is paper, not sky*.
 
+The Solar System bodies on the page are the ones you have switched on,
+no more and no fewer. Every figure in this article has all nine on.
+
 Read the middle line from left to right and every body is accounted for.
 The first column is the body's ecliptic longitude from the map's central
 meridian, positive to the left; the second its ecliptic latitude, its

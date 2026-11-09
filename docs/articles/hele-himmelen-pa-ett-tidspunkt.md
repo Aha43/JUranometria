@@ -57,6 +57,9 @@ himmelretningene og senit. Utenfor ellipsen er det ingenting. Siden sier
 det selv når den leses opp: *utenfor det elliptiske omrisset er det
 papir, ikke himmel*.
 
+Solsystemlegemene på siden er de du har slått på, verken flere eller
+færre. Hver figur i denne artikkelen har alle ni på.
+
 Les midtlinjen fra venstre mot høyre, og hvert legeme er gjort rede for.
 Første kolonne er legemets ekliptiske lengde fra kartets sentralmeridian,
 positiv mot venstre; den andre er den ekliptiske bredden, høyden over
