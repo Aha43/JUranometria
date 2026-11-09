@@ -93,42 +93,42 @@ Observer-aligned: the central meridian is the ecliptic longitude of the zenith, 
 
 ## 5. The seam and the sampled curves (R-5, R-6)
 
-Each reference great circle as the curve seam draws it on the whole sky: the number of runs (one, when the seam cuts it once), whether any closed, how far a run's end lies off the outline (`x^2/a^2 + y^2/b^2 - 1`, refined to the seam), and the longest chord between samples in pixels. Figure pieces and grid pieces that would cross more than 40 per cent of the page are counted as jumps.
+Each reference great circle as the curve seam draws it on the whole sky: the number of runs (one, when the seam cuts it once), whether any closed, whether every run's end lies on the outline (`|x^2/a^2 + y^2/b^2 - 1|` at most `1e-12` after refinement to the seam; the residual itself is machine precision and differs between platforms, so it is not pinned), and the longest chord between samples in pixels. Figure pieces and grid pieces that would cross more than 40 per cent of the page are counted as jumps.
 
-| page | curve | runs | closed | end off the outline | longest chord px |
+| page | curve | runs | closed | on the outline (<= 1e-12) | longest chord px |
 |---|---|---|---|---|---|
-| `evening-en-white` | ecliptic | 1 | no | 1.3e-15 | 1.39 |
-| `evening-en-white` | celestial equator | 1 | no | 1.3e-15 | 1.44 |
-| `evening-en-white` | horizon | 1 | no | 1.1e-15 | 1.68 |
-| `evening-en-white` | meridian | 1 | no | 1.1e-16 | 3.17 |
-| `evening-nb-black` | ecliptic | 1 | no | 1.3e-15 | 1.39 |
-| `evening-nb-black` | celestial equator | 1 | no | 1.3e-15 | 1.44 |
-| `evening-nb-black` | horizon | 1 | no | 1.1e-15 | 1.68 |
-| `evening-nb-black` | meridian | 1 | no | 1.1e-16 | 3.17 |
-| `evening-en-black` | ecliptic | 1 | no | 1.3e-15 | 1.39 |
-| `evening-en-black` | celestial equator | 1 | no | 1.3e-15 | 1.44 |
-| `evening-en-black` | horizon | 1 | no | 1.1e-15 | 1.68 |
-| `evening-en-black` | meridian | 1 | no | 1.1e-16 | 3.17 |
-| `evening-nb-white` | ecliptic | 1 | no | 1.3e-15 | 1.39 |
-| `evening-nb-white` | celestial equator | 1 | no | 1.3e-15 | 1.44 |
-| `evening-nb-white` | horizon | 1 | no | 1.1e-15 | 1.68 |
-| `evening-nb-white` | meridian | 1 | no | 1.1e-16 | 3.17 |
-| `evening-en-white-laptop` | ecliptic | 1 | no | 1.3e-15 | 1.00 |
-| `evening-en-white-laptop` | celestial equator | 1 | no | 1.7e-15 | 1.04 |
-| `evening-en-white-laptop` | horizon | 1 | no | 1.1e-15 | 1.21 |
-| `evening-en-white-laptop` | meridian | 1 | no | 8.9e-16 | 2.28 |
-| `evening-en-white-subdue-off` | ecliptic | 1 | no | 1.3e-15 | 1.39 |
-| `evening-en-white-subdue-off` | celestial equator | 1 | no | 1.3e-15 | 1.44 |
-| `evening-en-white-subdue-off` | horizon | 1 | no | 1.1e-15 | 1.68 |
-| `evening-en-white-subdue-off` | meridian | 1 | no | 1.1e-16 | 3.17 |
-| `gathering-en-white` | ecliptic | 1 | no | 1.3e-15 | 1.39 |
-| `gathering-en-white` | celestial equator | 1 | no | 1.1e-15 | 1.39 |
-| `gathering-en-white` | horizon | 1 | no | 1.1e-15 | 1.43 |
-| `gathering-en-white` | meridian | 1 | no | 8.9e-16 | 2.49 |
-| `spread-en-white` | ecliptic | 1 | no | 1.3e-15 | 1.39 |
-| `spread-en-white` | celestial equator | 1 | no | 8.9e-16 | 1.44 |
-| `spread-en-white` | horizon | 1 | no | 1.6e-15 | 1.71 |
-| `spread-en-white` | meridian | 1 | no | 2.2e-16 | 3.42 |
+| `evening-en-white` | ecliptic | 1 | no | yes | 1.39 |
+| `evening-en-white` | celestial equator | 1 | no | yes | 1.44 |
+| `evening-en-white` | horizon | 1 | no | yes | 1.68 |
+| `evening-en-white` | meridian | 1 | no | yes | 3.17 |
+| `evening-nb-black` | ecliptic | 1 | no | yes | 1.39 |
+| `evening-nb-black` | celestial equator | 1 | no | yes | 1.44 |
+| `evening-nb-black` | horizon | 1 | no | yes | 1.68 |
+| `evening-nb-black` | meridian | 1 | no | yes | 3.17 |
+| `evening-en-black` | ecliptic | 1 | no | yes | 1.39 |
+| `evening-en-black` | celestial equator | 1 | no | yes | 1.44 |
+| `evening-en-black` | horizon | 1 | no | yes | 1.68 |
+| `evening-en-black` | meridian | 1 | no | yes | 3.17 |
+| `evening-nb-white` | ecliptic | 1 | no | yes | 1.39 |
+| `evening-nb-white` | celestial equator | 1 | no | yes | 1.44 |
+| `evening-nb-white` | horizon | 1 | no | yes | 1.68 |
+| `evening-nb-white` | meridian | 1 | no | yes | 3.17 |
+| `evening-en-white-laptop` | ecliptic | 1 | no | yes | 1.00 |
+| `evening-en-white-laptop` | celestial equator | 1 | no | yes | 1.04 |
+| `evening-en-white-laptop` | horizon | 1 | no | yes | 1.21 |
+| `evening-en-white-laptop` | meridian | 1 | no | yes | 2.28 |
+| `evening-en-white-subdue-off` | ecliptic | 1 | no | yes | 1.39 |
+| `evening-en-white-subdue-off` | celestial equator | 1 | no | yes | 1.44 |
+| `evening-en-white-subdue-off` | horizon | 1 | no | yes | 1.68 |
+| `evening-en-white-subdue-off` | meridian | 1 | no | yes | 3.17 |
+| `gathering-en-white` | ecliptic | 1 | no | yes | 1.39 |
+| `gathering-en-white` | celestial equator | 1 | no | yes | 1.39 |
+| `gathering-en-white` | horizon | 1 | no | yes | 1.43 |
+| `gathering-en-white` | meridian | 1 | no | yes | 2.49 |
+| `spread-en-white` | ecliptic | 1 | no | yes | 1.39 |
+| `spread-en-white` | celestial equator | 1 | no | yes | 1.44 |
+| `spread-en-white` | horizon | 1 | no | yes | 1.71 |
+| `spread-en-white` | meridian | 1 | no | yes | 3.42 |
 
 | page | figure jumps | grid jumps | constellation names anchored | stranded |
 |---|---|---|---|---|

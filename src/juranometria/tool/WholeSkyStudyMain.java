@@ -149,6 +149,14 @@ public final class WholeSkyStudyMain {
         return specs;
     }
 
+    /**
+     * A run's end counts as on the outline when its normalised residual is
+     * within this. The residual is machine precision (1e-16 on one platform,
+     * 2e-16 on another), so the report states the claim, not the noise.
+     */
+    private static final double ON_THE_OUTLINE_TOLERANCE = 1e-12;
+    private static final String ON_THE_OUTLINE = "1e-12";
+
     /** One great circle on a page: how the sampled route drew it. */
     record Curve(String name, int runs, boolean closed, double endResidualMax,
                  double longestChordPx) {
@@ -511,18 +519,22 @@ public final class WholeSkyStudyMain {
         p("## 5. The seam and the sampled curves (R-5, R-6)");
         p("");
         p("Each reference great circle as the curve seam draws it on the whole sky: the number"
-                + " of runs (one, when the seam cuts it once), whether any closed, how far a"
-                + " run's end lies off the outline (`x^2/a^2 + y^2/b^2 - 1`, refined to the"
-                + " seam), and the longest chord between samples in pixels. Figure pieces and"
-                + " grid pieces that would cross more than 40 per cent of the page are counted"
-                + " as jumps.");
+                + " of runs (one, when the seam cuts it once), whether any closed, whether every"
+                + " run's end lies on the outline (`|x^2/a^2 + y^2/b^2 - 1|` at most"
+                + " `" + ON_THE_OUTLINE + "` after refinement to the seam; the residual itself is"
+                + " machine precision and differs between platforms, so it is not pinned), and"
+                + " the longest chord between samples in pixels. Figure pieces and grid pieces"
+                + " that would cross more than 40 per cent of the page are counted as jumps.");
         p("");
-        p("| page | curve | runs | closed | end off the outline | longest chord px |");
+        p("| page | curve | runs | closed | on the outline (<= " + ON_THE_OUTLINE
+                + ") | longest chord px |");
         p("|---|---|---|---|---|---|");
         for (Drawn d : drawn) {
             for (Curve c : d.measured().curves()) {
-                p(f("| `%s` | %s | %d | %s | %.1e | %.2f |", d.spec().name(), c.name(), c.runs(),
-                        c.closed() ? "yes" : "no", c.endResidualMax(), c.longestChordPx()));
+                p(f("| `%s` | %s | %d | %s | %s | %.2f |", d.spec().name(), c.name(), c.runs(),
+                        c.closed() ? "yes" : "no",
+                        c.endResidualMax() <= ON_THE_OUTLINE_TOLERANCE ? "yes" : "no",
+                        c.longestChordPx()));
             }
         }
         p("");

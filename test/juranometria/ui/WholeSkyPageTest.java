@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -48,14 +49,27 @@ class WholeSkyPageTest {
     private static final int H = 1000;
     private static final Observer OSLO_EVENING =
             new Observer(59.91, 10.75, Instant.parse("2026-12-15T21:00:00Z"));
-    private static final WholeSkyComposition.Services SERVICES =
-            new WholeSkyComposition.Services();
+    /** Every planet pack, loaded once for this class and released after it. */
+    private static WholeSkyComposition.Services SERVICES;
     private static WholeSkyComposition.Page page;
 
     @BeforeAll
     static void compose() throws Exception {
+        SERVICES = new WholeSkyComposition.Services();
         page = WholeSkyComposition.paint(new WholeSkyComposition.Ask(OSLO_EVENING,
                 ChartPalette.WHITE_PAPER, "en", 8.0, true, true, 60.0, W, H), SERVICES);
+    }
+
+    /**
+     * The services hold every planet pack (hundreds of megabytes of kernel
+     * bytes) and the page a 2000x1000 chart. Held in static fields they would
+     * stay alive for the rest of the suite; release them (#687, CI run
+     * 42538687161 went out of heap at the suite's end).
+     */
+    @AfterAll
+    static void release() {
+        page = null;
+        SERVICES = null;
     }
 
     @Test
