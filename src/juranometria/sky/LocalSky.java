@@ -212,13 +212,18 @@ public record LocalSky(Observer observer) {
      * observer's north point about 1e-12 rad behind the limb of its
      * own zenith globe. This form's error stays a few ulps
      * everywhere.
+     *
+     * <p>The right ascension is wrapped by the frame's own
+     * {@link SkyFrame#normalise}, which never lands on 360 (#709).
+     * Adding a turn to a negative angle is not enough: an angle
+     * within 2.84e-14 degrees below zero plus 360 rounds to exactly
+     * 360.0, which is not a right ascension, and the point was
+     * refused where it stood - on the equinox, which is where the
+     * east or west point is when the zenith is an ecliptic pole.
      */
-    private static SkyPosition positionOf(double[] v) {
-        double ra = Math.toDegrees(Math.atan2(v[1], v[0]));
-        if (ra < 0) {
-            ra += 360.0;
-        }
-        return new SkyPosition(ra, Math.toDegrees(Math.atan2(v[2],
-                Math.hypot(v[0], v[1]))));
+    static SkyPosition positionOf(double[] v) {
+        return new SkyPosition(
+                SkyFrame.normalise(Math.toDegrees(Math.atan2(v[1], v[0]))),
+                Math.toDegrees(Math.atan2(v[2], Math.hypot(v[0], v[1]))));
     }
 }

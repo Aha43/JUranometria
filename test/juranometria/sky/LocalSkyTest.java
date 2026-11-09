@@ -238,6 +238,42 @@ class LocalSkyTest {
                         + " and unreachable through this model");
     }
 
+    // ---- the wrap at the equinox (#709) ----------------------------
+
+    /**
+     * A direction a hair west of right ascension zero is still a
+     * direction. Adding a turn to a negative angle within 2.84e-14
+     * degrees of zero rounds to exactly 360.0, which is not a right
+     * ascension; the east or west point stands exactly there when the
+     * zenith is an ecliptic pole, and the page then failed to paint
+     * (#709). Held at the function, because which observer's rounding
+     * lands in that window differs from one machine to the next.
+     */
+    @Test
+    void aDirectionAHairWestOfTheEquinoxIsStillARightAscension() {
+        SkyPosition equinox = new SkyPosition(0.0, 0.0);
+        for (double hair : new double[] {
+                -1e-17, -1e-16, -2e-16, -4.9e-16, -5e-16, -1e-15, -1e-12}) {
+            SkyPosition at = LocalSky.positionOf(
+                    new double[] {1.0, hair, 0.0});
+            assertTrue(at.raDegrees() >= 0.0 && at.raDegrees() < 360.0,
+                    "a right ascension, for a hair of " + hair + ": "
+                            + at.raDegrees());
+            assertTrue(at.separationDegrees(equinox) < 1e-9,
+                    "and still at the equinox, for a hair of " + hair);
+        }
+        // Nothing else moved: every other direction keeps the angle
+        // the old wrap gave it, to the bit.
+        assertEquals(270.0, LocalSky.positionOf(
+                new double[] {0.0, -1.0, 0.0}).raDegrees(), 0.0);
+        assertEquals(Math.toDegrees(Math.atan2(-1e-12, 1.0)) + 360.0,
+                LocalSky.positionOf(
+                        new double[] {1.0, -1e-12, 0.0}).raDegrees(), 0.0);
+        assertEquals(Math.toDegrees(Math.atan2(1.0, -1.0)),
+                LocalSky.positionOf(
+                        new double[] {-1.0, 1.0, 0.0}).raDegrees(), 0.0);
+    }
+
     // ---- determinism -----------------------------------------------
 
     @Test
