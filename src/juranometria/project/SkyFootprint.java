@@ -504,9 +504,14 @@ public final class SkyFootprint {
      * The place this far from here, in this direction: the centre's
      * unit vector rotated about the local east axis and then about
      * the local axis toward it.
+     *
+     * <p>A right ascension a hair below zero must not be wrapped onto
+     * exactly 360.0, which is not a right ascension (#709: the same
+     * wrap in {@code LocalSky} refused a cardinal point at the
+     * equinox). {@code PageExtent} states the same guard.
      */
-    private static SkyPosition at(SkyPosition centre, double radius,
-                                  double bearing) {
+    static SkyPosition at(SkyPosition centre, double radius,
+                          double bearing) {
         double dec = Math.toRadians(centre.decDegrees());
         double ra = Math.toRadians(centre.raDegrees());
         double sinDec = Math.sin(dec) * Math.cos(radius)
@@ -518,6 +523,9 @@ public final class SkyFootprint {
         double degrees = Math.toDegrees(newRa) % 360.0;
         if (degrees < 0.0) {
             degrees += 360.0;
+        }
+        if (degrees >= 360.0) {
+            degrees = 0.0;
         }
         return new SkyPosition(degrees, Math.toDegrees(newDec));
     }

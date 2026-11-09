@@ -283,6 +283,31 @@ class SkyFootprintTest {
                         + " ordinary footprint to carry anywhere");
     }
 
+    /**
+     * An outline point a hair west of right ascension zero is still a
+     * place (#709). The wrap that adds a turn to a tiny negative angle
+     * lands on exactly 360.0, which is not a right ascension; an
+     * object centred on 0h with a sample bearing a hair west of north
+     * would have had no outline at all.
+     */
+    @Test
+    void anOutlinePointAHairWestOfZeroHoursIsStillAPlace() {
+        SkyPosition onZeroHours = new SkyPosition(0.0, 10.0);
+        for (double hair : new double[] {-1e-17, -1e-16, -1e-15, -1e-12}) {
+            SkyPosition at = SkyFootprint.at(onZeroHours, 0.01, hair);
+            assertTrue(at.raDegrees() >= 0.0 && at.raDegrees() < 360.0,
+                    "a right ascension, for a bearing of " + hair + ": "
+                            + at.raDegrees());
+            assertEquals(0.01, Math.toRadians(
+                    at.separationDegrees(onZeroHours)), 1e-9,
+                    "and still the stated distance away");
+        }
+        // An ordinary bearing keeps its place.
+        SkyPosition east = SkyFootprint.at(onZeroHours, 0.01, Math.PI / 2);
+        assertTrue(east.raDegrees() > 0.5 && east.raDegrees() < 0.6,
+                "due east of 0h is a little past it: " + east.raDegrees());
+    }
+
     private static double arcminToPx(double arcmin) {
         return Math.toRadians(arcmin / 60.0)
                 * mapping().pixelsPerPlaneUnit();
