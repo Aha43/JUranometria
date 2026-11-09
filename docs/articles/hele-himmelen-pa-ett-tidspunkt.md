@@ -145,16 +145,27 @@ deklinasjon, tegnet på et kart bygget rundt ekliptikken. Det misforholdet
 er det mest lærerike på siden. Løft det fram med *Fremheving* ▸
 *Ekvatorialt rutenett*, og projeksjonen viser seg selv.
 
+[![Kveldens kart over hele himmelen med det ekvatoriale rutenettet
+tegnet i kraftige blå linjer: meridianene stråler ut fra et punkt ved
+siden av Polaris øverst i midten, sirklene med høy deklinasjon er
+lukkede sløyfer rundt det punktet, og de lavere sirklene løper tvers
+over ellipsen som lange
+bølger.](images/whole-sky-evening-en-white-grid.png)](images/whole-sky-evening-en-white-grid.png)
+
+*Den samme kvelden med det ekvatoriale rutenettet løftet fram med
+Fremheving. Ingenting annet ved siden er endret; rutenettet viser hva
+projeksjonen gjør.*
+
 Rektascensjonsmeridianene møtes ikke øverst på kartet. De samles i
 himmelpolen ved siden av Polaris, godt under toppen og som regel til én
-side for sentralmeridianen, og deklinasjonssirklene lukker seg rundt det
-punktet i stedet for å løpe tvers over siden. Himmelekvator er en lang
-bølge som krysser den rette ekliptikken i de to jevndøgnspunktene. Nær
-sentrum har rutene i nettet nesten den formen de har på himmelen; mot
-sømmen heller de og blir lange. Men fordi kartet bevarer arealer, dekker
-hver rute mellom de samme to deklinasjonssirklene like stort areal på
-papiret, uansett hvordan den er bøyd. Form er det rutenettet mister på
-vei mot kanten, aldri størrelse.
+side for sentralmeridianen. Sirklene med høy deklinasjon lukker seg
+rundt det punktet; de som ligger nærmere himmelekvator, løper tvers over
+siden som lange bølger, og ekvator selv krysser den rette ekliptikken i
+de to jevndøgnspunktene. Nær sentrum har rutene i nettet nesten den
+formen de har på himmelen; mot sømmen heller de og blir lange. Men fordi
+kartet bevarer arealer, dekker hver rute mellom de samme to
+deklinasjonssirklene like stort areal på papiret, uansett hvordan den er
+bøyd. Form er det rutenettet mister på vei mot kanten, aldri størrelse.
 
 Rutenettet er sparsomt nummerert, og bare der et tall får plass i sin
 helhet. Rektascensjon skrives på papiret utenfor ellipsen der en

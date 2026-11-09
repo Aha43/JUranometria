@@ -40,6 +40,7 @@ class WholeSkyArticleTest {
     /** Each figure, and the evidence page it is a byte-for-byte copy of. */
     private static final Map<String, String> FIGURES = Map.of(
             "whole-sky-evening-en-white", "evening-en-white",
+            "whole-sky-evening-en-white-grid", "evening-en-white-grid",
             "whole-sky-evening-nb-black", "evening-nb-black",
             "whole-sky-evening-en-white-subdue-off", "evening-en-white-subdue-off",
             "whole-sky-spread-en-white", "spread-en-white",

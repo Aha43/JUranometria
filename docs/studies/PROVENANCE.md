@@ -1034,6 +1034,7 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/venus-on-the-chart/transit-2012-6.png` | `536d9052dd245ee1e792fc3a8885e31f6cf6cdc617ebb1d144527fea202e385e` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/venus-on-the-chart/transit-2012-8.png` | `0d3ad976e2483dd5341fc0ec3ebb1fb93217c10fd461561e27aff76769691b2a` | 2026-10-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/whole-sky/evening-en-black.png` | `3a732dec6d89ffb6144de852c8d41e010fcf3fa597173613656f828e18bdc0b0` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/whole-sky/evening-en-white-grid.png` | `2052f2d2b81eb835e3e44f81c6ac152a06a68c62cd2038228b8a697ac51200da` | 2026-11-09 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/whole-sky/evening-en-white-laptop.png` | `5c47567ff69bece7ef93999508e0b5debfe857fe6c15172509c1e3925d686299` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/whole-sky/evening-en-white-subdue-off.png` | `1ba5663b9ec54c34d63a40efb0b8f7fb6498e6d1c5ed07ee51fb7d99cdfb5ca4` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/whole-sky/evening-en-white.png` | `6f004f681d59aec7922b2b004038789e01d6f9271a1c72142570704a0af77423` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |

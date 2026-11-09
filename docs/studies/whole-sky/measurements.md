@@ -257,6 +257,7 @@ Leaving the whole sky without choosing restores the ordinary page exactly: true 
 | `spread-en-white.png` | spread | 2000x1000 | white-paper | en | on | 9 |
 | `journey-1-whole-sky.png` | evening | 2000x1000 | white-paper | en | on | 9 |
 | `journey-2-open-here.png` | evening | 2000x1000 | white-paper | en | on | the ordinary 60-degree chart about Saturn |
+| `evening-en-white-grid.png` | evening | 2000x1000 | white-paper | en | on | 9 |
 
 - `evening-en-white.png`: the evening case, English, white paper, external monitor
 - `evening-nb-black.png`: the same, Norwegian, black sky
@@ -266,6 +267,7 @@ Leaving the whole sky without choosing restores the ordinary page exactly: true 
 - `evening-en-white-subdue-off.png`: Subdue below horizon off
 - `gathering-en-white.png`: the gathering case
 - `spread-en-white.png`: the spread case
+- `evening-en-white-grid.png`: the evening case with the equatorial grid raised by the chart's own Emphasis, for the reader article (#705). Emphasis offers the equatorial grid on the whole sky: true; raised: true; the title block and the spoken description are those of `evening-en-white`: true.
 
 ## 11. Cost
 

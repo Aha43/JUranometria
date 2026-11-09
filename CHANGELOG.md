@@ -48,9 +48,10 @@ meridian down it, what the map keeps and where it shears, how the
 horizon, Subdue below horizon, the seam and the grid read on it, how
 every Solar System body is accounted for, how Open here returns to an
 ordinary chart, what zoom, pan and Reset view do there, which maps were
-drawn and not chosen, and what the view does not claim. Its six figures
-are the as-built study's pages byte for byte, and every number is held
-to the record it is read from in both languages.
+drawn and not chosen, and what the view does not claim. Its seven
+figures are the as-built study's pages byte for byte - one of them new,
+the evening page with the equatorial grid raised by Emphasis - and every
+number is held to the record it is read from in both languages.
 
 ## [6.4.0] - 2026-11-07
 

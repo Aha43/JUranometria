@@ -43,6 +43,7 @@ import juranometria.render.ChartHitTest;
 import juranometria.render.ChartOptions;
 import juranometria.render.ChartPalette;
 import juranometria.render.ChartRenderer;
+import juranometria.render.ChartStructure;
 import juranometria.render.EquatorialGrid;
 import juranometria.sheet.PaperSize;
 import juranometria.sky.Ecliptic;
@@ -231,7 +232,8 @@ public final class WholeSkyStudyMain {
         wordsSection(drawn);
         bookmarkSection();
         journeySection(services);
-        pagesSection(drawn);
+        GridRaised raised = gridRaised(services);
+        pagesSection(drawn, raised);
         costSection();
         boundarySection(services);
 
@@ -692,7 +694,45 @@ public final class WholeSkyStudyMain {
         p("");
     }
 
-    private static void pagesSection(List<Drawn> drawn) {
+    /** The page drawn with the equatorial grid raised, and what it kept. */
+    record GridRaised(boolean offered, boolean raised, int bodies, boolean sameWords) {
+    }
+
+    /**
+     * The evening page with the equatorial grid raised through the
+     * chart's own Emphasis (#705): the page on which the graticule
+     * shows the projection - the meridians gathering at the celestial
+     * pole, not at the top of an ecliptic map, and every cell keeping
+     * its area as it loses its shape. Nothing else about the page
+     * changes: the same bodies, the same title, the same spoken words.
+     */
+    private static GridRaised gridRaised(WholeSkyComposition.Services services)
+            throws Exception {
+        Case evening = CASES.get(0);
+        WholeSkyComposition.Page page = WholeSkyComposition.paint(
+                new WholeSkyComposition.Ask(evening.oslo(), ChartPalette.WHITE_PAPER, "en",
+                        READER_LIMIT, true, true, ORDINARY_FIELD, MONITOR_W, MONITOR_H), services);
+        GridRaised[] out = new GridRaised[1];
+        BufferedImage[] image = new BufferedImage[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            ChartRenderer renderer = new ChartRenderer(StarSizePolicy.DEFAULT, page.words());
+            List<String> titleBefore = renderer.titleBlockLines(page.chart().currentScene());
+            String spokenBefore = page.chart().getAccessibleContext().getAccessibleDescription();
+            boolean offered = page.chart().emphasisAvailable(ChartStructure.EQUATORIAL_GRID);
+            page.chart().toggleEmphasis(ChartStructure.EQUATORIAL_GRID);
+            image[0] = WholeSkyComposition.paintNow(page.chart(), MONITOR_W, MONITOR_H);
+            out[0] = new GridRaised(offered,
+                    page.chart().emphasizedSet().contains(ChartStructure.EQUATORIAL_GRID),
+                    page.chart().renderedBodies().size(),
+                    titleBefore.equals(renderer.titleBlockLines(page.chart().currentScene()))
+                            && spokenBefore.equals(page.chart().getAccessibleContext()
+                                    .getAccessibleDescription()));
+        });
+        ImageIO.write(image[0], "png", OUT.resolve("evening-en-white-grid.png").toFile());
+        return out[0];
+    }
+
+    private static void pagesSection(List<Drawn> drawn, GridRaised raised) {
         p("## 10. Pages");
         p("");
         p("| page | case | extent | palette | language | Subdue | bodies |");
@@ -705,10 +745,17 @@ public final class WholeSkyStudyMain {
         }
         p("| `journey-1-whole-sky.png` | evening | 2000x1000 | white-paper | en | on | 9 |");
         p("| `journey-2-open-here.png` | evening | 2000x1000 | white-paper | en | on | the ordinary 60-degree chart about Saturn |");
+        p(f("| `evening-en-white-grid.png` | evening | 2000x1000 | white-paper | en | on | %d |",
+                raised.bodies()));
         p("");
         for (Drawn d : drawn) {
             p("- `" + d.spec().name() + ".png`: " + d.spec().caption());
         }
+        p("- `evening-en-white-grid.png`: the evening case with the equatorial grid raised by"
+                + " the chart's own Emphasis, for the reader article (#705). Emphasis offers the"
+                + " equatorial grid on the whole sky: " + raised.offered() + "; raised: "
+                + raised.raised() + "; the title block and the spoken description are those of"
+                + " `evening-en-white`: " + raised.sameWords() + ".");
         p("");
     }
 

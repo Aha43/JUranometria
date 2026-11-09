@@ -146,16 +146,27 @@ declination, drawn on a map built around the ecliptic. That mismatch is
 the most instructive thing on the page. Raise it with *Emphasis* ▸
 *Equatorial grid* and the projection shows itself.
 
+[![The evening's whole-sky map with the equatorial grid drawn in strong
+blue lines: the meridians fan out from a point beside Polaris in the
+upper middle, the circles of high declination are closed loops around
+that point, and the lower circles run across the ellipse as long
+waves.](images/whole-sky-evening-en-white-grid.png)](images/whole-sky-evening-en-white-grid.png)
+
+*The same evening with the equatorial grid raised by Emphasis. Nothing
+else about the page has changed; the grid shows what the projection
+does.*
+
 The meridians of right ascension do not meet at the top of the map. They
 gather at the celestial pole beside Polaris, well below the top and
-usually to one side of the central meridian, and the circles of
-declination close around that point instead of running across the page.
-The celestial equator is a long wave that crosses the straight ecliptic
-at the two equinoxes. Near the centre the cells of the grid are close to
-the shapes they have on the sky; towards the seam they lean and
-lengthen. But because the map keeps areas, every cell between the same
-two circles of declination covers the same area of paper, however it is
-bent. Shape is what the grid loses on its way to the edge, never size.
+usually to one side of the central meridian. The circles of high
+declination close around that point; those nearer the celestial equator
+run across the page as long waves, and the equator itself crosses the
+straight ecliptic at the two equinoxes. Near the centre the cells of the
+grid are close to the shapes they have on the sky; towards the seam they
+lean and lengthen. But because the map keeps areas, every cell between
+the same two circles of declination covers the same area of paper,
+however it is bent. Shape is what the grid loses on its way to the edge,
+never size.
 
 The grid is numbered sparsely, and only where a figure fits whole. Right
 ascension is written on the paper outside the ellipse where a meridian
