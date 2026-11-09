@@ -40,6 +40,18 @@ does at and near the poles, and how its central meridian moves at high
 latitude, is measured in the as-built report (section 12) and recorded
 in `docs/decisions/all-sky-projection.md` (section 9).
 
+**The whole sky at one time: the reader article (#705).** A bilingual
+article, *The whole sky at one time* / *Hele himmelen på ett tidspunkt*,
+explains the whole-sky page: why no flat map keeps everything, why the
+atlas chose Hammer with the ecliptic across the middle and the zenith's
+meridian down it, what the map keeps and where it shears, how the
+horizon, Subdue below horizon, the seam and the grid read on it, how
+every Solar System body is accounted for, how Open here returns to an
+ordinary chart, what zoom, pan and Reset view do there, which maps were
+drawn and not chosen, and what the view does not claim. Its six figures
+are the as-built study's pages byte for byte, and every number is held
+to the record it is read from in both languages.
+
 ## [6.4.0] - 2026-11-07
 
 **Keep one Controller section open (#698, #699).** A slim row at the
