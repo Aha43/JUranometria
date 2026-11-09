@@ -566,7 +566,7 @@ circle is cut exactly once" and the as-built report's one run with its
 ends on the outline describe a circle that crosses the seam; this one
 lies along it.
 
-**What R-4 does at high latitude, measured and not ruled.** Through one
+**What R-4 does at high latitude, measured.** Through one
 sidereal day the central meridian goes all the way round only
 equatorward of the critical latitude, the J2000 ecliptic pole's
 declination of date (66.5588 at the measured instant), and it does not
@@ -578,8 +578,23 @@ central meridian swings and returns - 158 degrees at latitude 67, 119 at
 70, 52 at 80 - about ecliptic longitude 90 in the north and 270 in the
 south, so the seam stays in one half of the ecliptic and that half is
 never in the middle of the map. Each page is a correct whole-sky map;
-what the latitude changes is how the map moves with chart time. Whether
-R-4 stands as ruled at these latitudes, with this stated, or is amended
-is the owner's ruling; the one alternative §4 measured is the midheaven,
-defined at every latitude, which left the zenith up to 51 degrees of
-longitude off the central meridian at Oslo.
+what the latitude changes is how the map moves with chart time. The one
+alternative §4 measured is the midheaven, defined at every latitude,
+which left the zenith up to 51 degrees of longitude off the central
+meridian at Oslo.
+
+**Ruling (the owner, 2026-11-09): R-4 stands unchanged.** No fallback and
+no hysteresis is added near the ecliptic poles. Every page remains
+geometrically correct; a fallback would introduce another orientation
+rule and discontinuities of its own. The consequence is stated here and
+in the reader article (#705): near the polar circles the alignment is
+sensitive to time - at latitude 66.5 the central meridian can turn a
+quarter revolution in 71 seconds once in a sidereal day; poleward of the
+critical latitude it swings and returns instead of going all the way
+round; at an ecliptic pole longitude itself is undefined, so rounding may
+choose any central meridian, and every choice gives a correct whole-sky
+map and horizon. The page remains true, but a small change of chart time
+can rotate it sharply. The `LocalSky.positionOf` correction is accepted,
+and the `SkyFootprint.at` guard is kept: it is the same invalid-360
+defect, proven at its own function boundary, and matches the existing
+`PageExtent` defence, so it does not wait for a catalogue reproduction.
