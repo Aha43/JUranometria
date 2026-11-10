@@ -23,7 +23,7 @@ bookmarked, with its chart time and place; existing bookmarks are
 unchanged. Nothing about the mode is remembered between sessions. The
 graticule is numbered sparsely at the map's outline and along its central
 meridian, each figure placed only where it fits whole. Every existing page
-is drawn exactly as before. *Unqualified candidate.*
+is drawn exactly as before.
 
 **A horizon whose east or west point is the equinox (#709).** With the
 mathematical horizon shown, a chart could fail to draw when one of the
