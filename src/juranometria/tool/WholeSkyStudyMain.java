@@ -48,6 +48,7 @@ import juranometria.sheet.PaperSize;
 import juranometria.sky.Ecliptic;
 import juranometria.sky.LocalSky;
 import juranometria.sky.Observer;
+import juranometria.sky.SkyFrame;
 import juranometria.ui.ReferenceInk;
 
 /**
@@ -232,6 +233,7 @@ public final class WholeSkyStudyMain {
         journeySection(services);
         pagesSection(drawn);
         costSection();
+        boundarySection(services);
 
         PlatformEvidence.write(platform, OUT.resolve("platform.md").toString());
     }
@@ -726,6 +728,155 @@ public final class WholeSkyStudyMain {
                 + " and pinned nowhere: the #686 study measured 8 s and 0.95 GB for 20"
                 + " candidate pages on the owner's machine, and the evidence heap limit is"
                 + " re-measured before any evidence-heavy road (`juranometria-heap-limit`).");
+        p("");
+    }
+
+    /** One place to stand near a pole: a step in latitude and in east longitude, in degrees. */
+    record Step(String stands, double north, double east, boolean longitudeDetermined) {
+
+        /**
+         * A determined step in latitude keeps the pole on the observer's
+         * meridian, so that meridian is the central meridian and the seam.
+         */
+        boolean meridianThroughThePole() {
+            return longitudeDetermined && east == 0.0;
+        }
+    }
+
+    /**
+     * Where the central-meridian rule runs out (#709): the zenith at and
+     * around each ecliptic pole. Within about 1e-12 degrees of a pole
+     * the zenith's ecliptic longitude is decided by rounding, so those
+     * rows state only what must hold whatever longitude was chosen;
+     * from 1e-9 degrees out the longitude is the zenith's own and is
+     * printed. Then how the central meridian moves through a sidereal
+     * day by latitude, which is the same rule seen from real places.
+     */
+    private static void boundarySection(WholeSkyComposition.Services services) throws Exception {
+        Instant when = CASES.get(0).instant();
+        p("## 12. The zenith at and near an ecliptic pole (#709)");
+        p("");
+        p("The central meridian is the zenith's ecliptic longitude (R-4), which is undefined at"
+                + " an ecliptic pole and turns fast near one. Each row is the production page"
+                + " composed for an observer whose zenith stands where the row says, at "
+                + when + ": at the pole to rounding (`WholeSkyBoundary.observerUnder`), or a"
+                + " step from it in latitude or in east longitude. Within about 1e-12 degrees"
+                + " of the pole the longitude is decided by rounding and is not printed: every"
+                + " meridian passes through the pole, so any choice is a correct map, and the"
+                + " rule does not pick one. `yes` means, column by column: the zenith is"
+                + " drawn within a millionth of a pixel of the central meridian; the ecliptic,"
+                + " the celestial equator, the horizon and the observer's meridian are finite"
+                + " with no chord between samples over 8 px; the ecliptic and the equator are"
+                + " one run each; the region below the drawn horizon disagrees with the true"
+                + " side of it on under 0.5 per cent of the sky, sampled off the middle line;"
+                + " and, where a determined step in latitude keeps the pole on the observer's"
+                + " meridian, every point of that meridian is on the central meridian's line or"
+                + " on the outline.");
+        p("");
+        p("| pole | the zenith stands | paints | central longitude | bodies | zenith on the"
+                + " central meridian | circles finite, no long chord | ecliptic and equator in"
+                + " one run each | Subdue true | meridian on the central line and the outline |");
+        p("|---|---|---|---|---|---|---|---|---|---|");
+        List<Step> steps = List.of(
+                new Step("at the pole", 0.0, 0.0, false),
+                new Step("1e-12 in latitude", 1e-12, 0.0, false),
+                new Step("-1e-12 in latitude", -1e-12, 0.0, false),
+                new Step("1e-12 in longitude", 0.0, 1e-12, false),
+                new Step("-1e-12 in longitude", 0.0, -1e-12, false),
+                new Step("1e-9 in latitude", 1e-9, 0.0, true),
+                new Step("-1e-9 in latitude", -1e-9, 0.0, true),
+                new Step("1e-9 in longitude", 0.0, 1e-9, true),
+                new Step("-1e-9 in longitude", 0.0, -1e-9, true),
+                new Step("0.001 in latitude", 1e-3, 0.0, true),
+                new Step("0.1 in latitude", 0.1, 0.0, true),
+                new Step("-1 in latitude", -1.0, 0.0, true));
+        for (SkyPosition pole : List.of(WholeSkyBoundary.NORTH_POLE, WholeSkyBoundary.SOUTH_POLE)) {
+            String name = pole == WholeSkyBoundary.NORTH_POLE ? "north" : "south";
+            Observer at = WholeSkyBoundary.observerUnder(pole, when);
+            for (Step step : steps) {
+                Observer observer = new Observer(at.latitudeDegrees() + step.north(),
+                        at.eastLongitudeDegrees() + step.east(), when);
+                String row;
+                try {
+                    WholeSkyComposition.Page page = WholeSkyComposition.paint(
+                            new WholeSkyComposition.Ask(observer, ChartPalette.WHITE_PAPER, "en",
+                                    READER_LIMIT, true, true, ORDINARY_FIELD, MONITOR_W,
+                                    MONITOR_H), services);
+                    WholeSkyBoundary.Held[] held = new WholeSkyBoundary.Held[1];
+                    javax.swing.SwingUtilities.invokeAndWait(() -> held[0] =
+                            WholeSkyBoundary.measure(page, MONITOR_W, MONITOR_H));
+                    WholeSkyBoundary.Held h = held[0];
+                    boolean circles = h.circles().values().stream().allMatch(
+                            c -> c.finite() && c.longestChordPx() < 8.0);
+                    row = f("yes | %s | %d | %s | %s | %s | %s | %s",
+                            step.longitudeDetermined()
+                                    ? f("%.1f", h.centralLongitudeDegrees())
+                                    : "decided by rounding",
+                            h.bodies(),
+                            Math.abs(h.zenithOffCentralMeridianPx()) < 1e-6 ? "yes" : "no",
+                            circles ? "yes" : "no",
+                            h.circles().get("ecliptic").runs() == 1
+                                    && h.circles().get("celestial equator").runs() == 1
+                                    ? "yes" : "no",
+                            h.subdueDisagreement() < 0.005 ? "yes" : "no",
+                            !step.meridianThroughThePole() ? "-"
+                                    : h.meridianPointsAstray() == 0 ? "yes" : "no");
+                    if (pole == WholeSkyBoundary.NORTH_POLE && step.stands().equals(
+                            "1e-9 in longitude")) {
+                        ImageIO.write(page.image(), "png", OUT.resolve("pole-north.png").toFile());
+                    }
+                } catch (Exception e) {
+                    Throwable cause = e.getCause() == null ? e : e.getCause();
+                    row = "NO: " + cause.getMessage() + " | - | - | - | - | - | - | -";
+                }
+                p(f("| %s | %s | %s |", name, step.stands(), row));
+            }
+        }
+        p("");
+        p("- `pole-north.png`: the page with the zenith 1e-9 degrees of east longitude from the"
+                + " north ecliptic pole. The horizon lies on the ecliptic, and the northern"
+                + " ecliptic hemisphere is the sky above it.");
+        p("");
+        p("When the observer's meridian passes through the map's pole - the latitude rows - half"
+                + " of it is the central meridian and the other half is the seam itself. It is"
+                + " drawn on the outline, in as many runs as rounding puts its samples on one"
+                + " edge or the other; the count is not pinned. Section 5's one run with its"
+                + " ends on the outline describes a circle that crosses the seam, not one that"
+                + " lies along it.");
+        p("");
+        double critical = SkyFrame.toOfDate(WholeSkyBoundary.NORTH_POLE,
+                SkyFrame.julianDate(when)).decDegrees();
+        p("**The same rule through one sidereal day, by latitude.** East longitude " + OSLO_LON
+                + ", from " + when + ", the zenith's ecliptic longitude every second of chart"
+                + " time. The critical latitude, where the zenith passes through the pole, is"
+                + " the J2000 ecliptic pole's declination of date: " + f("%.4f", critical)
+                + " at this instant. Equatorward of it the central meridian goes all the way"
+                + " round, unevenly; poleward of it the central meridian swings and returns.");
+        p("");
+        p("| latitude | zenith nearest its ecliptic pole | the central meridian | fastest turn,"
+                + " degrees per minute | shortest time for a quarter turn |");
+        p("|---|---|---|---|---|");
+        for (double latitude : new double[] {0.0, 30.0, OSLO_LAT, 65.0, 66.0, 66.5, 66.6, 67.0,
+                68.0, 70.0, 75.0, 80.0, -66.5, -67.0}) {
+            WholeSkyBoundary.Day day = WholeSkyBoundary.day(latitude, OSLO_LON, when);
+            double fastest = day.fastestDegreesPerMinute();
+            int quarter = day.quarterTurnSeconds();
+            p(f("| %s | %.2f degrees | %s | %s | %s |",
+                    latitude == Math.rint(latitude) ? f("%.0f", latitude) : String.valueOf(latitude),
+                    day.nearestPoleDegrees(),
+                    day.goesRound() ? "goes all the way round"
+                            : f("swings %.0f degrees and back, about longitude %.0f",
+                                    day.swingDegrees(), day.swingAboutDegrees()),
+                    fastest < 10.0 ? f("%.2f", fastest)
+                            : fastest < 100.0 ? f("%.1f", fastest) : f("%.0f", fastest),
+                    quarter < 0 ? "never turns a quarter"
+                            : quarter < 180 ? quarter + " s" : f("%.0f min", quarter / 60.0)));
+        }
+        p("");
+        p("Every one of these pages is a whole-sky map with the zenith on its central meridian."
+                + " What the latitude changes is how the map moves with chart time: near a polar"
+                + " circle it turns a quarter in minutes or less once a day, and poleward of the"
+                + " circle the seam stays in one half of the ecliptic.");
         p("");
     }
 

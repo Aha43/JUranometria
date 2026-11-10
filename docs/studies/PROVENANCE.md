@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**1021 promoted artifacts.**
+**1022 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -1042,6 +1042,7 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/whole-sky/gathering-en-white.png` | `b5d9773357e5be9bcf165f0f443fbf961970f2e05c0e55b799d2c224839be746` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/whole-sky/journey-1-whole-sky.png` | `6f004f681d59aec7922b2b004038789e01d6f9271a1c72142570704a0af77423` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/whole-sky/journey-2-open-here.png` | `56582770d572ae4cccc9abbc18bd04fb2b4e8d6631d7db7702831006e08ae228` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/whole-sky/pole-north.png` | `5768d4c351eaf10055f0a67b30fc7a2f0691f6af4928c22aca89840a2b2f9f65` | 2026-11-09 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/whole-sky/spread-en-white.png` | `59cbeda809c2dadd5ded554c237fd6997c65d0f2b240476d94c370b06835ec63` | 2026-11-08 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/working-selection/decided-members.png` | `2db34e7aa922b3f75c0cd4c8903c2620b24a7f83d92608ee6ae1a9775c32c527` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/working-selection/today-two-leads.png` | `306cf50272170cbcbbb50e8385789143b59b5fb43ee98081f248eb08be7f80f0` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |

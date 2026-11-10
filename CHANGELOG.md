@@ -25,6 +25,21 @@ graticule is numbered sparsely at the map's outline and along its central
 meridian, each figure placed only where it fits whole. Every existing page
 is drawn exactly as before. *Unqualified candidate.*
 
+**A horizon whose east or west point is the equinox (#709).** With the
+mathematical horizon shown, a chart could fail to draw when one of the
+four cardinal points fell within a few hundred-trillionths of a degree
+west of right ascension 0h: the point's right ascension was wrapped onto
+exactly 360, which is not one. It needed about a picosecond of chart
+time and no reader will have met it, but it was an error while
+painting, in every release since 3.0.0. Found by measuring the whole-sky
+page with the zenith at an ecliptic pole, where the horizon is the
+ecliptic and its east or west point is the equinox. The same wrap in a
+deep-sky object's outline is guarded too. Nothing else about any page
+changes. The whole-sky page itself needed no correction there; what it
+does at and near the poles, and how its central meridian moves at high
+latitude, is measured in the as-built report (section 12) and recorded
+in `docs/decisions/all-sky-projection.md` (section 9).
+
 ## [6.4.0] - 2026-11-07
 
 **Keep one Controller section open (#698, #699).** A slim row at the
