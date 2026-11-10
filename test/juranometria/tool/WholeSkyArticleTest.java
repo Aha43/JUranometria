@@ -132,7 +132,15 @@ class WholeSkyArticleTest {
             new String[] {"up to 175 degrees of longitude", "**175 degrees** of longitude",
                     "**175 grader** i lengde", DECISION},
             new String[] {"3.1 degrees from the seam", "**3.1 degrees** from the seam",
-                    "**3.1 grader** fra sømmen", DECISION});
+                    "**3.1 grader** fra sømmen", DECISION},
+            // The high-latitude paragraph (#709, the owner's ruling on R-4):
+            // the as-built report's row for latitude 66.5 - the latitude
+            // itself, and the shortest quarter turn of the central meridian.
+            new String[] {"| 66.5 | 0.06 degrees | goes all the way round | 97.4 | 71 s |",
+                    "At latitude **66.5°**", "På **66.5°** bredde", BUILT},
+            new String[] {"| 66.5 | 0.06 degrees | goes all the way round | 97.4 | 71 s |",
+                    "**71 seconds** once during a sidereal day",
+                    "**71 sekunder** én gang i løpet av et stjernedøgn", BUILT});
 
     /**
      * What the page itself says, quoted in each language as the as-built

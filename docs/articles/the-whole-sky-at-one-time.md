@@ -56,7 +56,8 @@ points and the zenith. Outside the ellipse there is nothing. The page
 says so aloud: *outside the elliptical outline is paper, not sky*.
 
 The Solar System bodies on the page are the ones you have switched on,
-no more and no fewer. Every figure in this article has all nine on.
+no more and no fewer. Every whole-sky figure in this article has all
+nine switched on.
 
 Read the middle line from left to right and every body is accounted for.
 The first column is the body's ecliptic longitude from the map's central
@@ -196,6 +197,15 @@ this evening, and **37.7-68.6 degrees** from it across the three
 measured pages. The map is aligned with the observer; it is not a view
 of the sky with the zenith in the middle.
 
+**Near the polar circles this alignment becomes sensitive to time.** At
+latitude **66.5°** the central meridian can turn a quarter revolution in
+**71 seconds** once during a sidereal day. Poleward of the critical
+latitude it swings and returns instead of going all the way round. At an
+ecliptic pole longitude itself is undefined, so rounding may choose any
+central meridian; every choice still gives a correct whole-sky map and
+horizon. The page remains true, but a small change of chart time can
+rotate it sharply.
+
 **The horizon is one long curve.** With the mathematical horizon shown
 in Place and Time, the page draws it dashed, with its four cardinal
 points. On the sky it is a great circle; on this map it is a deep bowl
@@ -289,8 +299,8 @@ are drawn, but where six of them stand close together and each name
 carries *(below the horizon)*, there is not room to write them all: on
 the machine that drew the figure **four of the nine names** are placed.
 The marks remain, each can be selected, and the spoken description
-lists all nine with their horizon state. The names are what Open here
-is for.
+lists all nine with their horizon state. Open here lets you identify
+and inspect the crowded marks in an ordinary chart.
 
 At this scale every planet is a **cartographic symbol**, said as such
 aloud - *a cartographic symbol, not Neptune's apparent diameter* - and
@@ -325,7 +335,8 @@ chart exactly as you left it.
 
 ## What zoom, pan and Reset view do here
 
-The whole sky has no field to widen or narrow and no centre to move, so
+The whole sky has a projection centre, but no ordinary movable chart
+centre, and no single scale or field width applies across the map, so
 the controls that change those are refused rather than given a new
 meaning:
 
@@ -360,8 +371,8 @@ reasons worth knowing.
 better on average: a mean deformation of **32.2°** over the whole sky
 against Hammer's **35.6°**, with straight circles of latitude. But it
 carries a constant **12.0°** all along its middle line, where Hammer has
-none at the centre. The middle line and the centre are exactly where
-this map puts the planets and the observer's sky.
+none at the centre. The middle line is exactly where this map puts the
+planets, and the central meridian is the line that follows the observer.
 
 **The plain rectangle**, longitude across and latitude up, has the
 lowest mean deformation of all, **16.8°**. It pays for that in area,
@@ -384,7 +395,7 @@ leaves the observer's zenith as much as **175 degrees** of longitude
 from the middle of the map. One that follows the previous chart's centre
 depends on something unrelated to the question, and put Jupiter **3.1
 degrees** from the seam. One opposite the Sun, the tempting choice for a
-night sky, cuts the Sun in two at the seam every time.
+night sky, puts the Sun exactly on the seam every time.
 
 ## What the view does not claim
 

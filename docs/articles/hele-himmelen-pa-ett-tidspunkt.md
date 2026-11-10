@@ -58,7 +58,8 @@ det selv når den leses opp: *utenfor det elliptiske omrisset er det
 papir, ikke himmel*.
 
 Solsystemlegemene på siden er de du har slått på, verken flere eller
-færre. Hver figur i denne artikkelen har alle ni på.
+færre. Hver figur av hele himmelen i denne artikkelen har alle ni slått
+på.
 
 Les midtlinjen fra venstre mot høyre, og hvert legeme er gjort rede for.
 Første kolonne er legemets ekliptiske lengde fra kartets sentralmeridian,
@@ -189,11 +190,20 @@ over deg, og tittelens andre linje sier hvilken det er:
 *Sentralmeridian: senits ekliptiske lengde 65.0° · Stjerner til V 5.0*.
 Endre tiden eller stedet, og hele himmelen glir sidelengs under en ny
 sentralmeridian. Senit ligger på den meridianen, men det er ikke kartets
-sentrum: det beholder sin egen ekliptiske bredde, og fra Oslo legger det
+sentrum: det beholder sin egen ekliptiske bredde, og fra Oslo ligger
 senit godt over midtlinjen: **39.82°** fra sentrum denne kvelden, og
 **37.7-68.6 grader** fra det på de tre målte sidene. Kartet er rettet
 inn etter observatøren; det er ikke et bilde av himmelen med senit i
 midten.
+
+**Nær polarsirklene blir denne innrettingen følsom for tiden.** På
+**66.5°** bredde kan sentralmeridianen dreie en kvart omdreining på
+**71 sekunder** én gang i løpet av et stjernedøgn. Polover den kritiske
+bredden svinger den og vender tilbake i stedet for å gå hele veien
+rundt. Ved en ekliptikkpol er selve lengden udefinert, så avrundingen kan
+velge hvilken som helst sentralmeridian; hvert valg gir likevel et riktig
+kart over hele himmelen og en riktig horisont. Siden forblir sann, men en
+liten endring av karttiden kan dreie den kraftig.
 
 **Horisonten er én lang kurve.** Når den matematiske horisonten vises i
 Sted og tid, tegner siden den stiplet, med de fire himmelretningene. På
@@ -289,8 +299,8 @@ legemene er tegnet, men der seks av dem står tett sammen og hvert navn
 bærer *(under horisonten)*, er det ikke plass til å skrive alle: på
 maskinen som tegnet figuren, er **fire av de ni navnene** plassert.
 Merkene står der, hvert av dem kan velges, og den opplesbare
-beskrivelsen lister alle ni med horisonttilstanden deres. Navnene er det
-Åpne her er til for.
+beskrivelsen lister alle ni med horisonttilstanden deres. Åpne her lar
+deg identifisere og undersøke de tettstilte merkene i et vanlig kart.
 
 I denne målestokken er hver planet **et kartografisk symbol**, og siden
 sier det når den leses opp - *et kartografisk symbol, ikke Neptuns
@@ -326,9 +336,10 @@ tilbake nøyaktig som du forlot det.
 
 ## Hva zoom, panorering og Tilbakestill visningen gjør her
 
-Hele himmelen har ikke noe felt som kan gjøres bredere eller smalere, og
-ikke noe sentrum som kan flyttes, så kontrollene som endrer dem, avvises
-heller enn å få en ny betydning:
+Hele himmelen har et projeksjonssentrum, men ikke noe vanlig kartsentrum
+som kan flyttes, og ingen enkelt målestokk eller feltbredde gjelder over
+hele kartet, så kontrollene som endrer dem, avvises heller enn å få en ny
+betydning:
 
 - **Zoom** er utilgjengelig, og sier hvorfor: *zoom går aldri inn i
   eller ut av denne visningen*. Du kommer ikke til hele himmelen ved å
@@ -361,8 +372,8 @@ tegnede sider og målinger, og alternativene tapte av grunner det er verd
 rivalen og er bedre i gjennomsnitt: en middelforvrengning på **32.2°**
 over hele himmelen mot Hammers **35.6°**, med rette breddesirkler. Men
 den bærer konstante **12.0°** langs hele midtlinjen, der Hammer ikke har
-noen i sentrum. Midtlinjen og sentrum er nettopp der dette kartet legger
-planetene og observatørens himmel.
+noen i sentrum. Midtlinjen er nettopp der dette kartet legger planetene,
+og sentralmeridianen er linjen som følger observatøren.
 
 **Det enkle rektangelet**, lengde bortover og bredde oppover, har den
 laveste middelforvrengningen av alle, **16.8°**. Det betaler for det i
@@ -385,7 +396,7 @@ alltid, lar observatørens senit havne så mye som **175 grader** i lengde
 fra midten av kartet. Én som følger sentrum i det forrige kartet,
 avhenger av noe som ikke har med spørsmålet å gjøre, og la Jupiter **3.1
 grader** fra sømmen. Én rett overfor Solen, det fristende valget for en
-nattehimmel, klipper Solen i to ved sømmen hver gang.
+nattehimmel, legger Solen nøyaktig på sømmen hver gang.
 
 ## Hva visningen ikke påstår
 
