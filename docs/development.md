@@ -399,7 +399,11 @@ asked:
   pixels in each of the four images, columns 222–232 of rows 33–47; the
   ten sheet PNGs, the complete-figures study's A4 sheet now among them,
   stayed pixel-identical and each of the ten PDFs and SVGs differed by
-  one byte.
+  one byte. At 6.5.0 (6.4→6.5) the last digit moved once more: 124
+  pixels in each light image and 123 in each dark one, columns 222–232
+  of rows 33–47, the counts 5.5.0's 4→5 gave; the ten sheet PNGs stayed
+  pixel-identical and each of the ten PDFs and SVGs differed by one
+  byte.
 - **The articles.** Their footer names the release, and
   `scripts/build-articles.py` reads it from `VERSION` when the site is
   built rather than carrying a number - so there is nothing to
