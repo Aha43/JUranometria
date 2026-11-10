@@ -429,7 +429,7 @@ landing (2026-11-10 12:13 UTC) took two days and thirteen hours.
   Sun *below the horizon*; the ruled title and sentence carry no radial
   claim. Saturn is selected a pixel off its mark and Open here
   (`recenter`) lands on the ordinary 60° chart centred there with Saturn
-  on it and *Field 60°* in its title. A whole-sky bookmark is captured
+  on it and *Field 60.0°* in its title. A whole-sky bookmark is captured
   through `BookmarkCapture` (time and place kept whatever the boxes
   say), written as the one `mode` member in schema 1, read back byte for
   byte, and opened through the real `BookmarkOpener` after the chart's
