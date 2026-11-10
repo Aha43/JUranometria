@@ -46,6 +46,12 @@ behind that argument.
   Neptune, Triton and Nereid, why Neptune is always a symbol, why its moons
   appear only on the narrowest pages, and what it does not claim. Also in
   Norwegian: [Neptun på siden](neptun-pa-siden.md).
+- [The whole sky at one time](the-whole-sky-at-one-time.md) — why one
+  page shows the entire sky at the chart's time and place, why it is an
+  ellipse with the ecliptic across its middle, how to read its horizon,
+  its seam and its grid, how to go from it into an ordinary chart, and
+  what it does not claim. Also in Norwegian: [Hele himmelen på ett
+  tidspunkt](hele-himmelen-pa-ett-tidspunkt.md).
 
 ## How JUranometria works
 
