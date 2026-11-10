@@ -7,6 +7,8 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [6.5.0] - 2026-11-10
+
 **The whole sky at one chart time (#687, ruled on #686).** A *Whole sky*
 toggle on the toolbar, in the Controller and in the Chart menu shows the
 entire sky at the Place and Time instant as one equal-area map: Hammer
