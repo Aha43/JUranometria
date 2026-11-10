@@ -568,6 +568,7 @@ public final class PackagedAcceptanceMain {
         zoomLockJourney();
         pointerNavigationJourney();
         dogfoodingJourney();
+        wholeSkyJourney();
         companionJourney();
         controllerTabsJourney();
         occurrenceJourney();
@@ -3280,6 +3281,232 @@ public final class PackagedAcceptanceMain {
                 + " star is beyond the limit, " + hidden + " endpoints in open sky are counted"
                 + " for the report, figures off draw the same " + withFigures.size()
                 + " stars, V 7 admits every endpoint)");
+    }
+
+    /**
+     * The whole-sky journey (#704, closing road #703): the page as the
+     * application composes it - a production chart with the meridian
+     * module, the ecliptic and every Solar System module attached as
+     * {@code JUranometriaMain} attaches them, driven by the real
+     * controller through the one switch - entered from an ordinary 60°
+     * page at the Oslo evening of the as-built study; every enabled body
+     * accounted for on it and spoken; one body selected a pixel off its
+     * mark; Open here landing on the ordinary chart centred there at the
+     * field left; a whole-sky bookmark captured with its time and place,
+     * written as the one mode member and read back byte for byte, then
+     * opened through the real opener after the chart's time and place
+     * were moved, so the stored ones become the chart's and the whole sky
+     * is entered at the same central meridian. Nothing of the whole sky
+     * is stored (R-10): a fresh controller starts ordinary.
+     */
+    private static void wholeSkyJourney() throws Exception {
+        juranometria.sky.Observer evening = new juranometria.sky.Observer(59.91, 10.75,
+                java.time.Instant.parse("2026-12-15T21:00:00Z"));
+        juranometria.ui.ChartComponent[] chart = new juranometria.ui.ChartComponent[1];
+        juranometria.ui.ChartViewController[] controller =
+                new juranometria.ui.ChartViewController[1];
+        juranometria.ui.ChartModuleHost[] host = new juranometria.ui.ChartModuleHost[1];
+        juranometria.meridian.MeridianModule[] meridian =
+                new juranometria.meridian.MeridianModule[1];
+        juranometria.ui.WholeSkySession[] session = new juranometria.ui.WholeSkySession[1];
+        juranometria.solar.SolarSystemService solar = juranometria.solar.SolarSystemService.load();
+        juranometria.solar.SolarSystemPack solarPack = juranometria.solar.SolarSystemPack.load();
+        juranometria.solar.JovianSystemService jovian = new juranometria.solar.JovianSystemService(
+                solarPack, juranometria.solar.JovianPack.load());
+        juranometria.solar.SaturnSystemService saturn = new juranometria.solar.SaturnSystemService(
+                solarPack, juranometria.solar.SaturnPack.load());
+        juranometria.solar.MarsService mars = new juranometria.solar.MarsService(solarPack,
+                juranometria.solar.PlanetsPack.load(), juranometria.solar.MarsSystemPack.load());
+        juranometria.solar.UranusService uranus = juranometria.solar.UranusService.load();
+        juranometria.solar.NeptuneService neptune = juranometria.solar.NeptuneService.load();
+        int w = 1440;
+        int h = 720;
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            chart[0] = new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
+            chart[0].setSize(w, h);
+            controller[0] = new juranometria.ui.ChartViewController();
+            controller[0].onChange(chart[0]::setViewState);
+            host[0] = new juranometria.ui.ChartModuleHost(chart[0], new SelectionModel(),
+                    request -> controller[0].recenter(request.centre()));
+            host[0].attach(new juranometria.ui.onthispage.OnThisPageModule(
+                    juranometria.ui.language.InterfaceText.forLanguage("en")));
+            meridian[0] = host[0].attach(new juranometria.meridian.MeridianModule(evening));
+            meridian[0].showing(true, true, true);
+            meridian[0].subduing(true);
+            chart[0].setContext(meridian[0].context());
+            chart[0].setSubdueBelowHorizon(() -> meridian[0].attached() && meridian[0].subduing()
+                    ? new juranometria.sky.LocalSky(meridian[0].observer()).zenith() : null);
+            host[0].attach(new juranometria.ecliptic.EclipticModule()).showing(true);
+            java.util.function.Supplier<juranometria.sky.Observer> observer =
+                    () -> meridian[0].attached() ? meridian[0].observer() : null;
+            juranometria.solarchart.SolarSystemModule planets = host[0].attach(
+                    new juranometria.solarchart.SolarSystemModule(observer, () -> solar,
+                            meridian[0]::subduing));
+            planets.withMars(() -> mars);
+            planets.withUranus(() -> uranus);
+            planets.withNeptune(() -> neptune);
+            planets.sunShowing(true);
+            planets.moonShowing(true);
+            planets.mercuryShowing(true);
+            planets.venusShowing(true);
+            planets.marsShowing(true);
+            planets.uranusShowing(true);
+            planets.neptuneShowing(true);
+            host[0].attach(new juranometria.jovianchart.JovianModule(observer, () -> jovian,
+                    meridian[0]::subduing)).showing(true);
+            host[0].attach(new juranometria.saturnchart.SaturnModule(observer, () -> saturn,
+                    meridian[0]::subduing)).showing(true);
+            controller[0].recenter(ChartViewState.DEFAULT.centre(), 60.0);
+            session[0] = new juranometria.ui.WholeSkySession(controller[0], observer);
+            meridian[0].onChange(session[0]::observerChanged);
+        });
+        require(!controller[0].state().wholeSky(), "a fresh controller starts ordinary (R-10)");
+        javax.swing.SwingUtilities.invokeAndWait(() -> session[0].enter());
+        paintHeadless(chart[0]);
+        ChartViewState whole = controller[0].state();
+        require(whole.wholeSky(), "Whole sky entered through the one switch");
+        java.util.Set<String> drawn = new java.util.TreeSet<>();
+        for (var body : chart[0].renderedBodies()) {
+            drawn.add(body.identity());
+        }
+        java.util.Set<String> enabled = new java.util.TreeSet<>(java.util.List.of("sun", "moon",
+                "mercury", "venus", "mars", "jovian.jupiter", "saturn", "uranus", "neptune"));
+        require(drawn.equals(enabled), "every enabled body is on the whole sky: " + drawn);
+        String spoken = chart[0].getAccessibleContext().getAccessibleDescription();
+        require(spoken.startsWith("Whole sky. Hammer projection, ecliptic north up,"
+                + " ecliptic longitude increases left at centre. Central meridian at the"
+                + " zenith's ecliptic longitude, "), "the ruled sentence is spoken: " + spoken);
+        int below = 0;
+        for (String name : new String[] {"Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter",
+                "Saturn", "Uranus", "Neptune"}) {
+            require(spoken.contains(name), "the page accounts for " + name + " aloud: " + spoken);
+            if (spoken.contains(name + " (below the horizon)")) {
+                below++;
+            }
+        }
+        require(spoken.contains("Sun (below the horizon)"), "an evening Sun is below the horizon");
+        java.util.List<String> title = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH_PAGE)
+                .titleBlockLines(chart[0].currentScene());
+        require(title.size() == 2 && title.get(0).startsWith("Whole sky · Hammer")
+                        && title.get(1).startsWith("Central meridian: zenith's ecliptic longitude"),
+                "the ruled title lines: " + title);
+        for (String line : title) {
+            require(!line.contains("ICRS") && !line.contains("Field"),
+                    "no radial claim on the whole sky: " + line);
+        }
+        String centralLongitude = chart[0].currentScene().title();
+        require(centralLongitude.startsWith("λ "), "the language-free subject: " + centralLongitude);
+
+        // Select one body a pixel off its mark, and Open here.
+        var saturnMark = chart[0].renderedBodies().stream()
+                .filter(b -> b.identity().equals("saturn")).findFirst().orElseThrow();
+        var picked = chart[0].selectableBodyAt(saturnMark.centre().x() + 1.0,
+                saturnMark.centre().y());
+        require(picked.isPresent() && picked.get().identity().equals("saturn"),
+                "a pointer a pixel off Saturn selects Saturn on the whole sky");
+        SkyPosition where = ChartHitTest.skyAt(
+                juranometria.project.DrawnPage.of(chart[0].currentScene()),
+                saturnMark.centre().x(), saturnMark.centre().y());
+        javax.swing.SwingUtilities.invokeAndWait(() -> controller[0].recenter(where));
+        paintHeadless(chart[0]);
+        ChartViewState opened = controller[0].state();
+        require(!opened.wholeSky(), "Open here leaves the whole sky");
+        require(opened.fieldWidthDegrees() == 60.0, "at the field the reader left: "
+                + opened.fieldWidthDegrees());
+        require(opened.centre().separationDegrees(where) < 1e-9, "centred where Saturn was");
+        require(chart[0].currentScene().viewport().fieldWidthDegrees() == 60.0,
+                "the ordinary 60° page is drawn");
+        require(chart[0].renderedBodies().stream().anyMatch(b -> b.identity().equals("saturn")),
+                "Saturn is on the ordinary detailed chart");
+        java.util.List<String> ordinary = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH_PAGE)
+                .titleBlockLines(chart[0].currentScene());
+        require(ordinary.stream().anyMatch(l -> l.contains("Field 60.0°")),
+                "the ordinary chart states its field again: " + ordinary);
+
+        // A whole-sky bookmark: captured with its time and place, written
+        // as the one mode member, read back byte for byte, and opened.
+        javax.swing.SwingUtilities.invokeAndWait(() -> session[0].enter());
+        paintHeadless(chart[0]);
+        juranometria.ui.bookmark.BookmarkCapture.Proposal proposal =
+                juranometria.ui.bookmark.BookmarkCapture.propose(controller[0].state(),
+                        java.util.List.of("saturn"), "saturn", meridian[0].observer());
+        require(proposal.wholeSky() && proposal.timeTicked(),
+                "a whole-sky proposal keeps its time and place");
+        juranometria.bookmark.BookmarkLibrary.Draft draft =
+                juranometria.ui.bookmark.BookmarkCapture.draft(proposal, "Tonight's whole sky",
+                        proposal.subjects(), proposal.primary(), false,
+                        juranometria.bookmark.ChartTime.Purpose.OBSERVATION, false, null);
+        require(draft.time().isPresent() && draft.place().isPresent(),
+                "time and place are kept whatever the boxes say (R-11)");
+        juranometria.bookmark.Node.Bookmark bookmark = new juranometria.bookmark.Node.Bookmark(
+                "whole-sky-1", draft.title(), draft.view(), draft.subjects(), draft.primary(),
+                draft.time(), draft.place(), draft.note());
+        juranometria.bookmark.Library library = new juranometria.bookmark.Library(
+                AppInfo.version(), java.util.List.of(bookmark));
+        String text = juranometria.bookmark.BookmarkDocument.text(library);
+        require(text.contains("\"version\": 1") && text.contains("\"mode\": \"whole-sky\"")
+                        && !text.contains("\"ra\"") && !text.contains("\"field\""),
+                "written as the one mode member in schema 1: " + text);
+        juranometria.bookmark.BookmarkDocument.Read read =
+                juranometria.bookmark.BookmarkDocument.read(text);
+        require(read instanceof juranometria.bookmark.BookmarkDocument.Usable, "read back: " + read);
+        juranometria.bookmark.Library back =
+                ((juranometria.bookmark.BookmarkDocument.Usable) read).library();
+        require(back.equals(library) && juranometria.bookmark.BookmarkDocument.text(back)
+                .equals(text), "byte for byte");
+        juranometria.bookmark.Node.Bookmark stored = (juranometria.bookmark.Node.Bookmark)
+                back.root().get(0);
+        // Leave, move the chart's time and place, then open the bookmark.
+        javax.swing.SwingUtilities.invokeAndWait(() -> {
+            session[0].leave();
+            meridian[0].observer(new juranometria.sky.Observer(40.0, -74.0,
+                    java.time.Instant.parse("2027-03-01T03:00:00Z")));
+        });
+        paintHeadless(chart[0]);
+        require(!controller[0].state().wholeSky()
+                        && controller[0].state().fieldWidthDegrees() == 60.0,
+                "left to the ordinary page");
+        juranometria.ui.bookmark.BookmarkOpener opener = new juranometria.ui.bookmark.BookmarkOpener(
+                controller[0], meridian[0], host[0].workingSelection(), host[0]::inventory,
+                () -> paintHeadlessNow(chart[0]), candidate -> false, java.util.Map.of(),
+                subject -> java.util.Optional.empty(), session[0]::enter);
+        juranometria.ui.bookmark.BookmarkOpener.Report[] report =
+                new juranometria.ui.bookmark.BookmarkOpener.Report[1];
+        javax.swing.SwingUtilities.invokeAndWait(() -> report[0] = opener.open(stored));
+        paintHeadless(chart[0]);
+        require(controller[0].state().wholeSky(), "opening the bookmark enters the whole sky");
+        require(meridian[0].observer().equals(evening),
+                "after the stored time and place became the chart's: " + meridian[0].observer());
+        require(chart[0].currentScene().title().equals(centralLongitude),
+                "at the same central meridian: " + chart[0].currentScene().title()
+                        + " vs " + centralLongitude);
+        require(chart[0].renderedBodies().size() == 9, "with every body on it again");
+        javax.swing.SwingUtilities.invokeAndWait(() -> session[0].leave());
+        require(!controller[0].state().wholeSky()
+                        && controller[0].state().fieldWidthDegrees() == 60.0,
+                "and the ordinary page is restored exactly on leaving (R-8)");
+        System.out.println("whole sky OK (entered through the one switch from a 60° page at the"
+                + " Oslo evening: " + drawn.size() + " of " + enabled.size() + " enabled bodies"
+                + " drawn and spoken, " + below + " below the horizon, the ruled title and"
+                + " sentence with no radial claim, central meridian " + centralLongitude
+                + "; Saturn selected a pixel off its mark and Open here landed on the ordinary"
+                + " 60° chart centred there with Saturn on it; a whole-sky bookmark kept its"
+                + " time and place, was written as the one mode member and read back byte for"
+                + " byte, and opened through the real opener after the chart's time and place"
+                + " were moved, restoring them and the whole sky at the same central meridian;"
+                + " leaving restored the 60° page)");
+    }
+
+    /** Paints the chart as it stands, on the calling (event) thread. */
+    private static void paintHeadlessNow(juranometria.ui.ChartComponent chart) {
+        BufferedImage image = new BufferedImage(chart.getWidth(), chart.getHeight(),
+                BufferedImage.TYPE_INT_RGB);
+        java.awt.Graphics2D g = image.createGraphics();
+        try {
+            chart.paint(g);
+        } finally {
+            g.dispose();
+        }
     }
 
     /** The view report's count, asked of its one source, the page's drawn marks. */
