@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**1023 promoted artifacts.**
+**1032 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -684,6 +684,15 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/meridian-ticks/south-60.png` | `ab6460888a7eea19cd7cf265bda1c96c7b3bd201925997c97c0bffeccfe51b90` | 2026-11-07 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/meridian-ticks/south-8.png` | `3a938bfa3f4bd7dd6bf8ac612ef8b8f088dd1b671a4991a6a6386e44b11e98c1` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/meridian-ticks/zenith-60.png` | `27a5d02a3146d5767548ca8978810ed4f3338343c38789122a683f32942e4c92` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meteor-showers/december-whole-sky-every-active-seam-en-white.png` | `596f3a3fadbfb790ceec01f2c5c96d29d8115402549189d1697a8b703980af0a` | 2026-11-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meteor-showers/eta-aquariids-below-horizon-seam-en-white.png` | `9360dd67f6114c436ff050592629aa22f2bfda3a553aedd28dcd9180530c065d` | 2026-11-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meteor-showers/geminids-whole-sky-glyph-en-white.png` | `2792e715c9f68dde08b5c3174320ffd23c4133e1de600fbb51d04305a3adb00d` | 2026-11-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meteor-showers/geminids-whole-sky-seam-en-white.png` | `b6409f9150d6384c7e82ff9c7711a15c5c1594f801454eb8a5f9ba8a8f64ccda` | 2026-11-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meteor-showers/glyph-sheet.png` | `4c4e7937afb6cfa12dcf4cd1d7fd5447784685297bb15990aca317d6edecf692` | 2026-11-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meteor-showers/perseids-close-glyph-en-white.png` | `01ebe67c009e5ecc596f21a56133364eb3ab1d564dd7e624e6170a786963da4d` | 2026-11-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meteor-showers/perseids-ordinary-glyph-en-white.png` | `457b6bdaf03c6fe57996b066f24a72d8ba5f25b2675f7da780c68b83008214da` | 2026-11-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meteor-showers/perseids-ordinary-glyph-nb-black.png` | `03851c4deddf285df0e559a1769e57ad16dc095d727f8126e3b4a64114420dd1` | 2026-11-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meteor-showers/perseids-ordinary-seam-en-white.png` | `dde5c7f1ebc07532badcd281005af6f7c8643633ec1abdf279a38447f24d7216` | 2026-11-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/moon-on-the-chart/apogee-farthest-3.png` | `fcf2cc23b0ff4751d62f28b778d7db3d98c8d6a590ecbdd35e0b1cd52b476988` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/moon-on-the-chart/july-last-quarter-horizon-36.png` | `39fb68565b38d0797806559a4e024599aca9acca4cf0f695f4e755aea878cac8` | 2026-10-25 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/moon-on-the-chart/june-first-quarter-3-dark.png` | `225c52e6cd09b21a35550c28c86b7d03b2ce0481c01a1e598b3a45078a6edd33` | 2026-09-30 | Mac OS X aarch64, Java 21.0.12.1 | various |
