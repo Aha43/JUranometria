@@ -241,6 +241,13 @@ public final class EvidenceContractMain {
         // The Neptune pack study (#654) is not registered for the same reason:
         // it reads the gitignored nep098_part-1.bsp and de440s.bsp;
         // `make neptune-pack-study` reproduces it against the pins.
+        // The meteor-shower study (#715) is not registered for the same reason:
+        // MeteorShowerStudyMain and MeteorShowerPagesMain read the gitignored
+        // imports/raw/meteor-showers (the IMO calendars' transcribed tables, the
+        // IAU MDC list and the GMN table), each held to its SHA-256 by
+        // MeteorStudyData; `make meteor-shower-study` and
+        // `make meteor-shower-pages` reproduce the reports and pages against
+        // the pins, and they are held as committed (owner, 2026-11-11).
         // Jupiter and the moons on production pages (#486): the report
         // is deterministic, its pages held through IMAGE_MAINS, and where
         // each name went is the platform record (PLATFORM_REPORTS).
