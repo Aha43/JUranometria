@@ -81,6 +81,18 @@ at each maximum against Table 5 (`measurements.md`, section 6) - and no
 second keying. A shipped pack would need a reviewed transcription with its
 own check (decision record, R-3).
 
+### The second keying (#716, 2026-11-12)
+
+For the nine showers of the first pack, Table 5 and Table 6 were keyed a
+second time from pages 25 and 26 rendered as images (PDFKit, three times
+enlarged), independently of the extracted text:
+`transcribed/imo-2027-second-keying-table5.tsv` and
+`imo-2027-second-keying-table6.tsv`, in the same gitignored folder. The
+pack's importer compares the two keyings field by field and writes nothing
+unless they agree; they agree in all 307 fields. The second keying was made
+by the coding agent reading the page image, not by a second person
+(decision record, section 8).
+
 ## What the repository carries of the IMO's data
 
 By the owner's ruling (decision record, C-1) the study does not publish most

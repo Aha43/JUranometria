@@ -1,6 +1,6 @@
 # Meteor showers at chart time
 
-**Status: ruled by the owner on 2026-11-11 (section 7).** Sprint 60, issue #715,
+**Status: ruled by the owner on 2026-11-11 (section 7); built as an unqualified candidate under #716 (section 8), not yet shippable.** Sprint 60, issue #715,
 road #714. A measurement and decision study; no production code. Product
 input: #564 and the meteor-shower outcome in the owner's 7.0.0 road outline.
 Measurements: `docs/studies/meteor-showers/measurements.md` (cited below as
@@ -396,3 +396,106 @@ What the trim did (C-1): `measurements.md` sections 4, 6 and 8 print the nine
 candidates and count the rest; section 9 prints the eleven showers listed at
 a ZHR of 10 or more, which the selection rule needs, and counts the others
 by strength. The untrimmed tables were never pushed.
+
+## 8. As built (#716; the unqualified candidate, before the IMO's reply)
+
+**Status: built for the owner's hands, not qualified, and not shippable
+yet.** By the owner's instruction of 2026-11-12 the feature was built while
+the IMO's answer to the contact of C-1 was outstanding, under one boundary:
+the derived pack, and any fixture that reproduces its values, stay out of
+the repository until the IMO has answered. So at this head:
+
+- `src/resources/meteor-showers/` is **not in the tree**. It is generated
+  on the owner's machine by `make import-meteor-showers` from the raw
+  sources and excluded from git locally. A clean checkout of this head
+  therefore has no pack: the application's meteor panel cannot load one,
+  and the tests that read the bundled pack fail there. That is the state
+  the boundary asks for, and the reason nothing here is pushed for review,
+  gated or merged.
+- The About and licensing entries for the pack (the notice in About, the
+  licensing summary in both languages, `LICENSING.md`, the archive's
+  licence list, the packaged-image inventory and the packaged acceptance's
+  pack check) are **not written yet**. They land with the pack, the IMO's
+  recorded reply and whatever conditions it carries, and the complete head
+  is qualified once then.
+
+### What was built, against section 5
+
+1. **The Sun's geocentric J2000 longitude** -
+   `SolarSystemService.solarLongitudeJ2000Degrees(Instant)`: astrometric,
+   from the Earth's centre, within the Sun's parallax of every observer's
+   published longitude (R-5).
+2. **The pack and its importer** - `juranometria.meteor.MeteorShowerPack`
+   reads `showers.tsv` and `radiants.tsv` against a checksummed manifest
+   that names the edition; `MeteorShowerPackMain` writes them. The importer
+   refuses unless: every raw input matches its SHA-256; the rule of R-11,
+   applied to the whole working list and the IAU list, selects exactly the
+   showers that were keyed twice; the two keyings agree in every field; each
+   shower's IAU number agrees between the two authorities; and the radiant
+   table read at the maximum lies within 2° of the working list's radiant.
+3. **The second keying (R-4).** The first transcription was parsed from
+   text extracted from the PDF. The second was keyed on 2026-11-12 from
+   pages 25 and 26 rendered as images, for the nine showers only: 307
+   fields, all in agreement. Stated plainly: the second keying was made by
+   the coding agent reading the page image, not by a second person. It is
+   independent of the text extraction and of the column-assignment step
+   that needed three hand corrections; it is not an independent human
+   review, and the owner may want to read the nine rows against the page
+   before the pack ships.
+4. **The shower service** - `MeteorShowers`: activity as an interval of
+   solar longitude (R-6), the radiant by the ruled evaluation with its
+   footing (R-9), the nominal maximum as the instant the Sun reaches the
+   listed longitude (R-7). Activity and row longitudes are computed at
+   import from the calendar's dates in the year that puts each date nearest
+   the maximum, so the Quadrantids' December rows are read in 2026 and
+   their January rows in 2027; the study read every row in 2027.
+5. **The overlay kind and mark** - `OverlayContribution.Radiant`, drawn by
+   the bodies' layer as glyph A (six rays, 3.5 to 10 px, about an empty
+   centre) in the page's text ink, named and refused like a body's name,
+   subdued and given "(below the horizon)" when below the drawn horizon.
+   It rides the body placements, so pointing, the page inventory, the
+   occurrence selection and its re-resolution when the chart time changes
+   are the planets' own code (R-13 to R-15).
+6. **The module, the panel and the actions** - `MeteorShowerModule` draws
+   only the selected shower and only while active (R-12);
+   `MeteorShowerSession` and `MeteorShowerControls` are one panel shown by
+   **Solar System > Meteor showers...** and by a **Meteor showers** group
+   after Neptune's in the Controller. It computes nothing until first
+   shown. Two actions: **Set chart time to next nominal maximum**, through
+   the one chart context (R-17), and **Centre on radiant**, which keeps the
+   field and the time. The night summary of C-6 is in the panel.
+7. **The box, the Inspector and bookmarks** - a sealed `RadiantFacts`
+   variant in the selected-object box (C-5); the Inspector says what a
+   radiant is and gives its place to a whole degree; a bookmark's shower
+   subject is named as the page names the shower, and opening one selects
+   that shower at the stored instant (R-20).
+8. **Words in both languages** (R-21), appended to both language files.
+
+### Choices made in building, for the owner's eye
+
+- **The mark's ink.** The page's text ink, as the ruled mock had it. The
+  seam's reference ink, tried first, was too pale to find on the whole sky.
+- **The parent body.** The IAU list states it per solution and the
+  solutions do not agree on spelling. The importer takes the statement
+  made most often, in its most frequent spelling, and none on a tie. That
+  yields a parent for seven showers, none for the Southern δ-Aquariids
+  (two different statements, one each), "(3200) Phaethon" for the Geminids
+  and, for the Leonids, **the list's majority spelling "55P/Temple-Tuttle"**
+  (five solutions against three for "Tempel"). The atlas should not print
+  a known misspelling, and it should not correct a source silently either.
+  *Open: drop the parent body from 6.6.0, or carry a ruled spelling with a
+  note of the source's variants.*
+- **"Next" only.** The panel gives the first nominal maximum at or after
+  the chart time (R-17). During an activity after the maximum that is next
+  year's; the one just past is not shown.
+- **The night.** From the local mean noon before the chart time to the
+  next, by the chart's longitude, where the study used 12:00 UTC at Oslo.
+  The radiant's highest is taken while the Sun is more than 12° down, as
+  the study measured it.
+- **The accuracy fixture (R-10)** is a test that reads the Global Meteor
+  Network's table from the raw folder and is skipped where the raw sources
+  are absent, which includes CI. *Open: after the IMO's answer, commit a
+  small GMN-derived fixture (CC BY 4.0, credited) so the claim is held
+  everywhere, or keep it a local check.*
+- **#719** (ecliptic-longitude ticks): not mocked; nothing about it was
+  exceptionally cheap.

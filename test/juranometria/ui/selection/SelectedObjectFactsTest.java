@@ -69,6 +69,36 @@ class SelectedObjectFactsTest {
     }
 
     @Test
+    void aRadiantSaysWhatItIsItsChartTimeAndItsPlaceToAWholeDegree() {
+        // An invented radiant: the box is the same whatever the shower (#716, C-5).
+        Instant at = Instant.parse("2030-08-12T22:00:00Z");
+        Furniture up = SelectedObjectFacts.box(new SelectedObjectFacts.RadiantFacts(
+                "meteor-shower.PER", "Perseids", at, new SkyPosition(47.6, 57.4), false), EN);
+        assertEquals("Perseids", up.heading());
+        assertEquals(List.of("meteor shower radiant", "for 2030-08-12 22:00 UTC",
+                "RA 48°   Dec +57° (J2000)"), up.lines(),
+                "never without the chart time, and no finer than the source prints");
+        Furniture down = SelectedObjectFacts.box(new SelectedObjectFacts.RadiantFacts(
+                "meteor-shower.PER", "Perseidene", at, new SkyPosition(359.7, -0.6), true), NB);
+        assertEquals(List.of("radiant for meteorsverm", "for 2030-08-12 22:00 UTC",
+                "RA 0°   Dec −1° (J2000)", "(under horisonten)"), down.lines());
+        assertTrue(down.spoken().startsWith("Valgt: Perseidene, radiant for meteorsverm,"));
+    }
+
+    @Test
+    void aSelectedRadiantOnThePageGetsTheRadiantBoxNotABodys() {
+        var moment = new juranometria.module.OverlayContribution.Moment(
+                Instant.parse("2030-08-12T22:00:00Z"), 60.0, 10.0);
+        var entry = new juranometria.page.PageEntry.Body("meteor-shower.PER", "Perseids",
+                PLACE, moment, true, 0.0);
+        assertTrue(SelectedObjectFacts.of(entry, false).orElseThrow()
+                instanceof SelectedObjectFacts.RadiantFacts);
+        var moon = new juranometria.page.PageEntry.Body("moon", "Moon", PLACE, moment, true, 0.0);
+        assertTrue(SelectedObjectFacts.of(moon, false).orElseThrow()
+                instanceof SelectedObjectFacts.BodyFacts);
+    }
+
+    @Test
     void theBoxIsBoundedAndAsksForTheUpperLeft() {
         Furniture box = SelectedObjectFacts.box(new SelectedObjectFacts.StarFacts(
                 "TYC 129-1873-1", "Betelgeuse", "α", "58", "Ori", 0.58, PLACE), EN);

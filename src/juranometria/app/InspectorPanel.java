@@ -1037,8 +1037,18 @@ said.say("inspector.tab.page.explain"));
         fact(said.say("inspector.occurrence.observer",
                 String.format(Locale.ROOT, "%.3f", body.latitudeDegrees()),
                 String.format(Locale.ROOT, "%.3f", body.eastLongitudeDegrees())), true);
-        fact(coordinates(body.position()));
-        fact(FRAME);
+        if (juranometria.meteor.MeteorShower.codeOf(body.identity()) != null) {
+            // A radiant (#716, R-15): what it is, and its place no finer
+            // than its source prints it.
+            fact(juranometria.ui.selection.SelectedObjectFacts.wholeDegrees(
+                    body.position(), said));
+            fact(FRAME);
+            fact("");
+            fact(said.say("inspector.occurrence.radiant"), true);
+        } else {
+            fact(coordinates(body.position()));
+            fact(FRAME);
+        }
         if (page != null && drawn.isEmpty()) {
             fact("");
             fact(said.say("inspector.occurrence.absent"), true);

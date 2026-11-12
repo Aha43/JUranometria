@@ -66,6 +66,7 @@ help:
 	@echo "  constellation-study  Render the Sprint 7 constellation-geography study"
 	@echo "  import-constellations  Regenerate the bundled constellation-geography pack"
 	@echo "  import-star-identities  Regenerate the bundled star-identity pack"
+	@echo "  import-meteor-showers   Regenerate the bundled meteor-shower pack"
 	@echo "  import-solar-system  Regenerate the bundled Solar System ephemeris pack from pinned inputs"
 	@echo "  sun-study    Write the first Sun table from the bundled pack (issue #399)"
 	@echo "  moon-study   Write the first Moon table from the bundled pack (issue #407)"
@@ -420,6 +421,11 @@ mercury-table-study: classes
 
 import-star-identities: classes
 	$(JAVA) -cp "$(CLASSES_DIR)" juranometria.tool.StarIdentityPackMain
+
+# The meteor-shower pack (#716), from the pinned raw sources under
+# imports/raw/meteor-showers; refuses unless the two keyings agree.
+import-meteor-showers: classes
+	$(JAVA) -cp "$(CLASSES_DIR)" juranometria.tool.MeteorShowerPackMain
 
 regional-study: classes
 	$(JAVA) -cp "$(CLASSES_DIR):$(LIB_DIR)/*" juranometria.tool.RegionalStudyMain

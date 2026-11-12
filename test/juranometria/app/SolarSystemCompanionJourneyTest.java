@@ -174,8 +174,10 @@ class SolarSystemCompanionJourneyTest {
                             "heading.solarsystem.venus", "heading.solarsystem.moon",
                             "heading.solarsystem.mars",
                             "heading.solarsystem.jupiter", "heading.solarsystem.saturn",
-                            "heading.solarsystem.uranus", "heading.solarsystem.neptune"), headings,
-                            "outward from the Sun, the bodies the atlas has");
+                            "heading.solarsystem.uranus", "heading.solarsystem.neptune",
+                            "heading.solarsystem.meteorshowers"), headings,
+                            "outward from the Sun, the bodies the atlas has, then the"
+                                    + " meteor showers (#716)");
                     // Mercury (#530): between the Sun and Venus, introduced
                     // collapsed; opened, it has computed nothing; since #542
                     // it offers Show on chart and Centre on chart over its layer.
@@ -404,9 +406,10 @@ class SolarSystemCompanionJourneyTest {
                             "Jupiter and moons on the chart", "Saturn on the chart",
                             "Uranus on the chart", "Neptune on the chart", "—",
                             "Sun...", "Mercury...", "Venus...", "Moon...", "Mars...", "Jupiter...",
-                            "Saturn...", "Uranus...", "Neptune..."),
+                            "Saturn...", "Uranus...", "Neptune...", "—", "Meteor showers..."),
                             order, "outward from the Sun, the switches and the tables (#530, #542,"
-                                    + " #576, #579, #603, #606, #635, #638, #656, #659)");
+                                    + " #576, #579, #603, #606, #635, #638, #656, #659), then the"
+                                    + " meteor showers in a group of their own (#716)");
 
                     // The window's own focus traversal reaches the group: the
                     // chosen view (its sibling is reached by the arrow keys,

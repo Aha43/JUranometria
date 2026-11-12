@@ -1502,4 +1502,34 @@ public final class AppMenuBar {
         }
         solar.insert(neptune, at);
     }
+
+    /**
+     * Solar System > Meteor showers... (#716), after the bodies' tables:
+     * the dialog host of the one meteor-shower session the Controller's
+     * Solar System tab also shows.
+     */
+    public static void addMeteorShowers(javax.swing.JMenuBar bar,
+                                        juranometria.ui.language.InterfaceText said,
+                                        Runnable openMeteorShowers) {
+        JMenu solar = solarSystemMenu(bar);
+        if (solar == null || openMeteorShowers == null) {
+            return;
+        }
+        JMenuItem showers = new JMenuItem(said.say("menu.meteorshowers.label"));
+        showers.setName("meteorShowersItem");
+        // No access letter: as Neptune's, every letter here is claimed.
+        showers.getAccessibleContext().setAccessibleName(said.say("menu.meteorshowers.a11y"));
+        juranometria.ui.Explain.control(showers, said.say("menu.meteorshowers.hover"),
+                said.say("menu.meteorshowers.explain"));
+        showers.addActionListener(event -> openMeteorShowers.run());
+        int at = solar.getMenuComponentCount();
+        for (int i = 0; i < solar.getMenuComponentCount(); i++) {
+            if ("neptuneTableItem".equals(solar.getMenuComponent(i).getName())) {
+                at = i + 1;
+            }
+        }
+        // A group of its own under the bodies' tables: not a body.
+        solar.insertSeparator(at);
+        solar.insert(showers, at + 1);
+    }
 }
