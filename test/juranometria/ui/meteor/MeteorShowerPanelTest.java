@@ -88,7 +88,7 @@ class MeteorShowerPanelTest {
         assertTrue(at >= 0 && radiant == at + 1, "the chart time and place, then the radiant:\n"
                 + all);
         assertTrue(all.contains("Active at chart time 2030-04-11 00:00 UTC"), all);
-        assertTrue(all.contains("Nominal maximum at solar longitude 100.5°; next: 2030-04-11,"
+        assertTrue(all.contains("Nominal maximum at solar longitude 100.5°; this activity period's: 2030-04-11,"
                 + " about 12 h UTC, known to an hour or two."), all);
         assertTrue(all.contains("Zenithal hourly rate (ZHR) 12: the rate for an ideal dark sky"),
                 all);
@@ -146,12 +146,40 @@ class MeteorShowerPanelTest {
                 text.maximum(SERVICE.shower("CCC").orElseThrow(), at));
     }
 
+    /** The owner's ruling of 2026-11-14: an active shower past its maximum keeps this period's. */
+    @Test
+    void afterTheMaximumAnActiveShowerOffersThisPeriodsAndSaysItHasPassed() throws Exception {
+        session.select("AAA");
+        onEventThread(() -> {
+            context.install(context.observer().at(SyntheticShowers.at(102.0)));
+            return null;
+        });
+        MeteorShowerSession.Facts facts = session.facts().orElseThrow();
+        assertTrue(facts.active(), "the premise: a day and a half after the maximum, still active");
+        String all = String.join("\n", new MeteorShowerText(EN).lines(facts, SERVICE.pack()));
+        assertTrue(all.contains("Nominal maximum at solar longitude 100.5°; this activity"
+                + " period's has passed: 2030-04-11, about 12 h UTC"), all);
+        String norsk = String.join("\n", new MeteorShowerText(NB).lines(facts, SERVICE.pack()));
+        assertTrue(norsk.contains("denne aktivitetsperiodens er passert: "), norsk);
+        Instant set = onEventThread(() -> session.setChartTimeToMaximum().orElseThrow());
+        assertEquals(SyntheticShowers.at(100.5), set, "back to this period's, not on to the next");
+
+        onEventThread(() -> {
+            context.install(context.observer().at(SyntheticShowers.at(200.0)));
+            return null;
+        });
+        MeteorShowerSession.Facts later = session.facts().orElseThrow();
+        assertTrue(!later.active(), "the premise: the period is over");
+        String after = String.join("\n", new MeteorShowerText(EN).lines(later, SERVICE.pack()));
+        assertTrue(after.contains("Nominal maximum at solar longitude 100.5°; next: 2031-"), after);
+    }
+
     @Test
     void theOneTimeActionInstallsThroughTheChartContextAndKeepsThePlace() throws Exception {
         session.select("AAA");
         List<Instant> installed = new ArrayList<>();
         context.onChange(change -> installed.add(change.current().instant()));
-        Instant set = onEventThread(() -> session.setChartTimeToNextMaximum().orElseThrow());
+        Instant set = onEventThread(() -> session.setChartTimeToMaximum().orElseThrow());
         assertEquals(SyntheticShowers.at(100.5), set);
         assertEquals(List.of(set), installed, "one installation, through the one chart time");
         assertEquals(59.91, context.observer().latitudeDegrees());

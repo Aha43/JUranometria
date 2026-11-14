@@ -147,6 +147,30 @@ public final class MeteorShowers {
         }
     }
 
+    /**
+     * The nominal maximum a reader at a chart time means (owner's ruling
+     * of 2026-11-14): while the shower is active, this activity period's,
+     * also when it has just passed, so that looking at an active shower
+     * after its maximum does not answer with next year's; while it is
+     * not active, the next one. Empty outside the years the Sun is
+     * computed for.
+     */
+    public Optional<Instant> nominalMaximumFor(MeteorShower shower, Instant chartTime) {
+        try {
+            double longitude = solarLongitude(chartTime);
+            if (!active(shower, longitude)) {
+                return nominalMaximumAtOrAfter(shower, chartTime);
+            }
+            // An activity period is far narrower than half a turn, so the
+            // maximum nearest in longitude is this period's.
+            double off = signed(shower.maximumLongitude() - longitude);
+            return Optional.of(solve(shower, chartTime.getEpochSecond()
+                    + Math.round(off / MEAN_MOTION * 86400.0)));
+        } catch (IllegalArgumentException outsideTheYears) {
+            return Optional.empty();
+        }
+    }
+
     /** The instant near a guess at which the Sun reaches the shower's listed longitude. */
     private Instant solve(MeteorShower shower, long guess) {
         long t = guess;

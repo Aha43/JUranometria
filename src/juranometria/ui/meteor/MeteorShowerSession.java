@@ -37,14 +37,16 @@ public final class MeteorShowerSession {
      *
      * @param radiant the radiant at the chart time; described only while active
      * @param moonToRadiantDegrees the Moon's distance from the radiant
-     * @param nextMaximum the first nominal maximum at or after the chart time
+     * @param maximum the nominal maximum offered at the chart time: this
+     *        activity period's while the shower is active, also when it has
+     *        passed, and otherwise the next
      * @param night the night around the chart time, while the shower is active
      */
     public record Facts(MeteorShower shower, Observer chart, double solarLongitude,
                         boolean active, MeteorShowers.Radiant radiant,
                         double radiantAltitudeDegrees, double sunAltitudeDegrees,
                         MoonObservation moon, double moonToRadiantDegrees,
-                        Optional<Instant> nextMaximum, Optional<ShowerNight> night) {
+                        Optional<Instant> maximum, Optional<ShowerNight> night) {
     }
 
     private final Supplier<Observer> observer;
@@ -151,7 +153,7 @@ public final class MeteorShowerSession {
                     new LocalSky(now).altitudeDegrees(radiant.at()),
                     sun.horizontal().altitudeDegrees(), moon,
                     moon.astrometricJ2000().separationDegrees(radiant.at()),
-                    service.nominalMaximumAtOrAfter(shower, now.instant()), night));
+                    service.nominalMaximumFor(shower, now.instant()), night));
         } catch (IllegalArgumentException outsideTheYears) {
             return Optional.empty();
         }
@@ -181,13 +183,14 @@ public final class MeteorShowerSession {
     }
 
     /**
-     * Sets the chart time to the selected shower's first nominal maximum
-     * at or after the chart time, through the one chart context; the
-     * place is kept. Returns the instant installed, or empty when there
+     * Sets the chart time to the selected shower's nominal maximum - this
+     * activity period's while the shower is active at the chart time, also
+     * when it has passed, and otherwise the next - through the one chart
+     * context; the place is kept. Returns the instant installed, or empty when there
      * was nothing to install.
      */
-    public Optional<Instant> setChartTimeToNextMaximum() {
-        Optional<Instant> next = facts().flatMap(Facts::nextMaximum);
+    public Optional<Instant> setChartTimeToMaximum() {
+        Optional<Instant> next = facts().flatMap(Facts::maximum);
         if (next.isPresent() && canSetChartTime()) {
             installer.install(installer.observer().at(next.get()));
         }

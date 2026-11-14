@@ -48,6 +48,10 @@ J2000.
 The IAU number, three-letter code, name and, where the list states
 one, the parent body are from the IAU Meteor Data Center's list of
 established meteor showers, V.2 (last update: Nov 10, 20:00:00 UTC, 2026).
+One name is corrected: the list's solutions most often spell the
+Leonids' parent comet "55P/Temple-Tuttle"; JUranometria carries
+55P/Tempel–Tuttle, the comet's name, and keeps the list's
+spelling in the pack's manifest.
 The Meteor Data Center asks that its database be cited as:
 
 - Jenniskens, P.; Jopek, T.J.; Janches, D.; Hajdukova, M.; Kokhirova,
@@ -64,4 +68,5 @@ The Meteor Data Center asks that its database be cited as:
 
 The Global Meteor Network's shower table (CC BY 4.0) was used only to
 check the accuracy of the radiant evaluation and is not part of
-JUranometria.
+JUranometria. A small extract of it, credited, is held with the
+project's tests.

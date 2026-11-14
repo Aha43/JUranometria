@@ -79,6 +79,23 @@ public final class MeteorShowerPackMain {
                 "ba674ce646da2cec431a4ce52987fa3f65cf07427a6e2996c2140bae28858512");
     }
 
+    /**
+     * Ruled normalizations of a parent body's name (owner, 2026-11-14): per
+     * code, the IAU list's statement as the import finds it and the name the
+     * pack carries instead. The Leonids' comet is 55P/Tempel-Tuttle, after
+     * Wilhelm Tempel; the list's most frequent spelling, "Temple", is an
+     * evident error. The import refuses when the list no longer says what
+     * is recorded here, and the manifest keeps the source's value.
+     */
+    static final Map<String, String[]> PARENT_NORMALIZED = Map.of(
+            "LEO", new String[] {"55P/Temple-Tuttle", "55P/Tempel\u2013Tuttle"});
+
+    /** The accuracy fixture the tests hold in CI (owner's ruling of 2026-11-14). */
+    static final Path GMN_FIXTURE = Path.of("test/resources/meteor-showers/gmn-radiant-samples.tsv");
+    static final String GMN_RAW = "gmn_shower_table_20230518.txt";
+    static final String GMN_URL = "https://raw.githubusercontent.com/wmpg/WesternMeteorPyLib/"
+            + "master/wmpl/share/gmn_shower_table_20230518.txt";
+
     private static final List<String> MONTHS = List.of("Jan", "Feb", "Mar", "Apr", "May", "Jun",
             "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
 
@@ -169,8 +186,18 @@ public final class MeteorShowerPackMain {
             }
             rows.sort(Comparator.comparingDouble(
                     r -> signed(r.solarLongitude() - anchor)));
+            String parent = identity.parent();
+            String[] ruled = PARENT_NORMALIZED.get(code);
+            if (ruled != null) {
+                if (!ruled[0].equals(parent)) {
+                    throw new IllegalStateException(code + ": the ruled normalization expects"
+                            + " the IAU list to state \"" + ruled[0] + "\" and it states \""
+                            + parent + "\" - rule again");
+                }
+                parent = ruled[1];
+            }
             MeteorShower shower = new MeteorShower(code, identity.number(), identity.name(),
-                    identity.parent(), spaced(f.get(2)), spaced(f.get(3)),
+                    parent, spaced(f.get(2)), spaced(f.get(3)),
                     round(solar.solarLongitudeJ2000Degrees(start)),
                     round(solar.solarLongitudeJ2000Degrees(end)), spaced(f.get(4)), f.get(5),
                     new SkyPosition(Double.parseDouble(f.get(6)), Double.parseDouble(f.get(7))),
@@ -229,6 +256,10 @@ public final class MeteorShowerPackMain {
         manifest.put("computed", "start_solar_longitude, end_solar_longitude and each radiant"
                 + " row's solar_longitude are JUranometria's, from the calendar's dates and"
                 + " the DE440 Sun; every other number is the source's as printed");
+        for (Map.Entry<String, String[]> ruled : new TreeMap<>(PARENT_NORMALIZED).entrySet()) {
+            manifest.put("parent.normalized." + ruled.getKey() + ".source", ruled.getValue()[0]);
+            manifest.put("parent.normalized." + ruled.getKey() + ".shipped", ruled.getValue()[1]);
+        }
         for (Map.Entry<String, String> pinned : SHA256.entrySet()) {
             manifest.put("source.sha256." + pinned.getKey().replace('/', '.'),
                     pinned.getValue());
@@ -254,9 +285,86 @@ public final class MeteorShowerPackMain {
         if (!loaded.showers().equals(showers)) {
             throw new IllegalStateException("the written pack does not read back as written");
         }
+        if (args.length == 0) {
+            int samples = writeGmnFixture(showers);
+            System.out.printf(Locale.ROOT, "wrote %d Global Meteor Network samples to %s%n",
+                    samples, GMN_FIXTURE);
+        }
         System.out.printf(Locale.ROOT, "wrote %d showers and %d radiant rows to %s;"
                 + " %d fields agreed between the two keyings%n", showers.size(), rowCount,
                 outDir, compared);
+    }
+
+    /**
+     * Writes the smallest extract of the Global Meteor Network's shower
+     * table that holds the accuracy claim of R-10: for each shower, the
+     * table's line nearest each printed radiant row and nearest the
+     * maximum, within 0.11 degrees of solar longitude, verbatim. The table
+     * is CC BY 4.0; the extract carries its source, digest, licence and
+     * attribution, lives with the tests and is never shipped.
+     */
+    private static int writeGmnFixture(List<MeteorShower> showers) throws IOException {
+        String digest = MeteorStudyData.SHA256.get(GMN_RAW);
+        PinnedInputs.verifyChecksum(RAW.resolve(GMN_RAW), digest);
+        Map<String, List<String>> byCode = new LinkedHashMap<>();
+        for (String line : Files.readAllLines(RAW.resolve(GMN_RAW), StandardCharsets.US_ASCII)) {
+            if (line.startsWith("#") || line.isBlank()) {
+                continue;
+            }
+            String[] f = line.trim().split("\\s+");
+            if (!f[1].equals("nan") && !f[2].equals("nan")) {
+                byCode.computeIfAbsent(f[6], k -> new ArrayList<>()).add(line);
+            }
+        }
+        StringBuilder out = new StringBuilder();
+        out.append("# An extract of the Global Meteor Network's shower lookup table, for the nine\n")
+                .append("# meteor showers of JUranometria's pack: the table's lines nearest each printed\n")
+                .append("# radiant row and nearest each maximum, verbatim. Test data only; not shipped.\n")
+                .append("#\n")
+                .append("# Source: \"Shower lookup table measured using GMN data up to May 18, 2023\"\n")
+                .append("#   ").append(GMN_URL).append('\n')
+                .append("#   SHA-256 of the source file: ").append(digest).append('\n')
+                .append("# Licence: Creative Commons Attribution 4.0 International (CC BY 4.0),\n")
+                .append("#   https://creativecommons.org/licenses/by/4.0/ - the Global Meteor Network's\n")
+                .append("#   data are released under it (https://globalmeteornetwork.org/data/).\n")
+                .append("# Attribution: Global Meteor Network, https://globalmeteornetwork.org/;\n")
+                .append("#   Vida et al. 2020, MNRAS 491, 2688-2705; Vida et al. 2021, MNRAS 506, 5046-5074.\n")
+                .append("# Changes: lines selected, nothing else; every data line is the source's own.\n")
+                .append("# Written by make import-meteor-showers (MeteorShowerPackMain); do not edit.\n")
+                .append("#\n")
+                .append("# Sol  SCE lon  SCE lat       Vg  Disp  IAU IAU\n")
+                .append("# deg      deg      deg     km/s  deg    No  cd\n");
+        int count = 0;
+        for (MeteorShower shower : showers) {
+            List<Double> wanted = new ArrayList<>();
+            for (MeteorShower.Row row : shower.rows()) {
+                wanted.add(row.solarLongitude());
+            }
+            wanted.add(shower.maximumLongitude());
+            Map<Double, String> chosen = new TreeMap<>();
+            for (double longitude : wanted) {
+                String best = null;
+                double bestOff = Double.MAX_VALUE;
+                for (String line : byCode.getOrDefault(shower.code(), List.of())) {
+                    double off = Math.abs(signed(
+                            Double.parseDouble(line.trim().split("\\s+")[0]) - longitude));
+                    if (off < bestOff) {
+                        best = line;
+                        bestOff = off;
+                    }
+                }
+                if (best != null && bestOff <= 0.11) {
+                    chosen.put(Double.parseDouble(best.trim().split("\\s+")[0]), best);
+                }
+            }
+            for (String line : chosen.values()) {
+                out.append(line).append('\n');
+                count++;
+            }
+        }
+        Files.createDirectories(GMN_FIXTURE.getParent());
+        Files.write(GMN_FIXTURE, out.toString().getBytes(StandardCharsets.US_ASCII));
+        return count;
     }
 
     private static Map<String, Listed> table5(Path file) throws IOException {
@@ -507,6 +615,10 @@ public final class MeteorShowerPackMain {
                 The IAU number, three-letter code, name and, where the list states
                 one, the parent body are from the IAU Meteor Data Center's list of
                 established meteor showers, V.2 (last update: %s).
+                One name is corrected: the list's solutions most often spell the
+                Leonids' parent comet "55P/Temple-Tuttle"; JUranometria carries
+                55P/Tempel\u2013Tuttle, the comet's name, and keeps the list's
+                spelling in the pack's manifest.
                 The Meteor Data Center asks that its database be cited as:
 
                 - Jenniskens, P.; Jopek, T.J.; Janches, D.; Hajdukova, M.; Kokhirova,
@@ -523,7 +635,8 @@ public final class MeteorShowerPackMain {
 
                 The Global Meteor Network's shower table (CC BY 4.0) was used only to
                 check the accuracy of the radiant evaluation and is not part of
-                JUranometria.
+                JUranometria. A small extract of it, credited, is held with the
+                project's tests.
                 """.formatted(CREDIT, EDITION, EDITION_REFERENCE, CORRECT_AS_OF, iauLastUpdate);
     }
 }

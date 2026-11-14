@@ -51,6 +51,13 @@ being Jopek et al. 2024, *A&A* 682, A159.
 BY 4.0 license"; reference the website and Vida et al. 2020, *MNRAS* 491,
 2688-2705, and Vida et al. 2021, *MNRAS* 506, 5046-5074.
 
+**In the repository (#716, owner's ruling of 2026-11-14):**
+`test/resources/meteor-showers/gmn-radiant-samples.tsv`, 44 lines of the
+table for the nine showers, verbatim, with the source's address, its
+SHA-256, the licence and this attribution in its heading. It is written by
+`make import-meteor-showers`, read by `MeteorShowerAccuracyTest`, and not
+shipped in any archive or image.
+
 ### Not used
 
 The American Meteor Society's calendar: its terms grant no reuse, it names no

@@ -91,7 +91,7 @@ public final class MeteorShowerControls extends JPanel {
         setMaximum.getAccessibleContext().setAccessibleName(said.say("meteor.setMaximum.a11y"));
         Explain.control(setMaximum, said.say("meteor.setMaximum.hover"),
                 said.say("meteor.setMaximum.explain"));
-        setMaximum.addActionListener(event -> session.setChartTimeToNextMaximum());
+        setMaximum.addActionListener(event -> session.setChartTimeToMaximum());
         centre = new JButton(said.say("meteor.centre.label"));
         centre.setName("meteorShowerCentre");
         centre.getAccessibleContext().setAccessibleName(said.say("meteor.centre.a11y"));
@@ -156,7 +156,7 @@ public final class MeteorShowerControls extends JPanel {
         facts.setText(String.join("\n", lines));
         facts.setCaretPosition(0);
         setMaximum.setEnabled(session.canSetChartTime()
-                && now.flatMap(MeteorShowerSession.Facts::nextMaximum).isPresent());
+                && now.flatMap(MeteorShowerSession.Facts::maximum).isPresent());
         centre.setEnabled(session.canCentre());
     }
 

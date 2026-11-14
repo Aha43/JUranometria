@@ -40,6 +40,36 @@ class MeteorShowerPackContractTest {
         }
     }
 
+    /**
+     * The transcription, held (owner's ruling of 2026-11-14, decision record
+     * section 10): the pack's two tables are the ones the two independent
+     * keyings of the calendar agreed on in all 307 fields. A change to either
+     * table is a new import, reviewed, and changes these digests with it.
+     */
+    @Test
+    void theTwiceKeyedValuesAreTheOnesThePackCarries() {
+        assertEquals("731bdf2ad416b7b23514afa7e33adc56d911643cbbf8b6cb893305cbb7dc9756",
+                PACK.manifest().get("checksum.showers.tsv"), "the working-list rows");
+        assertEquals("b8bfb1079bafa0481eaa7adc666c95b395058cb9c81774299cddcd4256f52b32",
+                PACK.manifest().get("checksum.radiants.tsv"), "the radiant rows");
+        assertEquals("307", PACK.manifest().get("keying.fields.compared"));
+        assertEquals("9", PACK.manifest().get("showers"));
+        assertEquals("52", PACK.manifest().get("radiant.rows"));
+    }
+
+    /** The one ruled normalization: the comet's name is carried, the source's spelling kept. */
+    @Test
+    void theLeonidsParentIsTheCometsNameAndTheSourcesSpellingIsRecorded() {
+        MeteorShower leonids = PACK.showers().stream()
+                .filter(s -> s.code().equals("LEO")).findFirst().orElseThrow();
+        assertEquals("55P/Tempel\u2013Tuttle", leonids.parentBody());
+        assertEquals("55P/Temple-Tuttle", PACK.manifest().get("parent.normalized.LEO.source"));
+        assertEquals(leonids.parentBody(), PACK.manifest().get("parent.normalized.LEO.shipped"));
+        for (MeteorShower shower : PACK.showers()) {
+            assertFalse(shower.parentBody().contains("Temple"), shower.code());
+        }
+    }
+
     @Test
     void theEditionIsNamedAndTheSourceIsCredited() {
         assertFalse(PACK.edition().isBlank());

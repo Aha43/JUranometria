@@ -93,6 +93,24 @@ class MeteorShowersTest {
         assertEquals(BBB.radiantAtMaximum(), none.at(), "no row: the working list's radiant");
     }
 
+    /** The owner's ruling of 2026-11-14: this period's while active, the next otherwise. */
+    @Test
+    void whileActiveTheMaximumOfferedIsThisPeriodsAlsoWhenItHasPassed() {
+        Instant expected = SyntheticShowers.at(100.5);
+        assertTrue(SERVICE.active(AAA, expected.plusSeconds(86400L)), "the premise: still active");
+        assertEquals(expected, SERVICE.nominalMaximumFor(AAA, expected.minusSeconds(86400L))
+                .orElseThrow(), "before the maximum, inside the period");
+        assertEquals(expected, SERVICE.nominalMaximumFor(AAA, expected.plusSeconds(86400L))
+                .orElseThrow(), "a day after it, still active: this period's, not next turn's");
+        assertEquals(expected, SERVICE.nominalMaximumFor(AAA, SyntheticShowers.at(20.0))
+                .orElseThrow(), "before the period: the next");
+        Instant after = SyntheticShowers.at(200.0);
+        assertTrue(!SERVICE.active(AAA, after), "the premise: the period is over");
+        assertEquals(expected.plusSeconds(360L * 86400L),
+                SERVICE.nominalMaximumFor(AAA, after).orElseThrow(),
+                "after the period: the next turn's");
+    }
+
     @Test
     void theNominalMaximumIsTheInstantTheSunReachesTheListedLongitude() {
         Instant expected = SyntheticShowers.at(100.5);

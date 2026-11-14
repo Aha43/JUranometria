@@ -84,7 +84,10 @@ public final class MeteorShowerText {
                 one(facts.solarLongitude())));
         lines.add(said.say("meteor.activity", s.activityStart(), s.activityEnd(),
                 one(s.startLongitude()), one(s.endLongitude())));
-        lines.add(facts.nextMaximum().map(at -> said.say("meteor.maximum", s.maximumLongitudeText(),
+        String which = !facts.active() ? "meteor.maximum"
+                : facts.maximum().map(at -> at.isBefore(facts.chart().instant())).orElse(false)
+                        ? "meteor.maximum.thisPassed" : "meteor.maximum.thisAhead";
+        lines.add(facts.maximum().map(at -> said.say(which, s.maximumLongitudeText(),
                 maximum(s, at))).orElseGet(() -> said.say("meteor.maximum.none",
                 s.maximumLongitudeText())));
         lines.add(said.say("meteor.rate", s.zhr(), s.populationIndex(), whole(s.vInfinity())));

@@ -21,9 +21,10 @@ subdued below the horizon, named, selectable, described aloud and in
 the selected-object box; outside the period nothing is drawn. Activity
 and the nominal maximum are reckoned by the Sun's ecliptic longitude
 (solar longitude), so they hold in any year the Sun is computed for,
-and the radiant drifts with the chart time. *Set chart time to next
-nominal maximum* moves the one chart time; nothing here keeps a clock
-of its own. A radiant can be bookmarked and reopened at its saved time
+and the radiant drifts with the chart time. *Set chart time to nominal
+maximum* moves the one chart time - to this activity period's maximum
+while the shower is active, also when it has passed, and otherwise to
+the next; nothing here keeps a clock of its own. A radiant can be bookmarked and reopened at its saved time
 and place; existing bookmarks are unchanged. The values are nominal,
 from the IMO Meteor Shower Calendar 2027 - Source: International Meteor
 Organization (IMO) – www.imo.net - with identities from the IAU Meteor

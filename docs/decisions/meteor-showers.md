@@ -558,7 +558,56 @@ The owner ruled on 2026-11-14:
   everywhere. The accuracy test against the Global Meteor Network's table
   still needs the raw folder and is skipped without it.
 
-Still open from section 8, for the owner at the hands-on checkpoint: the
-parent body's spelling, the accuracy fixture, and "next maximum only".
-Still outside: #719. Nothing here is qualified; the gate-impact plan comes
-after the candidate is accepted.
+The three choices section 8 left open were ruled at the hands-on
+checkpoint: section 10. Still outside: #719. Nothing here is qualified; the
+gate-impact plan comes after the candidate is accepted.
+
+## 10. The hands-on checkpoint (owner, 2026-11-14)
+
+The owner tried the first candidate, accepted its direction and ruled on
+the open choices. No ecliptic tick or solar-longitude marker is expected on
+the chart: that is #719, untouched. The panel uses and explains solar
+longitude.
+
+1. **The Leonids' parent body.** Parent bodies stay. The Leonids' is carried
+   as **55P/Tempel–Tuttle**: a ruled normalization of an evident spelling
+   error in the source, whose solutions say "55P/Temple-Tuttle" five times
+   and "55P/Tempel-Tuttle" three. The importer holds the normalization by
+   name, refuses if the list no longer states what the ruling corrected, and
+   writes the source's value to the manifest
+   (`parent.normalized.LEO.source`); the notice says so. The atlas does not
+   teach the misspelling and does not drop every shower's parent body
+   because of one. The rule for the other showers is unchanged (section 8).
+2. **The accuracy fixture.** A scientific accuracy test that is skipped in CI
+   is too weak. The importer writes the smallest extract of the Global
+   Meteor Network's table that holds R-10 for the nine showers - the
+   table's own lines nearest each printed radiant row and each maximum, 44
+   lines, verbatim - to `test/resources/meteor-showers/gmn-radiant-samples.tsv`,
+   with the source's address, its SHA-256, the CC BY 4.0 licence and the
+   attribution the network asks for. `MeteorShowerAccuracyTest` reads it
+   everywhere; where the raw table is present it also checks every line of
+   the extract against it. The extract is test data and is not shipped.
+3. **The maximum.** While the shower is active at the chart time, the panel
+   shows and the action offers **this activity period's** nominal maximum,
+   also when it has passed (the panel says "has passed"). While it is not
+   active, the next one. Looking at the Leonids the day after their maximum
+   no longer answers with next year's. The action is named *Set chart time
+   to nominal maximum* (*Sett karttiden til nominelt maksimum*); it no
+   longer says "next", because it is not always the next.
+   `MeteorShowers.nominalMaximumFor` holds the rule and
+   `MeteorShowersTest` its four cases.
+4. **The transcription.** The agent's independent second keying is accepted
+   for these nine rows. For the record: it was a fresh keying on 2026-11-12
+   from pages 25 and 26 of the calendar rendered as images, made without
+   reference to the first transcription, which was parsed from the PDF's
+   extracted text. The two were then compared field by field: 307 fields,
+   **no disagreement, so nothing to resolve**. The three hand corrections
+   noted in `sources.md` were made to the first transcription's column
+   assignment during the study, before the second keying existed; the
+   second keying agrees with the corrected values. The committed tests hold
+   the result: `MeteorShowerPackContractTest` pins the digests of both
+   tables and the count of fields compared, and the pack refuses to load if
+   a table does not match its manifest.
+5. **The Norwegian licensing summary** lacks its Mars, Uranus and Neptune
+   paragraphs. That predates the meteor work and is filed separately; the
+   meteor paragraph is complete in both languages.
