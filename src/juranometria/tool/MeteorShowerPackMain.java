@@ -38,8 +38,20 @@ import juranometria.solar.SolarSystemService;
  * image);</li>
  * <li>a shower whose IAU number in the IMO list is not the IAU list's,
  * or whose radiant table read at the maximum is more than two degrees
- * from the working list's radiant.</li>
+ * from the working list's radiant;</li>
+ * <li>a committed Global Meteor Network extract that is not what the
+ * pinned raw table gives: any data line that is not the source's own,
+ * and, when the pack is written elsewhere than its home, any byte that
+ * differs from the extract this run derives;</li>
+ * <li>a calendar text that no longer prints the one clock time it
+ * states outright, or a production Sun that does not reach the listed
+ * longitude within ten minutes of it.</li>
  * </ul>
+ *
+ * <p>These last two are the raw-source checks of the accuracy claim.
+ * They live here, at the import boundary, by the owner's ruling of
+ * 2026-11-14: a test exercises the committed product and never needs
+ * the raw sources.
  *
  * <p>What it computes, and the pack marks as the atlas's own: the solar
  * longitude of 00:00 UTC on the first date of activity and of 24:00 UTC
@@ -95,6 +107,23 @@ public final class MeteorShowerPackMain {
     static final String GMN_RAW = "gmn_shower_table_20230518.txt";
     static final String GMN_URL = "https://raw.githubusercontent.com/wmpg/WesternMeteorPyLib/"
             + "master/wmpl/share/gmn_shower_table_20230518.txt";
+
+    /**
+     * The text extraction of the pinned calendar PDF kept beside it
+     * ({@code docs/studies/meteor-showers/sources.md}), held to its own
+     * digest: where the one clock time the calendar prints is read.
+     */
+    static final String CALENDAR_TEXT = "transcribed/imo-cal2027.pdfkit.txt";
+    static final String CALENDAR_TEXT_SHA256 =
+            "3c1bd3536026dd4a3d84f564264c7a93b12cbd18d49615142479a33425b8cd94";
+    /** The calendar's own words for it (pages 3 and 4 of the 2027 edition). */
+    static final List<String> PRINTED_CLOCK_TIME = List.of(
+            "peak on January 4 shortly\nafter 03h UT",
+            "Quadrantids (010 QUA)\nActive: December 28\u2013January 12;"
+                    + " Maximum: January 4, 03h25m UT");
+    static final String CLOCK_TIME_SHOWER = "QUA";
+    static final Instant CLOCK_TIME = Instant.parse("2027-01-04T03:25:00Z");
+    static final long CLOCK_TIME_TOLERANCE_SECONDS = 600;
 
     private static final List<String> MONTHS = List.of("Jan", "Feb", "Mar", "Apr", "May", "Jun",
             "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
@@ -285,29 +314,90 @@ public final class MeteorShowerPackMain {
         if (!loaded.showers().equals(showers)) {
             throw new IllegalStateException("the written pack does not read back as written");
         }
-        if (args.length == 0) {
-            int samples = writeGmnFixture(showers);
-            System.out.printf(Locale.ROOT, "wrote %d Global Meteor Network samples to %s%n",
-                    samples, GMN_FIXTURE);
-        }
+        Instant clock = verifyPrintedClockTime(loaded, solar);
+        System.out.printf(Locale.ROOT, "calendar clock time verified against the pinned text:"
+                + " %s maximum printed %s, the production Sun reaches the listed longitude"
+                + " at %s%n", CLOCK_TIME_SHOWER, CLOCK_TIME, clock);
+        int samples = holdGmnExtract(showers, args.length == 0);
+        System.out.printf(Locale.ROOT, "Global Meteor Network extract verified against the"
+                + " pinned raw table: %d lines, each the source's own, in %s%s%n", samples,
+                GMN_FIXTURE, args.length == 0 ? " (written)" : " (committed bytes compared)");
         System.out.printf(Locale.ROOT, "wrote %d showers and %d radiant rows to %s;"
                 + " %d fields agreed between the two keyings%n", showers.size(), rowCount,
                 outDir, compared);
     }
 
     /**
-     * Writes the smallest extract of the Global Meteor Network's shower
+     * Holds the smallest extract of the Global Meteor Network's shower
      * table that holds the accuracy claim of R-10: for each shower, the
      * table's line nearest each printed radiant row and nearest the
      * maximum, within 0.11 degrees of solar longitude, verbatim. The table
      * is CC BY 4.0; the extract carries its source, digest, licence and
      * attribution, lives with the tests and is never shipped.
      */
-    private static int writeGmnFixture(List<MeteorShower> showers) throws IOException {
+    private static int holdGmnExtract(List<MeteorShower> showers, boolean write)
+            throws IOException {
         String digest = MeteorStudyData.SHA256.get(GMN_RAW);
         PinnedInputs.verifyChecksum(RAW.resolve(GMN_RAW), digest);
+        List<String> source = Files.readAllLines(RAW.resolve(GMN_RAW), StandardCharsets.US_ASCII);
+        String derived = gmnExtract(showers, source, digest);
+        if (Files.isRegularFile(GMN_FIXTURE)) {
+            // An extract that was edited is refused, not silently repaired.
+            java.util.Set<String> own = new java.util.HashSet<>(source);
+            for (String line : Files.readAllLines(GMN_FIXTURE, StandardCharsets.US_ASCII)) {
+                if (!line.startsWith("#") && !own.contains(line)) {
+                    throw new IllegalStateException("the committed Global Meteor Network extract"
+                            + " holds a line that is not the pinned source's own: " + line);
+                }
+            }
+        }
+        if (write) {
+            Files.createDirectories(GMN_FIXTURE.getParent());
+            Files.write(GMN_FIXTURE, derived.getBytes(StandardCharsets.US_ASCII));
+        }
+        if (!Files.isRegularFile(GMN_FIXTURE) || !derived.equals(
+                new String(Files.readAllBytes(GMN_FIXTURE), StandardCharsets.US_ASCII))) {
+            throw new IllegalStateException("the committed Global Meteor Network extract ("
+                    + GMN_FIXTURE + ") is not what the pinned raw table gives for this pack");
+        }
+        return (int) derived.lines().filter(line -> !line.startsWith("#")).count();
+    }
+
+    /**
+     * The one clock time the calendar states outright, read where the
+     * calendar prints it and held against the production Sun: the pinned
+     * text must still say it, and the pack's nominal maximum must fall
+     * within ten minutes of it (the calendar's λ⊙ is printed to 0.01°,
+     * about a quarter of an hour).
+     */
+    private static Instant verifyPrintedClockTime(MeteorShowerPack pack, SolarSystemService solar)
+            throws IOException {
+        Path text = RAW.resolve(CALENDAR_TEXT);
+        PinnedInputs.verifyChecksum(text, CALENDAR_TEXT_SHA256);
+        String calendar = Files.readString(text, StandardCharsets.UTF_8);
+        for (String printed : PRINTED_CLOCK_TIME) {
+            if (!calendar.contains(printed)) {
+                throw new IllegalStateException("the calendar text no longer prints: "
+                        + printed.replace('\n', ' '));
+            }
+        }
+        MeteorShowers showers = new MeteorShowers(pack, solar::solarLongitudeJ2000Degrees);
+        Instant found = showers.nominalMaximumAtOrAfter(
+                showers.shower(CLOCK_TIME_SHOWER).orElseThrow(),
+                Instant.parse("2027-01-01T00:00:00Z")).orElseThrow();
+        long off = Math.abs(found.getEpochSecond() - CLOCK_TIME.getEpochSecond());
+        if (off > CLOCK_TIME_TOLERANCE_SECONDS) {
+            throw new IllegalStateException("the production Sun reaches the " + CLOCK_TIME_SHOWER
+                    + " maximum at " + found + ", " + off + " s from the " + CLOCK_TIME
+                    + " the calendar prints");
+        }
+        return found;
+    }
+
+    private static String gmnExtract(List<MeteorShower> showers, List<String> source,
+                                     String digest) {
         Map<String, List<String>> byCode = new LinkedHashMap<>();
-        for (String line : Files.readAllLines(RAW.resolve(GMN_RAW), StandardCharsets.US_ASCII)) {
+        for (String line : source) {
             if (line.startsWith("#") || line.isBlank()) {
                 continue;
             }
@@ -334,7 +424,6 @@ public final class MeteorShowerPackMain {
                 .append("#\n")
                 .append("# Sol  SCE lon  SCE lat       Vg  Disp  IAU IAU\n")
                 .append("# deg      deg      deg     km/s  deg    No  cd\n");
-        int count = 0;
         for (MeteorShower shower : showers) {
             List<Double> wanted = new ArrayList<>();
             for (MeteorShower.Row row : shower.rows()) {
@@ -359,12 +448,9 @@ public final class MeteorShowerPackMain {
             }
             for (String line : chosen.values()) {
                 out.append(line).append('\n');
-                count++;
             }
         }
-        Files.createDirectories(GMN_FIXTURE.getParent());
-        Files.write(GMN_FIXTURE, out.toString().getBytes(StandardCharsets.US_ASCII));
-        return count;
+        return out.toString();
     }
 
     private static Map<String, Listed> table5(Path file) throws IOException {

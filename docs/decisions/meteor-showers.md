@@ -504,7 +504,8 @@ the repository until the IMO has answered. So at this head:
   Network's table from the raw folder and is skipped where the raw sources
   are absent, which includes CI. *Open: after the IMO's answer, commit a
   small GMN-derived fixture (CC BY 4.0, credited) so the claim is held
-  everywhere, or keep it a local check.*
+  everywhere, or keep it a local check.* (Settled: the fixture is committed,
+  section 10; no test is skipped for want of a raw source, section 11.)
 - **#719** (ecliptic-longitude ticks): not mocked; nothing about it was
   exceptionally cheap.
 
@@ -585,8 +586,8 @@ longitude.
    lines, verbatim - to `test/resources/meteor-showers/gmn-radiant-samples.tsv`,
    with the source's address, its SHA-256, the CC BY 4.0 licence and the
    attribution the network asks for. `MeteorShowerAccuracyTest` reads it
-   everywhere; where the raw table is present it also checks every line of
-   the extract against it. The extract is test data and is not shipped.
+   everywhere. The extract is test data and is not shipped. (Where it is
+   held to the raw table changed the same day: section 11.)
 3. **The maximum.** While the shower is active at the chart time, the panel
    shows and the action offers **this activity period's** nominal maximum,
    also when it has passed (the panel says "has passed"). While it is not
@@ -611,3 +612,43 @@ longitude.
 5. **The Norwegian licensing summary** lacks its Mars, Uranus and Neptune
    paragraphs. That predates the meteor work and is filed separately; the
    meteor paragraph is complete in both languages.
+
+## 11. Raw-source fidelity belongs to the importer (owner, 2026-11-14)
+
+The first head offered for merge, `12854f22` (PR #722), failed its one CI
+run. The display job found and started 2 788 tests and passed 2 786 with
+none failed: two were **aborted**, and that job allows none. Both were
+tests this work had added to `MeteorShowerAccuracyTest`, each skipping
+itself by assumption when `imports/raw/meteor-showers` is absent, which it
+always is in CI. Locally the folder is present, so both ran and passed, and
+neither the development suite nor the local gates could show it. The run is
+kept as the failed evidence and that head was not run again.
+
+The owner's ruling: **raw-source fidelity belongs at the import boundary;
+ordinary tests exercise the committed product and never abort merely
+because a developer-only source archive is absent.**
+
+As built:
+
+- `make import-meteor-showers` now refuses if the committed Global Meteor
+  Network extract is not what the pinned raw table gives: any data line
+  that is not the source's own (an edited extract is refused, not silently
+  repaired), and, after writing it or when the pack is written to another
+  folder, any byte that differs from the extract the run derives.
+- It also verifies the one clock time the calendar states outright. The
+  text extraction of the pinned PDF (`transcribed/imo-cal2027.pdfkit.txt`,
+  now held to its own SHA-256 in the importer) must still print "peak on
+  January 4 shortly after 03h UT" and "Maximum: January 4, 03h25m UT" for
+  the Quadrantids, and the production Sun must reach the listed longitude
+  within ten minutes of 03:25 UTC. It does at 03:26:02 UTC. (Section 4 of
+  the study wrote 03:23; the pack's solar longitudes are rounded to four
+  decimals, and the importer's figure is the bundled pack's.)
+- Each check prints a line when it has run, so an import's log shows it.
+- `MeteorShowerAccuracyTest` no longer reads a raw source or carries an
+  assumption. It holds the committed pack against the committed extract
+  (the R-10 figures), the extract's source, digest, licence and
+  attribution, the shape of its 44 lines, and the expected clock result
+  from the committed pack and the production Sun.
+
+The bundled pack and the extract are byte for byte what `12854f22` held.
+

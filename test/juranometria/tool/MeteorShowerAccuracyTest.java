@@ -3,6 +3,7 @@ package juranometria.tool;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -10,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
 import juranometria.chart.SkyPosition;
@@ -37,10 +37,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * is committed with the tests - the table's own lines nearest each printed
  * row and each maximum, with their source, digest, licence and attribution
  * ({@code test/resources/meteor-showers/gmn-radiant-samples.tsv}, written
- * by the importer) - so the claim is held everywhere, CI included. Where
- * the raw table is present the extract is also checked against it line by
- * line. The Quadrantids' clock time is the one instant the calendar
- * prints, and section 4 of the study measured it.
+ * by the importer) - so the claim is held everywhere, CI included.
+ *
+ * <p>Nothing here reads a raw source or is skipped for want of one
+ * (owner's ruling, 2026-11-14, after two such assumptions aborted on
+ * CI's display run): fidelity to the raw table and to the calendar's
+ * printed clock time is the importer's to refuse on
+ * ({@code make import-meteor-showers}); these tests hold the committed
+ * pack, the committed extract, its attribution, the calculation and the
+ * expected clock result.
  */
 class MeteorShowerAccuracyTest {
 
@@ -135,34 +140,41 @@ class MeteorShowerAccuracyTest {
     }
 
     @Test
-    void everyLineOfTheExtractIsTheSourcesOwn() throws Exception {
-        Path raw = MeteorStudyData.RAW.resolve("gmn_shower_table_20230518.txt");
-        Assumptions.assumeTrue(Files.isRegularFile(raw),
-                "the raw Global Meteor Network table is not on this machine");
-        PinnedInputs.verifyChecksum(raw, MeteorStudyData.SHA256.get(
-                "gmn_shower_table_20230518.txt"));
-        Set<String> source = new HashSet<>(Files.readAllLines(raw, StandardCharsets.US_ASCII));
-        for (String line : Files.readAllLines(FIXTURE, StandardCharsets.US_ASCII)) {
-            if (!line.startsWith("#")) {
-                assertTrue(source.contains(line), "not a line of the source: " + line);
-            }
-        }
-    }
-
-    @Test
     void theOneClockTimeTheCalendarPrintsIsWhereTheSunReachesTheListedLongitude()
             throws Exception {
-        Assumptions.assumeTrue(Files.isDirectory(MeteorStudyData.RAW),
-                "the raw meteor-shower sources are not on this machine");
         SolarSystemService solar = SolarSystemService.load();
         MeteorShowers showers = new MeteorShowers(MeteorShowerPack.load(),
                 solar::solarLongitudeJ2000Degrees);
-        // "Shortly after 03h UT" on 4 January 2027 (IMO 2027 calendar, p. 3; study section 4).
-        java.time.Instant found = showers.nominalMaximumAtOrAfter(
-                showers.shower("QUA").orElseThrow(),
-                java.time.Instant.parse("2027-01-01T00:00:00Z")).orElseThrow();
-        assertTrue(found.isAfter(java.time.Instant.parse("2027-01-04T03:00:00Z"))
-                && found.isBefore(java.time.Instant.parse("2027-01-04T04:00:00Z")),
-                found.toString());
+        // "Maximum: January 4, 03h25m UT", "shortly after 03h UT" (IMO 2027 calendar, pp. 3-4;
+        // study section 4). The importer reads those words in the pinned text; here the
+        // committed pack and the production Sun give the expected clock result.
+        Instant found = showers.nominalMaximumAtOrAfter(
+                showers.shower(MeteorShowerPackMain.CLOCK_TIME_SHOWER).orElseThrow(),
+                Instant.parse("2027-01-01T00:00:00Z")).orElseThrow();
+        assertEquals(Instant.parse("2027-01-04T03:25:00Z"), MeteorShowerPackMain.CLOCK_TIME);
+        assertTrue(found.isAfter(Instant.parse("2027-01-04T03:00:00Z")), found.toString());
+        long off = Math.abs(found.getEpochSecond()
+                - MeteorShowerPackMain.CLOCK_TIME.getEpochSecond());
+        assertTrue(off <= MeteorShowerPackMain.CLOCK_TIME_TOLERANCE_SECONDS,
+                found + " is " + off + " s from the printed time");
+    }
+
+    @Test
+    void everyDataLineOfTheExtractIsATableLineOfOneOfTheNineShowers() throws Exception {
+        Set<String> codes = new HashSet<>();
+        for (MeteorShower shower : MeteorShowerPack.load().showers()) {
+            codes.add(shower.code());
+        }
+        int lines = 0;
+        for (String line : Files.readAllLines(FIXTURE, StandardCharsets.US_ASCII)) {
+            if (line.startsWith("#")) {
+                continue;
+            }
+            String[] f = line.trim().split("\\s+");
+            assertEquals(7, f.length, line);
+            assertTrue(codes.contains(f[6]), line);
+            lines++;
+        }
+        assertEquals(44, lines, "the extract the importer derived and verified");
     }
 }

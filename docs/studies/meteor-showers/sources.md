@@ -70,6 +70,12 @@ The two calendars are PDFs. Their text was extracted with macOS PDFKit and
 kept beside the PDFs (`transcribed/imo-cal2026.pdfkit.txt`,
 `transcribed/imo-cal2027.pdfkit.txt`).
 
+Since 2026-11-14 the importer (`make import-meteor-showers`) holds the 2027
+extraction to its SHA-256 and reads in it the one clock time the calendar
+prints, the Quadrantids' maximum; it also holds the committed Global Meteor
+Network extract to the raw table. Those raw-source checks are the
+importer's, not the tests' (decision record, section 11).
+
 - **`transcribed/imo-2026-table5.tsv`, `imo-2027-table5.tsv`** - Table 5,
   the Working List of Visual Meteor Showers (p. 25), parsed from the
   extracted text. The 2027 table was also keyed by hand from the same page;
