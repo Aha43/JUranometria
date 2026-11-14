@@ -8154,6 +8154,36 @@ public final class PackagedAcceptanceMain {
                         && PackagedAcceptanceMain.class.getResourceAsStream(
                                 "/resources/neptune-system/PROVENANCE.md") != null,
                 "the Neptune System pack's notice and provenance travel with it");
+        // The meteor-shower pack (#716), inside the packaged image: the nine
+        // showers of the named edition under the IMO's credit, its notice
+        // beside it, and the one clock time the calendar prints - the
+        // Quadrantid maximum "shortly after 03h UT" on 4 January 2027 (IMO
+        // Meteor Shower Calendar 2027, p. 3; restated once from
+        // MeteorShowerAccuracyTest) - found where the packaged Sun reaches the
+        // listed solar longitude.
+        juranometria.meteor.MeteorShowerPack meteorPack = juranometria.meteor.MeteorShowerPack.load();
+        juranometria.meteor.MeteorShowers meteorShowers = new juranometria.meteor.MeteorShowers(
+                meteorPack, solar::solarLongitudeJ2000Degrees);
+        require(meteorShowers.showers().size() == 9
+                        && "IMO Meteor Shower Calendar 2027".equals(meteorPack.edition())
+                        && "Source: International Meteor Organization (IMO) \u2013 www.imo.net"
+                                .equals(meteorPack.credit()),
+                "the meteor-shower pack holds nine showers of the named edition under the IMO's credit: "
+                        + meteorShowers.showers().size() + ", " + meteorPack.edition() + ", "
+                        + meteorPack.credit());
+        java.time.Instant quadrantidMaximum = meteorShowers.nominalMaximumAtOrAfter(
+                meteorShowers.shower("QUA").orElseThrow(),
+                java.time.Instant.parse("2027-01-01T00:00:00Z")).orElseThrow();
+        require(quadrantidMaximum.isAfter(java.time.Instant.parse("2027-01-04T03:00:00Z"))
+                        && quadrantidMaximum.isBefore(java.time.Instant.parse("2027-01-04T04:00:00Z")),
+                "the Quadrantids' nominal maximum of 2027 falls shortly after 03h UT on 4 January: "
+                        + quadrantidMaximum);
+        require(PackagedAcceptanceMain.class.getResourceAsStream(
+                        "/resources/meteor-showers/NOTICE-meteor-showers.md") != null,
+                "the meteor-shower pack's notice travels with it");
+        System.out.println("meteor shower pack OK (" + meteorPack.edition()
+                + ", nine showers; the Quadrantids' nominal maximum of 2027 at "
+                + quadrantidMaximum.truncatedTo(java.time.temporal.ChronoUnit.MINUTES) + ")");
         System.out.println("neptune system pack OK (NEP098 and DE442 excerpts v"
                 + juranometria.solar.NeptuneSystemPack.load().manifest().get("pack.version")
                 + ", Neptune at Oslo within "

@@ -35,4 +35,13 @@ NAIF-reglene for endrede SPICE-kjerner (ingen avgift eller lisens);
 IAU 2015-konstantene kopiert fra NAIFs planetkonstantkjerne og fire
 ringradier sitert fra NASAs Planetary Data System Rings Node.
 
+Meteorsvermdata: en avledet tabell over ni årlige svermer fra IMO
+Meteor Shower Calendar 2027, brukt etter datapolitikken til
+International Meteor Organization med dens kreditering - Source:
+International Meteor Organization (IMO) - www.imo.net - og
+identiteter fra IAU Meteor Data Center, sitert slik det ber om.
+JUranometria er ikke tilknyttet eller anbefalt av IMO; posisjoner
+mellom de trykte radene, tidspunkter og alt for et sted er
+JUranometrias beregninger.
+
 Verktøylinjeikoner fra ikonsettet Tabler: MIT-lisens.

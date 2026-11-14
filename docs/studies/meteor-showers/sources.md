@@ -104,6 +104,21 @@ between the two editions. The full transcriptions stay in the gitignored raw
 folder. The owner contacts the IMO before #716 ships any derived offline
 pack.
 
+**2026-11-14.** The owner wrote to `info@imo.net`; no reply had come by
+2026-11-14, and the owner ruled that the wait is over (decision record,
+section 9): the IMO's data policy permits use, reproduction and sharing for
+any purpose without prior permission, and the pack is a derived nine-shower
+subset, neither the Calendar in substantial part nor the IMO's dataset as a
+standalone file. The pack `src/resources/meteor-showers/` is in the
+repository from #716 on, with the credit line, the edition's name and its
+notice. The full transcriptions, both keyings and the calendar PDFs stay in
+the gitignored raw folder. A newer edition of the calendar is a new import:
+fetch the PDF into `imports/raw/meteor-showers/`, key the nine showers'
+rows of Tables 5 and 6 twice, pin the checksums and the edition in
+`MeteorShowerPackMain`, and run `make import-meteor-showers`, which refuses
+unless the keyings agree. A later reply from the IMO is recorded here and
+in the decision record.
+
 ## A process deviation
 
 Preparing the study worktree, `scripts/download-libs.sh` fetched

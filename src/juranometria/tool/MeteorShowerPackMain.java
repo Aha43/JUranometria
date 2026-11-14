@@ -53,7 +53,7 @@ public final class MeteorShowerPackMain {
 
     static final Path RAW = Path.of("imports/raw/meteor-showers");
     static final int EDITION_YEAR = 2027;
-    static final String EDITION = "IMO 2027 Meteor Shower Calendar";
+    static final String EDITION = "IMO Meteor Shower Calendar 2027";
     static final String EDITION_REFERENCE = "IMO_INFO(3-26), edited by J. Rendtel";
     /** "Correct according to the best information available in June 2026" (Table 5's heading). */
     static final String CORRECT_AS_OF = "2026-06";
@@ -476,10 +476,23 @@ public final class MeteorShowerPackMain {
                 velocity, the population index, the zenithal hourly rate, and the
                 radiant table's rows.
 
-                The International Meteor Organization allows its published data to be
-                used, reproduced and shared with this credit, and asks that values a
-                user computes be marked as the user's own
-                (https://www.imo.net/about/using-imo-data/).
+                The International Meteor Organization's data policy
+                (https://www.imo.net/about/using-imo-data/) allows its published data
+                to be used, reproduced and shared for any purpose with this credit,
+                and asks that values a user computes be marked as the user's own.
+                JUranometria carries a derived subset of nine showers, not the
+                calendar in full or in substantial part and not the IMO's dataset as
+                a file, database or service of its own.
+
+                JUranometria is not affiliated with, sponsored by or endorsed by the
+                International Meteor Organization, and does not use its logo.
+
+                The nine showers' values were keyed twice from the calendar,
+                independently, and the pack is written only when the two keyings
+                agree in every field. The pack is one edition of the calendar. The
+                IMO revises its calendar every year; a newer edition enters
+                JUranometria as a new reviewed import that names its edition, and
+                until then the values shown are this edition's.
 
                 **Computed by JUranometria, not by the IMO:** the Sun's ecliptic
                 longitude at the first and last date of each activity period and at

@@ -53,4 +53,12 @@ NEP098, modified by JUranometria under NAIF's rules for modified SPICE
 kernels (no fee or licence); the IAU 2015 radii and pole, with its
 periodic term, copied from NAIF's planetary-constants kernel.
 
+Meteor shower data: a derived table of nine annual showers from the
+IMO Meteor Shower Calendar 2027, used under the International Meteor
+Organization's data policy with its credit - Source: International
+Meteor Organization (IMO) - www.imo.net - and identities from the IAU
+Meteor Data Center, cited as it asks. JUranometria is not affiliated
+with or endorsed by the IMO; positions between the printed rows,
+instants and everything for a place are JUranometria's calculations.
+
 Toolbar icons from the Tabler icon set: MIT license.

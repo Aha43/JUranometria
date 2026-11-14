@@ -136,7 +136,7 @@ public final class MeteorShowerPack {
         return showers;
     }
 
-    /** The edition the numbers are from, for example "IMO 2027 Meteor Shower Calendar". */
+    /** The edition the numbers are from, for example "IMO Meteor Shower Calendar 2027". */
     public String edition() {
         return manifest.get("edition");
     }

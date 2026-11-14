@@ -92,6 +92,9 @@ section).
 *C-1: push the study as it stands with the credit line, or first cut M§9 to
 the candidate showers and counts.*
 
+*Superseded in part on 2026-11-14 (section 9): the pack no longer waits for
+the IMO's answer. Every other part of R-3 stands.*
+
 **R-4. One named edition.** A pack is one edition of the IMO calendar,
 named with its "correct as of" date, and every panel that shows a value
 names the edition. A newer edition is a new import, held like the leap-second
@@ -399,8 +402,13 @@ by strength. The untrimmed tables were never pushed.
 
 ## 8. As built (#716; the unqualified candidate, before the IMO's reply)
 
-**Status: built for the owner's hands, not qualified, and not shippable
-yet.** By the owner's instruction of 2026-11-12 the feature was built while
+**Status on 2026-11-14: this section describes the head of 2026-11-12. Its
+boundary - the pack and the licensing entries kept out of the tree - was
+lifted by the ruling in section 9, which also says what landed with it.
+What was built, and the choices made in building, stand as written here.**
+
+**Status on 2026-11-12: built for the owner's hands, not qualified, and not
+shippable yet.** By the owner's instruction of 2026-11-12 the feature was built while
 the IMO's answer to the contact of C-1 was outstanding, under one boundary:
 the derived pack, and any fixture that reproduces its values, stay out of
 the repository until the IMO has answered. So at this head:
@@ -499,3 +507,58 @@ the repository until the IMO has answered. So at this head:
   everywhere, or keep it a local check.*
 - **#719** (ecliptic-longitude ticks): not mocked; nothing about it was
   exceptionally cheap.
+
+## 9. The IMO wait is over (owner, 2026-11-14)
+
+The owner ruled on 2026-11-14:
+
+- The courtesy message to `info@imo.net` had received no reply by
+  2026-11-14.
+- The IMO's current data policy explicitly permits use, reproduction and
+  sharing for any purpose, commercial applications included, without prior
+  permission (`https://www.imo.net/about/using-imo-data/`, read again on
+  2026-11-14; the page carries no date of its own).
+- JUranometria ships a derived nine-shower subset: not the Calendar in full
+  or in substantial part, and not the complete IMO dataset as a standalone
+  database or API. Those are the cases for which the policy asks to be
+  contacted first.
+- **Only R-3's requirement to wait for an IMO answer is superseded.** The
+  wait no longer blocks implementation, qualification or landing.
+- Every substantive safeguard stays:
+
+  | safeguard | where it is held |
+  |---|---|
+  | The exact credit, `Source: International Meteor Organization (IMO) – www.imo.net` | the pack's manifest and notice; the panel's edition line; `BundledNoticesTest`; the packaged acceptance |
+  | The edition named: IMO Meteor Shower Calendar 2027 | the manifest's `edition` (renamed from "IMO 2027 Meteor Shower Calendar" to the form the policy gives), the notice, the panel, About and both licensing records |
+  | No IMO logo, affiliation or endorsement claim | stated in the notice and in both licensing summaries; no IMO mark is in the tree |
+  | JUranometria's calculations told apart from the IMO's published values | the notice's "Computed by JUranometria, not by the IMO", the manifest's `computed`, the panel's edition line (R-9, R-21) |
+  | A reviewed, independently checked transcription | the second keying, 307 fields in agreement, refused by the importer otherwise (section 8, item 3). It was made by the coding agent from the page images, not by a second person; the owner may still read the nine rows against pages 25 and 26 |
+  | The source edition and the update path documented | the manifest's edition, reference, "correct as of" and source checksums; the notice's last paragraph on the IMO's part; R-4; `sources.md` |
+
+- A later answer from the IMO is preserved beside this record and any
+  reasonable correction it asks for is applied. It reopens nothing by
+  itself.
+
+### What landed with the ruling
+
+- `src/resources/meteor-showers/` is in the tree: `showers.tsv`,
+  `radiants.tsv`, the checksummed manifest and the notice. The data files
+  are byte for byte the ones generated on 2026-11-12; the notice gained the
+  policy's terms as ruled, the statement of no affiliation, the double
+  keying and the update path; the local git exclusion is gone.
+- The notice is the fifteenth document in About, in both languages; the
+  licensing summary names the pack in English and Norwegian;
+  `LICENSING.md` and the archive's `LICENSING.md` carry a row each; the
+  portable archive ships `licenses/NOTICE-meteor-showers.md`; the packaged
+  images' licensing inventory checks seventeen resources; the packaged
+  acceptance loads the pack, checks the nine, the edition, the credit and
+  the notice, and finds the Quadrantids' nominal maximum of 2027 shortly
+  after 03h UT on 4 January, the one clock time the calendar prints.
+- A clean checkout now has the pack, so the tests that read it run
+  everywhere. The accuracy test against the Global Meteor Network's table
+  still needs the raw folder and is skipped without it.
+
+Still open from section 8, for the owner at the hands-on checkpoint: the
+parent body's spelling, the accuracy fixture, and "next maximum only".
+Still outside: #719. Nothing here is qualified; the gate-impact plan comes
+after the candidate is accepted.
