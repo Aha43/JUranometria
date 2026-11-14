@@ -426,6 +426,38 @@ public final class SolarSystemService {
         return distance;
     }
 
+    /**
+     * The Sun's geocentric ecliptic longitude from the fixed J2000
+     * equinox at a civil instant, degrees in [0, 360): the coordinate a
+     * meteor shower is asked by (#716, R-5 of
+     * {@code docs/decisions/meteor-showers.md}).
+     *
+     * <p>Astrometric, as {@link SunObservation#eclipticLongitudeJ2000Degrees()}
+     * is - the Sun where it was when its light left it, with no
+     * aberration - and from the Earth's centre, so the value is the
+     * same for every observer. The topocentric value differs from it by
+     * at most the Sun's parallax, 8.8 arcseconds.
+     */
+    public double solarLongitudeJ2000Degrees(Instant instant) {
+        if (instant == null) {
+            throw new IllegalArgumentException("an instant");
+        }
+        requireInsideTheInterval(instant, "Sun");
+        double et = timeScales.tt(instant).secondsPastJ2000();
+        SpkKernel kernel = pack.kernel();
+        Vector3 earthPosition = kernel.state(SSB, EARTH_MOON_BARYCENTRE, et)
+                .position().plus(kernel.state(EARTH_MOON_BARYCENTRE, EARTH, et)
+                        .position());
+        double lightTime = 0.0;
+        Vector3 range = Vector3.ZERO;
+        for (int i = 0; i < 5; i++) {
+            range = kernel.state(SSB, SUN, et - lightTime).position()
+                    .minus(earthPosition);
+            lightTime = range.length() / C_KM_PER_S;
+        }
+        return Ecliptic.toEcliptic(position(range.unit())).longitudeDegrees();
+    }
+
     // ---- the Moon (#406, #407) ---------------------------------------
 
     /** A place in the barycentric frame at an instant, with its motion. */

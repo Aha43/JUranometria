@@ -742,6 +742,39 @@ public final class JUranometriaMain {
                 updateToNow,
                 juranometria.ui.language.InterfaceText.forLanguage(
                         language.interfaceLanguage()));
+        // Meteor showers (#716): the pack is read once, when a shower is
+        // first asked about; one module draws the selected shower's radiant
+        // while the chart time is inside its activity, and one session is
+        // shared by the dialog and the Controller's group. The Sun's
+        // longitude is the Solar System service's, so no second ephemeris.
+        java.util.function.Supplier<juranometria.meteor.MeteorShowers> meteorShowers =
+                new java.util.function.Supplier<>() {
+                    private juranometria.meteor.MeteorShowers loaded;
+
+                    @Override
+                    public synchronized juranometria.meteor.MeteorShowers get() {
+                        if (loaded == null) {
+                            loaded = new juranometria.meteor.MeteorShowers(
+                                    juranometria.meteor.MeteorShowerPack.load(),
+                                    instant -> solarSystem.get()
+                                            .solarLongitudeJ2000Degrees(instant));
+                        }
+                        return loaded;
+                    }
+                };
+        juranometria.meteorchart.MeteorShowerModule meteorOnChart = modules.attach(
+                new juranometria.meteorchart.MeteorShowerModule(observerNow, meteorShowers,
+                        meridian::subduing));
+        juranometria.ui.meteor.MeteorShowerSession meteorSession =
+                new juranometria.ui.meteor.MeteorShowerSession(observerNow, meteorShowers,
+                        solarSystem, meteorOnChart);
+        meteorSession.installThrough(meridian.context());
+        meteorSession.centreThrough(position -> {
+            controller.recenter(position);
+            frame.toFront();
+            chart.requestFocusInWindow();
+        });
+        placeAndTimeChanges.apply(meteorSession::changed);
         // Solar System in the Controller (ruled on #457), since #507 a
         // tab of its own after Chart: the Sun, Mercury (#530), Venus
         // (#502), Moon and Jupiter groups over those sessions and the
@@ -765,6 +798,8 @@ public final class JUranometriaMain {
         // Neptune's group after Uranus's (#656), outward from the Sun, with its
         // Show on chart and Centre on chart since #659.
         solarSection.withNeptune(neptuneTable, companionWords, neptuneLayer, centreOnChart);
+        // The Meteor showers group after the bodies (#716).
+        solarSection.withMeteorShowers(meteorSession, companionWords);
         // The tab opens with the instant the chart is frozen at and Update
         // to now (#259, ruling 9 on #556).
         solarSection.showChartInstant(observerNow, placeAndTimeChanges, updateToNow);
@@ -850,10 +885,34 @@ public final class JUranometriaMain {
         // atlas's own routes - one context installation (never PlaceStore),
         // the subjects' Solar System switches, recenter with the primary as
         // the named target, a paint, then the primary as the selection.
-        java.util.Map<String, juranometria.ui.solar.BodyOnChart> bodySwitches = java.util.Map.of(
+        java.util.Map<String, juranometria.ui.solar.BodyOnChart> bodySwitches =
+                new java.util.HashMap<>(java.util.Map.of(
                 "sun", sunLayer, "moon", moonLayer, "venus", venusLayer, "mercury", mercuryLayer,
                 "jovian.jupiter", jupiterLayer, "saturn", saturnLayer, "mars", marsLayer,
-                "uranus", uranusLayer, "neptune", neptuneLayer);
+                "uranus", uranusLayer, "neptune", neptuneLayer));
+        // A shower subject (#716, R-20) is "switched on" by selecting that
+        // shower: the bookmark's stored instant decides whether its radiant
+        // is then drawn, and nothing here computes a maximum.
+        for (String code : java.util.List.of("QUA", "LYR", "ETA", "SDA", "PER", "ORI", "LEO",
+                "GEM", "URS")) {
+            bodySwitches.put(juranometria.meteor.MeteorShower.IDENTITY_STEM + code,
+                    new juranometria.ui.solar.BodyOnChart() {
+                        @Override
+                        public boolean showing() {
+                            return code.equals(meteorOnChart.selected());
+                        }
+
+                        @Override
+                        public void show(boolean show) {
+                            meteorOnChart.select(show ? code : null);
+                        }
+
+                        @Override
+                        public void onChange(java.util.function.Consumer<Boolean> listener) {
+                            meteorOnChart.onChange(now -> listener.accept(code.equals(now)));
+                        }
+                    });
+        }
         java.util.function.Function<juranometria.bookmark.Subject, java.util.Optional<String>> catalogued =
                 subject -> bookmarkSearch.search(subject.id()).stream()
                         .filter(result -> result.identity().equals(subject.id()))
@@ -1054,6 +1113,14 @@ public final class JUranometriaMain {
                 () -> juranometria.ui.solar.NeptuneTableDialog.open(frame, neptuneTable,
                         juranometria.ui.language.InterfaceText.forLanguage(
                                 language.interfaceLanguage()), centreOnChart, neptuneLayer));
+        // Solar System > Meteor showers... (#716), after the bodies' tables:
+        // the dialog host of the same session the Controller holds.
+        AppMenuBar.addMeteorShowers(frame.getJMenuBar(),
+                juranometria.ui.language.InterfaceText.forLanguage(
+                        language.interfaceLanguage()),
+                () -> juranometria.ui.meteor.MeteorShowerDialog.open(frame, meteorSession,
+                        juranometria.ui.language.InterfaceText.forLanguage(
+                                language.interfaceLanguage())));
         // View > Solar System > Jupiter and moons on the chart (#484),
         // directly after Moon on the chart: the Jovian module's switch.
         javax.swing.JCheckBoxMenuItem jupiterOnChartItem = AppMenuBar.addJupiterOnChart(

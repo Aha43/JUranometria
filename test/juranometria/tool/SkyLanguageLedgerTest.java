@@ -54,7 +54,11 @@ class SkyLanguageLedgerTest {
         // #681 (bookmarks) adds the document's keys and the library's root
         // id, then the menu, toolbar and Controller names its stages need:
         // 170 at stage 1, the bound raised once for the whole road.
-        assertTrue(unresolved.size() < 190,
+        // #716 (meteor showers) adds eight: the shower identity stem, the
+        // pack's root, name, two header lines and checksum prefix, the
+        // module's registry name and the page-name key stem - 193, the
+        // bound raised once for the road.
+        assertTrue(unresolved.size() < 200,
                 "and the boundary stays small enough to read: "
                         + unresolved.size());
     }

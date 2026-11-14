@@ -1,0 +1,10 @@
+code	iau_number	iau_name	parent_body	activity_start	activity_end	start_solar_longitude	end_solar_longitude	maximum_date	maximum_solar_longitude	ra	dec	v_infinity	population_index	zhr
+QUA	10	Quadrantids	2003 EH1	Dec 28	Jan 12	275.8701	292.1787	Jan 04	283.15	230	49	41	2.1	80+
+LYR	6	April Lyrids	C/1861 G1 (Thatcher)	Apr 14	Apr 30	23.4556	40.0356	Apr 23	32.32	271	34	49	2.1	18
+ETA	31	eta-Aquariids	1P/Halley	Apr 19	May 28	28.3480	67.0529	May 06	45.5	338	-1	66	2.4	50
+SDA	5	Southern delta-Aquariids		Jul 12	Aug 23	109.0828	150.2486	Jul 31	128	340	-16	41	2.5	25
+PER	7	Perseids	109P/Swift-Tuttle	Jul 17	Aug 24	113.8502	151.2126	Aug 13	140.0	48	58	59	2.2	110+
+ORI	8	Orionids	1P/Halley	Oct 02	Nov 07	188.1984	224.9627	Oct 22	208	95	16	66	2.5	20
+LEO	13	Leonids	55P/Tempel–Tuttle	Nov 06	Nov 30	222.9568	248.1612	Nov 18	235.27	152	22	71	2.5	15+
+GEM	4	Geminids	(3200) Phaethon	Dec 04	Dec 20	251.2031	268.4783	Dec 14	262.2	112	33	35	2.6	150
+URS	15	Ursids	8P/Tuttle	Dec 17	Dec 26	264.4075	274.5909	Dec 23	270.7	217	76	33	2.8	10

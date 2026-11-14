@@ -51,6 +51,13 @@ being Jopek et al. 2024, *A&A* 682, A159.
 BY 4.0 license"; reference the website and Vida et al. 2020, *MNRAS* 491,
 2688-2705, and Vida et al. 2021, *MNRAS* 506, 5046-5074.
 
+**In the repository (#716, owner's ruling of 2026-11-14):**
+`test/resources/meteor-showers/gmn-radiant-samples.tsv`, 44 lines of the
+table for the nine showers, verbatim, with the source's address, its
+SHA-256, the licence and this attribution in its heading. It is written by
+`make import-meteor-showers`, read by `MeteorShowerAccuracyTest`, and not
+shipped in any archive or image.
+
 ### Not used
 
 The American Meteor Society's calendar: its terms grant no reuse, it names no
@@ -81,6 +88,18 @@ at each maximum against Table 5 (`measurements.md`, section 6) - and no
 second keying. A shipped pack would need a reviewed transcription with its
 own check (decision record, R-3).
 
+### The second keying (#716, 2026-11-12)
+
+For the nine showers of the first pack, Table 5 and Table 6 were keyed a
+second time from pages 25 and 26 rendered as images (PDFKit, three times
+enlarged), independently of the extracted text:
+`transcribed/imo-2027-second-keying-table5.tsv` and
+`imo-2027-second-keying-table6.tsv`, in the same gitignored folder. The
+pack's importer compares the two keyings field by field and writes nothing
+unless they agree; they agree in all 307 fields. The second keying was made
+by the coding agent reading the page image, not by a second person
+(decision record, section 8).
+
 ## What the repository carries of the IMO's data
 
 By the owner's ruling (decision record, C-1) the study does not publish most
@@ -91,6 +110,21 @@ differences from other sources, and as the handful of fields that changed
 between the two editions. The full transcriptions stay in the gitignored raw
 folder. The owner contacts the IMO before #716 ships any derived offline
 pack.
+
+**2026-11-14.** The owner wrote to `info@imo.net`; no reply had come by
+2026-11-14, and the owner ruled that the wait is over (decision record,
+section 9): the IMO's data policy permits use, reproduction and sharing for
+any purpose without prior permission, and the pack is a derived nine-shower
+subset, neither the Calendar in substantial part nor the IMO's dataset as a
+standalone file. The pack `src/resources/meteor-showers/` is in the
+repository from #716 on, with the credit line, the edition's name and its
+notice. The full transcriptions, both keyings and the calendar PDFs stay in
+the gitignored raw folder. A newer edition of the calendar is a new import:
+fetch the PDF into `imports/raw/meteor-showers/`, key the nine showers'
+rows of Tables 5 and 6 twice, pin the checksums and the edition in
+`MeteorShowerPackMain`, and run `make import-meteor-showers`, which refuses
+unless the keyings agree. A later reply from the IMO is recorded here and
+in the decision record.
 
 ## A process deviation
 

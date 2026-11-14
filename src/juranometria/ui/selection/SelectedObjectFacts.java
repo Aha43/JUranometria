@@ -52,6 +52,16 @@ public sealed interface SelectedObjectFacts {
     }
 
     /**
+     * A meteor shower's radiant (#716, ruling C-5): the shower's page
+     * name, the chart time that defines the radiant, its place to a whole
+     * degree as its source prints it, dimmed or not. Never without the
+     * chart time.
+     */
+    record RadiantFacts(String identity, String name, Instant instant, SkyPosition position,
+                        boolean belowHorizon) implements SelectedObjectFacts {
+    }
+
+    /**
      * The facts for one page-inventory entry, or empty for an entry the
      * box does not describe. {@code belowHorizon} is the page's own
      * answer for a body, from the placement it painted.
@@ -74,6 +84,9 @@ public sealed interface SelectedObjectFacts {
                         dso.magnitude(), dso.position()));
             }
             case PageEntry.Body b -> b.moment() == null ? Optional.empty()
+                    : juranometria.meteor.MeteorShower.codeOf(b.identity()) != null
+                    ? Optional.of(new RadiantFacts(b.identity(), b.name(),
+                            b.moment().instant(), b.position(), belowHorizon))
                     : Optional.of(new BodyFacts(b.identity(), b.name(), b.moment().instant(),
                             b.position(), belowHorizon));
             default -> Optional.empty();
@@ -135,6 +148,16 @@ public sealed interface SelectedObjectFacts {
                     lines.add(said.say("page.body.belowHorizon"));
                 }
             }
+            case RadiantFacts r -> {
+                heading = r.name();
+                lines.add(said.say("selected.radiant"));
+                lines.add(said.say("selected.time",
+                        MINUTE.format(r.instant().atOffset(ZoneOffset.UTC))));
+                lines.add(wholeDegrees(r.position(), said));
+                if (r.belowHorizon()) {
+                    lines.add(said.say("page.body.belowHorizon"));
+                }
+            }
         }
         String sentence = said.say("selected.spoken",
                 heading + ", " + String.join(", ", lines));
@@ -182,5 +205,13 @@ public sealed interface SelectedObjectFacts {
     /** An object's Messier name, if it has one. Moved here from the Inspector (#692). */
     static Optional<String> messierName(DeepSkyObject dso) {
         return dso.aliases().stream().filter(a -> a.startsWith("M ")).findFirst();
+    }
+
+    /** A radiant's J2000 place to a whole degree: its source prints no finer. */
+    static String wholeDegrees(SkyPosition position, InterfaceText said) {
+        long dec = Math.round(position.decDegrees());
+        return said.say("selected.radiant.position",
+                Long.toString(Math.round(position.raDegrees()) % 360),
+                dec == 0 ? "0" : (dec < 0 ? "\u2212" : "+") + Math.abs(dec));
     }
 }

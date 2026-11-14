@@ -1,6 +1,6 @@
 # Meteor showers at chart time
 
-**Status: ruled by the owner on 2026-11-11 (section 7).** Sprint 60, issue #715,
+**Status: ruled by the owner on 2026-11-11 (section 7); built as an unqualified candidate under #716 (section 8), not yet shippable.** Sprint 60, issue #715,
 road #714. A measurement and decision study; no production code. Product
 input: #564 and the meteor-shower outcome in the owner's 7.0.0 road outline.
 Measurements: `docs/studies/meteor-showers/measurements.md` (cited below as
@@ -91,6 +91,9 @@ asks. Until the owner rules, the study branch stays unpushed, because
 section).
 *C-1: push the study as it stands with the credit line, or first cut M§9 to
 the candidate showers and counts.*
+
+*Superseded in part on 2026-11-14 (section 9): the pack no longer waits for
+the IMO's answer. Every other part of R-3 stands.*
 
 **R-4. One named edition.** A pack is one edition of the IMO calendar,
 named with its "correct as of" date, and every panel that shows a value
@@ -396,3 +399,215 @@ What the trim did (C-1): `measurements.md` sections 4, 6 and 8 print the nine
 candidates and count the rest; section 9 prints the eleven showers listed at
 a ZHR of 10 or more, which the selection rule needs, and counts the others
 by strength. The untrimmed tables were never pushed.
+
+## 8. As built (#716; the unqualified candidate, before the IMO's reply)
+
+**Status on 2026-11-14: this section describes the head of 2026-11-12. Its
+boundary - the pack and the licensing entries kept out of the tree - was
+lifted by the ruling in section 9, which also says what landed with it.
+What was built, and the choices made in building, stand as written here.**
+
+**Status on 2026-11-12: built for the owner's hands, not qualified, and not
+shippable yet.** By the owner's instruction of 2026-11-12 the feature was built while
+the IMO's answer to the contact of C-1 was outstanding, under one boundary:
+the derived pack, and any fixture that reproduces its values, stay out of
+the repository until the IMO has answered. So at this head:
+
+- `src/resources/meteor-showers/` is **not in the tree**. It is generated
+  on the owner's machine by `make import-meteor-showers` from the raw
+  sources and excluded from git locally. A clean checkout of this head
+  therefore has no pack: the application's meteor panel cannot load one,
+  and the tests that read the bundled pack fail there. That is the state
+  the boundary asks for, and the reason nothing here is pushed for review,
+  gated or merged.
+- The About and licensing entries for the pack (the notice in About, the
+  licensing summary in both languages, `LICENSING.md`, the archive's
+  licence list, the packaged-image inventory and the packaged acceptance's
+  pack check) are **not written yet**. They land with the pack, the IMO's
+  recorded reply and whatever conditions it carries, and the complete head
+  is qualified once then.
+
+### What was built, against section 5
+
+1. **The Sun's geocentric J2000 longitude** -
+   `SolarSystemService.solarLongitudeJ2000Degrees(Instant)`: astrometric,
+   from the Earth's centre, within the Sun's parallax of every observer's
+   published longitude (R-5).
+2. **The pack and its importer** - `juranometria.meteor.MeteorShowerPack`
+   reads `showers.tsv` and `radiants.tsv` against a checksummed manifest
+   that names the edition; `MeteorShowerPackMain` writes them. The importer
+   refuses unless: every raw input matches its SHA-256; the rule of R-11,
+   applied to the whole working list and the IAU list, selects exactly the
+   showers that were keyed twice; the two keyings agree in every field; each
+   shower's IAU number agrees between the two authorities; and the radiant
+   table read at the maximum lies within 2° of the working list's radiant.
+3. **The second keying (R-4).** The first transcription was parsed from
+   text extracted from the PDF. The second was keyed on 2026-11-12 from
+   pages 25 and 26 rendered as images, for the nine showers only: 307
+   fields, all in agreement. Stated plainly: the second keying was made by
+   the coding agent reading the page image, not by a second person. It is
+   independent of the text extraction and of the column-assignment step
+   that needed three hand corrections; it is not an independent human
+   review, and the owner may want to read the nine rows against the page
+   before the pack ships.
+4. **The shower service** - `MeteorShowers`: activity as an interval of
+   solar longitude (R-6), the radiant by the ruled evaluation with its
+   footing (R-9), the nominal maximum as the instant the Sun reaches the
+   listed longitude (R-7). Activity and row longitudes are computed at
+   import from the calendar's dates in the year that puts each date nearest
+   the maximum, so the Quadrantids' December rows are read in 2026 and
+   their January rows in 2027; the study read every row in 2027.
+5. **The overlay kind and mark** - `OverlayContribution.Radiant`, drawn by
+   the bodies' layer as glyph A (six rays, 3.5 to 10 px, about an empty
+   centre) in the page's text ink, named and refused like a body's name,
+   subdued and given "(below the horizon)" when below the drawn horizon.
+   It rides the body placements, so pointing, the page inventory, the
+   occurrence selection and its re-resolution when the chart time changes
+   are the planets' own code (R-13 to R-15).
+6. **The module, the panel and the actions** - `MeteorShowerModule` draws
+   only the selected shower and only while active (R-12);
+   `MeteorShowerSession` and `MeteorShowerControls` are one panel shown by
+   **Solar System > Meteor showers...** and by a **Meteor showers** group
+   after Neptune's in the Controller. It computes nothing until first
+   shown. Two actions: **Set chart time to next nominal maximum**, through
+   the one chart context (R-17), and **Centre on radiant**, which keeps the
+   field and the time. The night summary of C-6 is in the panel.
+7. **The box, the Inspector and bookmarks** - a sealed `RadiantFacts`
+   variant in the selected-object box (C-5); the Inspector says what a
+   radiant is and gives its place to a whole degree; a bookmark's shower
+   subject is named as the page names the shower, and opening one selects
+   that shower at the stored instant (R-20).
+8. **Words in both languages** (R-21), appended to both language files.
+
+### Choices made in building, for the owner's eye
+
+- **The mark's ink.** The page's text ink, as the ruled mock had it. The
+  seam's reference ink, tried first, was too pale to find on the whole sky.
+- **The parent body.** The IAU list states it per solution and the
+  solutions do not agree on spelling. The importer takes the statement
+  made most often, in its most frequent spelling, and none on a tie. That
+  yields a parent for seven showers, none for the Southern δ-Aquariids
+  (two different statements, one each), "(3200) Phaethon" for the Geminids
+  and, for the Leonids, **the list's majority spelling "55P/Temple-Tuttle"**
+  (five solutions against three for "Tempel"). The atlas should not print
+  a known misspelling, and it should not correct a source silently either.
+  *Open: drop the parent body from 6.6.0, or carry a ruled spelling with a
+  note of the source's variants.*
+- **"Next" only.** The panel gives the first nominal maximum at or after
+  the chart time (R-17). During an activity after the maximum that is next
+  year's; the one just past is not shown.
+- **The night.** From the local mean noon before the chart time to the
+  next, by the chart's longitude, where the study used 12:00 UTC at Oslo.
+  The radiant's highest is taken while the Sun is more than 12° down, as
+  the study measured it.
+- **The accuracy fixture (R-10)** is a test that reads the Global Meteor
+  Network's table from the raw folder and is skipped where the raw sources
+  are absent, which includes CI. *Open: after the IMO's answer, commit a
+  small GMN-derived fixture (CC BY 4.0, credited) so the claim is held
+  everywhere, or keep it a local check.*
+- **#719** (ecliptic-longitude ticks): not mocked; nothing about it was
+  exceptionally cheap.
+
+## 9. The IMO wait is over (owner, 2026-11-14)
+
+The owner ruled on 2026-11-14:
+
+- The courtesy message to `info@imo.net` had received no reply by
+  2026-11-14.
+- The IMO's current data policy explicitly permits use, reproduction and
+  sharing for any purpose, commercial applications included, without prior
+  permission (`https://www.imo.net/about/using-imo-data/`, read again on
+  2026-11-14; the page carries no date of its own).
+- JUranometria ships a derived nine-shower subset: not the Calendar in full
+  or in substantial part, and not the complete IMO dataset as a standalone
+  database or API. Those are the cases for which the policy asks to be
+  contacted first.
+- **Only R-3's requirement to wait for an IMO answer is superseded.** The
+  wait no longer blocks implementation, qualification or landing.
+- Every substantive safeguard stays:
+
+  | safeguard | where it is held |
+  |---|---|
+  | The exact credit, `Source: International Meteor Organization (IMO) – www.imo.net` | the pack's manifest and notice; the panel's edition line; `BundledNoticesTest`; the packaged acceptance |
+  | The edition named: IMO Meteor Shower Calendar 2027 | the manifest's `edition` (renamed from "IMO 2027 Meteor Shower Calendar" to the form the policy gives), the notice, the panel, About and both licensing records |
+  | No IMO logo, affiliation or endorsement claim | stated in the notice and in both licensing summaries; no IMO mark is in the tree |
+  | JUranometria's calculations told apart from the IMO's published values | the notice's "Computed by JUranometria, not by the IMO", the manifest's `computed`, the panel's edition line (R-9, R-21) |
+  | A reviewed, independently checked transcription | the second keying, 307 fields in agreement, refused by the importer otherwise (section 8, item 3). It was made by the coding agent from the page images, not by a second person; the owner may still read the nine rows against pages 25 and 26 |
+  | The source edition and the update path documented | the manifest's edition, reference, "correct as of" and source checksums; the notice's last paragraph on the IMO's part; R-4; `sources.md` |
+
+- A later answer from the IMO is preserved beside this record and any
+  reasonable correction it asks for is applied. It reopens nothing by
+  itself.
+
+### What landed with the ruling
+
+- `src/resources/meteor-showers/` is in the tree: `showers.tsv`,
+  `radiants.tsv`, the checksummed manifest and the notice. The data files
+  are byte for byte the ones generated on 2026-11-12; the notice gained the
+  policy's terms as ruled, the statement of no affiliation, the double
+  keying and the update path; the local git exclusion is gone.
+- The notice is the fifteenth document in About, in both languages; the
+  licensing summary names the pack in English and Norwegian;
+  `LICENSING.md` and the archive's `LICENSING.md` carry a row each; the
+  portable archive ships `licenses/NOTICE-meteor-showers.md`; the packaged
+  images' licensing inventory checks seventeen resources; the packaged
+  acceptance loads the pack, checks the nine, the edition, the credit and
+  the notice, and finds the Quadrantids' nominal maximum of 2027 shortly
+  after 03h UT on 4 January, the one clock time the calendar prints.
+- A clean checkout now has the pack, so the tests that read it run
+  everywhere. The accuracy test against the Global Meteor Network's table
+  still needs the raw folder and is skipped without it.
+
+The three choices section 8 left open were ruled at the hands-on
+checkpoint: section 10. Still outside: #719. Nothing here is qualified; the
+gate-impact plan comes after the candidate is accepted.
+
+## 10. The hands-on checkpoint (owner, 2026-11-14)
+
+The owner tried the first candidate, accepted its direction and ruled on
+the open choices. No ecliptic tick or solar-longitude marker is expected on
+the chart: that is #719, untouched. The panel uses and explains solar
+longitude.
+
+1. **The Leonids' parent body.** Parent bodies stay. The Leonids' is carried
+   as **55P/Tempel–Tuttle**: a ruled normalization of an evident spelling
+   error in the source, whose solutions say "55P/Temple-Tuttle" five times
+   and "55P/Tempel-Tuttle" three. The importer holds the normalization by
+   name, refuses if the list no longer states what the ruling corrected, and
+   writes the source's value to the manifest
+   (`parent.normalized.LEO.source`); the notice says so. The atlas does not
+   teach the misspelling and does not drop every shower's parent body
+   because of one. The rule for the other showers is unchanged (section 8).
+2. **The accuracy fixture.** A scientific accuracy test that is skipped in CI
+   is too weak. The importer writes the smallest extract of the Global
+   Meteor Network's table that holds R-10 for the nine showers - the
+   table's own lines nearest each printed radiant row and each maximum, 44
+   lines, verbatim - to `test/resources/meteor-showers/gmn-radiant-samples.tsv`,
+   with the source's address, its SHA-256, the CC BY 4.0 licence and the
+   attribution the network asks for. `MeteorShowerAccuracyTest` reads it
+   everywhere; where the raw table is present it also checks every line of
+   the extract against it. The extract is test data and is not shipped.
+3. **The maximum.** While the shower is active at the chart time, the panel
+   shows and the action offers **this activity period's** nominal maximum,
+   also when it has passed (the panel says "has passed"). While it is not
+   active, the next one. Looking at the Leonids the day after their maximum
+   no longer answers with next year's. The action is named *Set chart time
+   to nominal maximum* (*Sett karttiden til nominelt maksimum*); it no
+   longer says "next", because it is not always the next.
+   `MeteorShowers.nominalMaximumFor` holds the rule and
+   `MeteorShowersTest` its four cases.
+4. **The transcription.** The agent's independent second keying is accepted
+   for these nine rows. For the record: it was a fresh keying on 2026-11-12
+   from pages 25 and 26 of the calendar rendered as images, made without
+   reference to the first transcription, which was parsed from the PDF's
+   extracted text. The two were then compared field by field: 307 fields,
+   **no disagreement, so nothing to resolve**. The three hand corrections
+   noted in `sources.md` were made to the first transcription's column
+   assignment during the study, before the second keying existed; the
+   second keying agrees with the corrected values. The committed tests hold
+   the result: `MeteorShowerPackContractTest` pins the digests of both
+   tables and the count of fields compared, and the pack refuses to load if
+   a table does not match its manifest.
+5. **The Norwegian licensing summary** lacks its Mars, Uranus and Neptune
+   paragraphs. That predates the meteor work and is filed separately; the
+   meteor paragraph is complete in both languages.

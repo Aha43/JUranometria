@@ -60,6 +60,7 @@ with it paragraph by paragraph.
 | `marssystem` | Mars System ephemeris |
 | `uranussystem` | Uranus System ephemeris |
 | `neptunesystem` | Neptune System ephemeris |
+| `meteorshowers` | Meteor shower data |
 | `tabler` | Tabler icons licence |
 
 ### Light
@@ -77,7 +78,7 @@ with it paragraph by paragraph.
 | shown | *(the application mark: decorative, no text, no spoken name)* |
 | shown | JUranometria 6.5.0 |
 | shown | A quiet, interactive atlas for learning the geography of the sky. |
-| shown | *(read-only document, 2650 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 3128 characters — printed in full below or listed by path)* |
 | shown | Full notices and licences... |
 | shown | Close |
 
@@ -91,7 +92,7 @@ with it paragraph by paragraph.
 |---|---|
 | window title | About JUranometria |
 | window, spoken | Application identity, version, and licensing information |
-| shown | *(read-only document, 49627 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 53182 characters — printed in full below or listed by path)* |
 | shown | Close |
 
 
@@ -110,7 +111,7 @@ with it paragraph by paragraph.
 | shown | *(the application mark: decorative, no text, no spoken name)* |
 | shown | JUranometria 6.5.0 |
 | shown | A quiet, interactive atlas for learning the geography of the sky. |
-| shown | *(read-only document, 2650 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 3128 characters — printed in full below or listed by path)* |
 | shown | Full notices and licences... |
 | shown | Close |
 
@@ -124,13 +125,13 @@ with it paragraph by paragraph.
 |---|---|
 | window title | About JUranometria |
 | window, spoken | Application identity, version, and licensing information |
-| shown | *(read-only document, 49627 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 53182 characters — printed in full below or listed by path)* |
 | shown | Close |
 
 
 ### The compact licensing summary, in full
 
-Its own document (2650 characters), the canonical English one, used whole because this language has not written its own. Every licence identifier below is exact and untranslated.
+Its own document (3128 characters), the canonical English one, used whole because this language has not written its own. Every licence identifier below is exact and untranslated.
 
 ```
 Code and documentation: MIT license, copyright JUranometria
@@ -188,6 +189,14 @@ NEP098, modified by JUranometria under NAIF's rules for modified SPICE
 kernels (no fee or licence); the IAU 2015 radii and pole, with its
 periodic term, copied from NAIF's planetary-constants kernel.
 
+Meteor shower data: a derived table of nine annual showers from the
+IMO Meteor Shower Calendar 2027, used under the International Meteor
+Organization's data policy with its credit - Source: International
+Meteor Organization (IMO) - www.imo.net - and identities from the IAU
+Meteor Data Center, cited as it asks. JUranometria is not affiliated
+with or endorsed by the IMO; positions between the printed rows,
+instants and everything for a place are JUranometria's calculations.
+
 Toolbar icons from the Tabler icon set: MIT license.
 ```
 
@@ -228,6 +237,7 @@ Toolbar icons from the Tabler icon set: MIT license.
 | `marssystem` | Marssystemefemeride |
 | `uranussystem` | Uranussystemefemeride |
 | `neptunesystem` | Neptunsystemefemeride |
+| `meteorshowers` | Meteorsvermdata |
 | `tabler` | Lisens for Tabler-ikonene |
 
 ### Light
@@ -245,7 +255,7 @@ Toolbar icons from the Tabler icon set: MIT license.
 | shown | *(the application mark: decorative, no text, no spoken name)* |
 | shown | JUranometria 6.5.0 |
 | shown | Et rolig, interaktivt atlas for å lære himmelens geografi. |
-| shown | *(read-only document, 1657 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 2124 characters — printed in full below or listed by path)* |
 | shown | Merknader og lisenser... |
 | shown | Lukk |
 
@@ -259,7 +269,7 @@ Toolbar icons from the Tabler icon set: MIT license.
 |---|---|
 | window title | Om JUranometria |
 | window, spoken | Programmets navn, versjon og lisensopplysninger |
-| shown | *(read-only document, 49636 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 53188 characters — printed in full below or listed by path)* |
 | shown | Lukk |
 
 
@@ -278,7 +288,7 @@ Toolbar icons from the Tabler icon set: MIT license.
 | shown | *(the application mark: decorative, no text, no spoken name)* |
 | shown | JUranometria 6.5.0 |
 | shown | Et rolig, interaktivt atlas for å lære himmelens geografi. |
-| shown | *(read-only document, 1657 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 2124 characters — printed in full below or listed by path)* |
 | shown | Merknader og lisenser... |
 | shown | Lukk |
 
@@ -292,13 +302,13 @@ Toolbar icons from the Tabler icon set: MIT license.
 |---|---|
 | window title | Om JUranometria |
 | window, spoken | Programmets navn, versjon og lisensopplysninger |
-| shown | *(read-only document, 49636 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 53188 characters — printed in full below or listed by path)* |
 | shown | Lukk |
 
 
 ### The compact licensing summary, in full
 
-Its own document (1657 characters), written in this language. Every licence identifier below is exact and untranslated.
+Its own document (2124 characters), written in this language. Every licence identifier below is exact and untranslated.
 
 ```
 Kode og dokumentasjon: MIT-lisens. Opphavsrett: JUranometria
@@ -338,6 +348,15 @@ NAIF-reglene for endrede SPICE-kjerner (ingen avgift eller lisens);
 IAU 2015-konstantene kopiert fra NAIFs planetkonstantkjerne og fire
 ringradier sitert fra NASAs Planetary Data System Rings Node.
 
+Meteorsvermdata: en avledet tabell over ni årlige svermer fra IMO
+Meteor Shower Calendar 2027, brukt etter datapolitikken til
+International Meteor Organization med dens kreditering - Source:
+International Meteor Organization (IMO) - www.imo.net - og
+identiteter fra IAU Meteor Data Center, sitert slik det ber om.
+JUranometria er ikke tilknyttet eller anbefalt av IMO; posisjoner
+mellom de trykte radene, tidspunkter og alt for et sted er
+JUranometrias beregninger.
+
 Verktøylinjeikoner fra ikonsettet Tabler: MIT-lisens.
 ```
 
@@ -360,8 +379,9 @@ Not reproduced here: they are upstream text, and a copy in a study is a copy tha
 | `marssystem` | `/resources/mars-system/NOTICE-mars-system.md` | 2752 |
 | `uranussystem` | `/resources/uranus-system/NOTICE-uranus-system.md` | 2661 |
 | `neptunesystem` | `/resources/neptune-system/NOTICE-neptune-system.md` | 2697 |
+| `meteorshowers` | `/resources/meteor-showers/NOTICE-meteor-showers.md` | 3435 |
 | `tabler` | `/resources/icons/LICENSE` | 1072 |
-| **seven** | | **47900** |
+| **seven** | | **51335** |
 
 ## The application mark
 

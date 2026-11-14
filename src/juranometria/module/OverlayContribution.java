@@ -736,6 +736,47 @@ public sealed interface OverlayContribution {
         }
     }
 
+    /**
+     * A meteor shower's radiant at a moment (#716, R-13 to R-15 of
+     * {@code docs/decisions/meteor-showers.md}): the point the shower's
+     * meteors appear to come from, evaluated for the chart time.
+     *
+     * <p>Not a body: it has no disc, no distance and no phase, and it
+     * hides nothing. The page draws one fixed mark for every radiant -
+     * short rays about an empty centre, in page units, carrying no data -
+     * and a click through it reaches what is under it. Like a body it
+     * carries the moment it was computed for, so it can be selected as an
+     * occurrence, and it stands in the bodies' layer of the page, which
+     * is all its role says.
+     *
+     * @param belowHorizon true when the radiant stands below the
+     *                     observer's mathematical horizon and that
+     *                     horizon is drawn: the page dims it and says so
+     */
+    record Radiant(String identity, String accessibleName, SkyPosition at,
+                   boolean belowHorizon, Moment moment, boolean selectable)
+            implements OverlayContribution {
+
+        public Radiant {
+            requireIdentified(identity, accessibleName, InkRole.BODY);
+            requireMomentIfSelectable(identity, moment, selectable);
+            if (at == null) {
+                throw new IllegalArgumentException(
+                        "a radiant is somewhere: " + identity);
+            }
+            if (moment == null) {
+                throw new IllegalArgumentException(
+                        "a radiant is never offered without the moment that"
+                                + " defines it: " + identity);
+            }
+        }
+
+        @Override
+        public InkRole role() {
+            return InkRole.BODY;
+        }
+    }
+
     /** A selectable body says what it is an occurrence of. */
     private static void requireMomentIfSelectable(String identity, Moment moment,
                                                   boolean selectable) {
