@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**1039 promoted artifacts.**
+**1053 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -464,6 +464,20 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/interface-language/mercurytable-nb-NO-7-instant.png` | `7380d63517828cc124f8ddd2ba4bb6e5f55ed9c568b0910b6a2af311db8e8153` | 2026-10-31 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/mercurytable-nb-NO-8-range.png` | `616a8daba9a1a50931c614cbba549c7581398f5f51acfdff31333e6ca90c5240` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/mercurytable-nb-NO-9-refused.png` | `9f6583461faee6f172d9ff4ebe4002ee7aef0bf763728f216fd95707d58be1b1` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/meteor-en-1-none-light.png` | `4396b934bc2c267568bac81ac30d06f74b4954564063c4986a29eb2969bebacf` | 2026-11-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/meteor-en-2-active-light.png` | `9cbce34d39ca1475c140741cededc00772c4247c77303a838e5ceb03b4c2c088` | 2026-11-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/meteor-en-3-active-dark.png` | `0c130c09e52bc69d35c3f15ace530983a634c971f9eea1d03efbaeab6195c270` | 2026-11-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/meteor-en-4-passed-light.png` | `38e35614b3e1ee7a03a98aaaf2f9bab13e6a6109414ba5b7a8ef34a72001a38c` | 2026-11-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/meteor-en-5-not-active-light.png` | `67a08bbcd7fd89a491a7c9cc2f1d16e465c9aaa5b69de4a2ee878bd5c482911c` | 2026-11-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/meteor-en-6-narrowest-light.png` | `e089dcc26f0873da9c3b6b3f0c46bcc99b6ebc1de0bd64922ca14376ccb89550` | 2026-11-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/meteor-en-7-narrowest-dark.png` | `da752caf1f35b5589495f1d238c510c70bb7b0b3b809b25a7ebbdcd41ed4102a` | 2026-11-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/meteor-nb-NO-1-none-light.png` | `773ce1bec2491d37ba86d37b71f02e860ad4e354ec406ac559be8648ca5e9836` | 2026-11-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/meteor-nb-NO-2-active-light.png` | `19edc73c89964aefc387c47d8e3abfbf87ef6ac8183f3c0bf33ff82291eaccb5` | 2026-11-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/meteor-nb-NO-3-active-dark.png` | `71faab8fdf960586995423396565a398251fd7786ea1d29f92423ad5ff83a621` | 2026-11-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/meteor-nb-NO-4-passed-light.png` | `846df34ee067a5893fc184b64406c827d7826d83b0fc93ceedad9337a9b9e0fc` | 2026-11-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/meteor-nb-NO-5-not-active-light.png` | `2c11375bd637bed8f0513cbf4c43ca09d029b9c088693e61592d8b5d75b214fc` | 2026-11-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/meteor-nb-NO-6-narrowest-light.png` | `f88b5a687fd927cf1645de32693617780f0d729106b07076097e54184f3364ba` | 2026-11-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/meteor-nb-NO-7-narrowest-dark.png` | `fcfe7b6fe0ba91c4b59d4d6384c53ede17aa4e30ebe39ea9b35a72439ff46bd9` | 2026-11-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/moontable-en-1-instant.png` | `891bf3379e20a63032b311ff4a7b929f6f68057ea4d0e587f4bf8f47e77fc8d8` | 2026-10-31 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/moontable-en-2-range.png` | `1728bae0cdb1ac7e63675ee62d5453d94452ae2041005730de334f0e36673b05` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/moontable-en-3-refused.png` | `4e1ce914916d219d304ee3c81301585114732a9d5483b8f6d9b87a2c387ce6e5` | 2026-10-24 | Mac OS X aarch64, Java 21.0.12.1 | various |

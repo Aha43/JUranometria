@@ -314,6 +314,26 @@ public final class ControlExplanationStudyMain {
 
     // ---- the surfaces the application builds ------------------------
 
+    private static Component meteorShowers(
+            juranometria.ui.language.InterfaceText english) {
+        juranometria.solar.SolarSystemService solar =
+                juranometria.solar.SolarSystemService.load();
+        juranometria.meteor.MeteorShowers showers = new juranometria.meteor.MeteorShowers(
+                juranometria.meteor.MeteorShowerPack.load(),
+                solar::solarLongitudeJ2000Degrees);
+        juranometria.sky.Observer oslo = new juranometria.sky.Observer(59.91, 10.75,
+                java.time.Instant.parse("2027-08-13T00:00:00Z"));
+        juranometria.ui.meteor.MeteorShowerSession session =
+                new juranometria.ui.meteor.MeteorShowerSession(() -> oslo, () -> showers,
+                        () -> solar, new juranometria.meteorchart.MeteorShowerModule(
+                                () -> oslo, () -> showers, () -> false));
+        session.select("PER");
+        juranometria.ui.meteor.MeteorShowerControls panel =
+                new juranometria.ui.meteor.MeteorShowerControls(session, english);
+        panel.refresh();
+        return panel;
+    }
+
     private static Map<String, Component> surfaces() {
         Map<String, Component> surfaces = new LinkedHashMap<>();
         juranometria.ui.ChartViewController navigation =
@@ -360,6 +380,11 @@ public final class ControlExplanationStudyMain {
                 juranometria.ui.companion.CompanionStore.inMemory()).checkBox(english));
         surfaces.put("Pointer navigation", new juranometria.ui.PointerNavigationPanel(
                 new juranometria.ui.PointerDrag(), english));
+        // The meteor-shower panel (#716; audited for #718): the one panel
+        // the Solar System menu's dialog and the Controller's group both
+        // show, read once over the bundled pack at a stated chart time, so
+        // the selector and both actions are inventoried as a reader meets them.
+        surfaces.put("Meteor showers", meteorShowers(english));
         // The Controller's Emphasis group (#525): one box per choice of
         // the toolbar's popup, over a chart of its own here.
         surfaces.put("Emphasis", new juranometria.ui.EmphasisControls(

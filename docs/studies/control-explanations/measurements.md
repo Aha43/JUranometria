@@ -41,6 +41,10 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Pointer navigation | JRadioButton | Horizontal only | &mdash; | A drag moves the page only across the screen, whatever the lines in the sky do. | self-explanatory |
 | Pointer navigation | JRadioButton | Vertical only | &mdash; | A drag moves the page only up and down the screen, whatever the lines in the sky do. | self-explanatory |
 | Pointer navigation | JRadioButton | Locked | &mdash; | Dragging does not move the chart; clicking still selects. | self-explanatory |
+| Meteor showers | JComboBox | (Meteor shower) | The shower whose radiant is drawn while it is active at the chart time | Chooses one meteor shower, in the order of the year, or none. Choosing does not move th... | hovered |
+| Meteor showers | JTextArea | (read-only text) | &mdash; | Choose one of nine annual meteor showers. Everything said of it is for the chart time a... | self-explanatory |
+| Meteor showers | JButton | Set chart time to nominal maximum | Sets the chart time to the shower's nominal maximum: this activity period's while it is... | Sets the chart time to the instant the Sun reaches the solar longitude listed for the s... | hovered |
+| Meteor showers | JButton | Centre on radiant | Centres the chart on the radiant at the chart time | Centres the chart on the selected shower's radiant for the chart time, keeping the fiel... | hovered |
 | Emphasis | JCheckBox | Meridian | &mdash; | Raises it on the chart - Meridian - until it is unchecked, Normal is chosen, or it can ... | self-explanatory |
 | Emphasis | JCheckBox | Ecliptic | &mdash; | Raises it on the chart - Ecliptic - until it is unchecked, Normal is chosen, or it can ... | self-explanatory |
 | Emphasis | JCheckBox | Equatorial grid | &mdash; | Raises it on the chart - Equatorial grid - until it is unchecked, Normal is chosen, or ... | self-explanatory |
@@ -191,7 +195,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 
 ## The audit
 
-**174 operable controls** across 21 surfaces: **109** hovered, **13** dynamic, **52** left to their own visible words, **0 undecided**.
+**178 operable controls** across 22 surfaces: **112** hovered, **13** dynamic, **53** left to their own visible words, **0 undecided**.
 
 **0** say the same words twice - a tooltip read back as a description. The seam refuses it, so this is zero or a finding.
 

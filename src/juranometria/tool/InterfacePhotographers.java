@@ -99,6 +99,11 @@ public final class InterfacePhotographers {
         GENERATORS.put("BookmarksSheetMain",
                 new Photographer("bookmarks-strings.md",
                         SheetCapture.Kind.FIXED_CANVAS));
+        // The meteor-shower panel (#716, photographed for #718): one
+        // component in two hosts, on a canvas at each host's width.
+        GENERATORS.put("MeteorShowerSheetMain",
+                new Photographer("meteor-strings.md",
+                        SheetCapture.Kind.FIXED_CANVAS));
     }
 
     /** Every photographer, by simple class name, in registry order. */

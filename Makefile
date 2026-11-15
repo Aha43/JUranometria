@@ -759,21 +759,35 @@ black-sky-study: classes
 # the canonical route kept 1.1-1.5 GiB live at its peak and the portable
 # route 1.2-1.7 GiB, the heap committed to its 2 GiB cap from a few
 # minutes in, no Full GC (docs/reviews/release-6.0.0-handover.md, 8).
+#
+# 3 GiB since #718 (the owner's choice, 2026-11-15). Measured on main
+# 6fe9503b, after the meteor road, under -Xlog:gc*: the canonical route
+# peaked at 1 773 MB with no Full GC, the portable route at
+# 1 879 MB with two Full GCs (each finding about 1 355 MB live), on a
+# route every road adds generators to: the limit is raised before it is
+# met, not after. Under 3 GiB (2bef9109) neither route met a Full GC.
+# Those peaks are occupancy after a young pause and rise with the limit
+# (2 705 and 2 863 MB under 3 GiB); what the process retains is nearer
+# the Full GCs' figure and the per-minute floor, about 1.5 GiB at the
+# portable route's worst. The limit is a qualification resource and
+# changes nothing the application does. It is separate from the test
+# suite's 4 GB and its static holders, which are #708's
+# (docs/reviews/release-6.6.0-handover.md, 6.3).
 # The three routes run the same instrument and keep the same limit.
 evidence-contracts: classes
-	$(JAVA) -Xmx2g -cp "$(CLASSES_DIR):$(LIB_DIR)/*" -Djava.awt.headless=true juranometria.tool.EvidenceContractMain
+	$(JAVA) -Xmx3g -cp "$(CLASSES_DIR):$(LIB_DIR)/*" -Djava.awt.headless=true juranometria.tool.EvidenceContractMain
 
 # What CI runs: the same instrument, forbidden to compare a rendering
 # here with pixels recorded on another machine. See
 # docs/decisions/test-evidence.md.
 evidence-contracts-ci: classes
-	$(JAVA) -Xmx2g -cp "$(CLASSES_DIR):$(LIB_DIR)/*" -Djava.awt.headless=true juranometria.tool.EvidenceContractMain ci
+	$(JAVA) -Xmx3g -cp "$(CLASSES_DIR):$(LIB_DIR)/*" -Djava.awt.headless=true juranometria.tool.EvidenceContractMain ci
 
 # The interaction route (#428): the portable contract over the
 # generators that own no chart picture; every chart picture is held as
 # committed, with its provenance account, and none is drawn.
 evidence-contracts-interaction: classes
-	$(JAVA) -Xmx2g -cp "$(CLASSES_DIR):$(LIB_DIR)/*" -Djava.awt.headless=true juranometria.tool.EvidenceContractMain interaction
+	$(JAVA) -Xmx3g -cp "$(CLASSES_DIR):$(LIB_DIR)/*" -Djava.awt.headless=true juranometria.tool.EvidenceContractMain interaction
 
 # Run on the machine that promotes reference images, after a reviewed
 # regeneration: records when, on what, and from which generator each
