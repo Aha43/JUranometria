@@ -16,6 +16,7 @@ import juranometria.solar.SolarSystemService.Row;
 import juranometria.solar.SolarSystemService.SunObservation;
 import juranometria.solar.time.TimeScales;
 
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -28,25 +29,24 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class SolarSystemServiceTest {
 
-    private static final SolarSystemService SERVICE = SolarSystemService.load();
     private static final Observer OSLO = new Observer(59.91, 10.75,
             Instant.parse("2026-06-21T10:00:00Z"));
 
     @Test
     void theCivilIntervalIsAnsweredInclusiveAndRefusedOutside() {
-        SERVICE.observe(Body.SUN, OSLO.at(Instant.parse("1900-01-01T00:00:00Z")));
-        SERVICE.observe(Body.SUN, OSLO.at(Instant.parse("2100-12-31T23:59:59Z")));
+        solar().observe(Body.SUN, OSLO.at(Instant.parse("1900-01-01T00:00:00Z")));
+        solar().observe(Body.SUN, OSLO.at(Instant.parse("2100-12-31T23:59:59Z")));
         IllegalArgumentException before = assertThrows(
-                IllegalArgumentException.class, () -> SERVICE.observe(Body.SUN,
+                IllegalArgumentException.class, () -> solar().observe(Body.SUN,
                         OSLO.at(Instant.parse("1899-12-31T23:59:59Z"))));
         assertTrue(before.getMessage().contains("1900-01-01"), before.getMessage());
-        assertThrows(IllegalArgumentException.class, () -> SERVICE.observe(Body.SUN,
+        assertThrows(IllegalArgumentException.class, () -> solar().observe(Body.SUN,
                 OSLO.at(Instant.parse("2101-01-01T00:00:00Z"))));
         // The Moon answers for the same interval and refuses the same way.
-        SERVICE.observe(Body.MOON, OSLO.at(Instant.parse("1900-01-01T00:00:00Z")));
-        SERVICE.observe(Body.MOON, OSLO.at(Instant.parse("2100-12-31T23:59:59Z")));
+        solar().observe(Body.MOON, OSLO.at(Instant.parse("1900-01-01T00:00:00Z")));
+        solar().observe(Body.MOON, OSLO.at(Instant.parse("2100-12-31T23:59:59Z")));
         IllegalArgumentException moon = assertThrows(
-                IllegalArgumentException.class, () -> SERVICE.observe(Body.MOON,
+                IllegalArgumentException.class, () -> solar().observe(Body.MOON,
                         OSLO.at(Instant.parse("1899-12-31T23:59:59Z"))));
         assertTrue(moon.getMessage().contains("Moon")
                 && moon.getMessage().contains("1900-01-01"), moon.getMessage());
@@ -56,8 +56,8 @@ class SolarSystemServiceTest {
     void theMoonInheritsTheRangeAndTheConfidenceUnchanged() {
         TimeRange range = new TimeRange(OSLO.instant(),
                 OSLO.instant().plus(Duration.ofMinutes(150)), Duration.ofHours(1));
-        List<Row> sun = SERVICE.observe(Body.SUN, OSLO, range);
-        List<Row> moon = SERVICE.observe(Body.MOON, OSLO, range);
+        List<Row> sun = solar().observe(Body.SUN, OSLO, range);
+        List<Row> moon = solar().observe(Body.MOON, OSLO, range);
         assertEquals(sun.size(), moon.size(), "the same samples");
         for (int i = 0; i < sun.size(); i++) {
             assertEquals(sun.get(i).sample(), moon.get(i).sample(),
@@ -73,14 +73,14 @@ class SolarSystemServiceTest {
         assertTrue(moved > 1.2 && moved < 1.6, "the Moon moves about half a"
                 + " degree an hour among the stars: " + moved + "° in 2.5 h");
         assertEquals(TimeScales.Confidence.ESTIMATED_AFTER_RECORD,
-                SERVICE.observe(Body.MOON, OSLO.at(
+                solar().observe(Body.MOON, OSLO.at(
                         Instant.parse("2080-01-01T00:00:00Z"))).timeConfidence());
     }
 
     @Test
     void theMoonsObserverChangesExactlyWhatItShould() {
-        MoonObservation oslo = (MoonObservation) SERVICE.observe(Body.MOON, OSLO);
-        MoonObservation quito = (MoonObservation) SERVICE.observe(Body.MOON,
+        MoonObservation oslo = (MoonObservation) solar().observe(Body.MOON, OSLO);
+        MoonObservation quito = (MoonObservation) solar().observe(Body.MOON,
                 new Observer(-0.18, 281.5, OSLO.instant()));
         double parallax = oslo.astrometricJ2000().separationDegrees(
                 quito.astrometricJ2000());
@@ -123,14 +123,14 @@ class SolarSystemServiceTest {
     @Test
     void everyAnswerSaysHowExactItsTimeIs() {
         assertEquals(TimeScales.Confidence.ESTIMATED_BEFORE_RECORD,
-                SERVICE.observe(Body.SUN, OSLO.at(
+                solar().observe(Body.SUN, OSLO.at(
                         Instant.parse("1950-06-01T00:00:00Z"))).timeConfidence());
         assertEquals(TimeScales.Confidence.EXACT,
-                SERVICE.observe(Body.SUN, OSLO).timeConfidence());
+                solar().observe(Body.SUN, OSLO).timeConfidence());
         assertEquals(TimeScales.Confidence.ESTIMATED_AFTER_RECORD,
-                SERVICE.observe(Body.SUN, OSLO.at(
+                solar().observe(Body.SUN, OSLO.at(
                         Instant.parse("2080-01-01T00:00:00Z"))).timeConfidence());
-        assertEquals(SERVICE.timeScales().exactUntil(),
+        assertEquals(solar().timeScales().exactUntil(),
                 SolarSystemPack.load().leapSeconds().expires(),
                 "the exact boundary is the pinned record's own");
     }
@@ -139,7 +139,7 @@ class SolarSystemServiceTest {
     void aRangeAnswersEverySampleAndCarriesTheAppendedEndMark() {
         TimeRange range = new TimeRange(OSLO.instant(),
                 OSLO.instant().plus(Duration.ofMinutes(150)), Duration.ofHours(1));
-        List<Row> rows = SERVICE.observe(Body.SUN, OSLO, range);
+        List<Row> rows = solar().observe(Body.SUN, OSLO, range);
         assertEquals(4, rows.size());
         assertFalse(rows.get(0).sample().appendedEnd());
         assertTrue(rows.get(3).sample().appendedEnd());
@@ -162,8 +162,8 @@ class SolarSystemServiceTest {
 
     @Test
     void changingTheObserverChangesExactlyWhatItShould() {
-        SunObservation oslo = (SunObservation) SERVICE.observe(Body.SUN, OSLO);
-        SunObservation quito = (SunObservation) SERVICE.observe(Body.SUN,
+        SunObservation oslo = (SunObservation) solar().observe(Body.SUN, OSLO);
+        SunObservation quito = (SunObservation) solar().observe(Body.SUN,
                 new Observer(-0.18, 281.5, OSLO.instant()));
         assertTrue(oslo.astrometricJ2000().separationDegrees(
                 quito.astrometricJ2000()) * 3600.0 < 9.0,
@@ -176,7 +176,7 @@ class SolarSystemServiceTest {
         assertTrue(Math.abs(oslo.horizontal().altitudeDegrees()
                 - quito.horizontal().altitudeDegrees()) > 30.0,
                 "but a very different sky");
-        SunObservation later = (SunObservation) SERVICE.observe(Body.SUN,
+        SunObservation later = (SunObservation) solar().observe(Body.SUN,
                 OSLO.at(OSLO.instant().plus(Duration.ofDays(1))));
         double moved = oslo.astrometricJ2000().separationDegrees(
                 later.astrometricJ2000());
@@ -191,26 +191,26 @@ class SolarSystemServiceTest {
                     Locale.setDefault(Locale.forLanguageTag("tr-TR"));
                     TimeZone.setDefault(TimeZone.getTimeZone(
                             ZoneId.of("Pacific/Kiritimati")));
-                    SunObservation a = (SunObservation) SERVICE.observe(Body.SUN, OSLO);
+                    SunObservation a = (SunObservation) solar().observe(Body.SUN, OSLO);
                     Locale.setDefault(Locale.forLanguageTag("en-GB"));
                     TimeZone.setDefault(TimeZone.getTimeZone(ZoneId.of("UTC")));
-                    SunObservation b = (SunObservation) SERVICE.observe(Body.SUN, OSLO);
+                    SunObservation b = (SunObservation) solar().observe(Body.SUN, OSLO);
                     assertEquals(a, b, "locale and zone change nothing");
                     Locale.setDefault(Locale.forLanguageTag("tr-TR"));
-                    MoonObservation m = (MoonObservation) SERVICE.observe(Body.MOON, OSLO);
+                    MoonObservation m = (MoonObservation) solar().observe(Body.MOON, OSLO);
                     Locale.setDefault(Locale.forLanguageTag("en-GB"));
-                    assertEquals(m, SERVICE.observe(Body.MOON, OSLO), "nor for the Moon");
+                    assertEquals(m, solar().observe(Body.MOON, OSLO), "nor for the Moon");
                 }));
     }
 
     @Test
     void nullsAreRefusedByName() {
         assertThrows(IllegalArgumentException.class,
-                () -> SERVICE.observe(null, OSLO));
+                () -> solar().observe(null, OSLO));
         assertThrows(IllegalArgumentException.class,
-                () -> SERVICE.observe(Body.SUN, null));
+                () -> solar().observe(Body.SUN, null));
         assertThrows(IllegalArgumentException.class,
-                () -> SERVICE.observe(Body.SUN, OSLO, null));
+                () -> solar().observe(Body.SUN, OSLO, null));
         assertThrows(IllegalArgumentException.class,
                 () -> new SolarSystemService(null));
     }

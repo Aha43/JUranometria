@@ -17,6 +17,7 @@ import juranometria.render.ChartRenderer;
 import juranometria.sky.Observer;
 import juranometria.solar.JovianSystemService;
 
+import static juranometria.solar.SharedServices.jovian;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -32,12 +33,10 @@ class JovianLabelInvariantTest {
             Instant.parse("2026-12-11T22:45:00Z"));
     private static final double[] FIELDS = {12.0, 8.0, 6.0, 4.0, 3.0, 2.0};
 
-    private static JovianSystemService service;
     private static FontMetrics font;
 
     @BeforeAll
     static void load() {
-        service = JovianSystemService.load();
         Graphics2D probe = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB).createGraphics();
         try {
             font = ChartRenderer.TextMetrics.of(probe).labels();
@@ -58,7 +57,7 @@ class JovianLabelInvariantTest {
         int checked = 0;
         for (Instant t = Instant.parse("2026-01-01T00:00:00Z");
                 t.isBefore(Instant.parse("2027-01-01T00:00:00Z")); t = t.plus(Duration.ofHours(6))) {
-            JovianSystemService.Configuration c = service.observeMoons(OSLO.at(t));
+            JovianSystemService.Configuration c = jovian().observeMoons(OSLO.at(t));
             for (double field : fields) {
                 checked++;
                 if (JovianCartographyStudyMain.losesEveryMoonLabel(field, c, font)) {

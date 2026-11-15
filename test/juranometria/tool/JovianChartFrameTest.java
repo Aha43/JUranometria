@@ -3,7 +3,6 @@ package juranometria.tool;
 import java.time.Instant;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import juranometria.chart.SkyPosition;
@@ -14,11 +13,11 @@ import juranometria.project.Projection;
 import juranometria.project.ViewportMapping;
 import juranometria.sky.Observer;
 import juranometria.sky.SkyFrame;
-import juranometria.solar.JovianSystemService;
 import juranometria.solar.JovianSystemService.Configuration;
 import juranometria.solar.JovianSystemService.JupiterObservation;
 import juranometria.solar.JovianSystemService.MoonPlace;
 
+import static juranometria.solar.SharedServices.jovian;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -31,14 +30,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class JovianChartFrameTest {
 
-    private static JovianSystemService service;
     private static final Observer OSLO = new Observer(59.91, 10.75,
             Instant.parse("2026-12-11T22:45:00Z"));
-
-    @BeforeAll
-    static void load() {
-        service = JovianSystemService.load();
-    }
 
     @Test
     void thePoleDerivedInTheChartsFrameAgreesWithTheTablesAngleCarriedBackToJ2000() {
@@ -46,10 +39,10 @@ class JovianChartFrameTest {
         double turn = 0.0;
         for (int year = 1900; year <= 2100; year += 4) {
             Instant t = Instant.parse(year + "-03-01T00:00:00Z");
-            JupiterObservation j = service.observeJupiterGeocentric(t);
-            double jd = service.timeScales().tt(t).jdTt();
+            JupiterObservation j = jovian().observeJupiterGeocentric(t);
+            double jd = jovian().timeScales().tt(t).jdTt();
             double derived = JovianChartGeometry.positionAngleJ2000(j.astrometricJ2000(),
-                    JovianChartGeometry.pole(service.pack().constants(), jd));
+                    JovianChartGeometry.pole(jovian().pack().constants(), jd));
             double carried = JovianChartGeometry.ofDateAngleCarriedToJ2000(j.apparentOfDate(),
                     j.poleAngleDegrees(), jd);
             worst = Math.max(worst, Math.abs(wrap(derived - carried)));
@@ -62,7 +55,7 @@ class JovianChartFrameTest {
 
     @Test
     void everyBodysPageCentreIsItsOwnJ2000PlaceAndRoundTrips() {
-        Configuration c = service.observeMoons(OSLO);
+        Configuration c = jovian().observeMoons(OSLO);
         DrawnPage page = JovianCartographyStudyMain.emptyPage(c.jupiter().astrometricJ2000(),
                 1.0, 900, 700);
         Projection projection = page.projection();
@@ -81,7 +74,7 @@ class JovianChartFrameTest {
 
     @Test
     void aMoonsPageOffsetIsItsJ2000OffsetTurnedByThePagesTangentsAcrossTheSky() {
-        Configuration c = service.observeMoons(OSLO);
+        Configuration c = jovian().observeMoons(OSLO);
         JupiterObservation j = c.jupiter();
         // Jupiter's own arrangement, carried to other parts of the sky by
         // keeping each moon's J2000 offset - the poles, the equator, RA 0/24h.
@@ -115,7 +108,7 @@ class JovianChartFrameTest {
         double worst = 0.0;
         JupiterObservation before = null;
         for (int s = 0; s <= 240; s++) {
-            JupiterObservation now = service.observeJupiterGeocentric(split.plusSeconds(s));
+            JupiterObservation now = jovian().observeJupiterGeocentric(split.plusSeconds(s));
             if (before != null) {
                 worst = Math.max(worst, now.astrometricJ2000()
                         .separationDegrees(before.astrometricJ2000()) * 3600.0);
@@ -134,7 +127,7 @@ class JovianChartFrameTest {
         double worst = 0.0;
         for (Instant t = Instant.parse("2001-01-01T00:00:00Z");
                 t.isBefore(Instant.parse("2100-12-01T00:00:00Z")); t = t.plusSeconds(86400L * 97)) {
-            Configuration c = service.observeMoonsGeocentric(t);
+            Configuration c = jovian().observeMoonsGeocentric(t);
             for (MoonPlace m : c.moons()) {
                 double[] off = JovianCartographyStudyMain.j2000Offset(c.jupiter(), m);
                 worst = Math.max(worst, Math.hypot(off[0] - m.xArcseconds(), off[1] - m.yArcseconds()));

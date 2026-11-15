@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -18,7 +17,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import juranometria.chart.SkyPosition;
@@ -102,21 +100,9 @@ class MoonReferenceVectorTest {
     record SunRow(Instant when, double raApp, double decApp, double eclLon) {
     }
 
-    private static SolarSystemService service;
-    private static LocalDate exactUntil;
-
-    @BeforeAll
-    static void loadTheService() {
-        service();
-    }
-
-    /** The service, loaded once - here or from a sibling test. */
+    /** The service the suite shares (#708) - here or from a sibling test. */
     static SolarSystemService service() {
-        if (service == null) {
-            service = SolarSystemService.load();
-            exactUntil = service.timeScales().exactUntil();
-        }
-        return service;
+        return SharedServices.solar();
     }
 
     static Instant stamp(String field) {
@@ -179,8 +165,8 @@ class MoonReferenceVectorTest {
     }
 
     private static boolean exact(Instant when) {
-        service();
-        return when.atOffset(ZoneOffset.UTC).toLocalDate().isBefore(exactUntil);
+        return when.atOffset(ZoneOffset.UTC).toLocalDate()
+                .isBefore(service().timeScales().exactUntil());
     }
 
     private static String era(Instant when) {
@@ -357,7 +343,7 @@ class MoonReferenceVectorTest {
     /** The Sun's apparent RA of date at the row, through the service. */
     private static double sunApparentRa(MoonObservation moon, Row row) {
         SolarSystemService.SunObservation sun = (SolarSystemService.SunObservation)
-                service.observe(Body.SUN, observerAt(row));
+                service().observe(Body.SUN, observerAt(row));
         return sun.apparentOfDate().raDegrees();
     }
 

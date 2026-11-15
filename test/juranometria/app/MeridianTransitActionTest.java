@@ -4,7 +4,6 @@ import java.time.Instant;
 
 import javax.swing.SwingUtilities;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import juranometria.chart.Selection;
@@ -17,6 +16,7 @@ import juranometria.sky.SkyFrame;
 import juranometria.solar.SolarSystemService;
 import juranometria.ui.language.InterfaceText;
 
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -34,12 +34,6 @@ class MeridianTransitActionTest {
     private static final Instant AUGUST = Instant.parse("2026-08-15T06:00:00Z");
     private static final Observer OSLO = new Observer(59.91, 10.75, AUGUST);
     private static final double TWO_SECONDS_DEGREES = 2.0 * 360.0 / 86400.0;
-    private static SolarSystemService service;
-
-    @BeforeAll
-    static void load() {
-        service = SolarSystemService.load();
-    }
 
     private static void edt(Runnable work) throws Exception {
         SwingUtilities.invokeAndWait(work);
@@ -52,7 +46,7 @@ class MeridianTransitActionTest {
     }
 
     private static MeridianTransitAction action(MeridianModule module, String language) {
-        return new MeridianTransitAction(module, () -> service,
+        return new MeridianTransitAction(module, () -> solar(),
                 () -> { throw new AssertionError("Jupiter's pack is not read for this"); },
                 () -> { throw new AssertionError("Saturn's pack is not read for this"); },
                 InterfaceText.forLanguage(language));
@@ -94,7 +88,7 @@ class MeridianTransitActionTest {
         edt(() -> said[0] = action(module, "nb-NO").apply(moon));
         Instant at = module.observer().instant();
         assertTrue(said[0].startsWith("Karttid satt til "), said[0]);
-        SkyPosition then = ((SolarSystemService.MoonObservation) service.observe(
+        SkyPosition then = ((SolarSystemService.MoonObservation) solar().observe(
                 SolarSystemService.Body.MOON, OSLO.at(at))).apparentOfDate();
         double lst = SiderealSolver.localSiderealTimeDegrees(at, OSLO.eastLongitudeDegrees());
         assertTrue(Math.abs(signed(lst - then.raDegrees())) < TWO_SECONDS_DEGREES,

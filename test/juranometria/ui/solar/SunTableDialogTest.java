@@ -16,15 +16,14 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import juranometria.sky.Observer;
-import juranometria.solar.SolarSystemService;
 import juranometria.solar.SolarSystemService.Body;
 import juranometria.solar.SolarSystemService.SunObservation;
 import juranometria.ui.language.InterfaceText;
 
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -40,12 +39,6 @@ class SunTableDialogTest {
 
     private static final Instant MIDSUMMER = Instant.parse("2026-06-21T10:00:00Z");
     private static final Observer OSLO = new Observer(59.91, 10.75, MIDSUMMER);
-    private static SolarSystemService service;
-
-    @BeforeAll
-    static void loadTheService() {
-        service = SolarSystemService.load();
-    }
 
     /** A rig whose observer a test can change between reads. */
     private static final class Rig {
@@ -57,7 +50,7 @@ class SunTableDialogTest {
             content = SolarTableDialog.content(() -> {
                 reads++;
                 return observer;
-            }, service, InterfaceText.forLanguage(language), SolarTable.sun());
+            }, solar(), InterfaceText.forLanguage(language), SolarTable.sun());
         }
     }
 
@@ -77,7 +70,7 @@ class SunTableDialogTest {
     @Test
     void theRowIsTheServicesAnswerSpelledByTheFormat() {
         Rig rig = new Rig("en");
-        SunObservation o = (SunObservation) service.observe(Body.SUN, OSLO);
+        SunObservation o = (SunObservation) solar().observe(Body.SUN, OSLO);
         SolarTableModel m = rig.content.model;
         assertEquals(SunTableFormat.minute(MIDSUMMER), m.getValueAt(0, 0));
         assertEquals(SunTableFormat.hms(o.astrometricJ2000()), m.getValueAt(0, 1));
@@ -110,7 +103,7 @@ class SunTableDialogTest {
         assertNotEquals(before, rig.content.model.getValueAt(0, 4),
                 "Quito's Sun stands at a different height");
         assertTrue(rig.content.observerNote.getText().contains("-0.18"));
-        SunObservation quito = (SunObservation) service.observe(Body.SUN,
+        SunObservation quito = (SunObservation) solar().observe(Body.SUN,
                 rig.observer);
         assertEquals(SunTableFormat.altitude(quito.horizontal().altitudeDegrees(),
                 "(below the horizon)"), rig.content.model.getValueAt(0, 4));

@@ -26,7 +26,6 @@ import juranometria.project.ViewportMapping;
 import juranometria.render.ChartHitTest;
 import juranometria.render.ChartRenderer;
 import juranometria.sky.Observer;
-import juranometria.solar.SolarSystemService;
 import juranometria.solar.SolarSystemService.Body;
 import juranometria.solar.SolarSystemService.SunObservation;
 import juranometria.solarchart.SolarSystemModule;
@@ -35,6 +34,7 @@ import juranometria.ui.language.PageText;
 import juranometria.ui.solar.SunChartSession;
 import juranometria.ui.solar.SunChartStore;
 
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -53,7 +53,6 @@ class SunOnTheChartJourneyTest {
     private static final PageText ENGLISH = PageText.in(InterfaceText.forLanguage("en"));
     private static final Instant EQUINOX = Instant.parse("2026-03-20T14:45:53Z");
     private static final Observer OSLO = new Observer(59.913, 10.752, EQUINOX);
-    private static final SolarSystemService SERVICE = SolarSystemService.load();
 
     private ChartComponent chart;
     private SelectionModel selection;
@@ -77,7 +76,7 @@ class SunOnTheChartJourneyTest {
             meridian.showing(horizonDrawn, horizonDrawn, false);
             module = SunChartSession.begin(host,
                     () -> meridian.attached() ? meridian.observer() : null,
-                    () -> SERVICE, meridian::horizonShowing);
+                    () -> solar(), meridian::horizonShowing);
         });
         flush();
     }
@@ -124,7 +123,7 @@ class SunOnTheChartJourneyTest {
         paint();
         List<ReferenceInk.BodyPlacement> drawn = chart.renderedBodies();
         assertEquals(1, drawn.size());
-        SunObservation sun = (SunObservation) SERVICE.observe(Body.SUN, OSLO);
+        SunObservation sun = (SunObservation) solar().observe(Body.SUN, OSLO);
         DrawnPage page = DrawnPage.of(chart.currentScene());
         PixelPoint expected = new ViewportMapping(page).toPixel(
                 page.projection().project(sun.astrometricJ2000()).orElseThrow());
@@ -214,7 +213,7 @@ class SunOnTheChartJourneyTest {
     }
 
     private static SunObservation sun(Observer at) {
-        return (SunObservation) SERVICE.observe(Body.SUN, at);
+        return (SunObservation) solar().observe(Body.SUN, at);
     }
 
     private void click(int x, int y) throws Exception {

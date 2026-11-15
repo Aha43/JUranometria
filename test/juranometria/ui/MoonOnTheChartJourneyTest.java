@@ -25,7 +25,6 @@ import juranometria.project.ViewportMapping;
 import juranometria.render.ChartHitTest;
 import juranometria.render.ChartRenderer;
 import juranometria.sky.Observer;
-import juranometria.solar.SolarSystemService;
 import juranometria.solar.SolarSystemService.Body;
 import juranometria.solar.SolarSystemService.MoonObservation;
 import juranometria.solarchart.SolarSystemModule;
@@ -36,6 +35,7 @@ import juranometria.ui.solar.MoonChartSession;
 import juranometria.ui.solar.MoonChartStore;
 import juranometria.ui.solar.SunChartSession;
 
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -52,7 +52,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class MoonOnTheChartJourneyTest {
 
     private static final PageText ENGLISH = PageText.in(InterfaceText.forLanguage("en"));
-    private static final SolarSystemService SERVICE = SolarSystemService.load();
 
     private ChartComponent chart;
     private SelectionModel selection;
@@ -66,7 +65,7 @@ class MoonOnTheChartJourneyTest {
     }
 
     private void build(Observer observer, double field) throws Exception {
-        MoonObservation moon = (MoonObservation) SERVICE.observe(Body.MOON, observer);
+        MoonObservation moon = (MoonObservation) solar().observe(Body.MOON, observer);
         SwingUtilities.invokeAndWait(() -> {
             chart = new ChartComponent(Atlas.assembler(), ENGLISH);
             chart.setSize(900, 700);
@@ -81,7 +80,7 @@ class MoonOnTheChartJourneyTest {
             meridian.showing(false, false, false);
             module = SunChartSession.begin(host,
                     () -> meridian.attached() ? meridian.observer() : null,
-                    () -> SERVICE, meridian::horizonShowing);
+                    () -> solar(), meridian::horizonShowing);
         });
         flush();
     }
@@ -123,7 +122,7 @@ class MoonOnTheChartJourneyTest {
         paint();
         List<ReferenceInk.BodyPlacement> drawn = chart.renderedBodies();
         assertEquals(1, drawn.size(), "the Moon's switch draws the Moon alone");
-        MoonObservation moon = (MoonObservation) SERVICE.observe(Body.MOON, oslo);
+        MoonObservation moon = (MoonObservation) solar().observe(Body.MOON, oslo);
         DrawnPage page = DrawnPage.of(chart.currentScene());
         PixelPoint expected = new ViewportMapping(page).toPixel(
                 page.projection().project(moon.astrometricJ2000()).orElseThrow());

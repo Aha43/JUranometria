@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import juranometria.tool.NeptuneComparison;
 
+import static juranometria.solar.SharedServices.neptune;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -16,8 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * #655), so the targets are known to bite - Uranus's (#634) for Neptune.
  */
 class NeptuneMutationTest {
-
-    private static final NeptuneService SERVICE = NeptuneService.load();
 
     private interface Quantity {
         double of(NeptuneService.NeptuneObservation o, NeptuneComparison.Table t, String[] f);
@@ -35,7 +34,7 @@ class NeptuneMutationTest {
                     continue;
                 }
                 NeptuneService.NeptuneObservation o =
-                        SERVICE.observeRival(NeptuneComparison.observer("oslo", when), rival);
+                        neptune().observeRival(NeptuneComparison.observer("oslo", when), rival);
                 if (o.elongationDegrees() > 1.0) {
                     worst = Math.max(worst, Math.abs(q.of(o, t, f)));
                 }
@@ -73,7 +72,7 @@ class NeptuneMutationTest {
     @Test
     void thePlanetodeticTiltIsNotThePlanetocentric() throws IOException {
         double worst = worst(NeptuneService.Rival.PLANETODETIC_TILT, (o, t, f) -> {
-            double centric = SERVICE.observe(NeptuneComparison.observer("oslo", o.instant())).tiltDegrees();
+            double centric = neptune().observe(NeptuneComparison.observer("oslo", o.instant())).tiltDegrees();
             return (o.tiltDegrees() - centric) * 3600.0;
         });
         assertTrue(worst > 600.0, "N-4: Horizons' planetodetic value is never the tilt: " + worst);
@@ -102,10 +101,10 @@ class NeptuneMutationTest {
         NeptuneComparison.Table t = NeptuneComparison.table("matrix-7d-nereid-oslo");
         for (String[] f : t.rows()) {
             Instant when = NeptuneComparison.instant(f[0]);
-            if (!SERVICE.moonsAnswerAt(when) || !when.isBefore(Instant.parse("2027-06-28T00:00:00Z"))) {
+            if (!neptune().moonsAnswerAt(when) || !when.isBefore(Instant.parse("2027-06-28T00:00:00Z"))) {
                 continue;
             }
-            NeptuneService.Configuration c = SERVICE.configurationRival(
+            NeptuneService.Configuration c = neptune().configurationRival(
                     NeptuneComparison.observer("oslo", when), NeptuneService.Rival.J2000_OFFSETS);
             if (c.neptune().elongationDegrees() > 1.0) {
                 worst = Math.max(worst, Math.abs(c.moon(NeptuneService.Moon.NEREID).xArcseconds()

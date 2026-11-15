@@ -11,7 +11,6 @@ import juranometria.project.PlanePoint;
 import juranometria.project.Projection;
 import juranometria.project.ViewportMapping;
 import juranometria.sky.Observer;
-import juranometria.solar.SaturnSystemService;
 import juranometria.solar.SaturnSystemService.Configuration;
 import juranometria.solar.SaturnSystemService.MoonPlace;
 import juranometria.solar.SaturnSystemService.SaturnObservation;
@@ -19,6 +18,7 @@ import juranometria.solar.SaturnSystemService.SaturnObservation;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import static juranometria.solar.SharedServices.saturn;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -35,12 +35,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class SaturnCartographyTest {
 
-    private static SaturnSystemService service;
-
     @BeforeAll
     static void load() {
-        service = SaturnSystemService.load();
-        SaturnCartographyStudyMain.service = service;
+        SaturnCartographyStudyMain.service = saturn();
     }
 
     @Test
@@ -49,9 +46,9 @@ class SaturnCartographyTest {
         double turn = 0.0;
         for (int year = 1900; year <= 2100; year += 4) {
             Instant t = Instant.parse(year + "-03-01T00:00:00Z");
-            SaturnObservation s = service.observeSaturnGeocentric(t);
-            double jd = service.timeScales().tt(t).jdTt();
-            double derived = service.poleAngleJ2000Degrees(s);
+            SaturnObservation s = saturn().observeSaturnGeocentric(t);
+            double jd = saturn().timeScales().tt(t).jdTt();
+            double derived = saturn().poleAngleJ2000Degrees(s);
             double carried = JovianChartGeometry.ofDateAngleCarriedToJ2000(s.apparentOfDate(),
                     s.poleAngleDegrees(), jd);
             worst = Math.max(worst, Math.abs(SaturnCartographyStudyMain.wrap(derived - carried)));
@@ -64,7 +61,7 @@ class SaturnCartographyTest {
 
     @Test
     void everyBodyProjectsOntoEveryPageAndBack() {
-        Configuration c = service.observeMoons(SaturnCartographyStudyMain.OSLO);
+        Configuration c = saturn().observeMoons(SaturnCartographyStudyMain.OSLO);
         double[] fields = {ChartViewState.normalMinimumFieldDegrees(),
                 SaturnCartographyStudyMain.CLOSER_FIELDS[0], SaturnCartographyStudyMain.CLOSER_FIELDS[1]};
         for (double field : fields) {
@@ -88,7 +85,7 @@ class SaturnCartographyTest {
 
     @Test
     void theRingEllipseOnThePageIsTheContractsSemiAxesAcrossThePole() {
-        SaturnObservation s = service.observeSaturn(SaturnCartographyStudyMain.OSLO);
+        SaturnObservation s = saturn().observeSaturn(SaturnCartographyStudyMain.OSLO);
         DrawnPage page = DrawnPage.of(SaturnCartographyStudyMain.scene(s.astrometricJ2000(), 0.25,
                 SaturnCartographyStudyMain.PAGE_W, SaturnCartographyStudyMain.PAGE_H));
         Projection projection = page.projection();
@@ -104,7 +101,7 @@ class SaturnCartographyTest {
         double dot = fig.majorPx()[0] * fig.polePx()[0] + fig.majorPx()[1] * fig.polePx()[1];
         assertEquals(0.0, dot, 1e-9, "the major axis is across the pole");
         double[] up = JovianChartGeometry.pageDirection(projection, mapping, s.astrometricJ2000(),
-                service.poleAngleJ2000Degrees(s));
+                saturn().poleAngleJ2000Degrees(s));
         assertEquals(up[0], fig.polePx()[0], 1e-9, "the pole is the derived J2000 angle turned by the page");
         assertEquals(up[1], fig.polePx()[1], 1e-9);
     }
@@ -124,7 +121,7 @@ class SaturnCartographyTest {
     void theTablesOffsetsAreNotThePagesOneTheJ2000PlacesAre() {
         double worst = 0.0;
         for (int year = 2000; year <= 2100; year += 10) {
-            Configuration c = service.observeMoonsGeocentric(Instant.parse(year + "-06-01T00:00:00Z"));
+            Configuration c = saturn().observeMoonsGeocentric(Instant.parse(year + "-06-01T00:00:00Z"));
             for (MoonPlace m : c.moons()) {
                 double[] off = SaturnCartographyStudyMain.j2000Offset(c.saturn(), m);
                 worst = Math.max(worst, Math.hypot(off[0] - m.xArcseconds(), off[1] - m.yArcseconds()));
@@ -151,7 +148,7 @@ class SaturnCartographyTest {
         assertEquals(2.0, SaturnCartographyStudyMain.EDGE_ON_PX, "rings thinner than this are a line");
         assertEquals(1.0, SaturnCartographyStudyMain.LINE_PX);
         assertEquals(6.0, SaturnCartographyStudyMain.OUTLINE_MINOR_PX);
-        SaturnObservation s = service.observeSaturn(SaturnCartographyStudyMain.OSLO);
+        SaturnObservation s = saturn().observeSaturn(SaturnCartographyStudyMain.OSLO);
         double at1 = JovianCartographyStudyMain.pxPerArcsec(1.0, SaturnCartographyStudyMain.PAGE_W,
                 SaturnCartographyStudyMain.PAGE_H);
         assertTrue(SaturnCartographyStudyMain.figure(s, at1, 0.0).rings(),

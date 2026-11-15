@@ -26,6 +26,7 @@ import juranometria.sky.Observer;
 import juranometria.solar.SolarSystemService.Body;
 import juranometria.solar.SolarSystemService.SunObservation;
 
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -79,13 +80,11 @@ class SunReferenceVectorTest {
                double diam, double deltaAu, double eclLon) {
     }
 
-    private static SolarSystemService service;
     private static LocalDate exactUntil;
 
     @BeforeAll
     static void loadTheService() {
-        service = SolarSystemService.load();
-        exactUntil = service.timeScales().exactUntil();
+        exactUntil = solar().timeScales().exactUntil();
     }
 
     static List<Row> rows(String name) throws IOException {
@@ -170,7 +169,7 @@ class SunReferenceVectorTest {
         names.addAll(fixtures("dense-2026-"));
         for (String name : names) {
             for (Row row : rows(name)) {
-                SunObservation o = (SunObservation) service.observe(Body.SUN,
+                SunObservation o = (SunObservation) solar().observe(Body.SUN,
                         observerAt(row));
                 boolean isExact = !row.when.atOffset(ZoneOffset.UTC)
                         .toLocalDate().isBefore(exactUntil) ? false : true;
@@ -239,7 +238,7 @@ class SunReferenceVectorTest {
         List<String> checked = new ArrayList<>();
         for (String name : fixtures("named-")) {
             for (Row row : rows(name)) {
-                SunObservation o = (SunObservation) service.observe(Body.SUN,
+                SunObservation o = (SunObservation) solar().observe(Body.SUN,
                         observerAt(row));
                 boolean exact = row.when.atOffset(ZoneOffset.UTC).toLocalDate()
                         .isBefore(exactUntil);

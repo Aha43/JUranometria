@@ -2,13 +2,13 @@ package juranometria.solar;
 
 import java.io.IOException;
 import java.time.Instant;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import juranometria.chart.SkyPosition;
 import juranometria.sky.Observer;
 import juranometria.solar.MercuryService.MercuryObservation;
 import juranometria.solar.MercuryService.Rival;
 import juranometria.tool.MercuryComparison;
+import static juranometria.solar.SharedServices.mercury;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -24,12 +24,6 @@ class MercuryMutationTest {
 
     private static final double LAT = 59.91;
     private static final double LON = 10.75;
-    private static MercuryService service;
-
-    @BeforeAll
-    static void load() {
-        service = MercuryService.load();
-    }
 
     /** Horizons' Oslo row at an instant, from the committed fixtures. */
     private static String[] row(String stem, String instant) throws IOException {
@@ -53,7 +47,7 @@ class MercuryMutationTest {
     @Test
     void aGeocentricPlaceFailsTheAstrometricTargetNearInferiorConjunction() throws IOException {
         String[] f = row("dense-2026-inferior-conjunction-1-oslo-199", "2026-Mar-07 11:00");
-        MercuryObservation geo = service.observeGeocentric(Instant.parse("2026-03-07T11:00:00Z"));
+        MercuryObservation geo = mercury().observeGeocentric(Instant.parse("2026-03-07T11:00:00Z"));
         double error = sep(geo.astrometricJ2000(), f[3], f[4]);
         assertTrue(error > 10.0, "Mercury's parallax is a dozen arcseconds here; a geocentric"
                 + " place misses the 0.05″ target by far: " + error + "″");
@@ -63,7 +57,7 @@ class MercuryMutationTest {
     void readingTheCivilInstantAsTerrestrialTimeFailsTheAstrometricTarget() throws IOException {
         String[] f = row("named-oslo-199", "2026-Jan-21 16:00");
         // The rival forgets TT - UTC, 69.184 s in 2026: it computes the instant that much early.
-        MercuryObservation rival = service.observe(oslo("2026-01-21T16:00:00Z").at(
+        MercuryObservation rival = mercury().observe(oslo("2026-01-21T16:00:00Z").at(
                 Instant.parse("2026-01-21T16:00:00Z").minusMillis(69_184)));
         double error = sep(rival.astrometricJ2000(), f[3], f[4]);
         assertTrue(error > 2.0, "at superior conjunction Mercury moves 0.07″ a second; 69 s"
@@ -82,8 +76,8 @@ class MercuryMutationTest {
         String[] f = row("named-oslo-199", "2012-Feb-07 09:00");
         assertTrue(Double.parseDouble(f[17]) > 2.0 && Double.parseDouble(f[11]) > 99.0,
                 "2.07° from the Sun, beyond it");
-        MercuryObservation right = service.observe(oslo("2012-02-07T09:00:00Z"));
-        MercuryObservation rival = service.observeRival(oslo("2012-02-07T09:00:00Z"),
+        MercuryObservation right = mercury().observe(oslo("2012-02-07T09:00:00Z"));
+        MercuryObservation rival = mercury().observeRival(oslo("2012-02-07T09:00:00Z"),
                 Rival.NO_DEFLECTION);
         double rightError = sep(right.apparentOfDate(), f[5], f[6]);
         double rivalError = sep(rival.apparentOfDate(), f[5], f[6]);
@@ -97,7 +91,7 @@ class MercuryMutationTest {
     @Test
     void leavingOutAberrationFailsTheApparentTarget() throws IOException {
         String[] f = row("named-oslo-199", "1972-Jan-01 00:00");
-        MercuryObservation rival = service.observeRival(oslo("1972-01-01T00:00:00Z"),
+        MercuryObservation rival = mercury().observeRival(oslo("1972-01-01T00:00:00Z"),
                 Rival.NO_ABERRATION);
         double error = sep(rival.apparentOfDate(), f[5], f[6]);
         assertTrue(error > 5.0, "aberration is about 20″: " + error + "″");
@@ -106,7 +100,7 @@ class MercuryMutationTest {
     @Test
     void theGeometricPhaseAngleFailsTheStoTarget() throws IOException {
         String[] f = row("named-oslo-199", "1972-Jan-01 00:00");
-        MercuryObservation rival = service.observeRival(oslo("1972-01-01T00:00:00Z"),
+        MercuryObservation rival = mercury().observeRival(oslo("1972-01-01T00:00:00Z"),
                 Rival.GEOMETRIC_PHASE_ANGLE);
         double error = Math.abs(rival.phaseAngleDegrees() - Double.parseDouble(f[19])) * 3600.0;
         assertTrue(error > 2.0, "S-T-O carries two aberrations, Mercury's at up to 49 km/s;"
@@ -133,10 +127,10 @@ class MercuryMutationTest {
         // longitude - Mercury's latitude is large at this one.
         String[] f = row("dense-2026-inferior-conjunction-1-oslo-199", "2026-Mar-06 20:00");
         assertTrue(f[18].contains("L"));
-        MercuryObservation o = service.observe(oslo("2026-03-06T20:00:00Z"));
+        MercuryObservation o = mercury().observe(oslo("2026-03-06T20:00:00Z"));
         assertTrue(o.side() == SolarSystemService.Side.WEST_OF_SUN, "the ruled side agrees");
-        double et = service.timeScales().tt(o.instant()).secondsPastJ2000();
-        assertTrue(service.geocentricLongitudeFromSunAtEt(et) > 0.0,
+        double et = mercury().timeScales().tt(o.instant()).secondsPastJ2000();
+        assertTrue(mercury().geocentricLongitudeFromSunAtEt(et) > 0.0,
                 "by ecliptic longitude Mercury is still east: the rival would disagree");
     }
 
@@ -146,7 +140,7 @@ class MercuryMutationTest {
         // substituted - docs/studies/mercury/authority-comparison.md, "The
         // radius", measures the mean at 2439.4 km.
         String[] f = row("named-oslo-199", "2026-Mar-07 11:00");
-        MercuryObservation o = service.observe(oslo("2026-03-07T11:00:00Z"));
+        MercuryObservation o = mercury().observe(oslo("2026-03-07T11:00:00Z"));
         double mean = 2.0 * Math.toDegrees(Math.asin(2439.4 / o.distanceKm())) * 3600.0;
         assertTrue(Math.abs(mean - Double.parseDouble(f[12])) > 0.001,
                 "the mean radius is 0.05 % smaller: past the 0.001″ target near inferior"

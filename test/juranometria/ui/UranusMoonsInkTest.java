@@ -13,12 +13,13 @@ import juranometria.module.OverlayRegistry;
 import juranometria.project.DrawnPage;
 import juranometria.render.ChartPalette;
 import juranometria.sky.Observer;
-import juranometria.solar.SolarSystemService;
 import juranometria.solar.UranusService;
 import juranometria.solarchart.SolarSystemModule;
 import juranometria.ui.language.InterfaceText;
 import juranometria.ui.language.PageText;
 
+import static juranometria.solar.SharedServices.solar;
+import static juranometria.solar.SharedServices.uranus;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -40,8 +41,6 @@ class UranusMoonsInkTest {
 
     private static final PageText ENGLISH = PageText.in(InterfaceText.forLanguage("en"));
     private static final PageText NORSK = PageText.in(InterfaceText.forLanguage("nb-NO"));
-    private static final SolarSystemService SOLAR = SolarSystemService.load();
-    private static final UranusService URANUS = UranusService.load();
     private static final double OSLO_LAT = 59.913;
     private static final double OSLO_LON = 10.752;
     /** Espenak's 2026 opposition hour (uranus-events.txt). */
@@ -56,9 +55,9 @@ class UranusMoonsInkTest {
     }
 
     private static OverlayRegistry offering(Instant when) {
-        SolarSystemModule module = new SolarSystemModule(() -> oslo(when), () -> SOLAR,
+        SolarSystemModule module = new SolarSystemModule(() -> oslo(when), () -> solar(),
                 () -> false);
-        module.withUranus(() -> URANUS);
+        module.withUranus(() -> uranus());
         module.uranusShowing(true);
         module.sunShowing(false);
         OverlayRegistry registry = new OverlayRegistry();
@@ -68,7 +67,7 @@ class UranusMoonsInkTest {
 
     private static ChartScene page(Instant when, double field) {
         return Atlas.assembler().assemble(new ChartViewState(
-                URANUS.observe(oslo(when)).astrometricJ2000(), field, 8.0, null, null), 900, 700);
+                uranus().observe(oslo(when)).astrometricJ2000(), field, 8.0, null, null), 900, 700);
     }
 
     private static List<ReferenceInk.BodyPlacement> placed(ChartScene scene, OverlayRegistry r,
@@ -122,7 +121,7 @@ class UranusMoonsInkTest {
         // Horizons codes Miranda t (in front of Uranus) from Oslo on 2005-05-28.
         Instant transit = Instant.parse("2005-05-28T00:00:00Z");
         assertEquals(UranusService.DiscRelation.IN_FRONT,
-                URANUS.observeMoons(oslo(transit)).moon(UranusService.Moon.MIRANDA).discRelation());
+                uranus().observeMoons(oslo(transit)).moon(UranusService.Moon.MIRANDA).discRelation());
         OverlayRegistry r = offering(transit);
         ChartScene closest = page(transit, 0.25);
         assertNull(find(placed(closest, r, ENGLISH), id(UranusService.Moon.MIRANDA)),
@@ -147,7 +146,7 @@ class UranusMoonsInkTest {
         // Horizons codes Ariel u (in the shadow) from Oslo on 2006-02-04.
         Instant eclipsed = Instant.parse("2006-02-04T00:00:00Z");
         assertEquals(UranusService.ShadowRelation.IN_SHADOW,
-                URANUS.observeMoons(oslo(eclipsed)).moon(UranusService.Moon.ARIEL).shadowRelation());
+                uranus().observeMoons(oslo(eclipsed)).moon(UranusService.Moon.ARIEL).shadowRelation());
         OverlayRegistry r = offering(eclipsed);
         ChartScene closest = page(eclipsed, 0.25);
         assertNull(find(placed(closest, r, ENGLISH), id(UranusService.Moon.ARIEL)),

@@ -24,7 +24,6 @@ import juranometria.project.DrawnPage;
 import juranometria.project.PixelPoint;
 import juranometria.project.ViewportMapping;
 import juranometria.sky.Observer;
-import juranometria.solar.SolarSystemService;
 import juranometria.solar.SolarSystemService.Body;
 import juranometria.solar.VenusService.VenusObservation;
 import juranometria.solarchart.SolarSystemModule;
@@ -34,6 +33,7 @@ import juranometria.ui.solar.SunChartSession;
 import juranometria.ui.solar.VenusChartSession;
 import juranometria.ui.solar.VenusChartStore;
 
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -53,7 +53,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class VenusOnTheChartJourneyTest {
 
     private static final PageText ENGLISH = PageText.in(InterfaceText.forLanguage("en"));
-    private static final SolarSystemService SERVICE = SolarSystemService.load();
 
     private ChartComponent chart;
     private SelectionModel selection;
@@ -73,7 +72,7 @@ class VenusOnTheChartJourneyTest {
     }
 
     private static VenusObservation venus(Observer at) {
-        return (VenusObservation) SERVICE.observe(Body.VENUS, at);
+        return (VenusObservation) solar().observe(Body.VENUS, at);
     }
 
     private void build(Observer observer, double field) throws Exception {
@@ -90,7 +89,7 @@ class VenusOnTheChartJourneyTest {
             meridian.showing(false, false, false);
             module = SunChartSession.begin(host,
                     () -> meridian.attached() ? meridian.observer() : null,
-                    () -> SERVICE, meridian::horizonShowing);
+                    () -> solar(), meridian::horizonShowing);
         });
         flush();
     }

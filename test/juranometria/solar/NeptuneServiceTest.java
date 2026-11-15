@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import juranometria.sky.Observer;
 import juranometria.solar.spk.Vector3;
 
+import static juranometria.solar.SharedServices.neptune;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -22,17 +23,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class NeptuneServiceTest {
 
-    private static final NeptuneService SERVICE = NeptuneService.load();
     private static final Observer OSLO = new Observer(59.91, 10.75, Instant.parse("2026-10-29T12:00:00Z"));
 
     @Test
     void theDeflectionIsJupitersFormulaExactly() {
         JovianSystemService jovian = JovianSystemService.load();
-        double et = SERVICE.timeScales().tt(OSLO.instant()).secondsPastJ2000();
+        double et = neptune().timeScales().tt(OSLO.instant()).secondsPastJ2000();
         Vector3 observer = new Vector3(1.2e8, -8.1e7, -3.5e7);
         for (Vector3 range : List.of(new Vector3(-1.4e8, 2.0e7, 1.1e7),
                 new Vector3(3.0e7, 9.0e7, -2.0e7), new Vector3(1.0e9, 2.5e9, 4.0e8))) {
-            assertEquals(jovian.deflectedBySun(range, observer, et), SERVICE.deflectedBySun(range, observer, et),
+            assertEquals(jovian.deflectedBySun(range, observer, et), neptune().deflectedBySun(range, observer, et),
                     "one formula, every planet's service");
         }
     }
@@ -45,7 +45,7 @@ class NeptuneServiceTest {
         for (double jd : new double[] {2415020.5, 2461343.0, 2488434.5}) {
             double t = (jd - 2451545.0) / 36525.0;
             double n = Math.toRadians(357.85 + 52.316 * t);
-            Vector3 p = SERVICE.pole(jd);
+            Vector3 p = neptune().pole(jd);
             assertEquals(299.36 + 0.70 * Math.sin(n), Math.toDegrees(Math.atan2(p.y(), p.x())) + 360.0, 1e-9,
                     "RA with 0.70 sin N at JD " + jd);
             assertEquals(43.46 - 0.51 * Math.cos(n), Math.toDegrees(Math.asin(p.z())), 1e-9,
@@ -55,8 +55,8 @@ class NeptuneServiceTest {
 
     @Test
     void theTiltIsPlanetocentricAndThePolarDiameterIsTakenAtIt() {
-        NeptuneService.NeptuneObservation o = SERVICE.observe(OSLO);
-        NeptuneService.NeptuneObservation detic = SERVICE.observeRival(OSLO, NeptuneService.Rival.PLANETODETIC_TILT);
+        NeptuneService.NeptuneObservation o = neptune().observe(OSLO);
+        NeptuneService.NeptuneObservation detic = neptune().observeRival(OSLO, NeptuneService.Rival.PLANETODETIC_TILT);
         assertTrue(Math.abs(detic.tiltDegrees()) > Math.abs(o.tiltDegrees()),
                 "the planetodetic reading lies farther from the equator than the planetocentric");
         double re = 24764.0;
@@ -72,10 +72,10 @@ class NeptuneServiceTest {
 
     @Test
     void theMoonsComeInTheRuledOrderAndAnswerWithNeptune() {
-        NeptuneService.Configuration c = SERVICE.observeMoons(OSLO);
+        NeptuneService.Configuration c = neptune().observeMoons(OSLO);
         assertEquals(List.of(NeptuneService.Moon.TRITON, NeptuneService.Moon.NEREID),
                 c.moons().stream().map(NeptuneService.MoonPlace::moon).toList());
-        assertEquals(SERVICE.observe(OSLO).astrometricJ2000(), c.neptune().astrometricJ2000(),
+        assertEquals(neptune().observe(OSLO).astrometricJ2000(), c.neptune().astrometricJ2000(),
                 "the configuration's Neptune is the Neptune the planet's card shows");
         // #654's measured extremes: Triton within 16.97″, Nereid within 457.71″.
         assertTrue(c.moon(NeptuneService.Moon.TRITON).separationArcseconds() < 17.0, "Triton lies near Neptune");
@@ -94,12 +94,12 @@ class NeptuneServiceTest {
         // passes the Sun a little over a degree from its centre, outside its
         // 0.27° disc, so the reading must be false both there and in October.
         NeptuneService.NeptuneObservation conjunction =
-                SERVICE.observeGeocentric(Instant.parse("2026-03-22T10:00:00Z"));
+                neptune().observeGeocentric(Instant.parse("2026-03-22T10:00:00Z"));
         assertTrue(conjunction.elongationDegrees() < 2.0, "near the Sun at the conjunction");
         assertFalse(conjunction.behindSun(), "never behind the Sun in 2026");
         assertEquals(conjunction.elongationDegrees() * 3600.0 < conjunction.sunAngularRadiusArcseconds()
                 + conjunction.equatorialDiameterArcseconds() / 2.0, conjunction.behindSun());
-        assertFalse(SERVICE.observe(OSLO).behindSun(), "far from the Sun in October");
+        assertFalse(neptune().observe(OSLO).behindSun(), "far from the Sun in October");
     }
 
     @Test

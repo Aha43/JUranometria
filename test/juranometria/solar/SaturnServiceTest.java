@@ -3,7 +3,6 @@ package juranometria.solar;
 import java.time.Instant;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import juranometria.sky.Observer;
@@ -16,6 +15,7 @@ import juranometria.solar.SaturnSystemService.ShadowRelation;
 import juranometria.solar.SaturnSystemService.VisibilityState;
 import juranometria.solar.spk.Vector3;
 
+import static juranometria.solar.SharedServices.saturn;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -34,43 +34,37 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class SaturnServiceTest {
 
     private static final Observer OSLO = new Observer(59.91, 10.75, Instant.parse("2026-10-05T00:00:00Z"));
-    private static SaturnSystemService service;
-
-    @BeforeAll
-    static void load() {
-        service = SaturnSystemService.load();
-    }
 
     @Test
     void theGeocentricIntermediateHasNoHorizonAndTheObserversHasOne() {
-        assertNull(service.observeSaturnGeocentric(OSLO.instant()).horizontal());
-        assertNotNull(service.observeSaturn(OSLO).horizontal());
+        assertNull(saturn().observeSaturnGeocentric(OSLO.instant()).horizontal());
+        assertNotNull(saturn().observeSaturn(OSLO).horizontal());
     }
 
     @Test
     void theSameAnswerForTheSameObserverAlways() {
-        assertEquals(service.observeSaturn(OSLO), service.observeSaturn(OSLO));
-        assertEquals(service.observeMoons(OSLO), SaturnSystemService.load().observeMoons(OSLO));
+        assertEquals(saturn().observeSaturn(OSLO), saturn().observeSaturn(OSLO));
+        assertEquals(saturn().observeMoons(OSLO), SaturnSystemService.load().observeMoons(OSLO));
     }
 
     @Test
     void theDeflectionIsJupitersFormulaExactly() {
         JovianSystemService jovian = JovianSystemService.load();
-        double et = service.timeScales().tt(OSLO.instant()).secondsPastJ2000();
+        double et = saturn().timeScales().tt(OSLO.instant()).secondsPastJ2000();
         Vector3 observer = new Vector3(1.2e8, -8.1e7, -3.5e7);
         for (Vector3 range : List.of(new Vector3(-1.4e8, 2.0e7, 1.1e7),
                 new Vector3(3.0e7, 9.0e7, -2.0e7), new Vector3(1.0e9, 1.0e9, 4.0e8))) {
-            assertEquals(jovian.deflectedBySun(range, observer, et), service.deflectedBySun(range, observer, et),
+            assertEquals(jovian.deflectedBySun(range, observer, et), saturn().deflectedBySun(range, observer, et),
                     "one formula, three services");
         }
     }
 
     @Test
     void theRingGeometryIsTheRulingsDefinitions() {
-        SaturnPack.Constants k = service.pack().constants();
+        SaturnPack.Constants k = saturn().pack().constants();
         for (String when : List.of("2003-04-07T00:00:00Z", "2025-03-23T12:00:00Z", "2025-04-10T00:00:00Z",
                 "2026-10-05T00:00:00Z", "2032-06-01T00:00:00Z")) {
-            SaturnObservation o = service.observeSaturn(OSLO.at(Instant.parse(when)));
+            SaturnObservation o = saturn().observeSaturn(OSLO.at(Instant.parse(when)));
             // The unlit face, exactly when B and B′ differ in sign.
             assertEquals(Math.signum(o.ringOpeningDegrees()) * Math.signum(o.sunRingOpeningDegrees()) < 0.0,
                     o.unlitFaceSeen(), when);
@@ -91,7 +85,7 @@ class SaturnServiceTest {
         }
         // The widest opening #574 measured, 2003-04-07: about 27 degrees
         // planetocentric, the south face - never Horizons' planetodetic 32.
-        double b = service.observeSaturn(OSLO.at(Instant.parse("2003-04-07T00:00:00Z"))).ringOpeningDegrees();
+        double b = saturn().observeSaturn(OSLO.at(Instant.parse("2003-04-07T00:00:00Z"))).ringOpeningDegrees();
         assertTrue(b < -26.9 && b > -27.1, "the true geometric opening, not the planetodetic latitude: " + b);
     }
 
@@ -112,7 +106,7 @@ class SaturnServiceTest {
 
     @Test
     void theSevenMoonsComeOutwardFromSaturnAndTheirStatesAreTheirRelations() {
-        Configuration c = service.observeMoons(OSLO);
+        Configuration c = saturn().observeMoons(OSLO);
         assertEquals(List.of(Moon.MIMAS, Moon.ENCELADUS, Moon.TETHYS, Moon.DIONE, Moon.RHEA, Moon.TITAN,
                 Moon.IAPETUS), c.moons().stream().map(MoonPlace::moon).toList());
         for (MoonPlace p : c.moons()) {
@@ -135,8 +129,8 @@ class SaturnServiceTest {
     @Test
     void sat441sTwoSegmentsMeetWithoutASeam() {
         double split = SaturnPackTest.SPLIT_ET;
-        Configuration before = service.configurationAtEt(split - 0.001);
-        Configuration after = service.configurationAtEt(split + 0.001);
+        Configuration before = saturn().configurationAtEt(split - 0.001);
+        Configuration after = saturn().configurationAtEt(split + 0.001);
         for (Moon moon : Moon.values()) {
             double moved = before.moon(moon).separationArcseconds() - after.moon(moon).separationArcseconds();
             // two milliseconds of real motion move Mimas by a few

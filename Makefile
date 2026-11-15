@@ -1316,6 +1316,16 @@ classify: classes
 		juranometria.tool.ChangeClassifierMain \
 		--changed $(BUILD_DIR)/changed-paths.txt --base $(BUILD_DIR)/base
 
+# The whole suite runs in one process under a stated 4 GiB heap (#708).
+# Unstated, the heap was a quarter of the machine's memory: 4 GiB on a
+# 16 GB CI runner and something else everywhere else, so a green run
+# here and a green run there did not mean the same thing. The suite's
+# planetary services are read once and shared (test/juranometria/solar/
+# SharedServices.java); the measured level under this cap is recorded in
+# docs/development.md. Raising the cap is not the repair for a suite
+# that outgrows it - find what the tests are keeping.
+TEST_HEAP := -Xmx4g
+
 test: check-libs classes
 	rm -rf $(TEST_CLASSES)
 	mkdir -p $(TEST_CLASSES)
@@ -1324,6 +1334,6 @@ test: check-libs classes
 		-cp "$(LIB_DIR)/*:$(JUNIT_JAR):$(CLASSES_DIR)" \
 		-d $(TEST_CLASSES) \
 		$(TEST_SOURCES)
-	$(JAVA) -cp "$(CLASSES_DIR):$(TEST_CLASSES):$(LIB_DIR)/*:$(JUNIT_JAR)" \
+	$(JAVA) $(TEST_HEAP) -cp "$(CLASSES_DIR):$(TEST_CLASSES):$(LIB_DIR)/*:$(JUNIT_JAR)" \
 		org.junit.platform.console.ConsoleLauncher execute \
 		--scan-class-path "$(TEST_CLASSES)"

@@ -9,7 +9,6 @@ import javax.swing.JMenuBar;
 import javax.swing.SwingUtilities;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import juranometria.app.AppMenuBar;
@@ -22,13 +21,13 @@ import juranometria.project.DrawnPage;
 import juranometria.project.PixelPoint;
 import juranometria.project.ViewportMapping;
 import juranometria.sky.Observer;
-import juranometria.solar.JovianSystemService;
 import juranometria.solar.JovianSystemService.JupiterObservation;
 import juranometria.ui.language.InterfaceText;
 import juranometria.ui.language.PageText;
 import juranometria.ui.solar.JovianChartSession;
 import juranometria.ui.solar.JovianChartStore;
 
+import static juranometria.solar.SharedServices.jovian;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -48,20 +47,14 @@ class JupiterOnTheChartJourneyTest {
     private static final PageText ENGLISH = PageText.in(InterfaceText.forLanguage("en"));
     private static final Observer OSLO = new Observer(59.913, 10.752,
             Instant.parse("2026-12-11T22:45:00Z"));
-    private static JovianSystemService service;
 
     private ChartComponent chart;
     private ChartModuleHost host;
     private JovianModule module;
     private Preferences node;
 
-    @BeforeAll
-    static void load() {
-        service = JovianSystemService.load();
-    }
-
     private void build(double field) throws Exception {
-        JupiterObservation jupiter = service.observeJupiter(OSLO);
+        JupiterObservation jupiter = jovian().observeJupiter(OSLO);
         SwingUtilities.invokeAndWait(() -> {
             chart = new ChartComponent(Atlas.assembler(), ENGLISH);
             chart.setSize(900, 700);
@@ -75,7 +68,7 @@ class JupiterOnTheChartJourneyTest {
             meridian.showing(false, false, false);
             module = host.attach(new JovianModule(
                     () -> meridian.attached() ? meridian.observer() : null,
-                    () -> service, meridian::horizonShowing));
+                    () -> jovian(), meridian::horizonShowing));
         });
         flush();
     }
@@ -117,7 +110,7 @@ class JupiterOnTheChartJourneyTest {
         List<ReferenceInk.BodyPlacement> drawn = chart.renderedBodies();
         assertEquals(JovianModule.JUPITER, drawn.get(0).identity(),
                 "Jupiter first; its moons (#485) after it, each decided on its own");
-        JupiterObservation jupiter = service.observeJupiter(OSLO);
+        JupiterObservation jupiter = jovian().observeJupiter(OSLO);
         DrawnPage page = DrawnPage.of(chart.currentScene());
         PixelPoint expected = new ViewportMapping(page).toPixel(
                 page.projection().project(jupiter.astrometricJ2000()).orElseThrow());

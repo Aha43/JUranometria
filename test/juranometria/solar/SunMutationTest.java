@@ -15,6 +15,7 @@ import juranometria.solar.SolarSystemService.SunObservation;
 import juranometria.solar.SunReferenceVectorTest.Row;
 import juranometria.solar.time.TimeScales;
 
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -29,12 +30,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class SunMutationTest {
 
-    private static SolarSystemService service;
     private static List<Row> named;
 
     @BeforeAll
     static void load() throws IOException {
-        service = SolarSystemService.load();
         named = SunReferenceVectorTest.rows("named-oslo");
     }
 
@@ -48,7 +47,7 @@ class SunMutationTest {
     void readingTheCivilInstantAsTerrestrialTimeFailsTheAstrometricTarget() {
         Row row = exactEra(0);
         double ttMinusUtc = 69.184; // what the rival would forget to add
-        SunObservation rival = (SunObservation) service.observe(Body.SUN,
+        SunObservation rival = (SunObservation) solar().observe(Body.SUN,
                 SunReferenceVectorTest.observerAt(row)
                         .at(row.when().minusSeconds((long) ttMinusUtc)));
         double error = SunReferenceVectorTest.arcsec(rival.astrometricJ2000(),
@@ -61,7 +60,7 @@ class SunMutationTest {
     @Test
     void skippingPrecessionAndNutationFailsTheApparentTarget() {
         Row row = exactEra(0);
-        SunObservation o = (SunObservation) service.observe(Body.SUN,
+        SunObservation o = (SunObservation) solar().observe(Body.SUN,
                 SunReferenceVectorTest.observerAt(row));
         double error = SunReferenceVectorTest.arcsec(o.astrometricJ2000(),
                 row.raApp(), row.decApp());
@@ -72,9 +71,9 @@ class SunMutationTest {
     @Test
     void leavingOutAberrationFailsTheApparentTarget() {
         Row row = exactEra(0);
-        SunObservation o = (SunObservation) service.observe(Body.SUN,
+        SunObservation o = (SunObservation) solar().observe(Body.SUN,
                 SunReferenceVectorTest.observerAt(row));
-        TimeScales.Epoch epoch = service.timeScales().tt(row.when());
+        TimeScales.Epoch epoch = solar().timeScales().tt(row.when());
         SkyPosition unaberrated = SkyFrame.toOfDate(o.astrometricJ2000(),
                 epoch.jdTt());
         double error = SunReferenceVectorTest.arcsec(unaberrated,
@@ -88,7 +87,7 @@ class SunMutationTest {
     void aWestPositiveLongitudeFailsTheHorizontalTarget() {
         Row row = exactEra(0);
         Observer right = SunReferenceVectorTest.observerAt(row);
-        SunObservation rival = (SunObservation) service.observe(Body.SUN,
+        SunObservation rival = (SunObservation) solar().observe(Body.SUN,
                 new Observer(right.latitudeDegrees(),
                         -right.eastLongitudeDegrees(), right.instant()));
         double error = SunReferenceVectorTest.horizontalArcsec(
@@ -102,9 +101,9 @@ class SunMutationTest {
         // The Sun's parallax is up to 8.8″; a rival that ignored the
         // station would be topocentric only in name.
         Row row = exactEra(0);
-        TimeScales.Epoch epoch = service.timeScales().tt(row.when());
-        SkyPosition geocentric = service.geocentricApparentOfDate(epoch.jdTt());
-        SunObservation o = (SunObservation) service.observe(Body.SUN,
+        TimeScales.Epoch epoch = solar().timeScales().tt(row.when());
+        SkyPosition geocentric = solar().geocentricApparentOfDate(epoch.jdTt());
+        SunObservation o = (SunObservation) solar().observe(Body.SUN,
                 SunReferenceVectorTest.observerAt(row));
         double parallax = geocentric.separationDegrees(o.apparentOfDate()) * 3600.0;
         assertTrue(parallax > 3.0 && parallax < 9.0, "the station moves the"

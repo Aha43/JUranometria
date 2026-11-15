@@ -16,11 +16,12 @@ import juranometria.project.DrawnPage;
 import juranometria.render.ChartPalette;
 import juranometria.sky.Observer;
 import juranometria.solar.MarsService;
-import juranometria.solar.SolarSystemService;
 import juranometria.solarchart.SolarSystemModule;
 import juranometria.ui.language.InterfaceText;
 import juranometria.ui.language.PageText;
 
+import static juranometria.solar.SharedServices.mars;
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -41,8 +42,6 @@ class MarsMoonsInkTest {
 
     private static final PageText ENGLISH = PageText.in(InterfaceText.forLanguage("en"));
     private static final PageText NORSK = PageText.in(InterfaceText.forLanguage("nb-NO"));
-    private static final SolarSystemService SOLAR = SolarSystemService.load();
-    private static final MarsService MARS = MarsService.load();
     private static final double OSLO_LAT = 59.913;
     private static final double OSLO_LON = 10.752;
     private static final String PHOBOS = SolarSystemModule.identityOf(MarsService.Moon.PHOBOS);
@@ -53,9 +52,9 @@ class MarsMoonsInkTest {
     }
 
     private static OverlayRegistry offering(Instant when) {
-        SolarSystemModule module = new SolarSystemModule(() -> oslo(when), () -> SOLAR,
+        SolarSystemModule module = new SolarSystemModule(() -> oslo(when), () -> solar(),
                 () -> false);
-        module.withMars(() -> MARS);
+        module.withMars(() -> mars());
         module.marsShowing(true);
         module.sunShowing(false);
         OverlayRegistry registry = new OverlayRegistry();
@@ -65,7 +64,7 @@ class MarsMoonsInkTest {
 
     private static ChartScene page(Instant when, double field) {
         return Atlas.assembler().assemble(new ChartViewState(
-                MARS.observe(oslo(when)).astrometricJ2000(), field, 8.0, null, null), 900, 700);
+                mars().observe(oslo(when)).astrometricJ2000(), field, 8.0, null, null), 900, 700);
     }
 
     private static List<ReferenceInk.BodyPlacement> placed(ChartScene scene, OverlayRegistry r,
@@ -90,7 +89,7 @@ class MarsMoonsInkTest {
                                  Predicate<MarsService.MoonPlace> asked) {
         for (Instant t = from; t.isBefore(from.plus(Duration.ofDays(days)));
                 t = t.plus(Duration.ofMinutes(10))) {
-            if (asked.test(MARS.observeMoons(oslo(t)).moon(moon))) {
+            if (asked.test(mars().observeMoons(oslo(t)).moon(moon))) {
                 return t;
             }
         }
@@ -174,8 +173,8 @@ class MarsMoonsInkTest {
         Instant shadowed = null;
         for (Instant t = from; t.isBefore(from.plus(Duration.ofDays(20)));
                 t = t.plus(Duration.ofMinutes(10))) {
-            MarsService.MoonPlace m = MARS.observeMoons(oslo(t)).moon(MarsService.Moon.PHOBOS);
-            double radius = MARS.observe(oslo(t)).equatorialDiameterArcseconds() / 2.0;
+            MarsService.MoonPlace m = mars().observeMoons(oslo(t)).moon(MarsService.Moon.PHOBOS);
+            double radius = mars().observe(oslo(t)).equatorialDiameterArcseconds() / 2.0;
             if (m.shadowRelation() == MarsService.ShadowRelation.IN_SHADOW
                     && m.discRelation() == MarsService.DiscRelation.CLEAR
                     && m.separationArcseconds() - radius > 6.0) {

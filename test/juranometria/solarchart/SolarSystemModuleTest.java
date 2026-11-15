@@ -10,10 +10,10 @@ import juranometria.module.OverlayContribution;
 import juranometria.module.OverlayRegistry;
 import juranometria.module.TestChartServices;
 import juranometria.sky.Observer;
-import juranometria.solar.SolarSystemService;
 import juranometria.solar.SolarSystemService.Body;
 import juranometria.solar.SolarSystemService.SunObservation;
 
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -30,7 +30,6 @@ class SolarSystemModuleTest {
 
     private static final Observer OSLO = new Observer(59.913, 10.752,
             Instant.parse("2026-03-20T14:45:53Z"));
-    private static final SolarSystemService SERVICE = SolarSystemService.load();
 
     private static final class Rig {
         Observer observer = OSLO;
@@ -42,7 +41,7 @@ class SolarSystemModuleTest {
             return observer;
         }, () -> {
             serviceReads++;
-            return SERVICE;
+            return solar();
         }, () -> horizonDrawn);
     }
 
@@ -65,7 +64,7 @@ class SolarSystemModuleTest {
         Rig rig = new Rig();
         rig.module.sunShowing(true);
         OverlayContribution.Body sun = sun(rig.module.contributedGeometry());
-        SunObservation expected = (SunObservation) SERVICE.observe(Body.SUN, OSLO);
+        SunObservation expected = (SunObservation) solar().observe(Body.SUN, OSLO);
         assertEquals(SolarSystemModule.SUN, sun.identity());
         assertEquals(InkRole.BODY, sun.role());
         assertEquals(expected.astrometricJ2000(), sun.at(),
@@ -87,7 +86,7 @@ class SolarSystemModuleTest {
         OverlayContribution.Body moon = (OverlayContribution.Body) offered.get(0);
         juranometria.solar.SolarSystemService.MoonObservation expected =
                 (juranometria.solar.SolarSystemService.MoonObservation)
-                        SERVICE.observe(Body.MOON, OSLO);
+                        solar().observe(Body.MOON, OSLO);
         assertEquals(SolarSystemModule.MOON, moon.identity());
         assertEquals(expected.astrometricJ2000(), moon.at());
         assertEquals(expected.angularDiameterArcseconds(),
@@ -123,7 +122,7 @@ class SolarSystemModuleTest {
         OverlayContribution.Body venus = (OverlayContribution.Body) offered.get(0);
         juranometria.solar.VenusService.VenusObservation expected =
                 (juranometria.solar.VenusService.VenusObservation)
-                        SERVICE.observe(Body.VENUS, OSLO);
+                        solar().observe(Body.VENUS, OSLO);
         assertEquals(SolarSystemModule.VENUS, venus.identity());
         assertEquals(expected.astrometricJ2000(), venus.at());
         assertEquals(expected.solidBodyDiameterArcseconds(),
@@ -168,7 +167,7 @@ class SolarSystemModuleTest {
         OverlayContribution.Body mercury = (OverlayContribution.Body) offered.get(0);
         juranometria.solar.MercuryService.MercuryObservation expected =
                 (juranometria.solar.MercuryService.MercuryObservation)
-                        SERVICE.observe(Body.MERCURY, OSLO);
+                        solar().observe(Body.MERCURY, OSLO);
         assertEquals(SolarSystemModule.MERCURY, mercury.identity());
         assertEquals("mercury", mercury.identity());
         assertEquals(expected.astrometricJ2000(), mercury.at());
@@ -207,7 +206,7 @@ class SolarSystemModuleTest {
         Rig rig = new Rig();
         rig.module.sunShowing(true);
         rig.observer = OSLO.at(Instant.parse("2026-03-20T21:33:00Z"));
-        SunObservation night = (SunObservation) SERVICE.observe(Body.SUN, rig.observer);
+        SunObservation night = (SunObservation) solar().observe(Body.SUN, rig.observer);
         assertTrue(night.horizontal().altitudeDegrees() < 0.0, "night at Oslo");
         assertTrue(sun(rig.module.contributedGeometry()).belowHorizon(),
                 "with the horizon drawn, the Sun is below it");
@@ -254,11 +253,11 @@ class SolarSystemModuleTest {
     @Test
     void nullsAreRefusedByName() {
         assertThrows(IllegalArgumentException.class,
-                () -> new SolarSystemModule(null, () -> SERVICE, () -> true));
+                () -> new SolarSystemModule(null, () -> solar(), () -> true));
         assertThrows(IllegalArgumentException.class,
                 () -> new SolarSystemModule(() -> OSLO, null, () -> true));
         assertThrows(IllegalArgumentException.class,
-                () -> new SolarSystemModule(() -> OSLO, () -> SERVICE, null));
+                () -> new SolarSystemModule(() -> OSLO, () -> solar(), null));
         assertThrows(IllegalArgumentException.class,
                 () -> new Rig().module.attach(null));
     }

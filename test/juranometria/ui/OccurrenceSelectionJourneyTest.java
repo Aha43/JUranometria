@@ -23,13 +23,13 @@ import juranometria.module.InkRole;
 import juranometria.module.OverlayContribution;
 import juranometria.page.LeadSelection;
 import juranometria.sky.Observer;
-import juranometria.solar.SolarSystemService;
 import juranometria.solar.SolarSystemService.Body;
 import juranometria.solar.SolarSystemService.MoonObservation;
 import juranometria.solarchart.SolarSystemModule;
 import juranometria.ui.language.InterfaceText;
 import juranometria.ui.language.PageText;
 
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -53,7 +53,6 @@ class OccurrenceSelectionJourneyTest {
 
     private static final Instant FIRST_QUARTER = Instant.parse("2026-03-26T10:32:00Z");
     private static final Observer OSLO = new Observer(59.913, 10.752, FIRST_QUARTER);
-    private static final SolarSystemService SERVICE = SolarSystemService.load();
 
     private ChartComponent chart;
     private SelectionModel selection;
@@ -78,7 +77,7 @@ class OccurrenceSelectionJourneyTest {
                 if (!offering) {
                     return List.of();
                 }
-                MoonObservation moon = (MoonObservation) SERVICE.observe(Body.MOON, observer);
+                MoonObservation moon = (MoonObservation) solar().observe(Body.MOON, observer);
                 return List.of(new OverlayContribution.Body(SolarSystemModule.MOON, "Moon",
                         moon.astrometricJ2000(), moon.angularDiameterArcseconds(),
                         new OverlayContribution.Lit(moon.illuminatedFraction(),
@@ -97,7 +96,7 @@ class OccurrenceSelectionJourneyTest {
     };
 
     private MoonObservation moon(Observer at) {
-        return (MoonObservation) SERVICE.observe(Body.MOON, at);
+        return (MoonObservation) solar().observe(Body.MOON, at);
     }
 
     private void build(String language) throws Exception {

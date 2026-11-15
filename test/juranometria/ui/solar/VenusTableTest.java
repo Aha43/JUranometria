@@ -9,16 +9,15 @@ import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import juranometria.sky.Observer;
-import juranometria.solar.SolarSystemService;
 import juranometria.solar.SolarSystemService.Body;
 import juranometria.solar.VenusService;
 import juranometria.solar.VenusService.VenusObservation;
 import juranometria.ui.language.InterfaceText;
 
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -44,19 +43,13 @@ class VenusTableTest {
     private static final Instant TRANSIT = Instant.parse("2012-06-06T01:00:00Z");
     /** Espenak's 2026 superior conjunction, to the hour (venus-events.txt). */
     private static final Instant SUPERIOR = Instant.parse("2026-01-06T16:00:00Z");
-    private static SolarSystemService service;
-
-    @BeforeAll
-    static void load() {
-        service = SolarSystemService.load();
-    }
 
     private static Observer oslo(Instant at) {
         return new Observer(59.91, 10.75, at);
     }
 
     private static SolarTableDialog.Content content(Observer observer, InterfaceText said) {
-        return SolarTableDialog.content(() -> observer, service, said, SolarTable.venus());
+        return SolarTableDialog.content(() -> observer, solar(), said, SolarTable.venus());
     }
 
     private static String cell(SolarTableDialog.Content c, int row, int column) {
@@ -96,7 +89,7 @@ class VenusTableTest {
     @Test
     void theGreatestEasternElongationReadsAsTheServiceAnswers() {
         SolarTableDialog.Content c = content(oslo(ELONGATION), EN);
-        VenusObservation o = (VenusObservation) service.observe(Body.VENUS, oslo(ELONGATION));
+        VenusObservation o = (VenusObservation) solar().observe(Body.VENUS, oslo(ELONGATION));
         assertEquals(1, c.model.getRowCount());
         assertEquals(SunTableFormat.minute(ELONGATION), cell(c, 0, 0));
         assertEquals(SunTableFormat.hms(o.astrometricJ2000()), cell(c, 0, 1));
@@ -156,14 +149,14 @@ class VenusTableTest {
     @Test
     void aRangeIsTheInstantAnswerAtEveryRowAndItsRefusalsSayVenus() throws Exception {
         Instant[] at = {Instant.parse("2026-10-20T03:00:00Z")};
-        SolarTableSession session = new SolarTableSession(() -> oslo(at[0]), service,
+        SolarTableSession session = new SolarTableSession(() -> oslo(at[0]), solar(),
                 SolarTable.venus());
         session.apply(SolarTableSession.Query.range(1, 2));
         assertEquals(SolarTableSession.Outcome.ROWS, session.result().outcome());
         assertEquals(8, session.result().rows().size(), "a week of days from the chart time, both ends");
         assertEquals(at[0], session.result().rows().get(0).sample().instant());
         for (SolarTableModel.Row r : session.result().rows()) {
-            assertEquals(service.observe(Body.VENUS, oslo(r.sample().instant())), r.observation(),
+            assertEquals(solar().observe(Body.VENUS, oslo(r.sample().instant())), r.observation(),
                     "each row is the instant answer at its own instant");
         }
         at[0] = Instant.parse("2100-12-28T00:00:00Z");
@@ -181,7 +174,7 @@ class VenusTableTest {
     @Test
     void twoHostsShareOneSessionAndTheControllersGroupComputesNothingWhenBuilt()
             throws Exception {
-        SolarTableSession session = new SolarTableSession(() -> oslo(ELONGATION), service,
+        SolarTableSession session = new SolarTableSession(() -> oslo(ELONGATION), solar(),
                 SolarTable.venus());
         SolarTableControls[] controller = new SolarTableControls[1];
         JComponent[] group = new JComponent[1];
@@ -212,7 +205,7 @@ class VenusTableTest {
     /** Since #514 Venus has a chart layer: its Centre on chart target names it. */
     @Test
     void venusCentresOnItsOwnLayer() {
-        SolarTableSession session = new SolarTableSession(() -> oslo(ELONGATION), service,
+        SolarTableSession session = new SolarTableSession(() -> oslo(ELONGATION), solar(),
                 SolarTable.venus());
         juranometria.ui.solar.BodyOnChart layer = new juranometria.ui.solar.BodyOnChart() {
             @Override

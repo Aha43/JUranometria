@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import juranometria.tool.MarsComparison;
 
+import static juranometria.solar.SharedServices.mars;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -18,8 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * the 0.2″ any proposed amendment would allow.
  */
 class MarsMutationTest {
-
-    private static final MarsService SERVICE = MarsService.load();
 
     private interface Quantity {
         double of(MarsService.MarsObservation o, MarsComparison.Table t, String[] f);
@@ -36,7 +35,7 @@ class MarsMutationTest {
                 if (year < 1972 || !when.isBefore(Instant.parse("2027-06-28T00:00:00Z"))) {
                     continue;
                 }
-                MarsService.MarsObservation o = SERVICE.observeRival(MarsComparison.observer("oslo", when), rival);
+                MarsService.MarsObservation o = mars().observeRival(MarsComparison.observer("oslo", when), rival);
                 if (o.elongationDegrees() > 1.0) {
                     worst = Math.max(worst, Math.abs(q.of(o, t, f)));
                 }
@@ -81,7 +80,7 @@ class MarsMutationTest {
     @Test
     void thePlanetodeticTiltIsNotThePlanetocentric() throws IOException {
         double worst = worst(MarsService.Rival.PLANETODETIC_TILT, (o, t, f) -> {
-            double centric = SERVICE.observe(MarsComparison.observer("oslo", o.instant())).tiltDegrees();
+            double centric = mars().observe(MarsComparison.observer("oslo", o.instant())).tiltDegrees();
             return (o.tiltDegrees() - centric) * 3600.0;
         });
         assertTrue(worst > 600.0, "M-3: Horizons' planetodetic value is never the tilt: " + worst);
@@ -101,10 +100,10 @@ class MarsMutationTest {
         MarsComparison.Table t = MarsComparison.table("matrix-7d-deimos-oslo");
         for (String[] f : t.rows()) {
             Instant when = MarsComparison.instant(f[0]);
-            if (!SERVICE.moonsAnswerAt(when) || !when.isBefore(Instant.parse("2027-06-28T00:00:00Z"))) {
+            if (!mars().moonsAnswerAt(when) || !when.isBefore(Instant.parse("2027-06-28T00:00:00Z"))) {
                 continue;
             }
-            MarsService.Configuration c = SERVICE.configurationRival(MarsComparison.observer("oslo", when),
+            MarsService.Configuration c = mars().configurationRival(MarsComparison.observer("oslo", when),
                     MarsService.Rival.J2000_OFFSETS);
             if (c.mars().elongationDegrees() > 1.0) {
                 worst = Math.max(worst, Math.abs(c.moon(MarsService.Moon.DEIMOS).xArcseconds()

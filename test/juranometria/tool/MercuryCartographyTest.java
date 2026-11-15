@@ -15,6 +15,7 @@ import juranometria.project.PlanePoint;
 import juranometria.project.ViewportMapping;
 import juranometria.render.ChartPalette;
 import juranometria.solar.MercuryService;
+import juranometria.solar.SharedServices;
 import juranometria.ui.language.InterfaceText;
 import juranometria.ui.language.PageText;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,14 +43,14 @@ class MercuryCartographyTest {
     static void load() throws Exception {
         java.lang.reflect.Field m = MercuryCartographyStudyMain.class.getDeclaredField("mercury");
         m.setAccessible(true);
-        m.set(null, MercuryService.load());
+        m.set(null, SharedServices.mercury());
         java.lang.reflect.Field s = MercuryCartographyStudyMain.class.getDeclaredField("solar");
         s.setAccessible(true);
-        s.set(null, juranometria.solar.SolarSystemService.load());
+        s.set(null, SharedServices.solar());
     }
 
     private static MercuryService.MercuryObservation at(Instant when) {
-        return MercuryService.load().observe(MercuryCartographyStudyMain.OSLO.at(when));
+        return SharedServices.mercury().observe(MercuryCartographyStudyMain.OSLO.at(when));
     }
 
     @Test

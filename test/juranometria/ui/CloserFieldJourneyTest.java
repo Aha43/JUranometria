@@ -24,6 +24,7 @@ import juranometria.ui.language.InterfaceText;
 import juranometria.ui.language.PageText;
 import juranometria.ui.solar.SunChartSession;
 
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -45,7 +46,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class CloserFieldJourneyTest {
 
     private static final PageText ENGLISH = PageText.in(InterfaceText.forLanguage("en"));
-    private static final SolarSystemService SERVICE = SolarSystemService.load();
     private static final double OSLO_LAT = 59.91;
     private static final double OSLO_LON = 10.75;
 
@@ -70,7 +70,7 @@ class CloserFieldJourneyTest {
     }
 
     private static SkyPosition mercury(Observer at) {
-        return ((MercuryObservation) SERVICE.observe(Body.MERCURY, at)).astrometricJ2000();
+        return ((MercuryObservation) solar().observe(Body.MERCURY, at)).astrometricJ2000();
     }
 
     /** The application's wiring (JUranometriaMain), at a page centred where asked. */
@@ -91,7 +91,7 @@ class CloserFieldJourneyTest {
             meridian.showing(false, false, false);
             module = SunChartSession.begin(host,
                     () -> meridian.attached() ? meridian.observer() : null,
-                    () -> SERVICE, meridian::horizonShowing);
+                    () -> solar(), meridian::horizonShowing);
             module.sunShowing(false);
         });
         flush();
@@ -230,7 +230,7 @@ class CloserFieldJourneyTest {
     @Test
     void theSunNeverOffersACloserField() throws Exception {
         Observer at = oslo();
-        SkyPosition sun = ((SolarSystemService.SunObservation) SERVICE.observe(Body.SUN, at))
+        SkyPosition sun = ((SolarSystemService.SunObservation) solar().observe(Body.SUN, at))
                 .astrometricJ2000();
         build(at, sun, 1.0);
         SwingUtilities.invokeAndWait(() -> module.sunShowing(true));
@@ -410,7 +410,7 @@ class CloserFieldJourneyTest {
     @Test
     void theMoonNeverOffersACloserField() throws Exception {
         Observer at = oslo();
-        SkyPosition moon = ((SolarSystemService.MoonObservation) SERVICE.observe(Body.MOON, at))
+        SkyPosition moon = ((SolarSystemService.MoonObservation) solar().observe(Body.MOON, at))
                 .astrometricJ2000();
         build(at, moon, 1.0);
         SwingUtilities.invokeAndWait(() -> module.moonShowing(true));

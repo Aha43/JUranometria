@@ -14,11 +14,12 @@ import juranometria.project.DrawnPage;
 import juranometria.render.ChartPalette;
 import juranometria.sky.Observer;
 import juranometria.solar.NeptuneService;
-import juranometria.solar.SolarSystemService;
 import juranometria.solarchart.SolarSystemModule;
 import juranometria.ui.language.InterfaceText;
 import juranometria.ui.language.PageText;
 
+import static juranometria.solar.SharedServices.neptune;
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -41,8 +42,6 @@ class NeptuneMoonsInkTest {
 
     private static final PageText ENGLISH = PageText.in(InterfaceText.forLanguage("en"));
     private static final PageText NORSK = PageText.in(InterfaceText.forLanguage("nb-NO"));
-    private static final SolarSystemService SOLAR = SolarSystemService.load();
-    private static final NeptuneService NEPTUNE = NeptuneService.load();
     private static final double OSLO_LAT = 59.913;
     private static final double OSLO_LON = 10.752;
     /** Espenak's 2026 opposition hour (neptune-events.txt). */
@@ -57,9 +56,9 @@ class NeptuneMoonsInkTest {
     }
 
     private static OverlayRegistry offering(Instant when) {
-        SolarSystemModule module = new SolarSystemModule(() -> oslo(when), () -> SOLAR,
+        SolarSystemModule module = new SolarSystemModule(() -> oslo(when), () -> solar(),
                 () -> false);
-        module.withNeptune(() -> NEPTUNE);
+        module.withNeptune(() -> neptune());
         module.neptuneShowing(true);
         module.sunShowing(false);
         OverlayRegistry registry = new OverlayRegistry();
@@ -69,7 +68,7 @@ class NeptuneMoonsInkTest {
 
     private static ChartScene page(Instant when, double field) {
         return Atlas.assembler().assemble(new ChartViewState(
-                NEPTUNE.observe(oslo(when)).astrometricJ2000(), field, 8.0, null, null), 900, 700);
+                neptune().observe(oslo(when)).astrometricJ2000(), field, 8.0, null, null), 900, 700);
     }
 
     private static List<ReferenceInk.BodyPlacement> placed(ChartScene scene, OverlayRegistry r,
@@ -148,7 +147,7 @@ class NeptuneMoonsInkTest {
         // Horizons codes Triton t (in front of Neptune) from Oslo on 2043-09-07.
         Instant transit = Instant.parse("2043-09-07T00:00:00Z");
         assertEquals(NeptuneService.DiscRelation.IN_FRONT,
-                NEPTUNE.observeMoons(oslo(transit)).moon(NeptuneService.Moon.TRITON).discRelation());
+                neptune().observeMoons(oslo(transit)).moon(NeptuneService.Moon.TRITON).discRelation());
         OverlayRegistry r = offering(transit);
         ChartScene closest = page(transit, 0.25);
         assertNull(find(placed(closest, r, ENGLISH), id(NeptuneService.Moon.TRITON)),

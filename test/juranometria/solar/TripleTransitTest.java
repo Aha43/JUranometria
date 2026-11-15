@@ -20,6 +20,7 @@ import juranometria.solar.JovianSystemService.ShadowRelation;
 import juranometria.solar.JovianSystemService.VisibilityState;
 import juranometria.tool.JovianComparison;
 
+import static juranometria.solar.SharedServices.jovian;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -33,13 +34,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class TripleTransitTest {
 
-    private static final JovianSystemService SERVICE = JovianSystemService.load();
     private static final Path IMCCE = Path.of("docs/studies/jovian-system/imcce-2026-12-11.txt");
 
     private static Configuration at(String site, String instant) {
         Instant when = Instant.parse(instant);
-        return site.equals("geocentric") ? SERVICE.observeMoonsGeocentric(when)
-                : SERVICE.observeMoons(JovianComparison.observer(site, when));
+        return site.equals("geocentric") ? jovian().observeMoonsGeocentric(when)
+                : jovian().observeMoons(JovianComparison.observer(site, when));
     }
 
     @Test

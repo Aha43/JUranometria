@@ -10,7 +10,6 @@ import java.util.function.Supplier;
 
 import javax.swing.SwingUtilities;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import juranometria.sky.Observer;
@@ -22,6 +21,7 @@ import juranometria.solar.MarsService.VisibilityState;
 import juranometria.tool.MarsComparison;
 import juranometria.ui.language.InterfaceText;
 
+import static juranometria.solar.SharedServices.mars;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -37,16 +37,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class MarsTableTest {
 
-    private static MarsService service;
     private static final InterfaceText EN = InterfaceText.forLanguage("en");
     private static final InterfaceText NB = InterfaceText.forLanguage("nb-NO");
     /** The study's "today" row (docs/studies/mars-system/horizons/named-mars-oslo.txt). */
     private static final Instant CARD = Instant.parse("2026-10-25T12:00:00Z");
-
-    @BeforeAll
-    static void load() {
-        service = MarsService.load();
-    }
 
     static Observer oslo(Instant when) {
         return MarsComparison.observer("oslo", when);
@@ -74,7 +68,7 @@ class MarsTableTest {
         AtomicInteger loaded = new AtomicInteger();
         Supplier<MarsService> counted = () -> {
             loaded.incrementAndGet();
-            return service;
+            return mars();
         };
         MarsTableSession session = new MarsTableSession(() -> oslo(CARD), counted);
         onEdt(() -> {
@@ -94,7 +88,7 @@ class MarsTableTest {
 
     @Test
     void theControllerGroupHasNoChartSwitchAndNoCentreOnChart() throws Exception {
-        MarsTableSession session = new MarsTableSession(() -> oslo(CARD), () -> service);
+        MarsTableSession session = new MarsTableSession(() -> oslo(CARD), () -> mars());
         onEdt(() -> {
             javax.swing.JComponent group = new MarsTableControls(session, EN, false).inController();
             List<java.awt.Component> all = new ArrayList<>();
@@ -120,7 +114,7 @@ class MarsTableTest {
 
     @Test
     void bothHostsShowOneAppliedResultAndNeitherOverwritesTheOthersDraft() throws Exception {
-        MarsTableSession session = new MarsTableSession(() -> oslo(CARD), () -> service);
+        MarsTableSession session = new MarsTableSession(() -> oslo(CARD), () -> mars());
         onEdt(() -> {
             MarsTableControls controller = new MarsTableControls(session, EN, false);
             controller.inController();
@@ -144,12 +138,12 @@ class MarsTableTest {
 
     @Test
     void everyValueShownIsTheServicesAnswerRounded() throws Exception {
-        MarsTableSession session = new MarsTableSession(() -> oslo(CARD), () -> service);
+        MarsTableSession session = new MarsTableSession(() -> oslo(CARD), () -> mars());
         onEdt(() -> {
             MarsTableControls c = new MarsTableControls(session, EN, false);
             c.apply();
             Configuration shown = session.result().entries().get(0).configuration();
-            Configuration fresh = service.observeMoons(oslo(CARD));
+            Configuration fresh = mars().observeMoons(oslo(CARD));
             for (int row = 0; row < 2; row++) {
                 assertSame(shown.moons().get(row), c.model.lines().get(row).moon());
                 MoonPlace b = fresh.moons().get(row);
@@ -173,7 +167,7 @@ class MarsTableTest {
 
     @Test
     void theCardsInstantReadsNaturallyInBothLanguages() throws Exception {
-        MarsTableSession session = new MarsTableSession(() -> oslo(CARD), () -> service);
+        MarsTableSession session = new MarsTableSession(() -> oslo(CARD), () -> mars());
         onEdt(() -> {
             MarsTableControls en = new MarsTableControls(session, EN, false);
             MarsTableControls nb = new MarsTableControls(session, NB, false);
@@ -216,7 +210,7 @@ class MarsTableTest {
     @Test
     void phobosNamedConfigurationsReadAsHorizonsCodesThem() throws Exception {
         Observer[] at = {null};
-        MarsTableSession session = new MarsTableSession(() -> at[0], () -> service);
+        MarsTableSession session = new MarsTableSession(() -> at[0], () -> mars());
         Map<String, String> rows = Map.of("2005-02-20T00:00:00Z", "O", "2005-02-27T00:00:00Z", "U",
                 "2005-03-06T00:00:00Z", "u", "2005-08-07T00:00:00Z", "t");
         onEdt(() -> {
@@ -240,7 +234,7 @@ class MarsTableTest {
     @Test
     void theMoonsLastSecondsAreRefusedByTheTdbBoundaryAndMarsIsStillShown() throws Exception {
         Observer[] at = {oslo(Instant.parse("2049-12-31T23:58:00Z"))};
-        MarsTableSession session = new MarsTableSession(() -> at[0], () -> service);
+        MarsTableSession session = new MarsTableSession(() -> at[0], () -> mars());
         onEdt(() -> {
             MarsTableControls en = new MarsTableControls(session, EN, false);
             MarsTableControls nb = new MarsTableControls(session, NB, false);
@@ -272,7 +266,7 @@ class MarsTableTest {
     @Test
     void aRangeAcrossTheMoonsEndKeepsMarsAndSaysWhereTheMoonsAreNotComputed() throws Exception {
         MarsTableSession session = new MarsTableSession(
-                () -> oslo(Instant.parse("2049-12-10T00:00:00Z")), () -> service);
+                () -> oslo(Instant.parse("2049-12-10T00:00:00Z")), () -> mars());
         onEdt(() -> {
             MarsTableControls en = new MarsTableControls(session, EN, false);
             MarsTableControls nb = new MarsTableControls(session, NB, false);
@@ -286,7 +280,7 @@ class MarsTableTest {
             int without = 0;
             for (MarsTableSession.Entry e : r.entries()) {
                 without += e.configuration() == null ? 1 : 0;
-                assertEquals(!service.moonsAnswerAt(e.sample().instant()), e.configuration() == null,
+                assertEquals(!mars().moonsAnswerAt(e.sample().instant()), e.configuration() == null,
                         "the moons are left out exactly where the boundary refuses them: "
                                 + e.sample().instant());
             }
@@ -326,7 +320,7 @@ class MarsTableTest {
     @Test
     void theRefusalsNameWhatTheyRefuse() throws Exception {
         Observer[] at = {null};
-        MarsTableSession session = new MarsTableSession(() -> at[0], () -> service);
+        MarsTableSession session = new MarsTableSession(() -> at[0], () -> mars());
         onEdt(() -> {
             MarsTableControls c = new MarsTableControls(session, EN, false);
             c.apply();
@@ -352,11 +346,11 @@ class MarsTableTest {
     @Test
     void aDateLineObserverIsAnsweredForItsOwnPlace() throws Exception {
         Observer chatham = MarsComparison.observer("chatham", CARD);
-        MarsTableSession session = new MarsTableSession(() -> chatham, () -> service);
+        MarsTableSession session = new MarsTableSession(() -> chatham, () -> mars());
         onEdt(() -> {
             MarsTableControls c = new MarsTableControls(session, EN, false);
             c.apply();
-            assertEquals(MarsMoonsModel.marsValues(service.observe(chatham), c.words()).get(2),
+            assertEquals(MarsMoonsModel.marsValues(mars().observe(chatham), c.words()).get(2),
                     c.cardValue("altitude"), "Chatham's own altitude");
             assertTrue(c.observerNote.getText().contains("-176.5") || c.observerNote.getText().contains("−176.5"),
                     "west of the date line, as Place and Time folds it: " + c.observerNote.getText());
@@ -366,7 +360,7 @@ class MarsTableTest {
     @Test
     void anEstimatedInstantIsMarkedAndItsStatesAreNotOfferedAsPredictions() throws Exception {
         MarsTableSession session = new MarsTableSession(
-                () -> oslo(Instant.parse("2040-06-01T00:00:00Z")), () -> service);
+                () -> oslo(Instant.parse("2040-06-01T00:00:00Z")), () -> mars());
         onEdt(() -> {
             MarsTableControls c = new MarsTableControls(session, EN, false);
             c.apply();
@@ -377,8 +371,8 @@ class MarsTableTest {
 
     @Test
     void theIntervalsTheTableNamesAreTheServices() {
-        assertEquals(MarsService.MARS_FIRST_DAY, service.firstDay());
-        assertEquals(MarsService.MARS_LAST_DAY, service.lastDay());
+        assertEquals(MarsService.MARS_FIRST_DAY, mars().firstDay());
+        assertEquals(MarsService.MARS_LAST_DAY, mars().lastDay());
         assertEquals(500, MarsTableSession.MAX_INSTANTS);
         assertEquals(2, MarsTableSession.MOONS);
     }

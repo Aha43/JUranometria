@@ -7,8 +7,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import juranometria.sky.Observer;
-import juranometria.solar.SolarSystemService;
 
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -22,11 +22,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  */
 class SolarSystemModuleNotifyTest {
 
-    private static final SolarSystemService SERVICE = SolarSystemService.load();
-
     private static SolarSystemModule module() {
         Observer oslo = new Observer(59.91, 10.75, Instant.parse("2026-06-21T10:00:00Z"));
-        return new SolarSystemModule(() -> oslo, () -> SERVICE, () -> true);
+        return new SolarSystemModule(() -> oslo, () -> solar(), () -> true);
     }
 
     @Test

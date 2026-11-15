@@ -10,7 +10,6 @@ import java.util.function.Supplier;
 
 import javax.swing.SwingUtilities;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import juranometria.sky.Observer;
@@ -22,6 +21,7 @@ import juranometria.solar.SaturnSystemService.VisibilityState;
 import juranometria.tool.SaturnComparison;
 import juranometria.ui.language.InterfaceText;
 
+import static juranometria.solar.SharedServices.saturn;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -39,16 +39,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class SaturnTableTest {
 
-    private static SaturnSystemService service;
     private static final InterfaceText EN = InterfaceText.forLanguage("en");
     private static final InterfaceText NB = InterfaceText.forLanguage("nb-NO");
     /** The card's instant ruled on #574: the 2026 daily Oslo row nearest the Earth. */
     private static final Instant CARD = Instant.parse("2026-10-05T00:00:00Z");
-
-    @BeforeAll
-    static void load() {
-        service = SaturnSystemService.load();
-    }
 
     static Observer oslo(Instant when) {
         return SaturnComparison.observer("oslo", when);
@@ -76,7 +70,7 @@ class SaturnTableTest {
         AtomicInteger loaded = new AtomicInteger();
         Supplier<SaturnSystemService> counted = () -> {
             loaded.incrementAndGet();
-            return service;
+            return saturn();
         };
         Observer[] observer = {oslo(CARD)};
         SaturnTableSession session = new SaturnTableSession(() -> observer[0], counted);
@@ -97,7 +91,7 @@ class SaturnTableTest {
 
     @Test
     void theControllerGroupHasNoChartSwitchAndNoCentreOnChart() throws Exception {
-        SaturnTableSession session = new SaturnTableSession(() -> oslo(CARD), () -> service);
+        SaturnTableSession session = new SaturnTableSession(() -> oslo(CARD), () -> saturn());
         onEdt(() -> {
             javax.swing.JComponent group = new SaturnTableControls(session, EN, false).inController();
             List<java.awt.Component> all = new ArrayList<>();
@@ -123,7 +117,7 @@ class SaturnTableTest {
 
     @Test
     void bothHostsShowOneAppliedResultAndNeitherOverwritesTheOthersDraft() throws Exception {
-        SaturnTableSession session = new SaturnTableSession(() -> oslo(CARD), () -> service);
+        SaturnTableSession session = new SaturnTableSession(() -> oslo(CARD), () -> saturn());
         onEdt(() -> {
             SaturnTableControls controller = new SaturnTableControls(session, EN, false);
             controller.inController();
@@ -147,12 +141,12 @@ class SaturnTableTest {
 
     @Test
     void everyValueShownIsTheServicesAnswerRounded() throws Exception {
-        SaturnTableSession session = new SaturnTableSession(() -> oslo(CARD), () -> service);
+        SaturnTableSession session = new SaturnTableSession(() -> oslo(CARD), () -> saturn());
         onEdt(() -> {
             SaturnTableControls c = new SaturnTableControls(session, EN, false);
             c.apply();
             Configuration shown = session.result().entries().get(0).configuration();
-            Configuration fresh = service.observeMoons(oslo(CARD));
+            Configuration fresh = saturn().observeMoons(oslo(CARD));
             for (int row = 0; row < 7; row++) {
                 assertSame(shown.moons().get(row), c.model.lines().get(row).moon());
                 MoonPlace a = shown.moons().get(row);
@@ -185,7 +179,7 @@ class SaturnTableTest {
 
     @Test
     void theCardsInstantReadsNaturallyInBothLanguages() throws Exception {
-        SaturnTableSession session = new SaturnTableSession(() -> oslo(CARD), () -> service);
+        SaturnTableSession session = new SaturnTableSession(() -> oslo(CARD), () -> saturn());
         onEdt(() -> {
             SaturnTableControls en = new SaturnTableControls(session, EN, false);
             SaturnTableControls nb = new SaturnTableControls(session, NB, false);
@@ -217,7 +211,7 @@ class SaturnTableTest {
     @Test
     void theRingsReadEdgeOnAndTheUnlitFaceAroundThe2025Crossings() throws Exception {
         Observer[] at = {oslo(Instant.parse("2025-03-23T17:51:00Z"))};
-        SaturnTableSession session = new SaturnTableSession(() -> at[0], () -> service);
+        SaturnTableSession session = new SaturnTableSession(() -> at[0], () -> saturn());
         onEdt(() -> {
             SaturnTableControls en = new SaturnTableControls(session, EN, false);
             SaturnTableControls nb = new SaturnTableControls(session, NB, false);
@@ -229,7 +223,7 @@ class SaturnTableTest {
             // two are on opposite sides of the ring plane.
             at[0] = oslo(Instant.parse("2025-04-15T00:00:00Z"));
             en.apply();
-            assertTrue(service.observeSaturn(at[0]).unlitFaceSeen());
+            assertTrue(saturn().observeSaturn(at[0]).unlitFaceSeen());
             assertTrue(en.cardValue("ringSun").endsWith(" · the unlit face is seen"), en.cardValue("ringSun"));
             assertTrue(nb.cardValue("ringSun").endsWith(" · den ubelyste siden sees"), nb.cardValue("ringSun"));
         });
@@ -238,11 +232,11 @@ class SaturnTableTest {
     @Test
     void aDateLineObserverIsAnsweredForItsOwnPlace() throws Exception {
         Observer chatham = SaturnComparison.observer("chatham", CARD);
-        SaturnTableSession session = new SaturnTableSession(() -> chatham, () -> service);
+        SaturnTableSession session = new SaturnTableSession(() -> chatham, () -> saturn());
         onEdt(() -> {
             SaturnTableControls c = new SaturnTableControls(session, EN, false);
             c.apply();
-            assertEquals(SaturnMoonsModel.saturnValues(service.observeSaturn(chatham), c.words()).get(2),
+            assertEquals(SaturnMoonsModel.saturnValues(saturn().observeSaturn(chatham), c.words()).get(2),
                     c.cardValue("altitude"), "Chatham's own altitude");
             assertTrue(c.observerNote.getText().contains("-176.5") || c.observerNote.getText().contains("−176.5"),
                     "west of the date line, as Place and Time folds it: " + c.observerNote.getText());
@@ -276,7 +270,7 @@ class SaturnTableTest {
     @Test
     void every2026DayAtOsloReadsHorizonsStateInWordsWhereTheFiguresAgree() throws Exception {
         Observer[] at = {null};
-        SaturnTableSession session = new SaturnTableSession(() -> at[0], () -> service);
+        SaturnTableSession session = new SaturnTableSession(() -> at[0], () -> saturn());
         int[] checked = new int[2];
         List<String> seen = new ArrayList<>();
         onEdt(() -> {
@@ -328,7 +322,7 @@ class SaturnTableTest {
     @Test
     void theRefusalsNameWhatTheyRefuse() throws Exception {
         Observer[] at = {null};
-        SaturnTableSession session = new SaturnTableSession(() -> at[0], () -> service);
+        SaturnTableSession session = new SaturnTableSession(() -> at[0], () -> saturn());
         onEdt(() -> {
             SaturnTableControls c = new SaturnTableControls(session, EN, false);
             c.apply();
@@ -369,7 +363,7 @@ class SaturnTableTest {
 
     @Test
     void aRangeIsGroupedByInstantAndStaysUnderTheCapOf142Instants() throws Exception {
-        SaturnTableSession session = new SaturnTableSession(() -> oslo(CARD), () -> service);
+        SaturnTableSession session = new SaturnTableSession(() -> oslo(CARD), () -> saturn());
         onEdt(() -> {
             SaturnTableControls c = new SaturnTableControls(session, EN, false);
             c.rangeView.setSelected(true);
@@ -402,7 +396,7 @@ class SaturnTableTest {
         // Five weeks ending at the card's instant, from the chart time
         // four weeks before it (#612: a range starts at the chart time).
         SaturnTableSession session = new SaturnTableSession(
-                () -> oslo(CARD.minus(java.time.Duration.ofDays(28))), () -> service);
+                () -> oslo(CARD.minus(java.time.Duration.ofDays(28))), () -> saturn());
         onEdt(() -> {
             SaturnTableControls en = new SaturnTableControls(session, EN, false);
             SaturnTableControls nb = new SaturnTableControls(session, NB, false);
@@ -456,7 +450,7 @@ class SaturnTableTest {
     @Test
     void anEstimatedInstantIsMarkedAndItsStatesAreNotOfferedAsPredictions() throws Exception {
         SaturnTableSession session = new SaturnTableSession(
-                () -> oslo(Instant.parse("2050-06-01T00:00:00Z")), () -> service);
+                () -> oslo(Instant.parse("2050-06-01T00:00:00Z")), () -> saturn());
         onEdt(() -> {
             SaturnTableControls c = new SaturnTableControls(session, EN, false);
             c.apply();
@@ -467,7 +461,7 @@ class SaturnTableTest {
 
     @Test
     void theIntervalsTheTableNamesAreThePacks() {
-        var pack = service.pack();
+        var pack = saturn().pack();
         assertEquals(pack.saturnFirstDay(), SaturnSystemService.SATURN_FIRST_DAY);
         assertEquals(pack.saturnLastDay(), SaturnSystemService.SATURN_LAST_DAY);
         assertEquals(pack.moonsFirstDay(), SaturnSystemService.MOONS_FIRST_DAY);

@@ -3,7 +3,6 @@ package juranometria.solar;
 import java.io.IOException;
 import java.time.Instant;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import juranometria.chart.SkyPosition;
@@ -12,6 +11,7 @@ import juranometria.solar.VenusService.Rival;
 import juranometria.solar.VenusService.VenusObservation;
 import juranometria.tool.VenusComparison;
 
+import static juranometria.solar.SharedServices.venus;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -25,12 +25,6 @@ class VenusMutationTest {
 
     private static final double LAT = 59.91;
     private static final double LON = 10.75;
-    private static VenusService service;
-
-    @BeforeAll
-    static void load() {
-        service = VenusService.load();
-    }
 
     /** Horizons' Oslo row at an instant, from the committed fixtures. */
     private static String[] row(String stem, String instant) throws IOException {
@@ -54,7 +48,7 @@ class VenusMutationTest {
     @Test
     void aGeocentricPlaceFailsTheAstrometricTargetNearInferiorConjunction() throws IOException {
         String[] f = row("dense-2026-inferior-conjunction-oslo-299", "2026-Oct-25 07:00");
-        VenusObservation geo = service.observeGeocentric(Instant.parse("2026-10-25T07:00:00Z"));
+        VenusObservation geo = venus().observeGeocentric(Instant.parse("2026-10-25T07:00:00Z"));
         double error = sep(geo.astrometricJ2000(), f[3], f[4]);
         assertTrue(error > 20.0, "Venus's parallax is half an arcminute here; a geocentric"
                 + " place misses the 0.05″ target by far: " + error + "″");
@@ -64,7 +58,7 @@ class VenusMutationTest {
     void readingTheCivilInstantAsTerrestrialTimeFailsTheAstrometricTarget() throws IOException {
         String[] f = row("named-oslo-299", "2026-Jan-06 16:00");
         // The rival forgets TT - UTC, 69.184 s in 2026: it computes the instant that much early.
-        VenusObservation rival = service.observe(oslo("2026-01-06T16:00:00Z").at(
+        VenusObservation rival = venus().observe(oslo("2026-01-06T16:00:00Z").at(
                 Instant.parse("2026-01-06T16:00:00Z").minusMillis(69_184)));
         double error = sep(rival.astrometricJ2000(), f[3], f[4]);
         assertTrue(error > 2.0, "at superior conjunction Venus moves 0.05″ a second; 69 s"
@@ -75,8 +69,8 @@ class VenusMutationTest {
     void leavingOutTheSunsDeflectionFailsTheApparentTargetNearTheSun() throws IOException {
         String[] f = row("named-oslo-299", "2026-Jan-06 16:00");
         assertTrue(Double.parseDouble(f[17]) > 0.5, "0.7° from the Sun, outside its disc");
-        VenusObservation right = service.observe(oslo("2026-01-06T16:00:00Z"));
-        VenusObservation rival = service.observeRival(oslo("2026-01-06T16:00:00Z"),
+        VenusObservation right = venus().observe(oslo("2026-01-06T16:00:00Z"));
+        VenusObservation rival = venus().observeRival(oslo("2026-01-06T16:00:00Z"),
                 Rival.NO_DEFLECTION);
         double rightError = sep(right.apparentOfDate(), f[5], f[6]);
         double rivalError = sep(rival.apparentOfDate(), f[5], f[6]);
@@ -88,7 +82,7 @@ class VenusMutationTest {
     @Test
     void leavingOutAberrationFailsTheApparentTarget() throws IOException {
         String[] f = row("named-oslo-299", "2026-Aug-15 06:00");
-        VenusObservation rival = service.observeRival(oslo("2026-08-15T06:00:00Z"),
+        VenusObservation rival = venus().observeRival(oslo("2026-08-15T06:00:00Z"),
                 Rival.NO_ABERRATION);
         double error = sep(rival.apparentOfDate(), f[5], f[6]);
         assertTrue(error > 5.0, "aberration is about 20″: " + error + "″");
@@ -97,7 +91,7 @@ class VenusMutationTest {
     @Test
     void theGeometricPhaseAngleFailsTheStoTarget() throws IOException {
         String[] f = row("named-oslo-299", "2026-Aug-15 06:00");
-        VenusObservation rival = service.observeRival(oslo("2026-08-15T06:00:00Z"),
+        VenusObservation rival = venus().observeRival(oslo("2026-08-15T06:00:00Z"),
                 Rival.GEOMETRIC_PHASE_ANGLE);
         double error = Math.abs(rival.phaseAngleDegrees() - Double.parseDouble(f[19])) * 3600.0;
         assertTrue(error > 2.0, "S-T-O carries two aberrations, up to 24″ between them: "
@@ -123,17 +117,17 @@ class VenusMutationTest {
         // ascension, a day before the conjunction in ecliptic longitude.
         String[] f = row("dense-2026-inferior-conjunction-oslo-299", "2026-Oct-23 03:00");
         assertTrue(f[18].contains("L"));
-        VenusObservation o = service.observe(oslo("2026-10-23T03:00:00Z"));
+        VenusObservation o = venus().observe(oslo("2026-10-23T03:00:00Z"));
         assertTrue(o.side() == SolarSystemService.Side.WEST_OF_SUN, "the ruled side agrees");
-        double et = service.timeScales().tt(o.instant()).secondsPastJ2000();
-        assertTrue(service.geocentricLongitudeFromSunAtEt(et) > 0.0,
+        double et = venus().timeScales().tt(o.instant()).secondsPastJ2000();
+        assertTrue(venus().geocentricLongitudeFromSunAtEt(et) > 0.0,
                 "by ecliptic longitude Venus is still east: the rival would disagree");
     }
 
     @Test
     void theCloudTopRadiusFailsTheDiameterTarget() throws IOException {
         String[] f = row("named-oslo-299", "2026-Oct-24 03:00");
-        VenusObservation o = service.observe(oslo("2026-10-24T03:00:00Z"));
+        VenusObservation o = venus().observe(oslo("2026-10-24T03:00:00Z"));
         double cloud = 2.0 * Math.toDegrees(Math.asin((6051.8 + 74.0) / o.distanceKm())) * 3600.0;
         assertTrue(Math.abs(cloud - Double.parseDouble(f[12])) > 0.5,
                 "the cloud deck is 1.22 % wider: far past the 0.001″ target");

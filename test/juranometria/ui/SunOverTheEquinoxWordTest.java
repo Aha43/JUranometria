@@ -26,7 +26,6 @@ import juranometria.render.ChartOptions;
 import juranometria.render.ChartPalette;
 import juranometria.render.ChartRenderer;
 import juranometria.sky.Observer;
-import juranometria.solar.SolarSystemService;
 import juranometria.solar.SolarSystemService.Body;
 import juranometria.solar.SolarSystemService.SunObservation;
 import juranometria.solarchart.SolarSystemModule;
@@ -34,6 +33,7 @@ import juranometria.tool.SeasonalEventsFixture;
 import juranometria.ui.language.InterfaceText;
 import juranometria.ui.language.PageText;
 
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -57,7 +57,6 @@ class SunOverTheEquinoxWordTest {
     private static final PageText ENGLISH = PageText.in(InterfaceText.forLanguage("en"));
     private static final ChartRenderer RENDERER = new ChartRenderer(
             StarSizePolicy.DEFAULT, ENGLISH);
-    private static final SolarSystemService SERVICE = SolarSystemService.load();
     private static final String WORD = "September equinox";
 
     private static Instant equinox() throws Exception {
@@ -76,7 +75,7 @@ class SunOverTheEquinoxWordTest {
         ecliptic.showing(true);
         registry.offer(EclipticModule.ID, ecliptic::contributedGeometry);
         SolarSystemModule solar = new SolarSystemModule(() -> observer,
-                () -> SERVICE, () -> false);
+                () -> solar(), () -> false);
         solar.sunShowing(sun);
         registry.offer(SolarSystemModule.ID, solar::contributedGeometry);
         return registry;
@@ -157,7 +156,7 @@ class SunOverTheEquinoxWordTest {
                 "this is the owner's page: the released word lies under the disc");
 
         // The Sun is exactly where it was and exactly as large.
-        SunObservation observed = (SunObservation) SERVICE.observe(Body.SUN, oslo);
+        SunObservation observed = (SunObservation) solar().observe(Body.SUN, oslo);
         ViewportMapping mapping = new ViewportMapping(page);
         PixelPoint centre = mapping.toPixel(
                 page.projection().project(observed.astrometricJ2000()).orElseThrow());

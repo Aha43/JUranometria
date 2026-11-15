@@ -11,7 +11,6 @@ import java.util.prefs.Preferences;
 
 import javax.swing.SwingUtilities;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import juranometria.app.Atlas;
@@ -34,6 +33,7 @@ import juranometria.ui.language.InterfaceText;
 import juranometria.ui.language.PageText;
 import juranometria.ui.placeandtime.PlaceStore;
 
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -52,12 +52,6 @@ class BelowHorizonTest {
     private static final Observer OSLO =
             new Observer(59.913, 10.752, Instant.parse("2026-03-20T21:33:00Z"));
     private static final LocalSky SKY = new LocalSky(OSLO);
-    private static SolarSystemService service;
-
-    @BeforeAll
-    static void load() {
-        service = SolarSystemService.load();
-    }
 
     /** A painted page, and the component that painted it. */
     private record Page(BufferedImage image, ChartComponent chart, MeridianModule meridian) {
@@ -76,7 +70,7 @@ class BelowHorizonTest {
             meridian.showing(true, line, false);
             meridian.subduing(subdue);
             chart.overlays().offer(MeridianModule.ID, meridian::contributedGeometry);
-            SolarSystemModule solar = new SolarSystemModule(() -> OSLO, () -> service,
+            SolarSystemModule solar = new SolarSystemModule(() -> OSLO, () -> solar(),
                     meridian::subduing);
             solar.sunShowing(true);
             chart.overlays().offer(SolarSystemModule.ID, solar::contributedGeometry);
@@ -223,7 +217,7 @@ class BelowHorizonTest {
     @Test
     void theSunIsSubduedOnceByTheCommonRuleWithOrWithoutTheLine() throws Exception {
         SolarSystemService.SunObservation sun = (SolarSystemService.SunObservation)
-                service.observe(SolarSystemService.Body.SUN, OSLO);
+                solar().observe(SolarSystemService.Body.SUN, OSLO);
         assertTrue(sun.horizontal().altitudeDegrees() < 0.0, "the premise: the Sun is down");
         ChartViewState onTheSun = new ChartViewState(sun.astrometricJ2000(), 3.0, 8.0,
                 null, null);

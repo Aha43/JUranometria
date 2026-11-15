@@ -9,7 +9,6 @@ import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import juranometria.sky.Observer;
@@ -20,6 +19,7 @@ import juranometria.solar.MercuryService;
 import juranometria.solar.MercuryService.MercuryObservation;
 import juranometria.ui.language.InterfaceText;
 
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -46,19 +46,13 @@ class MercuryTableTest {
     private static final Instant TRANSIT = Instant.parse("2019-11-11T15:20:00Z");
     /** Espenak's 2026 superior conjunction, to the hour (mercury-events.txt). */
     private static final Instant SUPERIOR = Instant.parse("2026-01-21T16:00:00Z");
-    private static SolarSystemService service;
-
-    @BeforeAll
-    static void load() {
-        service = SolarSystemService.load();
-    }
 
     private static Observer oslo(Instant at) {
         return new Observer(59.91, 10.75, at);
     }
 
     private static SolarTableDialog.Content content(Observer observer, InterfaceText said) {
-        return SolarTableDialog.content(() -> observer, service, said, SolarTable.mercury());
+        return SolarTableDialog.content(() -> observer, solar(), said, SolarTable.mercury());
     }
 
     private static String cell(SolarTableDialog.Content c, int row, int column) {
@@ -100,7 +94,7 @@ class MercuryTableTest {
     @Test
     void theGreatestEasternElongationReadsAsTheServiceAnswers() {
         SolarTableDialog.Content c = content(oslo(ELONGATION), EN);
-        MercuryObservation o = (MercuryObservation) service.observe(Body.MERCURY, oslo(ELONGATION));
+        MercuryObservation o = (MercuryObservation) solar().observe(Body.MERCURY, oslo(ELONGATION));
         assertEquals(1, c.model.getRowCount());
         assertEquals(SunTableFormat.minute(ELONGATION), cell(c, 0, 0));
         assertEquals(SunTableFormat.hms(o.astrometricJ2000()), cell(c, 0, 1));
@@ -164,7 +158,7 @@ class MercuryTableTest {
     @Test
     void aRangeIsTheInstantAnswerAtEveryRowAndItsRefusalsSayMercury() throws Exception {
         Instant[] at = {Instant.parse("2026-03-03T11:00:00Z")};
-        SolarTableSession session = new SolarTableSession(() -> oslo(at[0]), service,
+        SolarTableSession session = new SolarTableSession(() -> oslo(at[0]), solar(),
                 SolarTable.mercury());
         session.apply(SolarTableSession.Query.range(1, 2));
         assertEquals(SolarTableSession.Outcome.ROWS, session.result().outcome());
@@ -178,7 +172,7 @@ class MercuryTableTest {
         assertEquals("EEEEWWWW", sides.toString(), "the side changes once, by right ascension,"
                 + " through the 2026-03-07 inferior conjunction");
         for (SolarTableModel.Row r : session.result().rows()) {
-            assertEquals(service.observe(Body.MERCURY, oslo(r.sample().instant())), r.observation(),
+            assertEquals(solar().observe(Body.MERCURY, oslo(r.sample().instant())), r.observation(),
                     "each row is the instant answer at its own instant");
         }
         at[0] = Instant.parse("2100-12-28T00:00:00Z");
@@ -196,7 +190,7 @@ class MercuryTableTest {
     @Test
     void twoHostsShareOneSessionAndTheControllersGroupComputesNothingWhenBuilt()
             throws Exception {
-        SolarTableSession session = new SolarTableSession(() -> oslo(ELONGATION), service,
+        SolarTableSession session = new SolarTableSession(() -> oslo(ELONGATION), solar(),
                 SolarTable.mercury());
         SolarTableControls[] controller = new SolarTableControls[1];
         JComponent[] group = new JComponent[1];
@@ -228,9 +222,9 @@ class MercuryTableTest {
     @Test
     void theDateLineObserverReadsItsOwnSky() {
         Observer chatham = new Observer(-43.95, -176.5, ELONGATION);
-        SolarTableDialog.Content c = SolarTableDialog.content(() -> chatham, service, EN,
+        SolarTableDialog.Content c = SolarTableDialog.content(() -> chatham, solar(), EN,
                 SolarTable.mercury());
-        MercuryObservation o = (MercuryObservation) service.observe(Body.MERCURY, chatham);
+        MercuryObservation o = (MercuryObservation) solar().observe(Body.MERCURY, chatham);
         assertEquals(SunTableFormat.minute(ELONGATION), cell(c, 0, 0), "the instant is UTC");
         assertEquals(SunTableFormat.degrees(o.horizontal().altitudeDegrees())
                 + (o.horizontal().altitudeDegrees() < 0 ? " (below the horizon)" : ""),
@@ -243,7 +237,7 @@ class MercuryTableTest {
     /** Since #542 Mercury has a chart layer: its Centre on chart target names it. */
     @Test
     void mercuryCentresOnItsOwnLayer() {
-        SolarTableSession session = new SolarTableSession(() -> oslo(ELONGATION), service,
+        SolarTableSession session = new SolarTableSession(() -> oslo(ELONGATION), solar(),
                 SolarTable.mercury());
         juranometria.ui.solar.BodyOnChart layer = new juranometria.ui.solar.BodyOnChart() {
             @Override

@@ -16,6 +16,7 @@ import juranometria.solar.MarsService.MoonPlace;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import static juranometria.solar.SharedServices.mars;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -31,17 +32,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class MarsCartographyTest {
 
-    private static MarsService service;
-
     @BeforeAll
     static void load() {
-        service = MarsService.load();
-        MarsCartographyStudyMain.service = service;
+        MarsCartographyStudyMain.service = mars();
     }
 
     @Test
     void everyBodyIsDrawnAtItsOwnJ2000PlaceThroughThePagesProjection() {
-        Configuration c = service.observeMoonsGeocentric(MarsCartographyStudyMain.OPPOSITION_2003);
+        Configuration c = mars().observeMoonsGeocentric(MarsCartographyStudyMain.OPPOSITION_2003);
         DrawnPage page = DrawnPage.of(SaturnCartographyStudyMain.scene(c.mars().astrometricJ2000(), 0.25,
                 MarsCartographyStudyMain.PAGE_W, MarsCartographyStudyMain.PAGE_H));
         Projection projection = page.projection();
@@ -62,7 +60,7 @@ class MarsCartographyTest {
     @Test
     void aMoonBehindMarsIsNeverDrawnAndOneOnTheMarkIsNotDrawnWithoutTheFloor() {
         // Horizons codes Phobos U (behind, in the shadow) from Oslo on 2005-02-27.
-        Configuration behind = service.observeMoons(MarsCartographyStudyMain.OSLO.at(
+        Configuration behind = mars().observeMoons(MarsCartographyStudyMain.OSLO.at(
                 MarsCartographyStudyMain.PHOBOS_BEHIND_IN_SHADOW));
         assertEquals(DiscRelation.BEHIND, behind.moon(MarsService.Moon.PHOBOS).discRelation());
         double per1 = JovianCartographyStudyMain.pxPerArcsec(1.0, 900, 700);
@@ -71,7 +69,7 @@ class MarsCartographyTest {
                     MarsCartographyStudyMain.decide(floor, behind, per1).get(0));
         }
         // At 8° both moons stand on Mars's 6 px mark at the 2003 opposition.
-        Configuration close = service.observeMoonsGeocentric(MarsCartographyStudyMain.OPPOSITION_2003);
+        Configuration close = mars().observeMoonsGeocentric(MarsCartographyStudyMain.OPPOSITION_2003);
         double per8 = JovianCartographyStudyMain.pxPerArcsec(8.0, 900, 700);
         List<MarsCartographyStudyMain.Decision> d = MarsCartographyStudyMain.decide(false, close, per8);
         assertEquals(List.of(MarsCartographyStudyMain.Decision.AT_MARS, MarsCartographyStudyMain.Decision.AT_MARS), d);
@@ -82,7 +80,7 @@ class MarsCartographyTest {
     @Test
     void theClosestMarsExceedsTheMarkOnlyAtOneDegreeAndTheLadderStillRefusesTheCloserFields() {
         double at1 = JovianCartographyStudyMain.pxPerArcsec(1.0, 900, 700);
-        double largest = service.observeGeocentric(Instant.parse("2003-08-27T00:00:00Z")).equatorialDiameterArcseconds();
+        double largest = mars().observeGeocentric(Instant.parse("2003-08-27T00:00:00Z")).equatorialDiameterArcseconds();
         assertTrue(largest * at1 > MarsCartographyStudyMain.MARK_PX, "above the mark at 1° near the 2003 opposition");
         assertTrue(largest * at1 / 2.0 < MarsCartographyStudyMain.MARK_PX, "and below it at 2°");
         for (double field : MarsCartographyStudyMain.CLOSER_FIELDS) {
