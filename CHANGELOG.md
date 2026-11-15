@@ -7,6 +7,8 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [6.6.0] - 2026-11-15
+
 **The meteor-shower panel, photographed and audited (#718).** The
 panel's every word, in English and Norwegian, is now part of the
 interface evidence, and its controls are in the control-explanation
