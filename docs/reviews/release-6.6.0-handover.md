@@ -71,6 +71,7 @@ The contract is `docs/decisions/meteor-showers.md` (cited as §n).
 | the merges (owner, 2026-11-11, -15, -15) | PRs #720, #722, #723 | each merged pinned to its accepted head under the merge-identity rule |
 | #718 (owner, 2026-11-15) | this document | the integrated handover; stop with a proposed gate-impact plan; no VERSION, rehearsal, tag, publication or road close |
 | #718's draft (owner, 2026-11-15) | this document; §13 | close two evidence gaps before 6.6.0, together, as evidence and not redesign: a direct test of a selected radiant in the view report and the exported sheet, and the meteor panel in the control-explanation study and the interface photographs, in both languages; record the Export Sheet capture refusal on #362 and neither rerun the measurement nor call it passed; say that #715's merge identity was proved at landing and its record file not retained, and reconstruct nothing; the unanswered IMO message is non-blocking; **the 4 GB test cap and the 2 GiB contract cap are kept for 6.6.0**, #708 being the place to repair the static holders; then all seven gates and the site build |
+| #718's candidate (owner, 2026-11-15) | this document; §13; the Makefile | **the panel's 516 px is accepted as built for 6.6.0**: opening the meteor group may widen the Controller but does not make it permanently wider, and the evidence covers the narrowest layout in both languages; responsive compaction can be a later interface change if use shows it awkward. **The earlier heap ruling is revised: the evidence contracts' cap is raised from 2 GiB to 3 GiB before qualification**, the earlier decision having assumed more margin than the portable route's measured 1 879 MB with two full collections left; separate from #708's 4 GB suite and its static holders. Both contracts measured once under 3 GiB and recorded (section 6.3); no retest of the product candidate, since this changes a qualification resource and not what the application does |
 
 ## 3. The owner's checkpoints and verdicts
 
@@ -466,9 +467,44 @@ peak is 126 MB above 6.5.0's and 36 MB below 6.1.0's 1 915 MB, and it
 met two full collections where 6.5.0's met none; each found about
 1 355 MB live, so the heap was not exhausted, and the peak leaves 169 MB
 under the cap. The road added one registered study of seven pages.
-**The owner's decision (2026-11-15): the 2 GiB contract cap is kept for
-6.6.0**; it is to be measured again, and decided explicitly, before the
-next evidence-heavy road. These figures predate #718's own additions.
+**The owner's first decision (2026-11-15), made before the portable
+figure was in front of them, kept the 2 GiB cap. Shown the figure, the
+owner revised it the same day: the contracts' cap is 3 GiB from #718**
+(`2bef9109`; the three routes keep one limit, so the interaction route
+is raised with the other two). A reproducibility route that every road
+adds generators to is given room before it runs out, not after. It is a
+qualification resource: nothing the application does changes, and the
+4 GB test suite and its static holders remain #708's.
+
+Both contracts were then measured once under 3 GiB, on `2bef9109`, which
+is `f226d794` (this head's evidence additions) with the cap changed
+(`heap-718-3g`, the same commands):
+
+| | run | full GCs | peak occupancy after a young pause (MB) | highest per-minute floor (MB) | verdict |
+|---|---|---|---|---|---|
+| canonical, 2 GiB, `6fe9503b` | 17.0 min | 0 | 1 773 | 1 322 | OK |
+| portable, 2 GiB, `6fe9503b` | 19.4 min | 2 | 1 879 | 1 464 | OK |
+| **canonical, 3 GiB, `2bef9109`** | 17.0 min | **0** | 2 705 | 1 407 | `EVIDENCE CONTRACTS OK` |
+| **portable, 3 GiB, `2bef9109`** | 19.2 min | **0** | 2 863 | 1 558 | `EVIDENCE CONTRACTS OK` |
+
+Under 3 GiB neither route met a full collection and both reproduce every
+committed artifact, the meteor panel's sheets among them. **What the
+second measurement corrects:** the column this section and its
+predecessors called *peak live after a young pause* rose with the cap,
+from 1 773 to 2 705 MB and from 1 879 to 2 863 MB. It is occupancy -
+what the collector had not yet reclaimed - and not what the process
+retains; the 169 MB quoted above is therefore room the collector had
+left itself under 2 GiB, not the distance from exhaustion. What the
+process retains is better read from the two full collections at 2 GiB
+(about 1 355 MB after each) and from the *floor*: the lowest occupancy
+after any pause within each minute, at its highest minute. By the floor
+the portable route keeps about 1.5 GiB at its worst, half of the new
+cap. The two full collections at 2 GiB were real, and are gone at 3 GiB;
+what set them off was not investigated. The floor's rise between the two
+rows of each route (85 and 94 MB) mixes this head's additions with a
+larger heap's later collection and is not attributed. The route is to be
+measured again, by floor and by full collections, before the next
+evidence-heavy road.
 
 The road from the owner's filing (2026-11-11 18:22 UTC) to the third
 landing (2026-11-15 04:34 UTC) took three days and ten hours.
@@ -520,8 +556,8 @@ landing (2026-11-15 04:34 UTC) took three days and ten hours.
 - **The final qualification** of the integrated head, for the owner's
   approval, by the diff: section 9's proposal.
 - **#708, recorded, not fixed.** Open as filed; the present margin is
-  section 6.3's, and both caps are kept for 6.6.0 by the owner's
-  decision. No required qualification of this road met a heap failure.
+  section 6.3's; by the owner's decisions the 4 GB test cap is kept for
+  6.6.0 and the evidence contracts' cap is 3 GiB from this head. No required qualification of this road met a heap failure.
 - **The IMO.** The courtesy message is unanswered; by the owner's ruling
   that blocks nothing (§9).
 
@@ -545,8 +581,8 @@ seven gates once, and the site build**, on the exact committed head.
 |---|---|
 | 1 full suite | never skipped; one new test, and the control-explanation and interface-evidence tests read what changed |
 | 2 interface evidence | a new registered photographer and fifteen new committed artifacts; the gate draws them twice |
-| 3 canonical contract | the control-explanation study, the provenance record and the test-evidence inventory moved |
-| 4 portable contract | the same reports on the portable route |
+| 3 canonical contract | the control-explanation study, the provenance record and the test-evidence inventory moved; the route's heap is now 3 GiB |
+| 4 portable contract | the same reports on the portable route, under the same 3 GiB |
 | 5 packaged acceptance | an application class and three tools changed, so the jar's bytes changed; inventory stays 17 |
 | 6 portable archive | the jar's bytes changed |
 | site build | the changelog feeds it |
@@ -590,12 +626,15 @@ Mars, Uranus and Neptune paragraphs of the Norwegian licensing summary
   writer prints a view's `49.0` as `49`, where `bookmarks.md` says
   numbers keep their exact text (§6); the IAU list's count of
   established showers differs between the calendar's statement and the
-  fetched file (§2); **the meteor panel asks for 516 px**, measured while
+  fetched file (§2).
+- **Accepted, not open: the meteor panel asks for 516 px**, measured while
   photographing it, where the Controller opens at 360 px and is never
   narrower than its widest tab asks - so an opened *Meteor showers* group
-  sets the Controller's least width. As built and as accepted by hand;
-  whether the group should wrap narrower is a design question for a
-  later sprint.
+  sets the Controller's least width, and closing it releases it. **The
+  owner accepted this as built for 6.6.0 (2026-11-15)**; the photographs
+  hold the narrowest layout in both languages. Responsive compaction is
+  a possible later interface change if use shows the width awkward; it
+  is not filed.
 - **A newer IMO edition** is a new reviewed import (section 4.1); the
   2028 calendar is not anticipated here.
 - **A later reply from the IMO** is recorded beside the decision record

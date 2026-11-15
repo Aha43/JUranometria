@@ -13,7 +13,10 @@ interface evidence, and its controls are in the control-explanation
 audit; a selected radiant has a test of its own through the view report
 and the exported sheet. The audit found that the panel's read-only text
 had no spoken description; it now has the panel's own explanation.
-Nothing else about the panel, the chart or the pack changes.
+Nothing else about the panel, the chart or the pack changes. The
+evidence contracts (`make evidence-contracts` and its two sibling
+routes) now run under a 3 GiB heap instead of 2 GiB; this is a
+qualification resource and changes nothing the application does.
 
 **Meteor showers and their radiants: the reader article (#717).** A
 bilingual article - *Meteor showers and their radiants* and

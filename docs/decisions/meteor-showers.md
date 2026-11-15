@@ -724,5 +724,20 @@ the suite's heap is recorded on #362 and was neither rerun nor called
 passed; #715's merge identity was proved at landing and its local record
 file was not retained, which the handover says without reconstructing
 one. The unanswered message to the IMO blocks nothing (section 9). The
-4 GB test cap and the 2 GiB contract cap are kept for 6.6.0; #708 is
-where the static holders are repaired.
+4 GB test cap is kept for 6.6.0; #708 is where the static holders are
+repaired.
+
+Two further rulings on the candidate (owner, 2026-11-15):
+
+- **The panel's width is accepted as built.** The panel asks for 516 px,
+  so an opened *Meteor showers* group may widen the Controller; it does
+  not make it permanently wider, and the photographs hold the narrowest
+  layout in both languages. Responsive compaction can be a later
+  interface change if use shows it awkward.
+- **The evidence contracts' heap is 3 GiB, not 2.** The first ruling
+  kept 2 GiB before the portable route's figure was seen: 1 879 MB at
+  its peak with two full collections. Under 3 GiB both routes ran
+  without a full collection and reproduced every artifact; the handover
+  (section 6.3) holds the figures, and what they do and do not measure.
+  This is a qualification resource and changes nothing the application
+  does; it is separate from #708.

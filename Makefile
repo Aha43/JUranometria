@@ -762,13 +762,16 @@ black-sky-study: classes
 #
 # 3 GiB since #718 (the owner's choice, 2026-11-15). Measured on main
 # 6fe9503b, after the meteor road, under -Xlog:gc*: the canonical route
-# peaked at 1 773 MB live with no Full GC, the portable route at
-# 1 879 MB with two Full GCs (each finding about 1 355 MB live). That
-# left 169 MB under 2 GiB on a route every road adds generators to,
-# which is too close for a reproducibility instrument: the limit is
-# raised before it is met, not after. The limit is a qualification
-# resource and changes nothing the application does. It is separate
-# from the test suite's 4 GB and its static holders, which are #708's
+# peaked at 1 773 MB with no Full GC, the portable route at
+# 1 879 MB with two Full GCs (each finding about 1 355 MB live), on a
+# route every road adds generators to: the limit is raised before it is
+# met, not after. Under 3 GiB (2bef9109) neither route met a Full GC.
+# Those peaks are occupancy after a young pause and rise with the limit
+# (2 705 and 2 863 MB under 3 GiB); what the process retains is nearer
+# the Full GCs' figure and the per-minute floor, about 1.5 GiB at the
+# portable route's worst. The limit is a qualification resource and
+# changes nothing the application does. It is separate from the test
+# suite's 4 GB and its static holders, which are #708's
 # (docs/reviews/release-6.6.0-handover.md, 6.3).
 # The three routes run the same instrument and keep the same limit.
 evidence-contracts: classes
