@@ -152,6 +152,20 @@ are executable, not aspirational:
   reader's real preference store through any derived production door, display
   tests state their premises, and exactly one file (`ReaderInput`) may build
   and dispatch a raw key event.
+- **The suite runs in one process under a stated 4 GiB heap** (`-Xmx4g` in
+  `make test`, #708), the maximum the CI runners already gave it unstated.
+  Planetary services are read once and shared: a computational test takes its
+  service from `juranometria.solar.SharedServices` and never keeps a service,
+  pack or kernel in a static field of its own, where it would hold 15 to 95 MB
+  of kernel bytes until the last test has run. `StaticServiceHolderTest`
+  refuses a new static holder outside that fixture and a short reviewed list;
+  `SharedServicesTest` holds the shared services to answering by the question
+  alone. A test whose subject is the reading itself — a pack's contract, a
+  corrupt resource, an excerpt, independence — reads its own into a local.
+  Measured without raw sources on 2026-11-15: about 3.6 GB held at the end of
+  the run before the fixture, about 0.8 GB with it, and no full collection. A
+  suite that outgrows the cap is repaired by finding what it keeps, not by
+  raising the cap.
 - **Display tests press what a reader presses**, through `ReaderInput`:
   premise-asserted pointer clicks, focus-insisting typing that aborts honestly
   where a desktop refuses, pointer-chosen tabs, and focus-proven shortcuts. A
