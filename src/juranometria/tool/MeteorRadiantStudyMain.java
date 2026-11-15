@@ -316,18 +316,22 @@ public final class MeteorRadiantStudyMain {
         InterfaceText norwegian = InterfaceText.forLanguage("nb-NO");
         p("## 1. The nine showers the atlas carries");
         p("");
-        p("As the bundled pack holds them. Activity and the maximum are the calendar's dates"
-                + " in its own year, 2027; the solar longitudes beside them are what the atlas"
+        p("As the bundled pack holds them, and as the panel words them. Activity and the"
+                + " maximum are the calendar's dates in its own year, 2027, kept in the pack as"
+                + " the calendar prints them and shown with each language's own month names; the solar longitudes beside them are what the atlas"
                 + " evaluates. ZHR, population index and entry speed are printed as the source"
                 + " prints them.");
         p("");
-        p("| code | name | Norwegian name | activity | solar longitude | maximum at | ZHR"
-                + " | population index | km/s | radiant rows | parent body |");
-        p("|---|---|---|---|---|---|---|---|---|---|---|");
+        p("| code | name | Norwegian name | activity | activity, in Norwegian | solar longitude"
+                + " | maximum at | ZHR | population index | km/s | radiant rows | parent body |");
+        p("|---|---|---|---|---|---|---|---|---|---|---|---|");
+        MeteorShowerText inEnglish = new MeteorShowerText(english);
+        MeteorShowerText inNorwegian = new MeteorShowerText(norwegian);
         for (MeteorShower s : showers.showers()) {
-            p(f("| %s | %s | %s | %s - %s | %.1f - %.1f | %s | %s | %s | %.0f | %d | %s |",
-                    s.code(), new MeteorShowerText(english).name(s),
-                    new MeteorShowerText(norwegian).name(s), s.activityStart(), s.activityEnd(),
+            p(f("| %s | %s | %s | %s - %s | %s - %s | %.1f - %.1f | %s | %s | %s | %.0f | %d"
+                    + " | %s |", s.code(), inEnglish.name(s), inNorwegian.name(s),
+                    inEnglish.date(s.activityStart()), inEnglish.date(s.activityEnd()),
+                    inNorwegian.date(s.activityStart()), inNorwegian.date(s.activityEnd()),
                     s.startLongitude(), s.endLongitude(), s.maximumLongitudeText(), s.zhr(),
                     s.populationIndex(), s.vInfinity(), s.rows().size(),
                     s.parentBody().isEmpty() ? "-" : s.parentBody()));

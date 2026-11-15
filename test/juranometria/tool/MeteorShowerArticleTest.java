@@ -70,17 +70,18 @@ class MeteorShowerArticleTest {
             new String[] {"23:00", BUILT},
             new String[] {"2027-12-14", BUILT},
             new String[] {"20:00", BUILT},
-            // The nine showers: the calendar's activity, then the listed
-            // solar longitude of the maximum beside the listed rate.
-            new String[] {"Dec 28 - Jan 12", BUILT}, new String[] {"283.15 | 80+", BUILT},
-            new String[] {"Apr 14 - Apr 30", BUILT}, new String[] {"32.32 | 18", BUILT},
-            new String[] {"Apr 19 - May 28", BUILT}, new String[] {"45.5 | 50", BUILT},
-            new String[] {"Jul 12 - Aug 23", BUILT}, new String[] {"128 | 25", BUILT},
-            new String[] {"Jul 17 - Aug 24", BUILT}, new String[] {"140.0 | 110+", BUILT},
-            new String[] {"Oct 02 - Nov 07", BUILT}, new String[] {"208 | 20", BUILT},
-            new String[] {"Nov 06 - Nov 30", BUILT}, new String[] {"235.27 | 15+", BUILT},
-            new String[] {"Dec 04 - Dec 20", BUILT}, new String[] {"262.2 | 150", BUILT},
-            new String[] {"Dec 17 - Dec 26", BUILT}, new String[] {"270.7 | 10", BUILT},
+            // The nine showers: the listed solar longitude of the maximum
+            // beside the listed rate (the activity dates are in PHRASES,
+            // each language with its own month names).
+            new String[] {"283.15 | 80+", BUILT},
+            new String[] {"32.32 | 18", BUILT},
+            new String[] {"45.5 | 50", BUILT},
+            new String[] {"128 | 25", BUILT},
+            new String[] {"140.0 | 110+", BUILT},
+            new String[] {"208 | 20", BUILT},
+            new String[] {"235.27 | 15+", BUILT},
+            new String[] {"262.2 | 150", BUILT},
+            new String[] {"270.7 | 10", BUILT},
             // The Perseids' nominal maximum in three consecutive years.
             new String[] {"2026-08-13 02:00", BUILT},
             new String[] {"2027-08-13 08:11", BUILT},
@@ -114,6 +115,17 @@ class MeteorShowerArticleTest {
      * language's own unit word, a count in the language's own.
      */
     private static final List<String[]> PHRASES = List.of(
+            // The activity as the panel words it in each language (#717: the
+            // Norwegian panel no longer shows the calendar's English months).
+            new String[] {"| Dec 28 - Jan 12 | 28. des. - 12. jan. |", "| Dec 28 - Jan 12 |", "| 28. des. - 12. jan. |", BUILT},
+            new String[] {"| Apr 14 - Apr 30 | 14. apr. - 30. apr. |", "| Apr 14 - Apr 30 |", "| 14. apr. - 30. apr. |", BUILT},
+            new String[] {"| Apr 19 - May 28 | 19. apr. - 28. mai |", "| Apr 19 - May 28 |", "| 19. apr. - 28. mai |", BUILT},
+            new String[] {"| Jul 12 - Aug 23 | 12. juli - 23. aug. |", "| Jul 12 - Aug 23 |", "| 12. juli - 23. aug. |", BUILT},
+            new String[] {"| Jul 17 - Aug 24 | 17. juli - 24. aug. |", "| Jul 17 - Aug 24 |", "| 17. juli - 24. aug. |", BUILT},
+            new String[] {"| Oct 02 - Nov 07 | 2. okt. - 7. nov. |", "| Oct 02 - Nov 07 |", "| 2. okt. - 7. nov. |", BUILT},
+            new String[] {"| Nov 06 - Nov 30 | 6. nov. - 30. nov. |", "| Nov 06 - Nov 30 |", "| 6. nov. - 30. nov. |", BUILT},
+            new String[] {"| Dec 04 - Dec 20 | 4. des. - 20. des. |", "| Dec 04 - Dec 20 |", "| 4. des. - 20. des. |", BUILT},
+            new String[] {"| Dec 17 - Dec 26 | 17. des. - 26. des. |", "| Dec 17 - Dec 26 |", "| 17. des. - 26. des. |", BUILT},
             new String[] {"For 5 of the nine the nominal maximum falls on a different UTC"
                     + " calendar date", "**5 of the nine**", "**5 av de ni**", BUILT},
             new String[] {"on the sky 22.1 and 4.5 degrees", "**22.1** degrees",
@@ -157,7 +169,7 @@ class MeteorShowerArticleTest {
                     "Ingen radiant tegnes eller beskrives", BUILT},
             new String[] {"Activity period: Jul 17 to Aug 24 in the calendar, solar longitude"
                     + " 113.9° to 151.2°.",
-                    "Aktivitetsperiode: Jul 17 til Aug 24 i kalenderen, sollengde 113.9° til"
+                    "Aktivitetsperiode: 17. juli til 24. aug. i kalenderen, sollengde 113.9° til"
                     + " 151.2°.", BUILT},
             new String[] {"Sun more than 6° below the horizon: 6.4 h; more than 12°: 3.8 h; more"
                     + " than 18°: none.",
@@ -324,7 +336,9 @@ class MeteorShowerArticleTest {
         List<String> found = new ArrayList<>();
         Matcher digits = Pattern.compile("\\d+(?:\\.\\d+)?").matcher(text);
         while (digits.find()) {
-            found.add(digits.group());
+            // A day of the month is the same number with or without its
+            // leading zero: the calendar prints "Dec 04", Norwegian "4. des.".
+            found.add(digits.group().replaceFirst("^0+(?=\\d)", ""));
         }
         Collections.sort(found);
         return found;

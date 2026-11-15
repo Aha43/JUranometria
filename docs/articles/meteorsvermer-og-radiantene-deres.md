@@ -7,11 +7,12 @@ hvordan du bruker panelet og kartet, og hva atlaset ikke påstår*
 
 ## Et punkt banene peker tilbake mot
 
-En meteor er et støvkorn, oftest ikke større enn et sandkorn, som
-brenner opp i møtet med luften. En meteorsverm oppstår når Jorden går
-gjennom en strøm av slike korn som alle følger nesten den samme banen
-rundt Solen. Fordi de deler bane, møter de Jorden side om side, i
-parallelle baner.
+En meteor er lysstripen som ses når et støvkorn, oftest ikke større enn
+et sandkorn, brenner opp i møtet med luften. Selve kornet er en
+meteoroide; meteoren er det vi ser av slutten på det. En meteorsverm
+oppstår når Jorden går gjennom en strøm av slike korn som alle følger
+nesten den samme banen rundt Solen. Fordi de deler bane, møter de Jorden
+side om side, i parallelle baner.
 
 Parallelle linjer sett innenfra ser ikke parallelle ut. Jernbaneskinner
 ser ut til å møtes i et punkt på horisonten; snøfnugg i billysene ser ut
@@ -46,15 +47,15 @@ på ti eller mer.
 
 | sverm | aktiv, slik kalenderen daterer den | sollengde ved maksimum | oppført rate (ZHR) |
 |---|---|---|---|
-| Kvadrantidene | Dec 28 - Jan 12 | 283.15 | 80+ |
-| Lyridene | Apr 14 - Apr 30 | 32.32 | 18 |
-| Eta-akvaridene | Apr 19 - May 28 | 45.5 | 50 |
-| Sørlige delta-akvarider | Jul 12 - Aug 23 | 128 | 25 |
-| Perseidene | Jul 17 - Aug 24 | 140.0 | 110+ |
-| Orionidene | Oct 02 - Nov 07 | 208 | 20 |
-| Leonidene | Nov 06 - Nov 30 | 235.27 | 15+ |
-| Geminidene | Dec 04 - Dec 20 | 262.2 | 150 |
-| Ursidene | Dec 17 - Dec 26 | 270.7 | 10 |
+| Kvadrantidene | 28. des. - 12. jan. | 283.15 | 80+ |
+| Lyridene | 14. apr. - 30. apr. | 32.32 | 18 |
+| Eta-akvaridene | 19. apr. - 28. mai | 45.5 | 50 |
+| Sørlige delta-akvarider | 12. juli - 23. aug. | 128 | 25 |
+| Perseidene | 17. juli - 24. aug. | 140.0 | 110+ |
+| Orionidene | 2. okt. - 7. nov. | 208 | 20 |
+| Leonidene | 6. nov. - 30. nov. | 235.27 | 15+ |
+| Geminidene | 4. des. - 20. des. | 262.2 | 150 |
+| Ursidene | 17. des. - 26. des. | 270.7 | 10 |
 
 Verdiene er fra én navngitt utgave, IMO Meteor Shower Calendar 2027, og
 hver visning av dem i atlaset sier det. Source: International Meteor
@@ -117,8 +118,8 @@ endret seg.
 
 Det samme gjelder aktivitetsperioden. Kalenderens datoer gjøres én gang
 om til et intervall i sollengde, og en sverm er aktiv når karttiden
-ligger innenfor det. Panelet oppgir begge: *Aktivitetsperiode: Jul 17
-til Aug 24 i kalenderen, sollengde 113.9° til 151.2°.* Det legger til at
+ligger innenfor det. Panelet oppgir begge: *Aktivitetsperiode: 17. juli
+til 24. aug. i kalenderen, sollengde 113.9° til 151.2°.* Det legger til at
 endene er kalenderens konvensjon, riktige til omtrent et døgn. En strøm
 har ingen kant; aktiviteten tiltar og avtar gradvis.
 
@@ -189,10 +190,12 @@ annet merke, og sier det i navnet: *Eta-akvaridene (under horisonten)*.
 Over horisonten er høyere bedre, av en grunn som er ren geometri. En
 strøm som kommer inn rett ovenfra, faller rett ned på luftlaget over
 deg. En som kommer inn på skrå, spres over mer av det, slik skrått
-sollys spres over mer mark, i forhold til sinus til radiantens høyde.
-Fra Oslo er det høyeste punktet Perseidenes radiant når i mørket natten
-for maksimum i 2027, **+60.3** grader, og sinus til det er **0.87**. Ved 30
-grader ville tallet vært en halv.
+sollys spres over mer mark. Alt annet likt følger det som når deg, sinus
+til radiantens høyde. Fra Oslo er det høyeste punktet Perseidenes
+radiant når i mørket natten for maksimum i 2027, **+60.3** grader, og
+sinus til det er **0.87**. Ved 30 grader ville tallet vært en halv. Det
+er en geometrisk faktor og ikke noe mer; det er ikke en rate for din
+natt.
 
 Høyden avhenger av hvor du er. Panelets nattsammendrag oppgir radiantens
 største høyde mens Solen er mer enn 12 grader nede:
@@ -258,8 +261,8 @@ minst på det du kommer til å telle.
 ZHR er et beregnet tall: antallet svermmeteorer én ideell observatør
 ville se på en time under en fullkomment klar himmel som viser stjerner
 til magnitude +6.5, med radianten i senit. Hver av de betingelsene er
-som regel ikke oppfylt. Radianten står ikke i senit, og raten faller med
-sinus til høyden, slik forrige avsnitt beskriver. Himmelen er sjelden så
+som regel ikke oppfylt. Radianten står ikke i senit, og alt annet likt
+faller raten med sinus til høyden, slik et tidligere avsnitt beskriver. Himmelen er sjelden så
 mørk; under en himmel som viser færre stjerner, viser den også færre
 meteorer, og den mister mest der en sverm er rik på svake.
 **Populasjonsindeksen** som står ved siden av raten, sier hvor rik den
@@ -279,8 +282,9 @@ horisonten, og hvor Månen er.
 
 For Solen oppgir panelet tre varigheter, prøvd gjennom natten rundt
 karttiden: hvor lenge Solen står mer enn 6, 12 og 18 grader under
-horisonten. Den siste er astronomisk mørke, når Solen ikke lenger lyser
-opp himmelen i det hele tatt. På høye bredder er det sanne svaret ofte
+horisonten. Den siste er astronomisk mørke: 18 grader er den
+konvensjonelle slutten på astronomisk tussmørke. På høye bredder er det
+sanne svaret ofte
 *ingen*. Natten for Perseidenes maksimum i 2027, fra Oslo: *Solen mer
 enn 6° under horisonten: 6.4 t; mer enn 12°: 3.8 t; mer enn 18°: ingen.*
 I desember har Geminidene **12.6 timer** astronomisk mørke fra det samme

@@ -6,19 +6,19 @@ Source: International Meteor Organization (IMO) – www.imo.net. Edition: IMO Me
 
 ## 1. The nine showers the atlas carries
 
-As the bundled pack holds them. Activity and the maximum are the calendar's dates in its own year, 2027; the solar longitudes beside them are what the atlas evaluates. ZHR, population index and entry speed are printed as the source prints them.
+As the bundled pack holds them, and as the panel words them. Activity and the maximum are the calendar's dates in its own year, 2027, kept in the pack as the calendar prints them and shown with each language's own month names; the solar longitudes beside them are what the atlas evaluates. ZHR, population index and entry speed are printed as the source prints them.
 
-| code | name | Norwegian name | activity | solar longitude | maximum at | ZHR | population index | km/s | radiant rows | parent body |
-|---|---|---|---|---|---|---|---|---|---|---|
-| QUA | Quadrantids | Kvadrantidene | Dec 28 - Jan 12 | 275.9 - 292.2 | 283.15 | 80+ | 2.1 | 41 | 4 | 2003 EH1 |
-| LYR | Lyrids | Lyridene | Apr 14 - Apr 30 | 23.5 - 40.0 | 32.32 | 18 | 2.1 | 49 | 4 | C/1861 G1 (Thatcher) |
-| ETA | Eta Aquariids | Eta-akvaridene | Apr 19 - May 28 | 28.3 - 67.1 | 45.5 | 50 | 2.4 | 66 | 8 | 1P/Halley |
-| SDA | Southern Delta Aquariids | Sørlige delta-akvarider | Jul 12 - Aug 23 | 109.1 - 150.2 | 128 | 25 | 2.5 | 41 | 9 | - |
-| PER | Perseids | Perseidene | Jul 17 - Aug 24 | 113.9 - 151.2 | 140.0 | 110+ | 2.2 | 59 | 9 | 109P/Swift-Tuttle |
-| ORI | Orionids | Orionidene | Oct 02 - Nov 07 | 188.2 - 225.0 | 208 | 20 | 2.5 | 66 | 7 | 1P/Halley |
-| LEO | Leonids | Leonidene | Nov 06 - Nov 30 | 223.0 - 248.2 | 235.27 | 15+ | 2.5 | 71 | 5 | 55P/Tempel–Tuttle |
-| GEM | Geminids | Geminidene | Dec 04 - Dec 20 | 251.2 - 268.5 | 262.2 | 150 | 2.6 | 35 | 4 | (3200) Phaethon |
-| URS | Ursids | Ursidene | Dec 17 - Dec 26 | 264.4 - 274.6 | 270.7 | 10 | 2.8 | 33 | 2 | 8P/Tuttle |
+| code | name | Norwegian name | activity | activity, in Norwegian | solar longitude | maximum at | ZHR | population index | km/s | radiant rows | parent body |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| QUA | Quadrantids | Kvadrantidene | Dec 28 - Jan 12 | 28. des. - 12. jan. | 275.9 - 292.2 | 283.15 | 80+ | 2.1 | 41 | 4 | 2003 EH1 |
+| LYR | Lyrids | Lyridene | Apr 14 - Apr 30 | 14. apr. - 30. apr. | 23.5 - 40.0 | 32.32 | 18 | 2.1 | 49 | 4 | C/1861 G1 (Thatcher) |
+| ETA | Eta Aquariids | Eta-akvaridene | Apr 19 - May 28 | 19. apr. - 28. mai | 28.3 - 67.1 | 45.5 | 50 | 2.4 | 66 | 8 | 1P/Halley |
+| SDA | Southern Delta Aquariids | Sørlige delta-akvarider | Jul 12 - Aug 23 | 12. juli - 23. aug. | 109.1 - 150.2 | 128 | 25 | 2.5 | 41 | 9 | - |
+| PER | Perseids | Perseidene | Jul 17 - Aug 24 | 17. juli - 24. aug. | 113.9 - 151.2 | 140.0 | 110+ | 2.2 | 59 | 9 | 109P/Swift-Tuttle |
+| ORI | Orionids | Orionidene | Oct 02 - Nov 07 | 2. okt. - 7. nov. | 188.2 - 225.0 | 208 | 20 | 2.5 | 66 | 7 | 1P/Halley |
+| LEO | Leonids | Leonidene | Nov 06 - Nov 30 | 6. nov. - 30. nov. | 223.0 - 248.2 | 235.27 | 15+ | 2.5 | 71 | 5 | 55P/Tempel–Tuttle |
+| GEM | Geminids | Geminidene | Dec 04 - Dec 20 | 4. des. - 20. des. | 251.2 - 268.5 | 262.2 | 150 | 2.6 | 35 | 4 | (3200) Phaethon |
+| URS | Ursids | Ursidene | Dec 17 - Dec 26 | 17. des. - 26. des. | 264.4 - 274.6 | 270.7 | 10 | 2.8 | 33 | 2 | 8P/Tuttle |
 
 ## 2. The pages
 
@@ -192,7 +192,7 @@ The panel, word for word, for the chart's place and time. Each block is the whol
 > Perseidene. IAU 007 PER, Perseids.
 > Opphavslegeme, slik IAU Meteor Data Center oppgir det: 109P/Swift-Tuttle.
 > Aktiv på karttidspunktet 2027-08-13 00:00 UTC (solens ekliptiske lengde, sollengde, er 139.7°).
-> Aktivitetsperiode: Jul 17 til Aug 24 i kalenderen, sollengde 113.9° til 151.2°. Endene er kalenderens konvensjon, riktige til omtrent et døgn.
+> Aktivitetsperiode: 17. juli til 24. aug. i kalenderen, sollengde 113.9° til 151.2°. Endene er kalenderens konvensjon, riktige til omtrent et døgn.
 > Nominelt maksimum ved sollengde 140.0°; denne aktivitetsperiodens: 2027-08-13, rundt kl. 08 UTC, kjent til en time eller to.
 > Zenital timerate (ZHR) 110+: raten for en ideell mørk himmel med radianten i senit, ikke det en observatør vil telle. Populasjonsindeks 2.2; inngangsfart 59 km/s.
 >
@@ -272,7 +272,7 @@ The panel, word for word, for the chart's place and time. Each block is the whol
 > Geminidene. IAU 004 GEM, Geminids.
 > Opphavslegeme, slik IAU Meteor Data Center oppgir det: (3200) Phaethon.
 > Aktiv på karttidspunktet 2027-12-14 20:00 UTC (solens ekliptiske lengde, sollengde, er 262.2°).
-> Aktivitetsperiode: Dec 04 til Dec 20 i kalenderen, sollengde 251.2° til 268.5°. Endene er kalenderens konvensjon, riktige til omtrent et døgn.
+> Aktivitetsperiode: 4. des. til 20. des. i kalenderen, sollengde 251.2° til 268.5°. Endene er kalenderens konvensjon, riktige til omtrent et døgn.
 > Nominelt maksimum ved sollengde 262.2°; denne aktivitetsperiodens er passert: 2027-12-14, rundt kl. 20 UTC, kjent til en time eller to.
 > Zenital timerate (ZHR) 150: raten for en ideell mørk himmel med radianten i senit, ikke det en observatør vil telle. Populasjonsindeks 2.6; inngangsfart 35 km/s.
 >
@@ -303,7 +303,7 @@ The panel, word for word, for the chart's place and time. Each block is the whol
 > Perseidene. IAU 007 PER, Perseids.
 > Opphavslegeme, slik IAU Meteor Data Center oppgir det: 109P/Swift-Tuttle.
 > Ikke aktiv på karttidspunktet 2027-12-14 20:00 UTC (solens ekliptiske lengde, sollengde, er 262.2°). Ingen radiant tegnes eller beskrives.
-> Aktivitetsperiode: Jul 17 til Aug 24 i kalenderen, sollengde 113.9° til 151.2°. Endene er kalenderens konvensjon, riktige til omtrent et døgn.
+> Aktivitetsperiode: 17. juli til 24. aug. i kalenderen, sollengde 113.9° til 151.2°. Endene er kalenderens konvensjon, riktige til omtrent et døgn.
 > Nominelt maksimum ved sollengde 140.0°; neste: 2028-08-12, rundt kl. 14 UTC, kjent til en time eller to.
 > Zenital timerate (ZHR) 110+: raten for en ideell mørk himmel med radianten i senit, ikke det en observatør vil telle. Populasjonsindeks 2.2; inngangsfart 59 km/s.
 >

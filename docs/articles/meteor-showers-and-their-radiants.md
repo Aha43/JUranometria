@@ -7,11 +7,13 @@ panel and the chart, and what the atlas does not claim*
 
 ## A point the paths point back to
 
-A meteor is a grain of dust, most often no bigger than a grain of sand,
-burning up as it meets the air. A meteor shower is what happens when the
-Earth passes through a stream of such grains, all travelling along nearly
-the same orbit round the Sun. Because they share an orbit, they meet the
-Earth travelling side by side, in parallel.
+A meteor is the streak of light seen when a grain of dust, most often
+no bigger than a grain of sand, burns up as it meets the air. The grain
+itself is a meteoroid; the meteor is what we see of its end. A meteor
+shower is what happens when the Earth passes through a stream of such
+grains, all travelling along nearly the same orbit round the Sun.
+Because they share an orbit, they meet the Earth travelling side by
+side, in parallel.
 
 Parallel lines seen from the inside do not look parallel. Railway tracks
 appear to meet at a point on the horizon; snowflakes in the headlights
@@ -187,10 +189,12 @@ other mark, and says so in its name: *Eta Aquariids (below the horizon)*.
 Above the horizon, higher is better, for a reason that is pure geometry.
 A stream arriving from overhead falls straight onto the layer of air
 above you. One arriving at a slant is spread over more of it, as slanting
-sunlight is spread over more ground, in proportion to the sine of the
-radiant's altitude. From Oslo the Perseid radiant's highest point in the
-dark on the night of the 2027 maximum is **+60.3** degrees, and the sine
-of that is **0.87**. At 30 degrees the figure would be a half.
+sunlight is spread over more ground. All else being equal, what reaches
+you goes with the sine of the radiant's altitude. From Oslo the Perseid
+radiant's highest point in the dark on the night of the 2027 maximum is
+**+60.3** degrees, and the sine of that is **0.87**. At 30 degrees the
+figure would be a half. That is a geometric factor and nothing more; it
+is not a rate for your night.
 
 Height depends on where you are. The panel's night summary gives the
 radiant's highest altitude while the Sun is more than 12 degrees down:
@@ -259,8 +263,9 @@ number least like what you will count.
 The ZHR is a calculated figure: the number of shower meteors one ideal
 observer would see in an hour under a perfectly clear sky showing stars
 to magnitude +6.5, with the radiant overhead. Every one of those
-conditions is usually unmet. The radiant is not overhead, and the rate
-falls with the sine of its altitude, as the previous section describes.
+conditions is usually unmet. The radiant is not overhead, and all else
+being equal the rate falls with the sine of its altitude, as an earlier
+section describes.
 The sky is seldom that dark; under a sky that shows fewer stars it
 shows fewer meteors too, and it loses most where a shower is rich in
 faint ones. The **population index** printed beside the rate says how
@@ -281,8 +286,9 @@ horizon, and where the Moon is.
 
 For the Sun the panel gives three durations, sampled through the night
 around the chart time: how long the Sun stands more than 6, 12 and 18
-degrees below the horizon. The last is astronomical darkness, when the
-Sun no longer lightens the sky at all. At high latitude the true answer
+degrees below the horizon. The last is astronomical darkness: 18
+degrees is the conventional end of astronomical twilight. At high
+latitude the true answer
 is often *none*. On the night of the 2027 Perseid maximum, from Oslo:
 *Sun more than 6° below the horizon: 6.4 h; more than 12°: 3.8 h; more
 than 18°: none.* In December the Geminids have **12.6 h** of astronomical

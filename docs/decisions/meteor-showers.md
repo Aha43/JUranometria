@@ -486,7 +486,8 @@ the repository until the IMO has answered. So at this head:
 - **The parent body.** The IAU list states it per solution and the
   solutions do not agree on spelling. The importer takes the statement
   made most often, in its most frequent spelling, and none on a tie. That
-  yields a parent for seven showers, none for the Southern δ-Aquariids
+  yields a parent for eight showers - seven distinct bodies, because
+  1P/Halley is the parent of two - and none for the Southern δ-Aquariids
   (two different statements, one each), "(3200) Phaethon" for the Geminids
   and, for the Leonids, **the list's majority spelling "55P/Temple-Tuttle"**
   (five solutions against three for "Tempel"). The atlas should not print
@@ -652,3 +653,46 @@ As built:
 
 The bundled pack and the extract are byte for byte what `12854f22` held.
 
+## 12. The article's text checkpoint (owner, 2026-11-15)
+
+The reader article (#717) was read by the owner in both languages with its
+seven figures, and accepted subject to corrections. The rulings:
+
+1. **Text and figures accepted**, with the corrections below.
+2. **Both working titles are kept**: *Meteor showers and their radiants*,
+   *Meteorsvermer og radiantene deres*.
+3. **Cape Town stays** beside Oslo: shower planning is about place as well
+   as time, and an Oslo-only article would hide that.
+4. **The rate section stays.** The sine of the radiant's altitude is
+   described as the simple geometric factor, all else being equal, never as
+   a predicted local rate. JUranometria computes no local rate.
+
+The corrections, as made:
+
+- **A meteor is not the grain.** The grain is a meteoroid; the meteor is
+  the visible phenomenon in the air. Both languages open accordingly.
+- **Astronomical darkness.** The article no longer says the Sun then
+  lightens the sky not at all; it says 18 degrees is the conventional end
+  of astronomical twilight.
+- **The Norwegian panel showed the calendar's English month names**
+  ("Jul 17 til Aug 24"). That was a localization defect found by the
+  article, not fidelity to the source. The pack keeps each date as the
+  calendar prints it; `MeteorShowerText.date` now shows it through the
+  interface's own words (`meteor.date`, `meteor.month.1` to `.12`), so the
+  Norwegian panel says "17. juli til 24. aug." and the English panel is
+  unchanged. `MeteorShowerPanelTest` holds both, and a date printed some
+  other way is shown as it stands.
+- **"All else being equal" / "alt annet likt"** stands around the sine of
+  the altitude in both languages.
+- **The parent bodies are counted correctly** in section 8: eight showers
+  with a parent, seven distinct bodies.
+- **The Southern δ-Aquariids keep no parent.** The importer found two
+  different statements, one each, and refused to choose; the article says
+  the atlas states none.
+- **The Quadrantids' 03:26 against the study's 03:23** stays as recorded
+  in section 11.
+
+The as-built study (`docs/studies/meteor-radiants`) was regenerated; its
+pages did not change, and its report gained the Norwegian wording of each
+activity period. Because application words changed, qualification is all
+seven gates and the site build.

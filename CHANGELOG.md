@@ -19,7 +19,10 @@ are production pages from a new as-built study,
 `docs/studies/meteor-radiants` (`make meteor-radiant-study`), which
 reads only the bundled pack and is registered in the evidence contract;
 `MeteorShowerArticleTest` holds every figure, number and quoted word to
-its source.
+its source. Writing it found a localization defect, now corrected: the
+Norwegian *Meteorsvermer* panel showed the activity period with the
+calendar's English month names; it now says "17. juli til 24. aug.". The
+bundled pack is unchanged.
 
 **Meteor showers at chart time (#716, ruled on #715).** *Solar System >
 Meteor showers...* and a *Meteor showers* group in the Controller open
