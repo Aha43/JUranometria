@@ -84,6 +84,10 @@ public final class MeteorShowerControls extends JPanel {
         facts.setFont(label.getFont());
         facts.setColumns(44);
         facts.getAccessibleContext().setAccessibleName(said.say("meteor.facts.a11y"));
+        // Read-only text that says the whole thing itself: no tooltip, and the
+        // panel's own explanation spoken after its name (found undecided by the
+        // control-explanation audit when the panel joined it, #718).
+        Explain.selfExplanatory(facts, said.say("meteor.explain"));
         add(facts, BorderLayout.CENTER);
 
         setMaximum = new JButton(said.say("meteor.setMaximum.label"));

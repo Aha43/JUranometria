@@ -1,6 +1,6 @@
 # Meteor showers at chart time
 
-**Status: ruled by the owner on 2026-11-11 (section 7); built as an unqualified candidate under #716 (section 8), not yet shippable.** Sprint 60, issue #715,
+**Status: ruled by the owner on 2026-11-11 (section 7); built, accepted and landed under #716 (sections 8 to 11); explained by the article #717 (section 12); handed to release by #718 (section 13).** Sprint 60, issue #715,
 road #714. A measurement and decision study; no production code. Product
 input: #564 and the meteor-shower outcome in the owner's 7.0.0 road outline.
 Measurements: `docs/studies/meteor-showers/measurements.md` (cited below as
@@ -696,3 +696,33 @@ The as-built study (`docs/studies/meteor-radiants`) was regenerated; its
 pages did not change, and its report gained the Norwegian wording of each
 activity period. Because application words changed, qualification is all
 seven gates and the site build.
+
+## 13. The handover's evidence additions (owner, 2026-11-15)
+
+The first draft of the 6.6.0 handover (#718,
+`docs/reviews/release-6.6.0-handover.md`) reported four observations.
+The owner ruled two of them release-evidence gaps to close before 6.6.0,
+as evidence and not as redesign:
+
+- **A selected radiant in the view report and the exported sheet.** The
+  bodies' route is useful evidence, but a radiant is deliberately not a
+  body and gets one explicit journey through those outputs:
+  `RadiantInReportAndSheetTest`.
+- **The panel in the control-explanation study and the interface
+  photographs**, in both languages: `MeteorShowerSheetMain`
+  (`docs/studies/interface-language/meteor-strings.md` and fourteen
+  sheets) and a *Meteor showers* surface in
+  `ControlExplanationStudyMain`. Hands-on acceptance alone is not the
+  panel's permanent evidence.
+
+Joining the audit found one undecided control, the panel's read-only
+facts text. It is declared self-explanatory and described aloud by the
+panel's existing explanation; no word was added in either language.
+
+On the other two: the Export Sheet capture refusal met while measuring
+the suite's heap is recorded on #362 and was neither rerun nor called
+passed; #715's merge identity was proved at landing and its local record
+file was not retained, which the handover says without reconstructing
+one. The unanswered message to the IMO blocks nothing (section 9). The
+4 GB test cap and the 2 GiB contract cap are kept for 6.6.0; #708 is
+where the static holders are repaired.

@@ -253,6 +253,9 @@ yielding, speech and paper are production's; the words are the study's.
   Inspector also uses. The box accepts no free text, and no module can add
   a line. Not promised by this seam: measurement readouts, meteor
   radiants, projection notes, user notes, or a general information box.
+  *Amended 2026-11-11 (`meteor-showers.md`, C-5): the sealed value gained
+  a fourth variant, a meteor shower's radiant, by the owner's ruling; the
+  seam is still sealed and still takes no free text.*
 - **Words.** New keys for the compact magnitude (*V {0}*, *B {0}*), the
   five families in the singular, *for {0} UTC* and *Selected: {0}*; every
   other word is the Inspector's or the page's. The Inspector's English-only

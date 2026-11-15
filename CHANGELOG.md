@@ -7,6 +7,14 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**The meteor-shower panel, photographed and audited (#718).** The
+panel's every word, in English and Norwegian, is now part of the
+interface evidence, and its controls are in the control-explanation
+audit; a selected radiant has a test of its own through the view report
+and the exported sheet. The audit found that the panel's read-only text
+had no spoken description; it now has the panel's own explanation.
+Nothing else about the panel, the chart or the pack changes.
+
 **Meteor showers and their radiants: the reader article (#717).** A
 bilingual article - *Meteor showers and their radiants* and
 *Meteorsvermer og radiantene deres* - explains what a radiant is and
