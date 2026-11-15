@@ -7,6 +7,23 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Meteor showers and their radiants: the reader article (#717).** A
+bilingual article - *Meteor showers and their radiants* and
+*Meteorsvermer og radiantene deres* - explains what a radiant is and
+why it moves, why the atlas reckons a shower by solar longitude and
+needs a chart time to place it, why the radiant's height, the Moon and
+the dark decide a shower night, what a ZHR and a nominal maximum do and
+do not say, why a meteor is compatible with a shower and never proven
+to belong to it, and what the atlas does not claim. Its seven figures
+are production pages from a new as-built study,
+`docs/studies/meteor-radiants` (`make meteor-radiant-study`), which
+reads only the bundled pack and is registered in the evidence contract;
+`MeteorShowerArticleTest` holds every figure, number and quoted word to
+its source. Writing it found a localization defect, now corrected: the
+Norwegian *Meteorsvermer* panel showed the activity period with the
+calendar's English month names; it now says "17. juli til 24. aug.". The
+bundled pack is unchanged.
+
 **Meteor showers at chart time (#716, ruled on #715).** *Solar System >
 Meteor showers...* and a *Meteor showers* group in the Controller open
 one panel of nine annual showers - Quadrantids, Lyrids, Eta Aquariids,

@@ -20,7 +20,7 @@ that finds the bytes unchanged keeps the date they already carried, and the
 contract's check only ever reads this file: a timestamp refreshed by a gate
 that merely passed would date the check rather than the decision.
 
-**1032 promoted artifacts.**
+**1039 promoted artifacts.**
 
 | artifact | sha256 | recorded | environment | generator |
 |---|---|---|---|---|
@@ -684,6 +684,13 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/meridian-ticks/south-60.png` | `ab6460888a7eea19cd7cf265bda1c96c7b3bd201925997c97c0bffeccfe51b90` | 2026-11-07 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/meridian-ticks/south-8.png` | `3a938bfa3f4bd7dd6bf8ac612ef8b8f088dd1b671a4991a6a6386e44b11e98c1` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/meridian-ticks/zenith-60.png` | `27a5d02a3146d5767548ca8978810ed4f3338343c38789122a683f32942e4c92` | 2026-10-12 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meteor-radiants/eta-aquariids-below-horizon-en-white.png` | `69fe9b7b83eeb6b96cc23d8fa596e69f12ced25cf9e9b77b670042b4d119e2fc` | 2026-11-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meteor-radiants/geminids-evening-en-white.png` | `c3e87322bdd0f3d5ac7823e1c06f1657c0000eb1d4001bb702704b8b36ed72c8` | 2026-11-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meteor-radiants/geminids-whole-sky-en-white.png` | `44f361c2ed5e7f3cd93a94c306df044603d7531d74a6a4036c04783722f54986` | 2026-11-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meteor-radiants/perseids-early-en-white.png` | `b84a866fef478a8ef90f37cc3b36a5aa1b4d2623d4e7e4c201c61893c747fc07` | 2026-11-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meteor-radiants/perseids-late-en-white.png` | `7ff0a46a42db3227c883cad573f230b4ba43415f1931eece32228ebc79c32b73` | 2026-11-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meteor-radiants/perseids-night-en-white.png` | `dfe19be7295667f92e512524694922a13a23816b9855fd1e32cbce8d01f818e7` | 2026-11-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/meteor-radiants/perseids-night-nb-black.png` | `236684993edf724b070805459a94dd62a0b10fc3c54c9674156ed5934af70e65` | 2026-11-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/meteor-showers/december-whole-sky-every-active-seam-en-white.png` | `596f3a3fadbfb790ceec01f2c5c96d29d8115402549189d1697a8b703980af0a` | 2026-11-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/meteor-showers/eta-aquariids-below-horizon-seam-en-white.png` | `9360dd67f6114c436ff050592629aa22f2bfda3a553aedd28dcd9180530c065d` | 2026-11-11 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/meteor-showers/geminids-whole-sky-glyph-en-white.png` | `2792e715c9f68dde08b5c3174320ffd23c4133e1de600fbb51d04305a3adb00d` | 2026-11-11 | Mac OS X aarch64, Java 21.0.12.1 | various |

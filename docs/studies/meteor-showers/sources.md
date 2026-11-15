@@ -139,3 +139,18 @@ Preparing the study worktree, `scripts/download-libs.sh` fetched
 owner's approval (the test library had not been copied from the main
 checkout with the runtime jars). The script verified its SHA-256. Recorded
 in the decision record, section 6.
+
+## What the calendar means by its own terms
+
+Added 2026-11-15 for the reader article (#717), which explains these terms
+and cites this record for them. The 2027 calendar's list of abbreviations
+and symbols (p. 24) defines the ZHR as a calculated maximum number of
+meteors an ideal observer would see in perfectly clear skies, with a
+reference limiting magnitude of +6.5 and the shower radiant overhead, in
+meteors per hour. It defines the population index r from each shower's
+magnitude distribution: 2.0 to 2.5 means a larger share of bright meteors
+than average, and above 3.0 a larger share of faint ones. It says of the
+radiant that it drifts across the sky each day because of the Earth's own
+orbital motion around the Sun, which Table 6 allows for, and of the solar
+longitude that it is a precise measure of the Earth's position on its orbit
+that does not depend on the calendar, given for the equinox 2000.0.

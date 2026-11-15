@@ -214,6 +214,32 @@ class MeteorShowerPanelTest {
         assertTrue(all.contains("Aktiv på karttidspunktet 2030-04-11 00:00 UTC"), all);
     }
 
+    /**
+     * The calendar's dates in the reader's language (#717, the owner's
+     * ruling at the text checkpoint): the pack keeps "Jul 17" as the
+     * calendar prints it, and only the words shown change.
+     */
+    @Test
+    void theCalendarsDatesAreShownWithTheReadersOwnMonthNames() {
+        MeteorShowerText english = new MeteorShowerText(EN);
+        MeteorShowerText norwegian = new MeteorShowerText(NB);
+        assertEquals("Jul 17", english.date("Jul 17"));
+        assertEquals("Dec 04", english.date("Dec 04"));
+        assertEquals("17. juli", norwegian.date("Jul 17"));
+        assertEquals("4. des.", norwegian.date("Dec 04"));
+        assertEquals("28. mai", norwegian.date("May 28"));
+        assertEquals("2. okt.", norwegian.date("Oct 02"));
+        // A date printed some other way is shown as it stands, never guessed.
+        assertEquals("around December 1", norwegian.date("around December 1"));
+        for (juranometria.meteor.MeteorShower shower : SERVICE.showers()) {
+            for (String printed : List.of(shower.activityStart(), shower.activityEnd())) {
+                assertEquals(printed, english.date(printed), "English is the calendar's own");
+                assertTrue(norwegian.date(printed).matches("\\d{1,2}\\. \\p{L}+\\.?"),
+                        printed + " in Norwegian: " + norwegian.date(printed));
+            }
+        }
+    }
+
     @Test
     void bothHostsShowOneSessionAndTheControlsFollowTheChartTime() throws Exception {
         MeteorShowerControls[] hosts = onEventThread(() -> new MeteorShowerControls[] {

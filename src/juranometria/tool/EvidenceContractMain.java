@@ -234,6 +234,13 @@ public final class EvidenceContractMain {
         // one Whole sky switch (#687).
         REPORT_MAINS.put("juranometria.tool.WholeSkyStudyMain",
                 "docs/studies/whole-sky/measurements.md");
+        // Meteor showers at chart time, as built (#716, written for the
+        // article #717): the production chart with the production meteor
+        // module, and the panel's own words. It reads the bundled pack and
+        // no raw source, so - unlike the #715 study beside it, which is
+        // held as committed - it reproduces in CI and is registered.
+        REPORT_MAINS.put("juranometria.tool.MeteorRadiantStudyMain",
+                "docs/studies/meteor-radiants/measurements.md");
         // The Mercury pack study (#528) is not registered, as the Venus one is
         // not: both read the gitignored de440s.bsp and pck00011.tpc, which the CI
         // runner does not hold; `make mercury-pack-study` reproduces the report
@@ -499,6 +506,8 @@ public final class EvidenceContractMain {
                 "docs/studies/guide-and-explain/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.WholeSkyStudyMain",
                 "docs/studies/whole-sky/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.MeteorRadiantStudyMain",
+                "docs/studies/meteor-radiants/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.JupiterOnTheChartStudyMain",
                 "docs/studies/jupiter-on-the-chart/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.SolarSystemLabelsStudyMain",
@@ -713,6 +722,10 @@ public final class EvidenceContractMain {
             // entered through the Whole sky switch, and the Open here
             // journey.
             "juranometria.tool.WholeSkyStudyMain",
+            // Meteor showers at chart time, as built (#716): production
+            // pages with the selected shower's radiant drawn by the
+            // production module.
+            "juranometria.tool.MeteorRadiantStudyMain",
             // Jupiter and the Galilean moons on the chart (issue #486):
             // production pages composed by the component with the Jovian
             // module attached.

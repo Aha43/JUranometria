@@ -2,8 +2,10 @@ package juranometria.ui.meteor;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.MonthDay;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -35,6 +37,9 @@ public final class MeteorShowerText {
     private static final DateTimeFormatter CLOCK =
             DateTimeFormatter.ofPattern("HH:mm", Locale.ROOT).withZone(ZoneOffset.UTC);
 
+    /** How the calendar, and so the pack, prints a date: "Jul 17". */
+    private static final DateTimeFormatter PRINTED_DATE =
+            DateTimeFormatter.ofPattern("MMM dd", Locale.ENGLISH);
     private final InterfaceText said;
 
     public MeteorShowerText(InterfaceText said) {
@@ -82,7 +87,7 @@ public final class MeteorShowerText {
         }
         lines.add(said.say(facts.active() ? "meteor.active" : "meteor.inactive", when,
                 one(facts.solarLongitude())));
-        lines.add(said.say("meteor.activity", s.activityStart(), s.activityEnd(),
+        lines.add(said.say("meteor.activity", date(s.activityStart()), date(s.activityEnd()),
                 one(s.startLongitude()), one(s.endLongitude())));
         String which = !facts.active() ? "meteor.maximum"
                 : facts.maximum().map(at -> at.isBefore(facts.chart().instant())).orElse(false)
@@ -112,6 +117,24 @@ public final class MeteorShowerText {
         lines.add("");
         lines.add(edition(pack));
         return lines;
+    }
+
+    /**
+     * A calendar date of the pack in the reader's language (#717). The
+     * pack keeps the date as the calendar prints it, an English month
+     * abbreviation and a day; only the words shown change. A date the
+     * pack would print some other way is shown as it stands.
+     */
+    public String date(String printed) {
+        try {
+            MonthDay day = MonthDay.parse(printed, PRINTED_DATE);
+            // The day goes in as a number: each language's pattern decides
+            // whether it is written "04", as the calendar prints it, or "4".
+            return said.say("meteor.date", said.say("meteor.month." + day.getMonthValue()),
+                    day.getDayOfMonth());
+        } catch (DateTimeParseException notAsTheCalendarPrints) {
+            return printed;
+        }
     }
 
     private void night(ShowerNight night, List<String> lines) {
