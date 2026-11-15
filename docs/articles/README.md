@@ -52,6 +52,12 @@ behind that argument.
   its seam and its grid, how to go from it into an ordinary chart, and
   what it does not claim. Also in Norwegian: [Hele himmelen på ett
   tidspunkt](hele-himmelen-pa-ett-tidspunkt.md).
+- [Meteor showers and their radiants](meteor-showers-and-their-radiants.md)
+  — what a radiant is and why it moves, why the atlas needs a chart time
+  to place one, why its height, the Moon and the dark decide a shower
+  night, what a quoted rate and a nominal maximum do and do not say, and
+  what the atlas does not claim. Also in Norwegian: [Meteorsvermer og
+  radiantene deres](meteorsvermer-og-radiantene-deres.md).
 
 ## How JUranometria works
 
