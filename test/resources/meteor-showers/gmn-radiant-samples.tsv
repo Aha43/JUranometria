@@ -1,0 +1,61 @@
+# An extract of the Global Meteor Network's shower lookup table, for the nine
+# meteor showers of JUranometria's pack: the table's lines nearest each printed
+# radiant row and nearest each maximum, verbatim. Test data only; not shipped.
+#
+# Source: "Shower lookup table measured using GMN data up to May 18, 2023"
+#   https://raw.githubusercontent.com/wmpg/WesternMeteorPyLib/master/wmpl/share/gmn_shower_table_20230518.txt
+#   SHA-256 of the source file: 0f9ae2675c9f6b48b3cc1ea6f83a4b7d39e8910b1eace4f7fd73e1dbe5a98595
+# Licence: Creative Commons Attribution 4.0 International (CC BY 4.0),
+#   https://creativecommons.org/licenses/by/4.0/ - the Global Meteor Network's
+#   data are released under it (https://globalmeteornetwork.org/data/).
+# Attribution: Global Meteor Network, https://globalmeteornetwork.org/;
+#   Vida et al. 2020, MNRAS 491, 2688-2705; Vida et al. 2021, MNRAS 506, 5046-5074.
+# Changes: lines selected, nothing else; every data line is the source's own.
+# Written by make import-meteor-showers (MeteorShowerPackMain); do not edit.
+#
+# Sol  SCE lon  SCE lat       Vg  Disp  IAU IAU
+# deg      deg      deg     km/s  deg    No  cd
+283.2  276.734   63.766   40.425  3.59   10 QUA
+284.0  276.979   63.996   40.311  3.95   10 QUA
+ 32.4  240.937   56.663   46.721  2.37    6 LYR
+ 34.2  296.475    7.000   64.979  1.50   31 ETA
+ 39.0  295.291    7.296   65.203  1.58   31 ETA
+ 44.0  294.058    7.603   65.437  1.87   31 ETA
+ 45.4  293.713    7.690   65.503  1.95   31 ETA
+ 48.8  292.875    7.899   65.662  1.78   31 ETA
+ 53.6  291.691    8.194   65.887  1.50   31 ETA
+ 58.4  290.685    8.393   65.911  1.50   31 ETA
+ 63.2  290.061    8.551   66.092  3.50   31 ETA
+116.8  210.982   -6.317   42.264  1.50    5 SDA
+121.4  209.804   -6.820   41.414  1.93    5 SDA
+126.2  208.574   -7.344   40.526  2.65    5 SDA
+128.0  208.113   -7.541   40.193  2.43    5 SDA
+132.0  207.088   -7.977   39.454  1.95    5 SDA
+136.8  205.859   -8.502   38.566  1.50    5 SDA
+141.6  204.629   -9.026   37.679  1.50    5 SDA
+116.8  282.270   40.008   58.474  1.87    7 PER
+121.4  282.479   39.679   58.543  1.87    7 PER
+126.2  282.698   39.337   58.614  1.87    7 PER
+132.0  282.961   38.923   58.701  2.26    7 PER
+136.8  283.179   38.580   58.773  2.64    7 PER
+140.0  283.325   38.352   58.821  2.90    7 PER
+141.6  283.397   38.238   58.845  2.90    7 PER
+146.4  283.616   37.895   58.916  2.80    7 PER
+191.2  250.822   -8.750   66.870  1.80    8 ORI
+196.0  249.706   -8.443   66.528  1.80    8 ORI
+201.0  248.544   -8.124   66.172  1.87    8 ORI
+206.0  247.382   -7.804   65.816  2.06    8 ORI
+208.0  246.917   -7.676   65.673  2.14    8 ORI
+211.0  246.220   -7.484   65.459  2.02    8 ORI
+216.0  245.058   -7.165   65.103  1.62    8 ORI
+222.0  243.663   -6.781   64.676  1.50    8 ORI
+227.0  275.112   11.614   69.366  1.50   13 LEO
+232.0  273.576   10.845   69.607  1.75   13 LEO
+235.2  272.593   10.353   69.761  1.98   13 LEO
+237.0  272.040   10.076   69.848  1.82   13 LEO
+242.0  270.503    9.307   70.089  1.50   13 LEO
+252.2  209.034   11.028   32.751  1.50    4 GEM
+257.2  208.497   10.757   33.325  1.56    4 GEM
+262.2  207.961   10.486   33.899  1.96    4 GEM
+262.4  207.939   10.475   33.922  1.92    4 GEM
+270.6  218.399   71.950   33.079  2.61   15 URS

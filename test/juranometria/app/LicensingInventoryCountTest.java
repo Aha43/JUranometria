@@ -33,9 +33,9 @@ class LicensingInventoryCountTest {
     }
 
     @Test
-    void theListCarriesEveryNoticeAboutShowsSixteenInAll() throws Exception {
+    void theListCarriesEveryNoticeAboutShowsSeventeenInAll() throws Exception {
         List<String> listed = inventory();
-        assertEquals(16, listed.size(), "the summary, About's notices and both BSD texts: " + listed);
+        assertEquals(17, listed.size(), "the summary, About's notices and both BSD texts: " + listed);
         String about = Files.readString(Path.of("src/juranometria/app/AboutDialog.java"),
                 StandardCharsets.UTF_8);
         Matcher m = Pattern.compile("new Notice\\(\"\\w+\",\\s*\"/(resources/[^\"]+)\"").matcher(about);
@@ -44,7 +44,7 @@ class LicensingInventoryCountTest {
             notices++;
             assertTrue(listed.contains(m.group(1)), "the packaged inventory checks " + m.group(1));
         }
-        assertEquals(14, notices, "About's notices, as AboutTextTest counts them");
+        assertEquals(15, notices, "About's notices, as AboutTextTest counts them");
         assertTrue(listed.contains("resources/about/licensing-summary.txt"));
     }
 

@@ -2337,7 +2337,16 @@ public final class ReferenceInk {
                 bodies.add(owned.geometry());
             }
         }
-        if (bodies.isEmpty()) {
+        // A meteor shower's radiants (#716): marks, not bodies, placed and
+        // named after them.
+        List<OverlayContribution.Radiant> radiants = new ArrayList<>();
+        for (OverlayRegistry.Owned owned : contributions) {
+            if (owned.geometry() instanceof OverlayContribution.Radiant radiant) {
+                radiants.add(radiant);
+            }
+        }
+        radiants.sort(Comparator.comparing(OverlayContribution::identity));
+        if (bodies.isEmpty() && radiants.isEmpty()) {
             return List.of();
         }
         // Farthest first; identity breaks a tie, so the page never
@@ -2409,6 +2418,22 @@ public final class ReferenceInk {
         }
         String[] names = new String[drawn.size()];
         Rectangle2D[] boxes = new Rectangle2D[drawn.size()];
+        // Where each radiant lands; one off the sky is not drawn.
+        List<OverlayContribution.Radiant> radiantsDrawn = new ArrayList<>();
+        List<PixelPoint> radiantCentres = new ArrayList<>();
+        List<Shape> radiantMarks = new ArrayList<>();
+        for (OverlayContribution.Radiant radiant : radiants) {
+            PixelPoint at = projection.project(radiant.at()).map(mapping::toPixel).orElse(null);
+            if (at == null || !sky.contains(at.x(), at.y())) {
+                continue;
+            }
+            radiantsDrawn.add(radiant);
+            radiantCentres.add(at);
+            radiantMarks.add(new Ellipse2D.Double(at.x() - RADIANT_OUTER, at.y() - RADIANT_OUTER,
+                    2.0 * RADIANT_OUTER, 2.0 * RADIANT_OUTER));
+        }
+        String[] radiantNames = new String[radiantsDrawn.size()];
+        Rectangle2D[] radiantBoxes = new Rectangle2D[radiantsDrawn.size()];
         // The Galilean moons (#485), decided moon by moon; their marks
         // keep words and names clear of them.
         List<JovianSystem> systems = systemsOn(page, contributions);
@@ -2427,6 +2452,8 @@ public final class ReferenceInk {
         for (SatelliteMark m : moons) {
             inks.add(inkOf(m));
         }
+        // After the bodies' and the moons' ink: names keep clear of the marks.
+        inks.addAll(radiantMarks);
         java.util.Map<SatelliteMark, String> moonNames = new java.util.HashMap<>();
         java.util.Map<SatelliteMark, Rectangle2D> moonBoxes = new java.util.HashMap<>();
         Graphics2D g2 = (Graphics2D) g.create();
@@ -2560,6 +2587,41 @@ public final class ReferenceInk {
                             (float) (box.getMaxY() - metrics.getDescent()));
                 }
             }
+            // Pass five: the radiants (#716) - the mark, then its name by
+            // the bodies' own rule: the first clean adjacent box, refused
+            // when none is clean, and the horizon's words when it is below.
+            Color markInk = palette.textInk();
+            for (int i = 0; i < radiantsDrawn.size(); i++) {
+                OverlayContribution.Radiant radiant = radiantsDrawn.get(i);
+                boolean below = radiant.belowHorizon();
+                g2.setColor(below
+                        ? juranometria.render.BelowHorizon.subdued(markInk, palette.ground())
+                        : markInk);
+                java.awt.Stroke before = g2.getStroke();
+                g2.setStroke(RADIANT_STROKE);
+                for (Shape ray : radiantRays(radiantCentres.get(i))) {
+                    g2.draw(ray);
+                }
+                g2.setStroke(before);
+                String name = words.bodyName(radiant.identity());
+                if (below) {
+                    name = name + " " + words.bodyBelowHorizon();
+                }
+                radiantNames[i] = name;
+                double w = metrics.stringWidth(name);
+                double h = metrics.getAscent() + metrics.getDescent();
+                Rectangle2D box = bodyNameBox(radiantCentres.get(i), RADIANT_OUTER, w, h,
+                        paper, sky, bounded, taken, obstacles);
+                if (box != null) {
+                    taken.add(box);
+                    radiantBoxes[i] = box;
+                    g2.setColor(below
+                            ? juranometria.render.BelowHorizon.subdued(nameInk, palette.ground())
+                            : nameInk);
+                    g2.drawString(name, (float) box.getMinX(),
+                            (float) (box.getMaxY() - metrics.getDescent()));
+                }
+            }
         } finally {
             g2.dispose();
         }
@@ -2587,7 +2649,40 @@ public final class ReferenceInk {
                     moonNames.get(m), moonBoxes.get(m), s.belowHorizon(), true, state,
                     s.moment(), s.selectable()));
         }
+        // A radiant is a mark, never opaque ink: a symbol, so a click
+        // through it reaches what is under it, and the description says
+        // what the mark is.
+        for (int i = 0; i < radiantsDrawn.size(); i++) {
+            OverlayContribution.Radiant radiant = radiantsDrawn.get(i);
+            placed.add(new BodyPlacement(radiant.identity(), radiantCentres.get(i),
+                    radiantMarks.get(i), radiantNames[i], radiantBoxes[i],
+                    radiant.belowHorizon(), true, null, radiant.moment(),
+                    radiant.selectable()));
+        }
         return List.copyOf(placed);
+    }
+
+    /** A radiant's rays end this far from its position, page pixels (#716, glyph A). */
+    public static final double RADIANT_OUTER = 10.0;
+    /** A radiant's rays start this far from its position: the centre stays empty. */
+    public static final double RADIANT_INNER = 3.5;
+    private static final java.awt.Stroke RADIANT_STROKE = new BasicStroke(1.2f,
+            BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+
+    /**
+     * A radiant's mark (#716, ruling C-4): six short rays about an empty
+     * centre, the first straight up. Fixed on the page and carrying no
+     * data - no rate, no speed, no strength.
+     */
+    static List<Shape> radiantRays(PixelPoint at) {
+        List<Shape> rays = new ArrayList<>();
+        for (int i = 0; i < 6; i++) {
+            double a = Math.toRadians(60.0 * i - 90.0);
+            rays.add(new Line2D.Double(at.x() + RADIANT_INNER * Math.cos(a),
+                    at.y() + RADIANT_INNER * Math.sin(a), at.x() + RADIANT_OUTER * Math.cos(a),
+                    at.y() + RADIANT_OUTER * Math.sin(a)));
+        }
+        return rays;
     }
 
     /** The moment a body was computed for, or null when it states none. */

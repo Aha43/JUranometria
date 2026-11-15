@@ -17,6 +17,7 @@ the application.
 | Bright-sky pack DSO tiles (`src/resources/catalog/bright-sky/tiles/*/dsos.csv`) | CC-BY-SA-4.0 | [`src/resources/catalog/bright-sky/NOTICE-openngc.md`](src/resources/catalog/bright-sky/NOTICE-openngc.md), full text beside it |
 | Star-identity pack (`src/resources/catalog/star-identities/star-identities.csv`) | BSD-3-Clause | [`src/resources/catalog/star-identities/NOTICE-star-identities.md`](src/resources/catalog/star-identities/NOTICE-star-identities.md), full licence text beside it |
 | Solar System ephemeris pack (`src/resources/solar-system/*.bsp`, a JUranometria-modified excerpt of JPL DE440, and the IERS `Leap_Second.dat`) | NAIF's rules for modified SPICE kernels (no fee or licence; renamed and re-attributed); IERS public data | [`src/resources/solar-system/NOTICE-solar-system.md`](src/resources/solar-system/NOTICE-solar-system.md), provenance beside it |
+| Meteor-shower pack (`src/resources/meteor-showers/*.tsv`, a derived table of nine annual showers from the IMO Meteor Shower Calendar 2027; identities from the IAU Meteor Data Center) | The IMO's data policy: use, reproduction and sharing with the credit "Source: International Meteor Organization (IMO) – www.imo.net"; no affiliation or endorsement. IAU MDC cited as it asks | [`src/resources/meteor-showers/NOTICE-meteor-showers.md`](src/resources/meteor-showers/NOTICE-meteor-showers.md) |
 
 ## Redistributed runtime libraries
 

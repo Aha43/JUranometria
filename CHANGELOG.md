@@ -7,6 +7,31 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Meteor showers at chart time (#716, ruled on #715).** *Solar System >
+Meteor showers...* and a *Meteor showers* group in the Controller open
+one panel of nine annual showers - Quadrantids, Lyrids, Eta Aquariids,
+Southern Delta Aquariids, Perseids, Orionids, Leonids, Geminids and
+Ursids. Choose one and the panel says, for the chart time and place,
+whether it is active, where its radiant is and how high, where the Sun
+and the Moon are, and how long the Sun is more than 6, 12 and 18
+degrees down that night - facts, never a verdict on the night. While
+the chart time is inside the shower's activity period its radiant is
+drawn as a six-rayed mark, on the ordinary chart and on the whole sky,
+subdued below the horizon, named, selectable, described aloud and in
+the selected-object box; outside the period nothing is drawn. Activity
+and the nominal maximum are reckoned by the Sun's ecliptic longitude
+(solar longitude), so they hold in any year the Sun is computed for,
+and the radiant drifts with the chart time. *Set chart time to nominal
+maximum* moves the one chart time - to this activity period's maximum
+while the shower is active, also when it has passed, and otherwise to
+the next; nothing here keeps a clock of its own. A radiant can be bookmarked and reopened at its saved time
+and place; existing bookmarks are unchanged. The values are nominal,
+from the IMO Meteor Shower Calendar 2027 - Source: International Meteor
+Organization (IMO) – www.imo.net - with identities from the IAU Meteor
+Data Center; positions between the printed rows, instants and
+everything for a place are JUranometria's calculations. The pack's
+notice is in About, in both languages. In English and Norwegian.
+
 ## [6.5.0] - 2026-11-10
 
 **The whole sky at one chart time (#687, ruled on #686).** A *Whole sky*

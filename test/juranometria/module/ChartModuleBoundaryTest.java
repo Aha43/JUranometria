@@ -129,9 +129,11 @@ class ChartModuleBoundaryTest {
         // #563 (R-1, R-9) adds the altitude readout: the meridian's pole and
         // the zenith, from which the page alone decides where one reading
         // stands and what it states.
+        // #716 (R-13) adds the radiant: a meteor shower's radiant at a moment,
+        // a mark that is not a body and can be selected as an occurrence.
         java.util.List<String> vocabulary = java.util.List.of("GreatCircle",
                 "Point", "Path", "Region", "DirectionMark", "Tick", "Body",
-                "OblateBody", "RingedBody", "Satellite", "AltitudeReadout");
+                "OblateBody", "RingedBody", "Satellite", "AltitudeReadout", "Radiant");
         assertEquals(vocabulary,
                 java.util.Arrays.stream(OverlayContribution.class
                                 .getPermittedSubclasses())
@@ -139,8 +141,8 @@ class ChartModuleBoundaryTest {
                                 java.util.Comparator.comparingInt(vocabulary::indexOf))
                         .toList(),
                 "a great circle, a point, a path, a region, a direction mark, a"
-                        + " tick, a body, an oblate body, a ringed body, a satellite and an altitude"
-                        + " readout - the geometry"
+                        + " tick, a body, an oblate body, a ringed body, a satellite, an altitude"
+                        + " readout and a radiant - the geometry"
                         + " a module may contribute, and nothing else");
     }
 

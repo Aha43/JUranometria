@@ -68,6 +68,8 @@ public final class SolarSystemSection {
     private UranusTableControls uranus;
     /** Neptune's controls, or null until a host gives the section Neptune's session. */
     private NeptuneTableControls neptune;
+    /** The meteor-shower panel (#716), or null for a host built without it. */
+    private juranometria.ui.meteor.MeteorShowerControls meteorShowers;
     /** Mars's controls, or null until a host gives the section Mars's session. */
     private MarsTableControls mars;
 
@@ -290,6 +292,26 @@ public final class SolarSystemSection {
                 onChart == null ? null : centre, onChart);
     }
 
+    /**
+     * Gives the section the Meteor showers group after the bodies (#716):
+     * the same panel the dialog shows, over the one shared session.
+     */
+    public void withMeteorShowers(juranometria.ui.meteor.MeteorShowerSession session,
+                                  InterfaceText said) {
+        if (session == null || said == null) {
+            throw new IllegalArgumentException("the meteor-shower session, in a language");
+        }
+        if (meteorShowers != null) {
+            meteorShowers.release();
+        }
+        meteorShowers = new juranometria.ui.meteor.MeteorShowerControls(session, said);
+    }
+
+    /** The meteor-shower panel, or null for a host built without it. */
+    public juranometria.ui.meteor.MeteorShowerControls meteorShowers() {
+        return meteorShowers;
+    }
+
     /** Neptune's controls, or null for a host built without Neptune. */
     public NeptuneTableControls neptune() {
         return neptune;
@@ -475,6 +497,11 @@ public final class SolarSystemSection {
                     said.say("solarsystem.neptune"), neptune.inController(), said, store,
                     true));
         }
+        if (meteorShowers != null) {
+            groups.add(CompanionSection.remembered(ID + ".meteorshowers",
+                    said.say("solarsystem.meteorshowers"), meteorShowers, said, store,
+                    true));
+        }
         return groups;
     }
 
@@ -504,6 +531,9 @@ public final class SolarSystemSection {
         }
         if (neptune != null) {
             neptune.release();
+        }
+        if (meteorShowers != null) {
+            meteorShowers.release();
         }
     }
 }

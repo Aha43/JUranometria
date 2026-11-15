@@ -244,6 +244,10 @@ public final class BookmarkOpener {
         if (bodyIdentity.startsWith("jovian.")) {
             return "jovian.jupiter";
         }
+        // A meteor shower's radiant (#716) is drawn by selecting that shower.
+        if (bodyIdentity.startsWith(juranometria.meteor.MeteorShower.IDENTITY_STEM)) {
+            return bodyIdentity;
+        }
         int dot = bodyIdentity.indexOf('.');
         return dot < 0 ? bodyIdentity : bodyIdentity.substring(0, dot);
     }

@@ -317,6 +317,46 @@ class BundledNoticesTest {
         }
     }
 
+    /**
+     * The meteor-shower pack (#716) ships under the owner's ruling of
+     * 2026-11-14 (docs/decisions/meteor-showers.md, section 9): the IMO's
+     * exact credit, the edition named, no affiliation claimed, JUranometria's
+     * calculations told apart from the IMO's values, the double keying and
+     * the update path.
+     */
+    @Test
+    void theMeteorShowerPackShipsWithItsNoticeAndTheRuledSafeguards() {
+        String notice = resourceText("/resources/meteor-showers/NOTICE-meteor-showers.md")
+                .replaceAll("\\s+", " ");
+        assertTrue(notice.contains("Source: International Meteor Organization (IMO) \u2013 www.imo.net"),
+                "the IMO's credit line, exactly");
+        assertTrue(notice.contains("IMO Meteor Shower Calendar 2027"), "the edition is named");
+        assertTrue(notice.contains("not affiliated with, sponsored by or endorsed by")
+                && notice.contains("does not use its logo"), "no affiliation, endorsement or logo");
+        assertTrue(notice.contains("Computed by JUranometria, not by the IMO"),
+                "JUranometria's calculations are told apart from the IMO's values");
+        assertTrue(notice.contains("keyed twice") && notice.contains("agree in every field"),
+                "the transcription was checked independently");
+        assertTrue(notice.contains("a newer edition enters JUranometria as a new reviewed import"),
+                "the update path");
+        assertTrue(notice.contains("derived subset of nine showers")
+                && notice.contains("not the calendar in full or in substantial part"),
+                "what is carried, and what is not");
+        assertTrue(notice.contains("IAU Meteor Data Center") && notice.contains("Jenniskens"),
+                "the identity source is cited as it asks");
+        assertTrue(notice.contains("Global Meteor Network") && notice.contains("is not part of JUranometria"),
+                "the accuracy check's table is not shipped");
+    }
+
+    @Test
+    void everyMeteorShowerResourceShipsOnTheClasspath() {
+        for (String resource : new String[] {
+                "manifest.properties", "showers.tsv", "radiants.tsv", "NOTICE-meteor-showers.md"}) {
+            assertNotNull(BundledNoticesTest.class.getResource("/resources/meteor-showers/" + resource),
+                    resource + " must ship as a resource");
+        }
+    }
+
     @Test
     void everyMarsSystemResourceShipsOnTheClasspath() {
         for (String resource : new String[] {
