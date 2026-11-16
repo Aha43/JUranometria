@@ -26,6 +26,7 @@ import juranometria.solar.SolarSystemService.Phase;
 import juranometria.tool.MoonEventsFixture;
 import juranometria.ui.language.InterfaceText;
 
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -41,12 +42,10 @@ class MoonTableDialogTest {
 
     private static final Instant MIDSUMMER = Instant.parse("2026-06-21T10:00:00Z");
     private static final Observer OSLO = new Observer(59.91, 10.75, MIDSUMMER);
-    private static SolarSystemService service;
     private static Map<String, MoonEventsFixture.Event> events;
 
     @BeforeAll
     static void load() throws IOException {
-        service = SolarSystemService.load();
         events = MoonEventsFixture.read();
     }
 
@@ -60,7 +59,7 @@ class MoonTableDialogTest {
             content = SolarTableDialog.content(() -> {
                 reads++;
                 return observer;
-            }, service, InterfaceText.forLanguage(language), SolarTable.moon());
+            }, solar(), InterfaceText.forLanguage(language), SolarTable.moon());
         }
 
         String cell(int row, int column) {
@@ -95,7 +94,7 @@ class MoonTableDialogTest {
     @Test
     void theRowIsTheServicesAnswerSpelledByTheFormats() {
         Rig rig = new Rig("en");
-        MoonObservation o = (MoonObservation) service.observe(Body.MOON, OSLO);
+        MoonObservation o = (MoonObservation) solar().observe(Body.MOON, OSLO);
         assertEquals(SunTableFormat.minute(MIDSUMMER), rig.cell(0, 0));
         assertEquals(SunTableFormat.hms(o.astrometricJ2000()), rig.cell(0, 1));
         assertEquals(SunTableFormat.dms(o.astrometricJ2000()), rig.cell(0, 2));

@@ -12,9 +12,9 @@ import juranometria.meteor.MeteorShowers;
 import juranometria.meteor.SyntheticShowers;
 import juranometria.meteorchart.MeteorShowerModule;
 import juranometria.sky.Observer;
-import juranometria.solar.SolarSystemService;
 import juranometria.ui.language.InterfaceText;
 
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -31,7 +31,6 @@ class MeteorShowerPanelTest {
     private static final InterfaceText EN = InterfaceText.forLanguage("en");
     private static final InterfaceText NB = InterfaceText.forLanguage("nb-NO");
     private static final MeteorShowers SERVICE = SyntheticShowers.service();
-    private static final SolarSystemService SOLAR = SolarSystemService.load();
 
     private final ChartContextHolder context = new ChartContextHolder(
             new Observer(59.91, 10.75, SyntheticShowers.at(100.0)));
@@ -41,7 +40,7 @@ class MeteorShowerPanelTest {
 
     private MeteorShowerSession session() {
         MeteorShowerSession made = new MeteorShowerSession(context::observer, () -> SERVICE,
-                () -> SOLAR, module);
+                () -> solar(), module);
         made.installThrough(context);
         context.onChange(change -> made.changed());
         return made;

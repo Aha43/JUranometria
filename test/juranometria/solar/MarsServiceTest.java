@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import juranometria.sky.Observer;
 import juranometria.solar.spk.Vector3;
 
+import static juranometria.solar.SharedServices.mars;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -21,17 +22,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class MarsServiceTest {
 
-    private static final MarsService SERVICE = MarsService.load();
     private static final Observer OSLO = new Observer(59.91, 10.75, Instant.parse("2026-10-25T12:00:00Z"));
 
     @Test
     void theDeflectionIsJupitersFormulaExactly() {
         JovianSystemService jovian = JovianSystemService.load();
-        double et = SERVICE.timeScales().tt(OSLO.instant()).secondsPastJ2000();
+        double et = mars().timeScales().tt(OSLO.instant()).secondsPastJ2000();
         Vector3 observer = new Vector3(1.2e8, -8.1e7, -3.5e7);
         for (Vector3 range : List.of(new Vector3(-1.4e8, 2.0e7, 1.1e7),
                 new Vector3(3.0e7, 9.0e7, -2.0e7), new Vector3(1.0e9, 1.0e9, 4.0e8))) {
-            assertEquals(jovian.deflectedBySun(range, observer, et), SERVICE.deflectedBySun(range, observer, et),
+            assertEquals(jovian.deflectedBySun(range, observer, et), mars().deflectedBySun(range, observer, et),
                     "one formula, every planet's service");
         }
     }
@@ -41,16 +41,16 @@ class MarsServiceTest {
         // docs/decisions/mars-system.md, "The pole needs its periodic terms":
         // without them the pole stands about 1.5° from Horizons'.
         double jd = 2461339.0;
-        Vector3 full = SERVICE.pole(jd, MarsService.Rival.NONE);
-        Vector3 secular = SERVICE.pole(jd, MarsService.Rival.SECULAR_POLE);
+        Vector3 full = mars().pole(jd, MarsService.Rival.NONE);
+        Vector3 secular = mars().pole(jd, MarsService.Rival.SECULAR_POLE);
         double degrees = Math.toDegrees(Math.acos(full.dot(secular)));
         assertTrue(degrees > 1.4 && degrees < 1.7, "the periodic terms move the pole " + degrees + "°");
     }
 
     @Test
     void theTiltIsPlanetocentricAndThePolarDiameterIsTakenAtIt() {
-        MarsService.MarsObservation o = SERVICE.observe(OSLO);
-        MarsService.MarsObservation detic = SERVICE.observeRival(OSLO, MarsService.Rival.PLANETODETIC_TILT);
+        MarsService.MarsObservation o = mars().observe(OSLO);
+        MarsService.MarsObservation detic = mars().observeRival(OSLO, MarsService.Rival.PLANETODETIC_TILT);
         assertTrue(Math.abs(detic.tiltDegrees()) > Math.abs(o.tiltDegrees()),
                 "the planetodetic reading lies farther from the equator than the planetocentric");
         double re = 3396.19;
@@ -65,10 +65,10 @@ class MarsServiceTest {
 
     @Test
     void theMoonsComeInTheRuledOrderAndAnswerWithMars() {
-        MarsService.Configuration c = SERVICE.observeMoons(OSLO);
+        MarsService.Configuration c = mars().observeMoons(OSLO);
         assertEquals(List.of(MarsService.Moon.PHOBOS, MarsService.Moon.DEIMOS),
                 c.moons().stream().map(MarsService.MoonPlace::moon).toList());
-        assertEquals(SERVICE.observe(OSLO).astrometricJ2000(), c.mars().astrometricJ2000(),
+        assertEquals(mars().observe(OSLO).astrometricJ2000(), c.mars().astrometricJ2000(),
                 "the configuration's Mars is the Mars the planet's card shows");
         for (MarsService.MoonPlace p : c.moons()) {
             assertTrue(p.separationArcseconds() < 90.0, p.moon() + " lies near Mars");

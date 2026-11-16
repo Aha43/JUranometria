@@ -3,7 +3,6 @@ package juranometria.solar;
 import java.io.IOException;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import juranometria.chart.SkyPosition;
@@ -14,6 +13,7 @@ import juranometria.solar.SaturnSystemService.Rival;
 import juranometria.solar.SaturnSystemService.SaturnObservation;
 import juranometria.tool.SaturnComparison;
 
+import static juranometria.solar.SharedServices.saturn;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -28,12 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class SaturnMutationTest {
 
     private static final String SATURN_YEAR = "dense-2026-saturn-oslo";
-    private static SaturnSystemService service;
-
-    @BeforeAll
-    static void load() {
-        service = SaturnSystemService.load();
-    }
 
     private static Observer oslo(String[] f) {
         return SaturnComparison.observer("oslo", SaturnComparison.stamp(f[0]));
@@ -46,7 +40,7 @@ class SaturnMutationTest {
 
     /** Horizons' planetodetic reading of a planetocentric angle, on the pack's spheroid. */
     private static double planetodetic(double centricDegrees) {
-        SaturnPack.Constants k = service.pack().constants();
+        SaturnPack.Constants k = saturn().pack().constants();
         double ratio = k.saturnEquatorialRadiusKm() / k.saturnPolarRadiusKm();
         return Math.toDegrees(Math.atan(Math.tan(Math.toRadians(centricDegrees)) * ratio * ratio));
     }
@@ -59,9 +53,9 @@ class SaturnMutationTest {
         double rival = 0.0;
         double ours = 0.0;
         for (String[] f : SaturnComparison.rows(SATURN_YEAR)) {
-            rival = Math.max(rival, sep(service.observeSaturnRival(oslo(f), Rival.BARYCENTRE_FOR_CENTRE)
+            rival = Math.max(rival, sep(saturn().observeSaturnRival(oslo(f), Rival.BARYCENTRE_FOR_CENTRE)
                     .astrometricJ2000(), f[ra], f[dec]));
-            ours = Math.max(ours, sep(service.observeSaturn(oslo(f)).astrometricJ2000(), f[ra], f[dec]));
+            ours = Math.max(ours, sep(saturn().observeSaturn(oslo(f)).astrometricJ2000(), f[ra], f[dec]));
         }
         assertTrue(ours <= 0.01, "the service meets the ruled 0.01″: " + ours);
         assertTrue(rival > 0.02, "the 6 → 699 offset moves Saturn by several hundredths of an arcsecond;"
@@ -74,7 +68,7 @@ class SaturnMutationTest {
         int obs = SaturnComparison.column(h, "ObsSub-LAT");
         double rival = 0.0;
         for (String[] f : SaturnComparison.rows(SATURN_YEAR)) {
-            SaturnObservation o = service.observeSaturnRival(oslo(f), Rival.PLANETODETIC_OPENING);
+            SaturnObservation o = saturn().observeSaturnRival(oslo(f), Rival.PLANETODETIC_OPENING);
             rival = Math.max(rival, Math.abs(planetodetic(o.ringOpeningDegrees())
                     - Double.parseDouble(f[obs].strip())) * 3600.0);
         }
@@ -90,9 +84,9 @@ class SaturnMutationTest {
         double ours = 0.0;
         for (String[] f : SaturnComparison.rows(SATURN_YEAR)) {
             double horizons = Double.parseDouble(f[sun].strip());
-            rival = Math.max(rival, Math.abs(planetodetic(service.observeSaturnRival(oslo(f),
+            rival = Math.max(rival, Math.abs(planetodetic(saturn().observeSaturnRival(oslo(f),
                     Rival.UNABERRATED_SUN).sunRingOpeningDegrees()) - horizons) * 3600.0);
-            ours = Math.max(ours, Math.abs(planetodetic(service.observeSaturn(oslo(f))
+            ours = Math.max(ours, Math.abs(planetodetic(saturn().observeSaturn(oslo(f))
                     .sunRingOpeningDegrees()) - horizons) * 3600.0);
         }
         assertTrue(ours <= 0.01, "the service meets the ruled 0.01″: " + ours);
@@ -112,8 +106,8 @@ class SaturnMutationTest {
             if (SaturnComparison.stamp(f[0]).isBefore(java.time.Instant.parse("2000-01-01T00:00:00Z"))) {
                 continue;
             }
-            MoonPlace r = service.configurationRival(oslo(f), Rival.J2000_OFFSETS).moon(Moon.IAPETUS);
-            MoonPlace p = service.observeMoons(oslo(f)).moon(Moon.IAPETUS);
+            MoonPlace r = saturn().configurationRival(oslo(f), Rival.J2000_OFFSETS).moon(Moon.IAPETUS);
+            MoonPlace p = saturn().observeMoons(oslo(f)).moon(Moon.IAPETUS);
             double hx = Double.parseDouble(f[x].strip());
             double hy = Double.parseDouble(f[y].strip());
             rival = Math.max(rival, Math.hypot(r.xArcseconds() - hx, r.yArcseconds() - hy));

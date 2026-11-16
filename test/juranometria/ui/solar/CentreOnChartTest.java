@@ -10,7 +10,6 @@ import javax.swing.JButton;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import juranometria.chart.ChartViewState;
@@ -20,6 +19,7 @@ import juranometria.solar.JovianSystemService;
 import juranometria.solar.SolarSystemService;
 import juranometria.ui.language.InterfaceText;
 
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -39,15 +39,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class CentreOnChartTest {
 
-    private static SolarSystemService solar;
     private static final InterfaceText EN = InterfaceText.forLanguage("en");
     private static final InterfaceText NB = InterfaceText.forLanguage("nb-NO");
     private static final Instant WHEN = Instant.parse("2026-06-21T10:00:00Z");
-
-    @BeforeAll
-    static void load() {
-        solar = SolarSystemService.load();
-    }
 
     /** The chart, as the action sees it: where it was sent, and how often it came forward. */
     static final class FakeChart implements CentreOnChart.Chart {
@@ -147,7 +141,7 @@ class CentreOnChartTest {
     void theChartIsCentredOnTheTablesJ2000PlaceAtTheNormalMinimumFieldAndComesForward()
             throws Exception {
         for (SolarTable body : List.of(SolarTable.sun(), SolarTable.moon())) {
-            SolarTableSession session = new SolarTableSession(() -> oslo(WHEN), solar, body);
+            SolarTableSession session = new SolarTableSession(() -> oslo(WHEN), solar(), body);
             FakeChart chart = new FakeChart();
             CentreOnChart action = new CentreOnChart(chart);
             FakeLayer layer = new FakeLayer(true);
@@ -167,7 +161,7 @@ class CentreOnChartTest {
 
     @Test
     void theFieldIsTheChartsMinimumNotAConstantSoAFinerRungMovesIt() throws Exception {
-        SolarTableSession session = new SolarTableSession(() -> oslo(WHEN), solar, SolarTable.moon());
+        SolarTableSession session = new SolarTableSession(() -> oslo(WHEN), solar(), SolarTable.moon());
         FakeChart chart = new FakeChart();
         chart.minimum = 0.25;
         CentreOnChart action = new CentreOnChart(chart);
@@ -181,7 +175,7 @@ class CentreOnChartTest {
     @Test
     void theTypedQueryIsComputedFirstNotAResultDisplayedEarlier() throws Exception {
         Instant[] now = {WHEN};
-        SolarTableSession session = new SolarTableSession(() -> oslo(now[0]), solar, SolarTable.moon());
+        SolarTableSession session = new SolarTableSession(() -> oslo(now[0]), solar(), SolarTable.moon());
         FakeChart chart = new FakeChart();
         CentreOnChart action = new CentreOnChart(chart);
         FakeLayer layer = new FakeLayer(true);
@@ -209,7 +203,7 @@ class CentreOnChartTest {
 
     @Test
     void aLayerThatIsOffIsTurnedOnThroughItsSwitchAndOneThatIsOnIsLeftAlone() throws Exception {
-        SolarTableSession session = new SolarTableSession(() -> oslo(WHEN), solar, SolarTable.moon());
+        SolarTableSession session = new SolarTableSession(() -> oslo(WHEN), solar(), SolarTable.moon());
         FakeChart chart = new FakeChart();
         CentreOnChart action = new CentreOnChart(chart);
         FakeLayer off = new FakeLayer(false);
@@ -230,7 +224,7 @@ class CentreOnChartTest {
 
     @Test
     void bothHostsPressTheSameActionAndFollowOneResult() throws Exception {
-        SolarTableSession session = new SolarTableSession(() -> oslo(WHEN), solar, SolarTable.moon());
+        SolarTableSession session = new SolarTableSession(() -> oslo(WHEN), solar(), SolarTable.moon());
         FakeChart chart = new FakeChart();
         CentreOnChart action = new CentreOnChart(chart);
         FakeLayer layer = new FakeLayer(false);
@@ -256,7 +250,7 @@ class CentreOnChartTest {
     @Test
     void aRefusalMovesNothingAndTurnsNothingOn() throws Exception {
         Observer[] at = {null};
-        SolarTableSession session = new SolarTableSession(() -> at[0], solar, SolarTable.sun());
+        SolarTableSession session = new SolarTableSession(() -> at[0], solar(), SolarTable.sun());
         FakeChart chart = new FakeChart();
         CentreOnChart action = new CentreOnChart(chart);
         FakeLayer layer = new FakeLayer(false);
@@ -276,7 +270,7 @@ class CentreOnChartTest {
 
     @Test
     void theKeyboardReachesAndPressesItInBothLanguages() throws Exception {
-        SolarTableSession session = new SolarTableSession(() -> oslo(WHEN), solar, SolarTable.moon());
+        SolarTableSession session = new SolarTableSession(() -> oslo(WHEN), solar(), SolarTable.moon());
         FakeChart chart = new FakeChart();
         CentreOnChart action = new CentreOnChart(chart);
         FakeLayer layer = new FakeLayer(true);
@@ -295,7 +289,7 @@ class CentreOnChartTest {
                     .getAccessibleName());
             assertEquals('S', (char) nb.centreOnChart.getMnemonic());
             assertEquals("Centre the chart on the Sun", new SolarTableControls(
-                    new SolarTableSession(() -> oslo(WHEN), solar, SolarTable.sun()), EN, null,
+                    new SolarTableSession(() -> oslo(WHEN), solar(), SolarTable.sun()), EN, null,
                     false, action, layer).centreOnChart.getAccessibleContext().getAccessibleName());
             // Enter and Space both press it while it has the keyboard.
             for (String key : List.of("ENTER", "SPACE")) {
@@ -327,8 +321,8 @@ class CentreOnChartTest {
             assertEquals(0.25, chart.field, "the target's field, not the Sun's and the Moon's");
             assertTrue(layer.shown, "its layer would be turned on");
             SolarSystemSection section = new SolarSystemSection(
-                    new SolarTableSession(() -> oslo(WHEN), solar, SolarTable.sun()),
-                    new SolarTableSession(() -> oslo(WHEN), solar, SolarTable.moon()),
+                    new SolarTableSession(() -> oslo(WHEN), solar(), SolarTable.sun()),
+                    new SolarTableSession(() -> oslo(WHEN), solar(), SolarTable.moon()),
                     layer, layer, session, action, EN);
             assertNotNull(section.sun().centreOnChart);
             assertNotNull(section.moon().centreOnChart);
@@ -351,8 +345,8 @@ class CentreOnChartTest {
         onEdt(() -> {
             // The Controller's group: the switch's box and the button.
             SolarSystemSection section = new SolarSystemSection(
-                    new SolarTableSession(() -> oslo(WHEN), solar, SolarTable.sun()),
-                    new SolarTableSession(() -> oslo(WHEN), solar, SolarTable.moon()),
+                    new SolarTableSession(() -> oslo(WHEN), solar(), SolarTable.sun()),
+                    new SolarTableSession(() -> oslo(WHEN), solar(), SolarTable.moon()),
                     other, other, session, jupiterLayer, action, EN);
             javax.swing.JComponent group = section.jupiter().inController();
             javax.swing.JCheckBox box = (javax.swing.JCheckBox) find(group, "jupiterOnChart");

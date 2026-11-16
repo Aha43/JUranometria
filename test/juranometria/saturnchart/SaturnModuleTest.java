@@ -10,9 +10,9 @@ import juranometria.sky.Observer;
 import juranometria.solar.SaturnSystemService;
 import juranometria.solar.SaturnSystemService.SaturnObservation;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import static juranometria.solar.SharedServices.saturn;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -31,19 +31,13 @@ class SaturnModuleTest {
     /** The contract's card instant (#574): the 2026 Oslo day nearest the Earth. */
     private static final Observer OSLO = new Observer(59.91, 10.75,
             Instant.parse("2026-10-05T00:00:00Z"));
-    private static SaturnSystemService service;
-
-    @BeforeAll
-    static void load() {
-        service = SaturnSystemService.load();
-    }
 
     @Test
     void hiddenByDefaultItOffersNothingAndNeverReadsTheService() {
         AtomicInteger reads = new AtomicInteger();
         SaturnModule module = new SaturnModule(() -> OSLO, () -> {
             reads.incrementAndGet();
-            return service;
+            return saturn();
         }, () -> false);
         assertFalse(module.showing());
         assertEquals(List.of(), module.contributedGeometry());
@@ -53,12 +47,12 @@ class SaturnModuleTest {
 
     @Test
     void shownItOffersSaturnWhereTheServicePutsItWithItsFigureRingsAndTheRuledMinimum() {
-        SaturnModule module = new SaturnModule(() -> OSLO, () -> service, () -> false);
+        SaturnModule module = new SaturnModule(() -> OSLO, () -> saturn(), () -> false);
         module.showing(true);
         List<OverlayContribution> offered = module.contributedGeometry();
         assertEquals(8, offered.size(), "Saturn first, then the seven ruled moons");
         OverlayContribution.RingedBody saturn = (OverlayContribution.RingedBody) offered.get(0);
-        SaturnObservation s = service.observeSaturn(OSLO);
+        SaturnObservation s = saturn().observeSaturn(OSLO);
         assertEquals(SaturnModule.SATURN, saturn.identity());
         assertEquals("Saturn", saturn.accessibleName());
         assertEquals(s.astrometricJ2000(), saturn.at(), "the service's astrometric J2000 place");
@@ -78,10 +72,10 @@ class SaturnModuleTest {
 
     @Test
     void theSevenMoonsAreOfferedAsSatellitesOfSaturnWithTheTablesStates() {
-        SaturnModule module = new SaturnModule(() -> OSLO, () -> service, () -> false);
+        SaturnModule module = new SaturnModule(() -> OSLO, () -> saturn(), () -> false);
         module.showing(true);
         List<OverlayContribution> offered = module.contributedGeometry();
-        SaturnSystemService.Configuration c = service.observeMoons(OSLO);
+        SaturnSystemService.Configuration c = saturn().observeMoons(OSLO);
         for (int i = 0; i < 7; i++) {
             OverlayContribution.Satellite s = (OverlayContribution.Satellite) offered.get(1 + i);
             SaturnSystemService.MoonPlace m = c.moons().get(i);
@@ -112,7 +106,7 @@ class SaturnModuleTest {
     @Test
     void beforeTheMoonsYearsSaturnIsOfferedAlone() {
         SaturnModule module = new SaturnModule(
-                () -> OSLO.at(Instant.parse("1950-06-01T00:00:00Z")), () -> service, () -> false);
+                () -> OSLO.at(Instant.parse("1950-06-01T00:00:00Z")), () -> saturn(), () -> false);
         module.showing(true);
         List<OverlayContribution> offered = module.contributedGeometry();
         assertEquals(1, offered.size(), "1950: Saturn drawn, the moons have no numbers");
@@ -121,12 +115,12 @@ class SaturnModuleTest {
 
     @Test
     void thePoleIsTheFrameContractsNeverTheTablesOfDateAngle() {
-        SaturnModule module = new SaturnModule(() -> OSLO, () -> service, () -> false);
+        SaturnModule module = new SaturnModule(() -> OSLO, () -> saturn(), () -> false);
         module.showing(true);
         OverlayContribution.RingedBody saturn =
                 (OverlayContribution.RingedBody) module.contributedGeometry().get(0);
-        SaturnObservation s = service.observeSaturn(OSLO);
-        assertEquals(service.poleAngleJ2000Degrees(s), saturn.poleAngleDegrees(),
+        SaturnObservation s = saturn().observeSaturn(OSLO);
+        assertEquals(saturn().poleAngleJ2000Degrees(s), saturn.poleAngleDegrees(),
                 "derived in J2000 at Saturn's place");
         assertTrue(Math.abs(saturn.poleAngleDegrees() - s.poleAngleDegrees()) > 1e-6,
                 "and not the table's of-date angle: " + saturn.poleAngleDegrees()
@@ -135,9 +129,9 @@ class SaturnModuleTest {
         // degree (the #578 study, section C): the of-date angle is never drawn.
         double turn = 0.0;
         for (int year = 2000; year <= 2100; year += 10) {
-            SaturnObservation then = service.observeSaturnGeocentric(
+            SaturnObservation then = saturn().observeSaturnGeocentric(
                     Instant.parse(year + "-03-01T00:00:00Z"));
-            turn = Math.max(turn, Math.abs(service.poleAngleJ2000Degrees(then)
+            turn = Math.max(turn, Math.abs(saturn().poleAngleJ2000Degrees(then)
                     - then.poleAngleDegrees()));
         }
         assertTrue(turn > 0.1, "the frames part over the century: " + turn);
@@ -150,14 +144,14 @@ class SaturnModuleTest {
         Observer low = null;
         for (Instant t = Instant.parse("2026-12-01T12:00:00Z"); low == null;
                 t = t.plusSeconds(600)) {
-            double alt = service.observeSaturn(OSLO.at(t)).horizontal().altitudeDegrees();
+            double alt = saturn().observeSaturn(OSLO.at(t)).horizontal().altitudeDegrees();
             if (alt < -1.0 && alt > -4.0) {
                 low = OSLO.at(t);
             }
         }
         Observer at = low;
         boolean[] horizon = {false};
-        SaturnModule module = new SaturnModule(() -> at, () -> service, () -> horizon[0]);
+        SaturnModule module = new SaturnModule(() -> at, () -> saturn(), () -> horizon[0]);
         module.showing(true);
         assertFalse(((OverlayContribution.RingedBody) module.contributedGeometry().get(0))
                 .belowHorizon(), "with no horizon drawn the celestial chart draws it normally");
@@ -169,21 +163,21 @@ class SaturnModuleTest {
     @Test
     void outsideTheNumbersYearsNothingIsDrawn() {
         SaturnModule module = new SaturnModule(
-                () -> OSLO.at(Instant.parse("1899-12-31T00:00:00Z")), () -> service, () -> false);
+                () -> OSLO.at(Instant.parse("1899-12-31T00:00:00Z")), () -> saturn(), () -> false);
         module.showing(true);
         assertEquals(List.of(), module.contributedGeometry(), "1899: the table says why");
         SaturnModule inRange = new SaturnModule(
-                () -> OSLO.at(Instant.parse("1950-06-01T00:00:00Z")), () -> service, () -> false);
+                () -> OSLO.at(Instant.parse("1950-06-01T00:00:00Z")), () -> saturn(), () -> false);
         inRange.showing(true);
         assertEquals(1, inRange.contributedGeometry().size(), "1950: Saturn is drawn");
-        SaturnModule nobody = new SaturnModule(() -> null, () -> service, () -> false);
+        SaturnModule nobody = new SaturnModule(() -> null, () -> saturn(), () -> false);
         nobody.showing(true);
         assertEquals(List.of(), nobody.contributedGeometry(), "no observer, nothing");
     }
 
     @Test
     void theSwitchTellsItsFollowersOfRealChangesOnly() {
-        SaturnModule module = new SaturnModule(() -> OSLO, () -> service, () -> false);
+        SaturnModule module = new SaturnModule(() -> OSLO, () -> saturn(), () -> false);
         List<Boolean> heard = new ArrayList<>();
         module.onChange(heard::add);
         assertEquals(List.of(false), heard, "told the current state at once");

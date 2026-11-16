@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import juranometria.chart.SkyPosition;
@@ -13,6 +12,7 @@ import juranometria.solar.SolarSystemService;
 import juranometria.ui.language.InterfaceText;
 import juranometria.ui.placeandtime.PlaceAndTimeFurniture;
 
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -35,12 +35,6 @@ class SiderealSolverTest {
     private static final Observer OSLO = new Observer(59.91, 10.75, AUGUST);
     /** One second of time, as the sidereal turning of the circle in a UTC day; the whole-second answer adds one more. */
     private static final double TWO_SECONDS_DEGREES = 2.0 * 360.0 / 86400.0;
-    private static SolarSystemService service;
-
-    @BeforeAll
-    static void load() {
-        service = SolarSystemService.load();
-    }
 
     private static double lst(Instant at) {
         return SiderealSolver.localSiderealTimeDegrees(at, OSLO.eastLongitudeDegrees());
@@ -143,7 +137,7 @@ class SiderealSolverTest {
     @Test
     void theMoonIsIteratedToTheSecondOnItsTopocentricPlace() {
         SiderealSolver.Culmination transit = SiderealSolver.nextUpperCulmination(OSLO,
-                at -> ((SolarSystemService.MoonObservation) service.observe(
+                at -> ((SolarSystemService.MoonObservation) solar().observe(
                         SolarSystemService.Body.MOON, OSLO.at(at))).apparentOfDate());
         assertNotNull(transit, "the Moon's culmination settles within the bound");
         assertTrue(transit.rounds() >= 2 && transit.rounds() <= SiderealSolver.ROUNDS,
@@ -151,7 +145,7 @@ class SiderealSolverTest {
         assertFalse(transit.instant().isBefore(AUGUST));
         assertTrue(ChronoUnit.HOURS.between(AUGUST, transit.instant()) < 26,
                 "the next lunar transit, under a day and an hour on");
-        SkyPosition then = ((SolarSystemService.MoonObservation) service.observe(
+        SkyPosition then = ((SolarSystemService.MoonObservation) solar().observe(
                 SolarSystemService.Body.MOON, OSLO.at(transit.instant()))).apparentOfDate();
         assertTrue(Math.abs(signed(lst(transit.instant()) - then.raDegrees()))
                 < TWO_SECONDS_DEGREES, "re-read at the answer, the Moon is on the meridian");

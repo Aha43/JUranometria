@@ -30,12 +30,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class MoonMutationTest {
 
-    private static SolarSystemService service;
     private static Row row;
 
     @BeforeAll
     static void load() throws IOException {
-        service = MoonReferenceVectorTest.service();
         row = MoonReferenceVectorTest.rows("named-oslo").stream()
                 .filter(r -> r.when().equals(Instant.parse("2026-06-21T10:00:00Z")))
                 .findFirst().orElseThrow();
@@ -48,8 +46,8 @@ class MoonMutationTest {
     @Test
     void aGeocentricPlaceFailsTheAstrometricTargetByAWholeDegree() {
         // The Moon's parallax reaches a degree; the station is not optional.
-        TimeScales.Epoch epoch = service.timeScales().tt(row.when());
-        SkyPosition geocentric = service.geocentricMoon(epoch.jdTt()).astrometricJ2000();
+        TimeScales.Epoch epoch = SharedServices.solar().timeScales().tt(row.when());
+        SkyPosition geocentric = SharedServices.solar().geocentricMoon(epoch.jdTt()).astrometricJ2000();
         double error = MoonReferenceVectorTest.arcsec(geocentric, row.ra(), row.dec());
         assertTrue(error > 1800.0, "a geocentric Moon misses Horizons'"
                 + " topocentric one by over half a degree at this hour: " + error + "″");
@@ -58,7 +56,7 @@ class MoonMutationTest {
     @Test
     void readingTheCivilInstantAsTerrestrialTimeFailsTheAstrometricTarget() {
         double ttMinusUtc = 69.184; // what the rival would forget to add
-        MoonObservation rival = (MoonObservation) service.observe(Body.MOON,
+        MoonObservation rival = (MoonObservation) SharedServices.solar().observe(Body.MOON,
                 MoonReferenceVectorTest.observerAt(row)
                         .at(row.when().minusSeconds((long) ttMinusUtc)));
         double error = MoonReferenceVectorTest.arcsec(rival.astrometricJ2000(),
@@ -76,7 +74,7 @@ class MoonMutationTest {
                 .filter(r -> r.when().equals(Instant.parse("1972-01-01T00:00:00Z")))
                 .findFirst().orElseThrow();
         MoonObservation o = MoonReferenceVectorTest.observe(leap);
-        TimeScales.Epoch epoch = service.timeScales().tt(leap.when());
+        TimeScales.Epoch epoch = SharedServices.solar().timeScales().tt(leap.when());
         SkyPosition unaberrated = SkyFrame.toOfDate(o.astrometricJ2000(),
                 epoch.jdTt());
         double error = MoonReferenceVectorTest.arcsec(unaberrated,
@@ -144,7 +142,7 @@ class MoonMutationTest {
                 continue;
             }
             SolarSystemService.SunObservation sun = (SolarSystemService.SunObservation)
-                    service.observe(Body.SUN, MoonReferenceVectorTest.observerAt(r));
+                    SharedServices.solar().observe(Body.SUN, MoonReferenceVectorTest.observerAt(r));
             double rival = SolarSystemService.brightLimbAngle(
                     sun.astrometricJ2000(), o.astrometricJ2000());
             worst = Math.max(worst, Math.abs(MoonReferenceVectorTest.wrapped(

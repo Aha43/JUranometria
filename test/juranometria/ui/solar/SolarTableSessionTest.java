@@ -5,17 +5,16 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import juranometria.sky.Observer;
-import juranometria.solar.SolarSystemService;
 import juranometria.solar.TimeRange;
 import juranometria.ui.solar.SolarTableSession.Mode;
 import juranometria.ui.solar.SolarTableSession.Outcome;
 import juranometria.ui.solar.SolarTableSession.Query;
 import juranometria.ui.solar.SolarTableSession.Result;
 
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -36,17 +35,10 @@ class SolarTableSessionTest {
         return new Observer(59.91, 10.75, java.time.Instant.parse("2026-06-21T10:00:00Z"));
     }
 
-    private static SolarSystemService service;
-
-    @BeforeAll
-    static void load() {
-        service = SolarSystemService.load();
-    }
-
     @Test
     void nothingIsComputedUntilAQueryIsApplied() {
         Observer[] observer = {oslo()};
-        SolarTableSession session = new SolarTableSession(() -> observer[0], service,
+        SolarTableSession session = new SolarTableSession(() -> observer[0], solar(),
                 SolarTable.sun());
         assertEquals(0, session.computations(), "building asks the service nothing");
         assertFalse(session.result().applied());
@@ -67,7 +59,7 @@ class SolarTableSessionTest {
     @Test
     void updateRecomputesTheAppliedQueryOverAFreshObserver() {
         Observer[] observer = {oslo()};
-        SolarTableSession session = new SolarTableSession(() -> observer[0], service,
+        SolarTableSession session = new SolarTableSession(() -> observer[0], solar(),
                 SolarTable.sun());
         session.update();
         assertEquals(Mode.INSTANT, session.result().query().mode(),
@@ -86,7 +78,7 @@ class SolarTableSessionTest {
     @Test
     void aRangeAnswersItsRowsAndEveryRefusalIsData() {
         Observer observer = oslo();
-        SolarTableSession session = new SolarTableSession(() -> observer, service,
+        SolarTableSession session = new SolarTableSession(() -> observer, solar(),
                 SolarTable.moon());
         session.apply(Query.range(1, 2));
         assertEquals(Outcome.ROWS, session.result().outcome());
@@ -110,7 +102,7 @@ class SolarTableSessionTest {
         assertTrue(session.result().rowsAsked() > TimeRange.MAX_ROWS);
 
         SolarTableSession late = new SolarTableSession(
-                () -> observer.at(Instant.parse("2100-12-28T00:00:00Z")), service,
+                () -> observer.at(Instant.parse("2100-12-28T00:00:00Z")), solar(),
                 SolarTable.moon());
         late.apply(Query.range(1, 2));
         assertEquals(Outcome.REFUSED_INTERVAL, late.result().outcome());
@@ -121,7 +113,7 @@ class SolarTableSessionTest {
     @Test
     void anAbsentObserverAnswersNothingAndTwoBodiesAreIndependent() {
         Observer[] observer = {null};
-        SolarTableSession sun = new SolarTableSession(() -> observer[0], service,
+        SolarTableSession sun = new SolarTableSession(() -> observer[0], solar(),
                 SolarTable.sun());
         sun.apply(Query.instant());
         assertEquals(Outcome.OBSERVER_ABSENT, sun.result().outcome());
@@ -129,7 +121,7 @@ class SolarTableSessionTest {
         assertEquals(0, sun.computations(), "nothing to compute for");
 
         observer[0] = oslo();
-        SolarTableSession moon = new SolarTableSession(() -> observer[0], service,
+        SolarTableSession moon = new SolarTableSession(() -> observer[0], solar(),
                 SolarTable.moon());
         moon.apply(Query.instant());
         assertEquals(1, moon.computations());
@@ -140,7 +132,7 @@ class SolarTableSessionTest {
     @Test
     void releasingASubscriptionLetsGoAndTwiceIsOnce() {
         SolarTableSession session = new SolarTableSession(SolarTableSessionTest::oslo,
-                service, SolarTable.sun());
+                solar(), SolarTable.sun());
         SolarTableSession.Subscription following = session.onChange(r -> { });
         assertEquals(1, session.subscribers());
         following.cancel();

@@ -7,7 +7,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import juranometria.app.Atlas;
 import juranometria.chart.ChartScene;
@@ -33,6 +32,8 @@ import juranometria.solar.SolarSystemService;
 import juranometria.solarchart.SolarSystemModule;
 import juranometria.ui.language.InterfaceText;
 import juranometria.ui.language.PageText;
+import static juranometria.solar.SharedServices.jovian;
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -63,14 +64,6 @@ class SolarSystemLabelsEmphasisTest {
     /** Espenak's 2012 Venus transit, to the hour (venus-events.txt): Venus's name refused inside the Sun's ink at 2° (#514). */
     private static final Observer OSLO_TRANSIT = new Observer(59.913, 10.752,
             Instant.parse("2012-06-06T01:00:00Z"));
-    private static SolarSystemService solar;
-    private static JovianSystemService jovian;
-
-    @BeforeAll
-    static void load() {
-        solar = SolarSystemService.load();
-        jovian = JovianSystemService.load();
-    }
 
     private static ChartScene page(SkyPosition centre, double field) {
         return Atlas.assembler().assemble(new ChartViewState(centre, field, 8.0, null, null),
@@ -79,7 +72,7 @@ class SolarSystemLabelsEmphasisTest {
 
     /** The Sun, the Moon and Venus, through the production module, the horizon drawn. */
     private static OverlayRegistry solarSystem(Observer at, boolean horizon) {
-        SolarSystemModule module = new SolarSystemModule(() -> at, () -> solar, () -> horizon);
+        SolarSystemModule module = new SolarSystemModule(() -> at, () -> solar(), () -> horizon);
         module.sunShowing(true);
         module.moonShowing(true);
         module.venusShowing(true);
@@ -89,7 +82,7 @@ class SolarSystemLabelsEmphasisTest {
     }
 
     private static OverlayRegistry jupiterAndMoons(Observer at) {
-        JovianModule module = new JovianModule(() -> at, () -> jovian, () -> false);
+        JovianModule module = new JovianModule(() -> at, () -> jovian(), () -> false);
         module.showing(true);
         OverlayRegistry registry = new OverlayRegistry();
         registry.offer(JovianModule.ID, module::contributedGeometry);
@@ -97,7 +90,7 @@ class SolarSystemLabelsEmphasisTest {
     }
 
     private static SkyPosition sunAt(Observer at) {
-        return ((SolarSystemService.SunObservation) solar.observe(
+        return ((SolarSystemService.SunObservation) solar().observe(
                 SolarSystemService.Body.SUN, at)).astrometricJ2000();
     }
 
@@ -247,7 +240,7 @@ class SolarSystemLabelsEmphasisTest {
 
     @Test
     void onTheClosePageJupitersMoonsNamesTakeTheRedWithJupiters() {
-        JovianSystemService.JupiterObservation jupiter = jovian.observeJupiter(OSLO_TRIPLE);
+        JovianSystemService.JupiterObservation jupiter = jovian().observeJupiter(OSLO_TRIPLE);
         ChartScene scene = page(jupiter.astrometricJ2000(),
                 ChartViewState.normalMinimumFieldDegrees());
         OverlayRegistry registry = jupiterAndMoons(OSLO_TRIPLE);
@@ -285,7 +278,7 @@ class SolarSystemLabelsEmphasisTest {
         // Venus's name lies inside the Sun's ink, so the name is refused -
         // and the class does not force it.
         Observer at = OSLO_TRANSIT;
-        SolarSystemModule module = new SolarSystemModule(() -> at, () -> solar, () -> false);
+        SolarSystemModule module = new SolarSystemModule(() -> at, () -> solar(), () -> false);
         module.sunShowing(true);
         module.venusShowing(true);
         OverlayRegistry registry = new OverlayRegistry();
@@ -317,7 +310,7 @@ class SolarSystemLabelsEmphasisTest {
         chart[0].toggleEmphasis(ChartStructure.SOLAR_SYSTEM_LABELS);
         assertEquals(Set.of(), chart[0].emphasizedSet(), "an unavailable ask settles");
         javax.swing.SwingUtilities.invokeAndWait(() -> {
-            module[0] = host[0].attach(new SolarSystemModule(() -> OSLO_EQUINOX, () -> solar,
+            module[0] = host[0].attach(new SolarSystemModule(() -> OSLO_EQUINOX, () -> solar(),
                     () -> false));
             module[0].sunShowing(true);
         });
@@ -352,7 +345,7 @@ class SolarSystemLabelsEmphasisTest {
             chart[0] = new ChartComponent(Atlas.assembler(), ENGLISH);
             chart[0].setSize(900, 700);
             chart[0].setViewState(new ChartViewState(sunAt(OSLO_EQUINOX), 120.0, 8.0, null, null));
-            SolarSystemModule module = new SolarSystemModule(() -> OSLO_EQUINOX, () -> solar,
+            SolarSystemModule module = new SolarSystemModule(() -> OSLO_EQUINOX, () -> solar(),
                     () -> false);
             module.sunShowing(true);
             module.moonShowing(true);

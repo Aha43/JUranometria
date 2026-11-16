@@ -5,7 +5,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import juranometria.app.Atlas;
@@ -29,6 +28,7 @@ import juranometria.solar.JovianSystemService;
 import juranometria.ui.language.InterfaceText;
 import juranometria.ui.language.PageText;
 
+import static juranometria.solar.SharedServices.jovian;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -49,12 +49,6 @@ class JovianMoonsInkTest {
     private static final ChartRenderer RENDERER = new ChartRenderer(StarSizePolicy.DEFAULT, ENGLISH);
     private static final Observer TRIPLE = new Observer(59.913, 10.752,
             Instant.parse("2026-12-11T22:45:00Z"));
-    private static JovianSystemService service;
-
-    @BeforeAll
-    static void load() {
-        service = JovianSystemService.load();
-    }
 
     private static ChartScene page(SkyPosition centre, double field) {
         return Atlas.assembler().assemble(new ChartViewState(centre, field, 8.0, null, null),
@@ -68,7 +62,7 @@ class JovianMoonsInkTest {
     }
 
     private static List<OverlayContribution> module(Observer at) {
-        JovianModule module = new JovianModule(() -> at, () -> service, () -> false);
+        JovianModule module = new JovianModule(() -> at, () -> jovian(), () -> false);
         module.showing(true);
         return module.contributedGeometry();
     }
@@ -105,7 +99,7 @@ class JovianMoonsInkTest {
     @Test
     void theTripleTransitAtTheNormalMinimumKeepsItsThreeMarksInFrontOfJupiter() {
         List<OverlayContribution> offered = module(TRIPLE);
-        JovianSystemService.Configuration c = service.observeMoons(TRIPLE);
+        JovianSystemService.Configuration c = jovian().observeMoons(TRIPLE);
         ChartScene scene = page(c.jupiter().astrometricJ2000(),
                 ChartViewState.normalMinimumFieldDegrees());
         List<ReferenceInk.BodyPlacement> all = placed(scene, offering(offered),
@@ -242,7 +236,7 @@ class JovianMoonsInkTest {
                 t.isBefore(Instant.parse("2027-01-01T00:00:00Z")); t = t.plusSeconds(6 * 3600 * 7)) {
             Observer at = new Observer(59.913, 10.752, t);
             List<OverlayContribution> offered = module(at);
-            ChartScene scene = page(service.observeJupiter(at).astrometricJ2000(),
+            ChartScene scene = page(jovian().observeJupiter(at).astrometricJ2000(),
                     ChartViewState.normalMinimumFieldDegrees());
             List<ReferenceInk.BodyPlacement> all = placed(scene, offering(offered),
                     ChartPalette.WHITE_PAPER, ENGLISH);
@@ -278,7 +272,7 @@ class JovianMoonsInkTest {
     @Test
     void eachMoonIsSpokenWithItsStateAndAsASymbolInBothLanguages() {
         List<OverlayContribution> offered = module(TRIPLE);
-        JovianSystemService.Configuration c = service.observeMoons(TRIPLE);
+        JovianSystemService.Configuration c = jovian().observeMoons(TRIPLE);
         ChartScene scene = page(c.jupiter().astrometricJ2000(), 1.0);
         String en = ChartComponent.withBodies("Chart.", placed(scene, offering(offered),
                 ChartPalette.WHITE_PAPER, ENGLISH), ENGLISH);

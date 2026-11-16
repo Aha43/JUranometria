@@ -7,6 +7,17 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**The test suite reads each planetary service once (#708).** The whole
+suite runs in one process, and seventy-five test classes each read their
+own planetary service and kept it until the run ended: about 3.6 GB
+held under the 4 GiB heap the CI runners happened to give it. The
+computational tests now share one instance of each service, as the
+application does; a new test refuses a static service, pack or kernel
+holder anywhere else, and another holds the shared services to
+answering by the question alone, whatever was asked before. `make test`
+now states its heap, `-Xmx4g`; the suite ends holding about 0.8 GB of
+it. Nothing the application does changes.
+
 ## [6.6.0] - 2026-11-15
 
 **The meteor-shower panel, photographed and audited (#718).** The

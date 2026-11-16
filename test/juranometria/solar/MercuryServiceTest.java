@@ -3,13 +3,13 @@ package juranometria.solar;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import juranometria.sky.Observer;
 import juranometria.solar.MercuryService.LimbConditioning;
 import juranometria.solar.MercuryService.MercuryObservation;
 import juranometria.solar.MercuryService.Phase;
 import juranometria.solar.spk.Vector3;
+import static juranometria.solar.SharedServices.mercury;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -26,57 +26,51 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class MercuryServiceTest {
 
-    private static MercuryService service;
     /** Oslo at the 2026 greatest eastern elongation (Espenak, mercury-events.txt). */
     private static final Observer OSLO = new Observer(59.91, 10.75,
             Instant.parse("2026-02-19T18:00:00Z"));
 
-    @BeforeAll
-    static void load() {
-        service = MercuryService.load();
-    }
-
     @Test
     void theIntervalIsThePacksAndOutsideItIsRefusedByName() {
-        assertEquals(java.time.LocalDate.of(1900, 1, 1), service.firstDay());
-        assertEquals(java.time.LocalDate.of(2100, 12, 31), service.lastDay());
-        assertNotNull(service.observe(OSLO.at(Instant.parse("1900-01-01T00:00:00Z"))));
-        assertNotNull(service.observe(OSLO.at(Instant.parse("2100-12-31T23:59:59Z"))));
+        assertEquals(java.time.LocalDate.of(1900, 1, 1), mercury().firstDay());
+        assertEquals(java.time.LocalDate.of(2100, 12, 31), mercury().lastDay());
+        assertNotNull(mercury().observe(OSLO.at(Instant.parse("1900-01-01T00:00:00Z"))));
+        assertNotNull(mercury().observe(OSLO.at(Instant.parse("2100-12-31T23:59:59Z"))));
         for (String outside : new String[] {"1899-12-31T23:59:59Z", "2101-01-01T00:00:00Z"}) {
             IllegalArgumentException refused = assertThrows(IllegalArgumentException.class,
-                    () -> service.observe(OSLO.at(Instant.parse(outside))));
+                    () -> mercury().observe(OSLO.at(Instant.parse(outside))));
             assertTrue(refused.getMessage().contains("Mercury is computed for civil dates from"
                     + " 1900-01-01 to 2100-12-31"), refused.getMessage());
             assertThrows(IllegalArgumentException.class,
-                    () -> service.observeGeocentric(Instant.parse(outside)));
+                    () -> mercury().observeGeocentric(Instant.parse(outside)));
         }
     }
 
     @Test
     void theGeocentricIntermediateHasNoHorizonAndTheObserversHasOne() {
-        assertNull(service.observeGeocentric(OSLO.instant()).horizontal());
-        assertNotNull(service.observe(OSLO).horizontal());
+        assertNull(mercury().observeGeocentric(OSLO.instant()).horizontal());
+        assertNotNull(mercury().observe(OSLO).horizontal());
     }
 
     @Test
     void theSameAnswerForTheSameObserverAlways() {
-        assertEquals(service.observe(OSLO), service.observe(OSLO));
-        assertEquals(service.observe(OSLO), MercuryService.load().observe(OSLO));
+        assertEquals(mercury().observe(OSLO), mercury().observe(OSLO));
+        assertEquals(mercury().observe(OSLO), MercuryService.load().observe(OSLO));
     }
 
     @Test
     void theDeflectionIsJupitersAndVenussFormulaExactly() {
         JovianSystemService jovian = JovianSystemService.load();
         VenusService venus = VenusService.load();
-        double et = service.timeScales().tt(OSLO.instant()).secondsPastJ2000();
+        double et = mercury().timeScales().tt(OSLO.instant()).secondsPastJ2000();
         Vector3 observer = new Vector3(1.2e8, -8.1e7, -3.5e7);
         for (Vector3 range : List.of(new Vector3(-1.4e8, 2.0e7, 1.1e7),
                 new Vector3(3.0e7, 9.0e7, -2.0e7), new Vector3(1.0e8, 1.0e8, 4.0e7))) {
             assertEquals(jovian.deflectedBySun(range, observer, et),
-                    service.deflectedBySun(range, observer, et),
+                    mercury().deflectedBySun(range, observer, et),
                     "one formula, three services");
             assertEquals(venus.deflectedBySun(range, observer, et),
-                    service.deflectedBySun(range, observer, et));
+                    mercury().deflectedBySun(range, observer, et));
         }
     }
 
@@ -109,7 +103,7 @@ class MercuryServiceTest {
     @Test
     void the2019TransitIsInFrontOfTheSunAndItsLimbIsNotWellDefined() {
         // NASA/GSFC: greatest transit 2019-11-11 15:20 UT (mercury-events.txt).
-        MercuryObservation o = service.observe(OSLO.at(Instant.parse("2019-11-11T15:20:00Z")));
+        MercuryObservation o = mercury().observe(OSLO.at(Instant.parse("2019-11-11T15:20:00Z")));
         assertEquals(Phase.IN_FRONT_OF_SUN, o.phase());
         assertTrue(o.elongationDegrees() * 3600.0 < o.sunAngularRadiusArcseconds(),
                 "Mercury's centre within the Sun's disc");
@@ -118,7 +112,7 @@ class MercuryServiceTest {
 
     @Test
     void theGreatestEasternElongationOf2026IsHalfLitInTheEveningSky() {
-        MercuryObservation o = service.observe(OSLO);
+        MercuryObservation o = mercury().observe(OSLO);
         assertEquals(Phase.NEAR_HALF_LIT, o.phase());
         assertEquals(SolarSystemService.Side.EAST_OF_SUN, o.side());
         assertEquals(LimbConditioning.WELL_DEFINED, o.brightLimbConditioning());
@@ -130,10 +124,10 @@ class MercuryServiceTest {
     void aRangeIsTheInstantAnswerAtEverySample() {
         TimeRange range = new TimeRange(Instant.parse("2026-03-04T00:00:00Z"),
                 Instant.parse("2026-03-10T00:00:00Z"), Duration.ofDays(1));
-        List<MercuryService.Row> rows = service.observe(OSLO, range);
+        List<MercuryService.Row> rows = mercury().observe(OSLO, range);
         assertEquals(7, rows.size());
         for (MercuryService.Row row : rows) {
-            assertEquals(service.observe(OSLO.at(row.sample().instant())), row.observation());
+            assertEquals(mercury().observe(OSLO.at(row.sample().instant())), row.observation());
         }
     }
 
@@ -143,7 +137,7 @@ class MercuryServiceTest {
         // same pack; loading Mercury's changes nothing it says.
         Observer venusOslo = new Observer(59.91, 10.75, Instant.parse("2026-08-15T06:00:00Z"));
         VenusService.VenusObservation before = VenusService.load().observe(venusOslo);
-        service.observe(OSLO);
+        mercury().observe(OSLO);
         assertEquals(before, VenusService.load().observe(venusOslo));
         assertEquals(VenusService.Phase.NEAR_HALF_LIT, before.phase());
     }

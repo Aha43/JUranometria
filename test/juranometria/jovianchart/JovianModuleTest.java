@@ -4,7 +4,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import juranometria.module.InkRole;
@@ -14,6 +13,7 @@ import juranometria.solar.JovianSystemService;
 import juranometria.solar.JovianSystemService.JupiterObservation;
 import juranometria.tool.JovianChartGeometry;
 
+import static juranometria.solar.SharedServices.jovian;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -28,19 +28,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class JovianModuleTest {
 
-    private static JovianSystemService service;
-
-    @BeforeAll
-    static void load() {
-        service = JovianSystemService.load();
-    }
-
     private static Observer oslo(String instant) {
         return new Observer(59.91, 10.75, Instant.parse(instant));
     }
 
     private static JovianModule module(Observer[] at, boolean[] horizon) {
-        return new JovianModule(() -> at[0], () -> service, () -> horizon[0]);
+        return new JovianModule(() -> at[0], () -> jovian(), () -> horizon[0]);
     }
 
     @Test
@@ -49,7 +42,7 @@ class JovianModuleTest {
         JovianModule module = new JovianModule(() -> oslo("2026-12-11T22:45:00Z"),
                 () -> {
                     loads[0]++;
-                    return service;
+                    return jovian();
                 }, () -> true);
         assertFalse(module.showing());
         assertEquals(List.of(), module.contributedGeometry());
@@ -64,7 +57,7 @@ class JovianModuleTest {
         List<OverlayContribution> offered = module.contributedGeometry();
         assertEquals(5, offered.size(), "Jupiter first, then its four moons (#485)");
         OverlayContribution.OblateBody jupiter = (OverlayContribution.OblateBody) offered.get(0);
-        JupiterObservation expected = service.observeJupiter(at);
+        JupiterObservation expected = jovian().observeJupiter(at);
         assertEquals(JovianModule.JUPITER, jupiter.identity());
         assertEquals(expected.astrometricJ2000(), jupiter.at());
         assertEquals(expected.equatorialDiameterArcseconds(), jupiter.equatorialDiameterArcseconds());
@@ -81,11 +74,11 @@ class JovianModuleTest {
         double widest = 0.0;
         for (int year = 1900; year <= 2100; year += 10) {
             Observer at = oslo(year + "-03-01T00:00:00Z");
-            JupiterObservation j = service.observeJupiter(at);
-            double jd = service.timeScales().tt(j.instant()).jdTt();
+            JupiterObservation j = jovian().observeJupiter(at);
+            double jd = jovian().timeScales().tt(j.instant()).jdTt();
             double study = JovianChartGeometry.positionAngleJ2000(j.astrometricJ2000(),
-                    JovianChartGeometry.pole(service.pack().constants(), jd));
-            double production = service.poleAngleJ2000Degrees(j);
+                    JovianChartGeometry.pole(jovian().pack().constants(), jd));
+            double production = jovian().poleAngleJ2000Degrees(j);
             assertEquals(study, production, 1e-9, "the study's derivation, at " + year);
             double turned = Math.abs(((production - j.poleAngleDegrees()) + 540.0) % 360.0 - 180.0);
             widest = Math.max(widest, turned);
@@ -98,7 +91,7 @@ class JovianModuleTest {
     void belowTheHorizonOnlyWhileTheHorizonIsDrawn() {
         // 12:20 UTC on 1 December 2026 at Oslo: Jupiter is below the horizon.
         Observer at = oslo("2026-12-01T12:20:00Z");
-        assertTrue(service.observeJupiter(at).horizontal().altitudeDegrees() < 0.0);
+        assertTrue(jovian().observeJupiter(at).horizontal().altitudeDegrees() < 0.0);
         boolean[] horizon = {true};
         JovianModule module = module(new Observer[] {at}, horizon);
         module.showing(true);
@@ -116,7 +109,7 @@ class JovianModuleTest {
         module.showing(true);
         List<OverlayContribution> offered = module.contributedGeometry();
         assertEquals(5, offered.size(), "Jupiter, then Io, Europa, Ganymede and Callisto");
-        JovianSystemService.Configuration c = service.observeMoons(at);
+        JovianSystemService.Configuration c = jovian().observeMoons(at);
         for (int i = 0; i < 4; i++) {
             OverlayContribution.Satellite moon = (OverlayContribution.Satellite) offered.get(i + 1);
             JovianSystemService.MoonPlace expected = c.moons().get(i);
@@ -160,6 +153,6 @@ class JovianModuleTest {
         assertEquals(List.of(false, true, false), heard);
         assertThrows(IllegalArgumentException.class, () -> module.onChange(null));
         assertThrows(IllegalArgumentException.class,
-                () -> new JovianModule(null, () -> service, () -> true));
+                () -> new JovianModule(null, () -> jovian(), () -> true));
     }
 }

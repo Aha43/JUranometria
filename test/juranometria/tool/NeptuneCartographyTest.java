@@ -15,6 +15,7 @@ import juranometria.solar.NeptuneService.MoonPlace;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import static juranometria.solar.SharedServices.neptune;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -33,17 +34,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class NeptuneCartographyTest {
 
-    private static NeptuneService service;
-
     @BeforeAll
     static void load() {
-        service = NeptuneService.load();
-        NeptuneCartographyStudyMain.service = service;
+        NeptuneCartographyStudyMain.service = neptune();
     }
 
     @Test
     void everyBodyIsDrawnAtItsOwnJ2000PlaceThroughThePagesProjection() {
-        Configuration c = service.observeMoonsGeocentric(NeptuneCartographyStudyMain.OPPOSITION_2026);
+        Configuration c = neptune().observeMoonsGeocentric(NeptuneCartographyStudyMain.OPPOSITION_2026);
         DrawnPage page = DrawnPage.of(SaturnCartographyStudyMain.scene(c.neptune().astrometricJ2000(), 0.25,
                 NeptuneCartographyStudyMain.PAGE_W, NeptuneCartographyStudyMain.PAGE_H));
         Projection projection = page.projection();
@@ -64,7 +62,7 @@ class NeptuneCartographyTest {
     @Test
     void aMoonBehindNeptuneIsNeverDrawnAndOneOnTheMarkIsNotDrawnWithoutTheFloor() {
         // Horizons codes Triton U (behind, in the shadow) from Oslo on 2044-09-26.
-        Configuration behind = service.observeMoons(NeptuneCartographyStudyMain.OSLO.at(
+        Configuration behind = neptune().observeMoons(NeptuneCartographyStudyMain.OSLO.at(
                 NeptuneCartographyStudyMain.TRITON_BEHIND_IN_SHADOW));
         assertEquals(DiscRelation.BEHIND, behind.moon(NeptuneService.Moon.TRITON).discRelation());
         double per1 = JovianCartographyStudyMain.pxPerArcsec(1.0, 900, 700);
@@ -73,7 +71,7 @@ class NeptuneCartographyTest {
                     NeptuneCartographyStudyMain.decide(floor, behind, per1).get(0));
         }
         // At 8° Triton stands on Neptune's 6 px mark at the 2026 opposition; Nereid, far out, does not.
-        Configuration close = service.observeMoonsGeocentric(NeptuneCartographyStudyMain.OPPOSITION_2026);
+        Configuration close = neptune().observeMoonsGeocentric(NeptuneCartographyStudyMain.OPPOSITION_2026);
         double per8 = JovianCartographyStudyMain.pxPerArcsec(8.0, 900, 700);
         List<NeptuneCartographyStudyMain.Decision> at8 = NeptuneCartographyStudyMain.decide(false, close, per8);
         assertEquals(NeptuneCartographyStudyMain.Decision.AT_NEPTUNE, at8.get(NeptuneService.Moon.TRITON.ordinal()));

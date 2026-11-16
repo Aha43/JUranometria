@@ -17,6 +17,7 @@ import juranometria.solar.UranusService.UranusObservation;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import static juranometria.solar.SharedServices.uranus;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -33,17 +34,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class UranusCartographyTest {
 
-    private static UranusService service;
-
     @BeforeAll
     static void load() {
-        service = UranusService.load();
-        UranusCartographyStudyMain.service = service;
+        UranusCartographyStudyMain.service = uranus();
     }
 
     @Test
     void everyBodyIsDrawnAtItsOwnJ2000PlaceThroughThePagesProjection() {
-        Configuration c = service.observeMoonsGeocentric(UranusCartographyStudyMain.OPPOSITION_2026);
+        Configuration c = uranus().observeMoonsGeocentric(UranusCartographyStudyMain.OPPOSITION_2026);
         DrawnPage page = DrawnPage.of(SaturnCartographyStudyMain.scene(c.uranus().astrometricJ2000(), 0.25,
                 UranusCartographyStudyMain.PAGE_W, UranusCartographyStudyMain.PAGE_H));
         Projection projection = page.projection();
@@ -64,7 +62,7 @@ class UranusCartographyTest {
     @Test
     void aMoonBehindUranusIsNeverDrawnAndOneOnTheMarkIsNotDrawnWithoutTheFloor() {
         // Horizons codes Miranda U (behind, in the shadow) from Oslo on 2005-03-19.
-        Configuration behind = service.observeMoons(UranusCartographyStudyMain.OSLO.at(
+        Configuration behind = uranus().observeMoons(UranusCartographyStudyMain.OSLO.at(
                 UranusCartographyStudyMain.MIRANDA_BEHIND_IN_SHADOW));
         assertEquals(DiscRelation.BEHIND, behind.moon(UranusService.Moon.MIRANDA).discRelation());
         double per1 = JovianCartographyStudyMain.pxPerArcsec(1.0, 900, 700);
@@ -73,7 +71,7 @@ class UranusCartographyTest {
                     UranusCartographyStudyMain.decide(floor, behind, per1).get(0));
         }
         // At 8° every moon stands on Uranus's 6 px mark at the 2026 opposition.
-        Configuration close = service.observeMoonsGeocentric(UranusCartographyStudyMain.OPPOSITION_2026);
+        Configuration close = uranus().observeMoonsGeocentric(UranusCartographyStudyMain.OPPOSITION_2026);
         double per8 = JovianCartographyStudyMain.pxPerArcsec(8.0, 900, 700);
         for (UranusCartographyStudyMain.Decision d : UranusCartographyStudyMain.decide(false, close, per8)) {
             assertEquals(UranusCartographyStudyMain.Decision.AT_URANUS, d);
@@ -91,7 +89,7 @@ class UranusCartographyTest {
     void uranusNeverReachesTheMarkAndTheEpsilonRingLeavesItOnlyAtTheNarrowestField() {
         double at1 = JovianCartographyStudyMain.pxPerArcsec(1.0, 900, 700);
         // Uranus's largest disc in the weekly Oslo matrix (measurements.md, 4.07631″, 2051-03-13).
-        UranusObservation largest = service.observeGeocentric(Instant.parse("2051-03-13T00:00:00Z"));
+        UranusObservation largest = uranus().observeGeocentric(Instant.parse("2051-03-13T00:00:00Z"));
         assertTrue(largest.equatorialDiameterArcseconds() * at1 / 0.25 < UranusCartographyStudyMain.MARK_PX,
                 "under the mark even at 0.25°");
         double ring = UranusCartographyStudyMain.ringDiameterArcseconds(largest,

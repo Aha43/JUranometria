@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import juranometria.sky.Observer;
 import juranometria.solar.spk.Vector3;
 
+import static juranometria.solar.SharedServices.uranus;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -22,17 +23,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class UranusServiceTest {
 
-    private static final UranusService SERVICE = UranusService.load();
     private static final Observer OSLO = new Observer(59.91, 10.75, Instant.parse("2026-10-27T12:00:00Z"));
 
     @Test
     void theDeflectionIsJupitersFormulaExactly() {
         JovianSystemService jovian = JovianSystemService.load();
-        double et = SERVICE.timeScales().tt(OSLO.instant()).secondsPastJ2000();
+        double et = uranus().timeScales().tt(OSLO.instant()).secondsPastJ2000();
         Vector3 observer = new Vector3(1.2e8, -8.1e7, -3.5e7);
         for (Vector3 range : List.of(new Vector3(-1.4e8, 2.0e7, 1.1e7),
                 new Vector3(3.0e7, 9.0e7, -2.0e7), new Vector3(1.0e9, 2.5e9, 4.0e8))) {
-            assertEquals(jovian.deflectedBySun(range, observer, et), SERVICE.deflectedBySun(range, observer, et),
+            assertEquals(jovian.deflectedBySun(range, observer, et), uranus().deflectedBySun(range, observer, et),
                     "one formula, every planet's service");
         }
     }
@@ -43,15 +43,15 @@ class UranusServiceTest {
         assertEquals("257.311,0.,0.", pack.manifest().get("pck.BODY799_POLE_RA"), "verbatim (U-4)");
         assertEquals("-15.175,0.,0.", pack.manifest().get("pck.BODY799_POLE_DEC"), "verbatim");
         assertFalse(pack.manifest().containsKey("pck.BODY799_NUT_PREC_RA"), "no periodic terms");
-        Vector3 p = SERVICE.pole(2461339.0);
+        Vector3 p = uranus().pole(2461339.0);
         assertEquals(257.311, Math.toDegrees(Math.atan2(p.y(), p.x())) + 360.0, 1e-9);
         assertEquals(-15.175, Math.toDegrees(Math.asin(p.z())), 1e-9);
     }
 
     @Test
     void theTiltIsPlanetocentricAndThePolarDiameterIsTakenAtIt() {
-        UranusService.UranusObservation o = SERVICE.observe(OSLO);
-        UranusService.UranusObservation detic = SERVICE.observeRival(OSLO, UranusService.Rival.PLANETODETIC_TILT);
+        UranusService.UranusObservation o = uranus().observe(OSLO);
+        UranusService.UranusObservation detic = uranus().observeRival(OSLO, UranusService.Rival.PLANETODETIC_TILT);
         assertTrue(Math.abs(detic.tiltDegrees()) > Math.abs(o.tiltDegrees()),
                 "the planetodetic reading lies farther from the equator than the planetocentric");
         double re = 25559.0;
@@ -67,11 +67,11 @@ class UranusServiceTest {
 
     @Test
     void theMoonsComeInTheRuledOrderAndAnswerWithUranus() {
-        UranusService.Configuration c = SERVICE.observeMoons(OSLO);
+        UranusService.Configuration c = uranus().observeMoons(OSLO);
         assertEquals(List.of(UranusService.Moon.MIRANDA, UranusService.Moon.ARIEL, UranusService.Moon.UMBRIEL,
                         UranusService.Moon.TITANIA, UranusService.Moon.OBERON),
                 c.moons().stream().map(UranusService.MoonPlace::moon).toList());
-        assertEquals(SERVICE.observe(OSLO).astrometricJ2000(), c.uranus().astrometricJ2000(),
+        assertEquals(uranus().observe(OSLO).astrometricJ2000(), c.uranus().astrometricJ2000(),
                 "the configuration's Uranus is the Uranus the planet's card shows");
         for (UranusService.MoonPlace p : c.moons()) {
             assertTrue(p.separationArcseconds() < 50.0, p.moon() + " lies near Uranus");
@@ -85,11 +85,11 @@ class UranusServiceTest {
         // from the Sun's centre, outside its 0.26° disc; a day of motion moves
         // it 1° along, so the reading must be false both there and at quadrature.
         UranusService.UranusObservation conjunction =
-                SERVICE.observeGeocentric(Instant.parse("2026-05-22T16:00:00Z"));
+                uranus().observeGeocentric(Instant.parse("2026-05-22T16:00:00Z"));
         assertTrue(conjunction.elongationDegrees() < 1.0, "near the Sun at the conjunction");
         assertEquals(conjunction.elongationDegrees() * 3600.0 < conjunction.sunAngularRadiusArcseconds()
                 + conjunction.equatorialDiameterArcseconds() / 2.0, conjunction.behindSun());
-        assertFalse(SERVICE.observe(OSLO).behindSun(), "far from the Sun in October");
+        assertFalse(uranus().observe(OSLO).behindSun(), "far from the Sun in October");
     }
 
     @Test

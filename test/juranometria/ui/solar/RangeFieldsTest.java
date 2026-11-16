@@ -7,15 +7,14 @@ import java.time.Instant;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import juranometria.context.ChartContextHolder;
 import juranometria.sky.Observer;
-import juranometria.solar.JovianSystemService;
-import juranometria.solar.SolarSystemService;
 import juranometria.ui.language.InterfaceText;
 
+import static juranometria.solar.SharedServices.jovian;
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -32,14 +31,6 @@ class RangeFieldsTest {
     private static final InterfaceText EN = InterfaceText.forLanguage("en");
     private static final Instant AUGUST = Instant.parse("2026-08-15T06:00:00Z");
     private static final Observer OSLO = new Observer(59.91, 10.75, AUGUST);
-    private static SolarSystemService solar;
-    private static JovianSystemService jovian;
-
-    @BeforeAll
-    static void load() {
-        solar = SolarSystemService.load();
-        jovian = JovianSystemService.load();
-    }
 
     private static Component named(Container root, String name) {
         for (Component child : root.getComponents()) {
@@ -103,7 +94,7 @@ class RangeFieldsTest {
             throws Exception {
         SwingUtilities.invokeAndWait(() -> {
             ChartContextHolder chart = new ChartContextHolder(OSLO);
-            SolarTableSession session = new SolarTableSession(chart::observer, solar,
+            SolarTableSession session = new SolarTableSession(chart::observer, solar(),
                     SolarTable.venus());
             session.followContext(chart);
             SolarTableControls controls = new SolarTableControls(session, EN, null, false);
@@ -117,7 +108,7 @@ class RangeFieldsTest {
     @Test
     void theSunAndMoonDialogShowsTheRangeFieldsOnlyUnderOverATimeRange() throws Exception {
         SwingUtilities.invokeAndWait(() -> {
-            SolarTableDialog.Content content = SolarTableDialog.content(() -> OSLO, solar,
+            SolarTableDialog.Content content = SolarTableDialog.content(() -> OSLO, solar(),
                     EN, SolarTable.sun());
             exercise(content, content.instantView, content.rangeView, content.span,
                     content.step, content.compute, () -> 0, "the Sun's dialog");
@@ -128,7 +119,7 @@ class RangeFieldsTest {
     void aPlanetsDialogAndControllerGroupShowTheRangeFieldsOnlyUnderOverATimeRange()
             throws Exception {
         SwingUtilities.invokeAndWait(() -> {
-            JovianTableSession session = new JovianTableSession(() -> OSLO, () -> jovian);
+            JovianTableSession session = new JovianTableSession(() -> OSLO, () -> jovian());
             JovianTableControls dialog = new JovianTableControls(session, EN, true);
             JComponent inDialog = dialog.inDialog();
             exercise(inDialog, dialog.instantView, dialog.rangeView, dialog.span,

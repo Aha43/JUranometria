@@ -23,16 +23,15 @@ import juranometria.render.ChartPalette;
 import juranometria.render.ChartRenderer;
 import juranometria.saturnchart.SaturnModule;
 import juranometria.sky.Observer;
-import juranometria.solar.SaturnSystemService;
 import juranometria.solar.SaturnSystemService.Configuration;
 import juranometria.solar.SaturnSystemService.DiscRelation;
 import juranometria.solar.SaturnSystemService.MoonPlace;
 import juranometria.solar.SaturnSystemService.ShadowRelation;
 import juranometria.solar.SaturnSystemService.VisibilityState;
+import juranometria.solar.SharedServices;
 import juranometria.ui.language.InterfaceText;
 import juranometria.ui.language.PageText;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -61,12 +60,6 @@ class SaturnMoonsInkTest {
     private static final double RP = 54364.0;
     /** The card's distance (#574): 8.434258 AU. */
     private static final double FAR_KM = 8.434258 * 149_597_870.7;
-    private static SaturnSystemService service;
-
-    @BeforeAll
-    static void load() {
-        service = SaturnSystemService.load();
-    }
 
     private static ChartScene page(SkyPosition centre, double field) {
         return Atlas.assembler().assemble(new ChartViewState(centre, field, 8.0, null, null),
@@ -74,7 +67,7 @@ class SaturnMoonsInkTest {
     }
 
     private static List<OverlayContribution> module(Observer at) {
-        SaturnModule module = new SaturnModule(() -> at, () -> service, () -> false);
+        SaturnModule module = new SaturnModule(() -> at, () -> SharedServices.saturn(), () -> false);
         module.showing(true);
         return module.contributedGeometry();
     }
@@ -118,7 +111,7 @@ class SaturnMoonsInkTest {
     private static Observer firstWith(VisibilityState state) {
         for (Instant t = Instant.parse("2026-07-01T00:00:00Z");
                 t.isBefore(Instant.parse("2027-01-01T00:00:00Z")); t = t.plusSeconds(3600)) {
-            Configuration c = service.observeMoons(OSLO.at(t));
+            Configuration c = SharedServices.saturn().observeMoons(OSLO.at(t));
             for (MoonPlace m : c.moons()) {
                 if (m.state() == state) {
                     return OSLO.at(t);
@@ -137,7 +130,7 @@ class SaturnMoonsInkTest {
     @Test
     void atTheNormalMinimumEveryMoonNotBehindIsASymbolAtItsOwnPlaceWithItsState() {
         List<OverlayContribution> offered = module(OSLO);
-        Configuration c = service.observeMoons(OSLO);
+        Configuration c = SharedServices.saturn().observeMoons(OSLO);
         ChartScene scene = page(c.saturn().astrometricJ2000(),
                 ChartViewState.normalMinimumFieldDegrees());
         List<ReferenceInk.BodyPlacement> all = placed(scene, offering(offered), ENGLISH);
@@ -169,7 +162,7 @@ class SaturnMoonsInkTest {
     void aMoonInFrontIsPaintedOverTheFigure() {
         Observer at = firstWith(VisibilityState.IN_FRONT_OF_SATURN);
         List<OverlayContribution> offered = module(at);
-        Configuration c = service.observeMoons(at);
+        Configuration c = SharedServices.saturn().observeMoons(at);
         ChartScene scene = page(c.saturn().astrometricJ2000(),
                 ChartViewState.normalMinimumFieldDegrees());
         List<ReferenceInk.BodyPlacement> all = placed(scene, offering(offered), ENGLISH);
@@ -257,7 +250,7 @@ class SaturnMoonsInkTest {
                 t.isBefore(Instant.parse("2027-01-01T00:00:00Z")); t = t.plusSeconds(7 * 86400)) {
             Observer at = OSLO.at(t);
             List<OverlayContribution> offered = module(at);
-            ChartScene scene = page(service.observeSaturn(at).astrometricJ2000(),
+            ChartScene scene = page(SharedServices.saturn().observeSaturn(at).astrometricJ2000(),
                     ChartViewState.normalMinimumFieldDegrees());
             List<ReferenceInk.BodyPlacement> all = placed(scene, offering(offered), ENGLISH);
             List<java.awt.geom.Rectangle2D> boxes = new ArrayList<>();
@@ -291,7 +284,7 @@ class SaturnMoonsInkTest {
     void eachMoonIsSpokenWithTheTablesStateWordsInBothLanguages() {
         Observer at = firstWith(VisibilityState.IN_FRONT_OF_SATURN);
         List<OverlayContribution> offered = module(at);
-        Configuration c = service.observeMoons(at);
+        Configuration c = SharedServices.saturn().observeMoons(at);
         ChartScene scene = page(c.saturn().astrometricJ2000(), 1.0);
         String en = ChartComponent.withBodies("Chart.", placed(scene, offering(offered), ENGLISH),
                 ENGLISH);
@@ -311,7 +304,7 @@ class SaturnMoonsInkTest {
                 + "'s apparent diameter)."), "a clear moon needs no state word: " + en);
         // Partly in shadow keeps the table's distinction (ruling 4).
         Observer partly = firstWith(VisibilityState.PARTLY_IN_SATURNS_SHADOW);
-        Configuration cp = service.observeMoons(partly);
+        Configuration cp = SharedServices.saturn().observeMoons(partly);
         String enPartly = ChartComponent.withBodies("Chart.", placed(
                 page(cp.saturn().astrometricJ2000(), 1.0), offering(module(partly)), ENGLISH),
                 ENGLISH);

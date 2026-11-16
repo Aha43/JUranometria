@@ -18,11 +18,12 @@ import juranometria.render.ChartPalette;
 import juranometria.render.ChartRenderer;
 import juranometria.sky.Observer;
 import juranometria.solar.NeptuneService;
-import juranometria.solar.SolarSystemService;
+import juranometria.solar.SharedServices;
 import juranometria.solarchart.SolarSystemModule;
 import juranometria.ui.language.InterfaceText;
 import juranometria.ui.language.PageText;
 
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -41,8 +42,6 @@ class NeptuneInkTest {
 
     private static final PageText ENGLISH = PageText.in(InterfaceText.forLanguage("en"));
     private static final PageText NORSK = PageText.in(InterfaceText.forLanguage("nb-NO"));
-    private static final SolarSystemService SOLAR = SolarSystemService.load();
-    private static final NeptuneService NEPTUNE = NeptuneService.load();
     private static final double OSLO_LAT = 59.913;
     private static final double OSLO_LON = 10.752;
     /** Espenak's 2026 opposition and conjunction hours, and the 2003 conjunction hour (neptune-events.txt). */
@@ -56,14 +55,14 @@ class NeptuneInkTest {
     }
 
     private static NeptuneService.NeptuneObservation neptune(Instant when) {
-        return NEPTUNE.observe(new Observer(OSLO_LAT, OSLO_LON, when));
+        return SharedServices.neptune().observe(new Observer(OSLO_LAT, OSLO_LON, when));
     }
 
     /** The module's own contribution for the instant, through the production module. */
     private static OverlayRegistry offering(Instant when, boolean withSun) {
         SolarSystemModule module = new SolarSystemModule(
-                () -> new Observer(OSLO_LAT, OSLO_LON, when), () -> SOLAR, () -> false);
-        module.withNeptune(() -> NEPTUNE);
+                () -> new Observer(OSLO_LAT, OSLO_LON, when), () -> solar(), () -> false);
+        module.withNeptune(() -> SharedServices.neptune());
         module.neptuneShowing(true);
         module.sunShowing(withSun);
         OverlayRegistry registry = new OverlayRegistry();
@@ -176,7 +175,7 @@ class NeptuneInkTest {
         OverlayRegistry before = offering(Instant.parse("1899-06-01T00:00:00Z"), false);
         assertTrue(before.collect().isEmpty(), "before 1900 the chart draws nothing for Neptune");
         SolarSystemModule bare = new SolarSystemModule(
-                () -> new Observer(OSLO_LAT, OSLO_LON, OPPOSITION_2026), () -> SOLAR, () -> false);
+                () -> new Observer(OSLO_LAT, OSLO_LON, OPPOSITION_2026), () -> solar(), () -> false);
         bare.neptuneShowing(true);
         assertTrue(bare.contributedGeometry().isEmpty(), "a module given no Neptune service draws no Neptune");
     }

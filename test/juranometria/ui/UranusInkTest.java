@@ -18,11 +18,12 @@ import juranometria.render.ChartPalette;
 import juranometria.render.ChartRenderer;
 import juranometria.sky.Observer;
 import juranometria.solar.UranusService;
-import juranometria.solar.SolarSystemService;
+import juranometria.solar.SharedServices;
 import juranometria.solarchart.SolarSystemModule;
 import juranometria.ui.language.InterfaceText;
 import juranometria.ui.language.PageText;
 
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -40,8 +41,6 @@ class UranusInkTest {
 
     private static final PageText ENGLISH = PageText.in(InterfaceText.forLanguage("en"));
     private static final PageText NORSK = PageText.in(InterfaceText.forLanguage("nb-NO"));
-    private static final SolarSystemService SOLAR = SolarSystemService.load();
-    private static final UranusService URANUS = UranusService.load();
     private static final double OSLO_LAT = 59.913;
     private static final double OSLO_LON = 10.752;
     /** Espenak's 2026 opposition and conjunction hours (uranus-events.txt). */
@@ -54,14 +53,14 @@ class UranusInkTest {
     }
 
     private static UranusService.UranusObservation uranus(Instant when) {
-        return URANUS.observe(new Observer(OSLO_LAT, OSLO_LON, when));
+        return SharedServices.uranus().observe(new Observer(OSLO_LAT, OSLO_LON, when));
     }
 
     /** The module's own contribution for the instant, through the production module. */
     private static OverlayRegistry offering(Instant when, boolean withSun) {
         SolarSystemModule module = new SolarSystemModule(
-                () -> new Observer(OSLO_LAT, OSLO_LON, when), () -> SOLAR, () -> false);
-        module.withUranus(() -> URANUS);
+                () -> new Observer(OSLO_LAT, OSLO_LON, when), () -> solar(), () -> false);
+        module.withUranus(() -> SharedServices.uranus());
         module.uranusShowing(true);
         module.sunShowing(withSun);
         OverlayRegistry registry = new OverlayRegistry();
@@ -160,7 +159,7 @@ class UranusInkTest {
         OverlayRegistry before = offering(Instant.parse("1899-06-01T00:00:00Z"), false);
         assertTrue(before.collect().isEmpty(), "before 1900 the chart draws nothing for Uranus");
         SolarSystemModule bare = new SolarSystemModule(
-                () -> new Observer(OSLO_LAT, OSLO_LON, OPPOSITION_2026), () -> SOLAR, () -> false);
+                () -> new Observer(OSLO_LAT, OSLO_LON, OPPOSITION_2026), () -> solar(), () -> false);
         bare.uranusShowing(true);
         assertTrue(bare.contributedGeometry().isEmpty(), "a module given no Uranus service draws no Uranus");
     }

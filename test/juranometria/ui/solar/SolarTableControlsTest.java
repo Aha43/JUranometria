@@ -13,15 +13,14 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import juranometria.sky.Observer;
-import juranometria.solar.SolarSystemService;
 import juranometria.ui.companion.CompanionStore;
 import juranometria.ui.language.InterfaceText;
 import juranometria.ui.solar.SolarTableSession.Mode;
 
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -41,12 +40,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class SolarTableControlsTest {
 
     private static final InterfaceText EN = InterfaceText.forLanguage("en");
-    private static SolarSystemService service;
-
-    @BeforeAll
-    static void load() {
-        service = SolarSystemService.load();
-    }
 
     /** The observer the dialog tests state: Oslo at midsummer 2026, as SunTableDialogTest's OSLO. */
     private static Observer oslo() {
@@ -88,7 +81,7 @@ class SolarTableControlsTest {
         final FakeOnChart onChart = new FakeOnChart();
 
         Hosts(SolarTable table) throws Exception {
-            session = new SolarTableSession(() -> observer[0], service, table);
+            session = new SolarTableSession(() -> observer[0], solar(), table);
             Object[] built = new Object[3];
             SwingUtilities.invokeAndWait(() -> {
                 built[0] = new SolarTableControls(session, EN, onChart, false);
@@ -120,7 +113,7 @@ class SolarTableControlsTest {
     @Test
     void theControllersGroupComputesNothingWhenBuilt() throws Exception {
         Observer[] observer = {oslo()};
-        SolarTableSession session = new SolarTableSession(() -> observer[0], service,
+        SolarTableSession session = new SolarTableSession(() -> observer[0], solar(),
                 SolarTable.sun());
         SolarTableControls[] built = new SolarTableControls[1];
         JComponent[] group = new JComponent[1];
@@ -234,9 +227,9 @@ class SolarTableControlsTest {
     void theSectionRemembersEachGroupApartAndIntroducesMoonCollapsed() throws Exception {
         juranometria.app.SwingSession.scratchPreferences("solar-section", node -> {
             Observer observer = oslo();
-            SolarTableSession sun = new SolarTableSession(() -> observer, service,
+            SolarTableSession sun = new SolarTableSession(() -> observer, solar(),
                     SolarTable.sun());
-            SolarTableSession moon = new SolarTableSession(() -> observer, service,
+            SolarTableSession moon = new SolarTableSession(() -> observer, solar(),
                     SolarTable.moon());
             CompanionStore store = CompanionStore.forNode(node);
             JComponent[] built = new JComponent[1];

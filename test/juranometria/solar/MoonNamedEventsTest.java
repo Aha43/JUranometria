@@ -17,6 +17,7 @@ import juranometria.solar.SolarSystemService.Trend;
 import juranometria.solar.time.TimeScales;
 import juranometria.tool.MoonEventsFixture;
 
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -37,18 +38,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class MoonNamedEventsTest {
 
-    private static SolarSystemService service;
     private static Map<String, MoonEventsFixture.Event> events;
 
     /** Geocentric quantities: the catalogues are geocentric. */
     private static SolarSystemService.MoonGeometry at(String event) {
-        TimeScales.Epoch epoch = service.timeScales().tt(events.get(event).instant());
-        return service.geocentricMoon(epoch.jdTt());
+        TimeScales.Epoch epoch = solar().timeScales().tt(events.get(event).instant());
+        return solar().geocentricMoon(epoch.jdTt());
     }
 
     @BeforeAll
     static void load() throws IOException {
-        service = SolarSystemService.load();
         events = MoonEventsFixture.read();
     }
 
@@ -129,9 +128,9 @@ class MoonNamedEventsTest {
                     + " km against the table's " + published);
             boolean perigee = event.startsWith("perigee");
             for (int hours : new int[] {-24, -6, 6, 24}) {
-                TimeScales.Epoch epoch = service.timeScales().tt(
+                TimeScales.Epoch epoch = solar().timeScales().tt(
                         e.instant().plus(Duration.ofHours(hours)));
-                double then = service.geocentricMoon(epoch.jdTt()).distanceKm();
+                double then = solar().geocentricMoon(epoch.jdTt()).distanceKm();
                 assertTrue(perigee ? then > now.distanceKm() : then < now.distanceKm(),
                         event + " is the extreme: " + hours + " h away " + then);
             }
@@ -151,7 +150,7 @@ class MoonNamedEventsTest {
             Phase geocentric = at(event).phase();
             for (double[] site : new double[][] {{59.91, 10.75}, {-0.18, -78.5},
                     {-33.93, 18.42}, {82.5, -62.34}}) {
-                MoonObservation o = (MoonObservation) service.observe(Body.MOON,
+                MoonObservation o = (MoonObservation) solar().observe(Body.MOON,
                         new Observer(site[0], site[1], events.get(event).instant()));
                 assertEquals(geocentric, o.phase(), event + " from " + site[0]);
                 assertEquals(at(event).trend(), o.trend());

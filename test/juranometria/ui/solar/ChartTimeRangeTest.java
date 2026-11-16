@@ -6,15 +6,14 @@ import java.util.List;
 
 import javax.swing.SwingUtilities;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import juranometria.context.ChartContextHolder;
 import juranometria.sky.Observer;
 import juranometria.solar.JovianSystemService;
-import juranometria.solar.SolarSystemService;
 import juranometria.ui.language.InterfaceText;
 
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -39,19 +38,13 @@ class ChartTimeRangeTest {
     private static final InterfaceText EN = InterfaceText.forLanguage("en");
     private static final Instant AUGUST = Instant.parse("2026-08-15T06:00:00Z");
     private static final Observer OSLO = new Observer(59.91, 10.75, AUGUST);
-    private static SolarSystemService service;
-
-    @BeforeAll
-    static void load() {
-        service = SolarSystemService.load();
-    }
 
     private static void edt(Runnable work) throws Exception {
         SwingUtilities.invokeAndWait(work);
     }
 
     private static SolarTableControls venus(ChartContextHolder chart) {
-        SolarTableSession session = new SolarTableSession(chart::observer, service,
+        SolarTableSession session = new SolarTableSession(chart::observer, solar(),
                 SolarTable.venus());
         session.followContext(chart);
         return new SolarTableControls(session, EN, null, false);
@@ -166,7 +159,7 @@ class ChartTimeRangeTest {
         assertEquals(AUGUST, controls.selectedInstant(), "the instant view's one row, unselected");
         assertTrue(controls.setChartTime.isEnabled());
 
-        SolarTableSession plain = new SolarTableSession(() -> OSLO, service, SolarTable.venus());
+        SolarTableSession plain = new SolarTableSession(() -> OSLO, solar(), SolarTable.venus());
         SolarTableControls over = new SolarTableControls(plain, EN, null, false);
         assertNull(over.setChartTime, "a plain supplier cannot install: no row action");
         assertFalse(plain.canSetChartTime());

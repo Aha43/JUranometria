@@ -18,7 +18,6 @@ import juranometria.project.PixelPoint;
 import juranometria.project.ViewportMapping;
 import juranometria.saturnchart.SaturnModule;
 import juranometria.sky.Observer;
-import juranometria.solar.SaturnSystemService;
 import juranometria.solar.SaturnSystemService.SaturnObservation;
 import juranometria.ui.language.InterfaceText;
 import juranometria.ui.language.PageText;
@@ -26,9 +25,9 @@ import juranometria.ui.solar.SaturnChartSession;
 import juranometria.ui.solar.SaturnChartStore;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import static juranometria.solar.SharedServices.saturn;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -51,20 +50,14 @@ class SaturnOnTheChartJourneyTest {
     /** The contract's card instant (#574) at Oslo. */
     private static final Observer OSLO = new Observer(59.91, 10.75,
             Instant.parse("2026-10-05T00:00:00Z"));
-    private static SaturnSystemService service;
 
     private ChartComponent chart;
     private ChartModuleHost host;
     private SaturnModule module;
     private Preferences node;
 
-    @BeforeAll
-    static void load() {
-        service = SaturnSystemService.load();
-    }
-
     private void build(double field) throws Exception {
-        SaturnObservation saturn = service.observeSaturn(OSLO);
+        SaturnObservation saturn = saturn().observeSaturn(OSLO);
         SwingUtilities.invokeAndWait(() -> {
             chart = new ChartComponent(Atlas.assembler(), ENGLISH);
             chart.setSize(900, 700);
@@ -78,7 +71,7 @@ class SaturnOnTheChartJourneyTest {
             meridian.showing(false, false, false);
             module = host.attach(new SaturnModule(
                     () -> meridian.attached() ? meridian.observer() : null,
-                    () -> service, meridian::horizonShowing));
+                    () -> saturn(), meridian::horizonShowing));
         });
         flush();
     }
@@ -121,7 +114,7 @@ class SaturnOnTheChartJourneyTest {
         assertFalse(drawn.isEmpty(), "Saturn drawn");
         ReferenceInk.BodyPlacement placed = drawn.get(0);
         assertEquals(SaturnModule.SATURN, placed.identity());
-        SaturnObservation saturn = service.observeSaturn(OSLO);
+        SaturnObservation saturn = saturn().observeSaturn(OSLO);
         DrawnPage page = DrawnPage.of(chart.currentScene());
         PixelPoint expected = new ViewportMapping(page).toPixel(
                 page.projection().project(saturn.astrometricJ2000()).orElseThrow());
@@ -161,7 +154,7 @@ class SaturnOnTheChartJourneyTest {
         SwingUtilities.invokeAndWait(() -> module.showing(true));
         paint();
         List<ReferenceInk.BodyPlacement> drawn = chart.renderedBodies();
-        juranometria.solar.SaturnSystemService.Configuration c = service.observeMoons(OSLO);
+        juranometria.solar.SaturnSystemService.Configuration c = saturn().observeMoons(OSLO);
         int moons = 0;
         for (juranometria.solar.SaturnSystemService.MoonPlace m : c.moons()) {
             ReferenceInk.BodyPlacement p = drawn.stream()

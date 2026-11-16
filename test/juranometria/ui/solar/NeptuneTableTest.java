@@ -10,7 +10,6 @@ import java.util.function.Supplier;
 
 import javax.swing.SwingUtilities;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import juranometria.sky.Observer;
@@ -22,6 +21,7 @@ import juranometria.solar.NeptuneService.VisibilityState;
 import juranometria.tool.NeptuneComparison;
 import juranometria.ui.language.InterfaceText;
 
+import static juranometria.solar.SharedServices.neptune;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -39,16 +39,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class NeptuneTableTest {
 
-    private static NeptuneService service;
     private static final InterfaceText EN = InterfaceText.forLanguage("en");
     private static final InterfaceText NB = InterfaceText.forLanguage("nb-NO");
     /** The study's "today" row (docs/studies/neptune-system/horizons/named-*-oslo.txt). */
     private static final Instant CARD = Instant.parse("2026-10-29T12:00:00Z");
-
-    @BeforeAll
-    static void load() {
-        service = NeptuneService.load();
-    }
 
     static Observer oslo(Instant when) {
         return NeptuneComparison.observer("oslo", when);
@@ -76,7 +70,7 @@ class NeptuneTableTest {
         AtomicInteger loaded = new AtomicInteger();
         Supplier<NeptuneService> counted = () -> {
             loaded.incrementAndGet();
-            return service;
+            return neptune();
         };
         NeptuneTableSession session = new NeptuneTableSession(() -> oslo(CARD), counted);
         onEdt(() -> {
@@ -96,7 +90,7 @@ class NeptuneTableTest {
 
     @Test
     void neitherHostHasAChartSwitchOrCentreOnChart() throws Exception {
-        NeptuneTableSession session = new NeptuneTableSession(() -> oslo(CARD), () -> service);
+        NeptuneTableSession session = new NeptuneTableSession(() -> oslo(CARD), () -> neptune());
         onEdt(() -> {
             for (javax.swing.JComponent host : List.of(
                     new NeptuneTableControls(session, EN, false).inController(),
@@ -125,7 +119,7 @@ class NeptuneTableTest {
 
     @Test
     void bothHostsShowOneAppliedResultAndNeitherOverwritesTheOthersDraft() throws Exception {
-        NeptuneTableSession session = new NeptuneTableSession(() -> oslo(CARD), () -> service);
+        NeptuneTableSession session = new NeptuneTableSession(() -> oslo(CARD), () -> neptune());
         onEdt(() -> {
             NeptuneTableControls controller = new NeptuneTableControls(session, EN, false);
             controller.inController();
@@ -149,12 +143,12 @@ class NeptuneTableTest {
 
     @Test
     void everyValueShownIsTheServicesAnswerRounded() throws Exception {
-        NeptuneTableSession session = new NeptuneTableSession(() -> oslo(CARD), () -> service);
+        NeptuneTableSession session = new NeptuneTableSession(() -> oslo(CARD), () -> neptune());
         onEdt(() -> {
             NeptuneTableControls c = new NeptuneTableControls(session, EN, false);
             c.apply();
             Configuration shown = session.result().entries().get(0).configuration();
-            Configuration fresh = service.observeMoons(oslo(CARD));
+            Configuration fresh = neptune().observeMoons(oslo(CARD));
             for (int row = 0; row < 2; row++) {
                 assertSame(shown.moons().get(row), c.model.lines().get(row).moon());
                 MoonPlace b = fresh.moons().get(row);
@@ -188,7 +182,7 @@ class NeptuneTableTest {
 
     @Test
     void theCardsInstantReadsNaturallyInBothLanguages() throws Exception {
-        NeptuneTableSession session = new NeptuneTableSession(() -> oslo(CARD), () -> service);
+        NeptuneTableSession session = new NeptuneTableSession(() -> oslo(CARD), () -> neptune());
         onEdt(() -> {
             NeptuneTableControls en = new NeptuneTableControls(session, EN, false);
             NeptuneTableControls nb = new NeptuneTableControls(session, NB, false);
@@ -199,7 +193,7 @@ class NeptuneTableTest {
                     "as Horizons codes the study's today (*) for both");
             assertEquals("klar av Neptun", nb.model.getValueAt(1, 6));
             assertEquals("Neptune · 2026-10-29 12:00:00 UTC", en.cardTitle.getText());
-            String tilt = service.observe(oslo(CARD)).northPoleTowardObserver()
+            String tilt = neptune().observe(oslo(CARD)).northPoleTowardObserver()
                     ? "(north pole towards you)" : "(south pole towards you)";
             assertTrue(en.cardValue("tilt").endsWith(tilt), en.cardValue("tilt"));
             assertTrue(nb.cardValue("tilt").endsWith(tilt.contains("north")
@@ -233,7 +227,7 @@ class NeptuneTableTest {
     @Test
     void namedConfigurationsReadAsHorizonsCodesThem() throws Exception {
         Observer[] at = {null};
-        NeptuneTableSession session = new NeptuneTableSession(() -> at[0], () -> service);
+        NeptuneTableSession session = new NeptuneTableSession(() -> at[0], () -> neptune());
         record Coded(String instant, Moon moon, String code) {
         }
         List<Coded> rows = List.of(new Coded("2043-09-07T00:00:00Z", Moon.TRITON, "t"),
@@ -269,7 +263,7 @@ class NeptuneTableTest {
     @Test
     void theStateIsTheFlattenedFigures() throws Exception {
         NeptuneTableSession session = new NeptuneTableSession(
-                () -> oslo(Instant.parse("2044-09-26T00:00:00Z")), () -> service);
+                () -> oslo(Instant.parse("2044-09-26T00:00:00Z")), () -> neptune());
         onEdt(() -> {
             NeptuneTableControls en = new NeptuneTableControls(session, EN, false);
             en.apply();
@@ -282,7 +276,7 @@ class NeptuneTableTest {
     @Test
     void beforeTheMoonsYearsNeptuneIsShownAloneAndTheRefusalNamesThem() throws Exception {
         Observer[] at = {oslo(Instant.parse("2000-01-01T00:00:00Z"))};
-        NeptuneTableSession session = new NeptuneTableSession(() -> at[0], () -> service);
+        NeptuneTableSession session = new NeptuneTableSession(() -> at[0], () -> neptune());
         onEdt(() -> {
             NeptuneTableControls en = new NeptuneTableControls(session, EN, false);
             NeptuneTableControls nb = new NeptuneTableControls(session, NB, false);
@@ -315,7 +309,7 @@ class NeptuneTableTest {
     @Test
     void aRangeAcrossTheMoonsStartKeepsNeptuneAndSaysWhereTheMoonsAreNotComputed() throws Exception {
         NeptuneTableSession session = new NeptuneTableSession(
-                () -> oslo(Instant.parse("1999-12-10T00:00:00Z")), () -> service);
+                () -> oslo(Instant.parse("1999-12-10T00:00:00Z")), () -> neptune());
         onEdt(() -> {
             NeptuneTableControls en = new NeptuneTableControls(session, EN, false);
             NeptuneTableControls nb = new NeptuneTableControls(session, NB, false);
@@ -329,7 +323,7 @@ class NeptuneTableTest {
             int without = 0;
             for (NeptuneTableSession.Entry e : r.entries()) {
                 without += e.configuration() == null ? 1 : 0;
-                assertEquals(!service.moonsAnswerAt(e.sample().instant()), e.configuration() == null,
+                assertEquals(!neptune().moonsAnswerAt(e.sample().instant()), e.configuration() == null,
                         "the moons are left out exactly where the service refuses them: "
                                 + e.sample().instant());
             }
@@ -370,7 +364,7 @@ class NeptuneTableTest {
     @Test
     void theRefusalsNameWhatTheyRefuse() throws Exception {
         Observer[] at = {null};
-        NeptuneTableSession session = new NeptuneTableSession(() -> at[0], () -> service);
+        NeptuneTableSession session = new NeptuneTableSession(() -> at[0], () -> neptune());
         onEdt(() -> {
             NeptuneTableControls c = new NeptuneTableControls(session, EN, false);
             c.apply();
@@ -396,11 +390,11 @@ class NeptuneTableTest {
     @Test
     void aDateLineObserverIsAnsweredForItsOwnPlace() throws Exception {
         Observer chatham = NeptuneComparison.observer("chatham", CARD);
-        NeptuneTableSession session = new NeptuneTableSession(() -> chatham, () -> service);
+        NeptuneTableSession session = new NeptuneTableSession(() -> chatham, () -> neptune());
         onEdt(() -> {
             NeptuneTableControls c = new NeptuneTableControls(session, EN, false);
             c.apply();
-            assertEquals(NeptuneMoonsModel.neptuneValues(service.observe(chatham), c.words()).get(2),
+            assertEquals(NeptuneMoonsModel.neptuneValues(neptune().observe(chatham), c.words()).get(2),
                     c.cardValue("altitude"), "Chatham's own altitude");
             assertTrue(c.observerNote.getText().contains("-176.5") || c.observerNote.getText().contains("−176.5"),
                     "west of the date line, as Place and Time folds it: " + c.observerNote.getText());
@@ -410,7 +404,7 @@ class NeptuneTableTest {
     @Test
     void anEstimatedInstantIsMarkedAndItsStatesAreNotOfferedAsPredictions() throws Exception {
         NeptuneTableSession session = new NeptuneTableSession(
-                () -> oslo(Instant.parse("2040-06-01T00:00:00Z")), () -> service);
+                () -> oslo(Instant.parse("2040-06-01T00:00:00Z")), () -> neptune());
         onEdt(() -> {
             NeptuneTableControls c = new NeptuneTableControls(session, EN, false);
             c.apply();
@@ -421,10 +415,10 @@ class NeptuneTableTest {
 
     @Test
     void theIntervalsTheTableNamesAreThePacks() {
-        assertEquals(NeptuneService.NEPTUNE_FIRST_DAY, service.firstDay());
-        assertEquals(NeptuneService.NEPTUNE_LAST_DAY, service.lastDay());
-        assertEquals(NeptuneService.MOONS_FIRST_DAY, service.moonsFirstDay());
-        assertEquals(NeptuneService.MOONS_LAST_DAY, service.moonsLastDay());
+        assertEquals(NeptuneService.NEPTUNE_FIRST_DAY, neptune().firstDay());
+        assertEquals(NeptuneService.NEPTUNE_LAST_DAY, neptune().lastDay());
+        assertEquals(NeptuneService.MOONS_FIRST_DAY, neptune().moonsFirstDay());
+        assertEquals(NeptuneService.MOONS_LAST_DAY, neptune().moonsLastDay());
         assertEquals(500, NeptuneTableSession.MAX_INSTANTS);
         assertEquals(2, NeptuneTableSession.MOONS);
     }

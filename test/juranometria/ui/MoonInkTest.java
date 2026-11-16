@@ -34,6 +34,7 @@ import juranometria.tool.MoonEventsFixture;
 import juranometria.ui.language.InterfaceText;
 import juranometria.ui.language.PageText;
 
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -51,7 +52,6 @@ class MoonInkTest {
     private static final PageText NORSK = PageText.in(InterfaceText.forLanguage("nb-NO"));
     private static final ChartRenderer RENDERER = new ChartRenderer(
             StarSizePolicy.DEFAULT, ENGLISH);
-    private static final SolarSystemService SERVICE = SolarSystemService.load();
     private static final double OSLO_LAT = 59.913;
     private static final double OSLO_LON = 10.752;
     /** Placeholder distances: only their order is read. */
@@ -151,7 +151,7 @@ class MoonInkTest {
         for (String name : List.of("new-moon-june", "first-quarter-june",
                 "full-moon-june", "last-quarter-july")) {
             Observer oslo = new Observer(OSLO_LAT, OSLO_LON, events.get(name).instant());
-            MoonObservation moon = (MoonObservation) SERVICE.observe(Body.MOON, oslo);
+            MoonObservation moon = (MoonObservation) solar().observe(Body.MOON, oslo);
             OverlayRegistry registry = registry(oslo, false, true);
             DrawnPage page = page(moon.astrometricJ2000(), 3.0);
             ReferenceInk.BodyPlacement drawn = ReferenceInk.bodyPlacements(page,
@@ -230,7 +230,7 @@ class MoonInkTest {
     void onTheBlackSkyTheLitSideIsTheStarInk() throws Exception {
         MoonEventsFixture.Event full = MoonEventsFixture.read().get("full-moon-june");
         Observer oslo = new Observer(OSLO_LAT, OSLO_LON, full.instant());
-        MoonObservation moon = (MoonObservation) SERVICE.observe(Body.MOON, oslo);
+        MoonObservation moon = (MoonObservation) solar().observe(Body.MOON, oslo);
         OverlayRegistry registry = registry(oslo, false, true);
         ChartScene scene = Atlas.assembler().assemble(new ChartViewState(
                 moon.astrometricJ2000(), 3.0, 8.0, null, null), 900, 700);
@@ -245,7 +245,7 @@ class MoonInkTest {
     }
 
     private static OverlayRegistry registry(Observer observer, boolean sun, boolean moon) {
-        SolarSystemModule module = new SolarSystemModule(() -> observer, () -> SERVICE,
+        SolarSystemModule module = new SolarSystemModule(() -> observer, () -> solar(),
                 () -> false);
         module.sunShowing(sun);
         module.moonShowing(moon);

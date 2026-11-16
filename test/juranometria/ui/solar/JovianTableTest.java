@@ -10,7 +10,6 @@ import java.util.function.Supplier;
 
 import javax.swing.SwingUtilities;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import juranometria.sky.Observer;
@@ -24,6 +23,7 @@ import juranometria.ui.language.InterfaceText;
 import juranometria.ui.solar.SolarTableSession.Mode;
 import juranometria.ui.solar.SolarTableSession.Query;
 
+import static juranometria.solar.SharedServices.jovian;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -39,15 +39,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class JovianTableTest {
 
-    private static JovianSystemService service;
     private static final InterfaceText EN = InterfaceText.forLanguage("en");
     private static final InterfaceText NB = InterfaceText.forLanguage("nb-NO");
     private static final Instant TRIPLE = Instant.parse("2026-12-11T22:45:00Z");
-
-    @BeforeAll
-    static void load() {
-        service = JovianSystemService.load();
-    }
 
     static Observer oslo(Instant when) {
         return JovianComparison.observer("oslo", when);
@@ -75,7 +69,7 @@ class JovianTableTest {
         AtomicInteger loaded = new AtomicInteger();
         Supplier<JovianSystemService> counted = () -> {
             loaded.incrementAndGet();
-            return service;
+            return jovian();
         };
         Observer[] observer = {oslo(TRIPLE)};
         JovianTableSession session = new JovianTableSession(() -> observer[0], counted);
@@ -97,7 +91,7 @@ class JovianTableTest {
 
     @Test
     void bothHostsShowOneAppliedResultAndNeitherOverwritesTheOthersDraft() throws Exception {
-        JovianTableSession session = new JovianTableSession(() -> oslo(TRIPLE), () -> service);
+        JovianTableSession session = new JovianTableSession(() -> oslo(TRIPLE), () -> jovian());
         onEdt(() -> {
             JovianTableControls controller = new JovianTableControls(session, EN, false);
             controller.inController();
@@ -122,12 +116,12 @@ class JovianTableTest {
 
     @Test
     void everyValueShownIsTheServicesAnswerRounded() throws Exception {
-        JovianTableSession session = new JovianTableSession(() -> oslo(TRIPLE), () -> service);
+        JovianTableSession session = new JovianTableSession(() -> oslo(TRIPLE), () -> jovian());
         onEdt(() -> {
             JovianTableControls c = new JovianTableControls(session, EN, false);
             c.apply();
             Configuration shown = session.result().entries().get(0).configuration();
-            Configuration fresh = service.observeMoons(oslo(TRIPLE));
+            Configuration fresh = jovian().observeMoons(oslo(TRIPLE));
             // the rows are the session's result objects, not recomputed
             for (int row = 0; row < 4; row++) {
                 assertSame(shown.moons().get(row), c.model.lines().get(row).moon());
@@ -156,7 +150,7 @@ class JovianTableTest {
 
     @Test
     void theTripleTransitReadsNaturallyInBothLanguages() throws Exception {
-        JovianTableSession session = new JovianTableSession(() -> oslo(TRIPLE), () -> service);
+        JovianTableSession session = new JovianTableSession(() -> oslo(TRIPLE), () -> jovian());
         onEdt(() -> {
             JovianTableControls en = new JovianTableControls(session, EN, false);
             JovianTableControls nb = new JovianTableControls(session, NB, false);
@@ -200,7 +194,7 @@ class JovianTableTest {
     void everyDecember2026HourAtOsloReadsHorizonsStateInWordsButTheAllowlistedGraze()
             throws Exception {
         Observer[] at = {null};
-        JovianTableSession session = new JovianTableSession(() -> at[0], () -> service);
+        JovianTableSession session = new JovianTableSession(() -> at[0], () -> jovian());
         int[] checked = new int[1];
         List<String> seen = new ArrayList<>();
         onEdt(() -> {
@@ -243,7 +237,7 @@ class JovianTableTest {
     @Test
     void theRefusalsNameWhatTheyRefuse() throws Exception {
         Observer[] at = {null};
-        JovianTableSession session = new JovianTableSession(() -> at[0], () -> service);
+        JovianTableSession session = new JovianTableSession(() -> at[0], () -> jovian());
         onEdt(() -> {
             JovianTableControls c = new JovianTableControls(session, EN, false);
             c.apply();
@@ -285,7 +279,7 @@ class JovianTableTest {
 
     @Test
     void aRangeIsGroupedByInstantAndStaysUnderTheCapOf250Instants() throws Exception {
-        JovianTableSession session = new JovianTableSession(() -> oslo(TRIPLE), () -> service);
+        JovianTableSession session = new JovianTableSession(() -> oslo(TRIPLE), () -> jovian());
         onEdt(() -> {
             JovianTableControls c = new JovianTableControls(session, EN, false);
             c.rangeView.setSelected(true);
@@ -321,7 +315,7 @@ class JovianTableTest {
         // Five weeks ending at the triple transit, from the chart time
         // four weeks before it (#612: a range starts at the chart time).
         JovianTableSession session = new JovianTableSession(
-                () -> oslo(TRIPLE.minus(java.time.Duration.ofDays(28))), () -> service);
+                () -> oslo(TRIPLE.minus(java.time.Duration.ofDays(28))), () -> jovian());
         onEdt(() -> {
             JovianTableControls en = new JovianTableControls(session, EN, false);
             JovianTableControls nb = new JovianTableControls(session, NB, false);
@@ -399,7 +393,7 @@ class JovianTableTest {
     @Test
     void anEstimatedInstantIsMarkedAndItsStatesAreNotOfferedAsPredictions() throws Exception {
         JovianTableSession session = new JovianTableSession(
-                () -> oslo(Instant.parse("2050-06-01T00:00:00Z")), () -> service);
+                () -> oslo(Instant.parse("2050-06-01T00:00:00Z")), () -> jovian());
         onEdt(() -> {
             JovianTableControls c = new JovianTableControls(session, EN, false);
             c.apply();
@@ -410,7 +404,7 @@ class JovianTableTest {
 
     @Test
     void theIntervalsTheTableNamesAreThePacks() {
-        var pack = service.pack();
+        var pack = jovian().pack();
         assertEquals(pack.jupiterFirstDay(), JovianSystemService.JUPITER_FIRST_DAY);
         assertEquals(pack.jupiterLastDay(), JovianSystemService.JUPITER_LAST_DAY);
         assertEquals(pack.moonsFirstDay(), JovianSystemService.MOONS_FIRST_DAY);

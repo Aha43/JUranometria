@@ -24,11 +24,12 @@ import juranometria.render.ChartPalette;
 import juranometria.render.ChartRenderer;
 import juranometria.sky.Observer;
 import juranometria.solar.MarsService;
-import juranometria.solar.SolarSystemService;
+import juranometria.solar.SharedServices;
 import juranometria.solarchart.SolarSystemModule;
 import juranometria.ui.language.InterfaceText;
 import juranometria.ui.language.PageText;
 
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -47,8 +48,6 @@ class MarsInkTest {
 
     private static final PageText ENGLISH = PageText.in(InterfaceText.forLanguage("en"));
     private static final PageText NORSK = PageText.in(InterfaceText.forLanguage("nb-NO"));
-    private static final SolarSystemService SOLAR = SolarSystemService.load();
-    private static final MarsService MARS = MarsService.load();
     private static final double OSLO_LAT = 59.913;
     private static final double OSLO_LON = 10.752;
     /** Espenak's 2003 opposition hour (docs/studies/mars-system/mars-events.txt). */
@@ -60,14 +59,14 @@ class MarsInkTest {
     }
 
     private static MarsService.MarsObservation mars(Instant when) {
-        return MARS.observe(new Observer(OSLO_LAT, OSLO_LON, when));
+        return SharedServices.mars().observe(new Observer(OSLO_LAT, OSLO_LON, when));
     }
 
     /** The module's own contribution for the instant, through the production module. */
     private static OverlayRegistry offering(Instant when, boolean withSun) {
         SolarSystemModule module = new SolarSystemModule(
-                () -> new Observer(OSLO_LAT, OSLO_LON, when), () -> SOLAR, () -> false);
-        module.withMars(() -> MARS);
+                () -> new Observer(OSLO_LAT, OSLO_LON, when), () -> solar(), () -> false);
+        module.withMars(() -> SharedServices.mars());
         module.marsShowing(true);
         module.sunShowing(withSun);
         OverlayRegistry registry = new OverlayRegistry();
@@ -147,7 +146,7 @@ class MarsInkTest {
         double least = 360.0;
         for (Instant day = Instant.parse("1912-01-01T00:00:00Z"); day.isBefore(Instant.parse("1913-01-01T00:00:00Z"));
                 day = day.plus(Duration.ofDays(1))) {
-            double e = MARS.observeGeocentric(day).elongationDegrees();
+            double e = SharedServices.mars().observeGeocentric(day).elongationDegrees();
             if (e < least) {
                 least = e;
                 best = day;
@@ -156,7 +155,7 @@ class MarsInkTest {
         Instant around = best;
         for (int h = -24; h <= 24; h++) {
             Instant t = around.plus(Duration.ofHours(h));
-            double e = MARS.observeGeocentric(t).elongationDegrees();
+            double e = SharedServices.mars().observeGeocentric(t).elongationDegrees();
             if (e < least) {
                 least = e;
                 best = t;
@@ -189,7 +188,7 @@ class MarsInkTest {
         OverlayRegistry before = offering(Instant.parse("1899-06-01T00:00:00Z"), false);
         assertTrue(before.collect().isEmpty(), "before 1900 the chart draws nothing for Mars");
         SolarSystemModule bare = new SolarSystemModule(
-                () -> new Observer(OSLO_LAT, OSLO_LON, OPPOSITION_2003), () -> SOLAR, () -> false);
+                () -> new Observer(OSLO_LAT, OSLO_LON, OPPOSITION_2003), () -> solar(), () -> false);
         bare.marsShowing(true);
         assertTrue(bare.contributedGeometry().isEmpty(), "a module given no Mars service draws no Mars");
     }

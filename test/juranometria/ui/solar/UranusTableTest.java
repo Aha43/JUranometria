@@ -10,7 +10,6 @@ import java.util.function.Supplier;
 
 import javax.swing.SwingUtilities;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import juranometria.sky.Observer;
@@ -22,6 +21,7 @@ import juranometria.solar.UranusService.VisibilityState;
 import juranometria.tool.UranusComparison;
 import juranometria.ui.language.InterfaceText;
 
+import static juranometria.solar.SharedServices.uranus;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -39,16 +39,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class UranusTableTest {
 
-    private static UranusService service;
     private static final InterfaceText EN = InterfaceText.forLanguage("en");
     private static final InterfaceText NB = InterfaceText.forLanguage("nb-NO");
     /** The study's "today" row (docs/studies/uranus-system/horizons/named-*-oslo.txt). */
     private static final Instant CARD = Instant.parse("2026-10-27T12:00:00Z");
-
-    @BeforeAll
-    static void load() {
-        service = UranusService.load();
-    }
 
     static Observer oslo(Instant when) {
         return UranusComparison.observer("oslo", when);
@@ -76,7 +70,7 @@ class UranusTableTest {
         AtomicInteger loaded = new AtomicInteger();
         Supplier<UranusService> counted = () -> {
             loaded.incrementAndGet();
-            return service;
+            return uranus();
         };
         UranusTableSession session = new UranusTableSession(() -> oslo(CARD), counted);
         onEdt(() -> {
@@ -96,7 +90,7 @@ class UranusTableTest {
 
     @Test
     void neitherHostHasAChartSwitchOrCentreOnChart() throws Exception {
-        UranusTableSession session = new UranusTableSession(() -> oslo(CARD), () -> service);
+        UranusTableSession session = new UranusTableSession(() -> oslo(CARD), () -> uranus());
         onEdt(() -> {
             for (javax.swing.JComponent host : List.of(
                     new UranusTableControls(session, EN, false).inController(),
@@ -125,7 +119,7 @@ class UranusTableTest {
 
     @Test
     void bothHostsShowOneAppliedResultAndNeitherOverwritesTheOthersDraft() throws Exception {
-        UranusTableSession session = new UranusTableSession(() -> oslo(CARD), () -> service);
+        UranusTableSession session = new UranusTableSession(() -> oslo(CARD), () -> uranus());
         onEdt(() -> {
             UranusTableControls controller = new UranusTableControls(session, EN, false);
             controller.inController();
@@ -149,12 +143,12 @@ class UranusTableTest {
 
     @Test
     void everyValueShownIsTheServicesAnswerRounded() throws Exception {
-        UranusTableSession session = new UranusTableSession(() -> oslo(CARD), () -> service);
+        UranusTableSession session = new UranusTableSession(() -> oslo(CARD), () -> uranus());
         onEdt(() -> {
             UranusTableControls c = new UranusTableControls(session, EN, false);
             c.apply();
             Configuration shown = session.result().entries().get(0).configuration();
-            Configuration fresh = service.observeMoons(oslo(CARD));
+            Configuration fresh = uranus().observeMoons(oslo(CARD));
             for (int row = 0; row < 5; row++) {
                 assertSame(shown.moons().get(row), c.model.lines().get(row).moon());
                 MoonPlace b = fresh.moons().get(row);
@@ -188,7 +182,7 @@ class UranusTableTest {
 
     @Test
     void theCardsInstantReadsNaturallyInBothLanguages() throws Exception {
-        UranusTableSession session = new UranusTableSession(() -> oslo(CARD), () -> service);
+        UranusTableSession session = new UranusTableSession(() -> oslo(CARD), () -> uranus());
         onEdt(() -> {
             UranusTableControls en = new UranusTableControls(session, EN, false);
             UranusTableControls nb = new UranusTableControls(session, NB, false);
@@ -200,7 +194,7 @@ class UranusTableTest {
                     "as Horizons codes the study's today (*) for all five");
             assertEquals("klar av Uranus", nb.model.getValueAt(4, 6));
             assertEquals("Uranus · 2026-10-27 12:00:00 UTC", en.cardTitle.getText());
-            String tilt = service.observe(oslo(CARD)).northPoleTowardObserver()
+            String tilt = uranus().observe(oslo(CARD)).northPoleTowardObserver()
                     ? "(north pole towards you)" : "(south pole towards you)";
             assertTrue(en.cardValue("tilt").endsWith(tilt), en.cardValue("tilt"));
             assertTrue(nb.cardValue("tilt").endsWith(tilt.contains("north")
@@ -235,7 +229,7 @@ class UranusTableTest {
     @Test
     void namedConfigurationsReadAsHorizonsCodesThem() throws Exception {
         Observer[] at = {null};
-        UranusTableSession session = new UranusTableSession(() -> at[0], () -> service);
+        UranusTableSession session = new UranusTableSession(() -> at[0], () -> uranus());
         record Coded(String instant, Moon moon, String code) {
         }
         List<Coded> rows = List.of(new Coded("2009-12-05T00:00:00Z", Moon.UMBRIEL, "O"),
@@ -270,7 +264,7 @@ class UranusTableTest {
     @Test
     void theStateIsTheFlattenedFiguresWhereHorizonsSphereDiffers() throws Exception {
         UranusTableSession session = new UranusTableSession(
-                () -> oslo(Instant.parse("2004-05-29T00:00:00Z")), () -> service);
+                () -> oslo(Instant.parse("2004-05-29T00:00:00Z")), () -> uranus());
         onEdt(() -> {
             UranusTableControls en = new UranusTableControls(session, EN, false);
             en.apply();
@@ -285,7 +279,7 @@ class UranusTableTest {
     @Test
     void beforeTheMoonsYearsUranusIsShownAloneAndTheRefusalNamesThem() throws Exception {
         Observer[] at = {oslo(Instant.parse("2000-01-01T00:00:00Z"))};
-        UranusTableSession session = new UranusTableSession(() -> at[0], () -> service);
+        UranusTableSession session = new UranusTableSession(() -> at[0], () -> uranus());
         onEdt(() -> {
             UranusTableControls en = new UranusTableControls(session, EN, false);
             UranusTableControls nb = new UranusTableControls(session, NB, false);
@@ -318,7 +312,7 @@ class UranusTableTest {
     @Test
     void aRangeAcrossTheMoonsStartKeepsUranusAndSaysWhereTheMoonsAreNotComputed() throws Exception {
         UranusTableSession session = new UranusTableSession(
-                () -> oslo(Instant.parse("1999-12-10T00:00:00Z")), () -> service);
+                () -> oslo(Instant.parse("1999-12-10T00:00:00Z")), () -> uranus());
         onEdt(() -> {
             UranusTableControls en = new UranusTableControls(session, EN, false);
             UranusTableControls nb = new UranusTableControls(session, NB, false);
@@ -332,7 +326,7 @@ class UranusTableTest {
             int without = 0;
             for (UranusTableSession.Entry e : r.entries()) {
                 without += e.configuration() == null ? 1 : 0;
-                assertEquals(!service.moonsAnswerAt(e.sample().instant()), e.configuration() == null,
+                assertEquals(!uranus().moonsAnswerAt(e.sample().instant()), e.configuration() == null,
                         "the moons are left out exactly where the service refuses them: "
                                 + e.sample().instant());
             }
@@ -373,7 +367,7 @@ class UranusTableTest {
     @Test
     void theRefusalsNameWhatTheyRefuse() throws Exception {
         Observer[] at = {null};
-        UranusTableSession session = new UranusTableSession(() -> at[0], () -> service);
+        UranusTableSession session = new UranusTableSession(() -> at[0], () -> uranus());
         onEdt(() -> {
             UranusTableControls c = new UranusTableControls(session, EN, false);
             c.apply();
@@ -399,11 +393,11 @@ class UranusTableTest {
     @Test
     void aDateLineObserverIsAnsweredForItsOwnPlace() throws Exception {
         Observer chatham = UranusComparison.observer("chatham", CARD);
-        UranusTableSession session = new UranusTableSession(() -> chatham, () -> service);
+        UranusTableSession session = new UranusTableSession(() -> chatham, () -> uranus());
         onEdt(() -> {
             UranusTableControls c = new UranusTableControls(session, EN, false);
             c.apply();
-            assertEquals(UranusMoonsModel.uranusValues(service.observe(chatham), c.words()).get(2),
+            assertEquals(UranusMoonsModel.uranusValues(uranus().observe(chatham), c.words()).get(2),
                     c.cardValue("altitude"), "Chatham's own altitude");
             assertTrue(c.observerNote.getText().contains("-176.5") || c.observerNote.getText().contains("−176.5"),
                     "west of the date line, as Place and Time folds it: " + c.observerNote.getText());
@@ -413,7 +407,7 @@ class UranusTableTest {
     @Test
     void anEstimatedInstantIsMarkedAndItsStatesAreNotOfferedAsPredictions() throws Exception {
         UranusTableSession session = new UranusTableSession(
-                () -> oslo(Instant.parse("2040-06-01T00:00:00Z")), () -> service);
+                () -> oslo(Instant.parse("2040-06-01T00:00:00Z")), () -> uranus());
         onEdt(() -> {
             UranusTableControls c = new UranusTableControls(session, EN, false);
             c.apply();
@@ -424,10 +418,10 @@ class UranusTableTest {
 
     @Test
     void theIntervalsTheTableNamesAreThePacks() {
-        assertEquals(UranusService.URANUS_FIRST_DAY, service.firstDay());
-        assertEquals(UranusService.URANUS_LAST_DAY, service.lastDay());
-        assertEquals(UranusService.MOONS_FIRST_DAY, service.moonsFirstDay());
-        assertEquals(UranusService.MOONS_LAST_DAY, service.moonsLastDay());
+        assertEquals(UranusService.URANUS_FIRST_DAY, uranus().firstDay());
+        assertEquals(UranusService.URANUS_LAST_DAY, uranus().lastDay());
+        assertEquals(UranusService.MOONS_FIRST_DAY, uranus().moonsFirstDay());
+        assertEquals(UranusService.MOONS_LAST_DAY, uranus().moonsLastDay());
         assertEquals(200, UranusTableSession.MAX_INSTANTS);
         assertEquals(5, UranusTableSession.MOONS);
     }

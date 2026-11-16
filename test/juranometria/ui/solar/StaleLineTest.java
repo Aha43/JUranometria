@@ -10,15 +10,14 @@ import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import juranometria.context.ChartContextHolder;
 import juranometria.sky.Observer;
 import juranometria.solar.JovianSystemService;
-import juranometria.solar.SolarSystemService;
 import juranometria.ui.language.InterfaceText;
 
+import static juranometria.solar.SharedServices.solar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -43,19 +42,13 @@ class StaleLineTest {
     private static final Instant AUGUST = Instant.parse("2026-08-15T06:00:00Z");
     private static final Observer OSLO =
             new Observer(59.91, 10.75, Instant.parse("2026-08-15T06:00:00Z"));
-    private static SolarSystemService service;
-
-    @BeforeAll
-    static void load() {
-        service = SolarSystemService.load();
-    }
 
     private static void edt(Runnable work) throws Exception {
         SwingUtilities.invokeAndWait(work);
     }
 
     private static SolarTableControls venus(ChartContextHolder chart) {
-        SolarTableSession session = new SolarTableSession(chart::observer, service,
+        SolarTableSession session = new SolarTableSession(chart::observer, solar(),
                 SolarTable.venus());
         session.followContext(chart);
         return new SolarTableControls(session, EN, null, false);

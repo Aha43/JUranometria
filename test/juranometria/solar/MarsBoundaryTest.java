@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import juranometria.sky.Observer;
 
+import static juranometria.solar.SharedServices.mars;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -21,19 +22,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class MarsBoundaryTest {
 
-    private static final MarsService SERVICE = MarsService.load();
     private static final Observer OSLO = new Observer(59.91, 10.75, Instant.parse("2026-10-25T12:00:00Z"));
 
     /** The civil instant, to the millisecond, whose TT reading is the exclusive end. */
     private static Instant civilEnd() {
-        double end = SERVICE.moonsEndJdTdb();
+        double end = mars().moonsEndJdTdb();
         long lo = Instant.parse("2049-12-31T23:50:00Z").toEpochMilli();
         long hi = Instant.parse("2050-01-01T00:00:00Z").toEpochMilli();
-        assertTrue(SERVICE.timeScales().tt(Instant.ofEpochMilli(lo)).jdTt() < end);
-        assertTrue(SERVICE.timeScales().tt(Instant.ofEpochMilli(hi)).jdTt() >= end);
+        assertTrue(mars().timeScales().tt(Instant.ofEpochMilli(lo)).jdTt() < end);
+        assertTrue(mars().timeScales().tt(Instant.ofEpochMilli(hi)).jdTt() >= end);
         while (hi - lo > 1) {
             long mid = (lo + hi) / 2;
-            if (SERVICE.timeScales().tt(Instant.ofEpochMilli(mid)).jdTt() < end) {
+            if (mars().timeScales().tt(Instant.ofEpochMilli(mid)).jdTt() < end) {
                 lo = mid;
             } else {
                 hi = mid;
@@ -48,46 +48,46 @@ class MarsBoundaryTest {
         assertTrue(end.isBefore(Instant.parse("2050-01-01T00:00:00Z")),
                 "the last civil seconds of 2049 already lie past the TDB boundary: " + end);
         Instant justBefore = end.minusSeconds(1);
-        assertTrue(SERVICE.moonsAnswerAt(justBefore));
-        assertEquals(2, SERVICE.observeMoons(OSLO.at(justBefore)).moons().size());
-        assertFalse(SERVICE.moonsAnswerAt(end));
+        assertTrue(mars().moonsAnswerAt(justBefore));
+        assertEquals(2, mars().observeMoons(OSLO.at(justBefore)).moons().size());
+        assertFalse(mars().moonsAnswerAt(end));
         IllegalArgumentException refused = assertThrows(IllegalArgumentException.class,
-                () -> SERVICE.observeMoons(OSLO.at(end)));
+                () -> mars().observeMoons(OSLO.at(end)));
         assertTrue(refused.getMessage().contains("2000 to 2049"), refused.getMessage());
-        assertThrows(IllegalArgumentException.class, () -> SERVICE.observeMoonsGeocentric(end));
+        assertThrows(IllegalArgumentException.class, () -> mars().observeMoonsGeocentric(end));
         assertThrows(IllegalArgumentException.class,
-                () -> SERVICE.observeMoons(OSLO.at(Instant.parse("2050-06-01T00:00:00Z"))));
+                () -> mars().observeMoons(OSLO.at(Instant.parse("2050-06-01T00:00:00Z"))));
     }
 
     @Test
     void theKernelsFinalInstantIsNeverEvaluated() {
-        double endEt = (SERVICE.moonsEndJdTdb() - 2451545.0) * 86400.0;
-        assertThrows(IllegalArgumentException.class, () -> SERVICE.configurationAtEt(endEt),
+        double endEt = (mars().moonsEndJdTdb() - 2451545.0) * 86400.0;
+        assertThrows(IllegalArgumentException.class, () -> mars().configurationAtEt(endEt),
                 "the exclusive end itself is refused before any kernel is read");
-        assertEquals(2, SERVICE.configurationAtEt(endEt - 1.0).moons().size());
+        assertEquals(2, mars().configurationAtEt(endEt - 1.0).moons().size());
     }
 
     @Test
     void theStartIsTheFirstCivilDayOf2000() {
-        assertFalse(SERVICE.moonsAnswerAt(Instant.parse("1999-12-31T23:59:59Z")));
+        assertFalse(mars().moonsAnswerAt(Instant.parse("1999-12-31T23:59:59Z")));
         assertThrows(IllegalArgumentException.class,
-                () -> SERVICE.observeMoons(OSLO.at(Instant.parse("1999-12-31T23:59:59Z"))));
-        assertTrue(SERVICE.moonsAnswerAt(Instant.parse("2000-01-01T00:00:00Z")));
-        assertEquals(2, SERVICE.observeMoons(OSLO.at(Instant.parse("2000-01-01T00:00:00Z"))).moons().size());
+                () -> mars().observeMoons(OSLO.at(Instant.parse("1999-12-31T23:59:59Z"))));
+        assertTrue(mars().moonsAnswerAt(Instant.parse("2000-01-01T00:00:00Z")));
+        assertEquals(2, mars().observeMoons(OSLO.at(Instant.parse("2000-01-01T00:00:00Z"))).moons().size());
     }
 
     @Test
     void marsItselfAnswersOnBothSidesOfTheMoonsYears() {
         for (String when : new String[] {"1900-01-01T00:00:00Z", "1999-12-31T23:59:59Z",
                 "2050-06-01T00:00:00Z", "2100-12-31T23:59:59Z"}) {
-            assertTrue(SERVICE.observe(OSLO.at(Instant.parse(when))).distanceKm() > 0.0, when);
+            assertTrue(mars().observe(OSLO.at(Instant.parse(when))).distanceKm() > 0.0, when);
         }
         assertThrows(IllegalArgumentException.class,
-                () -> SERVICE.observe(OSLO.at(Instant.parse("2101-01-01T00:00:00Z"))));
+                () -> mars().observe(OSLO.at(Instant.parse("2101-01-01T00:00:00Z"))));
         assertThrows(IllegalArgumentException.class,
-                () -> SERVICE.observe(OSLO.at(Instant.parse("1899-12-31T23:59:59Z"))));
-        assertEquals(MarsService.MARS_FIRST_DAY, SERVICE.firstDay());
-        assertEquals(MarsService.MARS_LAST_DAY, SERVICE.lastDay());
+                () -> mars().observe(OSLO.at(Instant.parse("1899-12-31T23:59:59Z"))));
+        assertEquals(MarsService.MARS_FIRST_DAY, mars().firstDay());
+        assertEquals(MarsService.MARS_LAST_DAY, mars().lastDay());
         assertEquals(LocalDate.of(2000, 1, 1), MarsService.MOONS_FIRST_DAY);
         assertEquals(MarsSystemPack.load().moonsLastYear(), MarsService.MOONS_LAST_YEAR);
         assertEquals(MarsSystemPack.load().moonsFirstDay(), MarsService.MOONS_FIRST_DAY);
