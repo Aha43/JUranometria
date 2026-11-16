@@ -51,7 +51,8 @@ public final class ViewReport {
             List<String> workingSet, String workingLead,
             String osName, String osVersion, String osArch,
             String javaVersion, List<String> furniture, String pointerDrag,
-            int figureEndpointsBelowLimit) {
+            int figureEndpointsBelowLimit,
+            EclipticNotation eclipticNotation) {
 
         public Snapshot {
             emphasis = emphasis == null ? Set.of() : Set.copyOf(emphasis);
@@ -86,7 +87,7 @@ public final class ViewReport {
                     chosen, drawn, interfaceLanguage, skyLanguageChosen,
                     skyLanguageOnChart, emphasis, modules, placeAndTime,
                     eclipticShowing, selection, workingSet, workingLead, osName,
-                    osVersion, osArch, javaVersion, furniture, null, 0);
+                    osVersion, osArch, javaVersion, furniture, null, 0, null);
         }
 
         /** The same state with the pointer drag's mode, by its token (#691). */
@@ -97,7 +98,7 @@ public final class ViewReport {
                     skyLanguageChosen, skyLanguageOnChart, emphasis, modules,
                     placeAndTime, eclipticShowing, selection, workingSet,
                     workingLead, osName, osVersion, osArch, javaVersion,
-                    furniture, mode, figureEndpointsBelowLimit);
+                    furniture, mode, figureEndpointsBelowLimit, eclipticNotation);
         }
 
         /** The same state with its count of figure endpoints the limit hides (#571). */
@@ -108,7 +109,18 @@ public final class ViewReport {
                     skyLanguageChosen, skyLanguageOnChart, emphasis, modules,
                     placeAndTime, eclipticShowing, selection, workingSet,
                     workingLead, osName, osVersion, osArch, javaVersion,
-                    furniture, pointerDrag, count);
+                    furniture, pointerDrag, count, eclipticNotation);
+        }
+
+        /** The same state with the ecliptic's two notations (#719), or without them. */
+        public Snapshot withEclipticNotation(EclipticNotation notation) {
+            return new Snapshot(version, view, chartWidthPx, chartHeightPx,
+                    pageWidthPx, pageHeightPx, pageOffsetXPx, pageOffsetYPx,
+                    displayScale, chosen, drawn, interfaceLanguage,
+                    skyLanguageChosen, skyLanguageOnChart, emphasis, modules,
+                    placeAndTime, eclipticShowing, selection, workingSet,
+                    workingLead, osName, osVersion, osArch, javaVersion,
+                    furniture, pointerDrag, figureEndpointsBelowLimit, notation);
         }
 
         /** A state with no module furniture drawn - every report before #259. */
@@ -135,6 +147,14 @@ public final class ViewReport {
                     eclipticShowing, selection, workingSet, workingLead, osName,
                     osVersion, osArch, javaVersion, List.of());
         }
+    }
+
+    /**
+     * The ecliptic's longitude scale and solar-longitude marker as the
+     * reader left their switches (#719) - present only while the
+     * ecliptic module is attached.
+     */
+    public record EclipticNotation(boolean scale, boolean marker) {
     }
 
     /**
@@ -229,7 +249,10 @@ public final class ViewReport {
                 // What the last paint drew (#259), as the page allocated it.
                 chart.renderedFurniture().stream()
                         .map(juranometria.ui.ChartComponent.DrawnFurniture::report)
-                        .toList());
+                        .toList())
+                .withEclipticNotation(eclipticShowing == null ? null
+                        : new EclipticNotation(ecliptic.scaleShowing(),
+                                ecliptic.solarMarkerShowing()));
     }
 
     /** The screen's own scale, or null where no screen supplies one. */
@@ -326,6 +349,12 @@ public final class ViewReport {
         }
         if (s.eclipticShowing() != null) {
             lines.add("ecliptic: " + onOff(s.eclipticShowing()));
+        }
+        // The two notations that ride the ecliptic (#719): each switch
+        // as the reader left it, whether or not the line is shown.
+        if (s.eclipticNotation() != null) {
+            lines.add("ecliptic-longitude-scale: " + onOff(s.eclipticNotation().scale()));
+            lines.add("solar-longitude-marker: " + onOff(s.eclipticNotation().marker()));
         }
         lines.add("selection: " + selection(s.selection()));
         lines.add("working-set: " + (s.workingSet().isEmpty() ? "none"

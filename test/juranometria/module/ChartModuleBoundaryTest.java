@@ -131,9 +131,14 @@ class ChartModuleBoundaryTest {
         // stands and what it states.
         // #716 (R-13) adds the radiant: a meteor shower's radiant at a moment,
         // a mark that is not a body and can be selected as an occurrence.
+        // #719 adds the longitude scale and the longitude marker: a circle,
+        // an origin and where the module's own landmarks stand; a marked
+        // value and the disc it stands clear of. The page alone decides the
+        // step, the strokes, the carets and every figure.
         java.util.List<String> vocabulary = java.util.List.of("GreatCircle",
                 "Point", "Path", "Region", "DirectionMark", "Tick", "Body",
-                "OblateBody", "RingedBody", "Satellite", "AltitudeReadout", "Radiant");
+                "OblateBody", "RingedBody", "Satellite", "AltitudeReadout", "Radiant",
+                "LongitudeScale", "LongitudeMarker");
         assertEquals(vocabulary,
                 java.util.Arrays.stream(OverlayContribution.class
                                 .getPermittedSubclasses())
@@ -142,7 +147,8 @@ class ChartModuleBoundaryTest {
                         .toList(),
                 "a great circle, a point, a path, a region, a direction mark, a"
                         + " tick, a body, an oblate body, a ringed body, a satellite, an altitude"
-                        + " readout and a radiant - the geometry"
+                        + " readout, a radiant, a longitude scale and a longitude marker"
+                        + " - the geometry"
                         + " a module may contribute, and nothing else");
     }
 

@@ -124,7 +124,8 @@ public final class WholeSkyComposition {
     public record Page(ChartComponent chart, ChartViewController controller,
                        WholeSkySession session, ChartModuleHost host,
                        MeridianModule meridian, OnThisPageModule onThisPage,
-                       PageText words, InterfaceText said, BufferedImage image) {
+                       PageText words, InterfaceText said, BufferedImage image,
+                       EclipticModule ecliptic, SolarSystemModule solar) {
     }
 
     private WholeSkyComposition() {
@@ -159,6 +160,9 @@ public final class WholeSkyComposition {
         Supplier<Observer> observer = () -> meridian.attached() ? meridian.observer() : null;
         SolarSystemModule solar = host.attach(new SolarSystemModule(observer,
                 services::solar, meridian::subduing));
+        // The solar-longitude marker (#719), wired as the application
+        // wires it: off until a study asks the ecliptic module for it.
+        solar.withSolarLongitudeMarker(ecliptic::solarMarkerDrawn);
         solar.withMars(services::mars);
         solar.withUranus(services::uranus);
         solar.withNeptune(services::neptune);
@@ -190,7 +194,7 @@ public final class WholeSkyComposition {
         session.enter();
         BufferedImage image = paintNow(chart, ask.widthPx(), ask.heightPx());
         return new Page(chart, controller, session, host, meridian, onThisPage, words,
-                said, image);
+                said, image, ecliptic, solar);
     }
 
     /** Paints the chart as it stands; on the event thread already. */

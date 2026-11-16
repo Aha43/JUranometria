@@ -189,6 +189,16 @@ everywhere), and one paragraph in *Meteor showers and their radiants* tying
 the solar longitude it already explains to the marker; both languages, by
 the prose route.
 
+## The ruling
+
+The owner ruled Q1 to Q12 as proposed on 2026-11-16, with
+clarifications. The ruling and what was built from it are in
+`docs/decisions/ecliptic-longitude.md`. Two points go beyond the
+proposals above: a very close page may hold no graduation, and no finer
+ruler is invented (Q3); and the whole-sky article also explains that a
+great circle such as the meridian may leave one side of the map and
+continue at the opposite edge (Q12).
+
 ## What this study is not
 
 The figure placements are the mock's estimate, made against pixels and not

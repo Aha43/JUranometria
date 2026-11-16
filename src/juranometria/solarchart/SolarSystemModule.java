@@ -441,6 +441,27 @@ public final class SolarSystemModule implements ChartModule {
         listener.accept(moonShowing);
     }
 
+    /** The solar-longitude marker's identity among this module's contributions (#719). */
+    public static final String SOLAR_LONGITUDE_MARKER = "solar-longitude-marker";
+
+    /** The line the marker rides: the ecliptic's own identity, by which the page inks it. */
+    public static final String MARKED_LINE = "ecliptic";
+
+    private BooleanSupplier solarLongitudeMarker = () -> false;
+
+    /**
+     * Whether the solar-longitude marker is drawn (#719): the ecliptic
+     * module's wish, read at every paint. The ecliptic has no date by
+     * decision, so the marker - a notation of the chart's time - is
+     * contributed here, where the instant is.
+     */
+    public void withSolarLongitudeMarker(BooleanSupplier drawn) {
+        if (drawn == null) {
+            throw new IllegalArgumentException("the marker is asked for, or is not");
+        }
+        this.solarLongitudeMarker = drawn;
+    }
+
     /** How many times the chart asked, for tests of pull-not-push. */
     public long timesAsked() {
         return contributions;
@@ -459,9 +480,10 @@ public final class SolarSystemModule implements ChartModule {
      */
     public List<OverlayContribution> contributedGeometry() {
         contributions++;
+        boolean marker = solarLongitudeMarker.getAsBoolean();
         if (!sunShowing && !moonShowing && !venusShowing && !mercuryShowing
                 && !(marsShowing && mars != null) && !(uranusShowing && uranus != null)
-                && !(neptuneShowing && neptune != null)) {
+                && !(neptuneShowing && neptune != null) && !marker) {
             return List.of();
         }
         Observer now = observer.get();
@@ -470,6 +492,28 @@ public final class SolarSystemModule implements ChartModule {
         }
         boolean horizon = horizonDrawn.getAsBoolean();
         List<OverlayContribution> offered = new ArrayList<>();
+        if (marker) {
+            // The solar longitude (#719, rulings 1, 2 and 6): the J2000
+            // longitude from the Earth's centre - the number the Sun's
+            // table and the meteor panel state, the same at every place -
+            // on the ecliptic itself, latitude zero, whether or not the
+            // Sun is shown. It carries the Sun's apparent diameter so the
+            // page's mark stands clear of the disc at every field.
+            // Outside the Sun's years nothing is offered.
+            try {
+                double longitude = service.get()
+                        .solarLongitudeJ2000Degrees(now.instant());
+                longitude = ((longitude % 360.0) + 360.0) % 360.0;
+                SunObservation sun = (SunObservation) service.get().observe(Body.SUN, now);
+                offered.add(new OverlayContribution.LongitudeMarker(
+                        SOLAR_LONGITUDE_MARKER, MARKED_LINE,
+                        juranometria.sky.Ecliptic.toEquatorial(longitude, 0.0),
+                        juranometria.sky.Ecliptic.POLE, longitude,
+                        sun.angularDiameterArcseconds(), InkRole.REFERENCE_LINE));
+            } catch (IllegalArgumentException outsideTheYears) {
+                // Nothing for this instant.
+            }
+        }
         if (sunShowing) {
             SunObservation sun = (SunObservation) service.get().observe(Body.SUN, now);
             offered.add(new OverlayContribution.Body(SUN, "Sun",

@@ -447,6 +447,21 @@ public final class ChartComponent extends JComponent {
                 words.altitudeTick(readout.get().altitudeDegrees()));
     }
 
+    /**
+     * The description, then the solar longitude the page marks (#719,
+     * ruling 10): the marker's value in the meteor panel's words,
+     * whenever the marker is on. The scale's strokes and figures are
+     * not spoken, as altitude ticks are not.
+     */
+    static String withSolarLongitude(String base, java.util.OptionalDouble marked,
+            juranometria.project.PageWords words) {
+        if (marked.isEmpty()) {
+            return base;
+        }
+        return base + ' ' + words.solarLongitudeSpoken(
+                words.solarLongitudeFigure(marked.getAsDouble()));
+    }
+
     /** The description, then each drawn body by its name on the page (#415). */
     static String withBodies(String base,
             java.util.List<ReferenceInk.BodyPlacement> bodies,
@@ -1367,9 +1382,10 @@ public final class ChartComponent extends JComponent {
             // A moon of Mars the page leaves undrawn is still given (#606,
             // R-3 and R-4 on #605): behind Mars, or too close to tell apart.
             getAccessibleContext().setAccessibleDescription(withPointerNote(describedBase = withFurniture(
-                    withUnseenMoons(withBodies(withReadout(withDirections(describe(scene),
-                            spokenDirections),
-                            readout, words), drawnBodies, words),
+                    withUnseenMoons(withBodies(withSolarLongitude(withReadout(withDirections(
+                            describe(scene), spokenDirections),
+                            readout, words), ReferenceInk.markedSolarLongitude(
+                                    overlays.collect()), words), drawnBodies, words),
                             ReferenceInk.unseenMoons(juranometria.project.DrawnPage.of(scene),
                                     overlays.collect()), words), drawnFurniture)));
             // One ring per selected drawn member (issue #261): the

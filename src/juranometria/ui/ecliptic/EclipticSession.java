@@ -36,6 +36,9 @@ public final class EclipticSession {
         private final EclipticStore store;
         private final List<Consumer<Boolean>> followers =
                 new CopyOnWriteArrayList<>();
+        /** The notations' boxes (#719): told with the followers, never counted as the control. */
+        private final List<Consumer<Boolean>> notations =
+                new CopyOnWriteArrayList<>();
 
         private Switch(EclipticModule module, EclipticStore store) {
             this.module = module;
@@ -52,6 +55,46 @@ public final class EclipticSession {
             module.showing(!module.showing());
             store.save(module.showing());
             tell();
+        }
+
+        /** Whether the longitude scale is asked for (#719). */
+        public boolean scaleShowing() {
+            return module.scaleShowing();
+        }
+
+        /** Sets the longitude scale, writes the choice down, and tells every follower. */
+        public void scale(boolean shown) {
+            module.scaleShowing(shown);
+            store.saveScale(shown);
+            tell();
+        }
+
+        /** Whether the solar-longitude marker is asked for (#719). */
+        public boolean solarMarkerShowing() {
+            return module.solarMarkerShowing();
+        }
+
+        /** Sets the solar-longitude marker, writes the choice down, and tells every follower. */
+        public void solarMarker(boolean shown) {
+            module.solarMarkerShowing(shown);
+            store.saveSolarMarker(shown);
+            tell();
+        }
+
+        /**
+         * Adds a control that follows all three states - the line, its
+         * scale and its marker - told at once and on every change of
+         * any of them (#719): a box that rides the ecliptic is enabled
+         * by the first and ticked by its own. Returns what cancels it.
+         */
+        public Runnable followAll(Runnable follower) {
+            if (follower == null) {
+                throw new IllegalArgumentException("a follower is a control");
+            }
+            Consumer<Boolean> each = showing -> follower.run();
+            notations.add(each);
+            follower.run();
+            return () -> notations.remove(each);
         }
 
         /**
@@ -88,12 +131,19 @@ public final class EclipticSession {
                                 + " to turn it off");
             }
             module.showing(store.shownOrDefault());
+            // The two notations that ride the line (#719): remembered
+            // beside it, off for a reader who never asked.
+            module.scaleShowing(store.scaleShown());
+            module.solarMarkerShowing(store.solarMarkerShown());
             tell();
         }
 
         private void tell() {
             boolean showing = module.showing();
             for (Consumer<Boolean> follower : followers) {
+                follower.accept(showing);
+            }
+            for (Consumer<Boolean> follower : notations) {
                 follower.accept(showing);
             }
         }

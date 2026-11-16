@@ -510,6 +510,9 @@ public final class JUranometriaMain {
                 juranometria.ui.solar.SunChartSession.begin(modules,
                         () -> meridian.attached() ? meridian.observer() : null,
                         solarSystem, meridian::subduing);
+        // The solar-longitude marker (#719): asked for on the ecliptic's
+        // switch, drawn by the module that has the chart's time.
+        sunOnChart.withSolarLongitudeMarker(ecliptic::solarMarkerDrawn);
         // The Sun's and the Moon's applied query and result (#458,
         // ruled on #457): one session per body, shared by its dialog
         // and the Controller's group, over Place and Time's observer

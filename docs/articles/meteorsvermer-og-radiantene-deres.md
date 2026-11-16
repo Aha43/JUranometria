@@ -123,6 +123,16 @@ til 24. aug. i kalenderen, sollengde 113.9° til 151.2°.* Det legger til at
 endene er kalenderens konvensjon, riktige til omtrent et døgn. En strøm
 har ingen kant; aktiviteten tiltar og avtar gradvis.
 
+Sollengden kan også ses på kartet. Når ekliptikken vises, setter
+*Sollengdemerke* i Kartvalg to små piler på ekliptikken ved Solens
+ekliptiske lengde på karttidspunktet, med tallet ved siden av: det
+samme tallet som panelet oppgir. *Lengdeskala* graderer linjen, slik at
+en aktivitetsperiode kan leses langs den som en strekning av
+ekliptikken, og merket ses gå inn i og ut av den når karttidspunktet
+endres.
+[Hele himmelen på ett tidspunkt](hele-himmelen-pa-ett-tidspunkt.md)
+forklarer begge.
+
 En radiant uten et tidspunkt er altså ingen posisjon. Atlaset oppgir
 aldri en slik: panelet, Inspektøren og den oppleste beskrivelsen gir
 alltid karttiden sammen med den.

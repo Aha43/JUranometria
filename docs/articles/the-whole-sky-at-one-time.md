@@ -143,6 +143,45 @@ direction the Sun travels through the year, increases to the left. It is
 said to hold *at centre* because that is where it was measured to hold;
 near the edges of an ellipse "left" is no longer a direction on the sky.
 
+## The ecliptic as a ruler
+
+The release that follows 6.6 lets the straight middle line be read.
+Under *Ecliptic* in Chart Options are two further switches, both off
+until you ask for them.
+
+**Longitude scale** graduates the ecliptic in degrees of ecliptic
+longitude: a short stroke every 10° and a longer one with its figure
+every 30°. The four diamonds already on the line, the two equinoxes and
+the two solstices, stand for 0°, 90°, 180° and 270°, so no stroke and no
+figure are drawn there. A figure that finds no clear room beside its
+stroke is left out; the stroke stays. Zero is never written as 360°.
+
+The longitudes are counted from the equinox of **J2000**, the frame the
+whole atlas is drawn in, and not from the equinox of the chart's own
+year. The two differ by about a third of a degree in these years, which
+is why the Sun at a March equinox stands just short of the diamond and
+not on it.
+
+The strokes are not evenly spaced on the page, and that is the map and
+not the sky. The projection keeps areas, not distances along the middle
+line: on the measured page two strokes 10° apart stand **55.5** pixels
+apart at the centre and **40.9** at the ends. Count strokes, not
+millimetres.
+
+**Solar longitude marker** puts two small filled carets on the ecliptic,
+one above the line and one below, pointing at the Sun's ecliptic
+longitude at the chart time, with the number beside them to one decimal.
+The carets mark a value of the chart time and not a thing in the sky, so
+they are drawn at full strength below the horizon as well, where the Sun
+itself is quieted; they stand wherever the Sun is, whether or not the
+Sun is shown, and they do not move when you change the place. Change the
+chart time by a day and they move about one degree along the line.
+
+On an ordinary chart the same two switches show the part of the scale
+that is on the page, with closer steps on closer fields: every 5° with a
+figure every 10° on fields from 24° down to 12°, and every degree with a
+figure every 5° at 8° and closer.
+
 ## What the grid tells you
 
 The grid on this page is still the equatorial one, right ascension and
@@ -253,6 +292,13 @@ to pole. It has to be cut somewhere, and what happens there is ruled:
   unbroken run from edge to edge. They are not the exact curves of the
   ordinary pages: on this one projection each is drawn through **1,440
   samples**, and its two ends are placed on the outline itself.
+- **A circle may leave one side and return at the other.** The meridian
+  shows it most plainly: it can run off one edge of the map and continue
+  from the opposite edge. Nothing is wrong with the line. The sphere has
+  been cut along the seam, and the two edges are the same half-circle of
+  sky. Nor does the map prefer one celestial pole: both are ordinary
+  points inside the ellipse, each as far from the middle line as the
+  other.
 - **A split constellation is named once.** A figure the seam divides is
   drawn in two parts, one at each edge, and its name stands on the part
   that holds more of its lines. On every measured page each of the

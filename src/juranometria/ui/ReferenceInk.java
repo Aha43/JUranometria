@@ -11,6 +11,7 @@ import java.awt.geom.Arc2D;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
+import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -420,6 +421,26 @@ public final class ReferenceInk {
                                     readout.altitudeDegrees(), true, InkRole.REFERENCE_LINE),
                             words, taken, reserved, discs, palette, emphasized,
                             GRADUATION / 2.0));
+            // The longitude notation (#719), last: the solar-longitude
+            // marker first, so that its figure gives way only to words
+            // already written - a landmark's among them - and the
+            // scale's figures give way to it; then the scale, its
+            // strokes always and each figure where it finds room.
+            for (OverlayRegistry.Owned owned : reference) {
+                if (owned.geometry()
+                        instanceof OverlayContribution.LongitudeMarker marker) {
+                    drawLongitudeMarker(g2, projection, mapping, paper, sky, bounded,
+                            marker, words, taken, reserved, discs, palette);
+                }
+            }
+            for (OverlayRegistry.Owned owned : reference) {
+                if (owned.geometry()
+                        instanceof OverlayContribution.LongitudeScale scale) {
+                    drawLongitudeScale(g2, page, mapping, paper, sky, bounded,
+                            scale, words, taken, reserved, discs, palette,
+                            emphasized, below);
+                }
+            }
             return laid.directions();
         } finally {
             g2.dispose();
@@ -500,6 +521,368 @@ public final class ReferenceInk {
         } finally {
             g.setClip(marksClip);
         }
+    }
+
+    // ---- the longitude notation (#719) -------------------------------
+
+    /** A figured stroke of the longitude scale, either side of the line. */
+    static final double LONGITUDE_MAJOR = 2.0 * GRADUATION;
+    /** The room between a longitude stroke or the marker and its figure. */
+    static final double LONGITUDE_FIGURE_GAP = 3.0;
+    /** The marker's carets: how near the line a tip comes with no disc to clear. */
+    static final double CARET_TIP = 6.0;
+    /** A caret's height from tip to base, and half its base. */
+    static final double CARET_HEIGHT = 7.0;
+    static final double CARET_HALF_BASE = 4.0;
+    /** How far a caret's tip stands clear of the Sun's drawn limb. */
+    static final double CARET_CLEAR_OF_DISC = 3.0;
+
+    /**
+     * How a page graduates a longitude scale (ruling 3 on #719): the
+     * step between strokes and between figures, by the page's field.
+     * Ten and thirty degrees on the whole sky and on fields wider than
+     * 24 degrees; five and ten from 24 degrees down to fields wider
+     * than 8; one and five at 8 degrees and closer. A very close page
+     * may hold no stroke at all, which the ruling accepts.
+     */
+    public record LongitudeCadence(double stepDegrees, double figureEveryDegrees) {
+
+        public static LongitudeCadence forField(double fieldWidthDegrees) {
+            if (fieldWidthDegrees > 24.0) {
+                return new LongitudeCadence(10.0, 30.0);
+            }
+            if (fieldWidthDegrees > 8.0) {
+                return new LongitudeCadence(5.0, 10.0);
+            }
+            return new LongitudeCadence(1.0, 5.0);
+        }
+
+        /** Whether the stroke at this count carries a figure. */
+        public boolean figured(double degrees) {
+            double n = degrees / figureEveryDegrees;
+            return Math.abs(n - Math.rint(n)) < 1e-9;
+        }
+    }
+
+    /** One stroke of a longitude scale as a page draws it. */
+    public record LongitudeStroke(double degrees, PixelPoint at, boolean figured) {
+    }
+
+    /**
+     * The strokes of a scale that stand on this page, in ascending
+     * count: every step of the page's cadence except where the module's
+     * own landmarks stand and except a stroke exactly on a whole-sky
+     * page's seam (ruling 4 on #719).
+     */
+    public static List<LongitudeStroke> longitudeStrokes(DrawnPage page,
+            OverlayContribution.LongitudeScale scale) {
+        Projection projection = page.projection();
+        ViewportMapping mapping = new ViewportMapping(page);
+        Rectangle2D paper = ChartRenderer.paperOf(page.scene());
+        java.awt.Shape sky = skyOf(mapping.regionFor(page.scene().viewport(), projection),
+                paper);
+        LongitudeCadence cadence = LongitudeCadence.forField(
+                page.scene().viewport().fieldWidthDegrees());
+        java.util.OptionalDouble seam = seamCount(projection, scale);
+        List<LongitudeStroke> strokes = new ArrayList<>();
+        long count = Math.round(360.0 / cadence.stepDegrees());
+        for (long k = 0; k < count; k++) {
+            double degrees = k * cadence.stepDegrees();
+            double landmarks = degrees / scale.landmarkEveryDegrees();
+            if (Math.abs(landmarks - Math.rint(landmarks)) < 1e-9) {
+                continue;
+            }
+            if (seam.isPresent() && Math.abs(turnBetween(degrees, seam.getAsDouble())) < 1e-6) {
+                continue;
+            }
+            PixelPoint at = projection.project(scale.at(degrees))
+                    .map(mapping::toPixel).orElse(null);
+            if (at == null || !sky.contains(at.x(), at.y())) {
+                continue;
+            }
+            strokes.add(new LongitudeStroke(degrees, at, cadence.figured(degrees)));
+        }
+        return List.copyOf(strokes);
+    }
+
+    /**
+     * The count at which a whole-sky page is cut, when the page is cut
+     * across this scale: the point of the circle opposite the page's
+     * centre. Empty on every other page.
+     */
+    private static java.util.OptionalDouble seamCount(Projection projection,
+            OverlayContribution.LongitudeScale scale) {
+        if (projection.wholeSphere().isEmpty()) {
+            return java.util.OptionalDouble.empty();
+        }
+        return java.util.OptionalDouble.of(
+                (projection.wholeSphere().get().centralLongitudeDegrees() + 180.0) % 360.0);
+    }
+
+    private static double turnBetween(double a, double b) {
+        double d = (a - b) % 360.0;
+        if (d > 180.0) {
+            d -= 360.0;
+        }
+        if (d < -180.0) {
+            d += 360.0;
+        }
+        return d;
+    }
+
+    /**
+     * The unit vector on the page that points from a point of a circle
+     * to its pole's side - across the line, towards its north - or null
+     * where the projection refuses the neighbourhood. A step towards
+     * the pole stays on the same side of a whole-sky seam, which a step
+     * along the circle does not.
+     */
+    private static double[] towardsThePole(Projection projection, ViewportMapping mapping,
+            juranometria.chart.SkyPosition at, juranometria.chart.SkyPosition pole,
+            PixelPoint pixel) {
+        double[] a = juranometria.sky.SkyFrame.toVector(at);
+        double[] p = juranometria.sky.SkyFrame.toVector(pole);
+        double c = Math.cos(Math.toRadians(0.05));
+        double sn = Math.sin(Math.toRadians(0.05));
+        PixelPoint north = projection.project(juranometria.sky.SkyFrame.toPosition(
+                new double[] {a[0] * c + p[0] * sn, a[1] * c + p[1] * sn,
+                        a[2] * c + p[2] * sn})).map(mapping::toPixel).orElse(null);
+        if (north == null) {
+            return null;
+        }
+        double dx = north.x() - pixel.x();
+        double dy = north.y() - pixel.y();
+        double length = Math.hypot(dx, dy);
+        if (length == 0.0) {
+            return null;
+        }
+        return new double[] {dx / length, dy / length};
+    }
+
+    /**
+     * A figure's box beside a mark on a line (ruling 5 on #719): centred
+     * on the normal, the line's north side first and then its south,
+     * wholly on the paper and the sky and clear of every word already
+     * written, the page's own reserved ink and every body's disc - or
+     * null. Nothing else on the page moves for it.
+     */
+    private static Rectangle2D longitudeFigureBox(PixelPoint at, double[] north,
+            double reach, double width, double height, int[] sides, Rectangle2D paper,
+            java.awt.Shape sky, List<Rectangle2D> taken, List<java.awt.Shape> reserved,
+            List<Shape> discs) {
+        for (int side : sides) {
+            double away = reach + LONGITUDE_FIGURE_GAP
+                    + 0.5 * (Math.abs(north[0]) * width + Math.abs(north[1]) * height);
+            double cx = at.x() + side * north[0] * away;
+            double cy = at.y() + side * north[1] * away;
+            Rectangle2D box = new Rectangle2D.Double(cx - width / 2.0, cy - height / 2.0,
+                    width, height);
+            if (paper.contains(box) && sky.contains(box) && clear(box, taken, reserved)
+                    && !touchesAny(box, discs)) {
+                return box;
+            }
+        }
+        return null;
+    }
+
+    private static void drawLongitudeScale(Graphics2D g, DrawnPage page,
+            ViewportMapping mapping, Rectangle2D paper, java.awt.Shape sky, boolean bounded,
+            OverlayContribution.LongitudeScale scale, juranometria.project.PageWords words,
+            List<Rectangle2D> taken, List<java.awt.Shape> reserved, List<Shape> discs,
+            juranometria.render.ChartPalette palette,
+            java.util.function.Predicate<juranometria.render.ChartStructure> emphasized,
+            juranometria.render.BelowHorizon below) {
+        Projection projection = page.projection();
+        juranometria.render.StructureStyle.Style style =
+                juranometria.render.ChartStructure.ofIdentity(scale.lineIdentity())
+                        .map(s -> juranometria.render.StructureStyle.resolve(palette, s,
+                                emphasized.test(s), palette.figureInk(), SOLID))
+                        .orElseGet(() -> new juranometria.render.StructureStyle.Style(
+                                palette.figureInk(), SOLID));
+        List<LongitudeStroke> strokes = longitudeStrokes(page, scale);
+        // Every stroke first, then the figures: a figure is placed
+        // against what is written, never against a stroke not yet drawn.
+        // Subdued with the line it rides, by where each stroke stands
+        // (ruling 8).
+        List<double[]> norths = new ArrayList<>();
+        for (LongitudeStroke stroke : strokes) {
+            juranometria.chart.SkyPosition at = scale.at(stroke.degrees());
+            double[] north = towardsThePole(projection, mapping, at, scale.pole(),
+                    stroke.at());
+            norths.add(north);
+            if (north == null) {
+                continue;
+            }
+            double half = stroke.figured() ? LONGITUDE_MAJOR : GRADUATION;
+            g.setColor(below.toneFor(below.below(at), palette.ground()).apply(style.color()));
+            g.setStroke(style.stroke());
+            g.draw(new Line2D.Double(stroke.at().x() - north[0] * half,
+                    stroke.at().y() - north[1] * half,
+                    stroke.at().x() + north[0] * half,
+                    stroke.at().y() + north[1] * half));
+        }
+        Shape marksClip = g.getClip();
+        if (bounded) {
+            g.setClip(paper);
+        }
+        try {
+            g.setFont(EquatorialGrid.GRID_LABEL_FONT);
+            FontMetrics metrics = g.getFontMetrics();
+            for (int i = 0; i < strokes.size(); i++) {
+                LongitudeStroke stroke = strokes.get(i);
+                double[] north = norths.get(i);
+                if (!stroke.figured() || north == null) {
+                    continue;
+                }
+                String figure = words.longitudeTick(stroke.degrees());
+                Rectangle2D box = longitudeFigureBox(stroke.at(), north, LONGITUDE_MAJOR,
+                        metrics.stringWidth(figure),
+                        metrics.getAscent() + metrics.getDescent(), new int[] {1, -1},
+                        paper, sky, taken, reserved, discs);
+                if (box == null) {
+                    continue;
+                }
+                taken.add(box);
+                g.setColor(below.toneFor(below.below(scale.at(stroke.degrees())),
+                        palette.ground()).apply(palette.gridLabelInk()));
+                g.drawString(figure, (float) box.getMinX(),
+                        (float) (box.getMaxY() - metrics.getDescent()));
+            }
+        } finally {
+            g.setClip(marksClip);
+        }
+    }
+
+    /** The solar-longitude marker as a page draws it, or empty off the page. */
+    public record LongitudeMarkerPlacement(double degrees, PixelPoint at, double tipPx,
+            Shape north, Shape south) {
+    }
+
+    /**
+     * Where a marker's two carets stand on this page: one either side
+     * of the line, each pointing at it, their tips three pixels clear
+     * of the disc the marker brackets and never nearer than
+     * {@link #CARET_TIP} (ruling 6 on #719). Empty off the page.
+     */
+    public static java.util.Optional<LongitudeMarkerPlacement> longitudeMarker(
+            DrawnPage page, OverlayContribution.LongitudeMarker marker) {
+        Projection projection = page.projection();
+        ViewportMapping mapping = new ViewportMapping(page);
+        Rectangle2D paper = ChartRenderer.paperOf(page.scene());
+        java.awt.Shape sky = skyOf(mapping.regionFor(page.scene().viewport(), projection),
+                paper);
+        PixelPoint at = projection.project(marker.at()).map(mapping::toPixel).orElse(null);
+        if (at == null || !sky.contains(at.x(), at.y())) {
+            return java.util.Optional.empty();
+        }
+        double[] north = towardsThePole(projection, mapping, marker.at(),
+                marker.alongPole(), at);
+        if (north == null) {
+            return java.util.Optional.empty();
+        }
+        double tip = Math.max(CARET_TIP, discRadiusPx(projection, mapping, marker, at)
+                + CARET_CLEAR_OF_DISC);
+        return java.util.Optional.of(new LongitudeMarkerPlacement(marker.degrees(), at, tip,
+                caret(at, north, 1, tip), caret(at, north, -1, tip)));
+    }
+
+    /** The radius, on this page, of the disc a marker stands clear of. */
+    private static double discRadiusPx(Projection projection, ViewportMapping mapping,
+            OverlayContribution.LongitudeMarker marker, PixelPoint at) {
+        double radius = Math.toRadians(marker.clearDiameterArcseconds() / 2.0 / 3600.0);
+        if (radius == 0.0) {
+            return 0.0;
+        }
+        double[] a = juranometria.sky.SkyFrame.toVector(marker.at());
+        double[] p = juranometria.sky.SkyFrame.toVector(marker.alongPole());
+        double c = Math.cos(radius);
+        double sn = Math.sin(radius);
+        PixelPoint limb = projection.project(juranometria.sky.SkyFrame.toPosition(
+                new double[] {a[0] * c + p[0] * sn, a[1] * c + p[1] * sn,
+                        a[2] * c + p[2] * sn})).map(mapping::toPixel).orElse(null);
+        return limb == null ? 0.0 : Math.hypot(limb.x() - at.x(), limb.y() - at.y());
+    }
+
+    private static Shape caret(PixelPoint at, double[] n, int side, double tip) {
+        double tx = -n[1];
+        double ty = n[0];
+        Path2D caret = new Path2D.Double();
+        caret.moveTo(at.x() + side * n[0] * tip, at.y() + side * n[1] * tip);
+        double bx = at.x() + side * n[0] * (tip + CARET_HEIGHT);
+        double by = at.y() + side * n[1] * (tip + CARET_HEIGHT);
+        caret.lineTo(bx + tx * CARET_HALF_BASE, by + ty * CARET_HALF_BASE);
+        caret.lineTo(bx - tx * CARET_HALF_BASE, by - ty * CARET_HALF_BASE);
+        caret.closePath();
+        return caret;
+    }
+
+    /**
+     * The marker (#719, rulings 6 to 8): two filled carets in text ink,
+     * never subdued - a notation of the chart's time, not an object in
+     * the observer's sky - and the bare figure beside them in the same
+     * ink, south of the line first so that it leaves the north side to
+     * the scale's figures, or not written. The carets always stand:
+     * where they meet a landmark both are drawn and the figure, placed
+     * against the landmark's word, is what gives way.
+     */
+    private static void drawLongitudeMarker(Graphics2D g, Projection projection,
+            ViewportMapping mapping, Rectangle2D paper, java.awt.Shape sky, boolean bounded,
+            OverlayContribution.LongitudeMarker marker, juranometria.project.PageWords words,
+            List<Rectangle2D> taken, List<java.awt.Shape> reserved, List<Shape> discs,
+            juranometria.render.ChartPalette palette) {
+        PixelPoint at = projection.project(marker.at()).map(mapping::toPixel).orElse(null);
+        if (at == null || !sky.contains(at.x(), at.y())) {
+            return;
+        }
+        double[] north = towardsThePole(projection, mapping, marker.at(),
+                marker.alongPole(), at);
+        if (north == null) {
+            return;
+        }
+        double tip = Math.max(CARET_TIP, discRadiusPx(projection, mapping, marker, at)
+                + CARET_CLEAR_OF_DISC);
+        Shape northCaret = caret(at, north, 1, tip);
+        Shape southCaret = caret(at, north, -1, tip);
+        g.setColor(palette.textInk());
+        g.fill(northCaret);
+        g.fill(southCaret);
+        Shape marksClip = g.getClip();
+        if (bounded) {
+            g.setClip(paper);
+        }
+        try {
+            g.setFont(EquatorialGrid.GRID_LABEL_FONT);
+            FontMetrics metrics = g.getFontMetrics();
+            String figure = words.solarLongitudeFigure(marker.degrees());
+            Rectangle2D box = longitudeFigureBox(at, north, tip + CARET_HEIGHT,
+                    metrics.stringWidth(figure), metrics.getAscent() + metrics.getDescent(),
+                    new int[] {-1, 1}, paper, sky, taken, reserved, discs);
+            if (box != null) {
+                taken.add(box);
+                g.drawString(figure, (float) box.getMinX(),
+                        (float) (box.getMaxY() - metrics.getDescent()));
+            }
+        } finally {
+            g.setClip(marksClip);
+        }
+        // The carets are ink a later figure keeps clear of.
+        taken.add(northCaret.getBounds2D());
+        taken.add(southCaret.getBounds2D());
+    }
+
+    /**
+     * The solar longitude a page marks, for a reader who cannot see the
+     * mark (#719, ruling 10): the marker's value whenever one is
+     * offered, on the page or off it.
+     */
+    public static java.util.OptionalDouble markedSolarLongitude(
+            List<OverlayRegistry.Owned> contributions) {
+        for (OverlayRegistry.Owned owned : contributions) {
+            if (owned.geometry() instanceof OverlayContribution.LongitudeMarker marker) {
+                return java.util.OptionalDouble.of(marker.degrees());
+            }
+        }
+        return java.util.OptionalDouble.empty();
     }
 
     /**

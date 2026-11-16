@@ -7,6 +7,28 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**The ecliptic can be read as a ruler, and the chart time marked on it
+(#719).** Two new switches stand beneath *Ecliptic* in Chart Options,
+both off until asked for and remembered between sessions. *Longitude
+scale* graduates the ecliptic in degrees of J2000 ecliptic longitude: a
+stroke every 10° and a figure every 30° on the whole sky and wide
+fields, every 5° and 10° on fields from 24° down to 12°, every degree
+and 5° at 8° and closer. The four equinox and solstice marks stand for
+0°, 90°, 180° and 270°; zero is never written as 360°; a figure that
+finds no room is left out and its stroke stays. *Solar longitude
+marker* puts two filled carets on the ecliptic at the Sun's J2000
+ecliptic longitude at the chart time, with the number beside them to
+one decimal - the solar longitude the Sun table and the meteor panel
+state. It follows the chart time and not the place, is drawn whether or
+not the Sun is shown, and keeps full ink below the horizon, where the
+scale is subdued with its line. Both are drawn with the ecliptic and
+hidden with it, are exported with the page, and select nothing; the
+spoken description states the marked value and the view report states
+both switches. The whole-sky and meteor-shower articles explain them in
+both languages. The study and the ruling are
+`docs/studies/ecliptic-longitude/` and
+`docs/decisions/ecliptic-longitude.md`.
+
 **The Norwegian licensing summary names Mars, Uranus and Neptune
 (#721).** The short summary in Help > About, read in Norwegian, went
 from the Saturn System straight to the meteor showers: the Mars,

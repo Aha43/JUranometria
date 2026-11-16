@@ -142,6 +142,44 @@ Solen vandrer gjennom året, øker mot venstre. Det sies å gjelde *i
 midten* fordi det er der det er målt å gjelde; nær kantene av en ellipse
 er «venstre» ikke lenger en retning på himmelen.
 
+## Ekliptikken som linjal
+
+Utgaven som følger etter 6.6 gjør den rette midtlinjen lesbar. Under
+*Ekliptikken* i Kartvalg står to brytere til, begge av til du ber om
+dem.
+
+**Lengdeskala** graderer ekliptikken i grader ekliptisk lengde: en kort
+strek for hver 10° og en lengre med tallet sitt for hver 30°. De fire
+rombene som allerede står på linjen, de to jevndøgnene og de to
+solvervene, står for 0°, 90°, 180° og 270°, så der tegnes verken strek
+eller tall. Et tall som ikke finner ledig plass ved streken sin,
+utelates; streken blir stående. Null skrives aldri som 360°.
+
+Lengdene telles fra jevndøgnspunktet for **J2000**, rammen hele atlaset
+er tegnet i, og ikke fra jevndøgnspunktet for kartets eget år. De to
+skiller seg med omtrent en tredels grad i disse årene, og derfor står
+Solen ved et vårjevndøgn like før romben og ikke på den.
+
+Strekene står ikke jevnt på siden, og det skyldes kartet og ikke
+himmelen. Projeksjonen bevarer arealer, ikke avstander langs
+midtlinjen: på den målte siden står to streker med 10° mellom seg
+**55.5** piksler fra hverandre i midten og **40.9** ved endene. Tell
+streker, ikke millimeter.
+
+**Sollengdemerke** setter to små fylte piler på ekliptikken, én over
+linjen og én under, som peker på Solens ekliptiske lengde på
+karttidspunktet, med tallet ved siden av med én desimal. Pilene merker
+en verdi for karttidspunktet og ikke noe på himmelen, så de tegnes med
+full styrke også under horisonten, der Solen selv er dempet; de står
+der Solen er, enten Solen vises eller ikke, og de flytter seg ikke når
+du bytter sted. Endre karttidspunktet med et døgn, og de flytter seg
+omtrent én grad langs linjen.
+
+På et vanlig kart viser de samme to bryterne den delen av skalaen som
+er på siden, med tettere trinn i trangere felt: hver 5° med tall for
+hver 10° i felt fra 24° ned til 12°, og hver grad med tall for hver 5°
+ved 8° og trangere.
+
 ## Hva rutenettet forteller
 
 Rutenettet på denne siden er fortsatt det ekvatoriale, rektascensjon og
@@ -253,6 +291,13 @@ pol. Et sted må den klippes, og det som skjer der, er avgjort:
   fra kant til kant. De er ikke de eksakte kurvene fra de vanlige
   sidene: i denne ene projeksjonen tegnes hver av dem gjennom **1 440
   punkter**, og de to endene legges på selve omrisset.
+- **En sirkel kan forlate den ene siden og komme tilbake på den andre.**
+  Meridianen viser det tydeligst: den kan gå ut av kartet ved den ene
+  kanten og fortsette fra den motsatte. Det er ikke noe galt med linjen.
+  Kulen er klippet langs sømmen, og de to kantene er den samme
+  halvsirkelen på himmelen. Kartet foretrekker heller ingen av himmelens
+  poler: begge er vanlige punkter inne i ellipsen, like langt fra
+  midtlinjen.
 - **Et delt stjernebilde får navnet sitt én gang.** En figur sømmen
   deler, tegnes i to deler, én ved hver kant, og navnet står på den
   delen som har mest av linjene. På hver målte side har hvert av de

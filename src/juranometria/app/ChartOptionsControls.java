@@ -40,6 +40,9 @@ public final class ChartOptionsControls {
 
     /** The Ecliptic box's name (#675), for tests and journeys to find. */
     public static final String ECLIPTIC_BOX = "eclipticBox";
+    /** The two boxes beneath it (#719), for tests and journeys to find. */
+    public static final String LONGITUDE_SCALE_BOX = "eclipticLongitudeScaleBox";
+    public static final String SOLAR_LONGITUDE_MARKER_BOX = "solarLongitudeMarkerBox";
     /** The Selected object box's component name (#692). */
     public static final String SELECTED_OBJECT_BOX = "selectedObjectBox";
 
@@ -51,6 +54,8 @@ public final class ChartOptionsControls {
     private final JButton restoreDefaults;
     private final ChartOptionsController.Subscription following;
     private final JCheckBox eclipticBox;
+    private final JCheckBox longitudeScaleBox;
+    private final JCheckBox solarLongitudeMarkerBox;
     private final Runnable eclipticFollowing;
     private final JCheckBox selectedObjectBox;
     private final Runnable selectedObjectFollowing;
@@ -182,6 +187,8 @@ public final class ChartOptionsControls {
         // The chart keyboard's letter is the registered one, so the
         // hover and the spoken description promise the right key.
         JCheckBox eclipticBox_ = null;
+        JCheckBox longitudeScaleBox_ = null;
+        JCheckBox solarLongitudeMarkerBox_ = null;
         Runnable eclipticFollowing_ = () -> { };
         if (ecliptic != null) {
             JCheckBox box = ChartOptionsDialog.checkBox(
@@ -198,7 +205,41 @@ public final class ChartOptionsControls {
             box.addActionListener(event -> ecliptic.toggle());
             eclipticFollowing_ = ecliptic.follow(box::setSelected);
             eclipticBox_ = box;
+            // The two notations that ride the ecliptic (#719, ruling 9):
+            // directly beneath it, no chart-keyboard letter, unavailable
+            // while the line is hidden and keeping what the reader chose.
+            JCheckBox scale = ChartOptionsDialog.checkBoxWithoutShortcut(
+                    said.say("chartoptions.longitudeScale.label"), 'g',
+                    ecliptic.scaleShowing(),
+                    said.say("chartoptions.longitudeScale.a11y"),
+                    said.say("chartoptions.longitudeScale.hover"),
+                    said.say("chartoptions.longitudeScale.explain"),
+                    LONGITUDE_SCALE_BOX);
+            JCheckBox marker = ChartOptionsDialog.checkBoxWithoutShortcut(
+                    said.say("chartoptions.solarLongitudeMarker.label"), 'm',
+                    ecliptic.solarMarkerShowing(),
+                    said.say("chartoptions.solarLongitudeMarker.a11y"),
+                    said.say("chartoptions.solarLongitudeMarker.hover"),
+                    said.say("chartoptions.solarLongitudeMarker.explain"),
+                    SOLAR_LONGITUDE_MARKER_BOX);
+            scale.addActionListener(event -> ecliptic.scale(scale.isSelected()));
+            marker.addActionListener(event -> ecliptic.solarMarker(marker.isSelected()));
+            Runnable line = eclipticFollowing_;
+            Runnable notations = ecliptic.followAll(() -> {
+                scale.setSelected(ecliptic.scaleShowing());
+                marker.setSelected(ecliptic.solarMarkerShowing());
+                scale.setEnabled(ecliptic.showing());
+                marker.setEnabled(ecliptic.showing());
+            });
+            eclipticFollowing_ = () -> {
+                line.run();
+                notations.run();
+            };
+            longitudeScaleBox_ = scale;
+            solarLongitudeMarkerBox_ = marker;
         }
+        longitudeScaleBox = longitudeScaleBox_;
+        solarLongitudeMarkerBox = solarLongitudeMarkerBox_;
         eclipticBox = eclipticBox_;
         eclipticFollowing = eclipticFollowing_;
         // The selected-object box (#692): like the ecliptic's, a switch of
@@ -292,7 +333,7 @@ public final class ChartOptionsControls {
                                 names))),
                 new Subject("chart", said.say("chartoptions.tab.chart"),
                         marked(ChartOptionsDialog.column(chartColumn(grid, eclipticBox,
-                                titleBlock, selectedObjectBox, magnitudeKey, blackSky)))));
+                                longitudeScaleBox, solarLongitudeMarkerBox, titleBlock, selectedObjectBox, magnitudeKey, blackSky)))));
 
         restoreDefaults = new JButton(said.say("chartoptions.defaults.label"));
         restoreDefaults.setMnemonic('R');
@@ -335,6 +376,16 @@ public final class ChartOptionsControls {
     /** The Ecliptic box (#675), or null when these controls were built without the switch. */
     public JCheckBox eclipticBox() {
         return eclipticBox;
+    }
+
+    /** The Longitude scale box (#719), or null when built without the ecliptic's switch. */
+    public JCheckBox longitudeScaleBox() {
+        return longitudeScaleBox;
+    }
+
+    /** The Solar longitude marker box (#719), or null when built without the ecliptic's switch. */
+    public JCheckBox solarLongitudeMarkerBox() {
+        return solarLongitudeMarkerBox;
     }
 
     /** The Ecliptic box inside a host's component tree, or null. */

@@ -329,6 +329,96 @@ public sealed interface OverlayContribution {
     }
 
     /**
+     * A scale of degrees along a great circle (issue #719): the circle
+     * by its pole, the point the count starts from, and the count
+     * increasing in the direction the pole crossed with that point
+     * gives. Nothing about which degrees are marked: the page chooses
+     * the step and which strokes carry a figure from its own field, as
+     * the ruling on #719 lays down, and writes the figures in its own
+     * words. {@code landmarkEveryDegrees} names the degrees the module
+     * already marks with landmarks of its own - no stroke and no figure
+     * stand there.
+     */
+    record LongitudeScale(String identity, String lineIdentity, SkyPosition pole,
+                          SkyPosition origin, double landmarkEveryDegrees, InkRole role)
+            implements OverlayContribution {
+
+        public LongitudeScale {
+            if (identity == null || identity.isBlank()) {
+                throw new IllegalArgumentException("a scale carries an identity of its own");
+            }
+            if (lineIdentity == null || lineIdentity.isBlank()) {
+                throw new IllegalArgumentException("a scale belongs to a named line: " + identity);
+            }
+            if (pole == null || origin == null) {
+                throw new IllegalArgumentException(
+                        "a scale is given by its circle's pole and its origin: " + identity);
+            }
+            if (!(landmarkEveryDegrees > 0.0 && landmarkEveryDegrees <= 360.0)) {
+                throw new IllegalArgumentException(
+                        "the landmarks' spacing is a part of the turn: " + landmarkEveryDegrees);
+            }
+            if (role == null) {
+                throw new IllegalArgumentException("a scale has an ink role: " + identity);
+            }
+        }
+
+        /** The point of the circle at a count of degrees from the origin. */
+        public SkyPosition at(double degrees) {
+            double[] p = juranometria.sky.SkyFrame.toVector(pole);
+            double[] a = juranometria.sky.SkyFrame.toVector(origin);
+            double[] t = new double[] {
+                    p[1] * a[2] - p[2] * a[1],
+                    p[2] * a[0] - p[0] * a[2],
+                    p[0] * a[1] - p[1] * a[0]};
+            double c = Math.cos(Math.toRadians(degrees));
+            double s = Math.sin(Math.toRadians(degrees));
+            return juranometria.sky.SkyFrame.toPosition(new double[] {
+                    a[0] * c + t[0] * s, a[1] * c + t[1] * s, a[2] * c + t[2] * s});
+        }
+    }
+
+    /**
+     * A marked value on a graduated line (issue #719): the solar
+     * longitude on the ecliptic. A notation of the chart's time and not
+     * an object in the observer's sky: the page draws it in full ink
+     * above and below the horizon, selects nothing by it, and writes
+     * {@code degrees} beside it in its own words. {@code
+     * clearDiameterArcseconds} is the disc the mark must stand clear
+     * of - the Sun's, whether or not the Sun is drawn - so the mark
+     * brackets the disc at every field.
+     */
+    record LongitudeMarker(String identity, String lineIdentity, SkyPosition at,
+                           SkyPosition alongPole, double degrees,
+                           double clearDiameterArcseconds, InkRole role)
+            implements OverlayContribution {
+
+        public LongitudeMarker {
+            if (identity == null || identity.isBlank()) {
+                throw new IllegalArgumentException("a marker carries an identity of its own");
+            }
+            if (lineIdentity == null || lineIdentity.isBlank()) {
+                throw new IllegalArgumentException("a marker belongs to a named line: " + identity);
+            }
+            if (at == null || alongPole == null) {
+                throw new IllegalArgumentException(
+                        "a marker is somewhere on a circle given by its pole: " + identity);
+            }
+            if (!(degrees >= 0.0 && degrees < 360.0)) {
+                throw new IllegalArgumentException(
+                        "a marked longitude is within the turn, 360 excluded: " + degrees);
+            }
+            if (!(clearDiameterArcseconds >= 0.0)) {
+                throw new IllegalArgumentException(
+                        "the disc to stand clear of has a size: " + clearDiameterArcseconds);
+            }
+            if (role == null) {
+                throw new IllegalArgumentException("a marker has an ink role: " + identity);
+            }
+        }
+    }
+
+    /**
      * A Solar System body drawn at its true angular size (Sprint 37,
      * issue #415, under the #414 ruling): the centre, the disc's
      * apparent diameter, whether it is below the observer's drawn

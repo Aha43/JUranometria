@@ -99,6 +99,31 @@ public final class PageText implements PageWords {
     }
 
     @Override
+    public String longitudeTick(double longitudeDegrees) {
+        // Whole degrees within the turn: a count that reaches 360 is
+        // written as 0 (ruling 4 on #719).
+        long whole = Math.floorMod(Math.round(longitudeDegrees), 360L);
+        return said.say(STEM + "longitude.tick", Long.toString(whole));
+    }
+
+    @Override
+    public String solarLongitudeFigure(double longitudeDegrees) {
+        // One decimal and a point in every language, as the meteor
+        // panel writes the same number; 359.96 is 0.0, never 360.0.
+        double tenths = Math.rint(longitudeDegrees * 10.0) / 10.0;
+        if (tenths >= 360.0) {
+            tenths -= 360.0;
+        }
+        return said.say(STEM + "solarLongitude.figure",
+                String.format(java.util.Locale.ROOT, "%.1f", tenths));
+    }
+
+    @Override
+    public String solarLongitudeSpoken(String figure) {
+        return said.say(STEM + "solarLongitude.spoken", figure);
+    }
+
+    @Override
     public String chartInstructions() {
         return said.say(STEM + "chart.explain");
     }
