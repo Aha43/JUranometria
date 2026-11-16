@@ -372,9 +372,9 @@ that merely passed would date the check rather than the decision.
 | `docs/studies/interface-language/about-en-2-notices-light.png` | `4e77229c21ad64603fe5c22e3f4d70f9824ebbceeaa199465fe06411bf808914` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/about-en-3-compact-dark.png` | `d457ac90572f1e29b5a0eba4e537256f3fa6760f8f00ef2010adb4bb309acdc7` | 2026-11-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/about-en-4-notices-dark.png` | `4d8cf2718f716a90b13eff01adacc8ac2494fc603d2b40bc78872b536d6f44ba` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/about-nb-NO-5-compact-light.png` | `1ff30e93104debab1b826266062377967f432c53060f320b6d3f7f32790fc778` | 2026-11-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/about-nb-NO-5-compact-light.png` | `d4fd7648f7135c2a685b92cd529cef868f5a5d2838621592699056c99740422e` | 2026-11-16 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/about-nb-NO-6-notices-light.png` | `9ba22416a2697ad4b5b6976d7564979a5b8447ede04c4ba3418a7b9fd8798738` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
-| `docs/studies/interface-language/about-nb-NO-7-compact-dark.png` | `ea6320ee0a5b66f83b0bbf656685fa58c96792ab189250d70748fde836ef7cdd` | 2026-11-15 | Mac OS X aarch64, Java 21.0.12.1 | various |
+| `docs/studies/interface-language/about-nb-NO-7-compact-dark.png` | `4b6b4c8db8e7032b391cc5acd92e8df9058df71765b954f2a2226b6922057e9e` | 2026-11-16 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/about-nb-NO-8-notices-dark.png` | `ea0c15fabba7c1e765ea4746cdc6a937e6e87a4937bc429bb6007773d2021d7f` | 2026-09-26 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/bookmarks-en-1-library.png` | `48bd413c9a543ba8013fa4b58b71f93a06dd049be951013fc5b142eb8e1c96a7` | 2026-11-03 | Mac OS X aarch64, Java 21.0.12.1 | various |
 | `docs/studies/interface-language/bookmarks-en-2-add.png` | `7cfb795138b32343657113a8f699deebb707e9bab96f02449ec89c7934135835` | 2026-11-03 | Mac OS X aarch64, Java 21.0.12.1 | various |

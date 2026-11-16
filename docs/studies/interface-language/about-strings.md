@@ -255,7 +255,7 @@ Toolbar icons from the Tabler icon set: MIT license.
 | shown | *(the application mark: decorative, no text, no spoken name)* |
 | shown | JUranometria 6.6.0 |
 | shown | Et rolig, interaktivt atlas for å lære himmelens geografi. |
-| shown | *(read-only document, 2124 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 3046 characters — printed in full below or listed by path)* |
 | shown | Merknader og lisenser... |
 | shown | Lukk |
 
@@ -288,7 +288,7 @@ Toolbar icons from the Tabler icon set: MIT license.
 | shown | *(the application mark: decorative, no text, no spoken name)* |
 | shown | JUranometria 6.6.0 |
 | shown | Et rolig, interaktivt atlas for å lære himmelens geografi. |
-| shown | *(read-only document, 2124 characters — printed in full below or listed by path)* |
+| shown | *(read-only document, 3046 characters — printed in full below or listed by path)* |
 | shown | Merknader og lisenser... |
 | shown | Lukk |
 
@@ -308,7 +308,7 @@ Toolbar icons from the Tabler icon set: MIT license.
 
 ### The compact licensing summary, in full
 
-Its own document (2124 characters), written in this language. Every licence identifier below is exact and untranslated.
+Its own document (3046 characters), written in this language. Every licence identifier below is exact and untranslated.
 
 ```
 Kode og dokumentasjon: MIT-lisens. Opphavsrett: JUranometria
@@ -340,13 +340,31 @@ IAU 2015-konstantene kopiert fra NAIFs planetkonstantkjerne.
 Planetefemeride: ett utdrag av NASA/JPLs DE440 per planet, endret
 av JUranometria etter NAIF-reglene for endrede SPICE-kjerner (ingen
 avgift eller lisens); IAU 2015-radiene kopiert fra NAIFs
-planetkonstantkjerne.
+planetkonstantkjerne og, for Mars, pol- og rotasjonsmodellen.
 
 Saturnsystemefemeride: to utdrag av NASA/JPLs SAT441 (med
 Saturns barysenter fra DE440), endret av JUranometria etter
 NAIF-reglene for endrede SPICE-kjerner (ingen avgift eller lisens);
 IAU 2015-konstantene kopiert fra NAIFs planetkonstantkjerne og fire
 ringradier sitert fra NASAs Planetary Data System Rings Node.
+
+Marssystemefemeride: ett utdrag av NASA/JPLs MAR099 for Phobos og
+Deimos, endret av JUranometria etter NAIF-reglene for endrede
+SPICE-kjerner (ingen avgift eller lisens); IAU 2015-radiene kopiert
+fra NAIFs planetkonstantkjerne.
+
+Uranussystemefemeride: to utdrag av NAIFs kjerne ura184_part-3,
+Uranus' barysenter fra NASA/JPL DE442 og Miranda, Ariel, Umbriel,
+Titania og Oberon fra URA182.21, endret av JUranometria etter
+NAIF-reglene for endrede SPICE-kjerner (ingen avgift eller lisens);
+IAU 2015-radiene og polen kopiert fra NAIFs planetkonstantkjerne.
+
+Neptunsystemefemeride: to utdrag av NAIFs kjerne nep098_part-1,
+Neptuns barysenter fra NASA/JPL DE442 og Triton og Nereid fra
+NEP098, endret av JUranometria etter NAIF-reglene for endrede
+SPICE-kjerner (ingen avgift eller lisens); IAU 2015-radiene og
+polen, med det periodiske leddet, kopiert fra NAIFs
+planetkonstantkjerne.
 
 Meteorsvermdata: en avledet tabell over ni årlige svermer fra IMO
 Meteor Shower Calendar 2027, brukt etter datapolitikken til

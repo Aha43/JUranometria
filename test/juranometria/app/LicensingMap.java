@@ -172,6 +172,80 @@ public final class LicensingMap {
         }
     }
 
+    /**
+     * Bodies a summary names that no language translates: where the
+     * English paragraph names one, the same paragraph of every other
+     * summary names it too.
+     */
+    public static final List<String> NAMED_BODIES = List.of("Mars",
+            "Phobos", "Deimos", "Miranda", "Ariel", "Umbriel", "Titania",
+            "Oberon", "Triton", "Nereid");
+
+    /**
+     * What a paragraph of the canonical summary names that is the
+     * same in every language: anything with a digit in it - a
+     * kernel, a catalogue, a licence version, a year - an
+     * abbreviation of three capitals or more, and a named body.
+     */
+    public static List<String> inventory(String paragraph) {
+        List<String> named = new java.util.ArrayList<>();
+        java.util.regex.Matcher m = java.util.regex.Pattern
+                .compile("[\\w-]*\\d[\\w.-]*|[A-Z]{3,}").matcher(paragraph);
+        while (m.find()) {
+            String token = m.group().replaceAll("[.-]+$", "");
+            if (!named.contains(token)) {
+                named.add(token);
+            }
+        }
+        for (String body : NAMED_BODIES) {
+            if (java.util.regex.Pattern.compile("\\b" + body + "\\b")
+                    .matcher(paragraph).find() && !named.contains(body)) {
+                named.add(body);
+            }
+        }
+        return named;
+    }
+
+    /**
+     * Holds a language's summary to the canonical one's inventory,
+     * paragraph for paragraph (#721).
+     *
+     * <p>The pairings above find seven source families by keyword,
+     * and "ephemeris" is satisfied by the first paragraph that says
+     * it. So three packs - Mars, Uranus and Neptune - each gained an
+     * English paragraph while the Norwegian summary went on passing
+     * without them. This is the check that was missing: the two
+     * summaries have the same paragraphs in the same order, and
+     * whatever a canonical paragraph names that no language
+     * translates - {@link #inventory} - the paragraph in the same
+     * place names too. A pack added to one summary alone fails here.
+     */
+    public static void assertSameInventory(String language, String summary,
+                                           String canonical) {
+        String[] theirs = summary.strip().split("\\n\\s*\\n");
+        String[] ours = canonical.strip().split("\\n\\s*\\n");
+        org.junit.jupiter.api.Assertions.assertEquals(ours.length,
+                theirs.length, language + ": the summary has "
+                        + theirs.length + " paragraphs and the canonical"
+                        + " English one " + ours.length + "; every source"
+                        + " the English names has a paragraph here, in"
+                        + " the same order");
+        for (int i = 0; i < ours.length; i++) {
+            String said = theirs[i].replaceAll("\\s+", " ");
+            for (String name : inventory(ours[i].replaceAll("\\s+", " "))) {
+                assertTrue(said.contains(name), language + ": paragraph "
+                        + (i + 1) + " must name " + name + ", as the"
+                        + " canonical paragraph does (\"" + firstWords(ours[i])
+                        + "...\"), and says: " + said);
+            }
+        }
+    }
+
+    private static String firstWords(String paragraph) {
+        String flat = paragraph.replaceAll("\\s+", " ");
+        return flat.length() <= 40 ? flat : flat.substring(0, 40);
+    }
+
     /** Every licence identifier, exactly as it is spelled. */
     public static List<String> identifiers() {
         return List.of("MIT", "CC BY-NC 3.0 IGO", "CC BY-SA 4.0",
