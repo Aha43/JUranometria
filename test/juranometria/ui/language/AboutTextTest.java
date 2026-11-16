@@ -46,6 +46,66 @@ class AboutTextTest {
     }
 
     /**
+     * Every pack the English summary names, each language's names too
+     * (#721): the same paragraphs in the same order, each naming the
+     * kernels, catalogues, licences and bodies its English twin does.
+     */
+    @Test
+    void everyShippedSummaryNamesWhatTheCanonicalOneNamesParagraphForParagraph()
+            throws Exception {
+        String canonical = AboutText.canonicalSummary();
+        List<String> shipped = summariesInTheSourceTree();
+        assertTrue(shipped.size() > 1, "the premise: a summary other than"
+                + " the English one is in the tree - " + shipped);
+        for (String tag : shipped) {
+            LicensingMap.assertSameInventory(tag, AboutText
+                    .in(InterfaceText.forLanguage(tag)).summary(), canonical);
+        }
+    }
+
+    /**
+     * The fault #721 found, and its neighbours, all refused: a
+     * summary missing a pack's paragraph, one that keeps the
+     * paragraph and drops a kernel's name, and one that drops a body.
+     */
+    @Test
+    void aSummaryMissingAPackAKernelOrABodyIsRefused() {
+        String canonical = AboutText.canonicalSummary();
+        String norwegian = AboutText
+                .in(InterfaceText.forLanguage("nb-NO")).summary();
+        LicensingMap.assertSameInventory("nb-NO", norwegian, canonical);
+
+        int mars = norwegian.indexOf("Marssystemefemeride");
+        int uranus = norwegian.indexOf("Uranussystemefemeride");
+        assertTrue(mars > 0 && uranus > mars, "the premise: the Norwegian"
+                + " summary has its Mars paragraph before its Uranus one");
+        String withoutMars = norwegian.substring(0, mars)
+                + norwegian.substring(uranus);
+        assertThrows(AssertionError.class, () -> LicensingMap
+                .assertSameInventory("nb-NO", withoutMars, canonical),
+                "a summary with no Mars System paragraph is refused");
+
+        assertTrue(norwegian.contains("URA182.21"));
+        assertThrows(AssertionError.class, () -> LicensingMap
+                .assertSameInventory("nb-NO",
+                        norwegian.replace("URA182.21", "URA182"), canonical),
+                "and one that names a different kernel");
+
+        assertTrue(norwegian.contains("Nereid"));
+        assertThrows(AssertionError.class, () -> LicensingMap
+                .assertSameInventory("nb-NO",
+                        norwegian.replace(" og Nereid", ""), canonical),
+                "and one that leaves a moon out");
+
+        assertTrue(norwegian.contains("og, for Mars,"));
+        assertThrows(AssertionError.class, () -> LicensingMap
+                .assertSameInventory("nb-NO", norwegian.replace(
+                        " og, for Mars, pol- og rotasjonsmodellen", ""),
+                        canonical),
+                "and one whose planets paragraph leaves Mars's model out");
+    }
+
+    /**
      * The consequence is a pinned sentence, not a shape.
      *
      * <p>Three fixtures, all run through the <em>same</em> contract

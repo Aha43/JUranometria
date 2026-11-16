@@ -7,6 +7,18 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**The Norwegian licensing summary names Mars, Uranus and Neptune
+(#721).** The short summary in Help > About, read in Norwegian, went
+from the Saturn System straight to the meteor showers: the Mars,
+Uranus and Neptune System ephemerides each had a paragraph in English
+and none in Norwegian, and the planets paragraph did not mention
+Mars's pole and rotation model. All four are now there. The full
+notices behind *Notices and licences...* were complete in both
+languages all along. A new test holds every summary to the English
+one paragraph for paragraph - the same kernels, catalogues, licences
+and bodies named in the same place - so the next pack cannot be added
+to one language alone.
+
 **The test suite reads each planetary service once (#708).** The whole
 suite runs in one process, and seventy-five test classes each read their
 own planetary service and kept it until the run ended: about 3.6 GB
