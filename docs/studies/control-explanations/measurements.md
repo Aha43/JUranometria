@@ -118,6 +118,8 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 | Chart Options | JCheckBox | Constellation names | The figure's name, drawn where the figure is. Shortcut: <prefix> then N. | The figure's name, drawn where the figure is. Switch it here or from the chart with <pr... | hovered |
 | Chart Options | JCheckBox | Equatorial coordinate grid | ICRS/J2000 right-ascension and declination grid lines with coordinate labels. Shortcut:... | ICRS/J2000 right-ascension and declination grid lines with coordinate labels. Switch it... | hovered |
 | Chart Options | JCheckBox | Ecliptic | The ecliptic and its equinox and solstice marks. Shortcut: <prefix> then I. | The ecliptic and its equinox and solstice marks. Switch it here or from the chart with ... | hovered |
+| Chart Options | JCheckBox | Longitude scale | Graduate the ecliptic in degrees of longitude from the J2000 equinox | Marks the ecliptic in degrees of J2000 ecliptic longitude: every 10° with a figure ever... | hovered |
+| Chart Options | JCheckBox | Solar longitude marker | Mark the Sun's ecliptic longitude at the chart time on the ecliptic | Two carets on the ecliptic at the Sun's J2000 ecliptic longitude at the chart time, wit... | hovered |
 | Chart Options | JCheckBox | Title block | The panel in the lower left stating the target, centre, frame, field width, limiting ma... | The panel in the lower left stating the target, centre, frame, field width, limiting ma... | hovered |
 | Chart Options | JCheckBox | Stellar-magnitude key | A key in the upper right showing the circle size the chart draws for three visual magni... | A key in the upper right showing the circle size the chart draws for three visual magni... | hovered |
 | Chart Options | JCheckBox | Black sky | White stars and restrained light ink on a black ground, instead of the white-paper char... | White stars and restrained light ink on a black ground, instead of the white-paper char... | hovered |
@@ -195,7 +197,7 @@ A control with no decision is listed as **UNDECIDED**. The gate fails on one.
 
 ## The audit
 
-**178 operable controls** across 22 surfaces: **112** hovered, **13** dynamic, **53** left to their own visible words, **0 undecided**.
+**180 operable controls** across 22 surfaces: **114** hovered, **13** dynamic, **53** left to their own visible words, **0 undecided**.
 
 **0** say the same words twice - a tooltip read back as a description. The seam refuses it, so this is zero or a finding.
 

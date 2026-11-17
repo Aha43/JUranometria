@@ -241,6 +241,14 @@ public final class EvidenceContractMain {
         // held as committed - it reproduces in CI and is registered.
         REPORT_MAINS.put("juranometria.tool.MeteorRadiantStudyMain",
                 "docs/studies/meteor-radiants/measurements.md");
+        // The ecliptic's longitude scale and the solar-longitude marker
+        // (#719): the study the owner's ruling was made from. Production
+        // pages with the graduation and the marker mocked over them by the
+        // study tool - the record of the proposal, not of the build, which
+        // docs/decisions/ecliptic-longitude.md describes. It reads the
+        // bundled packs and no raw source, so it reproduces in CI.
+        REPORT_MAINS.put("juranometria.tool.EclipticLongitudeStudyMain",
+                "docs/studies/ecliptic-longitude/measurements.md");
         // The Mercury pack study (#528) is not registered, as the Venus one is
         // not: both read the gitignored de440s.bsp and pck00011.tpc, which the CI
         // runner does not hold; `make mercury-pack-study` reproduces the report
@@ -508,6 +516,8 @@ public final class EvidenceContractMain {
                 "docs/studies/whole-sky/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.MeteorRadiantStudyMain",
                 "docs/studies/meteor-radiants/platform.md");
+        PLATFORM_REPORTS.put("juranometria.tool.EclipticLongitudeStudyMain",
+                "docs/studies/ecliptic-longitude/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.JupiterOnTheChartStudyMain",
                 "docs/studies/jupiter-on-the-chart/platform.md");
         PLATFORM_REPORTS.put("juranometria.tool.SolarSystemLabelsStudyMain",
@@ -726,6 +736,10 @@ public final class EvidenceContractMain {
             // pages with the selected shower's radiant drawn by the
             // production module.
             "juranometria.tool.MeteorRadiantStudyMain",
+            // The ecliptic's longitude scale and the solar-longitude
+            // marker, as studied (#719): production pages with the
+            // proposal mocked over them.
+            "juranometria.tool.EclipticLongitudeStudyMain",
             // Jupiter and the Galilean moons on the chart (issue #486):
             // production pages composed by the component with the Jovian
             // module attached.
