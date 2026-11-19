@@ -48,11 +48,21 @@ public final class EclipticModule implements ChartModule {
     /** The name this module's ink is owned under. */
     public static final String ID = "ecliptic";
 
+    /** The longitude scale's identity among this module's contributions (#719). */
+    public static final String SCALE = ID + "/longitude-scale";
+
+    /** The four landmarks stand a quarter turn apart; the scale leaves them their places. */
+    public static final double LANDMARK_EVERY_DEGREES = 90.0;
+
     /**
      * Hidden until a reader asks. The gate's released default, and
      * the reason installing the module changes no page.
      */
     private boolean showing;
+
+    /** The longitude scale and the solar-longitude marker (#719): off until asked for. */
+    private boolean scaleShowing;
+    private boolean solarMarkerShowing;
 
     private ChartServices services;
     private Runnable withdraw;
@@ -123,6 +133,54 @@ public final class EclipticModule implements ChartModule {
         }
     }
 
+    /** Whether the ecliptic carries its longitude scale (issue #719). */
+    public boolean scaleShowing() {
+        return scaleShowing;
+    }
+
+    /**
+     * Graduate the ecliptic in longitude, or stop (#719). Drawn with
+     * the ecliptic: a reader who hides the line hides its scale with
+     * it, and a scale asked for on a hidden line draws nothing until
+     * the line is shown. The module still has no date: the scale is
+     * J2000's, as the circle and its landmarks are.
+     */
+    public void scaleShowing(boolean showing) {
+        this.scaleShowing = showing;
+        if (services != null) {
+            services.redraw();
+        }
+    }
+
+    /**
+     * Whether the reader asks for the solar-longitude marker (#719).
+     *
+     * <p>A wish and nothing more. This module has no instant and so
+     * cannot say where the Sun is; the module that has the chart's time
+     * reads this wish and contributes the marker while the ecliptic is
+     * shown ({@link #solarMarkerDrawn}).
+     */
+    public boolean solarMarkerShowing() {
+        return solarMarkerShowing;
+    }
+
+    /** Ask for the solar-longitude marker, or stop asking (#719). */
+    public void solarMarkerShowing(boolean showing) {
+        this.solarMarkerShowing = showing;
+        if (services != null) {
+            services.redraw();
+        }
+    }
+
+    /**
+     * Whether the marker is to be drawn now: asked for, on an ecliptic
+     * that is attached and shown. The marker rides the line as the
+     * scale does.
+     */
+    public boolean solarMarkerDrawn() {
+        return services != null && showing && solarMarkerShowing;
+    }
+
     /**
      * How many times this module has built its geometry.
      *
@@ -158,6 +216,15 @@ public final class EclipticModule implements ChartModule {
         offered.add(new OverlayContribution.GreatCircle(ID, "Ecliptic",
                 Ecliptic.POLE, OverlayContribution.Reference.PERMANENT,
                 InkRole.REFERENCE_LINE));
+        if (scaleShowing) {
+            // The scale rides the line (#719): the circle, where the
+            // count starts and where this module's own landmarks stand.
+            // Which degrees are stroked and figured is the page's, by
+            // its field.
+            offered.add(new OverlayContribution.LongitudeScale(
+                    SCALE, ID, Ecliptic.POLE, Ecliptic.toEquatorial(0.0, 0.0),
+                    LANDMARK_EVERY_DEGREES, InkRole.REFERENCE_LINE));
+        }
         for (Ecliptic.Landmark landmark : Ecliptic.landmarks()) {
             // The landmark's own identity and its own reader-facing
             // name: the chart draws the word the model chose, and no

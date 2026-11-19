@@ -241,10 +241,10 @@ Whether a particular read happens on the event thread is control flow, which tex
 
 | class | the contract | files |
 |---|---|---|
-| deterministic-report | regenerates byte-for-byte on the same tree | 206 |
+| deterministic-report | regenerates byte-for-byte on the same tree | 209 |
 | byte-exact-fixture | committed data with provenance; never regenerated casually | 397 |
 | captured-evidence | an operating-system screenshot, digest-pinned; a re-capture is a provenance event | 13 |
-| renderer-drawn | byte-reproducible per machine; production ink, no widgets | 1053 |
+| renderer-drawn | byte-reproducible per machine; production ink, no widgets | 1085 |
 | widget-rendered-inspection | Swing painted offscreen; platform-rendered, reviewed by eye | 186 |
 | session-photograph | a packed window on a display; drifts between desktop sessions | 3 |
 

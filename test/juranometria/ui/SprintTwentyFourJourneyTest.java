@@ -179,6 +179,14 @@ class SprintTwentyFourJourneyTest {
                                         .equals(hidden.identity())),
                 "and the chart really does not draw it");
 
+        // What the reader's store holds before anything is marked,
+        // every key and value (#719): the marks below may change none
+        // of it.
+        java.util.prefs.Preferences store = java.util.prefs.Preferences
+                .userRoot().node("juranometria-sprint24-journey");
+        store.flush();
+        java.util.SortedMap<String, String> before = snapshot(store);
+
         // 3. Sorted and walked by keyboard alone.
         FocusedWindow.insistOnFocus(window, table);
         List<String> byDefault = viewOrder();
@@ -382,15 +390,22 @@ class SprintTwentyFourJourneyTest {
         // 10. A new session begins with nothing marked, because
         //     there was nowhere for a mark to be kept.
         assertTrue(new WorkingSelection().members().isEmpty());
-        java.util.prefs.Preferences store = java.util.prefs.Preferences
-                .userRoot().node("juranometria-sprint24-journey");
         store.flush();
-        for (String key : store.keys()) {
-            assertFalse(key.toLowerCase(java.util.Locale.ROOT)
-                            .contains("mark"),
-                    "no working mark reached the reader's preferences: "
-                            + key);
+        assertEquals(before, snapshot(store),
+                "marking, replacing and clearing left the reader's"
+                        + " preferences exactly as they were, key for"
+                        + " key and value for value");
+    }
+
+    /** Every key of a node with its value, in key order. */
+    private static java.util.SortedMap<String, String> snapshot(
+            java.util.prefs.Preferences node)
+            throws java.util.prefs.BackingStoreException {
+        java.util.SortedMap<String, String> held = new java.util.TreeMap<>();
+        for (String key : node.keys()) {
+            held.put(key, node.get(key, null));
         }
+        return held;
     }
 
     // ----------------------------------------------------------------

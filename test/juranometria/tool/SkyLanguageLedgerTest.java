@@ -58,7 +58,11 @@ class SkyLanguageLedgerTest {
         // pack's root, name, two header lines and checksum prefix, the
         // module's registry name and the page-name key stem - 193, the
         // bound raised once for the road.
-        assertTrue(unresolved.size() < 200,
+        // #719 (the ecliptic's longitude scale and the solar-longitude
+        // marker) adds seven: two box names, two contribution identities,
+        // the marked line's identity and two preference keys - 200, so the
+        // bound is raised once, to 210.
+        assertTrue(unresolved.size() < 210,
                 "and the boundary stays small enough to read: "
                         + unresolved.size());
     }

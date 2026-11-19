@@ -287,4 +287,25 @@ public interface PageWords {
      * (#563): the figure is {@link #altitudeTick}'s, already a word.
      */
     String altitudeReadoutSpoken(String figure);
+
+    /**
+     * The figure written beside a figured stroke of the ecliptic's
+     * longitude scale (issue #719): whole degrees from the J2000
+     * equinox, zero never written as 360.
+     */
+    String longitudeTick(double longitudeDegrees);
+
+    /**
+     * The figure written beside the solar-longitude marker (#719): the
+     * bare number to one decimal, as the meteor panel states it, with
+     * no symbol and no word - the control, the speech and the panel
+     * say what the mark is.
+     */
+    String solarLongitudeFigure(double longitudeDegrees);
+
+    /**
+     * The spoken sentence for the solar-longitude marker (#719), in the
+     * meteor panel's words; the figure is {@link #solarLongitudeFigure}'s.
+     */
+    String solarLongitudeSpoken(String figure);
 }

@@ -285,6 +285,21 @@ class PageTextTest {
             public String altitudeReadoutSpoken(String figure) {
                 return "readout " + figure;
             }
+
+            @Override
+            public String longitudeTick(double longitudeDegrees) {
+                return EN.longitudeTick(longitudeDegrees);
+            }
+
+            @Override
+            public String solarLongitudeFigure(double longitudeDegrees) {
+                return EN.solarLongitudeFigure(longitudeDegrees);
+            }
+
+            @Override
+            public String solarLongitudeSpoken(String figure) {
+                return "solar longitude " + figure;
+            }
         };
 
         assertEquals("spherical Mercator",

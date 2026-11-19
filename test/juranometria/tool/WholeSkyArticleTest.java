@@ -51,6 +51,7 @@ class WholeSkyArticleTest {
     private static final String BUILT = "docs/studies/whole-sky/measurements.md";
     private static final String PLATFORM = "docs/studies/whole-sky/platform.md";
     private static final String STUDY = "docs/studies/all-sky/measurements.md";
+    private static final String RULER = "docs/studies/ecliptic-longitude/measurements.md";
     private static final String ENGLISH_WORDS = "src/resources/interface-language/en.properties";
     private static final String NORWEGIAN_WORDS = "src/resources/interface-language/nb-NO.properties";
 
@@ -87,7 +88,11 @@ class WholeSkyArticleTest {
             new String[] {"12.0", STUDY},
             new String[] {"16.8", STUDY},
             new String[] {"158", STUDY},
-            new String[] {"23.4", DECISION});
+            new String[] {"23.4", DECISION},
+            // The ecliptic as a ruler (#719): ten degrees at the centre of
+            // the page and at its ends, from the longitude study.
+            new String[] {"55.5", RULER},
+            new String[] {"40.9", RULER});
 
     /**
      * Each cited phrase: the report's words, then the English and the

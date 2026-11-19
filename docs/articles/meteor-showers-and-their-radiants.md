@@ -122,6 +122,15 @@ Jul 17 to Aug 24 in the calendar, solar longitude 113.9° to 151.2°.* It
 adds that the ends are the calendar's convention, known to about a day.
 A stream has no edge; activity fades in and fades out.
 
+The solar longitude can also be seen on the chart. With the ecliptic
+shown, *Solar longitude marker* in Chart Options puts two small carets
+on the ecliptic at the Sun's ecliptic longitude at the chart time, with
+the number beside them: the same number the panel states. *Longitude
+scale* graduates the line, so an activity period can be read along it
+as a stretch of the ecliptic and the marker seen entering and leaving
+it as the chart time is changed.
+[The whole sky at one time](the-whole-sky-at-one-time.md) explains both.
+
 So a radiant without a time is not a position. The atlas never states
 one: the panel, the Inspector and the spoken description always give the
 chart time with it.

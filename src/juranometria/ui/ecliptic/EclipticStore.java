@@ -72,6 +72,29 @@ public interface EclipticStore {
             @Override
             public void flush() {
             }
+
+            private boolean scale;
+            private boolean marker;
+
+            @Override
+            public boolean scaleShown() {
+                return scale;
+            }
+
+            @Override
+            public void saveScale(boolean shown) {
+                scale = shown;
+            }
+
+            @Override
+            public boolean solarMarkerShown() {
+                return marker;
+            }
+
+            @Override
+            public void saveSolarMarker(boolean shown) {
+                marker = shown;
+            }
         };
     }
 
@@ -80,6 +103,29 @@ public interface EclipticStore {
 
     /** Remembers this choice. */
     void save(boolean shown);
+
+    /**
+     * Whether the reader asked for the longitude scale (#719, ruling
+     * 9): off until asked for, and remembered beside the ecliptic's own
+     * choice. A store that keeps only the ecliptic answers false and
+     * forgets, which is the released page.
+     */
+    default boolean scaleShown() {
+        return false;
+    }
+
+    /** Remembers the longitude scale's choice (#719). */
+    default void saveScale(boolean shown) {
+    }
+
+    /** Whether the reader asked for the solar-longitude marker (#719): off until asked for. */
+    default boolean solarMarkerShown() {
+        return false;
+    }
+
+    /** Remembers the solar-longitude marker's choice (#719). */
+    default void saveSolarMarker(boolean shown) {
+    }
 
     /**
      * What to draw: the reader's choice if they made one, and the
@@ -137,6 +183,34 @@ public interface EclipticStore {
             @Override
             public void save(boolean shown) {
                 node.put(KEY, Boolean.toString(shown));
+            }
+
+            /**
+             * The two notations that ride the ecliptic (#719): each a
+             * key of its own, absent until chosen, and anything but
+             * "true" is off - the released page.
+             */
+            private static final String SCALE_KEY = "eclipticLongitudeScaleShown";
+            private static final String MARKER_KEY = "solarLongitudeMarkerShown";
+
+            @Override
+            public boolean scaleShown() {
+                return "true".equals(node.get(SCALE_KEY, null));
+            }
+
+            @Override
+            public void saveScale(boolean shown) {
+                node.put(SCALE_KEY, Boolean.toString(shown));
+            }
+
+            @Override
+            public boolean solarMarkerShown() {
+                return "true".equals(node.get(MARKER_KEY, null));
+            }
+
+            @Override
+            public void saveSolarMarker(boolean shown) {
+                node.put(MARKER_KEY, Boolean.toString(shown));
             }
 
             @Override

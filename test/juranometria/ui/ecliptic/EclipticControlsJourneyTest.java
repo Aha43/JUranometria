@@ -161,8 +161,18 @@ class EclipticControlsJourneyTest {
             }
         }
         assertEquals(java.util.List.of("Equatorial coordinate grid", "Ecliptic",
+                        "Longitude scale", "Solar longitude marker",
                         "Title block", "Stellar-magnitude key", "Black sky"), boxes,
-                "the Chart checklist, with the ecliptic after the grid");
+                "the Chart checklist, with the ecliptic after the grid and its"
+                        + " two notations directly beneath it (#719)");
+        // Both ride the line (ruling 9 on #719): unavailable while it is
+        // hidden, and off until asked for.
+        assertEquals(controls.eclipticBox().isSelected(),
+                controls.longitudeScaleBox().isEnabled());
+        assertEquals(controls.eclipticBox().isSelected(),
+                controls.solarLongitudeMarkerBox().isEnabled());
+        assertFalse(controls.longitudeScaleBox().isSelected());
+        assertFalse(controls.solarLongitudeMarkerBox().isSelected());
     }
 
     // ---- the routes a reader has --------------------------------------

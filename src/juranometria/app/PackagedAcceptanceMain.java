@@ -6206,6 +6206,15 @@ public final class PackagedAcceptanceMain {
                         + " that is present but not drawn");
 
         java.awt.image.BufferedImage unmarked = paint(chart);
+        // The reader's own preferences, every key and value, as they
+        // stand before anything is marked (#719). The promise is that
+        // working marks change none of them - not that no setting is
+        // ever named after a mark, which the solar-longitude marker's
+        // switch showed was never the same thing.
+        Preferences readers = Preferences.userRoot().node("juranometria");
+        readers.flush();
+        java.util.SortedMap<String, String> before =
+                preferenceSnapshot(readers);
         // Declared out here so the summary below can still say what
         // was measured, and assigned inside the guarded region.
         int added;
@@ -6246,13 +6255,13 @@ public final class PackagedAcceptanceMain {
         // A restart begins empty, because there is nowhere for a mark
         // to have been kept: the reader's stored options survive and
         // the working set does not.
-        Preferences node = Preferences.userRoot().node("juranometria");
-        node.flush();
-        for (String key : node.keys()) {
-            require(!key.toLowerCase(java.util.Locale.ROOT)
-                            .contains("mark"),
-                    "no working mark was written to preferences: " + key);
-        }
+        readers.flush();
+        java.util.SortedMap<String, String> after =
+                preferenceSnapshot(readers);
+        require(before.equals(after),
+                "marking, replacing and clearing left the reader's"
+                        + " preferences exactly as they were: "
+                        + preferenceDifference(before, after));
         } finally {
             host.detachAll();
         }
@@ -8557,6 +8566,41 @@ public final class PackagedAcceptanceMain {
         var out = new java.io.ByteArrayOutputStream();
         javax.imageio.ImageIO.write(image, "png", out);
         return out.toByteArray();
+    }
+
+    /**
+     * Every key of a preference node with its value, in key order: what
+     * a journey that must not touch the reader's settings is compared
+     * against.
+     */
+    private static java.util.SortedMap<String, String> preferenceSnapshot(
+            Preferences node) throws java.util.prefs.BackingStoreException {
+        java.util.SortedMap<String, String> held = new java.util.TreeMap<>();
+        for (String key : node.keys()) {
+            held.put(key, node.get(key, null));
+        }
+        return held;
+    }
+
+    /** What moved between two snapshots, by key; empty when nothing did. */
+    private static String preferenceDifference(
+            java.util.SortedMap<String, String> before,
+            java.util.SortedMap<String, String> after) {
+        java.util.List<String> moved = new java.util.ArrayList<>();
+        for (var entry : after.entrySet()) {
+            if (!before.containsKey(entry.getKey())) {
+                moved.add("added " + entry.getKey());
+            } else if (!java.util.Objects.equals(
+                    before.get(entry.getKey()), entry.getValue())) {
+                moved.add("changed " + entry.getKey());
+            }
+        }
+        for (String key : before.keySet()) {
+            if (!after.containsKey(key)) {
+                moved.add("removed " + key);
+            }
+        }
+        return String.join(", ", moved);
     }
 
     private static void require(boolean condition, String what) {
