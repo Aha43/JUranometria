@@ -539,6 +539,7 @@ public final class PackagedAcceptanceMain {
         readerJourney();
         onThisPageJourney();
         meridianJourney();
+        eclipticLongitudeJourney();
         emphasisJourney();
         emphasisThroughNavigation();
         allStarIdentities();
@@ -6152,6 +6153,353 @@ public final class PackagedAcceptanceMain {
                 + " withdrawn without touching it, and a second"
                 + " session opening with the reader's choice on the"
                 + " chart and on its tick)");
+    }
+
+    /**
+     * The ecliptic's longitude scale and the solar-longitude marker
+     * (#719), through the packaged application's own modules, switches
+     * and export, on a real chart, with the ink counted.
+     */
+    private static void eclipticLongitudeJourney() throws Exception {
+        juranometria.solar.SolarSystemService solar =
+                juranometria.solar.SolarSystemService.load();
+        // A December evening: the Sun's place is below Oslo's horizon,
+        // far from any landmark of the ecliptic.
+        java.time.Instant evening = java.time.Instant.parse("2027-12-14T20:00:00Z");
+        java.time.Instant[] now = {evening};
+        double longitude = solar.solarLongitudeJ2000Degrees(evening);
+        juranometria.chart.SkyPosition sunsPlace =
+                juranometria.sky.Ecliptic.toEquatorial(longitude, 0.0);
+
+        ChartViewController navigation = new ChartViewController();
+        navigation.recenter(sunsPlace, 24.0);
+        juranometria.ui.ChartComponent chart =
+                new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
+        chart.setSize(900, 700);
+        chart.setViewState(navigation.state());
+        navigation.onChange(chart::setViewState);
+        juranometria.chart.SelectionModel selection =
+                new juranometria.chart.SelectionModel();
+        juranometria.ui.ChartModuleHost host =
+                new juranometria.ui.ChartModuleHost(chart, selection, request -> { });
+        juranometria.ecliptic.EclipticModule ecliptic =
+                juranometria.ui.ecliptic.EclipticSession.begin(host);
+        // As JUranometriaMain wires it: the ecliptic module has no date,
+        // so the marker is the Solar System module's, on the ecliptic's
+        // wish. The Sun itself stays off throughout.
+        juranometria.solarchart.SolarSystemModule bodies =
+                new juranometria.solarchart.SolarSystemModule(
+                        () -> new juranometria.sky.Observer(59.913, 10.752, now[0]),
+                        () -> solar, () -> false);
+        bodies.withSolarLongitudeMarker(ecliptic::solarMarkerDrawn);
+        chart.overlays().offer(juranometria.solarchart.SolarSystemModule.ID,
+                bodies::contributedGeometry);
+
+        java.util.prefs.Preferences node = java.util.prefs.Preferences.userRoot()
+                .node("juranometria-packaged-ecliptic-longitude");
+        node.clear();
+        int strokes24;
+        int strokes8;
+        int strokesWhole;
+        int markerInk;
+        String figure = ENGLISH_PAGE.solarLongitudeFigure(longitude);
+        try {
+            juranometria.ui.ecliptic.EclipticStore store =
+                    juranometria.ui.ecliptic.EclipticStore.forNode(node);
+            require(!store.scaleShown() && !store.solarMarkerShown(),
+                    "a reader who has never chosen has neither notation");
+            juranometria.ui.ecliptic.EclipticSession.Switch chosen =
+                    juranometria.ui.ecliptic.EclipticSession.of(ecliptic, store);
+            ChartOptionsController options = new ChartOptionsController(
+                    ChartOptionsStore.forNode(node));
+            ChartOptionsControls controls = new ChartOptionsControls(options,
+                    () -> false, chosen,
+                    juranometria.ui.language.InterfaceText.forLanguage("en"));
+            javax.swing.JCheckBox line = controls.eclipticBox();
+            javax.swing.JCheckBox scale = controls.longitudeScaleBox();
+            javax.swing.JCheckBox marker = controls.solarLongitudeMarkerBox();
+            require(line != null && scale != null && marker != null,
+                    "Chart Options carries the Ecliptic box and its two notations");
+            chosen.restore();
+
+            // Hidden with the ecliptic: off, unavailable, and no ink.
+            java.awt.image.BufferedImage atlas = paint(chart);
+            require(!scale.isSelected() && !marker.isSelected()
+                            && !scale.isEnabled() && !marker.isEnabled(),
+                    "both notations begin off and unavailable while the"
+                            + " ecliptic is hidden");
+            require(longitudeNotations(chart).isEmpty(),
+                    "and nothing of either is offered to the page");
+
+            line.doClick();
+            java.awt.image.BufferedImage lineOnly = paint(chart);
+            require(scale.isEnabled() && marker.isEnabled()
+                            && !scale.isSelected() && !marker.isSelected(),
+                    "showing the ecliptic makes both available, still off");
+            require(differingPixels(atlas, lineOnly) > 100
+                            && longitudeNotations(chart).isEmpty(),
+                    "the line alone carries no graduation and no marker");
+
+            // The scale, on a 24 degree page: every 5 degrees, a figure
+            // every 10, and only the part this page holds.
+            scale.doClick();
+            java.awt.image.BufferedImage graduated = paint(chart);
+            juranometria.module.OverlayContribution.LongitudeScale offeredScale =
+                    longitudeNotations(chart).stream()
+                            .filter(juranometria.module.OverlayContribution
+                                    .LongitudeScale.class::isInstance)
+                            .map(juranometria.module.OverlayContribution
+                                    .LongitudeScale.class::cast)
+                            .findFirst().orElse(null);
+            require(offeredScale != null && longitudeNotations(chart).size() == 1,
+                    "the ecliptic module offers one scale and nothing else");
+            java.util.List<juranometria.ui.ReferenceInk.LongitudeStroke> on24 =
+                    juranometria.ui.ReferenceInk.longitudeStrokes(
+                            juranometria.project.DrawnPage.of(chart.currentScene()),
+                            offeredScale);
+            strokes24 = on24.size();
+            require(strokes24 >= 3 && on24.stream().allMatch(stroke ->
+                            stroke.degrees() % 5.0 == 0.0
+                                    && stroke.figured() == (stroke.degrees() % 10.0 == 0.0)
+                                    && Math.abs(stroke.degrees() - longitude) < 25.0),
+                    "a 24 degree page is graduated every 5 degrees with a"
+                            + " figure every 10, within the page: " + on24);
+            require(differingPixels(lineOnly, graduated) > 20,
+                    "and the graduation reaches the page");
+            for (juranometria.ui.ReferenceInk.LongitudeStroke stroke : on24) {
+                require(inkNear(graduated, lineOnly,
+                                (int) Math.round(stroke.at().x()),
+                                (int) Math.round(stroke.at().y()) + chart.pageOffsetY(), 7),
+                        "a stroke is drawn where the model puts "
+                                + stroke.degrees() + " degrees");
+            }
+
+            // The marker: the chart time's own geocentric J2000 solar
+            // longitude, with the Sun not shown.
+            marker.doClick();
+            java.awt.image.BufferedImage marked = paint(chart);
+            java.util.List<juranometria.module.OverlayContribution.LongitudeMarker>
+                    offeredMarkers = longitudeNotations(chart).stream()
+                            .filter(juranometria.module.OverlayContribution
+                                    .LongitudeMarker.class::isInstance)
+                            .map(juranometria.module.OverlayContribution
+                                    .LongitudeMarker.class::cast)
+                            .toList();
+            require(offeredMarkers.size() == 1
+                            && Math.abs(offeredMarkers.get(0).degrees() - longitude) < 1e-9,
+                    "one marker, at the service's solar longitude of the"
+                            + " chart time: " + offeredMarkers);
+            require(chart.renderedBodies().isEmpty(),
+                    "drawn although the Sun itself is not shown");
+            juranometria.ui.ReferenceInk.LongitudeMarkerPlacement placed =
+                    juranometria.ui.ReferenceInk.longitudeMarker(
+                            juranometria.project.DrawnPage.of(chart.currentScene()),
+                            offeredMarkers.get(0)).orElseThrow();
+            markerInk = differingPixels(graduated, marked);
+            require(markerInk > 20 && inkNear(marked, graduated,
+                            (int) Math.round(placed.north().getBounds2D().getCenterX()),
+                            (int) Math.round(placed.north().getBounds2D().getCenterY())
+                                    + chart.pageOffsetY(), 4)
+                            && inkNear(marked, graduated,
+                            (int) Math.round(placed.south().getBounds2D().getCenterX()),
+                            (int) Math.round(placed.south().getBounds2D().getCenterY())
+                                    + chart.pageOffsetY(), 4),
+                    "two carets either side of the line: " + markerInk + " px");
+            String spoken = chart.getAccessibleContext().getAccessibleDescription();
+            require(figure.matches("\\d{1,3}\\.\\d°") && spoken.contains(figure),
+                    "the marker's value is spoken to one decimal: " + figure
+                            + " in " + spoken);
+
+            // Chart time moves the marker; the place does not appear in it.
+            now[0] = evening.plus(java.time.Duration.ofDays(10));
+            chart.repaint();
+            double later = longitudeNotations(chart).stream()
+                    .filter(juranometria.module.OverlayContribution
+                            .LongitudeMarker.class::isInstance)
+                    .map(juranometria.module.OverlayContribution
+                            .LongitudeMarker.class::cast)
+                    .findFirst().orElseThrow().degrees();
+            require(later - longitude > 9.0 && later - longitude < 11.5
+                            && Math.abs(later - solar.solarLongitudeJ2000Degrees(now[0]))
+                                    < 1e-9,
+                    "ten days later the marker stands about ten degrees"
+                            + " on: " + longitude + " to " + later);
+            now[0] = evening;
+
+            // The export carries both through the ordinary route.
+            java.nio.file.Path with = java.nio.file.Files.createTempFile(
+                    "juranometria-acceptance-longitude-", ".png");
+            java.nio.file.Path without = java.nio.file.Files.createTempFile(
+                    "juranometria-acceptance-longitude-bare-", ".png");
+            try {
+                ExportSheet.Request request = new ExportSheet.Request(
+                        juranometria.sheet.SheetFormat.PNG,
+                        juranometria.sheet.PaperSize.A4, 150, false, false);
+                juranometria.chart.WorkingSelection none =
+                        new juranometria.chart.WorkingSelection();
+                juranometria.ui.language.InterfaceText english =
+                        juranometria.ui.language.InterfaceText.forLanguage("en");
+                require(ExportSheetSession.exportTo(with.toFile(), request, navigation,
+                                chart, options, none, existing -> true, english)
+                                instanceof ExportSheet.Outcome.Written,
+                        "the sheet with both notations is written");
+                scale.doClick();
+                marker.doClick();
+                paint(chart);
+                require(ExportSheetSession.exportTo(without.toFile(), request,
+                                navigation, chart, options, none, existing -> true,
+                                english) instanceof ExportSheet.Outcome.Written,
+                        "and the sheet without them");
+                java.awt.image.BufferedImage sheetWith =
+                        javax.imageio.ImageIO.read(with.toFile());
+                java.awt.image.BufferedImage sheetWithout =
+                        javax.imageio.ImageIO.read(without.toFile());
+                require(sheetWith.getWidth() == sheetWithout.getWidth()
+                                && differingPixels(sheetWithout, sheetWith) > 40,
+                        "the exported sheet carries the scale and the marker");
+                scale.doClick();
+                marker.doClick();
+            } finally {
+                java.nio.file.Files.deleteIfExists(with);
+                java.nio.file.Files.deleteIfExists(without);
+            }
+            require(differingPixels(marked, paint(chart)) == 0,
+                    "switched off and on again, the page is the same page");
+
+            // An 8 degree page: by the degree, a figure every 5, and
+            // the carets clear of where the Sun's disc would be.
+            navigation.recenter(sunsPlace, 8.0);
+            paint(chart);
+            juranometria.project.DrawnPage close =
+                    juranometria.project.DrawnPage.of(chart.currentScene());
+            java.util.List<juranometria.ui.ReferenceInk.LongitudeStroke> on8 =
+                    juranometria.ui.ReferenceInk.longitudeStrokes(close, offeredScale);
+            strokes8 = on8.size();
+            require(strokes8 >= 6 && on8.stream().allMatch(stroke ->
+                            stroke.figured() == (stroke.degrees() % 5.0 == 0.0)),
+                    "an 8 degree page is graduated by the degree with a"
+                            + " figure every 5: " + on8);
+            juranometria.ui.ReferenceInk.LongitudeMarkerPlacement closePlaced =
+                    juranometria.ui.ReferenceInk.longitudeMarker(close,
+                            offeredMarkers.get(0)).orElseThrow();
+            double discRadius = offeredMarkers.get(0).clearDiameterArcseconds()
+                    / 2.0 / 3600.0 * chart.currentScene().viewport().widthPx() / 8.0;
+            // Three pixels clear by the ruling; one allowed for rounding.
+            require(closePlaced.tipPx() >= discRadius + 2.0,
+                    "the carets stand clear of the Sun's limb: tip "
+                            + closePlaced.tipPx() + " px, disc radius " + discRadius);
+
+            // The whole sky: the full ruler, every 10 degrees but the
+            // four landmarks, zero never written as 360.
+            chart.setViewState(juranometria.chart.ChartViewState.wholeSky(
+                    juranometria.sky.Ecliptic.toEquatorial(55.0, 0.0), 5.0));
+            java.awt.image.BufferedImage whole = paint(chart);
+            java.util.List<juranometria.ui.ReferenceInk.LongitudeStroke> onWhole =
+                    juranometria.ui.ReferenceInk.longitudeStrokes(
+                            juranometria.project.DrawnPage.of(chart.currentScene()),
+                            offeredScale);
+            strokesWhole = onWhole.size();
+            require(strokesWhole == 32 && onWhole.stream().noneMatch(stroke ->
+                            stroke.degrees() % 90.0 == 0.0 || stroke.degrees() >= 360.0),
+                    "the whole sky carries thirty-two strokes, none at a"
+                            + " landmark and none called 360: " + onWhole);
+            require("0°".equals(ENGLISH_PAGE.longitudeTick(360.0)),
+                    "zero is written 0°");
+            scale.doClick();
+            marker.doClick();
+            require(differingPixels(whole, paint(chart)) > 100,
+                    "and both are ink on the whole-sky page");
+            scale.doClick();
+            marker.doClick();
+
+            // Hiding the ecliptic hides both without forgetting them.
+            navigation.recenter(sunsPlace, 24.0);
+            line.doClick();
+            require(!scale.isEnabled() && !marker.isEnabled()
+                            && longitudeNotations(chart).isEmpty()
+                            && differingPixels(atlas, paint(chart)) == 0,
+                    "with the ecliptic hidden both are unavailable and the"
+                            + " page is the atlas's again, pixel for pixel");
+            line.doClick();
+            require(scale.isSelected() && marker.isSelected()
+                            && differingPixels(marked, paint(chart)) == 0,
+                    "and shown again they return as they were");
+            store.flush();
+
+            // A second session, assembled again from the stored choice.
+            juranometria.ui.ecliptic.EclipticStore reopened =
+                    juranometria.ui.ecliptic.EclipticStore.forNode(node);
+            require(reopened.scaleShown() && reopened.solarMarkerShown(),
+                    "a fresh store reads both choices back");
+            juranometria.ui.ChartComponent next =
+                    new juranometria.ui.ChartComponent(Atlas.assembler(), ENGLISH_PAGE);
+            next.setSize(900, 700);
+            next.setViewState(navigation.state());
+            juranometria.ui.ChartModuleHost nextHost =
+                    new juranometria.ui.ChartModuleHost(next,
+                            new juranometria.chart.SelectionModel(), request -> { });
+            try {
+                juranometria.ecliptic.EclipticModule nextEcliptic =
+                        juranometria.ui.ecliptic.EclipticSession.begin(nextHost);
+                juranometria.solarchart.SolarSystemModule nextBodies =
+                        new juranometria.solarchart.SolarSystemModule(
+                                () -> new juranometria.sky.Observer(59.913, 10.752,
+                                        evening),
+                                () -> solar, () -> false);
+                nextBodies.withSolarLongitudeMarker(nextEcliptic::solarMarkerDrawn);
+                next.overlays().offer(juranometria.solarchart.SolarSystemModule.ID,
+                        nextBodies::contributedGeometry);
+                juranometria.ui.ecliptic.EclipticSession.Switch nextChosen =
+                        juranometria.ui.ecliptic.EclipticSession.of(nextEcliptic,
+                                reopened);
+                ChartOptionsControls nextControls = new ChartOptionsControls(
+                        new ChartOptionsController(ChartOptionsStore.forNode(node)),
+                        () -> false, nextChosen,
+                        juranometria.ui.language.InterfaceText.forLanguage("en"));
+                nextChosen.restore();
+                require(nextControls.longitudeScaleBox().isSelected()
+                                && nextControls.solarLongitudeMarkerBox().isSelected()
+                                && nextControls.eclipticBox().isSelected(),
+                        "the next session opens with all three ticks set");
+                require(differingPixels(marked, paint(next)) == 0,
+                        "and draws the page the first session left, pixel"
+                                + " for pixel");
+            } finally {
+                nextHost.detachAll();
+            }
+        } finally {
+            host.detachAll();
+            java.util.prefs.Preferences parent = node.parent();
+            node.removeNode();
+            parent.flush();
+        }
+
+        System.out.println("ecliptic longitude OK (both notations off and"
+                + " unavailable until the ecliptic shows; " + strokes24
+                + " strokes on a 24 degree page every 5 degrees, " + strokes8
+                + " on an 8 degree page by the degree, " + strokesWhole
+                + " on the whole sky with none at a landmark; the marker at "
+                + figure + " with the Sun not shown, " + markerInk
+                + " px, spoken, ten days moving it about ten degrees, clear"
+                + " of the limb on the close page; both on the exported"
+                + " sheet; hidden with the ecliptic and restored by a"
+                + " second session pixel for pixel)");
+    }
+
+    /** The longitude scale and marker the chart is offered now. */
+    private static java.util.List<juranometria.module.OverlayContribution>
+            longitudeNotations(juranometria.ui.ChartComponent chart) {
+        java.util.List<juranometria.module.OverlayContribution> found =
+                new java.util.ArrayList<>();
+        for (var owned : chart.overlays().collect()) {
+            if (owned.geometry() instanceof juranometria.module.OverlayContribution
+                    .LongitudeScale
+                    || owned.geometry() instanceof juranometria.module
+                            .OverlayContribution.LongitudeMarker) {
+                found.add(owned.geometry());
+            }
+        }
+        return found;
     }
 
     private static void onThisPageJourney() throws Exception {
