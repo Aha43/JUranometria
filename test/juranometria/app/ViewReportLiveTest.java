@@ -241,6 +241,31 @@ class ViewReportLiveTest {
     }
 
     @Test
+    void bothEclipticNotationsAreReportedFromTheirLiveSwitches() throws Exception {
+        // #719, ruling 10: the report states both switches, read from
+        // the ecliptic module at the moment the reader asks.
+        onLive(live -> {
+            assertTrue(live.report().contains("\necliptic: off\n"
+                            + "ecliptic-longitude-scale: off\n"
+                            + "solar-longitude-marker: off\n"),
+                    "both begin off, stated after the ecliptic's own line: "
+                            + live.report());
+            live.ecliptic().showing(true);
+            live.ecliptic().scaleShowing(true);
+            assertTrue(live.report().contains("\necliptic: on\n"
+                            + "ecliptic-longitude-scale: on\n"
+                            + "solar-longitude-marker: off\n"),
+                    "the scale alone: " + live.report());
+            live.ecliptic().solarMarkerShowing(true);
+            live.ecliptic().scaleShowing(false);
+            assertTrue(live.report().contains("\necliptic: on\n"
+                            + "ecliptic-longitude-scale: off\n"
+                            + "solar-longitude-marker: on\n"),
+                    "and the marker alone: " + live.report());
+        });
+    }
+
+    @Test
     void onlyTheAllowlistedMachineFactsAreEverAskedFor() throws Exception {
         onLive(live -> {
             List<String> asked = new ArrayList<>();
