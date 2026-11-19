@@ -7,6 +7,8 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [7.0.0] - 2026-11-19
+
 **The ecliptic can be read as a ruler, and the chart time marked on it
 (#719).** Two new switches stand beneath *Ecliptic* in Chart Options,
 both off until asked for and remembered between sessions. *Longitude

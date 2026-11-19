@@ -420,7 +420,11 @@ asked:
   byte. At 6.6.0 (6.5→6.6) the last digit moved once more: 99 pixels
   in each light image and 97 in each dark one, columns 222–231 of rows
   33–47; the ten sheet PNGs stayed pixel-identical and each of the ten
-  PDFs and SVGs differed by one byte.
+  PDFs and SVGs differed by one byte. At 7.0.0 (6.6→7.0, two digits as
+  at 6.0.0) both cells moved: 213 pixels in each light image and 212
+  in each dark one, columns 206–216 and 222–232 of rows 33–47, the dot
+  between them untouched; the ten sheet PNGs stayed pixel-identical
+  and each of the ten PDFs and SVGs differed by two bytes.
 - **The articles.** Their footer names the release, and
   `scripts/build-articles.py` reads it from `VERSION` when the site is
   built rather than carrying a number - so there is nothing to
