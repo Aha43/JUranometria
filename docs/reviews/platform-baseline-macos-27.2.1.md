@@ -254,3 +254,57 @@ owner's stored preferences were present and were left untouched.
    live, and an external display when one is at hand.
 
 #734, #735 and #736 are not started.
+
+## 9. Rulings of 2026-11-23, and the re-recording
+
+The owner ruled at the checkpoint:
+
+- **The baseline is accepted, within its recorded scope.** macOS 27.2.1
+  renders the committed material byte for byte as 27.0.1 did, and the
+  close-Saturn repair holds.
+- **F-1 is completed inside #737**, not as a product repair in #735: the
+  committed platform records are regenerated to name macOS 27.2.1.
+- **F-2 enters #735 and is linked to #282**, for both macOS
+  architectures, held by checks on the extracted published-form
+  archive. The claim is narrow: a valid signature seal. Not
+  notarization, and not Gatekeeper's behaviour for a quarantined
+  download.
+- **The owner's hands-on inspection** of the published application
+  (Controller, Place and Time, Export Sheet, whole sky with its ruler,
+  close Saturn) comes before #737 closes and is recorded separately
+  from this automated evidence (section 10, when given).
+- **The external display stays untested**, does not block #737, and is
+  carried to the later platform checkpoint.
+
+### What was re-recorded
+
+Fifty files, one kind of line. Records are in
+`~/juranometria-runs/runs/platform-737/C-rerecord`.
+
+| Files | How regenerated | Lines |
+|---|---|---|
+| 48 `platform.md` under `docs/studies/` | `make evidence-contracts-ci` on the study head, in place (`EVIDENCE CONTRACTS OK`, 1,205 s) | 51 |
+| `docs/studies/sky-language/placement.md` | the same run | 1 |
+| `docs/studies/interface-language/export-strings.md` | the export photographer's output from the interface gate run of section 3 (its two runs agree byte for byte) | 1 |
+
+- Every removed line is ``Recorded on: `Mac OS X 27.0.1/aarch64/Homebrew 21.0.12.1` `` and every added line is the same with `27.2.1`:
+  53 lines out, 53 in, nothing else. Forty-seven files change one line;
+  three carry the environment line twice and change two.
+- The regeneration of this section and the one left behind by section
+  3's portable run are the same patch, byte for byte: two independent
+  runs, one result.
+- No image, sheet, measurement, fixture or source file moved.
+- **Provenance did not need to move**: `make evidence-provenance` over
+  the re-recorded tree reports 1,085 promoted artifacts, 0 newly dated,
+  and leaves `docs/studies/PROVENANCE.md` unchanged. Platform records
+  are not promoted renderings.
+
+### What was deliberately not re-recorded
+
+Two `platform.md` files still name 27.0.1 and are right to:
+`docs/studies/all-sky/platform.md` (generator removed in #687) and
+`docs/studies/figure-anchors/platform.md` (superseded rule, #571). Both
+are marked historical and held as committed; no generator produces them
+on this machine, so nothing here was recorded on 27.2.1 and the line
+stays what it was. Neither is compared by a check that failed in
+section 3.

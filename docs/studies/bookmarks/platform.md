@@ -14,7 +14,7 @@ never across two - the portable half of this study is the document beside it.
 | Java | 21.0.12.1 |
 | headless | true |
 
-Recorded on: `Mac OS X 27.0.1/aarch64/Homebrew 21.0.12.1`
+Recorded on: `Mac OS X 27.2.1/aarch64/Homebrew 21.0.12.1`
 
 > **Platform observation.** The measurements below are this machine's:
 > ink counts, font extents and encoded sizes depend on the fonts and the
@@ -22,7 +22,7 @@ Recorded on: `Mac OS X 27.0.1/aarch64/Homebrew 21.0.12.1`
 > without anything being wrong. Held to reproducing here, never to matching
 > another machine's recording. What is portable - the schema, the round trips, the restoration matrix, the identities and the recovery walk - is in `measurements.md`. The sketches' pixel sizes depend on this desktop's fonts.
 >
-> Recorded on: `Mac OS X 27.0.1/aarch64/Homebrew 21.0.12.1`
+> Recorded on: `Mac OS X 27.2.1/aarch64/Homebrew 21.0.12.1`
 
 
 | sketch | width × height (px) |

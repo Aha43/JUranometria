@@ -14,7 +14,7 @@ never across two - the portable half of this study is the document beside it.
 | Java | 21.0.12.1 |
 | headless | true |
 
-Recorded on: `Mac OS X 27.0.1/aarch64/Homebrew 21.0.12.1`
+Recorded on: `Mac OS X 27.2.1/aarch64/Homebrew 21.0.12.1`
 
 What depends on this machine's fonts, from `make ecliptic-longitude-study`. Held to reproducing here, not pinned to bytes.
 
