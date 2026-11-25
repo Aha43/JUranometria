@@ -14,7 +14,7 @@ never across two - the portable half of this study is the document beside it.
 | Java | 21.0.12.1 |
 | headless | true |
 
-Recorded on: `Mac OS X 27.0.1/aarch64/Homebrew 21.0.12.1`
+Recorded on: `Mac OS X 27.2.1/aarch64/Homebrew 21.0.12.1`
 
 > **Platform observation.** The measurements below are this machine's:
 > ink counts, font extents and encoded sizes depend on the fonts and the
@@ -22,7 +22,7 @@ Recorded on: `Mac OS X 27.0.1/aarch64/Homebrew 21.0.12.1`
 > without anything being wrong. Held to reproducing here, never to matching
 > another machine's recording. What is portable - which ticks lie on each page, and that the bodies' placements and discs are untouched by the graduation - is in `measurements.md`.
 >
-> Recorded on: `Mac OS X 27.0.1/aarch64/Homebrew 21.0.12.1`
+> Recorded on: `Mac OS X 27.2.1/aarch64/Homebrew 21.0.12.1`
 
 | page | strokes inked | figures placed | max stroke deviation from the normal (px) |
 |---|---|---|---|

@@ -14,7 +14,7 @@ never across two - the portable half of this study is the document beside it.
 | Java | 21.0.12.1 |
 | headless | true |
 
-Recorded on: `Mac OS X 27.0.1/aarch64/Homebrew 21.0.12.1`
+Recorded on: `Mac OS X 27.2.1/aarch64/Homebrew 21.0.12.1`
 
 Whether the radiant's name found room on this machine's fonts, from `make meteor-radiant-study`. Held to reproducing here, not pinned to bytes.
 
